@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import QGroundControl.Palette
-import QGroundControl.ScreenTools
 
 TextField {
     id:                 control

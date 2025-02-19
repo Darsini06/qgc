@@ -14,6 +14,7 @@ qt_add_library(VehicleTest
         SendMavCommandWithSignallingTest.h
         VehicleLinkManagerTest.cc
         VehicleLinkManagerTest.h
+        ../../src/bluetooth_demo.h ../../src/bluetooth_demo.cpp
 )
 
 target_link_libraries(VehicleTest

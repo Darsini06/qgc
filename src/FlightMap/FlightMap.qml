@@ -79,8 +79,10 @@ Map {
             firstGCSPositionReceived = true
             //-- Only center on gsc if we have no vehicle (and we are supposed to do so)
             var _activeVehicleCoordinate = _activeVehicle ? _activeVehicle.coordinate : QtPositioning.coordinate()
-            if(QGroundControl.settingsManager.flyViewSettings.keepMapCenteredOnVehicle.rawValue || !_activeVehicleCoordinate.isValid)
+           // if(QGroundControl.settingsManager.flyViewSettings.keepMapCenteredOnVehicle.rawValue || !_activeVehicleCoordinate.isValid)
+            // Set current location and zoom
                 center = gcsPosition
+             zoomLevel = 15
         }
     }
 
@@ -108,6 +110,7 @@ Map {
     Connections {
         target: QGroundControl.settingsManager.flightMapSettings.mapType
         function onRawValueChanged() { updateActiveMapType() }
+
     }
 
     Connections {

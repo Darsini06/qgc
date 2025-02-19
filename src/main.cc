@@ -12,17 +12,21 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMessageBox>
 #include <QtQuick/QQuickWindow>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QDebug>
+#include <Bluetooth_class/bluetooth_class.h>
 
 #include "QGCApplication.h"
 #include "QGC.h"
 #include "AppMessages.h"
 
 #ifndef __mobile__
-    #include "RunGuard.h"
+#include "RunGuard.h"
 #endif
 
 #ifdef Q_OS_ANDROID
-    #include "AndroidInterface.h"
+#include "AndroidInterface.h"
 #endif
 
 #ifdef QT_DEBUG
@@ -57,7 +61,10 @@ int WindowsCrtReportHook(int reportType, char* message, int* returnValue)
 // To shut down QGC on Ctrl+C on Linux
 #ifdef Q_OS_LINUX
 
+#include <QGCPalette.h>
+#include <ScreenToolsController.h>
 #include <csignal>
+#include <unistd.h>
 
 void sigHandler(int s)
 {
@@ -82,6 +89,8 @@ void sigHandler(int s)
 
 int main(int argc, char *argv[])
 {
+  qDebug() << "Starting QGroundControl...";
+
 #ifndef __mobile__
     // We make the runguard key different for custom and non custom
     // builds, so they can be executed together in the same device.
@@ -94,8 +103,8 @@ int main(int argc, char *argv[])
         // QApplication is necessary to use QMessageBox
         QApplication errorApp(argc, argv);
         QMessageBox::critical(nullptr, QObject::tr("Error"),
-            QObject::tr("A second instance of %1 is already running. Please close the other instance and try again.").arg(QGC_APP_NAME)
-        );
+                              QObject::tr("A second instance of %1 is already running. Please close the other instance and try again.").arg(QGC_APP_NAME)
+                              );
         return -1;
     }
 #endif
@@ -105,10 +114,10 @@ int main(int argc, char *argv[])
     if (getuid() == 0) {
         QApplication errorApp(argc, argv);
         QMessageBox::critical(nullptr, QObject::tr("Error"),
-            QObject::tr("You are running %1 as root. "
-                "You should not do this since it will cause other issues with %1."
-                "%1 will now exit.<br/><br/>").arg(QGC_APP_NAME)
-        );
+                              QObject::tr("You are running %1 as root. "
+                                          "You should not do this since it will cause other issues with %1."
+                                          "%1 will now exit.<br/><br/>").arg(QGC_APP_NAME)
+                              );
         return -1;
     }
 #endif
@@ -195,13 +204,41 @@ int main(int argc, char *argv[])
 #endif // Q_OS_WIN
 #endif // QT_DEBUG
 
-    QGCApplication app(argc, argv, runUnitTests);
 
-    #ifdef Q_OS_LINUX
-        std::signal(SIGINT, sigHandler);
-        std::signal(SIGTERM, sigHandler);
-    #endif
 
+#ifdef Q_OS_LINUX
+    std::signal(SIGINT, sigHandler);
+    std::signal(SIGTERM, sigHandler);
+#endif
+
+    // --- Create the QGCApplication instance ---
+    QGCApplication app(argc, argv, /*runUnitTests*/ false);
+    // QQmlApplicationEngine engine;
+
+    //   qDebug() << "Initializing QML engine...";
+
+    // // Register QGCPalette as a QML type
+    // qmlRegisterType<QGCPalette>("QGroundControl.Palette", 1, 0, "QGCPalette");
+    // qmlRegisterType<ScreenToolsController>(
+    //     "QGroundControl.ScreenToolsController", 1, 0, "ScreenToolsController"
+    //     );
+
+    // // --- Create your own QML engine and expose the C++ object ---
+
+    // engine.addImportPath("qrc:/QGroundControl"); // if you have other QML modules packaged in resources
+    // engine.addImportPath("qrc:/qml");
+
+    // MyClass myCppClass;
+    // engine.rootContext()->setContextProperty("myCppClass", &myCppClass);
+
+    // // Load the main QML file.
+    // const QUrl url(QStringLiteral("qrc:/qml/MainRootWindow.qml"));
+    // engine.load(url);
+    // if (engine.rootObjects().isEmpty()) return -1;
+
+    // qDebug() << "Application started successfully.";
+
+    // // --- Initialize and run the application ---
     app.init();
 
     int exitCode = 0;
@@ -212,9 +249,9 @@ int main(int argc, char *argv[])
     } else
 #endif
     {
-        #ifdef Q_OS_ANDROID
-            AndroidInterface::checkStoragePermissions();
-        #endif
+#ifdef Q_OS_ANDROID
+        AndroidInterface::checkStoragePermissions();
+#endif
 
         exitCode = app.exec();
     }

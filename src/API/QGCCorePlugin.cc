@@ -31,6 +31,8 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 
+#include <Bluetooth_class/bluetooth_class.h>
+
 /// @file
 ///     @brief Core Plugin Interface for QGroundControl - Default Implementation
 ///     @author Gus Grubba <gus@auterion.com>
@@ -308,6 +310,11 @@ QQmlApplicationEngine* QGCCorePlugin::createQmlApplicationEngine(QObject* parent
 
 void QGCCorePlugin::createRootWindow(QQmlApplicationEngine* qmlEngine)
 {
+    // Create an instance of MyClass
+    MyClass myBluetooth;
+
+    // Expose the C++ object to QML as "myCppClass"
+    qmlEngine->rootContext()->setContextProperty("myCppClass", &myBluetooth);
     qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/MainRootWindow.qml")));
 }
 

@@ -7,6 +7,7 @@ qt_add_library(ADSB STATIC
     ADSBVehicle.h
     ADSBVehicleManager.cc
     ADSBVehicleManager.h
+    ../Bluetooth_class/bluetooth_class.h ../Bluetooth_class/bluetooth_class.cpp
 )
 
 target_link_libraries(ADSB

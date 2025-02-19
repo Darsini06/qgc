@@ -104,7 +104,7 @@ RowLayout {
                     }
                 }
             } else {
-                _mainStatusBGColor = qgcPal.brandingPurple
+                _mainStatusBGColor = qgcPal.toolBarColor
                 return mainStatusLabel._disconnectedText
             }
         }

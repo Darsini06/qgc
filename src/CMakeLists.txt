@@ -16,6 +16,8 @@ qt_add_library(QGC STATIC
     QGCConfig.h
     QGCToolbox.cc
     QGCToolbox.h
+
+
 )
 
 if(QGC_UTM_ADAPTER)

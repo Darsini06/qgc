@@ -33,32 +33,32 @@ Item {
 
     property real _totalAttitudeSize: attitudeSize + attitudeSpacing
 
-    IntegratedAttitudeIndicator {
-        id:                     rollIndicator
-        x:                      -_totalAttitudeSize
-        attitudeAngleDegrees:   vehicle ? vehicle.roll.rawValue : 0
-        compassRadius:          control.compassRadius
-    }
+    // IntegratedAttitudeIndicator {
+    //     id:                     rollIndicator
+    //     x:                      -_totalAttitudeSize
+    //     attitudeAngleDegrees:   vehicle ? vehicle.roll.rawValue : 0
+    //     compassRadius:          control.compassRadius
+    // }
 
-    IntegratedAttitudeIndicator {
-        x:                      -_totalAttitudeSize
-        attitudeAngleDegrees:   vehicle ? vehicle.pitch.rawValue : 0
-        compassRadius:          control.compassRadius
-        transformOrigin:        Item.Center
-        rotation:               90
-    }
+    // IntegratedAttitudeIndicator {
+    //     x:                      -_totalAttitudeSize
+    //     attitudeAngleDegrees:   vehicle ? vehicle.pitch.rawValue : 0
+    //     compassRadius:          control.compassRadius
+    //     transformOrigin:        Item.Center
+    //     rotation:               90
+    // }
 
-    Rectangle {
-        y:      _totalAttitudeSize
-        width:  compassRadius * 2
-        height: width
-        radius: width / 2
-        color:  qgcPal.window
+    // Rectangle {
+    //     y:      _totalAttitudeSize
+    //     width:  compassRadius * 2
+    //     height: width
+    //     radius: width / 2
+    //     color:  qgcPal.window
 
-        QGCCompassWidget {
-            size:               parent.width - compassBorder
-            vehicle:            globals.activeVehicle
-            anchors.centerIn:   parent
-        }
-    }
+    //     QGCCompassWidget {
+    //         size:               parent.width - compassBorder
+    //         vehicle:            globals.activeVehicle
+    //         anchors.centerIn:   parent
+    //     }
+    // }
 }

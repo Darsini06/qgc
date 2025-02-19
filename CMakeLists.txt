@@ -53,6 +53,7 @@ include(GNUInstallDirs)
 include(CMakeDependentOption)
 include(FetchContent)
 include(CMakePrintHelpers)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -121,7 +122,9 @@ endif()
 include(Qt6QGCConfiguration)
 
 set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml" CACHE PATH "Install path for QML" FORCE)
-# set(QML_IMPORT_PATH ${CMAKE_SOURCE_DIR}/qml ${CMAKE_BINARY_DIR}/imports CACHE STRING "Extra QML Import Paths" FORCE)
+set(QML_IMPORT_PATH "${CMAKE_SOURCE_DIR}/qml" "${CMAKE_BINARY_DIR}/qml" CACHE STRING "Extra QML Import Paths" FORCE)
+set(ENV{QML_IMPORT_PATH} ${QML_IMPORT_PATH})
+
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060600)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -201,6 +204,7 @@ qt_policy(
     SET QTP0001 NEW
     SET QTP0002 NEW
 )
+
 
 #######################################################
 #                QGroundControl Options
@@ -291,6 +295,10 @@ qt_add_executable(${PROJECT_NAME}
     src/main.cc
     ${QGC_RESOURCES}
 )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE "QML_IMPORT_PATH=${CMAKE_SOURCE_DIR}/qml")
+
+
 
 if(Qt6LinguistTools_FOUND)
     # TODO: Update to new qt_add_translations form in Qt6.7
@@ -443,6 +451,11 @@ add_compile_definitions(
 )
 
 add_subdirectory(src)
+
+
+
+
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         Qt6::Core

@@ -14,13 +14,13 @@ import QtQuick.Layouts
 import QtQuick.Window
 
 import QGroundControl
-import QGroundControl.Palette
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 
 import QGroundControl.UTMSP
+import QGroundControl.Palette 1.0
 
 /// @brief Native QML top level window
 /// All properties defined here are visible to all QML pages.
@@ -46,11 +46,13 @@ ApplicationWindow {
         firstRunPromptManager.nextPrompt()
     }
 
-    QtObject {
+   /* QtObject {
+        // First time showing dialogs codes
         id: firstRunPromptManager
 
         property var currentDialog:     null
-        property var rgPromptIds:       QGroundControl.corePlugin.firstRunPromptsToShow()
+       // property var rgPromptIds:       QGroundControl.corePlugin.firstRunPromptsToShow()
+        property var rgPromptIds:       null
         property int nextPromptIdIndex: 0
 
         function clearNextPromptSignal() {
@@ -60,18 +62,22 @@ ApplicationWindow {
         }
 
         function nextPrompt() {
-            if (nextPromptIdIndex < rgPromptIds.length) {
-                var component = Qt.createComponent(QGroundControl.corePlugin.firstRunPromptResource(rgPromptIds[nextPromptIdIndex]));
-                currentDialog = component.createObject(mainWindow)
-                currentDialog.closed.connect(nextPrompt)
-                currentDialog.open()
-                nextPromptIdIndex++
-            } else {
-                currentDialog = null
-                showPreFlightChecklistIfNeeded()
+            if(rgPromptIds != null){
+                if (nextPromptIdIndex < rgPromptIds.length) {
+                    var component = Qt.createComponent(QGroundControl.corePlugin.firstRunPromptResource(rgPromptIds[nextPromptIdIndex]));
+                    currentDialog = component.createObject(mainWindow)
+                    currentDialog.closed.connect(nextPrompt)
+                    currentDialog.open()
+                    nextPromptIdIndex++
+                } else {
+                    currentDialog = null
+                    showPreFlightChecklistIfNeeded()
+                }
             }
+
+
         }
-    }
+    }*/
 
     readonly property real      _topBottomMargins:          ScreenTools.defaultFontPixelHeight * 0.5
 
@@ -254,6 +260,30 @@ ApplicationWindow {
         visible:        false
     }
 
+    // Button {
+    //   text: "Enable Bluetooth"
+    //   anchors.bottom: parent.bottom
+    //   padding: 20
+    //   onClicked: {
+    //               if (typeof myCppClass !== "undefined" && myCppClass !== null) {
+    //                   myCppClass.requestBluetoothPermission();
+    //               } else {
+    //                   console.log("Error: myCppClass is not initialized!");
+    //               }
+    //           }
+    // }
+
+    // Connections {
+    //        target: myCppClass
+    //        function onBluetoothStatusChanged(granted) {
+    //            if (granted) {
+    //                console.log("Bluetooth permission granted!")
+    //            } else {
+    //                console.log("Bluetooth permission denied!")
+    //            }
+    //        }
+    //    }
+
     footer: LogReplayStatusBar {
         visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
     }
@@ -284,19 +314,19 @@ ApplicationWindow {
                         Layout.margins: toolSelectDialog._margins
                         spacing:        ScreenTools.defaultFontPixelWidth
 
-                        SubMenuButton {
-                            id:                 setupButton
-                            height:             toolSelectDialog._toolButtonHeight
-                            Layout.fillWidth:   true
-                            text:               qsTr("Vehicle Setup")
-                            imageResource:      "/qmlimages/Gears.svg"
-                            onClicked: {
-                                if (!mainWindow.preventViewSwitch()) {
-                                    mainWindow.closeIndicatorDrawer()
-                                    mainWindow.showVehicleSetupTool()
-                                }
-                            }
-                        }
+                        // SubMenuButton {
+                        //     id:                 setupButton
+                        //     height:             toolSelectDialog._toolButtonHeight
+                        //     Layout.fillWidth:   true
+                        //     text:               qsTr("Vehicle Setup")
+                        //     imageResource:      "/qmlimages/Gears.svg"
+                        //     onClicked: {
+                        //         if (!mainWindow.preventViewSwitch()) {
+                        //             mainWindow.closeIndicatorDrawer()
+                        //             mainWindow.showVehicleSetupTool()
+                        //         }
+                        //     }
+                        // }
 
                         SubMenuButton {
                             id:                 analyzeButton
