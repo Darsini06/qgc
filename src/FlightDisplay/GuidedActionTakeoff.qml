@@ -15,4 +15,6 @@ GuidedToolStripAction {
     visible:    _guidedController.showTakeoff || !_guidedController.showLand
     enabled:    _guidedController.showTakeoff
     actionID:   _guidedController.actionTakeoff
+
+
 }

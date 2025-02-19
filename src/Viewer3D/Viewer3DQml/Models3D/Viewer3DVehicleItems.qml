@@ -62,7 +62,7 @@ Node {
             case 16:
                 return qsTr("W"); //Waypoint
             case 22:
-                return qsTr("T"); //Takeoff
+                return qsTr("SRI"); //Takeoff
             case 195:
                 return qsTr("R"); //ROI
             case 201:
