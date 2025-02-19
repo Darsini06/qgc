@@ -15,7 +15,7 @@ import QGroundControl.Palette
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
 
-////     @author Omid Esrafilian <esrafilian.omid@gmail.com>
+///     @author Omid Esrafilian <esrafilian.omid@gmail.com>
 
 Node {
     id: vehicel3DBody
@@ -62,7 +62,7 @@ Node {
             case 16:
                 return qsTr("W"); //Waypoint
             case 22:
-                return qsTr("SRI"); //Takeoff
+                return qsTr("T"); //Takeoff
             case 195:
                 return qsTr("R"); //ROI
             case 201:
