@@ -15,7 +15,7 @@ import QGroundControl.Palette
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
 
-///     @author Omid Esrafilian <esrafilian.omid@gmail.com>
+////     @author Omid Esrafilian <esrafilian.omid@gmail.com>
 
 Node {
     id: vehicel3DBody
