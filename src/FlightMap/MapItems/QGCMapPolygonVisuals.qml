@@ -165,11 +165,13 @@ Item {
     }
 
     function _saveCurrentVertices() {
+        console.log("_saveCurrentVertices",)
         _savedVertices = [ ]
         _savedCircleMode = _circleMode
         for (var i=0; i<mapPolygon.count; i++) {
             _savedVertices.push(mapPolygon.vertexCoordinate(i))
         }
+        console.log("_savedCircleMode",_savedCircleMode)
     }
 
     function _restorePreviousVertices() {
@@ -611,6 +613,7 @@ Item {
                             _restorePreviousVertices()
                         }
                         mapPolygon.traceMode = false
+
                     } else {
                         _saveCurrentVertices()
                         _circleMode = false
@@ -639,7 +642,9 @@ Item {
             z:                  QGroundControl.zOrderMapItems + 1   // Over item indicators
 
             onClicked: (mouse) => {
+
                 if(_utmspEnabled){
+
                     if (mouse.button === Qt.LeftButton) {
                         mapPolygon.appendVertex(mapControl.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */))
                     }

@@ -138,6 +138,8 @@ Map {
             _map.zoomLevel += Math.log2(delta)
             _map.alignCoordinateToPoint(pinchStartCentroid, pinch.centroid.position)
         }
+
+
     }
 
     WheelHandler {
