@@ -71,6 +71,7 @@ Item {
     }
 
     function removeEditingVisuals() {
+
         _objMgrEditingVisuals.destroyObjects()
     }
 
