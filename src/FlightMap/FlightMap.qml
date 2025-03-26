@@ -13,6 +13,8 @@ import QtLocation
 import QtPositioning
 import QtQuick.Dialogs
 
+import MapGlobals 1.0
+
 import QGroundControl
 import QGroundControl.FactSystem
 import QGroundControl.Controls
@@ -28,8 +30,21 @@ Map {
     plugin:     Plugin { name: "QGroundControl" }
     opacity:    0.99 // https://bugreports.qt.io/browse/QTBUG-82185
 
+    bearing: MapGlobals.mapRotation
+
+    // Connections {
+    //     target: MapGlobals
+    //     function onForceRecenterChanged() {
+    //         if (MapGlobals.forceRecenter && MapGlobals.gcsPosition.isValid) {
+    //             center = MapGlobals.gcsPosition
+    //             zoomLevel = 15
+    //             MapGlobals.forceRecenter = false
+    //         }
+    //     }
+    // }
+
     property string mapName:                        'defaultMap'
-    property bool   isSatelliteMap:                 activeMapType.name.indexOf("Satellite") > -1 || activeMapType.name.indexOf("Hybrid") > -1
+    property bool   isSatelliteMap:                 false //activeMapType.name.indexOf("Satellite") > -1 || activeMapType.name.indexOf("Hybrid") > -1
     property var    gcsPosition:                    QGroundControl.qgcPositionManger.gcsPosition
     property real   gcsHeading:                     QGroundControl.qgcPositionManger.gcsHeading
     property bool   allowGCSLocationCenter:         false   ///< true: map will center/zoom to gcs location one time
@@ -39,6 +54,19 @@ Map {
     property bool   planView:                       false   ///< true: map being using for Plan view, items should be draggable
 
     readonly property real  maxZoomLevel: 20
+
+
+    function rotateMap(delta) {
+        console.log("Rotating map by delta:", delta); // Debug log
+        MapGlobals.mapRotation += delta  // Subtracting instead of adding to rotate in the opposite direction
+        if (MapGlobals.mapRotation >= 360) MapGlobals.mapRotation -= 360
+        if (MapGlobals.mapRotation <= -360) MapGlobals.mapRotation += 360
+        console.log("New mapRotation:", MapGlobals.mapRotation);
+    }
+
+    function resetRotation() {
+        MapGlobals.mapRotation = 0;
+    }
 
     property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
     property var    _activeVehicleCoordinate:   _activeVehicle ? _activeVehicle.coordinate : QtPositioning.coordinate()
@@ -57,12 +85,32 @@ Map {
             firstVehiclePositionReceived = true
             center = _activeVehicleCoordinate
             zoomLevel = QGroundControl.flightMapInitialZoom
+            console.log("_possiblyCenterToVehiclePosition method")
         }
     }
 
     function centerToSpecifiedLocation() {
         specifyMapPositionDialog.createObject(mainWindow).open()
     }
+
+    // // FlightMap.qml
+    // function centerOnTransmitter() {
+    //     if (gcsPosition.isValid) {
+    //         console.log("Centering map on transmitter");
+
+    //         // Bypass one-time center flags
+    //         allowGCSLocationCenter = true;
+    //         firstGCSPositionReceived = false;
+
+    //         // Force immediate center update
+    //         center = gcsPosition;
+    //         zoomLevel = 15;
+
+    //         // Workaround for Qt map refresh bug
+    //         visibleRegion = QtPositioning.rectangle(QtPositioning.coordinate(0,0), QtPositioning.coordinate(0,0));
+    //         visibleRegion = QtPositioning.rectangle(center, center);
+    //     }
+    // }
 
     Component {
         id: specifyMapPositionDialog
@@ -79,10 +127,10 @@ Map {
             firstGCSPositionReceived = true
             //-- Only center on gsc if we have no vehicle (and we are supposed to do so)
             var _activeVehicleCoordinate = _activeVehicle ? _activeVehicle.coordinate : QtPositioning.coordinate()
-           // if(QGroundControl.settingsManager.flyViewSettings.keepMapCenteredOnVehicle.rawValue || !_activeVehicleCoordinate.isValid)
+            // if(QGroundControl.settingsManager.flyViewSettings.keepMapCenteredOnVehicle.rawValue || !_activeVehicleCoordinate.isValid)
             // Set current location and zoom
-                center = gcsPosition
-             zoomLevel = 15
+            center = gcsPosition
+            zoomLevel = 15
         }
     }
 
@@ -97,6 +145,20 @@ Map {
             }
         }
     }
+
+    // function centerOnTransmitter() {
+    //     if (gcsPosition.isValid) {
+    //         console.log("Centering map on transmitter");
+    //         console.log("gcsPosition latitude:", gcsPosition.latitude, "longitude:", gcsPosition.longitude);
+    //         allowGCSLocationCenter = true; // Override one-time center flag
+    //         firstGCSPositionReceived = false; // Reset to allow re-centering
+    //         _map.center = gcsPosition;  // Center the map on the transmitter
+    //         _map.zoomLevel = 15;  // Set zoom level as needed
+    //         console.log("Map centered on transmitter:", _map.center);
+    //     } else {
+    //         console.log("Transmitter position is not valid");
+    //     }
+    // }
 
     on_ActiveVehicleCoordinateChanged: _possiblyCenterToVehiclePosition()
 
@@ -121,7 +183,7 @@ Map {
     signal mapPanStart
     signal mapPanStop
     signal mapClicked(var position)
-    
+
     PinchHandler {
         id:                 pinch
         target:             null
@@ -135,10 +197,13 @@ Map {
             }
         }
         onScaleChanged: (delta) => {
-            _map.zoomLevel += Math.log2(delta)
-            _map.alignCoordinateToPoint(pinchStartCentroid, pinch.centroid.position)
-        }
+                            _map.zoomLevel += Math.log2(delta)
+                            _map.alignCoordinateToPoint(pinchStartCentroid, pinch.centroid.position)
+                        }
 
+        onRotationChanged: (angleDelta) => {
+                               rotateMap(-angleDelta)  // Negate the angleDelta to rotate in the opposite direction
+                           }
 
     }
 
@@ -170,7 +235,7 @@ Map {
     TapHandler {
         onTapped: (eventPoint) => mapClicked(eventPoint.position)
     }
-    
+
     /// Ground Station location
     MapQuickItem {
         anchorPoint.x:  sourceItem.width / 2

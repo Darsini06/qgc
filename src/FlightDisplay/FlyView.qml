@@ -30,7 +30,8 @@ import QGroundControl.Vehicle
 // 3D Viewer modules
 import Viewer3D
 
-Item {
+Item
+{
     id: _root
 
     // These should only be used by MainRootWindow
@@ -191,4 +192,5 @@ Item {
             anchors.fill:           parent
         }
     }
+
 }

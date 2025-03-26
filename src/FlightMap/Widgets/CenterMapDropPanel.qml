@@ -79,6 +79,7 @@ ColumnLayout {
         onClicked: {
             dropPanel.hide()
             map.center = map.gcsPosition
+            console.log("map.center", map.center)
         }
     }
 

@@ -378,18 +378,18 @@ void PlanMasterController::loadFromFile(const QString& filename)
         }
 
         QList<JsonHelper::KeyValidateInfo> rgKeyInfo = {
-            { kJsonMissionObjectKey,        QJsonValue::Object, true },
-            { kJsonGeoFenceObjectKey,       QJsonValue::Object, true },
-            { kJsonRallyPointsObjectKey,    QJsonValue::Object, true },
-        };
+                                                        { kJsonMissionObjectKey,        QJsonValue::Object, true },
+                                                        { kJsonGeoFenceObjectKey,       QJsonValue::Object, true },
+                                                        { kJsonRallyPointsObjectKey,    QJsonValue::Object, true },
+                                                        };
         if (!JsonHelper::validateKeys(json, rgKeyInfo, errorString)) {
             qgcApp()->showAppMessage(errorMessage.arg(errorString));
             return;
         }
 
         if (!_missionController.load(json[kJsonMissionObjectKey].toObject(), errorString) ||
-                !_geoFenceController.load(json[kJsonGeoFenceObjectKey].toObject(), errorString) ||
-                !_rallyPointController.load(json[kJsonRallyPointsObjectKey].toObject(), errorString)) {
+            !_geoFenceController.load(json[kJsonGeoFenceObjectKey].toObject(), errorString) ||
+            !_rallyPointController.load(json[kJsonRallyPointsObjectKey].toObject(), errorString)) {
             qgcApp()->showAppMessage(errorMessage.arg(errorString));
         } else {
             //-- Allow plugins to post process the load
@@ -558,7 +558,7 @@ QStringList PlanMasterController::loadNameFilters(void) const
     QStringList filters;
 
     filters << tr("Supported types (*.%1 *.%2 *.%3 *.%4)").arg(AppSettings::planFileExtension).arg(AppSettings::missionFileExtension).arg(AppSettings::waypointsFileExtension).arg("txt") <<
-               tr("All Files (*)");
+        tr("All Files (*)");
     return filters;
 }
 
@@ -598,15 +598,15 @@ void PlanMasterController::_showPlanFromManagerVehicle(void)
 bool PlanMasterController::syncInProgress(void) const
 {
     return _missionController.syncInProgress() ||
-            _geoFenceController.syncInProgress() ||
-            _rallyPointController.syncInProgress();
+           _geoFenceController.syncInProgress() ||
+           _rallyPointController.syncInProgress();
 }
 
 bool PlanMasterController::isEmpty(void) const
 {
     return _missionController.isEmpty() &&
-            _geoFenceController.isEmpty() &&
-            _rallyPointController.isEmpty();
+           _geoFenceController.isEmpty() &&
+           _rallyPointController.isEmpty();
 }
 
 void PlanMasterController::_updatePlanCreatorsList(void)
@@ -614,19 +614,19 @@ void PlanMasterController::_updatePlanCreatorsList(void)
     if (!_flyView) {
         if (!_planCreators) {
             _planCreators = new QmlObjectListModel(this);
-            _planCreators->append(new BlankPlanCreator(this, this));
+            //_planCreators->append(new BlankPlanCreator(this, this));
             _planCreators->append(new SurveyPlanCreator(this, this));
-            _planCreators->append(new CorridorScanPlanCreator(this, this));
+            //_planCreators->append(new CorridorScanPlanCreator(this, this));
             emit planCreatorsChanged(_planCreators);
         }
 
         if (_managerVehicle->fixedWing()) {
-            if (_planCreators->count() == 4) {
+            if (_planCreators->count() == 1) {
                 _planCreators->removeAt(_planCreators->count() - 1);
             }
         } else {
-            if (_planCreators->count() != 4) {
-                _planCreators->append(new StructureScanPlanCreator(this, this));
+            if (_planCreators->count() != 1) {
+                _planCreators->append(new SurveyPlanCreator(this, this));
             }
         }
     }

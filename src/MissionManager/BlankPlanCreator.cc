@@ -18,5 +18,6 @@ BlankPlanCreator::BlankPlanCreator(PlanMasterController* planMasterController, Q
 
 void BlankPlanCreator::createPlan(const QGeoCoordinate& /*mapCenterCoord*/)
 {
+    qDebug() << "EmptyMap";
     _planMasterController->removeAll();
 }

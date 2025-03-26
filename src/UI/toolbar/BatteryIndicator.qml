@@ -25,7 +25,7 @@ Item {
     id:             control
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
-    width:          batteryIndicatorRow.width
+    //width:          batteryIndicatorRow.width
 
     property bool       showIndicator:      true
     property bool       waitForParameters:  false   // UI won't show until parameters are ready
@@ -42,7 +42,7 @@ Item {
 
     // Properties to hold the thresholds
     property int threshold1: batterySettings.threshold1.rawValue
-    property int threshold2: batterySettings.threshold2.rawValue   
+    property int threshold2: batterySettings.threshold2.rawValue
 
     // Control visibility based on battery state display setting
     property bool batteryState: batterySettings.battery_state_display.rawValue
@@ -89,21 +89,22 @@ Item {
 
         Row {
             anchors.top:    parent.top
-            anchors.bottom: parent.bottom
+                        anchors.bottom: parent.bottom
+
 
             function getBatteryColor() {
                 switch (battery.chargeState.rawValue) {
                     case MAVLink.MAV_BATTERY_CHARGE_STATE_OK:
                         if (!isNaN(battery.percentRemaining.rawValue)) {
                             if (battery.percentRemaining.rawValue > threshold1) {
-                                return qgcPal.colorGreen 
+                                return qgcPal.colorGreen
                             } else if (battery.percentRemaining.rawValue > threshold2) {
-                                return qgcPal.colorYellowGreen 
+                                return qgcPal.colorYellowGreen
                             } else {
-                                return qgcPal.colorYellow 
+                                return qgcPal.colorYellow
                             }
                         } else {
-                            return qgcPal.text
+                            return "white"
                         }
                     case MAVLink.MAV_BATTERY_CHARGE_STATE_LOW:
                         return qgcPal.colorOrange
@@ -113,9 +114,9 @@ Item {
                     case MAVLink.MAV_BATTERY_CHARGE_STATE_UNHEALTHY:
                         return qgcPal.colorRed
                     default:
-                        return qgcPal.text
+                        return "white"
                 }
-            }    
+            }
 
             function getBatterySvgSource() {
 
@@ -127,8 +128,8 @@ Item {
                             } else if (battery.percentRemaining.rawValue > threshold2) {
                                 return "/qmlimages/BatteryYellowGreen.svg"
                             } else {
-                                return "/qmlimages/BatteryYellow.svg"    
-                            } 
+                                return "/qmlimages/BatteryYellow.svg"
+                            }
                         }
                     case MAVLink.MAV_BATTERY_CHARGE_STATE_LOW:
                         return "/qmlimages/BatteryOrange.svg" // Low with orange svg
@@ -170,7 +171,8 @@ Item {
             QGCColoredImage {
                 anchors.top:        parent.top
                 anchors.bottom:     parent.bottom
-                width:              height
+                width:              20
+                height:20
                 sourceSize.width:   width
                 source:             getBatterySvgSource()
                 fillMode:           Image.PreserveAspectFit
@@ -186,16 +188,20 @@ Item {
                 QGCLabel {
                     Layout.alignment:       Qt.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
-                    color:                  qgcPal.text
+                    color:                  "white"
+                    width: 10
+                                        height: 20
                     text:                   getBatteryPercentageText()
-                    font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
+                    //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
                     visible:                _showBoth || _showPercentage
                 }
 
                 QGCLabel {
                     Layout.alignment:       Qt.AlignHCenter
-                    font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
-                    color:                  qgcPal.text
+                    width: 10
+                                        height: 20
+                    //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
+                    color:                  "white"
                     text:                   getBatteryVoltageText()
                     visible:                _showBoth || _showVoltage
                 }
@@ -326,7 +332,7 @@ Item {
                         }
                     }
                 }
-                
+
             }
 
             SettingsGroupLayout {
@@ -374,7 +380,7 @@ Item {
                         }
                     }
                     QGCLabel {
-                        visible: !threshold1visible 
+                        visible: !threshold1visible
                         text: qsTr("") + batterySettings.threshold1.rawValue.toString() + qsTr("%")
                     }
 
@@ -396,7 +402,7 @@ Item {
                             visible: threshold2visible
                             onEditingFinished: {
                                 // Validate and set the new threshold value
-                                batterySettings.setThreshold2(parseInt(text));                                
+                                batterySettings.setThreshold2(parseInt(text));
                             }
                         }
                     }

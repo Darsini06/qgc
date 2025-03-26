@@ -239,6 +239,9 @@ int main(int argc, char *argv[])
     // qDebug() << "Application started successfully.";
 
     // // --- Initialize and run the application ---
+
+    qmlRegisterSingletonType(QUrl("qrc:/qml/MapGlobals.qml"), "MapGlobals", 1, 0, "MapGlobals");
+
     app.init();
 
     int exitCode = 0;

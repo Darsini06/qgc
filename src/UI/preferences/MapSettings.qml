@@ -83,6 +83,7 @@ Item {
                     var index = comboBox.find(_mapTypeFact.rawValue)
                     if (index < 0) index = 0
                     comboBox.currentIndex = index
+                    console.log("comboBox.currentIndex : ",comboBox.currentIndex)
                 }
             }
         }
@@ -106,7 +107,11 @@ Item {
                 label:      qsTr("Add New Set")
                 buttonText: qsTr("Add")
                 enabled:    !_currentlyImportOrExporting
-                onClicked:  offlineMapEditorComponent.createObject(root).addNewSet()
+                onClicked:  {
+                     console.log("EmptyMapShowed")
+                offlineMapEditorComponent.createObject(root).addNewSet()
+                }
+
             }
 
             LabelledButton {

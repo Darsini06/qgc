@@ -152,6 +152,7 @@ SettingsPage {
             onAccepted: {
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.name = nameField.text
+                console.log("Bluetooth")
                 if (originalConfig) {
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
                 } else {

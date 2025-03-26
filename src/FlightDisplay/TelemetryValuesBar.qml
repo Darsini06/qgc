@@ -23,14 +23,14 @@ Item {
 
     property real extraWidth: 0 ///< Extra width to add to the background rectangle
 
-    Rectangle {
-        id:         backgroundRect
-        width:      control.width + extraWidth
-        height:     control.height
-        color:      qgcPal.window
-        radius:     ScreenTools.defaultFontPixelWidth / 2
-        opacity:    0.75
-    }
+    // Rectangle {
+    //     id:         backgroundRect
+    //     width:      control.width + extraWidth
+    //     height:     control.height
+    //     color:      qgcPal.window
+    //     radius:     ScreenTools.defaultFontPixelWidth / 2
+    //     opacity:    0.75
+    // }
 
     //DeadMouseArea { anchors.fill: parent }
 

@@ -38,6 +38,7 @@ MapQuickItem {
     property var    _map:           map
     property bool   _multiVehicle:  QGroundControl.multiVehicleManager.vehicles.count > 1
 
+
     sourceItem: Item {
         id:         vehicleItem
         width:      vehicleIcon.width
@@ -56,9 +57,9 @@ MapQuickItem {
             blurMax: 32
             blurMultiplier: .1
         }
-            
+
         Repeater {
-            model: vehicle ? vehicle.gimbalController.gimbals : [] 
+            model: vehicle ? vehicle.gimbalController.gimbals : []
             
             Item {
                 id:                           canvasItem
@@ -130,6 +131,8 @@ MapQuickItem {
                 origin.x:       vehicleIcon.width  / 2
                 origin.y:       vehicleIcon.height / 2
                 angle:          isNaN(heading) ? 0 : heading
+
+                onAngleChanged:  console.log("Vehicle Icon Angle:", angle)
             }
         }
 

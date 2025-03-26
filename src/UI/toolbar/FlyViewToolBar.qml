@@ -47,7 +47,8 @@ Rectangle {
 
     Rectangle {
         anchors.fill: viewButtonRow
-        
+
+
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0;                                     color: _mainStatusBGColor }
@@ -64,12 +65,13 @@ Rectangle {
         spacing:                ScreenTools.defaultFontPixelWidth / 2
 
         QGCToolBarButton {
-            id:                     currentButton
+            id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "/res/QGCLogoFull"
+            icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
-            onClicked:              mainWindow.showToolSelectDialog()
+            onClicked:              mainWindow.newscreen()
         }
+
 
         MainStatusIndicator {
             Layout.preferredHeight: viewButtonRow.height
@@ -81,7 +83,13 @@ Rectangle {
             onClicked:          _activeVehicle.closeVehicle()
             visible:            _activeVehicle && _communicationLost
         }
+
+
+
+
     }
+
+
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -95,6 +103,7 @@ Rectangle {
         flickableDirection:     Flickable.HorizontalFlick
 
         FlyViewToolBarIndicators { id: toolIndicators }
+
     }
 
     //-------------------------------------------------------------------------
@@ -159,6 +168,265 @@ Rectangle {
         color:          qgcPal.colorGreen
         visible:        !largeProgressBar.visible
     }
+
+    Rectangle {
+        id: statusBar
+            width: (60 + 20) * 6 // Adjust width based on icons
+            height: parent.height
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            color: "#222222" // Dark background
+
+
+        RowLayout {
+            anchors.fill: parent
+            //spacing: 5
+
+            BatteryIndicator {
+                                                id: batteryIndicator
+                                                height: 50
+                                                width : 50// Fixed height for the indicator
+                                                visible: activeVehicle ? true : false
+                                              }
+
+
+            // Battery Icon
+            Column {
+
+                Text {
+                    visible: activeVehicle ? false : true
+                    text: "Battery"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Row {
+                            spacing: 5
+                            QGCColoredImage {
+                                visible: activeVehicle ? false : true
+                                width: 20
+                                height: 20
+                                source: "/qmlimages/Battery.svg"
+                                color: "white"
+                            }
+                            Text {
+                                visible: activeVehicle ? false : true
+                                text: " : N/A"
+                                font.pixelSize: 14
+                                color: "white"
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+            }
+
+
+
+
+           Rectangle { width: 2; height: 50; color: "gray" } // Separator
+
+
+
+            // Satellite Icon
+            Column {
+                spacing: 2
+                Text {
+                    text: "Sat"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Row {
+
+                           spacing: 5
+                           QGCColoredImage {
+                               visible: activeVehicle ? false : true
+                               width: 20
+                               height: 20
+                               source: "/qmlimages/Gps.svg"
+                               color: "white"
+                           }
+                           Text {
+                               visible: activeVehicle ? false : true
+                               text: " : N/A"
+                               font.pixelSize: 14
+                               color: "white"
+                               verticalAlignment: Text.AlignVCenter
+                           }
+                           GPSIndicator {
+                                                               id: gpsindicator
+                                                               width:50 // Adjust width as needed
+                                                               height: 50                // Fixed height for the indicator
+                                                               visible: activeVehicle ? true : false
+                                                              }
+                       }
+            }
+
+            Rectangle { width: 2; height: 50; color: "gray" } // Separator
+
+            // Mode Icon
+            Column {
+                spacing: 2
+                Text {
+                    text: "Mode"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Row {
+                            spacing: 5
+                            QGCColoredImage {
+                                //visible: activeVehicle ? false : true
+                                width: 20
+                                height: 20
+                                source: "/qmlimages/TelemRSSI.svg"
+                                color: "white"
+                            }
+                            Text {
+                                //visible: activeVehicle ? false : true
+                                text: " : N/A"
+                                font.pixelSize: 14
+                                color: "white"
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            // TelemetryRSSIIndicator {
+                            //                                     id: telemetryRSSIIndicator
+                            //                                     width:80 // Adjust width as needed
+                            //                                     height: 50                // Fixed height for the indicator
+                            //                                     visible: activeVehicle ? true : false
+                            //                                   }
+
+                        }
+            }
+
+            Rectangle { width: 2; height: 50; color: "gray" } // Separator
+
+            // Spray Icon
+            Column {
+                spacing: 2
+                Text {
+
+                    text: "Spray"
+                    font.pixelSize: 14
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Row {
+                            spacing: 5
+                            QGCColoredImage {
+                                //visible: activeVehicle ? false : true
+                                width: 20
+                                height: 20
+                                source: "/qmlimages/TelemRSSI.svg"
+                                color: "white"
+                            }
+                            Text {
+                                //visible: activeVehicle ? false : true
+                                text: " : N/A"
+                                font.pixelSize: 14
+                                color: "white"
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            // TelemetryRSSIIndicator {
+                            //                                     id: telemetryRSSIIndicator1
+                            //                                     width:80 // Adjust width as needed
+                            //                                     height: 50                // Fixed height for the indicator
+                            //                                     visible: activeVehicle ? true : false
+                            //                                   }
+                        }
+            }
+
+            Rectangle { width: 2; height: 50; color: "gray" } // Separator
+
+            // Radar Icon
+            Column {
+                spacing: 2
+                Row {
+                            spacing: 5
+                            QGCColoredImage {
+                                width: 20
+                                height: 20
+                                source: "/qmlimages/RC.svg"
+                                color: "white"
+                            }
+                            Text {
+                                text: " : N/A"
+                                font.pixelSize: 14
+                                color: "white"
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+
+                Row {
+                            spacing: 5
+
+                            Text {
+                                text: "HD : N/A"
+                                font.pixelSize: 14
+                                color: "white"
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+            }
+
+
+
+            Rectangle { width: 2; height: 50; color: "gray" } // Separator
+
+
+                Row {
+                            spacing: 5
+                            QGCToolBarButton {
+                                                            id: button4
+                                                            Layout.preferredHeight: largeProgressBar1.height
+                                                            Layout.preferredWidth: 30
+                                                            icon.source: "qrc:/InstrumentValueIcons/dots-horizontal-triple.svg"
+                                                            icon.width: 20
+                                                            icon.height: 20
+                                                            logo: true
+                                                            onClicked: mainWindow.showToolSelectDialog()
+                                                            transform: Rotation {
+                                                                            angle: 90    // ✅ Rotate icon by 90 degrees
+                                                                            origin.x: button4.width / 2
+                                                                            origin.y: button4.height / 2
+                                                                        }
+                                                        }
+
+
+
+}
+
+            // More Options Icon
+            // Column {
+            //     spacing: 2
+            //     // Text {
+            //     //     text: "..."
+            //     //     font.pixelSize: 14
+            //     //     color: "white"
+            //     //     horizontalAlignment: Text.AlignHCenter
+            //     // }
+            //     QGCToolBarButton {
+            //                     id: button4
+            //                     Layout.preferredHeight: largeProgressBar1.height
+            //                     Layout.preferredWidth: 30
+            //                     icon.source: "qrc:/InstrumentValueIcons/dots-horizontal-triple.svg"
+            //                     icon.width: 20
+            //                     icon.height: 20
+            //                     logo: true
+            //                     onClicked: mainWindow.showToolSelectDialog()
+            //                     transform: Rotation {
+            //                                     angle: 90    // ✅ Rotate icon by 90 degrees
+            //                                     origin.x: button4.width / 2
+            //                                     origin.y: button4.height / 2
+            //                                 }
+            //                 }
+
+            // }
+        }
+    }
+
 
     // Large parameter download progress bar
     Rectangle {

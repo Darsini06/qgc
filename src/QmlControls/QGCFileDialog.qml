@@ -8,7 +8,7 @@ import QGroundControl
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controllers
-
+import Qt.labs.settings 1.0
 /// This control is meant to be a direct replacement for the standard Qml FileDialog control.
 /// It differs for mobile builds which uses a completely custom file picker.
 Item {
@@ -24,7 +24,7 @@ Item {
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
     signal rejected
-
+property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     function openForLoad() {
         _openForLoad = true
         if (_mobileDlg && folder.length !== 0) {
@@ -60,6 +60,7 @@ Item {
     Component.onCompleted: {
         _setupFileExtensions()
         _updateMobileShortPath()
+        console.log('local data ',_appSettings.username)
     }
 
     onFolderChanged:        _updateMobileShortPath()
@@ -145,6 +146,7 @@ Item {
                         text:           modelData
 
                         onClicked: {
+
                             mobileFileOpenDialog.close()
                             _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
                         }
@@ -219,7 +221,7 @@ Item {
                     QGCTextField {
                         id:                 filenameTextField
                         Layout.fillWidth:   true
-                        onTextChanged:      replaceMessage.visible = false
+                        text: _appSettings.username
                     }
                 }
 

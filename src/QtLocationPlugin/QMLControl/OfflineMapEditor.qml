@@ -26,7 +26,7 @@ import QGroundControl.FactControls
 
 FlightMap {
     id:                         _map
-    allowGCSLocationCenter:     true
+    allowGCSLocationCenter:     false //true
     allowVehicleLocationCenter: false
     mapName:                    "OfflineMap"
 

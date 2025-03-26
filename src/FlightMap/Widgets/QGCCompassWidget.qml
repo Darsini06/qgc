@@ -19,8 +19,8 @@ Rectangle {
     id:     root
     width:  size
     height: size
-    radius: width / 2
-    color:  qgcPal.window
+    radius: width / 0.5
+    color:  "transparent"
 
     property real size:                         _defaultSize
     property var  vehicle:                      null
@@ -76,6 +76,7 @@ Rectangle {
 
         CompassDial {
             anchors.fill: parent
+            visible: false
         }
 
         CompassHeadingIndicator {
@@ -139,6 +140,7 @@ Rectangle {
                 y: translateCenterToAngleY(parent.height / 2, _angle)
             }
         }
+
     }
 
     QGCLabel {

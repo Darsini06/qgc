@@ -20,11 +20,17 @@ import QGroundControl.Palette
 import QGroundControl.Controls
 import QGroundControl.FlightMap
 import QGroundControl.ShapeFileHelper
+import QGroundControl.FactSystem
+import QGroundControl.FactControls
+import QGroundControl.Controllers
+
+
+import Qt.labs.platform as Labs
 
 /// QGCMapPolygon map visuals
 Item {
     id: _root
-
+    property int selectedVertexIndex : -1                   // Will store the MapQuickItem the user clicked
     property var    mapControl                                  ///< Map control to place item in
     property var    mapPolygon                                  ///< QGCMapPolygon object
     property bool   interactive:        mapPolygon.interactive
@@ -42,36 +48,86 @@ Item {
     property string _instructionText:           _polygonToolsText
     property var    _savedVertices:             [ ]
     property bool   _savedCircleMode
-    property bool   _isVertexBeingDragged:      false
-
+    property bool   _isVertexBeingDragged:      true
+property string concatenatedText: ""
+    property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     property real _zorderDragHandle:    QGroundControl.zOrderMapItems + 3   // Highest to prevent splitting when items overlap
     property real _zorderSplitHandle:   QGroundControl.zOrderMapItems + 2
     property real _zorderCenterHandle:  QGroundControl.zOrderMapItems + 1   // Lowest such that drag or split takes precedence
-
+property var    _planMasterController:              planMasterController
     readonly property string _polygonToolsText: qsTr("Polygon Tools")
     readonly property string _traceText:        qsTr("Click in the map to add vertices. Click 'Done Tracing' when finished.")
 
+    Drawer {
+              id: arrowDrawer
+              edge: Qt.RightEdge
+              width: 200
+              //visible: false  // Hidden until a marker is clicked
+              onClosed: _root.selectedVertexIndex = -1
+
+              // A simple column of arrow buttons
+              Column {
+                  anchors.centerIn: parent
+                  spacing: 10
+
+                  Button {
+                      text: "Up"
+                      onClicked: {
+                          moveSelectedMarker(0, -5)
+                      }
+                  }
+                  Row {
+                      spacing: 10
+                      Button {
+                          text: "Left"
+                          onClicked: {
+                              moveSelectedMarker(-5, 0)
+                          }
+                      }
+                      Button {
+                          text: "Right"
+                          onClicked: {
+                              moveSelectedMarker(5, 0)
+                          }
+                      }
+                  }
+                  Button {
+                      text: "Down"
+                      onClicked: {
+                          moveSelectedMarker(0, 5)
+                      }
+                  }
+              }
+          }
+
+
+
+
     function addCommonVisuals() {
+        console.log("addCommonVisuals method")
         if (_objMgrCommonVisuals.empty) {
             _objMgrCommonVisuals.createObject(polygonComponent, mapControl, true)
         }
     }
 
+
+
     function removeCommonVisuals() {
+        console.log("removeCommonVisuals method")
         _objMgrCommonVisuals.destroyObjects()
     }
 
     function addEditingVisuals() {
         if (_objMgrEditingVisuals.empty) {
             _objMgrEditingVisuals.createObjects(
-                [ dragHandlesComponent, splitHandlesComponent, centerDragHandleComponent, edgeLengthHandlesComponent ], 
-                mapControl, 
+                [ dragHandlesComponent, splitHandlesComponent, centerDragHandleComponent, edgeLengthHandlesComponent ],
+                mapControl,
                 false /* addToMap */)
         }
     }
 
     function removeEditingVisuals() {
-
+        console.log("removeEditingVisuals method")
         _objMgrEditingVisuals.destroyObjects()
     }
 
@@ -83,6 +139,7 @@ Item {
     }
 
     function removeToolVisuals() {
+         console.log("removeToolVisuals method")
         _objMgrToolVisuals.destroyObjects()
     }
 
@@ -120,6 +177,7 @@ Item {
 
     /// Reset polygon back to initial default
     function _resetPolygon() {
+        console.log("_resetPolygon method")
         mapPolygon.beginReset()
         mapPolygon.clear()
         mapPolygon.appendVertices(defaultPolygonVertices())
@@ -128,6 +186,7 @@ Item {
     }
 
     function _createCircularPolygon(center, radius) {
+        console.log("_createCircularPolygon method")
         var unboundCenter = center.atDistanceAndAzimuth(0, 0)
         var segments = 16
         var angleIncrement = 360 / segments
@@ -166,7 +225,7 @@ Item {
     }
 
     function _saveCurrentVertices() {
-        console.log("_saveCurrentVertices",)
+        console.log("_saveCurrentVertices")
         _savedVertices = [ ]
         _savedCircleMode = _circleMode
         for (var i=0; i<mapPolygon.count; i++) {
@@ -200,7 +259,7 @@ Item {
         onTraceModeChanged: {
             if (mapPolygon.traceMode) {
                 _instructionText = _traceText
-                _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
+               // _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
             } else {
                 _instructionText = _polygonToolsText
                 _objMgrTraceVisuals.destroyObjects()
@@ -240,7 +299,7 @@ Item {
 
         function popupVertex(curIndex) {
             menu._editingVertexIndex = curIndex
-            removeVertexItem.visible = (mapPolygon.count > 3 && menu._editingVertexIndex >= 0)
+            removeVertexItem.visible = (mapPolygon.count > 0 && menu._editingVertexIndex >= 0)
             menu.popup()
         }
 
@@ -280,7 +339,17 @@ Item {
             visible:        !_circleMode && menu._editingVertexIndex >= 0
             onTriggered:    editVertexPositionDialog.createObject(mainWindow).open()
         }
+
+        QGCMenuItem {
+                   text:           qsTr("Adjust with arrows")
+                   visible:        !_circleMode
+                   onTriggered:    {
+                       _root.selectedVertexIndex = menu._editingVertexIndex
+                       arrowDrawer.open()
+                   }
+               }
     }
+
 
     Component {
         id: polygonComponent
@@ -417,7 +486,7 @@ Item {
             z:              _zorderDragHandle
             visible:        !_circleMode
             onDragStart:    _isVertexBeingDragged = true
-            onDragStop:     { _isVertexBeingDragged = false; mapPolygon.verifyClockwiseWinding() }
+            onDragStop:     { _isVertexBeingDragged = true; mapPolygon.verifyClockwiseWinding() }
 
             property int polygonVertex
 
@@ -465,29 +534,87 @@ Item {
         }
     }
 
+    // Component {
+    //     id: dragHandleComponent
+
+    //     MapQuickItem {
+    //         id:             mapQuickItem
+    //         anchorPoint.x:  dragHandle.width  / 2
+    //         anchorPoint.y:  dragHandle.height / 2
+    //         z:              _zorderDragHandle
+    //         visible:        !_circleMode
+
+    //         property int polygonVertex
+
+    //         sourceItem: Rectangle {
+    //             id:             dragHandle
+    //             width:          ScreenTools.defaultFontPixelHeight * 1.5
+    //             height:         width
+    //             radius:         width * 0.5
+    //             color:          Qt.rgba(1,1,1,0.8)
+    //             border.color:   Qt.rgba(0,0,0,0.25)
+    //             border.width:   1
+    //         }
+    //     }
+    // }
+
+
     Component {
-        id: dragHandleComponent
+           id: dragHandleComponent
 
-        MapQuickItem {
-            id:             mapQuickItem
-            anchorPoint.x:  dragHandle.width  / 2
-            anchorPoint.y:  dragHandle.height / 2
-            z:              _zorderDragHandle
-            visible:        !_circleMode
+           MapQuickItem {
+               id: mapQuickItem
+               anchorPoint.x: dragHandle.width / 2
+               anchorPoint.y: dragHandle.height / 2
+               z:  QGroundControl.zOrderMapItems + 3
+               visible: !_circleMode
+               objectName: "markerItem"
 
-            property int polygonVertex
+               // Index or label for the marker
+               property int markerIndex: 0
 
-            sourceItem: Rectangle {
-                id:             dragHandle
-                width:          ScreenTools.defaultFontPixelHeight * 1.5
-                height:         width
-                radius:         width * 0.5
-                color:          Qt.rgba(1,1,1,0.8)
-                border.color:   Qt.rgba(0,0,0,0.25)
-                border.width:   1
-            }
-        }
-    }
+               // Add this property so polygonVertex can be assigned:
+               property int polygonVertex: -1
+
+
+               // 1) Define a signal for when this marker is clicked
+               signal markerClicked(var clickedMarker)
+
+               // Show a small circle with the marker number inside
+               sourceItem: Rectangle {
+                   id: dragHandle
+                   width: ScreenTools.defaultFontPixelHeight * 1.5
+                   height: width
+                   radius: width / 2
+                   color: Qt.rgba(0, 0, 1, 0.8)  // Blue background
+                   border.color: Qt.rgba(1, 1, 1, 1)  // White border
+                   border.width: 2
+
+                   Text {
+                       anchors.centerIn: parent
+                       text: (polygonVertex + 1)
+                       color: "white"
+                       font.bold: true
+                       font.pixelSize: 10
+                   }
+
+                   // Use a MouseArea here to handle clicks
+                             MouseArea {
+                                 anchors.fill: parent
+                                 onClicked: {
+                                    // // Save the clicked marker in the main view and open the drawer
+                                    //  _root.selectedVertexIndex = mapQuickItem
+                                    // arrowDrawer.open()
+                                    // // Emit the markerClicked signal if further handling is needed
+                                    // mapQuickItem.markerClicked(mapQuickItem)
+                                      menu.popupVertex(polygonVertex)
+                                 }
+                             }
+               }
+           }
+       }
+
+
 
     // Add all polygon vertex drag handles to the map
     Component {
@@ -502,8 +629,17 @@ Item {
                 Component.onCompleted: {
                     var dragHandle = dragHandleComponent.createObject(mapControl)
                     dragHandle.coordinate = Qt.binding(function() { return object.coordinate })
+                    dragHandle.markerIndex = index + 1  // Assign numbers 1,2,3,4 based on index
                     dragHandle.polygonVertex = Qt.binding(function() { return index })
                     mapControl.addMapItem(dragHandle)
+
+                    //Connect the markerClicked signal to a function in this scope
+                                                       dragHandle.markerClicked.connect(function(clickedMarker) {
+                                                           // This code runs when the user clicks the marker
+                                                           _root.selectedVertexIndex = clickedMarker
+                                                          arrowDrawer.open()
+                                                       })
+
                     var dragArea = dragAreaComponent.createObject(mapControl, { "itemIndicator": dragHandle, "itemCoordinate": object.coordinate })
                     dragArea.polygonVertex = Qt.binding(function() { return index })
                     _visuals.push(dragHandle)
@@ -582,82 +718,294 @@ Item {
         }
     }
 
+    // Component {
+    //     id: toolbarComponent
+
+    //     PlanEditToolbar {
+    //         anchors.horizontalCenter:       mapControl.left
+    //         anchors.horizontalCenterOffset: mapControl.centerViewport.left + (mapControl.centerViewport.width / 2)
+    //         y:                              mapControl.centerViewport.top
+    //         availableWidth:                 mapControl.centerViewport.width
+
+    //         QGCButton {
+    //             _horizontalPadding: 0
+    //             text:               qsTr("Basic")
+    //             visible:            !mapPolygon.traceMode
+    //             onClicked:          _resetPolygon()
+    //         }
+
+    //         QGCButton {
+    //             _horizontalPadding: 0
+    //             text:               qsTr("Circular")
+    //             visible:            !mapPolygon.traceMode
+    //             onClicked:          _resetCircle()
+    //         }
+
+    //         QGCButton {
+    //             _horizontalPadding: 0
+    //             text:               mapPolygon.traceMode ? qsTr("Done Tracing") : qsTr("Trace")
+    //             onClicked: {
+    //                 if (mapPolygon.traceMode) {
+    //                     if (mapPolygon.count < 3) {
+    //                         _restorePreviousVertices()
+    //                     }
+    //                     mapPolygon.traceMode = false
+
+    //                 } else {
+    //                      mobileFileSaveDialogComponent.createObject(mainWindow).open()
+
+    //                 }
+    //             }
+    //         }
+
+    //         QGCButton {
+    //             _horizontalPadding: 0
+    //             text:               qsTr("Load KML/SHP...")
+    //             onClicked:          kmlOrSHPLoadDialog.openForLoad()
+    //             visible:            !mapPolygon.traceMode
+    //         }
+    //     }
+    // }
+
+
     Component {
-        id: toolbarComponent
+           id: toolbarComponent
 
-        PlanEditToolbar {
-            anchors.horizontalCenter:       mapControl.left
-            anchors.horizontalCenterOffset: mapControl.centerViewport.left + (mapControl.centerViewport.width / 2)
-            y:                              mapControl.centerViewport.top
-            availableWidth:                 mapControl.centerViewport.width
+           Item {
+               id: toolbarRoot
+               // Position and size this container to match the available viewport area
+                       x: mapControl.centerViewport.x
+                       y: mapControl.centerViewport.y
+                       width: mapControl.centerViewport.width
+                       height: mapControl.centerViewport.height
+               PlanEditToolbar {
+                   id: toolbar
+                   anchors.horizontalCenter: mapControl.left
+                   anchors.horizontalCenterOffset: mapControl.centerViewport.left + (mapControl.centerViewport.width / 2)
+                   y:                              mapControl.centerViewport.top
+                   availableWidth:                 mapControl.centerViewport.width
 
-            QGCButton {
-                _horizontalPadding: 0
-                text:               qsTr("Basic")
-                visible:            !mapPolygon.traceMode
-                onClicked:          _resetPolygon()
-            }
+                   // QGCButton {
+                   //     _horizontalPadding: 0
+                   //     text:               qsTr("Basic")
+                   //     visible:            !mapPolygon.traceMode
+                   //     onClicked:          _resetPolygon()
+                   // }
 
-            QGCButton {
-                _horizontalPadding: 0
-                text:               qsTr("Circular")
-                visible:            !mapPolygon.traceMode
-                onClicked:          _resetCircle()
-            }
+                   // QGCButton {
+                   //     _horizontalPadding: 0
+                   //     text:               qsTr("Circular")
+                   //     visible:            !mapPolygon.traceMode
+                   //     onClicked:          _resetCircle()
+                   // }
 
-            QGCButton {
-                _horizontalPadding: 0
-                text:               mapPolygon.traceMode ? qsTr("Done Tracing") : qsTr("Trace")
-                onClicked: {
-                    if (mapPolygon.traceMode) {
-                        if (mapPolygon.count < 3) {
-                            _restorePreviousVertices()
+                   QGCButton {
+                       _horizontalPadding: 0
+                       text:               mapPolygon.traceMode ? qsTr("Done Tracing") : qsTr("Trace")
+                       onClicked: {
+                           if (mapPolygon.traceMode) {
+                               if (mapPolygon.count < 3) {
+                                   _restorePreviousVertices()
+                               }
+                               mapPolygon.traceMode = false
+                               console.log("mapPolygon.traceMode if part")
+
+                           } else {
+                               mobileFileSaveDialogComponent.createObject(mainWindow).open()
+                               // _saveCurrentVertices()
+                               // _circleMode = false
+                               // mapPolygon.traceMode = true
+                               // mapPolygon.clear();
+                               // console.log("mapPolygon.traceMode else part")
+                           }
+                       }
+                   }
+
+                   QGCButton {
+                       _horizontalPadding: 0
+                       text:               qsTr("Load KML/SHP...")
+                       onClicked:          kmlOrSHPLoadDialog.openForLoad()
+                       visible:            !mapPolygon.traceMode
+                   }
+               }
+               Image {
+                   id: controlImage
+                   source: "qrc:/InstrumentValueIcons/location.svg"
+                   anchors.centerIn: parent  // Centers both horizontally and vertically
+                   width: 32
+                   height: 32
+                   visible: mapPolygon.traceMode
+
+                   // MouseArea {
+                   //     anchors.fill: parent
+                   //     onClicked: {
+                   //         console.log("SVG image clicked")
+                   //         // Add your click action here
+                   //     }
+                   // }
+               }
+
+               Row {
+                   spacing: 10
+                   anchors.right: parent.right
+                   anchors.bottom: parent.bottom
+                   anchors.rightMargin: 10
+                   anchors.bottomMargin: 10
+                   visible: mapPolygon.traceMode
+
+                   Button  {
+                       text: "Boundry Marking"
+                       onClicked: {
+                           // Convert the bottom-center point of controlImage to mapControl's coordinate space.
+                                   var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
+                                   // Then convert that point (in pixels) to a geographic coordinate.
+                                   var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
+                                   mapPolygon.appendVertex(bottomCoord)
+
+                       }
+                   }
+                   Button {
+                       text: "Button 2"
+                       onClicked: {
+                           // Handle Button 2 click
+                       }
+                   }
+               }
+
+           }
+
+       }
+
+
+    // Function to move the selected marker by dx/dy meters
+    function moveSelectedMarker(dxMeters, dyMeters) {
+        if (_root.selectedVertexIndex === -1 ||
+            _root.selectedVertexIndex >= mapPolygon.count) return
+
+        var vertex = mapPolygon.pathModel.get(_root.selectedVertexIndex)
+        if (!vertex) return
+
+        var coord = vertex.coordinate
+        var earthRadius = 6378137.0  // WGS-84
+
+        // Convert meter deltas to degrees
+        var newLat = coord.latitude + (dyMeters / earthRadius) * (180/Math.PI)
+        var newLon = coord.longitude + (dxMeters / (earthRadius * Math.cos(coord.latitude * Math.PI/180))) * (180/Math.PI)
+
+        mapPolygon.adjustVertex(_root.selectedVertexIndex, QtPositioning.coordinate(newLat, newLon))
+    }
+
+
+    // // Mouse area to capture clicks for tracing a polygon
+    // Component {
+    //     id:  traceMouseAreaComponent
+
+    //     MouseArea {
+    //         anchors.fill:       mapControl
+    //         preventStealing:    true
+    //         z:                  QGroundControl.zOrderMapItems + 1   // Over item indicators
+
+    //         onClicked: (mouse) => {
+
+    //             if(_utmspEnabled){
+
+    //                 if (mouse.button === Qt.LeftButton) {
+    //                     mapPolygon.appendVertex(mapControl.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */))
+    //                 }
+    //             }
+    //             else{
+    //                 if (mouse.button === Qt.LeftButton && _root.interactive) {
+    //                     mapPolygon.appendVertex(mapControl.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */))
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+
+
+
+    Component {
+            id: mobileFileSaveDialogComponent
+
+            QGCPopupDialog {
+                id:         mobileFileSaveDialog
+                title:      _root.title
+                buttons:    Dialog.Cancel | Dialog.Ok
+
+                onAccepted: {
+                    if (filenameTextField.text.length < 3 || filenameTextField1.text.length < 3 || filenameTextField2.text.length < 3) {
+                            mobileFileSaveDialog.preventClose = true
+                            return
                         }
-                        mapPolygon.traceMode = false
 
-                    } else {
-                        _saveCurrentVertices()
-                        _circleMode = false
-                        mapPolygon.traceMode = true
-                        mapPolygon.clear();
-                    }
+                    let concatenatedText = filenameTextField.text.substring(0, 3) +
+                                               filenameTextField1.text.substring(0, 3) +
+                                               filenameTextField2.text.substring(0, 3);
+
+
+_appSettings.username = concatenatedText;
+                       console.log(concatenatedText);
+
+
+
+                    _saveCurrentVertices()
+                    _circleMode = false
+                    mapPolygon.traceMode = true
+                    mapPolygon.clear();
                 }
-            }
 
-            QGCButton {
-                _horizontalPadding: 0
-                text:               qsTr("Load KML/SHP...")
-                onClicked:          kmlOrSHPLoadDialog.openForLoad()
-                visible:            !mapPolygon.traceMode
+                Column {
+                    id:         fileSaveColumn
+                    width:      40 * ScreenTools.defaultFontPixelWidth
+                    spacing:    ScreenTools.defaultFontPixelHeight / 2
+
+                    RowLayout {
+                        anchors.left:   parent.left
+                        anchors.right:  parent.right
+                        spacing:        ScreenTools.defaultFontPixelWidth
+
+                        QGCLabel { text: qsTr("New file name:") }
+
+                        QGCTextField {
+                            id:                 filenameTextField
+                            Layout.fillWidth:   true
+                            onTextChanged:      replaceMessage.visible = false
+                        }
+                    }
+
+                    RowLayout {
+                        anchors.left:   parent.left
+                        anchors.right:  parent.right
+                        spacing:        ScreenTools.defaultFontPixelWidth
+
+                        QGCLabel { text: qsTr("Mobile Number:") }
+
+                        QGCTextField {
+                            id:                 filenameTextField1
+                            Layout.fillWidth:   true
+                            validator:          RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                            inputMethodHints:   Qt.ImhDigitsOnly
+                            onTextChanged:      replaceMessage.visible = false
+                        }
+                    }
+                    RowLayout {
+                        anchors.left:   parent.left
+                        anchors.right:  parent.right
+                        spacing:        ScreenTools.defaultFontPixelWidth
+
+                        QGCLabel { text: qsTr("New file name:") }
+
+                        QGCTextField {
+                            id:                 filenameTextField2
+                            Layout.fillWidth:   true
+                            onTextChanged:      replaceMessage.visible = false
+                        }
+                    }
+
+                    }
             }
         }
-    }
-
-    // Mouse area to capture clicks for tracing a polygon
-    Component {
-        id:  traceMouseAreaComponent
-
-        MouseArea {
-            anchors.fill:       mapControl
-            preventStealing:    true
-            z:                  QGroundControl.zOrderMapItems + 1   // Over item indicators
-
-            onClicked: (mouse) => {
-
-                if(_utmspEnabled){
-
-                    if (mouse.button === Qt.LeftButton) {
-                        mapPolygon.appendVertex(mapControl.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */))
-                    }
-                }
-                else{
-                    if (mouse.button === Qt.LeftButton && _root.interactive) {
-                        mapPolygon.appendVertex(mapControl.toCoordinate(Qt.point(mouse.x, mouse.y), false /* clipToViewPort */))
-                    }
-                }
-            }
-        }
-    }
 
     Component {
         id: radiusDragHandleComponent
@@ -678,6 +1026,7 @@ Item {
             }
         }
     }
+
 
     Component {
         id: radiusDragAreaComponent
@@ -730,5 +1079,5 @@ Item {
             }
         }
     }
-}
 
+}

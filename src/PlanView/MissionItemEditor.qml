@@ -33,7 +33,8 @@ Rectangle {
 
     property var    _masterController:          masterController
     property var    _missionController:         _masterController.missionController
-    property bool   _currentItem:               missionItem.isCurrentItem
+    property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey")
+
     property color  _outerTextColor:            _currentItem ? qgcPal.primaryButtonText : qgcPal.text
     property bool   _noMissionItemsAdded:       ListView.view.model.count === 1
     property real   _sectionSpacer:             ScreenTools.defaultFontPixelWidth / 2  // spacing between section headings
@@ -60,6 +61,7 @@ Rectangle {
         MouseArea {
             anchors.fill:   parent
             onClicked: {
+                console.log("MissionEditor Class")
                 currentItemScope.focus = true
                 _root.clicked()
             }
@@ -118,7 +120,10 @@ Rectangle {
 
             QGCMouseArea {
                 fillItem:   parent
-                onClicked:  remove()
+                onClicked: {
+                    console.log("missionItem commandName",missionItem.commandName)
+                   remove()
+                }
             }
         }
 
@@ -188,7 +193,7 @@ Rectangle {
         height:                 _hamburgerSize
         sourceSize.height:      _hamburgerSize
         source:                 "qrc:/qmlimages/Hamburger.svg"
-        visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
+        visible:               (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0  //missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
         color:                  qgcPal.text
 
         QGCMouseArea {

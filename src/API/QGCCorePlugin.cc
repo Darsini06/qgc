@@ -315,7 +315,7 @@ void QGCCorePlugin::createRootWindow(QQmlApplicationEngine* qmlEngine)
 
     // Expose the C++ object to QML as "myCppClass"
     qmlEngine->rootContext()->setContextProperty("myCppClass", &myBluetooth);
-    qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/MainRootWindow.qml")));
+    qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/newscreen.qml")));
 }
 
 bool QGCCorePlugin::mavlinkMessage(Vehicle* vehicle, LinkInterface* link, mavlink_message_t message)

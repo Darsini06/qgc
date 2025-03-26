@@ -50,7 +50,13 @@
         <file alias="Analyze.svg">src/UI/toolbar/Images/Analyze.svg</file>
         <file alias="APM/BrandImage">src/FirmwarePlugin/APM/APMBrandImage.png</file>
         <file alias="APM/BrandImageSub">src/FirmwarePlugin/APM/APMBrandImageSub.png</file>
-        <file alias="NewImages/DroneImage">src/NewImages/searchIcon.png</file>
+        <file alias="NewImages/SearchIcon.png">src/NewImages/searchIcon.png</file>
+        <file alias="NewImages/CompassArrow.png">src/NewImages/compass_arrow.png</file>
+        <file alias="NewImages/Eraser.png">src/NewImages/eraser.png</file>
+        <file alias="NewImages/MapSwitch.png">src/NewImages/mapswitch.png</file>
+        <file alias="NewImages/MapRedirect.png">src/NewImages/redirect.png</file>
+        <file alias="NewImages/DroneRedirect.png">src/NewImages/drone_redirect.png</file>
+        <file alias="NewImages/MapRedirect1.png">src/NewImages/map_redirect.png</file>
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
         <file alias="arrow-down.png">src/QmlControls/arrow-down.png</file>

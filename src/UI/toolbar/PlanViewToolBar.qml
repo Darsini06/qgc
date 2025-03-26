@@ -29,7 +29,7 @@ Rectangle {
 
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property real   _controllerProgressPct: planMasterController.missionController.progressPct
-    
+
     QGCPalette { id: qgcPal }
 
     /// Bottom single pixel divider
@@ -48,13 +48,12 @@ Rectangle {
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom
         spacing:                ScreenTools.defaultFontPixelWidth / 2
-
         QGCToolBarButton {
-            id:                     currentButton
+            id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "/res/QGCLogoFull"
+            icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
-            onClicked:              mainWindow.showToolSelectDialog()
+            onClicked:              mainWindow.showFlyView()
         }
     }
 
@@ -93,7 +92,22 @@ Rectangle {
             }
         }
     }
+    Rectangle {
+        id:             largeProgressBar1
+        anchors.bottom: parent.bottom
+        anchors.right:  parent.right
+        height:         parent.height
+width:50
+        QGCToolBarButton {
+            id:                     currentButton
+            Layout.preferredHeight: largeProgressBar1.height
+            icon.source:            "qrc:/InstrumentValueIcons/dots-horizontal-triple.svg"
+            logo:                   true
+            onClicked:              mainWindow.showToolSelectDialog()
+            Layout.alignment:        Qt.AlignRight
+        }
 
+    }
     // Large mission download progress bar
     Rectangle {
         id:             largeProgressBar

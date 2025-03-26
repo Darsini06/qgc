@@ -41,7 +41,7 @@ RowLayout {
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true
-            color:      qgcPal.text
+            color:     "white" //qgcPal.text
             source:     "/qmlimages/FlightModesComponentIcon.png"
         }
 
@@ -49,6 +49,7 @@ RowLayout {
             text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
             font.pointSize:     fontPointSize
             Layout.alignment:   Qt.AlignCenter
+            color:     "white"
 
             MouseArea {
                 anchors.fill:   parent

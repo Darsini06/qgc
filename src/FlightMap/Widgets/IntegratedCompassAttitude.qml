@@ -19,6 +19,12 @@ Item {
     id:             control
     implicitWidth:  (compassRadius * 2) + attitudeSpacing + attitudeSize
     implicitHeight: implicitWidth
+    // anchors {
+    //         top: parent.top        // Lock to top
+    //         right: parent.right    // Lock to right
+    //         topMargin: -170         // Negative margin pulls it upward
+    //         //rightMargin: 220        // Adjust right spacing as needed
+    //     }
 
     property real attitudeSize:         rollIndicator.attitudeSize
     property real attitudeSpacing:      rollIndicator.attitudeSpacing
@@ -55,10 +61,17 @@ Item {
     //     radius: width / 2
     //     color:  qgcPal.window
 
-    //     QGCCompassWidget {
-    //         size:               parent.width - compassBorder
-    //         vehicle:            globals.activeVehicle
-    //         anchors.centerIn:   parent
-    //     }
     // }
+
+    // QGCCompassWidget {
+    //     size:               70 //parent.width - compassBorder
+    //     vehicle:            globals.activeVehicle
+    //     // anchors {
+    //     //     verticalCenter: parent.top    // Center at top edge
+    //     //         horizontalCenter: parent.right
+    //     //         }
+
+    // }
+
+
 }
