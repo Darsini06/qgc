@@ -20,12 +20,11 @@ import QGroundControl.Controllers
 import QGroundControl.ScreenTools
 
 SetupPage {
-    id:             flightModePage
-    pageComponent:  flightModePageComponent
+    id: flightModePage
 
     readonly property string _modeChannelParam: controller.modeChannelParam
     readonly property string _modeParamPrefix:  controller.modeParamPrefix
-    readonly property var    _pwmStrings:       [ "PWM 0 - 1230", "PWM 1231 - 1360", "PWM 1361 - 1490", "PWM 1491 - 1620", "PWM 1621 - 1749", "PWM 1750 +"]
+    readonly property var    _pwmStrings:       [ "PWM 0 - 1230", "PWM 1231 - 1360", "PWM 1361 - 1490", "PWM 1491 - 1620", "PWM 1621 - 1749", "PWM 1750 +" ]
 
     property real   _margins:                   ScreenTools.defaultFontPixelHeight
     property Fact   _nullFact
@@ -36,195 +35,253 @@ SetupPage {
     property int    _rcOptionStop:              _ch7OptAvailable ? 12 : 16
     property bool   _customSimpleMode:          controller.simpleMode === APMFlightModesComponentController.SimpleModeCustom
 
+    property string selectedTab: "flightMode"
+
     QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
     APMFlightModesComponentController {
-        id:         controller
+        id: controller
+    }
+
+    Column {
+        anchors.fill: parent
+        spacing: _margins
+
+        // Tabs Header
+        Row {
+            id: tabRow
+            width: parent.width
+            spacing: _margins
+
+            Rectangle {
+                id: tabFlightMode
+                width: parent.width / 2 - (_margins / 2)
+                height: ScreenTools.defaultFontPixelHeight * 2
+                color: selectedTab === "flightMode" ? "#ffffff" : "#cccccc"
+                radius: 6
+                border.width: 1
+                border.color: "#999999"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: selectedTab = "flightMode"
+                }
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: qsTr("Flight Mode Settings")
+                    font.bold: true
+                }
+            }
+
+            Rectangle {
+                id: tabSwitchOptions
+                width: parent.width / 2 - (_margins / 2)
+                height: ScreenTools.defaultFontPixelHeight * 2
+                color: selectedTab === "switchOptions" ? "#ffffff" : "#cccccc"
+                radius: 6
+                border.width: 1
+                border.color: "#999999"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: selectedTab = "switchOptions"
+                }
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: qsTr("Switch Options")
+                    font.bold: true
+                }
+            }
+        }
+
+        Loader {
+            id: tabLoader
+            anchors.top: tabRow.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            sourceComponent: selectedTab === "flightMode" ? flightModeComponent : switchOptionComponent
+        }
     }
 
     Component {
-        id: flightModePageComponent
+        id: flightModeComponent
 
-        Flow {
-            id:         flowLayout
-            width:      availableWidth
-            spacing:     _margins
+        ScrollView {
+            visible: selectedTab === "flightMode"
+            anchors.fill: parent
+            clip: true
+
+            contentItem: Item {
+                   width: parent.width
+                   height: columnContent.height
+
+                   Column {
+                       id: columnContent
+                       width: parent.width
+                       spacing: _margins
+
+
+                       Rectangle {
+                           width: parent.width
+                           color: qgcPal.windowShade
+
+                           Column {
+                               id: flightModeColumn
+                               width: parent.width - (_margins * 2)
+                               padding: ScreenTools.defaultFontPixelWidth
+                               spacing: ScreenTools.defaultFontPixelHeight
+
+                               Row {
+                                   spacing: _margins
+                                   visible: _fltmodeChExists
+
+                                   QGCLabel {
+                                       anchors.baseline: modeChannelCombo.baseline
+                                       text: qsTr("Flight mode channel:")
+                                   }
+
+                                   QGCComboBox {
+                                       id: modeChannelCombo
+                                       width: ScreenTools.defaultFontPixelWidth * 15
+                                       model: [qsTr("Not assigned"), qsTr("Channel 1"), qsTr("Channel 2"),
+                                               qsTr("Channel 3"), qsTr("Channel 4"), qsTr("Channel 5"),
+                                               qsTr("Channel 6"), qsTr("Channel 7"), qsTr("Channel 8")]
+                                       currentIndex: _fltmodeCh.value
+                                       onActivated: (index) => { _fltmodeCh.value = index }
+                                   }
+                               }
+
+                               GridLayout {
+                                   rows: _customSimpleMode ? 7 : 6
+                                   flow: GridLayout.TopToBottom
+
+                                   QGCLabel { text: ""; visible: _customSimpleMode }
+
+                                   Repeater {
+                                       model: 6
+                                       QGCLabel {
+                                           text: qsTr("Flight Mode ") + index
+                                           color: controller.activeFlightMode == index ? "yellow" : qgcPal.text
+                                           property int index: modelData + 1
+                                       }
+                                   }
+
+                                   QGCLabel { text: ""; visible: _customSimpleMode }
+
+                                   Repeater {
+                                       model: 6
+                                       FactComboBox {
+                                           Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 15
+                                           fact: controller.getParameterFact(-1, _modeParamPrefix + index)
+                                           indexModel: false
+                                           property int index: modelData + 1
+                                       }
+                                   }
+
+                                   QGCLabel {
+                                       text: qsTr("Simple")
+                                       font.pointSize: ScreenTools.smallFontPointSize
+                                       visible: _customSimpleMode
+                                   }
+
+                                   Repeater {
+                                       model: controller.simpleModeEnabled
+                                       QGCCheckBox {
+                                           Layout.alignment: Qt.AlignHCenter
+                                           visible: _customSimpleMode
+                                           checked: modelData
+                                           onClicked: controller.setSimpleMode(index, checked)
+                                       }
+                                   }
+
+                                   QGCLabel {
+                                       text: qsTr("Super-Simple")
+                                       font.pointSize: ScreenTools.smallFontPointSize
+                                       visible: _customSimpleMode
+                                   }
+
+                                   Repeater {
+                                       model: controller.superSimpleModeEnabled
+                                       QGCCheckBox {
+                                           Layout.alignment: Qt.AlignHCenter
+                                           visible: _customSimpleMode
+                                           checked: modelData
+                                           onClicked: controller.setSuperSimpleMode(index, checked)
+                                       }
+                                   }
+
+                                   QGCLabel { text: ""; visible: _customSimpleMode }
+
+                                   Repeater {
+                                       model: 6
+                                       QGCLabel { text: _pwmStrings[modelData] }
+                                   }
+                               }
+
+                               RowLayout {
+                                   spacing: _margins
+                                   visible: controller.simpleModesSupported
+
+                                   QGCLabel { text: qsTr("Simple Mode") }
+
+                                   QGCComboBox {
+                                       model: controller.simpleModeNames
+                                       currentIndex: controller.simpleMode
+                                       onActivated: (index) => { controller.simpleMode = index }
+                                   }
+                               }
+                           }
+                       }
+                   }
+
+            }
+
+        }
+    }
+
+    Component {
+        id: switchOptionComponent
+
+        ScrollView {
+            visible: selectedTab === "switchOptions"
+            anchors.fill: parent
+            clip: true
 
             Column {
-                spacing: _margins
+                width: parent.width
+                spacing: ScreenTools.defaultFontPixelHeight
 
-                QGCLabel {
-                    id:             flightModeLabel
-                    text:           qsTr("Flight Mode Settings") + (_fltmodeChExists ? "" : qsTr(" (Channel 5)"))
-                    font.bold:      true
-                }
+                Column {
+                    id: channelOptColumn
+                    width: parent.width
+                    anchors.margins: ScreenTools.defaultFontPixelWidth
+                    spacing: ScreenTools.defaultFontPixelHeight
 
-                Rectangle {
-                    id:     flightModeSettings
-                    width:  flightModeColumn.width + (_margins * 2)
-                    height: flightModeColumn.height + ScreenTools.defaultFontPixelHeight
-                    color:  qgcPal.windowShade
-
-                    Column {
-                        id:                 flightModeColumn
-                        anchors.margins:    ScreenTools.defaultFontPixelWidth
-                        anchors.left:       parent.left
-                        anchors.top:        parent.top
-                        spacing:            ScreenTools.defaultFontPixelHeight
+                    Repeater {
+                        model: _rcOptionStop - _rcOptionStart + 1
 
                         Row {
-                            spacing:    _margins
-                            visible:    _fltmodeChExists
+                            spacing: ScreenTools.defaultFontPixelWidth
+
+                            property int index: modelData + _rcOptionStart
+                            property Fact nullFact: Fact { }
 
                             QGCLabel {
-                                id:                 modeChannelLabel
-                                anchors.baseline:   modeChannelCombo.baseline
-                                text:               qsTr("Flight mode channel:")
+                                anchors.baseline: optCombo.baseline
+                                text: qsTr("Channel option %1 :").arg(index)
+                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "yellow" : qgcPal.text
                             }
 
-                            QGCComboBox {
-                                id:             modeChannelCombo
-                                width:          ScreenTools.defaultFontPixelWidth * 15
-                                model:          [ qsTr("Not assigned"), qsTr("Channel 1"), qsTr("Channel 2"),
-                                    qsTr("Channel 3"),    qsTr("Channel 4"), qsTr("Channel 5"),
-                                    qsTr("Channel 6"),    qsTr("Channel 7"), qsTr("Channel 8") ]
-
-                                currentIndex:   _fltmodeCh.value
-                                onActivated: (index) => { _fltmodeCh.value = index }
+                            FactComboBox {
+                                id: optCombo
+                                width: ScreenTools.defaultFontPixelWidth * 15
+                                fact: controller.getParameterFact(-1, "r.RC" + index + "_OPTION")
+                                indexModel: false
                             }
                         }
-
-                        GridLayout {
-                            rows:   _customSimpleMode ? 7 : 6
-                            flow:   GridLayout.TopToBottom
-
-                            QGCLabel { text: ""; visible: _customSimpleMode }
-                            Repeater {
-                                model:  6
-
-                                QGCLabel {
-                                    text:   qsTr("Flight Mode ") + index
-                                    color:  controller.activeFlightMode == index ? "yellow" : qgcPal.text
-
-                                    property int index: modelData + 1
-                                }
-                            }
-
-                            QGCLabel { text: ""; visible: _customSimpleMode }
-                            Repeater {
-                                model:  6
-
-                                FactComboBox {
-                                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 15
-                                    fact:                   controller.getParameterFact(-1, _modeParamPrefix + index)
-                                    indexModel:             false
-
-                                    property int index: modelData + 1
-                                }
-                            }
-
-                            QGCLabel {
-                                text:           qsTr("Simple")
-                                font.pointSize: ScreenTools.smallFontPointSize
-                                visible:        _customSimpleMode
-                            }
-                            Repeater {
-                                model:  controller.simpleModeEnabled
-                                QGCCheckBox {
-                                    Layout.alignment:   Qt.AlignHCenter
-                                    visible:            _customSimpleMode
-                                    checked:            modelData
-                                    onClicked:          controller.setSimpleMode(index, checked)
-                                }
-                            }
-
-                            QGCLabel {
-                                text:           qsTr("Super-Simple")
-                                font.pointSize: ScreenTools.smallFontPointSize
-                                visible:        _customSimpleMode
-                            }
-                            Repeater {
-                                model:  controller.superSimpleModeEnabled
-                                QGCCheckBox {
-                                    Layout.alignment:   Qt.AlignHCenter
-                                    visible:            _customSimpleMode
-                                    checked:            modelData
-                                    onClicked:          controller.setSuperSimpleMode(index, checked)
-                                }
-                            }
-
-                            QGCLabel { text: ""; visible: _customSimpleMode }
-                            Repeater {
-                                model:  6
-
-                                QGCLabel { text: _pwmStrings[modelData] }
-                            }
-                        }
-
-                        RowLayout {
-                            spacing: _margins
-                            visible: controller.simpleModesSupported
-
-                            QGCLabel { text: qsTr("Simple Mode") }
-
-                            QGCComboBox {
-                                model:          controller.simpleModeNames
-                                currentIndex:   controller.simpleMode
-                                onActivated: (index) => { controller.simpleMode = index }
-                            }
-                        }
-                    } // Column - Flight Modes
-                } // Rectangle - Flight Modes
-            } // Column - Flight Modes
-
-            Column {
-                spacing: _margins
-
-                QGCLabel {
-                    id:                 channelOptionsLabel
-                    text:               qsTr("Switch Options")
-                    font.bold:          true
+                    }
                 }
+            }
+        }
+    }
+}
 
-                Rectangle {
-                    id:     channelOptionsSettings
-                    width:  channelOptColumn.width + (_margins * 2)
-                    height: channelOptColumn.height + ScreenTools.defaultFontPixelHeight
-                    color:  qgcPal.windowShade
-
-                    Column {
-                        id:                 channelOptColumn
-                        anchors.margins:    ScreenTools.defaultFontPixelWidth
-                        anchors.left:       parent.left
-                        anchors.top:        parent.top
-                        spacing:            ScreenTools.defaultFontPixelHeight
-
-                        Repeater {
-                            model: _rcOptionStop - _rcOptionStart + 1
-
-                            Row {
-                                spacing: ScreenTools.defaultFontPixelWidth
-
-                                property int index: modelData + _rcOptionStart
-                                property Fact nullFact: Fact { }
-
-                                QGCLabel {
-                                    anchors.baseline:   optCombo.baseline
-                                    text:               qsTr("Channel option %1 :").arg(index)
-                                    color:              controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "yellow" : qgcPal.text
-                                }
-
-                                FactComboBox {
-                                    id:         optCombo
-                                    width:      ScreenTools.defaultFontPixelWidth * 15
-                                    fact:       controller.getParameterFact(-1, "r.RC" + index + "_OPTION")
-                                    indexModel: false
-                                }
-                            }
-                        } // Repeater -- Channel options
-                    } // Column - Channel options
-                } // Rectangle - Channel options
-            } // Column - Channel options
-        } // Flow
-    } // Component - flightModePageComponent
-} // SetupPage

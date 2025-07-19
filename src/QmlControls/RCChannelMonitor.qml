@@ -20,11 +20,14 @@ import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Controllers
 
+//New code
+
 Item {
     id:     _root
     height: monitorColumn.height
 
     property bool twoColumn: false
+    property int channelIndex: -1
 
     readonly property int _pwmMin:      800
     readonly property int _pwmMax:      2200
@@ -34,110 +37,241 @@ Item {
         id:             controller
     }
 
-    // Live channel monitor control component
     Component {
         id: channelMonitorDisplayComponent
 
         Item {
             height: ScreenTools.defaultFontPixelHeight
 
-            property int    rcValue:    1500
+            property int rcValue: 1500
+            property int __lastRcValue: 1500
+            readonly property int __rcValueMaxJitter: 2
+            property color __barColor: qgcPal.windowShade
 
-            property int            __lastRcValue:      1500
-            readonly property int   __rcValueMaxJitter: 2
-            property color          __barColor:         qgcPal.windowShade
+            // Row layout for label + seekbar
+            Row {
+                anchors.fill: parent
+                spacing: ScreenTools.defaultFontPixelWidth / 2
 
-            // Bar
-            Rectangle {
-                id:                     bar
-                anchors.verticalCenter: parent.verticalCenter
-                width:                  parent.width
-                height:                 parent.height / 2
-                color:                  __barColor
-            }
+                // RC Value label on the left
+                QGCLabel {
+                    width: ScreenTools.defaultFontPixelWidth * 5 // Adjust width as needed
+                    height: parent.height
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: rcValue.toString()
+                    color: "white"
+                    visible: mapped
+                }
 
-            // Center point
-            Rectangle {
-                anchors.horizontalCenter:   parent.horizontalCenter
-                width:                      ScreenTools.defaultFontPixelWidth / 2
-                height:                     parent.height
-                color:                      qgcPal.window
-            }
+                // Seekbar area (takes remaining width)
+                Item {
+                    width: parent.width - ScreenTools.defaultFontPixelWidth * 5.5 // Adjust based on label width
+                    height: parent.height
 
-            // Indicator
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width:                  parent.height * 0.75
-                height:                 width
-                x:                      (((reversed ? _pwmMax - rcValue : rcValue - _pwmMin) / _pwmRange) * parent.width) - (width / 2)
-                radius:                 width / 2
-                color:                  qgcPal.text
-                visible:                mapped
-            }
+                    // Bar
+                    Rectangle {
+                        id: bar
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                        height: parent.height / 2
+                        color: __barColor
+                    }
 
-            QGCLabel {
-                anchors.fill:           parent
-                horizontalAlignment:    Text.AlignHCenter
-                verticalAlignment:      Text.AlignVCenter
-                text:                   qsTr("Not Mapped")
-                visible:                !mapped
+                    // Center point
+                    Rectangle {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: ScreenTools.defaultFontPixelWidth / 2
+                        height: parent.height
+                        color: qgcPal.window
+                    }
+
+                    // Indicator
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.height * 0.75
+                        height: width
+                        x: (((reversed ? _pwmMax - rcValue : rcValue - _pwmMin) / _pwmRange) * parent.width) - (width / 2)
+                        radius: width / 2
+                        color: qgcPal.text
+                        visible: mapped
+                    }
+
+                    // Not Mapped label (centered in the seekbar area)
+                    QGCLabel {
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: qsTr("Not Mapped")
+                        visible: !mapped
+                    }
+                }
             }
 
             ColorAnimation {
-                id:         barAnimation
-                target:     bar
-                property:   "color"
-                from:       "yellow"
-                to:         __barColor
-                duration:   1500
-            }
-        }
-    } // Component - channelMonitorDisplayComponent
-
-    GridLayout {
-        id:         monitorColumn
-        width:      parent.width
-        columns:    twoColumn ? 2 : 1
-
-        QGCLabel {
-            Layout.columnSpan:  parent.columns
-            text:               qsTr("Channel Monitor")
-        }
-
-        Connections {
-            target: controller
-
-            onChannelRCValueChanged: (channel, rcValue) => {
-                if (channelMonitorRepeater.itemAt(channel)) {
-                    channelMonitorRepeater.itemAt(channel).loader.item.rcValue = rcValue
-                }
-            }
-        }
-
-        Repeater {
-            id:     channelMonitorRepeater
-            model:  controller.channelCount
-
-            RowLayout {
-                // Need this to get to loader from Connections above
-                property Item loader: theLoader
-
-                QGCLabel {
-                    id:     channelLabel
-                    text:   modelData + 1
-                }
-
-                Loader {
-                    id:                 theLoader
-                    Layout.fillWidth:   true
-                    //height:                 ScreenTools.defaultFontPixelHeight
-                    //width:                  parent.width - anchors.leftMargin - ScreenTools.defaultFontPixelWidth
-                    sourceComponent:        channelMonitorDisplayComponent
-
-                    property bool mapped:               true
-                    readonly property bool reversed:    false
-                }
+                id: barAnimation
+                target: bar
+                property: "color"
+                from: "yellow"
+                to: __barColor
+                duration: 1500
             }
         }
     }
+
+    RowLayout {
+        id: monitorRow
+        width: parent.width
+        height: ScreenTools.defaultFontPixelHeight
+        visible: channelIndex >= 5 // Show channels 6-16 (0-based index 5-15)
+
+        Loader {
+            id:                 theLoader
+            Layout.fillWidth:   true
+            Layout.preferredHeight: ScreenTools.defaultFontPixelHeight
+            Layout.alignment: Qt.AlignVCenter
+            sourceComponent:    channelMonitorDisplayComponent
+
+            property bool mapped:               true
+            readonly property bool reversed:    false
+        }
+    }
+
+    Connections {
+        target: controller
+
+        onChannelRCValueChanged: (channel, rcValue) => {
+                                     if (channel === channelIndex) {
+                                         theLoader.item.rcValue = rcValue;
+                                     }
+                                 }
+    }
+
 }
+
+//old code
+// Item {
+//     id:     _root
+//     height: monitorColumn.height
+
+//      property int channelIndex: -1
+//     property bool twoColumn: false
+
+//     readonly property int _pwmMin:      800
+//     readonly property int _pwmMax:      2200
+//     readonly property int _pwmRange:    _pwmMax - _pwmMin
+
+//     RCChannelMonitorController {
+//         id:             controller
+//     }
+
+//     // Live channel monitor control component
+//     Component {
+//         id: channelMonitorDisplayComponent
+
+//         Item {
+//             height: ScreenTools.defaultFontPixelHeight
+
+//             property int    rcValue:    1500
+
+//             property int            __lastRcValue:      1500
+//             readonly property int   __rcValueMaxJitter: 2
+//             property color          __barColor:         qgcPal.windowShade
+
+//             // Bar
+//             Rectangle {
+//                 id:                     bar
+//                 anchors.verticalCenter: parent.verticalCenter
+//                 width:                  parent.width
+//                 height:                 parent.height / 2
+//                 color:                  __barColor
+//             }
+
+//             // Center point
+//             Rectangle {
+//                 anchors.horizontalCenter:   parent.horizontalCenter
+//                 width:                      ScreenTools.defaultFontPixelWidth / 2
+//                 height:                     parent.height
+//                 color:                      qgcPal.window
+//             }
+
+//             // Indicator
+//             Rectangle {
+//                 anchors.verticalCenter: parent.verticalCenter
+//                 width:                  parent.height * 0.75
+//                 height:                 width
+//                 x:                      (((reversed ? _pwmMax - rcValue : rcValue - _pwmMin) / _pwmRange) * parent.width) - (width / 2)
+//                 radius:                 width / 2
+//                 color:                  qgcPal.text
+//                 visible:                mapped
+//             }
+
+//             QGCLabel {
+//                 anchors.fill:           parent
+//                 horizontalAlignment:    Text.AlignHCenter
+//                 verticalAlignment:      Text.AlignVCenter
+//                 text:                   qsTr("Not Mapped")
+//                 visible:                !mapped
+//             }
+
+//             ColorAnimation {
+//                 id:         barAnimation
+//                 target:     bar
+//                 property:   "color"
+//                 from:       "yellow"
+//                 to:         __barColor
+//                 duration:   1500
+//             }
+//         }
+//     } // Component - channelMonitorDisplayComponent
+
+//     GridLayout {
+//         id:         monitorColumn
+//         width:      parent.width
+//         columns:    1//twoColumn ? 2 : 1
+
+//         QGCLabel {
+//             Layout.columnSpan:  parent.columns
+//             text:               qsTr("Channel Monitor")
+//         }
+
+//         Connections {
+//             target: controller
+
+//             onChannelRCValueChanged: (channel, rcValue) => {
+//                 if (channelMonitorRepeater.itemAt(channel)) {
+//                     channelMonitorRepeater.itemAt(channel).loader.item.rcValue = rcValue
+//                 }
+//             }
+//         }
+
+//         Repeater {
+//             id:     channelMonitorRepeater
+//             model:  controller.channelCount
+
+//             RowLayout {
+//                 visible: modelData >= 5
+//                 // Need this to get to loader from Connections above
+//                 property Item loader: theLoader
+
+//                 QGCLabel {
+//                     id:     channelLabel
+//                     text:   modelData + 1
+//                 }
+
+//                 Loader {
+//                     id:                 theLoader
+//                     Layout.fillWidth:   true
+//                     //height:                 ScreenTools.defaultFontPixelHeight
+//                     //width:                  parent.width - anchors.leftMargin - ScreenTools.defaultFontPixelWidth
+//                     sourceComponent:        channelMonitorDisplayComponent
+
+//                     property bool mapped:               true
+//                     readonly property bool reversed:    false
+//                 }
+//             }
+//         }
+//     }
+
+// }

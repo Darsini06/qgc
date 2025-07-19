@@ -80,6 +80,12 @@ APMSensorsComponentController::~APMSensorsComponentController()
     _restorePreviousCompassCalFitness();
 }
 
+void APMSensorsComponentController::setCurrentCalibrationType(const QString& type)
+{
+    qDebug() << "setCurrentCalibrationType" << type;
+    _currentCalibrationType = type;
+}
+
 /// Appends the specified text to the status log area in the ui
 void APMSensorsComponentController::_appendStatusLog(const QString& text)
 {
@@ -93,22 +99,40 @@ void APMSensorsComponentController::_appendStatusLog(const QString& text)
 
 void APMSensorsComponentController::_startLogCalibration(void)
 {
+     qDebug()<< "_startLogCalibration 1";
     _hideAllCalAreas();
-    
+     qDebug()<< "_startLogCalibration 2";
     connect(_vehicle, &Vehicle::textMessageReceived, this, &APMSensorsComponentController::_handleUASTextMessage);
-    
+    qDebug()<< "_startLogCalibration 3";
     emit setAllCalButtonsEnabled(false);
-    if (_calTypeInProgress == QGCMAVLink::CalibrationAccel || _calTypeInProgress == QGCMAVLink::CalibrationAPMCompassMot) {
-        _nextButton->setEnabled(true);
-    }
-    _cancelButton->setEnabled(_calTypeInProgress == QGCMAVLink::CalibrationMag);
+    qDebug()<< "_startLogCalibration 4";
+    // if (_calTypeInProgress == QGCMAVLink::CalibrationAccel || _calTypeInProgress == QGCMAVLink::CalibrationAPMCompassMot) {
+    //     _nextButton->setEnabled(true);
+    //      qDebug()<< "_startLogCalibration 5";
+    // }
+    // _cancelButton->setEnabled(_calTypeInProgress == QGCMAVLink::CalibrationMag);
 
-    connect(qgcApp()->toolbox()->mavlinkProtocol(), &MAVLinkProtocol::messageReceived, this, &APMSensorsComponentController::_mavlinkMessageReceived);
+     qDebug()<< "_startLogCalibration 6";
+
+    MAVLinkProtocol* protocol = qgcApp()->toolbox()->mavlinkProtocol();
+
+    if (!protocol) {
+        qCritical() << "Error: MAVLinkProtocol is null!";
+    } else {
+        qDebug() << "MAVLinkProtocol is valid";
+        connect(protocol, &MAVLinkProtocol::messageReceived, this, &APMSensorsComponentController::_mavlinkMessageReceived);
+    }
+
+
+   // connect(qgcApp()->toolbox()->mavlinkProtocol(), &MAVLinkProtocol::messageReceived, this, &APMSensorsComponentController::_mavlinkMessageReceived);
+
+     qDebug()<< "_startLogCalibration 7";
 }
 
 void APMSensorsComponentController::_startVisualCalibration(void)
 {
     emit setAllCalButtonsEnabled(false);
+
     _cancelButton->setEnabled(true);
     _nextButton->setEnabled(false);
 
@@ -117,6 +141,7 @@ void APMSensorsComponentController::_startVisualCalibration(void)
     _progressBar->setProperty("value", 0);
 
     connect(qgcApp()->toolbox()->mavlinkProtocol(), &MAVLinkProtocol::messageReceived, this, &APMSensorsComponentController::_mavlinkMessageReceived);
+
 }
 
 void APMSensorsComponentController::_resetInternalState(void)
@@ -201,6 +226,7 @@ void APMSensorsComponentController::_stopCalibration(APMSensorsComponentControll
     _calTypeInProgress = QGCMAVLink::CalibrationNone;
 }
 
+
 void APMSensorsComponentController::_mavCommandResult(int vehicleId, int component, int command, int result, bool noReponseFromVehicle)
 {
     Q_UNUSED(component);
@@ -274,9 +300,13 @@ void APMSensorsComponentController::_mavCommandResult(int vehicleId, int compone
     } else if (command == MAV_CMD_FIXED_MAG_CAL_YAW) {
         if (result == MAV_RESULT_ACCEPTED) {
             _appendStatusLog(tr("Successfully completed"));
+            emit showToastMessage(tr("AccelCalibration successfully Completed"));
+
             _stopCalibration(StopCalibrationSuccessShowLog);
         } else {
             _appendStatusLog(tr("Failed"));
+             emit showToastMessage(tr("Calibration Failed"));
+            emit updateCalibrationStatus(_currentCalibrationType, "failure");
             _stopCalibration(StopCalibrationFailed);
         }
     }
@@ -303,12 +333,14 @@ void APMSensorsComponentController::calibrateAccel(bool doSimpleAccelCal)
 {
 
     _calTypeInProgress = QGCMAVLink::CalibrationAccel;
+
     if (doSimpleAccelCal) {
         _startLogCalibration();
         _calTypeInProgress = QGCMAVLink::CalibrationAPMAccelSimple;
         _vehicle->startCalibration(_calTypeInProgress);
         return;
     }
+
     _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(false);
     _startVisualCalibration();
     _cancelButton->setEnabled(false);
@@ -337,12 +369,13 @@ void APMSensorsComponentController::calibrateAccel(bool doSimpleAccelCal)
     _orientationCalNoseDownSideVisible = false;
 
     _calTypeInProgress = QGCMAVLink::CalibrationAccel;
+
     _orientationCalDownSideVisible = true;
     _orientationCalUpsideDownSideVisible = true;
     _orientationCalLeftSideVisible = true;
     _orientationCalRightSideVisible = true;
     _orientationCalTailDownSideVisible = true;
-    _orientationCalNoseDownSideVisible = true;
+    _orientationCalNoseDownSideVisible = 01;
 
     emit orientationCalSidesDoneChanged();
     emit orientationCalSidesVisibleChanged();
@@ -350,7 +383,9 @@ void APMSensorsComponentController::calibrateAccel(bool doSimpleAccelCal)
     _updateAndEmitShowOrientationCalArea(true);
 
     _vehicle->startCalibration(_calTypeInProgress);
+
 }
+
 
 void APMSensorsComponentController::calibrateMotorInterference(void)
 {
@@ -363,13 +398,21 @@ void APMSensorsComponentController::calibrateMotorInterference(void)
     _vehicle->startCalibration(_calTypeInProgress);
 }
 
-void APMSensorsComponentController::levelHorizon(void)
+ void APMSensorsComponentController::levelHorizon(void)
 {
     _calTypeInProgress = QGCMAVLink::CalibrationLevel;
+
     _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(false);
+
     _startLogCalibration();
+
+     qDebug()<< "levelHorizon Method Starting in .cc class" << _calTypeInProgress ;
+
     _appendStatusLog(tr("Hold the vehicle in its level flight position."));
+
     _vehicle->startCalibration(_calTypeInProgress);
+
+     qDebug()<< "levelHorizon Method Ending in .cc class";
 }
 
 void APMSensorsComponentController::calibratePressure(void)
@@ -437,6 +480,7 @@ void APMSensorsComponentController::_updateAndEmitShowOrientationCalArea(bool sh
 void APMSensorsComponentController::_hideAllCalAreas(void)
 {
     _updateAndEmitShowOrientationCalArea(false);
+     qDebug()<< "_hideAllCalAreas";
 }
 
 void APMSensorsComponentController::cancelCalibration(void)
@@ -514,10 +558,16 @@ void APMSensorsComponentController::_handleCommandAck(mavlink_message_t& message
                 break;
             case MAV_RESULT_ACCEPTED:
                 _appendStatusLog(tr("Successfully completed"));
+                emit showToastMessage(tr("Calibration successfully completed"));
+                emit updateCalibrationStatus(_currentCalibrationType, "success");
+                qDebug() << "setCurrentCalibrationType" << _currentCalibrationType;
                 _stopCalibration(StopCalibrationSuccessShowLog);
                 break;
             default:
                 _appendStatusLog(tr("Failed"));
+                 emit showToastMessage(tr("Calibration Failed"));
+                emit updateCalibrationStatus(_currentCalibrationType, "failure");
+                qDebug() << "setCurrentCalibrationType" << _currentCalibrationType;
                 _stopCalibration(StopCalibrationFailed);
                 break;
             }

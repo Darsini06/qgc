@@ -29,7 +29,8 @@ SetupPage {
 
         Item {
             width:  availableWidth
-            height: Math.max(leftColumn.height, rightColumn.height)
+            height: Math.max(leftColumn.height)
+
 
             function setupPageCompleted() {
                 controller.start()
@@ -165,134 +166,174 @@ SetupPage {
             // Left side column
             Column {
                 id:             leftColumn
-                anchors.left:   parent.left
-                anchors.right:  columnSpacer.left
+                width: parent.width
+                anchors.margins: 20
+                // anchors.left:   parent.left
+                // anchors.right:  columnSpacer.left
                 spacing:        10
 
-                // Attitude Controls
-                Column {
+                Row {
+                    spacing: ScreenTools.defaultFontPixelWidth
+
+                    QGCRadioButton {
+                        text:       qsTr("Mode 1")
+                        checked:    controller.transmitterMode == 1
+                        onClicked:  controller.transmitterMode = 1
+                    }
+
+                    QGCRadioButton {
+                        text:       qsTr("Mode 2")
+                        checked:    controller.transmitterMode == 2
+                        onClicked:  controller.transmitterMode = 2
+                    }
+                }
+
+                Row {
                     width:      parent.width
-                    spacing:    5
-                    QGCLabel { text: qsTr("Attitude Controls") }
+                    spacing: 10
 
-                    Item {
-                        width:  parent.width
-                        height: globals.defaultTextHeight * 2
-                        QGCLabel {
-                            id:     rollLabel
-                            width:  globals.defaultTextWidth * 10
-                            text:   qsTr("Roll")
-                        }
-
-                        Loader {
-                            id:                 rollLoader
-                            anchors.left:       rollLabel.right
-                            anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
-                            width:              100
-                            sourceComponent:    channelMonitorDisplayComponent
-
-                            property bool mapped:           controller.rollChannelMapped
-                            property bool reversed:         controller.rollChannelReversed
-                        }
-
-                        Connections {
-                            target: controller
-
-                            onRollChannelRCValueChanged: (rcValue) => rollLoader.item.rcValue = rcValue
-                        }
+                    Image {
+                        width: parent.width / 2
+                        fillMode:   Image.PreserveAspectFit
+                        smooth:     true
+                        source:     controller.imageHelp
                     }
+                    // Attitude Controls
+                    Column {
+                        width: parent.width / 2
+                        spacing:    5
+                        QGCLabel { text: qsTr("Attitude Controls")
+                            color:"black"}
 
-                    Item {
-                        width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                        Item {
+                            width:  parent.width
+                            height: globals.defaultTextHeight * 2
+                            QGCLabel {
+                                id:     rollLabel
+                                width:  globals.defaultTextWidth * 7
+                                text:   qsTr("Roll")
+                                color:"black"
+                            }
 
-                        QGCLabel {
-                            id:     pitchLabel
-                            width:  globals.defaultTextWidth * 10
-                            text:   qsTr("Pitch")
+                            Loader {
+                                id:                 rollLoader
+                                anchors.left:       rollLabel.right
+                                anchors.right:      parent.right
+                                height:             globals.defaultTextHeight
+                                width:              100
+                                sourceComponent:    channelMonitorDisplayComponent
+
+                                property bool mapped:           controller.rollChannelMapped
+                                property bool reversed:         controller.rollChannelReversed
+                            }
+
+                            Connections {
+                                target: controller
+
+                                onRollChannelRCValueChanged: (rcValue) => rollLoader.item.rcValue = rcValue
+                            }
                         }
 
-                        Loader {
-                            id:                 pitchLoader
-                            anchors.left:       pitchLabel.right
-                            anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
-                            width:              100
-                            sourceComponent:    channelMonitorDisplayComponent
+                        Item {
+                            width:  parent.width
+                            height: globals.defaultTextHeight * 2
 
-                            property bool mapped:           controller.pitchChannelMapped
-                            property bool reversed:         controller.pitchChannelReversed
+                            QGCLabel {
+                                id:     pitchLabel
+                                width:  globals.defaultTextWidth * 7
+                                text:   qsTr("Pitch")
+                                color:"black"
+                            }
+
+                            Loader {
+                                id:                 pitchLoader
+                                anchors.left:       pitchLabel.right
+                                anchors.right:      parent.right
+                                height:             globals.defaultTextHeight
+                                width:              100
+                                sourceComponent:    channelMonitorDisplayComponent
+
+                                property bool mapped:           controller.pitchChannelMapped
+                                property bool reversed:         controller.pitchChannelReversed
+                            }
+
+                            Connections {
+                                target: controller
+
+                                onPitchChannelRCValueChanged: (rcValue) => pitchLoader.item.rcValue = rcValue
+                            }
                         }
 
-                        Connections {
-                            target: controller
+                        Item {
+                            width:  parent.width
+                            height: globals.defaultTextHeight * 2
 
-                            onPitchChannelRCValueChanged: (rcValue) => pitchLoader.item.rcValue = rcValue
-                        }
-                    }
+                            QGCLabel {
+                                id:     yawLabel
+                                width:  globals.defaultTextWidth * 7
+                                text:   qsTr("Yaw")
+                                color:"black"
+                            }
 
-                    Item {
-                        width:  parent.width
-                        height: globals.defaultTextHeight * 2
+                            Loader {
+                                id:                 yawLoader
+                                anchors.left:       yawLabel.right
+                                anchors.right:      parent.right
+                                height:             globals.defaultTextHeight
+                                width:              100
+                                sourceComponent:    channelMonitorDisplayComponent
 
-                        QGCLabel {
-                            id:     yawLabel
-                            width:  globals.defaultTextWidth * 10
-                            text:   qsTr("Yaw")
-                        }
+                                property bool mapped:           controller.yawChannelMapped
+                                property bool reversed:         controller.yawChannelReversed
+                            }
 
-                        Loader {
-                            id:                 yawLoader
-                            anchors.left:       yawLabel.right
-                            anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
-                            width:              100
-                            sourceComponent:    channelMonitorDisplayComponent
+                            Connections {
+                                target: controller
 
-                            property bool mapped:           controller.yawChannelMapped
-                            property bool reversed:         controller.yawChannelReversed
-                        }
-
-                        Connections {
-                            target: controller
-
-                            onYawChannelRCValueChanged: (rcValue) => yawLoader.item.rcValue = rcValue
-                        }
-                    }
-
-                    Item {
-                        width:  parent.width
-                        height: globals.defaultTextHeight * 2
-
-                        QGCLabel {
-                            id:     throttleLabel
-                            width:  globals.defaultTextWidth * 10
-                            text:   qsTr("Throttle")
+                                onYawChannelRCValueChanged: (rcValue) => yawLoader.item.rcValue = rcValue
+                            }
                         }
 
-                        Loader {
-                            id:                 throttleLoader
-                            anchors.left:       throttleLabel.right
-                            anchors.right:      parent.right
-                            height:             globals.defaultTextHeight
-                            width:              100
-                            sourceComponent:    channelMonitorDisplayComponent
+                        Item {
+                            width:  parent.width
+                            height: globals.defaultTextHeight * 2
 
-                            property bool mapped:           controller.throttleChannelMapped
-                            property bool reversed:         controller.throttleChannelReversed
+                            QGCLabel {
+                                id:     throttleLabel
+                                width:  globals.defaultTextWidth * 7
+                                text:   qsTr("Throttle")
+                                color:"black"
+                            }
+
+                            Loader {
+                                id:                 throttleLoader
+                                anchors.left:       throttleLabel.right
+                                anchors.right:      parent.right
+                                height:             globals.defaultTextHeight
+                                width:              100
+                                sourceComponent:    channelMonitorDisplayComponent
+
+                                property bool mapped:           controller.throttleChannelMapped
+                                property bool reversed:         controller.throttleChannelReversed
+                            }
+
+                            Connections {
+                                target:                             controller
+                                onThrottleChannelRCValueChanged:    (rcValue) => throttleLoader.item.rcValue = rcValue
+                            }
                         }
 
-                        Connections {
-                            target:                             controller
-                            onThrottleChannelRCValueChanged:    (rcValue) => throttleLoader.item.rcValue = rcValue
-                        }
-                    }
-                } // Column - Attitude Control labels
+                    } // Column - Attitude Control labels
 
+
+
+
+                }
                 // Command Buttons
                 Row {
                     spacing: 10
+                    anchors.horizontalCenter:    parent.horizontalCenter
+
 
                     QGCButton {
                         id:         skipButton
@@ -333,6 +374,12 @@ SetupPage {
                     }
                 } // Row - Buttons
 
+
+                //  RCChannelMonitor {
+                //     width:      parent.width
+                //     twoColumn:  true
+                // }
+
                 // Status Text
                 QGCLabel {
                     id:         statusText
@@ -343,11 +390,13 @@ SetupPage {
                 Rectangle {
                     width:          parent.width
                     height:         1
-                    border.color:   qgcPal.text
+                    border.color:   "white"//qgcPal.text
                     border.width:   1
                 }
 
-                QGCLabel { text: qsTr("Additional Radio setup:") }
+                QGCLabel { text: qsTr("Additional Radio setup:")
+                    color:"white"
+                }
 
                 GridLayout {
                     id:                 switchSettingsGrid
@@ -382,6 +431,7 @@ SetupPage {
                 }
 
                 RowLayout {
+                    //anchors.horizontalCenter:  rightColumn.horizontalCenter
                     QGCButton {
                         id:         bindButton
                         text:       qsTr("Spektrum Bind")
@@ -396,15 +446,17 @@ SetupPage {
                                                                  function() { controller.copyTrims() })
                     }
                 }
+
             } // Column - Left Column
 
-            Item {
-                id:             columnSpacer
-                anchors.right:  rightColumn.left
-                width:          20
-            }
 
-            // Right side column
+            // Item {
+            //     id:             columnSpacer
+            //     anchors.right:  rightColumn.left
+            //     width:          20
+            // }
+
+            /*// Right side column
             Column {
                 id:             rightColumn
                 anchors.top:    parent.top
@@ -435,11 +487,11 @@ SetupPage {
                     source:     controller.imageHelp
                 }
 
-                RCChannelMonitor {
-                    width:      parent.width
-                    twoColumn:  true
-                }
-            } // Column - Right Column
+                // RCChannelMonitor {
+                //     width:      parent.width
+                //     twoColumn:  true
+                // }
+            } */// Column - Right Column
         } // Item
     } // Component - pageComponent
 } // SetupPage

@@ -32,21 +32,10 @@ Map {
 
     bearing: MapGlobals.mapRotation
 
-    // Connections {
-    //     target: MapGlobals
-    //     function onForceRecenterChanged() {
-    //         if (MapGlobals.forceRecenter && MapGlobals.gcsPosition.isValid) {
-    //             center = MapGlobals.gcsPosition
-    //             zoomLevel = 15
-    //             MapGlobals.forceRecenter = false
-    //         }
-    //     }
-    // }
-
     property string mapName:                        'defaultMap'
     property bool   isSatelliteMap:                 false //activeMapType.name.indexOf("Satellite") > -1 || activeMapType.name.indexOf("Hybrid") > -1
-    property var    gcsPosition:                    QGroundControl.qgcPositionManger.gcsPosition
-    property real   gcsHeading:                     QGroundControl.qgcPositionManger.gcsHeading
+    property var    gcsPosition:                    QGroundControl.qgcPositionManager.gcsPosition
+    property real   gcsHeading:                     QGroundControl.qgcPositionManager.gcsHeading
     property bool   allowGCSLocationCenter:         false   ///< true: map will center/zoom to gcs location one time
     property bool   allowVehicleLocationCenter:     false   ///< true: map will center/zoom to vehicle location one time
     property bool   firstGCSPositionReceived:       false   ///< true: first gcs position update was responded to
@@ -55,6 +44,10 @@ Map {
 
     readonly property real  maxZoomLevel: 20
 
+    Component.onCompleted: {
+        MapGlobals.activeFlightMap = this
+        console.log("FlightMap instance registered globally")
+    }
 
     function rotateMap(delta) {
         console.log("Rotating map by delta:", delta); // Debug log
@@ -131,6 +124,8 @@ Map {
             // Set current location and zoom
             center = gcsPosition
             zoomLevel = 15
+
+            console.log("GCS Position Updated:", gcsPosition)
         }
     }
 
@@ -258,4 +253,5 @@ Map {
             }
         }
     }
+
 } // Map

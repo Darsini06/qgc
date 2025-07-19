@@ -108,6 +108,9 @@ QGCCorePlugin::QGCCorePlugin(QGCApplication *app, QGCToolbox* toolbox)
 
 void QGCCorePlugin::setToolbox(QGCToolbox *toolbox)
 {
+
+     qDebug() << "QGCCorePlugin::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     qmlRegisterUncreatableType<QGCCorePlugin>       ("QGroundControl", 1, 0, "QGCCorePlugin",       "Reference only");
@@ -315,7 +318,8 @@ void QGCCorePlugin::createRootWindow(QQmlApplicationEngine* qmlEngine)
 
     // Expose the C++ object to QML as "myCppClass"
     qmlEngine->rootContext()->setContextProperty("myCppClass", &myBluetooth);
-    qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/newscreen.qml")));
+    qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/MainRootWindow.qml")));
+    //qmlEngine->load(QUrl(QStringLiteral("qrc:/qml/Newscreen.qml")));
 }
 
 bool QGCCorePlugin::mavlinkMessage(Vehicle* vehicle, LinkInterface* link, mavlink_message_t message)

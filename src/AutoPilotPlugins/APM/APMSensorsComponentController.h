@@ -92,6 +92,8 @@ public:
     Q_INVOKABLE void nextClicked                (void);
     Q_INVOKABLE bool usingUDPLink               (void);
 
+    Q_INVOKABLE void setCurrentCalibrationType(const QString& type);
+
     bool compassSetupNeeded (void) const;
     bool accelSetupNeeded   (void) const;
 
@@ -122,6 +124,9 @@ signals:
     void compass3CalFitnessChanged              (double compass3CalFitness);
     void setAllCalButtonsEnabled                (bool enabled);
 
+    void showToastMessage(QString message);
+    void updateCalibrationStatus(const QString& type, const QString& status);
+
 private slots:
     void _handleUASTextMessage  (int uasId, int compId, int severity, QString text);
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
@@ -139,6 +144,7 @@ private:
     void _handleMagCalReport                (mavlink_message_t& message);
     void _handleCommandLong                 (mavlink_message_t& message);
     void _restorePreviousCompassCalFitness  (void);
+
 
     enum StopCalibrationCode {
         StopCalibrationSuccess,
@@ -202,4 +208,6 @@ private:
     static constexpr const char* _compassCalFitnessParam = "COMPASS_CAL_FIT";
     
     static const int _supportedFirmwareCalVersion = 2;
+
+    QString _currentCalibrationType;
 };

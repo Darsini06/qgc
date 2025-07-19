@@ -199,18 +199,18 @@ void StructureScanComplexItem::setSequenceNumber(int sequenceNumber)
 bool StructureScanComplexItem::load(const QJsonObject& complexObject, int sequenceNumber, QString& errorString)
 {
     QList<JsonHelper::KeyValidateInfo> keyInfoList = {
-        { JsonHelper::jsonVersionKey,                   QJsonValue::Double, true },
-        { VisualMissionItem::jsonTypeKey,               QJsonValue::String, true },
-        { ComplexMissionItem::jsonComplexItemTypeKey,   QJsonValue::String, true },
-        { QGCMapPolygon::jsonPolygonKey,                QJsonValue::Array,  true },
-        { scanBottomAltName,                            QJsonValue::Double, true },
-        { structureHeightName,                          QJsonValue::Double, true },
-        { layersName,                                   QJsonValue::Double, true },
-        { _jsonCameraCalcKey,                           QJsonValue::Object, true },
-        { _entranceAltName,                             QJsonValue::Double, true },
-        { gimbalPitchName,                              QJsonValue::Double, true },
-        { startFromTopName,                             QJsonValue::Bool,   true },
-    };
+                                                      { JsonHelper::jsonVersionKey,                   QJsonValue::Double, true },
+                                                      { VisualMissionItem::jsonTypeKey,               QJsonValue::String, true },
+                                                      { ComplexMissionItem::jsonComplexItemTypeKey,   QJsonValue::String, true },
+                                                      { QGCMapPolygon::jsonPolygonKey,                QJsonValue::Array,  true },
+                                                      { scanBottomAltName,                            QJsonValue::Double, true },
+                                                      { structureHeightName,                          QJsonValue::Double, true },
+                                                      { layersName,                                   QJsonValue::Double, true },
+                                                      { _jsonCameraCalcKey,                           QJsonValue::Object, true },
+                                                      { _entranceAltName,                             QJsonValue::Double, true },
+                                                      { gimbalPitchName,                              QJsonValue::Double, true },
+                                                      { startFromTopName,                             QJsonValue::Bool,   true },
+                                                      };
     if (!JsonHelper::validateKeys(complexObject, keyInfoList, errorString)) {
         return false;
     }
@@ -275,8 +275,8 @@ void StructureScanComplexItem::_flightPathChanged(void)
     }
     //-- Update bounding cube for airspace management control
     _setBoundingCube(QGCGeoBoundingCube(
-                         QGeoCoordinate(north - 90.0, west - 180.0, bottom),
-                         QGeoCoordinate(south - 90.0, east - 180.0, top)));
+        QGeoCoordinate(north - 90.0, west - 180.0, bottom),
+        QGeoCoordinate(south - 90.0, east - 180.0, top)));
 
     emit coordinateChanged(coordinate());
     emit exitCoordinateChanged(exitCoordinate());
@@ -754,4 +754,3 @@ void StructureScanComplexItem::_segmentTerrainCollisionChanged(bool terrainColli
     ComplexMissionItem::_segmentTerrainCollisionChanged(terrainCollision);
     _structurePolygon.setShowAltColor(_cTerrainCollisionSegments != 0);
 }
-

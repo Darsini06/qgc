@@ -180,22 +180,23 @@ bool VideoSettings::streamConfigured(void)
     //-- If UDP, check if port is set
     if(vSource == videoSourceUDPH264 || vSource == videoSourceUDPH265) {
         qCDebug(VideoManagerLog) << "Testing configuration for UDP Stream:" << udpPort()->rawValue().toInt();
-        return udpPort()->rawValue().toInt() != 0;
+        //return udpPort()->rawValue().toInt() != 0;
+        return true;
     }
     //-- If RTSP, check for URL
     if(vSource == videoSourceRTSP) {
         qCDebug(VideoManagerLog) << "Testing configuration for RTSP Stream:" << rtspUrl()->rawValue().toString();
-        return !rtspUrl()->rawValue().toString().isEmpty();
+        return true;//return !rtspUrl()->rawValue().toString().isEmpty();
     }
     //-- If TCP, check for URL
     if(vSource == videoSourceTCP) {
         qCDebug(VideoManagerLog) << "Testing configuration for TCP Stream:" << tcpUrl()->rawValue().toString();
-        return !tcpUrl()->rawValue().toString().isEmpty();
+        return true;//return !tcpUrl()->rawValue().toString().isEmpty();
     }
     //-- If MPEG-TS, check if port is set
     if(vSource == videoSourceMPEGTS) {
         qCDebug(VideoManagerLog) << "Testing configuration for MPEG-TS Stream:" << udpPort()->rawValue().toInt();
-        return udpPort()->rawValue().toInt() != 0;
+        return true;//return udpPort()->rawValue().toInt() != 0;
     }
     //-- If Herelink Air unit, good to go
     if(vSource == videoSourceHerelinkAirUnit) {

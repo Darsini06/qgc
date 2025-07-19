@@ -125,6 +125,7 @@ QGCFlickable {
                             var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false /* clipToViewPort */)
                             var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false /* clipToViewPort */)
                             myGeoFenceController.addInclusionPolygon(topLeftCoord, bottomRightCoord)
+                            console.log("GeoFenceEditor.qml class addInclusionPolygon method")
                         }
                     }
 
@@ -137,6 +138,7 @@ QGCFlickable {
                             var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false /* clipToViewPort */)
                             var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false /* clipToViewPort */)
                             myGeoFenceController.addInclusionCircle(topLeftCoord, bottomRightCoord)
+                            console.log("GeoFenceEditor.qml class addInclusionCircle method")
                         }
                     }
 

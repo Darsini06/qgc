@@ -173,6 +173,8 @@ void CorridorScanComplexItemTest::_testItemCount(void)
 
 void CorridorScanComplexItemTest::_testPathChanges(void)
 {
+    qDebug() << "CorridorScanComplexItemTest::_testPathChanges";
+
      QGeoCoordinate vertex = _corridorItem->corridorPolyline()->vertexCoordinate(1);
      vertex.setLatitude(vertex.latitude() + 0.01);
      _corridorItem->corridorPolyline()->adjustVertex(1, vertex);

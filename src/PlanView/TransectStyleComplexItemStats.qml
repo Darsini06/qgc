@@ -5,6 +5,8 @@ import QGroundControl
 import QGroundControl.ScreenTools
 import QGroundControl.Controls
 
+import MapGlobals 1.0
+
 // Statistics section for TransectStyleComplexItems
 Grid {
     // The following properties must be available up the hierarchy chain
@@ -24,4 +26,7 @@ Grid {
 
     QGCLabel { text: qsTr("Trigger Distance") }
     QGCLabel { text: missionItem.cameraCalc.adjustedFootprintFrontal.valueString + " " + missionItem.cameraCalc.adjustedFootprintFrontal.units }
+
+    QGCLabel { text: qsTr("Time") }
+    QGCLabel { text: MapGlobals.time }
 }

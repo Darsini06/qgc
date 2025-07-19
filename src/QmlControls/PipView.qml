@@ -17,8 +17,8 @@ import QGroundControl.Palette
 
 Item {
     id:         _root
-    width:      _pipSize
-    height:     _pipSize * (9/16)
+    width:      parent.width * 0.2//_pipSize
+    height:     parent.width * 0.2 * (9/16)//_pipSize * (9/16)
     visible:    item2 && item2.pipState !== item2.pipState.window && show
 
     property var    item1:                  null    // Required
@@ -54,10 +54,16 @@ Item {
     function _initForItems() {
         var item1IsFull = QGroundControl.loadBoolGlobalSetting(item1IsFullSettingsKey, true)
         if (item1 && item2) {
-            item1.pipState.state = item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
-            item2.pipState.state = item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
-            _fullItem = item1IsFull ? item1 : item2
-            _pipOrWindowItem = item1IsFull ? item2 : item1
+            item1.pipState.state = item1.pipState.pipState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
+            item2.pipState.state = item2.pipState.fullState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
+            _fullItem = item2//item1IsFull ? item1 : item2
+            _pipOrWindowItem = item1//item1IsFull ? item2 : item1
+
+
+            // item1.pipState.state = item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
+            // item2.pipState.state = item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
+            // _fullItem = item1IsFull ? item1 : item2
+            // _pipOrWindowItem = item1IsFull ? item2 : item1
         } else {
             item1.pipState.state = item1.pipState.fullState
             _fullItem = item1
@@ -67,14 +73,17 @@ Item {
     }
 
     function _swapPip() {
+        mainWindow.showToastMessage("message");
         var item1IsFull = false
         if (item1.pipState.state === item1.pipState.fullState) {
+            mainWindow.showToastMessage("message11");
             item1.pipState.state = item1.pipState.pipState
             item2.pipState.state = item2.pipState.fullState
             _fullItem = item2
             _pipOrWindowItem = item1
             item1IsFull = false
         } else {
+            mainWindow.showToastMessage("message65");
             item1.pipState.state = item1.pipState.fullState
             item2.pipState.state = item2.pipState.pipState
             _fullItem = item1
@@ -82,7 +91,24 @@ Item {
             item1IsFull = true
         }
         QGroundControl.saveBoolGlobalSetting(item1IsFullSettingsKey, item1IsFull)
+
     }
+
+
+
+    function camera() {
+        mainWindow.showToastMessage("message");
+         _initForItems()
+        var item1IsFull = false
+        tem1.pipState.state = item1.pipState.pipState
+                    item2.pipState.state = item2.pipState.fullState
+                    _fullItem = item2
+                    _pipOrWindowItem = item1
+        item1IsFull = false
+        QGroundControl.saveBoolGlobalSetting(item1IsFullSettingsKey, item1IsFull)
+
+    }
+
 
     function _setPipIsExpanded(isExpanded) {
         QGroundControl.saveBoolGlobalSetting(_pipExpandedSettingsKey, isExpanded)
@@ -149,18 +175,18 @@ Item {
     }
 
     // Resize icon
-    Image {
-        id:             pipResizeIcon
-        source:         "/qmlimages/pipResize.svg"
-        fillMode:       Image.PreserveAspectFit
-        mipmap:         true
-        anchors.right:  parent.right
-        anchors.top:    parent.top
-        visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
-        height:         ScreenTools.defaultFontPixelHeight * 2.5
-        width:          ScreenTools.defaultFontPixelHeight * 2.5
-        sourceSize.height:  height
-    }
+    // Image {
+    //     id:             pipResizeIcon
+    //     source:         "/qmlimages/pipResize.svg"
+    //     fillMode:       Image.PreserveAspectFit
+    //     mipmap:         true
+    //     anchors.right:  parent.right
+    //     anchors.top:    parent.top
+    //     visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
+    //     height:         ScreenTools.defaultFontPixelHeight * 2.5
+    //     width:          ScreenTools.defaultFontPixelHeight * 2.5
+    //     sourceSize.height:  height
+    // }
 
     // Check min/max constraints on pip size when when parent is resized
     Connections {

@@ -9,7 +9,7 @@ RadioButton {
     font.family:    ScreenTools.normalFontFamily
     font.pointSize: ScreenTools.defaultFontPointSize
 
-    property color  textColor:  _qgcPal.text
+    property color  textColor: "black"// _qgcPal.text
     property var    _qgcPal:    QGCPalette { colorGroupEnabled: enabled }
     property bool   _noText:    text === ""
 

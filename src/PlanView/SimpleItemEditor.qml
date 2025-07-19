@@ -36,6 +36,7 @@ Rectangle {
         } else {
             altModeLabel.text = qsTr("Internal Error")
         }
+        missionItem.wizardMode = false
     }
 
     Component.onCompleted: updateAltitudeModeText()
@@ -175,6 +176,9 @@ Rectangle {
                     id:                 altField
                     Layout.fillWidth:   true
                     fact:               missionItem.altitude
+                    // Component.onCompleted: {
+                    // fact.value = 510.00
+                    // }
                 }
 
                 QGCLabel {

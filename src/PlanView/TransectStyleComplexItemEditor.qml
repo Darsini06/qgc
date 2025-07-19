@@ -12,6 +12,8 @@ import QGroundControl.FactControls
 import QGroundControl.Palette
 import QGroundControl.FlightMap
 
+import MapGlobals 1.0
+
 Rectangle {
     id:         _root
     height:     childrenRect.y + childrenRect.height + _margin
@@ -34,6 +36,12 @@ Rectangle {
     property real   _cameraMinTriggerInterval:  _missionItem.cameraCalc.minTriggerInterval.rawValue
     property string _doneAdjusting:             qsTr("Done")
     property bool   _presetsAvailable:          _missionItem.presetNames.length !== 0
+
+
+    Component.onCompleted: {
+        MapGlobals.acres = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
+    }
+
 
     function polygonCaptureStarted() {
         _missionItem.clearPolygon()

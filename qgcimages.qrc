@@ -57,6 +57,55 @@
         <file alias="NewImages/MapRedirect.png">src/NewImages/redirect.png</file>
         <file alias="NewImages/DroneRedirect.png">src/NewImages/drone_redirect.png</file>
         <file alias="NewImages/MapRedirect1.png">src/NewImages/map_redirect.png</file>
+        <file alias="NewImages/RCCallibration.png">src/NewImages/RCCallibration.png</file>
+        <file alias="NewImages/parameterSettings.png">src/NewImages/parameterSettings.png</file>
+        <file alias="NewImages/menu.png">src/NewImages/menu.png</file>
+        <file alias="NewImages/diamond.png">src/NewImages/diamond.png</file>
+
+        <file alias="NewImages/profile.png">src/NewImages/profile.png</file>
+        <file alias="NewImages/record.png">src/NewImages/record.png</file>
+        <file alias="NewImages/teams.png">src/NewImages/teams.png</file>
+
+        <file alias="NewImages/goldMedal.png">src/NewImages/goldMedal.png</file>
+        <file alias="NewImages/blackMedal.png">src/NewImages/blackMedal.png</file>
+        <file alias="NewImages/feedback.png">src/NewImages/feedback.png</file>
+        <file alias="NewImages/reports.png">src/NewImages/reports.png</file>
+        <file alias="NewImages/recordLogs.png">src/NewImages/recordLogs.png</file>
+        <file alias="NewImages/profileImage.png">src/NewImages/profileImage.png</file>
+        <file alias="NewImages/homeIcon.png">src/NewImages/homeIcon.png</file>
+        <file alias="NewImages/userGuide.png">src/NewImages/userGuide.png</file>
+        <file alias="NewImages/accountUpdate.png">src/NewImages/accountUpdate.png</file>
+
+        <file alias="NewImages/leftArrow.png">src/NewImages/leftArrow.png</file>
+        <file alias="NewImages/mapSelection.png">src/NewImages/mapSelection.png</file>
+        <file alias="NewImages/droneGpsMarking.png">src/NewImages/droneGpsMarking.png</file>
+        <file alias="NewImages/kmlFile.png">src/NewImages/kmlFile.png</file>
+        <file alias="NewImages/log.png">src/NewImages/log.png</file>
+        <file alias="NewImages/return.png">src/NewImages/return.png</file>
+        <file alias="NewImages/satellite.png">src/NewImages/satellite.png</file>
+
+        <file alias="NewImages/settings.png">src/NewImages/settings.png</file>
+        <file alias="NewImages/pinPoint.png">src/NewImages/pinPoint.png</file>
+        <file alias="NewImages/takeOff.png">src/NewImages/takeOff.png</file>
+
+        <file alias="NewImages/endTime.png">src/NewImages/endTime.png</file>
+        <file alias="NewImages/startTime.png">src/NewImages/startTime.png</file>
+        <file alias="NewImages/calendar.png">src/NewImages/calendar.png</file>
+        <file alias="NewImages/editphoto.png">src/NewImages/editphoto.png</file>
+        <file alias="NewImages/verified.png">src/NewImages/verified.png</file>
+
+        <file alias="NewImages/droneFly.json">src/NewImages/droneFly.json</file>
+        <file alias="NewImages/droneLoading.json">src/NewImages/droneLoading.json</file>
+        <file alias="NewImages/droneManFly.json">src/NewImages/droneManFly.json</file>
+
+        <file alias="NewImages/vtol.png">src/NewImages/vtol.png</file>
+<file alias="NewImages/survey.png">src/NewImages/survey.png</file>
+<file alias="NewImages/communication.png">src/NewImages/communication.png</file>
+<file alias="NewImages/agri.png">src/NewImages/agri.png</file>
+<file alias="NewImages/cameradrone.png">src/NewImages/cameradrone.png</file>
+<file alias="NewImages/aviatrickslogo.png">src/NewImages/aviatrickslogo.png</file>
+
+    
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
         <file alias="arrow-down.png">src/QmlControls/arrow-down.png</file>

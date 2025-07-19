@@ -193,7 +193,8 @@ Rectangle {
         height:                 _hamburgerSize
         sourceSize.height:      _hamburgerSize
         source:                 "qrc:/qmlimages/Hamburger.svg"
-        visible:               (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0  //missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
+        visible: missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
+        //visible:               (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0  //missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
         color:                  qgcPal.text
 
         QGCMouseArea {

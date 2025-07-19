@@ -1,3 +1,4 @@
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -9,7 +10,7 @@ import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.MultiVehicleManager
 import QGroundControl.Palette
-import QGroundControl.QGCMapEngineManager
+import QGroundControl.QGCMapEngineManager 1.0
 import QGroundControl.FlightMap
 import QGroundControl.Vehicle
 import MapGlobals 1.0
@@ -21,16 +22,11 @@ Row {
     property var _mapsSettings: _settingsManager ? _settingsManager.mapsSettings : null
     property var _mapEngineManager: QGroundControl.mapEngineManager
     property bool _currentlyImportOrExporting: _mapEngineManager.importAction === QGCMapEngineManager.ActionExporting || _mapEngineManager.importAction === QGCMapEngineManager.ActionImporting
+
     property var _mapProviderFact: _settingsManager ? _settingsManager.flightMapSettings.mapProvider : null
     property var _mapTypeFact: _settingsManager ? _settingsManager.flightMapSettings.mapType : null
 
-    property var map  // Add this property to hold a reference to the map
-    property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle // Access the active drone
-
     property var flightMap
-
-    property var    gcsPosition:                    QGroundControl.qgcPositionManger.gcsPosition
-
 
     spacing: 10  // Space between icons
 
@@ -79,10 +75,8 @@ Row {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if (!_currentlyImportOrExporting) {
-                    _mapEngineManager.importAction = QGCMapEngineManager.ActionNone
-                    importDialogComponent.createObject(mainWindow).open()
-                }
+                // Show confirmation dialog before clearing the map
+                clearMapDialogComponent.createObject(mainWindow).open()
             }
         }
 
@@ -124,7 +118,7 @@ Row {
         }
     }
 
-    Rectangle   {
+    Rectangle {
         width: 40
         height: 40
         radius: width / 2
@@ -158,16 +152,14 @@ Row {
             border.width: 2
             visible: false  // Hidden initially
 
-            Row
-            {
+            Row {
                 id: iconRow
                 anchors.centerIn: parent
                 spacing: 10  // Space between the icons
 
-                // First Image Icon
                 Image {
                     id: icon1
-                    source: "/qmlimages/NewImages/DroneRedirect.png"  // Replace with your actual image path
+                    source: "/qmlimages/NewImages/DroneRedirect.png"
                     width: 45
                     height: 45
                     fillMode: Image.PreserveAspectFit
@@ -175,20 +167,11 @@ Row {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            console.log("Clicked - Map valid:", !!map,
-                                        "Vehicle valid:", !!_activeVehicle,
-                                        "Coord valid:", map ? map._activeVehicleCoordinate.isValid : false)
                             MapGlobals.forceRecenter = true
                             MapGlobals.recenterInterval = 0
-                            if (map) {
-                                if (map.panRecenterTimer.running) {
-                                    map.panRecenterTimer.stop()
-                                }
-                                map.panRecenterTimer.interval = 0
-                                map.panRecenterTimer.start()
-                            }
 
-                            // Reset after 100ms to allow trigger
+                            iconsContainer.visible = false
+
                             Qt.callLater(function() {
                                 MapGlobals.recenterInterval = 10000
                                 MapGlobals.forceRecenter = false
@@ -197,33 +180,55 @@ Row {
                     }
                 }
 
-                // Second Image Icon
                 Image {
                     id: icon2
-                    source: "/qmlimages/NewImages/MapRedirect1.png"  // Replace with your actual image path
+                    source: "/qmlimages/NewImages/MapRedirect1.png"
                     width: 25
                     height: 25
                     fillMode: Image.PreserveAspectFit
-                    //color : "white"
                     y: 8
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                           if(flightMap && flightMap.gcsPosition.isValid){
-                               flightMap.center = flightMap.gcsPosition
-                               flightMap.zoomLevel = 15
-                           }
+                            MapGlobals.recenterMap()
 
+                            if(flightMap && flightMap.gcsPosition.isValid) {
+                                flightMap.center = flightMap.gcsPosition
+                            }
+
+                            iconsContainer.visible = false
                         }
                     }
                 }
             }
         }
-
     }
 
+    // New confirmation dialog for clearing the map
+    Component {
+        id: clearMapDialogComponent
 
+        QGCPopupDialog {
+            title: qsTr("Clear Map")
+            buttons: Dialog.Yes | Dialog.No
+
+            onAccepted: {
+                clearMap()
+                close()
+            }
+
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Are you sure you want to clear the map?")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
+
+    // Import dialog component (kept for reference)
     Component {
         id: importDialogComponent
 
@@ -272,6 +277,65 @@ Row {
             title: qsTr("Error Message")
             text: _mapEngineManager.errorMessage
             buttons: Dialog.Close
+        }
+    }
+
+    // Function to clear the map - revised to use available methods
+    function clearMap() {
+        if (!flightMap) {
+            console.error("Flight map is not defined");
+            return;
+        }
+
+        // Use the available methods from QGCMapEngineManager to clear the map
+        try {
+            // Delete all tile sets
+            if (_mapEngineManager && _mapEngineManager.deleteTileSet) {
+                // Delete all existing tile sets
+                var tileSets = _mapEngineManager.tileSets
+                for (var i = 0; i < tileSets.length; i++) {
+                    _mapEngineManager.deleteTileSet(tileSets[i].name)
+                }
+            }
+
+            // Try to use existing QGC methods to reset/reload the map
+            if (flightMap) {
+                // Force map to reload with default empty state
+                if (typeof flightMap.reload === "function") {
+                    flightMap.reload()
+                }
+
+                // Clear any mission items, polygons, etc.
+                if (typeof flightMap.clearMapItems === "function") {
+                    flightMap.clearMapItems()
+                }
+            }
+
+            // Reset to default map provider if needed
+            if (_mapProviderFact && _mapProviderFact.defaultValue !== undefined) {
+                _mapProviderFact.rawValue = _mapProviderFact.defaultValue
+            }
+
+            // Reset to default map type if needed
+            if (_mapTypeFact && _mapTypeFact.defaultValue !== undefined) {
+                _mapTypeFact.rawValue = _mapTypeFact.defaultValue
+            }
+
+            // Show success message
+            var message = qsTr("Map cleared successfully")
+            if (typeof mainWindow.showMessageDialog === "function") {
+                mainWindow.showMessageDialog(qsTr("Map Cleared"), message)
+            }
+        } catch (error) {
+            console.error("Error clearing map:", error)
+
+            // Show error message
+            if (typeof mainWindow.showMessageDialog === "function") {
+                mainWindow.showMessageDialog(
+                    qsTr("Error"),
+                    qsTr("Failed to clear map: ") + error.toString()
+                )
+            }
         }
     }
 }

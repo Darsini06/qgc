@@ -31,7 +31,7 @@ ToolStripActionList {
             property bool   _viewer3DEnabled:       QGroundControl.settingsManager.viewer3DSettings.enabled.rawValue
 
             id: view3DIcon
-            visible: _viewer3DEnabled
+            visible: false //_viewer3DEnabled
             text:           qsTr("3D View")
             iconSource:     "/qmlimages/Viewer3D/City3DMapIcon.svg"
             onTriggered:{

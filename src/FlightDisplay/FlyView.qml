@@ -30,8 +30,7 @@ import QGroundControl.Vehicle
 // 3D Viewer modules
 import Viewer3D
 
-Item
-{
+Item {
     id: _root
 
     // These should only be used by MainRootWindow
@@ -40,12 +39,14 @@ Item
 
     // Properties of UTM adapter
     property bool utmspSendActTrigger: false
+    property string planType:""
 
     PlanMasterController {
         id:                     _planController
         flyView:                true
         Component.onCompleted:  start()
     }
+
 
     property bool   _mainWindowIsMap:       mapControl.pipState.state === mapControl.pipState.fullState
     property bool   _isFullWindowItemDark:  _mainWindowIsMap ? mapControl.isSatelliteMap : true
@@ -65,6 +66,11 @@ Item
 
     property real   _fullItemZorder:    0
     property real   _pipItemZorder:     QGroundControl.zOrderWidgets
+
+    Component.onCompleted: {
+        console.log("PlanView received planType:", planType);
+
+    }
 
     function _calcCenterViewPort() {
         var newToolInset = Qt.rect(0, 0, width, height)
@@ -118,7 +124,7 @@ Item
             item1:                  mapControl
             item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
             show:                   QGroundControl.videoManager.hasVideo && !QGroundControl.videoManager.fullScreen &&
-                                        (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
+                                    (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
             z:                      QGroundControl.zOrderWidgets
 
             property real leftEdgeBottomInset: visible ? width + anchors.margins : 0

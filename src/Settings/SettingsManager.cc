@@ -41,6 +41,7 @@ SettingsManager::SettingsManager(QGCApplication* app, QGCToolbox* toolbox)
 
 void SettingsManager::setToolbox(QGCToolbox *toolbox)
 {
+     qDebug() << "SettingsManager::setToolbox";
     QGCTool::setToolbox(toolbox);
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     qmlRegisterUncreatableType<SettingsManager>("QGroundControl.SettingsManager", 1, 0, "SettingsManager", "Reference only");

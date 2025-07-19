@@ -17,10 +17,12 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controls
 import QGroundControl.FlightMap
-
+import MapGlobals 1.0
 /// Base control for both Survey and Corridor Scan map visuals
 Item {
     id: _root
+
+
 
     property var    map                                                 ///< Map control to place item in
     property bool   polygonInteractive: true
@@ -46,20 +48,40 @@ Item {
     signal clicked(int sequenceNumber)
 
     function _addVisualElements() {
+         console.log("edited")
         var toAdd = [ fullTransectsComponent, entryTransectComponent, exitTransectComponent, entryPointComponent, exitPointComponent,
                      entryArrow1Component, entryArrow2Component, exitArrow1Component, exitArrow2Component ]
         objMgr.createObjects(toAdd, map, true /* parentObjectIsMap */)
     }
+
+
+    function edit1() {
+
+        if(_root.interactive) {
+        clicked(_missionItem.sequenceNumber)
+        }
+
+
+    }
+
 
     function _destroyVisualElements() {
         objMgr.destroyObjects()
     }
 
     Component.onCompleted: {
+        console.log("edited",object.surveyAreaPolygon)
         _addVisualElements()
+        // if (_root.interactive && _missionItem.sequenceNumber === 0) {
+        //     _root.clicked(_missionItem.sequenceNumber)
+        // }
+        clicked(_missionItem.sequenceNumber)
     }
 
+
+
     Component.onDestruction: {
+
         _destroyVisualElements()
     }
 
@@ -73,7 +95,7 @@ Item {
         mapControl:         map
         mapPolygon:         _mapPolygon
         interactive:        polygonInteractive && _missionItem.isCurrentItem && _root.interactive
-        borderWidth:        1
+        borderWidth:        5
         borderColor:        "black"
         interiorColor:      QGroundControl.globalPalette.surveyPolygonInterior
         altColor:           QGroundControl.globalPalette.surveyPolygonTerrainCollision
@@ -83,10 +105,9 @@ Item {
     // Full set of transects lines. Shown when item is selected.
     Component {
         id: fullTransectsComponent
-
         MapPolyline {
             line.color: "white"
-            line.width: 2
+            line.width: 5
             path:       _transectPoints
             visible:    _currentItem
             opacity:    _root.opacity
@@ -133,6 +154,13 @@ Item {
                 index:      _missionItem.sequenceNumber
                 checked:    _missionItem.isCurrentItem
                 onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                Component.onCompleted: {
+                        // Automatically trigger the clicked behavior if condition is true
+                        if (_root.interactive) {
+                            _root.clicked(_missionItem.sequenceNumber)
+                        }
+                    }
             }
         }
     }
@@ -205,7 +233,19 @@ Item {
                 index:      _missionItem.lastSequenceNumber
                 checked:    _missionItem.isCurrentItem
                 onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                Component.onCompleted: {
+                        // Automatically trigger the clicked behavior if condition is true
+                        if (_root.interactive) {
+                            _root.clicked(_missionItem.sequenceNumber)
+                        }
+                    }
             }
         }
+    }
+
+    Button  {
+        text: "Edit"
+        onClicked: if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
     }
 }

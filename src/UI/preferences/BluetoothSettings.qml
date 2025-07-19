@@ -35,6 +35,7 @@ ColumnLayout {
         }
 
         QGCLabel { text: qsTr("Address") }
+
         QGCLabel {
             Layout.preferredWidth:  _secondColumnWidth
             text:                   subEditConfig.address
@@ -53,8 +54,9 @@ ColumnLayout {
 
             onClicked: {
                 checked = true
-                if (modelData !== "")
-                    subEditConfig.devName = modelData
+                if (modelData !== "") subEditConfig.devName = modelData
+                console.log("Bluetooth Device name : ",modelData)
+                QGroundControl.saveGlobalSetting("bluetooth_name", modelData)
             }
         }
     }
@@ -75,4 +77,5 @@ ColumnLayout {
             onClicked:  subEditConfig.stopScan()
         }
     }
+
 }

@@ -279,6 +279,7 @@ SetupPage {
                     }
                 }
             }
+
         } // Flow
     } // Component - powerPageComponent
 
@@ -640,4 +641,5 @@ SetupPage {
             }
         }
     }
+
 } // SetupPage

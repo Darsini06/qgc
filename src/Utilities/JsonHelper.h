@@ -46,6 +46,12 @@ public:
                                       const QString&    fileType,   ///< file type for file
                                       int               version);   ///< version number for file
 
+
+    static void saveQGCJsonFileHeader1(QJsonObject&      jsonObject, ///< root json object
+                                      const QString&    fileType,   ///< file type for file
+                                      int               version);   ///< version number for file
+
+
     /// Validates the standard parts of an external QGC json file (Plan file, ...):
     ///     jsonFileTypeKey - Required and checked to be equal to expectedFileType
     ///     jsonVersionKey - Required and checked to be below supportedMajorVersion, supportedMinorVersion

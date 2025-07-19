@@ -369,6 +369,16 @@ void JsonHelper::saveQGCJsonFileHeader(QJsonObject&     jsonObject,
     jsonObject[jsonVersionKey] = version;
 }
 
+
+void JsonHelper::saveQGCJsonFileHeader1(QJsonObject&     jsonObject,
+                                       const QString&   fileType,
+                                       int              version)
+{
+    jsonObject[jsonGroundStationKey] = jsonGroundStationValue;
+    jsonObject[jsonFileTypeKey] = fileType;
+    jsonObject[jsonVersionKey] = version;
+}
+
 bool JsonHelper::loadGeoCoordinateArray(const QJsonValue&   jsonValue,
                                         bool                altitudeRequired,
                                         QVariantList&       rgVarPoints,

@@ -131,7 +131,7 @@ protected:
 private:
     QString _name;
     bool _dynamic = false;     ///< A connection added automatically and not persistent (unless it's edited).
-    bool _autoConnect = false; ///< This connection is started automatically at boot
+    bool _autoConnect = true; ///< This connection is started automatically at boot
     bool _highLatency = false;
 };
 

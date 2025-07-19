@@ -31,7 +31,7 @@ RowLayout {
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property bool allowEditMode:    true
     property bool editMode:         false
-
+property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
     RowLayout {
         Layout.fillWidth: true
 
@@ -41,7 +41,7 @@ RowLayout {
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true
-            color:     "white" //qgcPal.text
+            color:      "black"
             source:     "/qmlimages/FlightModesComponentIcon.png"
         }
 
@@ -49,8 +49,7 @@ RowLayout {
             text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
             font.pointSize:     fontPointSize
             Layout.alignment:   Qt.AlignCenter
-            color:     "white"
-
+            color:      "black"
             MouseArea {
                 anchors.fill:   parent
                 onClicked:      mainWindow.showIndicatorDrawer(drawerComponent, control)
@@ -62,7 +61,7 @@ RowLayout {
         id: drawerComponent
 
         ToolIndicatorPage {
-            showExpand:         true
+            showExpand:         true  // edit icon
             waitForParameters:  control.waitForParameters
 
             contentComponent:    flightModeContentComponent
@@ -86,7 +85,7 @@ RowLayout {
             property var    activeVehicle:            QGroundControl.multiVehicleManager.activeVehicle
             property var    flightModeSettings:       QGroundControl.settingsManager.flightModeSettings
             property var    hiddenFlightModesFact:    null
-            property var    hiddenFlightModesList:    [] 
+            property var    hiddenFlightModesList:    []
 
             Component.onCompleted: {
                 // Hidden flight modes are classified by firmware and vehicle class
@@ -145,8 +144,9 @@ RowLayout {
                                 parent.children[1].toggle()
                                 parent.children[1].clicked()
                             } else {
-                                var controller = globals.guidedControllerFlyView
-                                controller.confirmAction(controller.actionSetFlightMode, modelData)
+                                // var controller = globals.guidedControllerFlyView
+                                // controller.confirmAction(controller.actionSetFlightMode, modelData)
+                                _activeVehicle.flightMode = modelData
                                 mainWindow.closeIndicatorDrawer()
                             }
                         }
@@ -160,7 +160,9 @@ RowLayout {
                             for (var i=0; i<modeRepeater.count; i++) {
                                 var checkBox = modeRepeater.itemAt(i).children[1]
                                 if (!checkBox.checked) {
+
                                     hiddenFlightModesList.push(modeRepeater.model[i])
+                                    console.log("length",hiddenFlightModesList.length)
                                 }
                             }
                             hiddenFlightModesFact.value = hiddenFlightModesList.join(",")
@@ -170,18 +172,18 @@ RowLayout {
                 }
             }
 
-            QGCLabel {
-                id:                     hiddenModesLabel
-                text:                   qsTr("Some Modes Hidden")
-                Layout.fillWidth:       true
-                font.pointSize:         ScreenTools.smallFontPointSize
-                horizontalAlignment:    Text.AlignHCenter
-                visible:                false
+            // QGCLabel {
+            //     id:                     hiddenModesLabel
+            //     text:                   qsTr("Some Modes Hidden")
+            //     Layout.fillWidth:       true
+            //     font.pointSize:         ScreenTools.smallFontPointSize
+            //     horizontalAlignment:    Text.AlignHCenter
+            //     visible:                false
 
-                function calcVisible() {
-                    hiddenModesLabel.visible = hiddenFlightModesList.length > 0
-                }
-            }
+            //     function calcVisible() {
+            //         hiddenModesLabel.visible = hiddenFlightModesList.length > 0
+            //     }
+            // }
         }
     }
 

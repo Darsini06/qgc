@@ -121,6 +121,7 @@ SettingsPage {
                             object.linkChanged()
                         } else {
                             _linkManager.createConnectedLink(object)
+
                         }
                     }
                 }
@@ -144,7 +145,7 @@ SettingsPage {
         QGCPopupDialog {
             title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== ""
+            acceptAllowed:  true//nameField.text !== ""
 
             property var originalConfig
             property var editingConfig
@@ -152,13 +153,21 @@ SettingsPage {
             onAccepted: {
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.name = nameField.text
-                console.log("Bluetooth")
+
+                console.log("Bluetooth Save Button",editingConfig.name)
+
                 if (originalConfig) {
+                    console.log("Bluetooth Save Button Edit Link",originalConfig)
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+
                 } else {
                     // If it was edited, it's no longer "dynamic"
                     editingConfig.dynamic = false
                     _linkManager.endCreateConfiguration(editingConfig)
+
+                      _linkManager.createConnectedLink(editingConfig)
+
+                     console.log("Bluetooth Save Button Add New Link",originalConfig)
                 }
             }
 
@@ -170,6 +179,7 @@ SettingsPage {
                 RowLayout {
                     Layout.fillWidth:   true
                     spacing:            ScreenTools.defaultFontPixelWidth
+                    visible: false
 
                     QGCLabel { text: qsTr("Name") }
                     QGCTextField {
@@ -180,19 +190,19 @@ SettingsPage {
                     }
                 }
 
-                QGCCheckBoxSlider {
-                    Layout.fillWidth:   true
-                    text:               qsTr("Automatically Connect on Start")
-                    checked:            editingConfig.autoConnect
-                    onCheckedChanged:   editingConfig.autoConnect = checked
-                }
+                // QGCCheckBoxSlider {
+                //     Layout.fillWidth:   true
+                //     text:               qsTr("Automatically Connect on Start")
+                //     checked:            editingConfig.autoConnect
+                //     onCheckedChanged:   editingConfig.autoConnect = checked
+                // }
 
-                QGCCheckBoxSlider {
-                    Layout.fillWidth:   true
-                    text:               qsTr("High Latency")
-                    checked:            editingConfig.highLatency
-                    onCheckedChanged:   editingConfig.highLatency = checked
-                }
+                // QGCCheckBoxSlider {
+                //     Layout.fillWidth:   true
+                //     text:               qsTr("High Latency")
+                //     checked:            editingConfig.highLatency
+                //     onCheckedChanged:   editingConfig.highLatency = checked
+                // }
 
                 LabelledComboBox {
                     label:                  qsTr("Type")

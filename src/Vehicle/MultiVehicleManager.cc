@@ -44,6 +44,8 @@ MultiVehicleManager::MultiVehicleManager(QGCApplication* app, QGCToolbox* toolbo
 
 void MultiVehicleManager::setToolbox(QGCToolbox *toolbox)
 {
+    qDebug() << "MultiVehicleManager::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     _firmwarePluginManager =     _toolbox->firmwarePluginManager();

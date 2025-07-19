@@ -218,8 +218,9 @@ void QGCMapPolyline::splitSegment(int vertexIndex)
 
 void QGCMapPolyline::appendVertex(const QGeoCoordinate& coordinate)
 {
-    _polylinePath.append(QVariant::fromValue(coordinate));
-    _polylineModel.append(new QGCQGeoCoordinate(coordinate, this));
+    qDebug() << "appendVertex QGCMapPolyline.cc";
+    //_polylinePath.append(QVariant::fromValue(coordinate));
+    //_polylineModel.append(new QGCQGeoCoordinate(coordinate, this));
     emit pathChanged();
 }
 
@@ -401,7 +402,7 @@ void QGCMapPolyline::appendVertices(const QList<QGeoCoordinate>& coordinates)
         _polylinePath.append(QVariant::fromValue(coordinate));
     }
     _polylineModel.append(objects);
-
+    qDebug() << "appendVertices method in QGCMapPolyLine";
     _endResetIfNotActive();
 }
 
@@ -449,8 +450,8 @@ void QGCMapPolyline::selectVertex(int index)
     } else {
         if (!qgcApp()->runningUnitTests()) {
             qCWarning(ParameterManagerLog)
-                    << QString("QGCMapPolyline: Selected vertex index (%1) is out of bounds! "
-                               "Polyline vertices indexes range is [%2..%3].").arg(index).arg(0).arg(count()-1);
+            << QString("QGCMapPolyline: Selected vertex index (%1) is out of bounds! "
+                       "Polyline vertices indexes range is [%2..%3].").arg(index).arg(0).arg(count()-1);
         }
         _selectedVertexIndex = -1;   // deselect vertex
     }

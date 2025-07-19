@@ -13,11 +13,19 @@
 #include <QtBluetooth/QBluetoothDeviceDiscoveryAgent>
 #include <QtBluetooth/QBluetoothSocket>
 #include <QtBluetooth/QBluetoothServiceInfo>
+
+#include <QBluetoothLocalDevice>
+#include <QtPositioning/QGeoPositionInfoSource>  // For location check
+
 #ifdef Q_OS_IOS
     #include <QtBluetooth/QBluetoothServiceDiscoveryAgent>
 #else
     #include <QtBluetooth/QBluetoothUuid>
 #endif
+
+
+// #include <QAndroidJniObject>
+// #include <QtAndroid>
 
 BluetoothLink::BluetoothLink(SharedLinkConfigurationPtr& config)
     : LinkInterface(config)
@@ -110,6 +118,7 @@ bool BluetoothLink::_hardwareConnect()
     _shutDown = false;
     _discoveryAgent->start();
 #else
+    qDebug()<< "BluetoothLink.cc _hardwareConnect";
     _createSocket();
     _targetSocket->connectToService(QBluetoothAddress(_bluetoothConfig->device().address), QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::SerialPort));
 #endif
@@ -124,6 +133,9 @@ void BluetoothLink::_createSocket()
         _targetSocket = nullptr;
     }
     _targetSocket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol, this);
+
+    qDebug()<< "BluetoothLink.cc _createSocket : " << _targetSocket ;
+
     QObject::connect(_targetSocket, &QBluetoothSocket::connected, this, &BluetoothLink::deviceConnected);
 
     QObject::connect(_targetSocket, &QBluetoothSocket::readyRead, this, &BluetoothLink::readBytes);
@@ -167,6 +179,7 @@ void BluetoothLink::deviceConnected()
 {
     _connectState = true;
     emit connected();
+    qDebug()<< "Bluetooth Connected";
 }
 
 void BluetoothLink::deviceDisconnected()
@@ -206,6 +219,7 @@ BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration* sou
 
 BluetoothConfiguration::~BluetoothConfiguration()
 {
+
     if(_deviceDiscover)
     {
         _deviceDiscover->stop();
@@ -268,6 +282,25 @@ void BluetoothConfiguration::stopScan()
 
 void BluetoothConfiguration::startScan()
 {
+
+    // Check if Bluetooth is ON
+    QBluetoothLocalDevice localDevice;
+    if (localDevice.hostMode() == QBluetoothLocalDevice::HostPoweredOff) {
+        //emit showUserMessage("Bluetooth is turned off. Please turn it on.");
+        qDebug() << "Bluetooth is turned off. Please turn it on.";
+         emit bluetoothOff();
+        return;
+    }
+
+// // Check if Location Services are available
+// #if defined(Q_OS_ANDROID)
+//     QGeoPositionInfoSource* source = QGeoPositionInfoSource::createDefaultSource(this);
+//     if (!source || source->availability() != QGeoPositionInfoSource::Available) {
+//         emit showUserMessage("Location service is turned off or not available. Please enable it.");
+//         return;
+//     }
+// #endif
+
     if(!_deviceDiscover) {
         _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
         connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,  this, &BluetoothConfiguration::deviceDiscovered);
@@ -276,6 +309,7 @@ void BluetoothConfiguration::startScan()
     } else {
         _deviceDiscover->stop();
     }
+
     _nameList.clear();
     _deviceList.clear();
     emit nameListChanged();

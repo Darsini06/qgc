@@ -22,14 +22,14 @@ import QGroundControl.Controllers
 Rectangle {
     id:     _root
     width:  parent.width
-    height: ScreenTools.toolbarHeight
-    color:  qgcPal.toolbarBackground
+    height: 50//ScreenTools.toolbarHeight
+    color:  "#A6ADFF"//qgcPal.toolbarBackground
 
     property var    planMasterController
 
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property real   _controllerProgressPct: planMasterController.missionController.progressPct
-
+    property var plantypes
     QGCPalette { id: qgcPal }
 
     /// Bottom single pixel divider
@@ -53,9 +53,46 @@ Rectangle {
             Layout.preferredHeight: viewButtonRow.height
             icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
-            onClicked:              mainWindow.showFlyView()
+            onClicked:
+            {
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
+                    mainWindow.cameraView()
+                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"){
+                    mainWindow.showFlyView()
+                    mainWindow.closefile()
+                    // if (planType === "Plan") {
+                    //                         mainWindow.showFlyView()
+                    //                         mainWindow.closefile()
+                    //                     } else {
+                    //                         mainWindow.showFlyView1()
+                    //                         mainWindow.closefile()
+                    //                     }
+                }
+
+                // if(MapGlobals.editdialog==="editdialog1"){
+                //     if (planType === "Plan") {
+                //         mainWindow.showFlyView()
+                //         mainWindow.closefile()
+                //     } else {
+                //         mainWindow.showFlyView1()
+                //         mainWindow.closefile()
+                //     }
+                // }else{
+                //     mainWindow.cameraView()
+
+                // }
+
+
+
+
+
+
+
+            }
         }
     }
+
+
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -97,15 +134,18 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-width:50
+        width:50
+
+
         QGCToolBarButton {
             id:                     currentButton
             Layout.preferredHeight: largeProgressBar1.height
-            icon.source:            "qrc:/InstrumentValueIcons/dots-horizontal-triple.svg"
+            icon.source:            "/qmlimages/NewImages/settings.png"
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
             Layout.alignment:        Qt.AlignRight
         }
+
 
     }
     // Large mission download progress bar

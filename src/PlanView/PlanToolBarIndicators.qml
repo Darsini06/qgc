@@ -10,6 +10,8 @@ import QGroundControl.FactControls
 import QGroundControl.Palette
 import QGroundControl.UTMSP
 
+import MapGlobals 1.0
+
 // Toolbar for Plan View
 Item {
     width: missionStats.width + _margins
@@ -86,6 +88,7 @@ Item {
         } else {
             complete = days + " days " + Qt.formatTime(t, 'hh:mm:ss')
         }
+        MapGlobals.time = complete
         return complete
     }
 

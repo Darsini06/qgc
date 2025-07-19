@@ -58,6 +58,72 @@ void SysStatusSensorInfo::update(const mavlink_sys_status_t& sysStatus)
     }
 }
 
+// QStringList SysStatusSensorInfo::sensorNames (void) const
+// {
+//     QStringList rgNames;
+
+//     // List ordering is unhealthy, healthy, disabled
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (sensorInfo.enabled && !sensorInfo.healthy) {
+//             rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+//         }
+//     }
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (sensorInfo.enabled && sensorInfo.healthy) {
+//             rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+//         }
+//     }
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (!sensorInfo.enabled) {
+//             rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+//         }
+//     }
+
+//     return rgNames;
+// }
+
+// QStringList SysStatusSensorInfo::sensorStatus(void) const
+// {
+//     QStringList rgStatus;
+
+//     // List ordering is unhealthy, healthy, disabled
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (sensorInfo.enabled && !sensorInfo.healthy) {
+//             rgStatus.append(tr("Error"));
+//         }
+//     }
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (sensorInfo.enabled && sensorInfo.healthy) {
+//             rgStatus.append(tr("Normal"));
+//         }
+//     }
+//     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
+//         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
+//         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
+
+//         if (!sensorInfo.enabled) {
+//             rgStatus.append(tr("Disabled"));
+//         }
+//     }
+
+//     return rgStatus;
+// }
+
 QStringList SysStatusSensorInfo::sensorNames (void) const
 {
     QStringList rgNames;
@@ -67,8 +133,13 @@ QStringList SysStatusSensorInfo::sensorNames (void) const
         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
+
         if (sensorInfo.enabled && !sensorInfo.healthy) {
-            rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            qWarning() << " Unknown sensor1" << QGCMAVLink::mavSysStatusSensorToString(sensorBitMask);
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            }
+
         }
     }
     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
@@ -76,7 +147,9 @@ QStringList SysStatusSensorInfo::sensorNames (void) const
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
         if (sensorInfo.enabled && sensorInfo.healthy) {
-            rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            }
         }
     }
     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
@@ -84,7 +157,9 @@ QStringList SysStatusSensorInfo::sensorNames (void) const
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
         if (!sensorInfo.enabled) {
-            rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgNames.append(QGCMAVLink::mavSysStatusSensorToString(sensorBitMask));
+            }
         }
     }
 
@@ -101,7 +176,10 @@ QStringList SysStatusSensorInfo::sensorStatus(void) const
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
         if (sensorInfo.enabled && !sensorInfo.healthy) {
-            rgStatus.append(tr("Error"));
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgStatus.append(tr("Error"));
+            }
+
         }
     }
     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
@@ -109,15 +187,22 @@ QStringList SysStatusSensorInfo::sensorStatus(void) const
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
         if (sensorInfo.enabled && sensorInfo.healthy) {
-            rgStatus.append(tr("Normal"));
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgStatus.append(tr("Normal"));
+            }
+
         }
+
     }
     for (int i=0; i<_sensorInfoMap.keys().count(); i++) {
         const MAV_SYS_STATUS_SENSOR sensorBitMask   = _sensorInfoMap.keys()[i];
         const SensorInfo_t&         sensorInfo      = _sensorInfoMap[sensorBitMask];
 
         if (!sensorInfo.enabled) {
-            rgStatus.append(tr("Disabled"));
+            if (QGCMAVLink::mavSysStatusSensorToString(sensorBitMask) != "") {
+                rgStatus.append(tr("Disabled"));
+            }
+
         }
     }
 

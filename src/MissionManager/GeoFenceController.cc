@@ -399,6 +399,8 @@ bool GeoFenceController::showPlanFromManagerVehicle(void)
 
 void GeoFenceController::addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
 {
+    qDebug() <<"addInclusionPolygon Method in GeoFenceController.cc class";
+
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());
     QGeoCoordinate bottomLeft(bottomRight.latitude(), topLeft.longitude());
 

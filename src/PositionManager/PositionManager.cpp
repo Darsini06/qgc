@@ -20,6 +20,9 @@
 #include <QtPositioning/QNmeaPositionInfoSource>
 #include <QtQml/QtQml>
 
+#include <QBluetoothPermission>
+
+
 QGC_LOGGING_CATEGORY(QGCPositionManagerLog, "qgc.positionmanager.positionmanager")
 
 QGCPositionManager::QGCPositionManager(QGCApplication *app, QGCToolbox *toolbox)
@@ -60,23 +63,66 @@ void QGCPositionManager::_handlePermissionStatus(Qt::PermissionStatus permission
     }
 }
 
-void QGCPositionManager::_checkPermission()
-{
-    QLocationPermission locationPermission;
-    locationPermission.setAccuracy(QLocationPermission::Precise);
 
-    const Qt::PermissionStatus permissionStatus = _app->checkPermission(locationPermission);
-    if (permissionStatus == Qt::PermissionStatus::Undetermined) {
-        _app->requestPermission(locationPermission, this, [this](const QPermission &permission) {
-            _handlePermissionStatus(permission.status());
-        });
+void QGCPositionManager::_handleBluetoothPermissionStatus(Qt::PermissionStatus status)
+{
+    if (status == Qt::PermissionStatus::Granted) {
+        qDebug() << "Bluetooth Permission Granted";
+        // You can start Bluetooth services here if needed
     } else {
-        _handlePermissionStatus(permissionStatus);
+        qCWarning(QGCPositionManagerLog) << Q_FUNC_INFO << "Bluetooth Permission Denied";
     }
 }
 
+
+void QGCPositionManager::_checkPermission()
+{
+    qDebug() << "QGCPositionManager :: _checkPermission()";
+    QLocationPermission locationPermission;
+
+    //Creates a permission request object for precise location.
+    locationPermission.setAccuracy(QLocationPermission::Precise);
+
+    //Checks if the permission is already granted.
+    const Qt::PermissionStatus permissionStatus = _app->checkPermission(locationPermission);
+
+
+    if (permissionStatus == Qt::PermissionStatus::Undetermined) {
+        _app->requestPermission(locationPermission, this, [this](const QPermission &permission) {
+            _handlePermissionStatus(permission.status());
+             _checkBluetoothPermission();
+        });
+        qDebug() << "_handlePermissionStatus - if :: " << permissionStatus;
+    } else {
+        _handlePermissionStatus(permissionStatus);
+         _checkBluetoothPermission();
+        qDebug() << "_handlePermissionStatus - else ::"<< permissionStatus;
+    }
+}
+
+
+void QGCPositionManager::_checkBluetoothPermission()
+{
+    qDebug() << "QGCPositionManager :: _checkBluetoothPermission()";
+
+    QBluetoothPermission bluetoothPermission;
+    bluetoothPermission.setCommunicationModes(QBluetoothPermission::Access);
+
+    const Qt::PermissionStatus btStatus = _app->checkPermission(bluetoothPermission);
+    if (btStatus == Qt::PermissionStatus::Undetermined) {
+        _app->requestPermission(bluetoothPermission, this, [this](const QPermission &perm) {
+            _handleBluetoothPermissionStatus(perm.status());
+        });
+    } else {
+        _handleBluetoothPermissionStatus(btStatus);
+    }
+}
+
+
 void QGCPositionManager::setToolbox(QGCToolbox *toolbox)
 {
+    qDebug() << "QGCPositionManager::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     (void) qmlRegisterUncreatableType<QGCPositionManager>("QGroundControl.QGCPositionManager", 1, 0, "QGCPositionManager", "Reference only");
@@ -85,9 +131,11 @@ void QGCPositionManager::setToolbox(QGCToolbox *toolbox)
         m_simulatedSource = new SimulatedPosition(this);
         _setPositionSource(QGCPositionSource::Simulated);
     } else {
+        qDebug() << "setToolbox";
         _checkPermission();
     }
 }
+
 
 void QGCPositionManager::setNmeaSourceDevice(QIODevice *device)
 {
@@ -108,6 +156,8 @@ void QGCPositionManager::setNmeaSourceDevice(QIODevice *device)
     m_nmeaSource->setUserEquivalentRangeError(5.1);
     _setPositionSource(QGCPositionManager::NmeaGPS);
 }
+
+
 
 void QGCPositionManager::_positionUpdated(const QGeoPositionInfo &update)
 {
@@ -204,9 +254,9 @@ void QGCPositionManager::_setPositionSource(QGCPositionSource source)
     if (m_currentSource != nullptr) {
         m_currentSource->setPreferredPositioningMethods(QGeoPositionInfoSource::SatellitePositioningMethods);
         m_updateInterval = m_currentSource->minimumUpdateInterval();
-        #if !defined(Q_OS_DARWIN) && !defined(Q_OS_IOS)
-            m_currentSource->setUpdateInterval(m_updateInterval);
-        #endif
+#if !defined(Q_OS_DARWIN) && !defined(Q_OS_IOS)
+        m_currentSource->setUpdateInterval(m_updateInterval);
+#endif
         (void) connect(m_currentSource, &QGeoPositionInfoSource::positionUpdated, this, &QGCPositionManager::_positionUpdated);
         (void) connect(m_currentSource, &QGeoPositionInfoSource::errorOccurred, this, [](QGeoPositionInfoSource::Error positioningError) {
             qCWarning(QGCPositionManagerLog) << Q_FUNC_INFO << positioningError;

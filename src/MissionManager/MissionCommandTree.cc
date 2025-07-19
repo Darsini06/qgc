@@ -27,6 +27,9 @@ MissionCommandTree::MissionCommandTree(QGCApplication* app, QGCToolbox* toolbox,
 
 void MissionCommandTree::setToolbox(QGCToolbox* toolbox)
 {
+
+    qDebug() << "MissionCommandTree::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     _settingsManager = toolbox->settingsManager();
@@ -41,8 +44,8 @@ void MissionCommandTree::setToolbox(QGCToolbox* toolbox)
         _staticCommandTree[MAV_AUTOPILOT_GENERIC][QGCMAVLink::VehicleClassSub]          = new MissionCommandList(":/unittest/UT-MavCmdInfoSub.json", false, this);
         _staticCommandTree[MAV_AUTOPILOT_GENERIC][QGCMAVLink::VehicleClassRoverBoat]    = new MissionCommandList(":/unittest/UT-MavCmdInfoRover.json", false, this);
     } else {
-#endif
-        // Load all levels of hierarchy
+#endif \
+    // Load all levels of hierarchy
         for (const QGCMAVLink::FirmwareClass_t firmwareClass: _toolbox->firmwarePluginManager()->supportedFirmwareClasses()) {
             FirmwarePlugin* plugin = _toolbox->firmwarePluginManager()->firmwarePluginForAutopilot(QGCMAVLink::firmwareClassToAutopilot(firmwareClass), MAV_TYPE_QUADROTOR);
 

@@ -138,10 +138,10 @@ bool
 MAVLinkLogProcessor::create(MAVLinkLogManager* manager, const QString path, uint8_t id)
 {
     _fileName = _fileName.asprintf("%s/%03d-%s%s",
-                      path.toLatin1().data(),
-                      id,
-                      QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss-zzz").toLocal8Bit().data(),
-                      manager->logExtension().toLocal8Bit().data());
+                                   path.toLatin1().data(),
+                                   id,
+                                   QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss-zzz").toLocal8Bit().data(),
+                                   manager->logExtension().toLocal8Bit().data());
     _fd = fopen(_fileName.toLocal8Bit().data(), "wb");
     if(_fd) {
         _record = new MAVLinkLogFiles(manager, _fileName, true);
@@ -323,6 +323,7 @@ MAVLinkLogManager::~MAVLinkLogManager()
 void
 MAVLinkLogManager::setToolbox(QGCToolbox* toolbox)
 {
+    qDebug() << "MAVLinkLogManager::setToolbox";
     QGCTool::setToolbox(toolbox);
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     qmlRegisterUncreatableType<MAVLinkLogManager>("QGroundControl.MAVLinkLogManager", 1, 0, "MAVLinkLogManager", "Reference only");

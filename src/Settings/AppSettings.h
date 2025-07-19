@@ -101,6 +101,7 @@ public:
     // Application wide file extensions
     static constexpr const char* parameterFileExtension =   "params";
     static constexpr const char* planFileExtension =        "plan";
+    static constexpr const char* planFileExtension1 =        "plan1";
     static constexpr const char* missionFileExtension =     "mission";
     static constexpr const char* waypointsFileExtension =   "waypoints";
     static constexpr const char* fenceFileExtension =       "fence";

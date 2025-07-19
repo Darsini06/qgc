@@ -73,6 +73,7 @@ QGroundControlQmlGlobal::~QGroundControlQmlGlobal()
 
 void QGroundControlQmlGlobal::setToolbox(QGCToolbox* toolbox)
 {
+     qDebug() << "QGroundControlQmlGlobal::setToolbox";
     QGCTool::setToolbox(toolbox);
 
     _linkManager            = toolbox->linkManager();

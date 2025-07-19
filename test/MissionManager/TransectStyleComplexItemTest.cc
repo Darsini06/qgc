@@ -238,6 +238,7 @@ TestTransectStyleItem::TestTransectStyleItem(PlanMasterController* masterControl
     , recalcComplexDistanceCalled   (false)
     , recalcCameraShotsCalled       (false)
 {
+    qDebug() << "TestTransectStyleItem method";
     // We use a 100m by 100m square test polygon
     const double edgeDistance = 100;
     surveyAreaPolygon()->appendVertex(UnitTestTerrainQuery::linearSlopeRegion.center());
@@ -255,6 +256,8 @@ void TestTransectStyleItem::_rebuildTransectsPhase1(void)
         return;
     }
 
+    qDebug() << "TestTransectStyleItem::_rebuildTransectsPhase1";
+
     _transects.append(QList<TransectStyleComplexItem::CoordInfo_t>{
         {surveyAreaPolygon()->vertexCoordinate(0), CoordTypeSurveyEntry},
         {surveyAreaPolygon()->vertexCoordinate(2), CoordTypeSurveyExit}}
@@ -268,6 +271,7 @@ void TestTransectStyleItem::_recalcCameraShots(void)
 
 void TestTransectStyleItem::adjustSurveAreaPolygon(void)
 {
+     qDebug() << "TestTransectStyleItem::adjustSurveAreaPolygon";
     QGeoCoordinate vertex = surveyAreaPolygon()->vertexCoordinate(0);
     vertex.setLatitude(vertex.latitude() + 1);
     surveyAreaPolygon()->adjustVertex(0, vertex);

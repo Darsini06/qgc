@@ -29,7 +29,7 @@ TransectStyleMapVisuals {
         interactive:    _currentItem && parent.interactive
         lineWidth:      3
         lineColor:      "#be781c"
-        visible:        _currentItem
+        visible:        false//_currentItem
         opacity:        parent.opacity
     }
 }

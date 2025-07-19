@@ -2963,11 +2963,22 @@ void Vehicle::rebootVehicle()
 
 void Vehicle::startCalibration(QGCMAVLink::CalibrationType calType)
 {
+
     SharedLinkInterfacePtr sharedLink = vehicleLinkManager()->primaryLink().lock();
+
+     if (!sharedLink.get()) {
+         qCritical() << "sharedLink is null when sending message!";
+         return;
+     }
+
+      qDebug()<< "startCalibration 1" << calType;
+
     if (!sharedLink) {
         qCDebug(VehicleLog) << "startCalibration: primary link gone!";
         return;
     }
+
+     qDebug()<< "startCalibration 2 " << calType;
 
     float param1 = 0;
     float param2 = 0;
@@ -3026,19 +3037,38 @@ void Vehicle::startCalibration(QGCMAVLink::CalibrationType calType)
         break;
     }
 
+     qDebug()<< "startCalibration 3 " << calType;
+
     // We can't use sendMavCommand here since we have no idea how long it will be before the command returns a result. This in turn
     // causes the retry logic to break down.
     mavlink_message_t msg;
-    mavlink_msg_command_long_pack_chan(_mavlink->getSystemId(),
-                                       _mavlink->getComponentId(),
-                                       sharedLink->mavlinkChannel(),
-                                       &msg,
-                                       id(),
-                                       defaultComponentId(),            // target component
-                                       MAV_CMD_PREFLIGHT_CALIBRATION,    // command id
-                                       0,                                // 0=first transmission of command
-                                       param1, param2, param3, param4, param5, param6, param7);
-    sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
+
+
+    qDebug() << "MAVLink channel:" << sharedLink->mavlinkChannel();
+    qDebug() << "Component ID:" << defaultComponentId();
+
+     if (sharedLink && sharedLink.get()) {
+ qDebug()<< "startCalibration 4 " << calType;
+         mavlink_msg_command_long_pack_chan(_mavlink->getSystemId(),
+                                            _mavlink->getComponentId(),
+                                            sharedLink->mavlinkChannel(),
+                                            &msg,
+                                            id(),
+                                            defaultComponentId(),            // target component
+                                            MAV_CMD_PREFLIGHT_CALIBRATION,    // command id
+                                            0,                                // 0=first transmission of command
+                                            param1, param2, param3, param4, param5, param6, param7);
+
+          qDebug()<< "startCalibration 5 " << calType;
+
+         sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
+
+          qDebug()<< "startCalibration 6 " << calType;
+    }else {
+         qCritical() << "Link is invalid. Cannot send calibration command.";
+     }
+
+
 }
 
 void Vehicle::stopCalibration(bool showError)

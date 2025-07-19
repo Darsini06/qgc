@@ -85,27 +85,28 @@ void MAVLinkProtocol::setVersion(unsigned version)
 
 void MAVLinkProtocol::setToolbox(QGCToolbox *toolbox)
 {
-   QGCTool::setToolbox(toolbox);
+    qDebug() << "MAVLinkProtocol::setToolbox";
+    QGCTool::setToolbox(toolbox);
 
-   _linkMgr =               _toolbox->linkManager();
-   _multiVehicleManager =   _toolbox->multiVehicleManager();
+    _linkMgr =               _toolbox->linkManager();
+    _multiVehicleManager =   _toolbox->multiVehicleManager();
 
-   qmlRegisterSingletonType<QGCMAVLink>("MAVLink", 1, 0, "MAVLink", mavlinkSingletonFactory);
-   qRegisterMetaType<mavlink_message_t>("mavlink_message_t");
+    qmlRegisterSingletonType<QGCMAVLink>("MAVLink", 1, 0, "MAVLink", mavlinkSingletonFactory);
+    qRegisterMetaType<mavlink_message_t>("mavlink_message_t");
 
-   loadSettings();
+    loadSettings();
 
-   // All the *Counter variables are not initialized here, as they should be initialized
-   // on a per-link basis before those links are used. @see resetMetadataForLink().
+    // All the *Counter variables are not initialized here, as they should be initialized
+    // on a per-link basis before those links are used. @see resetMetadataForLink().
 
-   connect(this, &MAVLinkProtocol::protocolStatusMessage,   _app, &QGCApplication::criticalMessageBoxOnMainThread);
-   connect(this, &MAVLinkProtocol::saveTelemetryLog,        _app, &QGCApplication::saveTelemetryLogOnMainThread);
-   connect(this, &MAVLinkProtocol::checkTelemetrySavePath,  _app, &QGCApplication::checkTelemetrySavePathOnMainThread);
+    connect(this, &MAVLinkProtocol::protocolStatusMessage,   _app, &QGCApplication::criticalMessageBoxOnMainThread);
+    connect(this, &MAVLinkProtocol::saveTelemetryLog,        _app, &QGCApplication::saveTelemetryLogOnMainThread);
+    connect(this, &MAVLinkProtocol::checkTelemetrySavePath,  _app, &QGCApplication::checkTelemetrySavePathOnMainThread);
 
-   connect(_multiVehicleManager, &MultiVehicleManager::vehicleAdded, this, &MAVLinkProtocol::_vehicleCountChanged);
-   connect(_multiVehicleManager, &MultiVehicleManager::vehicleRemoved, this, &MAVLinkProtocol::_vehicleCountChanged);
+    connect(_multiVehicleManager, &MultiVehicleManager::vehicleAdded, this, &MAVLinkProtocol::_vehicleCountChanged);
+    connect(_multiVehicleManager, &MultiVehicleManager::vehicleRemoved, this, &MAVLinkProtocol::_vehicleCountChanged);
 
-   emit versionCheckChanged(_enable_version_check);
+    emit versionCheckChanged(_enable_version_check);
 }
 
 void MAVLinkProtocol::loadSettings()
@@ -338,10 +339,10 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, QByteArray b)
                 emit vehicleHeartbeatInfo(link, _message.sysid, _message.compid, highLatency2.autopilot, highLatency2.type);
             }
 
-#if 0
-            // Given the current state of SiK Radio firmwares there is no way to make the code below work.
-            // The ArduPilot implementation of SiK Radio firmware always sends MAVLINK_MSG_ID_RADIO_STATUS as a mavlink 1
-            // packet even if the vehicle is sending Mavlink 2.
+#if 0 \
+    // Given the current state of SiK Radio firmwares there is no way to make the code below work. \
+    // The ArduPilot implementation of SiK Radio firmware always sends MAVLINK_MSG_ID_RADIO_STATUS as a mavlink 1 \
+    // packet even if the vehicle is sending Mavlink 2.
 
             // Detect if we are talking to an old radio not supporting v2
             mavlink_status_t* mavlinkStatus = mavlink_get_channel_status(mavlinkChannel);

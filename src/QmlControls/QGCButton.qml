@@ -46,11 +46,11 @@ Button {
         implicitHeight: ScreenTools.implicitButtonHeight
         border.width:   showBorder ? 1 : 0
         border.color:   qgcPal.buttonBorder
-        color:          primary ? qgcPal.primaryButton : qgcPal.button
+        color:         primary ? "#A6ADFF" : qgcPal.button
 
         Rectangle {
             anchors.fill:   parent
-            color:          qgcPal.buttonHighlight
+            color:         qgcPal.buttonHighlight
             opacity:        _showHighlight ? 1 : control.enabled && control.hovered ? .2 : 0
             radius:         parent.radius
         }

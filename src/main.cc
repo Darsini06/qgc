@@ -21,6 +21,8 @@
 #include "QGC.h"
 #include "AppMessages.h"
 
+#include "QGCMapEngineManager.h"
+
 #ifndef __mobile__
 #include "RunGuard.h"
 #endif
@@ -201,6 +203,7 @@ int main(int argc, char *argv[])
         const DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
         SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
     }
+
 #endif // Q_OS_WIN
 #endif // QT_DEBUG
 
@@ -213,7 +216,7 @@ int main(int argc, char *argv[])
 
     // --- Create the QGCApplication instance ---
     QGCApplication app(argc, argv, /*runUnitTests*/ false);
-    // QQmlApplicationEngine engine;
+    QQmlApplicationEngine engine;
 
     //   qDebug() << "Initializing QML engine...";
 
@@ -240,6 +243,7 @@ int main(int argc, char *argv[])
 
     // // --- Initialize and run the application ---
 
+    qmlRegisterType<QGCMapEngineManager>("QGroundControl.QGCMapEngineManager", 1, 0, "QGCMapEngineManager");
     qmlRegisterSingletonType(QUrl("qrc:/qml/MapGlobals.qml"), "MapGlobals", 1, 0, "MapGlobals");
 
     app.init();

@@ -1,4 +1,4 @@
-/****************************************************************************
+    /****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -84,10 +84,13 @@ SetupPage {
             property bool   _compassAutoRot:                _compassAutoRotAvailable ? _compassAutoRotFact.rawValue == 2 : false
             property bool   _showSimpleAccelCalOption:      false
             property bool   _doSimpleAccelCal:              false
-            property var    _gcsPosition:                    QGroundControl.qgcPositionManger.gcsPosition
+            property var    _gcsPosition:                    QGroundControl.qgcPositionManager.gcsPosition
             property var    _mapPosition:                    QGroundControl.flightMapPosition
 
             function showOrientationsDialog(calType) {
+
+                console.log("showOrientationsDialog calType :",calType)
+
                 var dialogTitle
                 var dialogButtons = Dialog.Ok
                 _showSimpleAccelCalOption = false
@@ -103,6 +106,7 @@ SetupPage {
                 case _calTypeAccel:
                     _orientationsDialogShowCompass = false
                     _orientationDialogHelp = orientationHelpCal
+                    console.log("_calTypeAccel Switch case")
                     dialogTitle = qsTr("Calibrate Accelerometer")
                     dialogButtons |= Dialog.Cancel
                     break
@@ -118,6 +122,7 @@ SetupPage {
 
             function showSimpleAccelCalOption() {
                 _showSimpleAccelCalOption = true
+                console.log("showSimpleAccelCalOption :",_showSimpleAccelCalOption)
             }
 
             function compassLabel(index) {
@@ -161,6 +166,7 @@ SetupPage {
 
                 onWaitingForCancelChanged: {
                     if (controller.waitingForCancel) {
+                        console.log("onWaitingForCancelChanged")
                         waitForCancelDialogComponent.createObject(mainWindow).open()
                     }
                 }
@@ -168,7 +174,10 @@ SetupPage {
                 onCalibrationComplete: {
                     switch (calType) {
                     case MAVLink.CalibrationAccel:
+                        console.log("MAVLink.CalibrationAccel")
+                        break
                     case MAVLink.CalibrationMag:
+                        console.log("MAVLink.CalibrationMag")
                         _singleCompassSettingsComponentShowPriority = true
                         postOnboardCompassCalibrationComponent.createObject(mainWindow).open()
                         break
@@ -176,6 +185,7 @@ SetupPage {
                 }
 
                 onSetAllCalButtonsEnabled: {
+                    console.log("onSetAllCalButtonsEnabled")
                     buttonColumn.enabled = enabled
                 }
             }
@@ -194,6 +204,7 @@ SetupPage {
                         target: controller
 
                         onWaitingForCancelChanged: {
+                            console.log("waitForCancelDialogComponent")
                             if (!controller.waitingForCancel) {
                                 close()
                             }
@@ -325,6 +336,7 @@ SetupPage {
                         QGCButton {
                             text:       qsTr("Reboot Vehicle")
                             onClicked: {
+                                console.log("Reboot Vehicle")
                                 controller.vehicle.rebootVehicle()
                                 postCalibrationDialog.close()
                             }
@@ -334,6 +346,7 @@ SetupPage {
             }
 
             property bool _singleCompassSettingsComponentShowPriority: true
+
             Component {
                 id: singleCompassSettingsComponent
 
@@ -384,13 +397,13 @@ SetupPage {
                                 Component.onCompleted: selectPriorityfromParams()
 
                                 onActivated: (index) => {
-                                    if (index == 3) {
-                                        // User cannot select Not Set
-                                        selectPriorityfromParams()
-                                    } else {
-                                        sensorParams.rgCompassPrio[index].rawValue = sensorParams.rgCompassId[_compassIndex].rawValue
-                                    }
-                                }
+                                                 if (index === 3) {
+                                                     // User cannot select Not Set
+                                                     selectPriorityfromParams()
+                                                 } else {
+                                                     sensorParams.rgCompassPrio[index].rawValue = sensorParams.rgCompassId[_compassIndex].rawValue
+                                                 }
+                                             }
                             }
                         }
 
@@ -413,6 +426,7 @@ SetupPage {
                 id: orientationsDialogComponent
 
                 QGCPopupDialog {
+
                     function compassMask () {
                         var mask = 0
                         mask |=  (0 + (sensorParams.rgCompassPrio[0].rawValue !== 0)) << 0
@@ -422,9 +436,12 @@ SetupPage {
                     }
 
                     onAccepted: {
+
                         if (_orientationDialogCalType == _calTypeAccel) {
+                            console.log("_orientationDialogCalType  == _calTypeAccel")
                             controller.calibrateAccel(_doSimpleAccelCal)
                         } else if (_orientationDialogCalType == _calTypeCompass) {
+                            console.log("_orientationDialogCalType  == _calTypeCompass")
                             if (!northCalibrationCheckBox.checked) {
                                 controller.calibrateCompass()
                             } else {
@@ -580,6 +597,7 @@ SetupPage {
                                 textColor:  isNaN(parseFloat(text)) ? qgcPal.warningText: qgcPal.textFieldText
                                 enabled:    !useGcsPositionCheckbox.checked
                             }
+                            
                             FactTextField {
                                 id:         northCalLon
                                 visible:    !useGcsPositionCheckbox.checked && !useMapPositionCheckbox.checked && northCalibrationCheckBox.checked
@@ -668,6 +686,7 @@ SetupPage {
                         indicatorGreen: !accelCalNeeded
 
                         onClicked: function () {
+                            console.log("Click Accelerometer button")
                             showOrientationsDialog(_calTypeAccel);
                             showSimpleAccelCalOption();
                         }
@@ -679,6 +698,7 @@ SetupPage {
                         indicatorGreen: !compassCalNeeded
 
                         onClicked: {
+                            console.log("Click Compass button")
                             if (controller.accelSetupNeeded) {
                                 mainWindow.showMessageDialog(qsTr("Calibrate Compass"), qsTr("Accelerometer must be calibrated prior to Compass."))
                             } else {
@@ -694,6 +714,7 @@ SetupPage {
                         readonly property string _levelHorizonText: qsTr("Level Horizon")
 
                         onClicked: {
+                            console.log("Level Horizon")
                             if (controller.accelSetupNeeded) {
                                 mainWindow.showMessageDialog(_levelHorizonText, qsTr("Accelerometer must be calibrated prior to Level Horizon."))
                             } else {
@@ -709,19 +730,24 @@ SetupPage {
                         width:      _buttonWidth
                         text:       qsTr("Gyro")
                         visible:    globals.activeVehicle && (globals.activeVehicle.multiRotor | globals.activeVehicle.rover | globals.activeVehicle.sub)
-                        onClicked:  mainWindow.showMessageDialog(qsTr("Calibrate Gyro"),
-                                                                 qsTr("For Gyroscope calibration you will need to place your vehicle on a surface and leave it still.\n\nClick Ok to start calibration."),
-                                                                 Dialog.Cancel | Dialog.Ok,
-                                                                 function() { controller.calibrateGyro() })
+                        onClicked: {
+                            console.log("Click Gyro button")
+                            mainWindow.showMessageDialog(qsTr("Calibrate Gyro"),
+                                                         qsTr("For Gyroscope calibration you will need to place your vehicle on a surface and leave it still.\n\nClick Ok to start calibration."),
+                                                         Dialog.Cancel | Dialog.Ok,
+                                                         function() { controller.calibrateGyro() })
+                        }
                     }
 
                     QGCButton {
                         width:      _buttonWidth
                         text:       _calibratePressureText
-                        onClicked:  mainWindow.showMessageDialog(_calibratePressureText,
-                                                                 qsTr("Pressure calibration will set the %1 to zero at the current pressure reading. %2").arg(_altText).arg(_helpTextFW),
-                                                                 Dialog.Cancel | Dialog.Ok,
-                                                                 function() { controller.calibratePressure() })
+                        onClicked: {
+                            console.log("Click Pressure Text button :",_calibratePressureText)
+                            mainWindow.showMessageDialog(_calibratePressureText,
+                                                         qsTr("Pressure calibration will set the %1 to zero at the current pressure reading. %2").arg(_altText).arg(_helpTextFW),
+                                                         Dialog.Cancel | Dialog.Ok,
+                                                         function() { controller.calibratePressure() })}
 
                         readonly property string _altText:                  globals.activeVehicle.sub ? qsTr("depth") : qsTr("altitude")
                         readonly property string _helpTextFW:               globals.activeVehicle.fixedWing ? qsTr("To calibrate the airspeed sensor shield it from the wind. Do not touch the sensor or obstruct any holes during the calibration.") : ""
@@ -732,13 +758,19 @@ SetupPage {
                         width:      _buttonWidth
                         text:       qsTr("CompassMot")
                         visible:    globals.activeVehicle ? globals.activeVehicle.supportsMotorInterference : false
-                        onClicked:  compassMotDialogComponent.createObject(mainWindow).open()
+                        onClicked:  {
+                             console.log("Click CompassMot button")
+                            compassMotDialogComponent.createObject(mainWindow).open()
+                        }
                     }
 
                     QGCButton {
                         width:      _buttonWidth
                         text:       qsTr("Sensor Settings")
-                        onClicked:  showOrientationsDialog(_calTypeSet)
+                        onClicked:  {
+                             console.log("Click Sensor Settings button")
+                            showOrientationsDialog(_calTypeSet)
+                        }
                     }
                 } // Column - Cal Buttons
 

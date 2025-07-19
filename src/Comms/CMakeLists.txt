@@ -21,19 +21,19 @@ qt_add_library(Comms STATIC
 
 target_link_libraries(Comms
     PRIVATE
-        Qt6::Qml
-        Qt6::Test
-        AirLink
-        MockLink
-        Settings
-        Vehicle
+    Qt6::Qml
+    Qt6::Test
+    AirLink
+    MockLink
+    Settings
+    Vehicle
     PUBLIC
-        Qt6::Core
-        Qt6::Network
-        MAVLink
-        QGC
-        QmlControls
-        Utilities
+    Qt6::Core
+    Qt6::Network
+    MAVLink
+    QGC
+    QmlControls
+    Utilities
 )
 
 target_include_directories(Comms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -45,39 +45,43 @@ if(QGC_NO_SERIAL_LINK)
 else()
     target_sources(Comms
         PRIVATE
-            QGCSerialPortInfo.cc
-            QGCSerialPortInfo.h
-            SerialLink.cc
-            SerialLink.h
-            UdpIODevice.cc
-            UdpIODevice.h
+        QGCSerialPortInfo.cc
+        QGCSerialPortInfo.h
+        SerialLink.cc
+        SerialLink.h
+        UdpIODevice.cc
+        UdpIODevice.h
     )
-    target_link_libraries(Comms
+target_link_libraries(Comms
+    PRIVATE
+    GPS
+    PositionManager
+)
+if(ANDROID)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/android/libs/qtandroidserialport qtandroidserialport.build)
+    target_sources(qtandroidserialport
         PRIVATE
-            GPS
-            PositionManager
+        ${CMAKE_SOURCE_DIR}/android/src/AndroidSerial.cc
+        ${CMAKE_SOURCE_DIR}/android/src/AndroidSerial.h
     )
-    if(ANDROID)
-        add_subdirectory(${CMAKE_SOURCE_DIR}/android/libs/qtandroidserialport qtandroidserialport.build)
-        target_sources(qtandroidserialport
-            PRIVATE
-                ${CMAKE_SOURCE_DIR}/android/src/AndroidSerial.cc
-                ${CMAKE_SOURCE_DIR}/android/src/AndroidSerial.h
-        )
-        target_include_directories(qtandroidserialport PUBLIC ${CMAKE_SOURCE_DIR}/android/src)
-        target_link_libraries(Comms PUBLIC qtandroidserialport)
-    else()
-        find_package(Qt6 REQUIRED COMPONENTS SerialPort)
-        target_link_libraries(Comms PUBLIC Qt6::SerialPort)
-    endif()
+target_include_directories(qtandroidserialport PUBLIC ${CMAKE_SOURCE_DIR}/android/src)
+target_link_libraries(Comms PUBLIC qtandroidserialport)
+else()
+    find_package(Qt6 REQUIRED COMPONENTS SerialPort)
+    target_link_libraries(Comms PUBLIC Qt6::SerialPort)
+endif()
 endif()
 
 ############# Bluetooth
 
 option(QGC_ENABLE_BLUETOOTH "Enable Bluetooth Links" ON)
 if(QGC_ENABLE_BLUETOOTH)
-    find_package(Qt6 REQUIRED COMPONENTS Bluetooth)
-    target_link_libraries(Comms PUBLIC Qt6::Bluetooth)
+    find_package(Qt6 REQUIRED COMPONENTS Core Bluetooth)  # ✅ REMOVE AndroidExtras
+    target_link_libraries(Comms
+        PUBLIC
+            Qt6::Core             # ✅ JNI is now part of Core
+            Qt6::Bluetooth
+    )
     target_sources(Comms
         PRIVATE
             BluetoothLink.cc
@@ -85,6 +89,7 @@ if(QGC_ENABLE_BLUETOOTH)
     )
     target_compile_definitions(Comms PUBLIC QGC_ENABLE_BLUETOOTH)
 endif()
+
 
 ############# ZEROConf
 
@@ -99,8 +104,8 @@ if(QGC_ZEROCONF_ENABLED)
         GIT_REPOSITORY https://github.com/nitroshare/qmdnsengine.git
         GIT_TAG 4e54bc86c8ed2d4fa2e7449d4ba6a6a2742d9eb1
     )
-    FetchContent_MakeAvailable(qmdnsengine)
+FetchContent_MakeAvailable(qmdnsengine)
 
-    target_link_libraries(Comms PRIVATE qmdnsengine)
-    target_compile_definitions(Comms PUBLIC QGC_ZEROCONF_ENABLED)
+target_link_libraries(Comms PRIVATE qmdnsengine)
+target_compile_definitions(Comms PUBLIC QGC_ZEROCONF_ENABLED)
 endif()

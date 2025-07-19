@@ -840,8 +840,12 @@ void RadioComponentController::_setHelpImage(const char* imageFile)
 
     if (_transmitterMode == 1) {
         file += _imageFileMode1Dir;
+        qDebug() << "file : " << file ;
+        qDebug() << "_imageFileMode1Dir : " << _imageFileMode1Dir ;
     } else if (_transmitterMode == 2) {
         file += _imageFileMode2Dir;
+        qDebug() << "file : " << file ;
+        qDebug() << "_imageFileMode2Dir : " << _imageFileMode2Dir ;
     } else {
         qWarning() << "Internal error: Bad _transmitterMode value";
         return;

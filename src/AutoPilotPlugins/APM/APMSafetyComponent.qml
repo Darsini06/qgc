@@ -145,30 +145,67 @@ SetupPage {
                 QGCLabel {
                     text:       qsTr("Battery1 Failsafe Triggers")
                     font.bold:   true
+                    visible:false
+                }
+                Rectangle {
+                    id: battery1FailsafeRect
+                    width: battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
+                    height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
+                    color: ggcPal.windowShade
+                    radius: ScreenTools.defaultFontPixelHeight / 2
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked:
+                            if (activeVehicle) {
+                                batteryDialog.open()
+                            } else {
+                                mainWindow.showToast("Device not connected");
+                            }
+
+                    }
+
+                    QGCLabel {
+                        id: battery1FailsafeLoader
+                        anchors.margins: _margins
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        text:       qsTr("Battery1 Failsafe Triggers")
+                        font.bold:   true
+                    }
+
+
                 }
 
-                Rectangle {
-                    width:  battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
-                    height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
-                    color:  ggcPal.windowShade
+                Popup {
+                    id: batteryDialog
+                    modal: true
+                    focus: true
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                    anchors.centerIn: Overlay.overlay
 
-                    Loader {
-                        id:                 battery1FailsafeLoader
-                        anchors.margins:    _margins
-                        anchors.top:        parent.top
-                        anchors.left:       parent.left
-                        sourceComponent:    _batt1ParamsAvailable ? batteryFailsafeComponent : restartRequiredComponent
-
-                        property Fact battMonitor:              _batt1Monitor
-                        property bool battParamsAvailable:      _batt1ParamsAvailable
-                        property Fact failsafeBattLowAct:       _failsafeBatt1LowAct
-                        property Fact failsafeBattCritAct:      _failsafeBatt1CritAct
-                        property Fact failsafeBattLowMah:       _failsafeBatt1LowMah
-                        property Fact failsafeBattCritMah:      _failsafeBatt1CritMah
-                        property Fact failsafeBattLowVoltage:   _failsafeBatt1LowVoltage
-                        property Fact failsafeBattCritVoltage:  _failsafeBatt1CritVoltage
+                    background: Rectangle {
+                        color: ggcPal.windowShade
+                        border.color: ggcPal.button
+                        border.width: 1
+                        radius: ScreenTools.defaultFontPixelHeight / 2
                     }
-                } // Rectangle
+
+                    contentItem: Loader {
+                        id: dialogLoader
+                        sourceComponent: _batt1ParamsAvailable ? batteryFailsafeComponent : restartRequiredComponent
+
+                        property Fact battMonitor: _batt1Monitor
+                        property bool battParamsAvailable: _batt1ParamsAvailable
+                        property Fact failsafeBattLowAct: _failsafeBatt1LowAct
+                        property Fact failsafeBattCritAct: _failsafeBatt1CritAct
+                        property Fact failsafeBattLowMah: _failsafeBatt1LowMah
+                        property Fact failsafeBattCritMah: _failsafeBatt1CritMah
+                        property Fact failsafeBattLowVoltage: _failsafeBatt1LowVoltage
+                        property Fact failsafeBattCritVoltage: _failsafeBatt1CritVoltage
+                    }
+                }
+
             } // Column - Battery Failsafe Settings
 
 
@@ -179,6 +216,7 @@ SetupPage {
                 QGCLabel {
                     text:       qsTr("Battery2 Failsafe Triggers")
                     font.bold:   true
+                    visible:false
                 }
 
                 Rectangle {
@@ -186,11 +224,52 @@ SetupPage {
                     height: battery2FailsafeLoader.y + battery2FailsafeLoader.height + _margins
                     color:  ggcPal.windowShade
 
-                    Loader {
-                        id:                 battery2FailsafeLoader
-                        anchors.margins:    _margins
-                        anchors.top:        parent.top
-                        anchors.left:       parent.left
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: battery2FailsafeLoaderdialog.open()
+                    }
+                    QGCLabel {
+                        id: battery2FailsafeLoader
+                        anchors.margins: _margins
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        text:       qsTr("Battery1 Failsafe Triggers")
+                        font.bold:   true
+                    }
+                    // Loader {
+                    //     id:                 battery2FailsafeLoader
+                    //     anchors.margins:    _margins
+                    //     anchors.top:        parent.top
+                    //     anchors.left:       parent.left
+                    //     sourceComponent:    _batt2ParamsAvailable ? batteryFailsafeComponent : restartRequiredComponent
+
+                    //     property Fact battMonitor:              _batt2Monitor
+                    //     property bool battParamsAvailable:      _batt2ParamsAvailable
+                    //     property Fact failsafeBattLowAct:       _failsafeBatt2LowAct
+                    //     property Fact failsafeBattCritAct:      _failsafeBatt2CritAct
+                    //     property Fact failsafeBattLowMah:       _failsafeBatt2LowMah
+                    //     property Fact failsafeBattCritMah:      _failsafeBatt2CritMah
+                    //     property Fact failsafeBattLowVoltage:   _failsafeBatt2LowVoltage
+                    //     property Fact failsafeBattCritVoltage:  _failsafeBatt2CritVoltage
+                    // }
+                } // Rectangle
+
+                Popup {
+                    id: battery2FailsafeLoaderdialog
+                    modal: true
+                    focus: true
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                    anchors.centerIn: Overlay.overlay
+
+                    background: Rectangle {
+                        color: ggcPal.windowShade
+                        border.color: ggcPal.button
+                        border.width: 1
+                        radius: ScreenTools.defaultFontPixelHeight / 2
+                    }
+
+                    contentItem: Loader {
+                        id: dialogLoader2
                         sourceComponent:    _batt2ParamsAvailable ? batteryFailsafeComponent : restartRequiredComponent
 
                         property Fact battMonitor:              _batt2Monitor
@@ -202,7 +281,7 @@ SetupPage {
                         property Fact failsafeBattLowVoltage:   _failsafeBatt2LowVoltage
                         property Fact failsafeBattCritVoltage:  _failsafeBatt2CritVoltage
                     }
-                } // Rectangle
+                }
             } // Column - Battery Failsafe Settings
 
             Component {
@@ -218,6 +297,7 @@ SetupPage {
                     QGCLabel {
                         text:       qsTr("Failsafe Triggers")
                         font.bold:   true
+                        visible:false
                     }
 
                     Rectangle {
@@ -277,6 +357,7 @@ SetupPage {
                         id:         failsafeLabel
                         text:       qsTr("Failsafe Triggers")
                         font.bold:   true
+                        visible:false
                     }
 
                     Rectangle {
@@ -343,9 +424,96 @@ SetupPage {
                     QGCLabel {
                         text:       qsTr("General Failsafe Triggers")
                         font.bold:   true
+                        visible:false
                     }
 
+
                     Rectangle {
+                        id: battery1FailsafeRect
+                        width: battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
+                        height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
+                        color: ggcPal.windowShade
+                        radius: ScreenTools.defaultFontPixelHeight / 2
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:
+                                if (activeVehicle) {
+                                    triggersdialog.open()
+                                } else {
+                                    mainWindow.showToast("Device not connected");
+                                }
+
+                        }
+
+                        QGCLabel {
+                            id: battery1FailsafeLoader
+                            anchors.margins: _margins
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            text:       qsTr("General Failsafe Triggers")
+                            font.bold:   true
+                        }
+
+
+                    }
+
+                    Popup {
+                        id: triggersdialog
+                        modal: true
+                        focus: true
+                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                        anchors.centerIn: Overlay.overlay
+
+                        background: Rectangle {
+                            color: ggcPal.windowShade
+                            border.color: ggcPal.button
+                            border.width: 1
+                            radius: ScreenTools.defaultFontPixelHeight / 2
+                        }
+
+                        contentItem: Column {
+                            id:                 generalFailsafeColumn
+                            anchors.margins:    _margins
+                            anchors.top:        parent.top
+                            anchors.left:       parent.left
+                            spacing:            _margins
+
+                            GridLayout {
+                                columnSpacing:  _margins
+                                rowSpacing:     _margins
+                                columns:        2
+
+                                QGCLabel { text: qsTr("Ground Station failsafe:") }
+                                FactComboBox {
+                                    fact:               _failsafeGCSEnable
+                                    indexModel:         false
+                                    Layout.fillWidth:   true
+                                }
+
+                                QGCLabel { text: qsTr("Throttle failsafe:") }
+                                QGCComboBox {
+                                    model:              [qsTr("Disabled"), qsTr("Always RTL"),
+                                        qsTr("Continue with Mission in Auto Mode"), qsTr("Always Land")]
+                                    currentIndex:       _failsafeThrEnable.value
+                                    Layout.fillWidth:   true
+
+                                    onActivated: (index) => { _failsafeThrEnable.value = index }
+                                }
+
+                                QGCLabel { text: qsTr("PWM threshold:") }
+                                FactTextField {
+                                    fact:               _failsafeThrValue
+                                    showUnits:          true
+                                    Layout.fillWidth:   true
+                                }
+                            } // GridLayout
+                        } // Column
+                    }
+
+
+
+                    /*Rectangle {
                         width:  generalFailsafeColumn.x + generalFailsafeColumn.width + _margins
                         height: generalFailsafeColumn.y + generalFailsafeColumn.height + _margins
                         color:  ggcPal.windowShade
@@ -387,7 +555,7 @@ SetupPage {
                                 }
                             } // GridLayout
                         } // Column
-                    } // Rectangle - Failsafe Settings
+                    }*/ // Rectangle - Failsafe Settings
                 } // Column - General Failsafe Settings
             }
 
@@ -415,9 +583,154 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("GeoFence")
                         font.bold:      true
+                        visible:false
                     }
 
                     Rectangle {
+                                        id: battery1FailsafeRect
+                                        width: battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
+                                        height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
+                                        color: ggcPal.windowShade
+                                        radius: ScreenTools.defaultFontPixelHeight / 2
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked:
+                                                if (activeVehicle) {
+                                                    geofencedialog.open()
+                                                } else {
+                                                    mainWindow.showToast("Device not connected");
+                                                }
+
+                                        }
+
+                                        QGCLabel {
+                                            id: battery1FailsafeLoader
+                                            anchors.margins: _margins
+                                            anchors.top: parent.top
+                                            anchors.left: parent.left
+                                            text:       qsTr("GeoFence")
+                                            font.bold:   true
+                                        }
+
+
+                                    }
+
+                                    Popup {
+                                        id: geofencedialog
+                                        modal: true
+                                        focus: true
+                                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                                        anchors.centerIn: Overlay.overlay
+
+                                        background: Rectangle {
+                                            color: ggcPal.windowShade
+                                            border.color: ggcPal.button
+                                            border.width: 1
+                                            radius: ScreenTools.defaultFontPixelHeight / 2
+                                        }
+
+                                        contentItem:                         ColumnLayout {
+                                            id:         mainLayout
+                                            x:          _margins
+                                            y:          _margins
+                                            spacing:    ScreenTools.defaultFontPixellHeight / 2
+
+                                            FactCheckBox {
+                                                id:     enabledCheckBox
+                                                text:   qsTr("Enabled")
+                                                fact:   _fenceEnable
+                                            }
+
+                                            GridLayout {
+                                                columns:    2
+                                                enabled:    enabledCheckBox.checked
+
+                                                QGCCheckBox {
+                                                    text:       qsTr("Maximum Altitude")
+                                                    checked:    _fenceType.rawValue & _maxAltitudeFenceBitMask
+
+                                                    onClicked: {
+                                                        if (checked) {
+                                                            _fenceType.rawValue |= _maxAltitudeFenceBitMask
+                                                        } else {
+                                                            _fenceType.value &= ~_maxAltitudeFenceBitMask
+                                                        }
+                                                    }
+                                                }
+
+                                                FactTextField {
+                                                    fact: _fenceAltMax
+                                                }
+
+                                                QGCCheckBox {
+                                                    text:       qsTr("Circle centered on Home")
+                                                    checked:    _fenceType.rawValue & _circleFenceBitMask
+
+                                                    onClicked: {
+                                                        if (checked) {
+                                                            _fenceType.rawValue |= _circleFenceBitMask
+                                                        } else {
+                                                            _fenceType.value &= ~_circleFenceBitMask
+                                                        }
+                                                    }
+                                                }
+
+                                                FactTextField {
+                                                    fact:       _fenceRadius
+                                                    showUnits:  true
+                                                }
+
+                                                QGCCheckBox {
+                                                    text:       qsTr("Inclusion/Exclusion Circles+Polygons")
+                                                    checked:    _fenceType.rawValue & _polygonFenceBitMask
+
+                                                    onClicked: {
+                                                        if (checked) {
+                                                            _fenceType.rawValue |= _polygonFenceBitMask
+                                                        } else {
+                                                            _fenceType.value &= ~_polygonFenceBitMask
+                                                        }
+                                                    }
+                                                }
+
+                                                Item {
+                                                    height: 1
+                                                    width:  1
+                                                }
+                                            } // GridLayout
+
+                                            Item {
+                                                height: 1
+                                                width:  1
+                                            }
+
+                                            GridLayout {
+                                                columns: 2
+                                                enabled: enabledCheckBox.checked
+
+                                                QGCLabel {
+                                                    text: qsTr("Breach action")
+                                                }
+
+                                                FactComboBox {
+                                                    sizeToContents: true
+                                                    fact:           _fenceAction
+                                                }
+
+                                                QGCLabel {
+                                                    text: qsTr("Fence margin")
+                                                }
+
+                                                FactTextField {
+                                                    fact: _fenceMargin
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+                   /* Rectangle {
                         width:  mainLayout.width + (_margins * 2)
                         height: mainLayout.height + (_margins * 2)
                         color:  ggcPal.windowShade
@@ -519,7 +832,8 @@ SetupPage {
                                 }
                             }
                         }
-                    } // Rectangle - GeoFence Settings
+
+                    }*/ // Rectangle - GeoFence Settings
                 } // Column - GeoFence Settings
             }
 
@@ -542,9 +856,163 @@ SetupPage {
                         id:             rtlLabel
                         text:           qsTr("Return to Launch")
                         font.bold:      true
+                        visible:false
                     }
 
                     Rectangle {
+                                        id: arming
+                                        width: battery1FailsafeLoader1.x + battery1FailsafeLoader1.width + _margins
+                                        height: battery1FailsafeLoader1.y + battery1FailsafeLoader1.height + _margins
+                                        color: ggcPal.windowShade
+                                        radius: ScreenTools.defaultFontPixelHeight / 2
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked:
+                                                if (activeVehicle) {
+                                                    rtldailog1.open()
+                                                } else {
+                                                    mainWindow.showToast("Device not connected");
+                                                }
+
+                                        }
+
+                                        QGCLabel {
+                                            id: battery1FailsafeLoader1
+                                            anchors.margins: _margins
+                                            anchors.top: parent.top
+                                            anchors.left: parent.left
+                                            text:       qsTr("Return to Launch")
+                                            font.bold:   true
+                                        }
+
+
+                                    }
+
+                    Popup {
+                        id: rtldailog1
+                        modal: true
+                        focus: true
+                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                        anchors.centerIn: Overlay.overlay
+
+                        background: Rectangle {
+                            color: ggcPal.windowShade
+                            border.color: ggcPal.button
+                            border.width: 1
+                            radius: ScreenTools.defaultFontPixelHeight / 2
+                        }
+
+                        contentItem:
+
+                            RowLayout {
+                                                                        id:         mainLayout
+
+
+
+
+
+
+                            QGCColoredImage {
+                                id:                 icon
+                                visible:            _showIcon
+                                anchors.margins:    _margins
+                                height:             ScreenTools.defaultFontPixelWidth * 20
+                                width:              ScreenTools.defaultFontPixelWidth * 20
+                                color:              ggcPal.text
+                                sourceSize.width:   width
+                                mipmap:             true
+                                fillMode:           Image.PreserveAspectFit
+                                source:             "/qmlimages/ReturnToHomeAltitude.svg"
+                            }
+
+                            QGCRadioButton {
+                                id:                 returnAtCurrentRadio
+                                anchors.margins:    _innerMargin
+                                anchors.left:       _showIcon ? icon.right : parent.left
+                                anchors.top:        parent.top
+                                text:               qsTr("Return at current altitude")
+                                checked:            _rtlAltFact.value == 0
+
+                                onClicked: _rtlAltFact.value = 0
+                            }
+
+                            QGCRadioButton {
+                                id:                 returnAltRadio
+                                anchors.topMargin:  _innerMargin
+                                anchors.top:        returnAtCurrentRadio.bottom
+                                anchors.left:       returnAtCurrentRadio.left
+                                text:               qsTr("Return at specified altitude:")
+                                checked:            _rtlAltFact.value != 0
+
+                                onClicked: _rtlAltFact.value = 1500
+                            }
+
+                            FactTextField {
+                                id:                 rltAltField
+                                anchors.leftMargin: _margins
+                                anchors.left:       returnAltRadio.right
+                                anchors.baseline:   returnAltRadio.baseline
+                                fact:               _rtlAltFact
+                                showUnits:          true
+                                enabled:            returnAltRadio.checked
+                            }
+
+                            QGCCheckBox {
+                                id:                 homeLoiterCheckbox
+                                anchors.left:       returnAtCurrentRadio.left
+                                anchors.baseline:   landDelayField.baseline
+                                checked:            _rtlLoitTimeFact.value > 0
+                                text:               qsTr("Loiter above Home for:")
+
+                                onClicked: _rtlLoitTimeFact.value = (checked ? 60 : 0)
+                            }
+
+                            FactTextField {
+                                id:                 landDelayField
+                                anchors.topMargin:  _innerMargin
+                                anchors.left:       rltAltField.left
+                                anchors.top:        rltAltField.bottom
+                                fact:               _rtlLoitTimeFact
+                                showUnits:          true
+                                enabled:            homeLoiterCheckbox.checked === true
+                            }
+
+                            QGCLabel {
+                                anchors.left:       returnAtCurrentRadio.left
+                                anchors.baseline:   rltAltFinalField.baseline
+                                text:               qsTr("Final land stage altitude:")
+                            }
+
+                            FactTextField {
+                                id:                 rltAltFinalField
+                                anchors.topMargin:  _innerMargin
+                                anchors.left:       rltAltField.left
+                                anchors.top:        landDelayField.bottom
+                                fact:               _rtlAltFinalFact
+                                showUnits:          true
+                            }
+
+                            QGCLabel {
+                                anchors.left:       returnAtCurrentRadio.left
+                                anchors.baseline:   landSpeedField.baseline
+                                text:               qsTr("Final land stage descent speed:")
+                            }
+
+                            FactTextField {
+                                id:                 landSpeedField
+                                anchors.topMargin: _innerMargin
+                                anchors.left:       rltAltField.left
+                                anchors.top:        rltAltFinalField.bottom
+                                fact:               _landSpeedFact
+                                showUnits:          true
+                            }
+
+                        }
+                    }
+
+
+                    /*Rectangle {
                         id:     rtlSettings
                         width:  landSpeedField.x + landSpeedField.width + _margins
                         height: landSpeedField.y + landSpeedField.height + _margins
@@ -646,7 +1114,8 @@ SetupPage {
                             fact:               _landSpeedFact
                             showUnits:          true
                         }
-                    } // Rectangle - RTL Settings
+
+                    }*/ // Rectangle - RTL Settings
                 } // Column - RTL Settings
             }
 
@@ -665,6 +1134,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Return to Launch")
                         font.bold:      true
+                        visible:false
                     }
 
                     Rectangle {
@@ -715,6 +1185,129 @@ SetupPage {
                 spacing: _margins / 2
 
                 QGCLabel {
+                    text: qsTr("Arming Checks")
+                    font.bold: true
+                    visible:false
+                }
+                Rectangle {
+                                    id: arming
+                                    width: battery1FailsafeLoader1.x + battery1FailsafeLoader1.width + _margins
+                                    height: battery1FailsafeLoader1.y + battery1FailsafeLoader1.height + _margins
+                                    color: ggcPal.windowShade
+                                    radius: ScreenTools.defaultFontPixelHeight / 2
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked:
+                                            if (activeVehicle) {
+                                                armingCheckDialog.open()
+                                            } else {
+                                                mainWindow.showToast("Device not connected");
+                                            }
+
+                                    }
+
+                                    QGCLabel {
+                                        id: battery1FailsafeLoader1
+                                        anchors.margins: _margins
+                                        anchors.top: parent.top
+                                        anchors.left: parent.left
+                                        text:       qsTr("Arming Checks")
+                                        font.bold:   true
+                                    }
+
+
+                                }
+
+                // Rectangle {
+                //     width: flowLayout.width
+                //     height: armingCheckInnerColumn.height + (_margins * 2)
+                //     color: ggcPal.windowShade
+
+                //     MouseArea {
+                //         anchors.fill: parent
+                //         onClicked: armingCheckDialog.open()
+                //     }
+
+
+
+
+                //     // Column {
+                //     //     id: armingCheckInnerColumn
+                //     //     anchors.margins: _margins
+                //     //     anchors.top: parent.top
+                //     //     anchors.left: parent.left
+                //     //     anchors.right: parent.right
+                //     //     spacing: _margins
+
+                //     //     FactBitmask {
+                //     //         id: armingCheckBitmask
+                //     //         anchors.left: parent.left
+                //     //         anchors.right: parent.right
+                //     //         firstEntryIsAll: true
+                //     //         fact: _armingCheck
+                //     //     }
+
+                //     //     QGCLabel {
+                //     //         id: armingCheckWarning
+                //     //         anchors.left: parent.left
+                //     //         anchors.right: parent.right
+                //     //         wrapMode: Text.WordWrap
+                //     //         color: qgcPal.warningText
+                //     //         text: qsTr("Warning: Turning off arming checks can lead to loss of Vehicle control.")
+                //     //         visible: _armingCheck.value != 1
+                //     //     }
+                //     // }
+
+                // }
+
+                Popup {
+                    id: armingCheckDialog
+                    modal: true
+                    focus: true
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                    anchors.centerIn: Overlay.overlay
+
+                    background: Rectangle {
+                        color: ggcPal.windowShade
+                        border.color: ggcPal.button
+                        border.width: 1
+                        radius: ScreenTools.defaultFontPixelHeight / 2
+                    }
+
+                    contentItem:
+
+                        RowLayout {
+                                                                    id:         mainLayout
+                                                                    x:          _margins
+                                                                    y:          _margins
+                                                                    spacing:    ScreenTools.defaultFontPixellHeight / 2
+
+                                                                    // Replicate the content from the original column
+                                                                    FactBitmask {
+                                                                        width: armingCheckBitmask.width
+                                                                        firstEntryIsAll: true
+                                                                        fact: _armingCheck
+                                                                    }
+
+                                                                    QGCLabel {
+                                                                        width: armingCheckWarning.width
+                                                                        wrapMode: Text.WordWrap
+                                                                        color: qgcPal.warningText
+                                                                        text: qsTr("Warning: Turning off arming checks can lead to loss of Vehicle control.")
+                                                                        visible: _armingCheck.value != 1
+                                                                    }
+
+                                                                }
+
+
+                }
+
+            }
+            /*Column {
+                spacing: _margins / 2
+
+                QGCLabel {
                     text:           qsTr("Arming Checks")
                     font.bold:      true
                 }
@@ -751,7 +1344,7 @@ SetupPage {
                         }
                     }
                 } // Rectangle - Arming checks
-            } // Column - Arming Checks
+            }*/ // Column - Arming Checks
         } // Flow
     } // Component - safetyPageComponent
 } // SetupView

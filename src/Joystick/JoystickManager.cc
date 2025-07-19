@@ -46,6 +46,8 @@ JoystickManager::~JoystickManager()
 
 void JoystickManager::setToolbox(QGCToolbox *toolbox)
 {
+     qDebug() << "JoystickManager::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     _multiVehicleManager = _toolbox->multiVehicleManager();

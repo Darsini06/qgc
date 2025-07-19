@@ -129,10 +129,20 @@ public:
     /// Allows custom builds to add custom items to the plan file after the document is created.
     virtual void    postSaveToJson          (PlanMasterController* /*pController*/, QJsonObject& /*json*/) {}
 
+    /// Allows custom builds to add custom items to the plan file before the document is created.
+    virtual void    preSaveToJson1           (PlanMasterController* /*pController*/, QJsonObject& /*json*/) {}
+    /// Allows custom builds to add custom items to the plan file after the document is created.
+    virtual void    postSaveToJson1          (PlanMasterController* /*pController*/, QJsonObject& /*json*/) {}
+
     /// Allows custom builds to add custom items to the mission section of the plan file before the item is created.
     virtual void    preSaveToMissionJson    (PlanMasterController* /*pController*/, QJsonObject& /*missionJson*/) {}
     /// Allows custom builds to add custom items to the mission section of the plan file after the item is created.
     virtual void    postSaveToMissionJson   (PlanMasterController* /*pController*/, QJsonObject& /*missionJson*/) {}
+
+    /// Allows custom builds to add custom items to the mission section of the plan file before the item is created.
+    virtual void    preSaveToMissionJson1    (PlanMasterController* /*pController*/, QJsonObject& /*missionJson*/) {}
+    /// Allows custom builds to add custom items to the mission section of the plan file after the item is created.
+    virtual void    postSaveToMissionJson1   (PlanMasterController* /*pController*/, QJsonObject& /*missionJson*/) {}
 
     /// Allows custom builds to load custom items from the plan file before the document is parsed.
     virtual void    preLoadFromJson     (PlanMasterController* /*pController*/, QJsonObject& /*json*/) {}

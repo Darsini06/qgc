@@ -724,6 +724,7 @@ QString APMFirmwarePlugin::_internalParameterMetaDataFile(const Vehicle* vehicle
     while ((currMajor >= 3) && (currMinor > 0)) {
         const QString tempFileName = fileNameFormat.arg(vehicleName).arg(currMajor).arg(currMinor);
         if (QFileInfo::exists(tempFileName)) {
+            qCWarning(APMFirmwarePluginLog) << Q_FUNC_INFO << "Device Connected Name 1"<<tempFileName;
             return tempFileName;
         }
         currMinor--;
@@ -738,6 +739,7 @@ QString APMFirmwarePlugin::_internalParameterMetaDataFile(const Vehicle* vehicle
     for (int i = 0; i < 10; i++) {
         const QString tempFileName = fileNameFormat.arg(vehicleName).arg(3).arg(i);
         if (QFileInfo::exists(tempFileName)) {
+            qCWarning(APMFirmwarePluginLog) << Q_FUNC_INFO << "Device Connected Name 2"<<tempFileName;
             return tempFileName;
         }
     }

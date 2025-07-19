@@ -410,6 +410,29 @@ void PlanMasterController::loadFromFile(const QString& filename)
     }
 }
 
+QJsonDocument PlanMasterController::saveToJson1()
+{
+    QJsonObject planJson;
+    qgcApp()->toolbox()->corePlugin()-> preSaveToJson1(this, planJson);
+    QJsonObject missionJson;
+    QJsonObject fenceJson;
+    QJsonObject rallyJson;
+    JsonHelper::saveQGCJsonFileHeader1(planJson, kPlanFileType, kPlanFileVersion);
+    //-- Allow plugin to preemptly add its own keys to mission
+    qgcApp()->toolbox()->corePlugin()->preSaveToMissionJson1(this, missionJson);
+    _missionController.save(missionJson);
+    //-- Allow plugin to add its own keys to mission
+    qgcApp()->toolbox()->corePlugin()->postSaveToMissionJson1(this, missionJson);
+    _geoFenceController.save(fenceJson);
+    _rallyPointController.save(rallyJson);
+    planJson[kJsonMissionObjectKey] = missionJson;
+    planJson[kJsonGeoFenceObjectKey] = fenceJson;
+    planJson[kJsonRallyPointsObjectKey] = rallyJson;
+    qgcApp()->toolbox()->corePlugin()->postSaveToJson1(this, planJson);
+    return QJsonDocument(planJson);
+}
+
+
 QJsonDocument PlanMasterController::saveToJson()
 {
     QJsonObject planJson;
@@ -459,6 +482,38 @@ void PlanMasterController::saveToFile(const QString& filename)
         emit currentPlanFileChanged();
     } else {
         QJsonDocument saveDoc = saveToJson();
+        file.write(saveDoc.toJson());
+        if(_currentPlanFile != planFilename) {
+            _currentPlanFile = planFilename;
+            emit currentPlanFileChanged();
+        }
+    }
+
+    // Only clear dirty bit if we are offline
+    if (offline()) {
+        setDirty(false);
+    }
+}
+
+void PlanMasterController::saveToFile1(const QString& filename)
+{
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    QString planFilename = filename;
+    if (!QFileInfo(filename).fileName().contains(".")) {
+        planFilename += QString(".%1").arg(fileExtension1());
+    }
+
+    QFile file(planFilename);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qgcApp()->showAppMessage(tr("Plan save error %1 : %2").arg(filename).arg(file.errorString()));
+        _currentPlanFile.clear();
+        emit currentPlanFileChanged();
+    } else {
+        QJsonDocument saveDoc = saveToJson1();
         file.write(saveDoc.toJson());
         if(_currentPlanFile != planFilename) {
             _currentPlanFile = planFilename;
@@ -548,6 +603,11 @@ QString PlanMasterController::fileExtension(void) const
     return AppSettings::planFileExtension;
 }
 
+QString PlanMasterController::fileExtension1(void) const
+{
+    return AppSettings::planFileExtension1;
+}
+
 QString PlanMasterController::kmlFileExtension(void) const
 {
     return AppSettings::kmlFileExtension;
@@ -562,6 +622,15 @@ QStringList PlanMasterController::loadNameFilters(void) const
     return filters;
 }
 
+QStringList PlanMasterController::loadNameFilters1(void) const
+{
+    QStringList filters;
+
+    filters << tr("Supported types (*.%1 *.%2 *.%3 *.%4)").arg(AppSettings::planFileExtension1).arg(AppSettings::missionFileExtension).arg(AppSettings::waypointsFileExtension).arg("txt") <<
+        tr("All Files (*)");
+    return filters;
+}
+
 
 QStringList PlanMasterController::saveNameFilters(void) const
 {
@@ -570,6 +639,15 @@ QStringList PlanMasterController::saveNameFilters(void) const
     filters << tr("Plan Files (*.%1)").arg(fileExtension()) << tr("All Files (*)");
     return filters;
 }
+
+QStringList PlanMasterController::saveNameFilters1(void) const
+{
+    QStringList filters;
+
+    filters << tr("Plan Files (*.%1)").arg(fileExtension1()) << tr("All Files (*)");
+    return filters;
+}
+
 
 void PlanMasterController::sendPlanToVehicle(Vehicle* vehicle, const QString& filename)
 {

@@ -86,6 +86,8 @@ void LinkManager::setToolbox(QGCToolbox *toolbox)
 {
     QGCTool::setToolbox(toolbox);
 
+     qDebug() << "LinkManager::setToolbox";
+
     _autoConnectSettings = toolbox->settingsManager()->autoConnectSettings();
     _mavlinkProtocol = _toolbox->mavlinkProtocol();
 
@@ -568,6 +570,9 @@ LinkConfiguration *LinkManager::createConfiguration(int type, const QString &nam
         _updateSerialPorts();
     }
 #endif
+
+    qDebug()<< "createConfiguration type : " << type;
+    qDebug()<< "createConfiguration name : " << name;
 
     return LinkConfiguration::createSettings(type, name);
 }

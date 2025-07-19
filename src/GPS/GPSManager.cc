@@ -35,6 +35,8 @@ GPSManager::~GPSManager()
 
 void GPSManager::setToolbox(QGCToolbox *toolbox)
 {
+     qDebug() << "GPSManager::setToolbox";
+
     QGCTool::setToolbox(toolbox);
 
     _gpsRtkFactGroup = new GPSRTKFactGroup(this);

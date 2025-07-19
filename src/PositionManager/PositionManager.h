@@ -15,6 +15,8 @@
 
 #include "QGCToolbox.h"
 
+#include <QBluetoothPermission>
+
 Q_DECLARE_LOGGING_CATEGORY(QGCPositionManagerLog)
 
 class QGeoPositionInfoSource;
@@ -67,6 +69,10 @@ private:
     void _checkPermission();
     void _setGCSHeading(qreal newGCSHeading);
     void _setGCSPosition(const QGeoCoordinate &newGCSPosition);
+
+    //Bluetooth
+    void _checkBluetoothPermission();
+    void _handleBluetoothPermissionStatus(Qt::PermissionStatus permissionStatus);
 
     bool m_usingPluginSource = false;
     int m_updateInterval = 0;

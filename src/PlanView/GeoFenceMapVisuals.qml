@@ -69,8 +69,10 @@ Item {
         console.log(bottomRightCoord)
 
         if (inclusionPolygon) {
+            console.log("GeoFenceMapVisuals.qml class addInclusion method")
             myGeoFenceController.addInclusion(topLeftCoord, bottomRightCoord)
         } else {
+            console.log("GeoFenceMapVisuals.qml class addExclusion method")
             myGeoFenceController.addExclusion(topLeftCoord, bottomRightCoord)
         }
     }

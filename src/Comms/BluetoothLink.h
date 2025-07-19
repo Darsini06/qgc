@@ -102,6 +102,7 @@ signals:
     void addressChanged (void);
     void nameListChanged(void);
     void scanningChanged(void);
+    void bluetoothOff();
 
 private:
     QBluetoothDeviceDiscoveryAgent* _deviceDiscover = nullptr;

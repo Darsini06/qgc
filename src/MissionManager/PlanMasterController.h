@@ -28,7 +28,7 @@ class PlanMasterController : public QObject
     Q_OBJECT
     Q_MOC_INCLUDE("QmlObjectListModel.h")
     Q_MOC_INCLUDE("Vehicle.h")
-    
+
 public:
     PlanMasterController(QObject* parent = nullptr);
 #ifdef QT_DEBUG
@@ -52,6 +52,7 @@ public:
     Q_PROPERTY(QString                  kmlFileExtension        READ kmlFileExtension                       CONSTANT)
     Q_PROPERTY(QString                  currentPlanFile         READ currentPlanFile                        NOTIFY currentPlanFileChanged)
     Q_PROPERTY(QStringList              loadNameFilters         READ loadNameFilters                        CONSTANT)                       ///< File filter list loading plan files
+    Q_PROPERTY(QStringList              loadNameFilters1         READ loadNameFilters1                        CONSTANT)
     Q_PROPERTY(QStringList              saveNameFilters         READ saveNameFilters                        CONSTANT)                       ///< File filter list saving plan files
     Q_PROPERTY(QmlObjectListModel*      planCreators            MEMBER _planCreators                        NOTIFY planCreatorsChanged)
 
@@ -80,6 +81,7 @@ public:
     Q_INVOKABLE void loadFromFile(const QString& filename);
     Q_INVOKABLE void saveToCurrent();
     Q_INVOKABLE void saveToFile(const QString& filename);
+    Q_INVOKABLE void saveToFile1(const QString& filename);
     Q_INVOKABLE void saveToKml(const QString& filename);
     Q_INVOKABLE void removeAll(void);                       ///< Removes all from controller only, synce required to remove from vehicle
     Q_INVOKABLE void removeAllFromVehicle(void);            ///< Removes all from vehicle and controller
@@ -94,15 +96,19 @@ public:
     bool        dirty           (void) const;
     void        setDirty        (bool dirty);
     QString     fileExtension   (void) const;
+    QString     fileExtension1   (void) const;
     QString     kmlFileExtension(void) const;
     QString     currentPlanFile (void) const { return _currentPlanFile; }
     QStringList loadNameFilters (void) const;
+    QStringList loadNameFilters1 (void) const;
     QStringList saveNameFilters (void) const;
+    QStringList saveNameFilters1 (void) const;
     bool        isEmpty         (void) const;
 
     void        setFlyView(bool flyView) { _flyView = flyView; }
 
     QJsonDocument saveToJson    ();
+    QJsonDocument saveToJson1    ();
 
     Vehicle* controllerVehicle(void) { return _controllerVehicle; }
     Vehicle* managerVehicle(void) { return _managerVehicle; }

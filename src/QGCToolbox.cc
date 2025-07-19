@@ -66,6 +66,8 @@ QGCToolbox::QGCToolbox(QGCApplication* app)
 
 void QGCToolbox::setChildToolboxes(void)
 {
+    qDebug() << "QGCToolbox::setChildToolboxes";
+
     // SettingsManager must be first so settings are available to any subsequent tools
     _settingsManager->setToolbox(this);
 
@@ -108,9 +110,11 @@ QGCTool::QGCTool(QGCApplication* app, QGCToolbox* toolbox)
     , _app(app)
     , _toolbox(nullptr)
 {
+
 }
 
 void QGCTool::setToolbox(QGCToolbox* toolbox)
 {
+     qDebug() << "QGCTool::setToolbox";
     _toolbox = toolbox;
 }

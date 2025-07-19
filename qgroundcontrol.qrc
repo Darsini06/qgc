@@ -312,6 +312,15 @@
         <file alias="VirtualJoystick.qml">src/FlightDisplay/VirtualJoystick.qml</file>
         <file alias="VTOLLandingPatternEditor.qml">src/PlanView/VTOLLandingPatternEditor.qml</file>
         <file alias="QGroundControl/FlightDisplay/FlyViewInsetViewer.qml">src/FlightDisplay/FlyViewInsetViewer.qml</file>
+        <file alias="SettingsPanel/RCCallibarationTab.qml">src/QmlControls/SettingsPanel/RCCallibarationTab.qml</file>
+        <file alias="SettingsPanel/ChannelSet.qml">src/QmlControls/SettingsPanel/ChannelSet.qml</file>
+        <file alias="SettingsPanel/ParameterMain.qml">src/QmlControls/SettingsPanel/ParameterMain.qml</file>
+        <file alias="SettingsPanel/BatteryTab.qml">src/QmlControls/SettingsPanel/BatteryTab.qml</file>
+        <file alias="SettingsPanel/SparayTab.qml">src/QmlControls/SettingsPanel/SparayTab.qml</file>
+        <file alias="LoginPages/WelcomeScreen.qml">src/QmlControls/LoginPages/WelcomeScreen.qml</file>
+        <file alias="LoginPages/HomeScreen.qml">src/QmlControls/LoginPages/HomeScreen.qml</file>
+        <file alias="LoginPages/ProfileScreen.qml">src/QmlControls/LoginPages/ProfileScreen.qml</file>
+        <file alias="LoginPages/RecordScreen.qml">src/QmlControls/LoginPages/RecordScreen.qml</file>
         <file alias="Viewer3D/Viewer3D.qml">src/Viewer3D/Viewer3DQml/Viewer3D.qml</file>
         <file alias="Viewer3D/qmldir">src/QmlControls/Viewer3D/qmldir</file>
         <file alias="Viewer3D/Models3D/CameraLightModel.qml">src/Viewer3D/Viewer3DQml/Models3D/CameraLightModel.qml</file>
@@ -352,9 +361,12 @@
         <file alias="Viewer3D/Models3D/Viewer3DVehicleItems.qml">src/Viewer3D/Viewer3DQml/Models3D/Viewer3DVehicleItems.qml</file>
         <file alias="Viewer3D/Viewer3DProgressBar.qml">src/Viewer3D/Viewer3DQml/Viewer3DProgressBar.qml</file>
         <file>MainRootIcons.qml</file>
-        <file>newscreen.qml</file>
-        <file>profilepage.qml</file>
+        <file>Newscreen.qml</file>
+        <file>Profilepage.qml</file>
         <file>MapGlobals.qml</file>
+        <file>ProfileScreenNew.qml</file>
+        <file>BasicParamters.qml</file>
+        <file>BasicParamtersList.qml</file>
     </qresource>
     <qresource prefix="/FirstRunPromptDialogs">
         <file alias="UnitsFirstRunPrompt.qml">src/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml</file>
