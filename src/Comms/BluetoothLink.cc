@@ -282,24 +282,12 @@ void BluetoothConfiguration::stopScan()
 
 void BluetoothConfiguration::startScan()
 {
-
-    // Check if Bluetooth is ON
     QBluetoothLocalDevice localDevice;
     if (localDevice.hostMode() == QBluetoothLocalDevice::HostPoweredOff) {
-        //emit showUserMessage("Bluetooth is turned off. Please turn it on.");
-        qDebug() << "Bluetooth is turned off. Please turn it on.";
-         emit bluetoothOff();
+        qDebug() << "Bluetooth is OFF. Requesting system to turn it ON...";
+        localDevice.powerOn();
         return;
     }
-
-// // Check if Location Services are available
-// #if defined(Q_OS_ANDROID)
-//     QGeoPositionInfoSource* source = QGeoPositionInfoSource::createDefaultSource(this);
-//     if (!source || source->availability() != QGeoPositionInfoSource::Available) {
-//         emit showUserMessage("Location service is turned off or not available. Please enable it.");
-//         return;
-//     }
-// #endif
 
     if(!_deviceDiscover) {
         _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
@@ -315,6 +303,7 @@ void BluetoothConfiguration::startScan()
     emit nameListChanged();
     _deviceDiscover->start();
 }
+
 
 void BluetoothConfiguration::deviceDiscovered(QBluetoothDeviceInfo info)
 {
@@ -356,6 +345,7 @@ void BluetoothConfiguration::doneScanning()
     }
 }
 
+
 void BluetoothConfiguration::setDevName(const QString &name)
 {
     for(const BluetoothData& data: _deviceList)
@@ -371,6 +361,7 @@ void BluetoothConfiguration::setDevName(const QString &name)
         }
     }
 }
+
 
 QString BluetoothConfiguration::address() const
 {
