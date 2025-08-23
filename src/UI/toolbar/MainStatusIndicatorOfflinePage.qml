@@ -45,6 +45,7 @@ ToolIndicatorPage {
             QGCLabel {
                 text:       qsTr("No Links Configured")
                 visible:    noLinks
+                color : "white"
             }
         
             Repeater {
@@ -76,7 +77,8 @@ ToolIndicatorPage {
                     buttonText: qsTr("Configure")
 
                     onClicked: {
-                        mainWindow.showSettingsTool(qsTr("Comm Links"))
+                        //mainWindow.showSettingsTool(qsTr("Comm Links"))
+                        mainWindow.showToolSelectDialog1(4)
                         mainWindow.closeIndicatorDrawer()
                     }
                 }

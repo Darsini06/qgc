@@ -28,9 +28,9 @@ import MapGlobals 1.0
 
 import QtQuick.LocalStorage 2.0
 
-// import QtQuick 2.15
-// import QtQuick.Controls 2.15
-// import QtQuick.Layouts 1.15
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import Qt.labs.folderlistmodel 2.1
 
 
@@ -243,7 +243,7 @@ ApplicationWindow {
         flyView.visible = false
         planView.visible = false
         newscreen.visible = true
-        modebtn.visible = false
+        //modebtn.visible = false
         modebtn1.visible = false
         mainrootIcons.visible = false
 
@@ -256,11 +256,11 @@ ApplicationWindow {
         listbtn.visible = false
         takeoffbtn.visible = false
         rtlbtn.visible = false
-        modebtn.visible = false
+        //modebtn.visible = false
         flyView.visible = false
         planView.visible = true
         modebtn1.visible = false
-        mainrootIcons.visible = true
+        mainrootIcons.visible = false
 
         waypointbtn.visible = false
         eraserbtn.visible = false
@@ -271,7 +271,7 @@ ApplicationWindow {
         listbtn.visible = false
         takeoffbtn.visible = true
         rtlbtn.visible = false
-        modebtn.visible = false
+        //modebtn.visible = false
         flyView.visible = true
         planView.visible = false
         modebtn1.visible = false
@@ -291,12 +291,12 @@ ApplicationWindow {
         planbtn.visible = true
         listbtn.visible = true
         takeoffbtn.visible = true
-        modebtn.visible = activeVehicle?false:true
+        //modebtn.visible = activeVehicle?false:true
         flyView.visible = true
         planView.visible = false
         newscreen.visible = false
         mainrootIcons.visible=true
-        modebtn1.visible = activeVehicle ? true : false
+        modebtn1.visible = true //activeVehicle ? true : false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -312,11 +312,11 @@ ApplicationWindow {
         planbtn.visible = true
         listbtn.visible = true
         takeoffbtn.visible = true
-        modebtn.visible = activeVehicle?false:true
+        //modebtn.visible = activeVehicle?false:true
         flyView.visible = true
         planView.visible = false
         newscreen.visible = false
-        modebtn1.visible = activeVehicle ? true : false
+        modebtn1.visible = true //activeVehicle ? true : false
         plan="Start"
         MapGlobals.edit = "edit1"
 
@@ -445,39 +445,93 @@ ApplicationWindow {
         id: dynamicCalDialog
         modal: true
         anchors.centerIn: parent
-        width: parent.width * 0.7
-        height: parent.height * 0.7
+        width: parent.width * 0.8
+        height: parent.height * 0.8
         clip: true
 
         property string dialogTitleText: ""
 
+        closePolicy: Popup.NoAutoClose
+        padding: 0   // no global padding
+
         background: Rectangle {
-            radius: 16
+            radius: 14
             color: "white"
         }
 
-        ColumnLayout {
+        Column {
             anchors.fill: parent
-            spacing: 10
-            anchors.margins: 10
+            spacing: 0
 
-            Item {
-                Layout.fillWidth: true
-                height: 30
+            // Title bar (full width, rounded top only)
+            Rectangle {
+                width: parent.width
+                height: titleLabel.implicitHeight + 14
+                color: "#7F56D9"
+                radius: 14
+                antialiasing: true
+                clip: true
 
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: dynamicCalDialog.dialogTitleText
-                    font.pixelSize: 18
-                    font.bold: true
+                // mask lower corners → flat against content
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 14
+                    color: "#7F56D9"
+                    radius: 0
+                }
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 0
+
+                    QGCLabel {
+                        id: titleLabel
+                        text: dynamicCalDialog.dialogTitleText
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: ScreenTools.mediumFontPointSize
+                        font.bold: true
+                        color: "white"
+                    }
+
+                    MouseArea {
+                        Layout.alignment: Qt.AlignRight
+                        width: 30
+                        height: 30
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: dynamicCalDialog.close()
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "\u2715"
+                            color: "white"
+                            font.pixelSize: 18
+                        }
+                    }
                 }
             }
 
-            Loader {
-                id: dialogLoader
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            // Content area with padding
+            Item {
+
+                width: parent.width
+                height: parent.height - (titleLabel.implicitHeight + 14)
+                anchors.margins: 0
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    color: "transparent"
+
+                    Loader {
+                        id: dialogLoader
+                        anchors.fill: parent
+                    }
+                }
             }
         }
 
@@ -574,8 +628,6 @@ ApplicationWindow {
                         "INSERT INTO users(username, displayname, email, password, confirmpassword) VALUES(?, ?, ?, ?, ?)",
                         [username, displayname, email, password, confirmpassword]
                         );
-
-
 
             if (rs.rowsAffected > 0) {
                 console.log("Password Reset");
@@ -675,6 +727,7 @@ ApplicationWindow {
             login.visible = false;
             mainWindow.newscreen();
             QGroundControl.saveBoolGlobalSetting("login", true)
+            modebtn1.visible = false
 
         }else{
             login.visible = true;
@@ -926,6 +979,14 @@ ApplicationWindow {
         }
     }
 
+    function showToolSelectDialog1(index) {
+        if (!mainWindow.preventViewSwitch()) {
+            sideDrawer.open()
+            tabBar.currentIndex = index; // 3rd index (0-based index)
+            loaders.source = tabModel.get(index).file; // Load that page
+        }
+    }
+
     function sideDrawer1(qmlFile) {
         console.log("qmlFile",)
         sideDrawer.pushView(qmlFile)
@@ -964,10 +1025,11 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "qrc:/qml/SettingsPanel/BasicParamters.qml"; title: "Flight Modes" }//ParameterMain
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "BasicParamters.qml"; title: "Settings" }
+            ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "BasicParamters.qml"; title: "Flight Modes" }//ParameterMain
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/ParameterMain.qml"; title: "Settings" }
             ListElement { image: "/qmlimages/NewImages/menu.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
             ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "GeneralSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "LinkSettings.qml"; title: "Info" }
         }
 
         contentItem: ColumnLayout {
@@ -975,7 +1037,7 @@ ApplicationWindow {
             spacing: 0
 
             // Top App Bar
-            Rectangle {
+            Rectangle  {
                 Layout.preferredHeight: ScreenTools.toolbarHeight
                 Layout.fillWidth: true
                 color: "#1b1c3e"
@@ -1011,7 +1073,6 @@ ApplicationWindow {
 
                     }
                 }
-
 
             }
 
@@ -1493,8 +1554,6 @@ ApplicationWindow {
             border.width: width * 0.05
             border.color: "#005BBB"
 
-
-
             QGCColoredImage {
                 id: camerabtnicon
                 source: "/qmlimages/NewImages/takeOff.png"
@@ -1503,9 +1562,6 @@ ApplicationWindow {
                 anchors.centerIn: parent
                 color: "white"
             }
-
-
-
 
             MouseArea {
                 anchors.fill: parent
@@ -1531,8 +1587,6 @@ ApplicationWindow {
             border.width: width * 0.05
             border.color: "#005BBB"
 
-
-
             QGCColoredImage {
                 id: landbtnicon
                 source: "/qmlimages/NewImages/return.png"
@@ -1541,10 +1595,6 @@ ApplicationWindow {
                 anchors.centerIn: parent
                 color: "white"
             }
-
-
-
-
 
             MouseArea {
                 anchors.fill: parent
@@ -1568,8 +1618,6 @@ ApplicationWindow {
             border.width: width * 0.05
             border.color: "#005BBB"
 
-
-
             QGCColoredImage {
                 id: rtlbtnicon
                 source: "/res/rtl.svg"
@@ -1578,9 +1626,6 @@ ApplicationWindow {
                 anchors.centerIn: parent
                 color: "white"
             }
-
-
-
 
 
             MouseArea {
@@ -1593,8 +1638,6 @@ ApplicationWindow {
                 }
             }
         }
-
-
 
         RowLayout {
             id: modeRow
@@ -1749,29 +1792,27 @@ ApplicationWindow {
             }
         }
 
-
-
-
         Rectangle {
             id: modebtn1
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
-            height: width                 // Keep it square
-            radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
-            visible:  activeVehicle ? true : false
-            border.width: width * 0.05
+
+            // Base it on flight mode text's size
+            width: flightmode1.implicitWidth + 40   // 10px padding left/right
+            height: flightmode1.implicitHeight + 20 // 5px padding top/bottom
+            radius: height / 2   // pill/capsule shaped
+            color: "#1b1c3e"
+            visible: true
+
+            border.width: 2
             border.color: "#005BBB"
-
-
 
             FlightModeIndicator {
                 id: flightmode1
-                visible: activeVehicle ? true : false
+                visible: true
                 anchors.centerIn: parent
-
             }
         }
+
     }
 
     Dialog {
@@ -2003,22 +2044,19 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.bottom: parent.bottom
-        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.bottomMargin: 20
-        anchors.leftMargin: 20
+        anchors.rightMargin: 20
         spacing: 20  // Adjust this value to control space between icons
 
         Rectangle {
             id: planbtn
-            Layout.alignment: Qt.AlignLeft
+            Layout.alignment: Qt.AlignRight
             width: 100
             height: 40
             radius: width / 2  // Makes it a circle
             color: "#1b1c3e"     // white background
             visible: false
-
-
-
 
             Text {
                 text: " + New Plot "
@@ -2026,6 +2064,8 @@ ApplicationWindow {
                 anchors.centerIn: parent
                 font.bold: true
             }
+
+
 
             MouseArea {
                 anchors.fill: parent
@@ -2446,17 +2486,17 @@ ApplicationWindow {
                     }
 
                     onClicked: {
-                        planView.data1()
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
                         MapGlobals.editdialog = "editdialog"
                         mainWindow.showPlanView()
                         dialog.visible = false
-filename.survey()
+                        planView.data1()
+
                     }
                 }
 
-                // Drone GPS - Dark Green
+                // Drone - Dark Green
                 Button {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width * 0.2
@@ -2488,7 +2528,7 @@ filename.survey()
                             }
 
                             Text {
-                                text: "Drone GPS"
+                                text: "Mark with Drone"
                                 color: "white"
                                 font.pixelSize: 16
                                 font.bold: true
@@ -2507,6 +2547,59 @@ filename.survey()
                         planView.data1()
                     }
                 }
+
+                // GPS - Dark Green
+                Button {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+
+                    background: Rectangle {
+                        id: bgGPS
+                        color: "#1b2a49" // Dark Green
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#3b6ea5"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: bgGPS.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Mark with GPS"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        MapGlobals.mark_with = "Mark_With_GPS"
+                        MapGlobals.edit = "edit"
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+                    }
+                }
+
 
                 // KML/SHP - Dark Purple
                 Button {
@@ -2552,7 +2645,7 @@ filename.survey()
                     }
 
                     onClicked: {
-                        MapGlobals.mark_with = "Mark_With_GPS"
+                        MapGlobals.mark_with = "KML_File"
                         MapGlobals.edit = "edit"
                         mainWindow.showPlanView()
                         dialog.visible = false
@@ -2666,6 +2759,7 @@ filename.survey()
             }
         }
     }
+
     function _restorePreviousVertices() {
         mapPolygon.beginReset()
         mapPolygon.clear()
@@ -2675,6 +2769,7 @@ filename.survey()
         mapPolygon.endReset()
         _circleMode = _savedCircleMode
     }
+
     Component {
 
         id: toolSelectComponent
@@ -3227,7 +3322,7 @@ filename.survey()
             Rectangle {
                 id:             backgroundRect
                 anchors.fill:   parent
-                color:          QGroundControl.globalPalette.window
+                color:          "black"//QGroundControl.globalPalette.window
                 radius:         indicatorDrawer._margins
                 opacity:        0.85
             }
@@ -3235,8 +3330,8 @@ filename.survey()
             Rectangle {
                 anchors.horizontalCenter:   backgroundRect.right
                 anchors.verticalCenter:     backgroundRect.top
-                width:                      ScreenTools.defaultFontPixelHeight
-                height:                     width
+                width:                      50//ScreenTools.defaultFontPixelHeight
+                height:                     20//width
                 radius:                     width / 2
                 color:                      QGroundControl.globalPalette.button
                 border.color:               QGroundControl.globalPalette.buttonText
@@ -3244,13 +3339,19 @@ filename.survey()
 
                 QGCLabel {
                     anchors.centerIn:   parent
-                    text:               ">"
+                    text:               "More"
                     color:              QGroundControl.globalPalette.buttonText
                 }
 
                 QGCMouseArea {
                     fillItem: parent
-                    onClicked: indicatorDrawer._expanded = true
+                    onClicked: {
+
+                        mainWindow.showToolSelectDialog1(4)
+                        mainWindow.closeIndicatorDrawer()
+
+                        //indicatorDrawer._expanded = true
+                    }
                 }
             }
         }
@@ -3318,14 +3419,14 @@ filename.survey()
         }
     }
 
-    Connections{
+    Connections {
         target: activationbar
         function onActivationTriggered(value){
             _utmspSendActTrigger= value
         }
     }
 
-    UTMSPActivationStatusBar{
+    UTMSPActivationStatusBar {
         id:                         activationbar
         activationStartTimestamp:   UTMSPStateStorage.startTimeStamp
         activationApproval:         UTMSPStateStorage.showActivationTab && QGroundControl.utmspManager.utmspVehicle.vehicleActivation

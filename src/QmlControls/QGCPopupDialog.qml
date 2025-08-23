@@ -203,20 +203,20 @@ Popup {
     //     border.width:   1
     //     border.color:   _qgcPal.windowShadeLight
     // }
+
     Rectangle {
         width: mainLayout.implicitWidth
         height: mainLayout.implicitHeight
-        color: "#ffffff"   // 🟡 Background color
-        radius: 20         // 🟢 Corner radius
+        color: "#ffffff"
+        radius: 20
         border.width: 1
         border.color: "#dddddd"  // optional light border
         anchors.centerIn: parent
+
         ColumnLayout {
-            id:                 mainLayout
-            anchors.centerIn:   parent
-            spacing:    _contentMargin
-
-
+            id: mainLayout
+            anchors.centerIn: parent
+            spacing: _contentMargin
 
             Rectangle {
                 Layout.fillWidth: true
@@ -225,6 +225,7 @@ Popup {
                 radius: 20
                 Layout.alignment: Qt.AlignHCenter
 
+                // Bottom rectangle to complete rounded shape
                 Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -232,33 +233,20 @@ Popup {
                     height: 25 // same as radius
                     color: "#7F56D9"
                 }
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 10
 
-
-                    QGCLabel {
-                        id: titleLable
-                        text: root.title
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                        color: "white"
-                        anchors.verticalCenter: parent.verticalCenter
-                        padding: 8
-                    }
-
-
-
+                // Centered title
+                QGCLabel {
+                    id: titleLable
+                    text: root.title
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: "white"
+                    padding: 8
                 }
-
             }
-
-
-
 
             Rectangle {
                 Layout.fillWidth:       true
@@ -303,8 +291,6 @@ Popup {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.bottomMargin:     20
 
-
-
                 QGCButton {
                     id: rejectButton
                     onClicked: _reject()
@@ -344,8 +330,6 @@ Popup {
                     }
                 }
             }
-
-
 
         }
 

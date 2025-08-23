@@ -41,7 +41,7 @@ Button {
 
     background: Rectangle {
         id:             backRect
-        radius:         backRadius
+        radius:         20//backRadius
         implicitWidth:  ScreenTools.implicitButtonWidth
         implicitHeight: ScreenTools.implicitButtonHeight
         border.width:   showBorder ? 1 : 0
@@ -50,9 +50,9 @@ Button {
 
         Rectangle {
             anchors.fill:   parent
-            color:         qgcPal.buttonHighlight
+            color:         "#A6ADFF"//qgcPal.buttonHighlight
             opacity:        _showHighlight ? 1 : control.enabled && control.hovered ? .2 : 0
-            radius:         parent.radius
+            radius:         20//parent.radius
         }
     }
 

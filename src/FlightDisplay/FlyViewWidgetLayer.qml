@@ -32,6 +32,8 @@ import QGroundControl.Vehicle
 Item {
     id: _root
 
+
+    property var    pipview
     property var    parentToolInsets
     property var    totalToolInsets:        _totalToolInsets
     property var    mapControl
@@ -53,6 +55,14 @@ Item {
     property bool   _showSingleVehicleUI:   true
 
     property bool utmspActTrigger
+
+
+    Component.onCompleted: {
+
+        console.log("pipView.visible :", pipview.visible);
+        console.log("_pipView.visible :", _pipView.visible);
+    }
+
 
     QGCToolInsets {
         id:                     _totalToolInsets
@@ -78,9 +88,9 @@ Item {
         anchors.right:      parent.right
         spacing:            _layoutSpacing
 
-        property real topEdgeRightInset:    childrenRect.height + _layoutMargin
-        property real rightEdgeTopInset:    width + _layoutMargin
-        property real rightEdgeCenterInset: rightEdgeTopInset
+        property real topEdgeRightInset :    childrenRect.height + _layoutMargin
+        property real rightEdgeTopInset :    width + _layoutMargin
+        property real rightEdgeCenterInset : rightEdgeTopInset
     }
 
     FlyViewBottomRightRowLayout {
@@ -89,7 +99,7 @@ Item {
         anchors.bottom:     parent.bottom
         anchors.left :      parent.left
         spacing:            _layoutSpacing
-        anchors.leftMargin: 60
+        anchors.leftMargin: 20
 
         property real bottomEdgeRightInset:     height + _layoutMargin
         property real bottomEdgeCenterInset:    bottomEdgeRightInset
@@ -122,8 +132,8 @@ Item {
         visible:                    _virtualJoystickEnabled && !QGroundControl.videoManager.fullScreen && !(_activeVehicle ? _activeVehicle.usingHighLatencyLink : false)
         anchors.bottom:             parent.bottom
         anchors.bottomMargin:       bottomLoaderMargin
-        anchors.left:               parent.left   
-        anchors.leftMargin:         ( y > toolStrip.y + toolStrip.height ? toolStrip.width / 2 : toolStrip.width * 1.05 + toolStrip.x) 
+        anchors.left:               parent.left
+        anchors.leftMargin:         ( y > toolStrip.y + toolStrip.height ? toolStrip.width / 2 : toolStrip.width * 1.05 + toolStrip.x)
         source:                     "qrc:/qml/VirtualJoystick.qml"
         active:                     _virtualJoystickEnabled && !(_activeVehicle ? _activeVehicle.usingHighLatencyLink : false)
 
@@ -131,8 +141,8 @@ Item {
         property bool autoCenterThrottle:      QGroundControl.settingsManager.appSettings.virtualJoystickAutoCenterThrottle.rawValue
         property bool _virtualJoystickEnabled: QGroundControl.settingsManager.appSettings.virtualJoystick.rawValue
         property real bottomEdgeRightInset:    parent.height-y
-        property var  _pipViewMargin:          _pipView.visible ? parentToolInsets.bottomEdgeLeftInset + ScreenTools.defaultFontPixelHeight * 2 : 
-                                               bottomRightRowLayout.height + ScreenTools.defaultFontPixelHeight * 1.5
+        property var  _pipViewMargin:          _pipView.visible ? parentToolInsets.bottomEdgeLeftInset + ScreenTools.defaultFontPixelHeight * 2 :
+                                                                  bottomRightRowLayout.height + ScreenTools.defaultFontPixelHeight * 1.5
 
         property var  bottomLoaderMargin:      _pipViewMargin >= parent.height / 2 ? parent.height / 2 : _pipViewMargin
 
@@ -148,7 +158,7 @@ Item {
         //Loader status logic
         onLoaded: {
             if (virtualJoystickMultiTouch.visible) {
-                virtualJoystickMultiTouch.item.calibration = true 
+                virtualJoystickMultiTouch.item.calibration = true
                 virtualJoystickMultiTouch.item.uiTotalWidth = rootWidth
                 virtualJoystickMultiTouch.item.uiRealX = itemX
             } else {

@@ -367,6 +367,8 @@
         <file>ProfileScreenNew.qml</file>
         <file>BasicParamters.qml</file>
         <file>BasicParamtersList.qml</file>
+        <file>Communication.qml</file>
+        <file>MissionExpand.qml</file>
     </qresource>
     <qresource prefix="/FirstRunPromptDialogs">
         <file alias="UnitsFirstRunPrompt.qml">src/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml</file>

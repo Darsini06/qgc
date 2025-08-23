@@ -52,24 +52,41 @@ Item {
     }
 
     function _initForItems() {
+
+
         var item1IsFull = QGroundControl.loadBoolGlobalSetting(item1IsFullSettingsKey, true)
+
         if (item1 && item2) {
-            item1.pipState.state = item1.pipState.pipState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
-            item2.pipState.state = item2.pipState.fullState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
-            _fullItem = item2//item1IsFull ? item1 : item2
-            _pipOrWindowItem = item1//item1IsFull ? item2 : item1
-
-
             // item1.pipState.state = item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
             // item2.pipState.state = item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
             // _fullItem = item1IsFull ? item1 : item2
             // _pipOrWindowItem = item1IsFull ? item2 : item1
+
+            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
+
+                item1.pipState.state = item1.pipState.pipState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
+                item2.pipState.state = item2.pipState.fullState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
+                _fullItem = item2//item1IsFull ? item1 : item2
+                _pipOrWindowItem = item1//item1IsFull ? item2 : item1
+
+            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"){
+
+                item1.pipState.state = item1.pipState.fullState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
+                item2.pipState.state = item2.pipState.pipState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
+                _fullItem = item2//item1IsFull ? item1 : item2
+                _pipOrWindowItem = item1//item1IsFull ? item2 : item1
+
+            }
+
         } else {
             item1.pipState.state = item1.pipState.fullState
             _fullItem = item1
             _pipOrWindowItem = null
         }
+
         _setPipIsExpanded(QGroundControl.loadBoolGlobalSetting(_pipExpandedSettingsKey, true))
+
+
     }
 
     function _swapPip() {
@@ -98,12 +115,12 @@ Item {
 
     function camera() {
         mainWindow.showToastMessage("message");
-         _initForItems()
+        _initForItems()
         var item1IsFull = false
         tem1.pipState.state = item1.pipState.pipState
-                    item2.pipState.state = item2.pipState.fullState
-                    _fullItem = item2
-                    _pipOrWindowItem = item1
+        item2.pipState.state = item2.pipState.fullState
+        _fullItem = item2
+        _pipOrWindowItem = item1
         item1IsFull = false
         QGroundControl.saveBoolGlobalSetting(item1IsFullSettingsKey, item1IsFull)
 
@@ -113,6 +130,8 @@ Item {
     function _setPipIsExpanded(isExpanded) {
         QGroundControl.saveBoolGlobalSetting(_pipExpandedSettingsKey, isExpanded)
         _isExpanded = isExpanded
+
+         console.log("_setPipIsExpanded",isExpanded);
     }
 
     Window {
@@ -154,24 +173,24 @@ Item {
         property real initialWidth: 0
 
         onPressed: (mouse) => {
-            // Remove the anchor so the our mouse coordinates stay in the same original place for drag tracking
-            pipResize.anchors.fill = undefined
-            pipResize.initialX = mouse.x
-            pipResize.initialWidth = _root.width
-        }
+                       // Remove the anchor so the our mouse coordinates stay in the same original place for drag tracking
+                       pipResize.anchors.fill = undefined
+                       pipResize.initialX = mouse.x
+                       pipResize.initialWidth = _root.width
+                   }
 
         onReleased: pipResize.anchors.fill = pipResizeIcon
 
         // Drag
         onPositionChanged: (mouse) => {
-            if (pipResize.pressed) {
-                var parentWidth = _root.parent.width
-                var newWidth = pipResize.initialWidth + mouse.x - pipResize.initialX
-                if (newWidth < parentWidth * _maxSize && newWidth > parentWidth * _minSize) {
-                    _pipSize = newWidth
-                }
-            }
-        }
+                               if (pipResize.pressed) {
+                                   var parentWidth = _root.parent.width
+                                   var newWidth = pipResize.initialWidth + mouse.x - pipResize.initialX
+                                   if (newWidth < parentWidth * _maxSize && newWidth > parentWidth * _minSize) {
+                                       _pipSize = newWidth
+                                   }
+                               }
+                           }
     }
 
     // Resize icon

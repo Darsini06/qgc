@@ -106,10 +106,17 @@ Item {
             property bool   _noMessages:    messageText.length === 0
             property var    _fact:          null
 
+            // function formatMessage(message) {
+            //     message = message.replace(new RegExp("<#E>", "g"), "color: " + qgcPal.warningText + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+            //     message = message.replace(new RegExp("<#I>", "g"), "color: " + qgcPal.warningText + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+            //     message = message.replace(new RegExp("<#N>", "g"), "color: " + qgcPal.text + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+            //     return message;
+            // }
+
             function formatMessage(message) {
-                message = message.replace(new RegExp("<#E>", "g"), "color: " + qgcPal.warningText + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
-                message = message.replace(new RegExp("<#I>", "g"), "color: " + qgcPal.warningText + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
-                message = message.replace(new RegExp("<#N>", "g"), "color: " + qgcPal.text + "; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+                message = message.replace(new RegExp("<#E>", "g"), "color: red; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+                message = message.replace(new RegExp("<#I>", "g"), "color: red; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
+                message = message.replace(new RegExp("<#N>", "g"), "color: white; font: " + (ScreenTools.defaultFontPointSize.toFixed(0) - 1) + "pt monospace;");
                 return message;
             }
 
@@ -128,16 +135,16 @@ Item {
             }
 
             onLinkActivated: (link) => {
-                if (link.startsWith('param://')) {
-                    var paramName = link.substr(8);
-                    _fact = controller.getParameterFact(-1, paramName, true)
-                    if (_fact != null) {
-                        paramEditorDialogComponent.createObject(mainWindow).open()
-                    }
-                } else {
-                    Qt.openUrlExternally(link);
-                }
-            }
+                                 if (link.startsWith('param://')) {
+                                     var paramName = link.substr(8);
+                                     _fact = controller.getParameterFact(-1, paramName, true)
+                                     if (_fact != null) {
+                                         paramEditorDialogComponent.createObject(mainWindow).open()
+                                     }
+                                 } else {
+                                     Qt.openUrlExternally(link);
+                                 }
+                             }
 
             Component {
                 id: paramEditorDialogComponent

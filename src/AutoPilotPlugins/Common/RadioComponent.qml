@@ -31,15 +31,13 @@ SetupPage {
             width:  availableWidth
             height: Math.max(leftColumn.height)
 
-
             function setupPageCompleted() {
                 controller.start()
                 updateChannelCount()
             }
 
             function updateChannelCount()
-            {
-            }
+            {}
 
             QGCPalette { id: qgcPal; colorGroupEnabled: radioPage.enabled }
 
@@ -172,28 +170,29 @@ SetupPage {
                 // anchors.right:  columnSpacer.left
                 spacing:        10
 
-                Row {
-                    spacing: ScreenTools.defaultFontPixelWidth
+                // Row {
+                //     spacing: ScreenTools.defaultFontPixelWidth
 
-                    QGCRadioButton {
-                        text:       qsTr("Mode 1")
-                        checked:    controller.transmitterMode == 1
-                        onClicked:  controller.transmitterMode = 1
-                    }
+                //     QGCRadioButton {
+                //         text:       qsTr("Mode 1")
+                //         checked:    controller.transmitterMode == 1
+                //         onClicked:  controller.transmitterMode = 1
+                //     }
 
-                    QGCRadioButton {
-                        text:       qsTr("Mode 2")
-                        checked:    controller.transmitterMode == 2
-                        onClicked:  controller.transmitterMode = 2
-                    }
-                }
+                //     QGCRadioButton {
+                //         text:       qsTr("Mode 2")
+                //         checked:    controller.transmitterMode == 2
+                //         onClicked:  controller.transmitterMode = 2
+                //     }
+                // }
 
                 Row {
                     width:      parent.width
-                    spacing: 10
+                    anchors.horizontalCenter:    parent.horizontalCenter
+                    spacing: 15
 
                     Image {
-                        width: parent.width / 2
+                        width: parent.width / 3
                         fillMode:   Image.PreserveAspectFit
                         smooth:     true
                         source:     controller.imageHelp
@@ -201,13 +200,13 @@ SetupPage {
                     // Attitude Controls
                     Column {
                         width: parent.width / 2
-                        spacing:    5
+                        spacing:    3
                         QGCLabel { text: qsTr("Attitude Controls")
                             color:"black"}
 
                         Item {
                             width:  parent.width
-                            height: globals.defaultTextHeight * 2
+                            height: globals.defaultTextHeight * 1.5
                             QGCLabel {
                                 id:     rollLabel
                                 width:  globals.defaultTextWidth * 7
@@ -236,7 +235,7 @@ SetupPage {
 
                         Item {
                             width:  parent.width
-                            height: globals.defaultTextHeight * 2
+                            height: globals.defaultTextHeight * 1.5
 
                             QGCLabel {
                                 id:     pitchLabel
@@ -266,7 +265,7 @@ SetupPage {
 
                         Item {
                             width:  parent.width
-                            height: globals.defaultTextHeight * 2
+                            height: globals.defaultTextHeight * 1.5
 
                             QGCLabel {
                                 id:     yawLabel
@@ -296,7 +295,7 @@ SetupPage {
 
                         Item {
                             width:  parent.width
-                            height: globals.defaultTextHeight * 2
+                            height: globals.defaultTextHeight * 1.5
 
                             QGCLabel {
                                 id:     throttleLabel
@@ -325,10 +324,9 @@ SetupPage {
 
                     } // Column - Attitude Control labels
 
-
-
-
                 }
+
+
                 // Command Buttons
                 Row {
                     spacing: 10
@@ -390,12 +388,12 @@ SetupPage {
                 Rectangle {
                     width:          parent.width
                     height:         1
-                    border.color:   "white"//qgcPal.text
+                    border.color:   qgcPal.text
                     border.width:   1
                 }
 
                 QGCLabel { text: qsTr("Additional Radio setup:")
-                    color:"white"
+                    color:"black"
                 }
 
                 GridLayout {
@@ -421,6 +419,7 @@ SetupPage {
                                 Layout.fillWidth:   true
                                 text:               fact.shortDescription
                             }
+
                             FactComboBox {
                                 width:      ScreenTools.defaultFontPixelWidth * 15
                                 fact:       parent.fact
@@ -448,7 +447,6 @@ SetupPage {
                 }
 
             } // Column - Left Column
-
 
             // Item {
             //     id:             columnSpacer

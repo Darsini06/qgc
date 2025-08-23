@@ -41,79 +41,96 @@ SetupPage {
                 visible:    controller.vehicle.motorCount == -1
             }
 
-            Row {
+            // Changed from Row to Column for vertical layout
+            Column {
                 id:         motorSliders
                 enabled:    safetySwitch.checked
-                spacing:    ScreenTools.defaultFontPixelWidth * 4
+                spacing:    ScreenTools.defaultFontPixelHeight
 
-                Repeater {
-                    id:         sliderRepeater
-                    model:      controller.vehicle.motorCount == -1 ? 8 : controller.vehicle.motorCount
+                // Main motor sliders in a horizontal row within the column
+                Row {
+                    spacing: ScreenTools.defaultFontPixelWidth * 2
 
-                    Column {
-                        property alias motorSlider: slider
+                    Repeater {
+                        id: sliderRepeater
+                        model: controller.vehicle.motorCount == -1 ? 8 : controller.vehicle.motorCount
 
-                        QGCLabel {
-                            anchors.horizontalCenter:   parent.horizontalCenter
-                            text:                       vehicleComponent.motorIndexToLetter(index)
-                        }
+                        Column {
+                            property alias motorSlider: slider
+                            spacing: ScreenTools.defaultFontPixelHeight / 2
 
-                        QGCSlider {
-                            id:                         slider
-                            height:                     ScreenTools.defaultFontPixelHeight * _sliderHeight
-                            orientation:                Qt.Vertical
-                            from:               0
-                            to:               100
-                            stepSize:                   1
-                            value:                      0
-                            live:   false
+                            QGCLabel {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: controller.vehicle.motorIndexToLetter ? controller.vehicle.motorIndexToLetter(index) : "M" + (index + 1)
+                            }
 
-                            onValueChanged: {
-                                controller.vehicle.motorTest(index + 1, value, value == 0 ? 0 : _motorTimeoutSecs, true)
-                                if (value != 0) {
-                                    motorTimer.restart()
+                            QGCSlider {
+                                id: slider
+                                width: ScreenTools.defaultFontPixelWidth * 8
+                                orientation: Qt.Horizontal
+                                from: 0
+                                to: 100
+                                stepSize: 1
+                                value: 0
+                                live: false
+
+                                onValueChanged: {
+                                    controller.vehicle.motorTest(index + 1, value, value == 0 ? 0 : _motorTimeoutSecs, true)
+                                    if (value != 0) {
+                                        motorTimer.restart()
+                                    }
+                                }
+
+                                Timer {
+                                    id: motorTimer
+                                    interval: _motorTimeoutSecs * 1000
+                                    repeat: false
+                                    running: false
+
+                                    onTriggered: {
+                                        allSlider.value = 0
+                                        slider.value = 0
+                                    }
                                 }
                             }
+                        }
+                    } // Repeater
 
-                            Timer {
-                                id:             motorTimer
-                                interval:       _motorTimeoutSecs * 1000
-                                repeat:         false
-                                running:        false
+                    // "All" slider in its own row
+                    Row {
+                        spacing: ScreenTools.defaultFontPixelWidth * 2
 
-                                onTriggered: {
-                                    allSlider.value = 0
-                                    slider.value = 0
+                        Column {
+                            spacing: ScreenTools.defaultFontPixelHeight / 2
+
+                            QGCLabel {
+                                anchors.horizontalCenter:   parent.horizontalCenter
+                                text:                       qsTr("All")
+                            }
+
+                            QGCSlider {
+                                id:                         allSlider
+                                width:                      ScreenTools.defaultFontPixelWidth * 8  // Set width for horizontal slider
+                                orientation:                Qt.Horizontal  // Changed to Horizontal
+                                from:                       0
+                                to:                         100
+                                stepSize:                   1
+                                value:                      0
+                                live:                       false
+
+                                onValueChanged: {
+                                    for (var sliderIndex=0; sliderIndex<sliderRepeater.count; sliderIndex++) {
+                                        sliderRepeater.itemAt(sliderIndex).motorSlider.value = allSlider.value
+                                    }
                                 }
                             }
-                        }
-                    } // Column
-                } // Repeater
+                        } // Column
+                    } // Row
 
-                Column {
-                    QGCLabel {
-                        anchors.horizontalCenter:   parent.horizontalCenter
-                        text:                       qsTr("All")
-                    }
 
-                    QGCSlider {
-                        id:                         allSlider
-                        height:                     ScreenTools.defaultFontPixelHeight * _sliderHeight
-                        orientation:                Qt.Vertical
-                        from:               0
-                        to:               100
-                        stepSize:                   1
-                        value:                      0
-                        live:   false
+                } // Row
 
-                        onValueChanged: {
-                            for (var sliderIndex=0; sliderIndex<sliderRepeater.count; sliderIndex++) {
-                                sliderRepeater.itemAt(sliderIndex).motorSlider.value = allSlider.value
-                            }
-                        }
-                    }
-                } // Column
-            } // Row
+            } // Column (main motor sliders container)
 
             QGCLabel {
                 anchors.left:   parent.left
@@ -144,4 +161,4 @@ SetupPage {
             } // Row
         } // Column
     } // Component
-} // SetupPahe
+} // SetupPage

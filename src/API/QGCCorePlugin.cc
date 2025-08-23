@@ -418,6 +418,7 @@ QVariantList QGCCorePlugin::firstRunPromptsToShow(void)
     }
 
     QVariantList rgVarIdsToShow;
+
     for (int id: rgIdsToShow) {
         rgVarIdsToShow.append(id);
     }

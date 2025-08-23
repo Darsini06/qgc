@@ -179,7 +179,7 @@ SettingsPage {
                 RowLayout {
                     Layout.fillWidth:   true
                     spacing:            ScreenTools.defaultFontPixelWidth
-                    visible: false
+                    visible: true
 
                     QGCLabel { text: qsTr("Name") }
                     QGCTextField {
@@ -190,12 +190,12 @@ SettingsPage {
                     }
                 }
 
-                // QGCCheckBoxSlider {
-                //     Layout.fillWidth:   true
-                //     text:               qsTr("Automatically Connect on Start")
-                //     checked:            editingConfig.autoConnect
-                //     onCheckedChanged:   editingConfig.autoConnect = checked
-                // }
+                QGCCheckBoxSlider {
+                    Layout.fillWidth:   true
+                    text:               qsTr("Automatically Connect on Start")
+                    checked:            editingConfig.autoConnect
+                    onCheckedChanged:   editingConfig.autoConnect = checked
+                }
 
                 // QGCCheckBoxSlider {
                 //     Layout.fillWidth:   true

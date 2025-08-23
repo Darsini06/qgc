@@ -196,6 +196,7 @@ RowLayout {
                 anchors.horizontalCenter:   parent.horizontalCenter
                 text:                       qsTr("Sensor Status")
                 visible:                    !_healthAndArmingChecksSupported
+                color: "white"
             }
 
             GridLayout {
@@ -207,18 +208,23 @@ RowLayout {
 
                 Repeater {
                     model: _activeVehicle.sysStatusSensorInfo.sensorNames
-                    QGCLabel { text: modelData }
+                    QGCLabel { text: modelData
+                        color: "white"
+                    }
                 }
 
                 Repeater {
                     model: _activeVehicle.sysStatusSensorInfo.sensorStatus
-                    QGCLabel { text: modelData }
+                    QGCLabel { text: modelData
+                    color: "white"
+                    }
                 }
             }
 
             QGCLabel {
                 text:       qsTr("Overall Status")
                 visible:    _healthAndArmingChecksSupported && _activeVehicle.healthAndArmingCheckReport.problemsForCurrentMode.count > 0
+                color: "white"
             }
             // List health and arming checks
             Repeater {
@@ -273,6 +279,7 @@ RowLayout {
                         textFormat:         TextEdit.RichText
                         clip:               true
                         visible:            object.expanded
+                        color: "white"
 
                         property var fact:  null
 
@@ -325,11 +332,15 @@ RowLayout {
                     columnSpacing:      ScreenTools.defaultFontPixelWidth *2
                     Layout.fillWidth:   true
 
-                    QGCLabel { Layout.fillWidth: true; text: qsTr("Vehicle Parameters") }
+                    QGCLabel { Layout.fillWidth: true;
+                        text: qsTr("Vehicle Parameters")
+                        color: "white"
+                    }
                     QGCButton {
                         text: qsTr("Configure")
                         onClicked: {
-                            mainWindow.showVehicleSetupTool(qsTr("Parameters"))
+                            mainWindow.showToolSelectDialog1(0)
+                            //mainWindow.showVehicleSetupTool(qsTr("Parameters"))
                             mainWindow.closeIndicatorDrawer()
                         }
                     }
@@ -338,7 +349,8 @@ RowLayout {
                     QGCButton {
                         text: qsTr("Configure")
                         onClicked: {
-                            mainWindow.showVehicleSetupTool()
+                            //mainWindow.showVehicleSetupTool()
+                             mainWindow.showToolSelectDialog1(1)
                             mainWindow.closeIndicatorDrawer()
                         }
                     }

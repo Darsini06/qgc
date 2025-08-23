@@ -22,8 +22,8 @@ import QGroundControl.Controllers
 Rectangle {
     id:     _root
     width:  parent.width
-    height: 50//ScreenTools.toolbarHeight
-    color:  "#A6ADFF"//qgcPal.toolbarBackground
+    height: ScreenTools.toolbarHeight
+    color:  "#1b1c3e"//qgcPal.toolbarBackground
 
     property var    planMasterController
 
@@ -32,15 +32,16 @@ Rectangle {
     property var plantypes
     QGCPalette { id: qgcPal }
 
+
     /// Bottom single pixel divider
-    Rectangle {
-        anchors.left:   parent.left
-        anchors.right:  parent.right
-        anchors.bottom: parent.bottom
-        height:         1
-        color:          "black"
-        visible:        qgcPal.globalTheme === QGCPalette.Light
-    }
+    // Rectangle {
+    //     anchors.left:   parent.left
+    //     anchors.right:  parent.right
+    //     anchors.bottom: parent.bottom
+    //     height:         1
+    //     color:          "white"
+    //     visible:        qgcPal.globalTheme === QGCPalette.Light
+    // }
 
     RowLayout {
         id:                     viewButtonRow
@@ -55,20 +56,6 @@ Rectangle {
             logo:                   true
             onClicked:
             {
-                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
-                    mainWindow.cameraView()
-                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"){
-                    mainWindow.showFlyView()
-                    mainWindow.closefile()
-                    // if (planType === "Plan") {
-                    //                         mainWindow.showFlyView()
-                    //                         mainWindow.closefile()
-                    //                     } else {
-                    //                         mainWindow.showFlyView1()
-                    //                         mainWindow.closefile()
-                    //                     }
-                }
-
                 // if(MapGlobals.editdialog==="editdialog1"){
                 //     if (planType === "Plan") {
                 //         mainWindow.showFlyView()
@@ -81,7 +68,17 @@ Rectangle {
                 //     mainWindow.cameraView()
 
                 // }
-
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
+                    mainWindow.cameraView()
+                }else{
+                    if (planType === "Plan") {
+                                            mainWindow.showFlyView()
+                                            mainWindow.closefile()
+                                        } else {
+                                            mainWindow.showFlyView1()
+                                            mainWindow.closefile()
+                                        }
+                }
 
 
 
@@ -93,6 +90,59 @@ Rectangle {
     }
 
 
+    Item {
+        width: parent.width
+        height: parent.height
+
+        Rectangle {
+            id: curvedBackground
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 300
+            anchors.rightMargin: 300
+            anchors.verticalCenter: parent.verticalCenter
+            height: parent.height * 0.10
+            radius: 150
+            color: "#7d8df7"
+            antialiasing: true
+            clip: true
+
+            // Fake square top edge
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: parent.height * 0.50
+                color: "#7d8df7"
+            }
+
+            Item {
+                anchors.fill: parent
+                anchors.topMargin:30
+                anchors.bottomMargin:10
+                anchors.bottom: parent.bottom
+
+                // Centered Image (instead of text)
+                Image {
+                    source: "/qmlimages/NewImages/aviatrickslogo.png"  // Change path if needed
+                    anchors.centerIn: parent
+                    width: 500
+                    height: 250
+                    fillMode: Image.PreserveAspectFit
+                    opacity: 1.0//0.0
+
+                    // SequentialAnimation on opacity {
+                    //     running: true
+                    //     loops: Animation.Infinite
+                    //     NumberAnimation { from: 0.0; to: 1.0; duration: 1000 }
+                    //     PauseAnimation { duration: 500 }
+                    //     NumberAnimation { from: 1.0; to: 0.0; duration: 1000 }
+                    // }
+                }
+            }
+        }
+    }
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -134,6 +184,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
+        color:          "#1b1c3e"
         width:50
 
 

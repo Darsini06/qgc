@@ -78,13 +78,13 @@ Item {
         propagateComposedEvents:    true
         visible:                    !valueArea.settingsUnlocked
 
-        onClicked: (mouse) => {
-            if (ScreenTools.isMobile) {
-                valueArea.settingsUnlocked = true
-                mouse.accepted = true
-            } else {
-                mouse.accepted = false
-            }
-        }
+        // onClicked: (mouse) => {
+        //     if (ScreenTools.isMobile) {
+        //         valueArea.settingsUnlocked = true
+        //         mouse.accepted = true
+        //     } else {
+        //         mouse.accepted = false
+        //     }
+        // }
     }
 }

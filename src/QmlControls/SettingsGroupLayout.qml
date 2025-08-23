@@ -32,6 +32,7 @@ ColumnLayout {
             text:           heading
             font.pointSize: ScreenTools.defaultFontPointSize + 1
             font.bold:      true
+            color: "white"
         }
 
         QGCLabel { 
@@ -40,6 +41,7 @@ ColumnLayout {
             wrapMode:           Text.WordWrap
             font.pointSize:     ScreenTools.smallFontPointSize
             visible:            headingDescription !== ""
+            color: "white"
         }
     }
 

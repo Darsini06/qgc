@@ -22,12 +22,14 @@ RowLayout {
 
     QGCLabel { 
         id:                 _labelLabel
-        Layout.fillWidth:   true 
+        Layout.fillWidth:   true
+        color: "white"
     }
 
     QGCLabel {
         id:                     _label
         Layout.preferredWidth:  labelPreferredWidth
+        color: "white"
     }
 }
 

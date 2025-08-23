@@ -158,7 +158,7 @@ Item {
 
                                     ColumnLayout {
 
-                                        spacing: 2
+                                        spacing: 1
 
                                         Row{
 
@@ -172,8 +172,8 @@ Item {
 
                                             QGCColoredImage {
                                                 source: "/qmlimages/NewImages/verified.png"
-                                                width: 25
-                                                height: 25
+                                                width: 20
+                                                height: 20
                                                 fillMode: Image.PreserveAspectFit
                                                 color: "transparent"
                                             }
@@ -238,7 +238,6 @@ Item {
                                 }
                             }
                         }
-
 
                         // Account Update
                         Rectangle {

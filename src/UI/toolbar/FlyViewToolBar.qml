@@ -67,7 +67,7 @@ Rectangle {
         QGCToolBarButton {
             id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "/qmlimages/Home.svg"
+            icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
             onClicked:              mainWindow.newscreen()
             icon.color:"white"
@@ -176,7 +176,9 @@ Rectangle {
             anchors.leftMargin: 300
             anchors.rightMargin: 300
             anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height * 0.10
+            width:280
             radius: 150
             color: "#7d8df7"
             antialiasing: true
@@ -203,7 +205,7 @@ Rectangle {
                     width: 500
                     height: 250
                     fillMode: Image.PreserveAspectFit
-                    opacity: 1.0
+                    opacity: 1.0//0.0
 
                     // SequentialAnimation on opacity {
                     //     running: true
@@ -286,7 +288,7 @@ Rectangle {
                                             id: batteryIndicator
                                             width:40
                                             height: 40                // Fixed height for the indicator
-                                            visible: activeVehicle ? true : false
+                                            visible: true//activeVehicle ? true : false
                                           }
 
 
@@ -399,10 +401,13 @@ Rectangle {
                             color: "white"
                         }
 
+
+
                     }
 
 
         }
+
 
 
 
@@ -807,11 +812,12 @@ Rectangle {
     //     //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
     //     // }
 
+
+
     //     // MouseArea {
     //     //     anchors.fill:   parent
     //     //     onClicked:      largeProgressBar._userHide = true
     //     // }
     // }
-
 
 }

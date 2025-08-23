@@ -143,7 +143,11 @@ SetupPage {
                         anchors.left:       parent.left
                         anchors.right:      parent.right
                         height:             basicTuningColumn.y + basicTuningColumn.height + _margins
-                        color:              qgcPal.windowShade
+                        color:              "white"
+                        border.color:       qgcPal.windowShade
+                        border.width:       2
+                        radius:             6
+
 
                         Column {
                             id:                 basicTuningColumn
@@ -160,10 +164,15 @@ SetupPage {
                                 QGCLabel {
                                     text:       qsTr("Roll/Pitch Sensitivity")
                                     font.bold:   true
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                 }
 
                                 QGCLabel {
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
                                     text: qsTr("Slide to the right if the copter is sluggish or slide to the left if the copter is twitchy")
+                                    font.pointSize: ScreenTools.smallFontPointSize
+
                                 }
 
                                 QGCSlider {
@@ -196,6 +205,8 @@ SetupPage {
                                 }
 
                                 QGCLabel {
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
                                     text: qsTr("Slide to the right to climb more aggressively or slide to the left to climb more gently")
                                 }
 
@@ -229,6 +240,8 @@ SetupPage {
                                 }
 
                                 QGCLabel {
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
                                     text: qsTr("Slide to the left for soft control, slide to the right for crisp control")
                                 }
 
@@ -338,7 +351,10 @@ SetupPage {
                                 width:          autoTuneColumn.x + autoTuneColumn.width + _margins
                                 height:         autoTuneColumn.y + autoTuneColumn.height + _margins
                                 anchors.top:    autoTuneLabel.bottom
-                                color:          qgcPal.windowShade
+                                color:          "white"
+                                border.color:   qgcPal.windowShade
+                                border.width:   2
+                                radius:         6
 
                                 Column {
                                     id:                 autoTuneColumn
@@ -349,10 +365,10 @@ SetupPage {
 
                                     Row {
                                         spacing: _margins
-
                                         QGCLabel { text: qsTr("Axes to AutoTune:") }
                                         FactBitmask { fact: _autoTuneAxes }
                                     }
+
 
                                     Row {
                                         spacing:    _margins
@@ -369,13 +385,14 @@ SetupPage {
                                             currentIndex:   _autoTuneSwitchChannelIndex
 
                                             onActivated: (index) => {
-                                                var channel = index
+                                                             var channel = index
 
-                                                if (channel > 0) {
-                                                    channel += 6
-                                                }
-                                                setChannelAutoTuneOption(channel)
-                                            }
+                                                             if (channel > 0) {
+                                                                 channel += 6
+                                                             }
+
+                                                             setChannelAutoTuneOption(channel)
+                                                         }
                                         }
                                     }
                                 }
@@ -395,68 +412,78 @@ SetupPage {
 
                             Rectangle {
                                 id:             channel6TuningOption
-                                width:          channel6TuningOptColumn.width + (_margins * 2)
-                                height:         channel6TuningOptColumn.height + ScreenTools.defaultFontPixelHeight
+                                width:          Math.max(channel6TuningOptColumn.implicitWidth + (_margins * 2), ScreenTools.defaultFontPixelWidth * 25)
+                                height:         channel6TuningOptColumn.implicitHeight + (_margins * 2)
                                 anchors.top:    inFlightTuneLabel.bottom
-                                color:          qgcPal.windowShade
+                                color:          "white"
+                                border.color:   qgcPal.windowShade
+                                border.width:   2
+                                radius:         6
 
                                 Column {
                                     id:                 channel6TuningOptColumn
-                                    anchors.margins:    ScreenTools.defaultFontPixelWidth
+                                    anchors.margins:    _margins
                                     anchors.left:       parent.left
+                                    anchors.right:      parent.right
                                     anchors.top:        parent.top
                                     spacing:            ScreenTools.defaultFontPixelHeight
 
-                                    Row {
-                                        spacing: ScreenTools.defaultFontPixelWidth
-                                        property Fact nullFact: Fact { }
+                                    Column {
+                                        width: parent.width
+                                        spacing: ScreenTools.defaultFontPixelHeight / 2
 
                                         QGCLabel {
-                                            anchors.baseline:   optCombo.baseline
-                                            text:               qsTr("RC Channel 6 Option (Tuning):")
-                                            //color:            controller.channelOptionEnabled[modelData] ? "yellow" : qgcPal.text
+                                            width: parent.width
+                                            wrapMode: Text.Wrap
+                                            text: qsTr("RC Channel 6 Option (Tuning):")
                                         }
 
                                         FactComboBox {
                                             id:         optCombo
-                                            width:      ScreenTools.defaultFontPixelWidth * 15
+                                            width:      parent.width
                                             fact:       controller.getParameterFact(-1, "TUNE")
                                             indexModel: false
                                         }
                                     }
 
-                                    Row {
-                                        spacing: ScreenTools.defaultFontPixelWidth
-                                        property Fact nullFact: Fact { }
+                                    GridLayout {
+                                        width: parent.width
+                                        columns: 4
+                                        rowSpacing: ScreenTools.defaultFontPixelHeight / 2
+                                        columnSpacing: ScreenTools.defaultFontPixelWidth / 2
 
                                         QGCLabel {
-                                            anchors.baseline:   tuneMinField.baseline
-                                            text:               qsTr("Min:")
-                                            //color:            controller.channelOptionEnabled[modelData] ? "yellow" : qgcPal.text
+                                            text: qsTr("Min:")
+                                            Layout.alignment: Qt.AlignVCenter
                                         }
 
                                         FactTextField {
-                                            id:                 tuneMinField
-                                            validator:          DoubleValidator {bottom: 0; top: 32767;}
-                                            fact:               controller.getParameterFact(-1, "r.TUNE_MAX")
+                                            id: tuneMinField
+                                            Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 8
+                                            validator: DoubleValidator {bottom: 0; top: 32767;}
+                                            fact: controller.getParameterFact(-1, "r.TUNE_MAX")
                                         }
 
                                         QGCLabel {
-                                            anchors.baseline:   tuneMaxField.baseline
-                                            text:               qsTr("Max:")
-                                            //color:            controller.channelOptionEnabled[modelData] ? "yellow" : qgcPal.text
+                                            text: qsTr("Max:")
+                                            Layout.alignment: Qt.AlignVCenter
                                         }
 
                                         FactTextField {
-                                            id:                 tuneMaxField
-                                            validator:          DoubleValidator {bottom: 0; top: 32767;}
-                                            fact:               controller.getParameterFact(-1, "r.TUNE_MIN")
+                                            id: tuneMaxField
+                                            Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 8
+                                            validator: DoubleValidator {bottom: 0; top: 32767;}
+                                            fact: controller.getParameterFact(-1, "r.TUNE_MIN")
                                         }
                                     }
+
                                 } // Column - Channel 6 Tuning option
                             } // Rectangle - Channel 6 Tuning options
-                        } // Rectangle - Channel 6 Tuning options wrap
+                        }
+
                     } // Flow - Tune
+
+
                 }
 
                 Loader {

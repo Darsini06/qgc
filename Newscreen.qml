@@ -23,6 +23,16 @@ Item {
     property var    _fullItem
     property var    _pipOrWindowItem
 
+    function swapCamera(){
+        var videoSettings = QGroundControl.settingsManager.videoSettings
+        if (videoSettings) {
+            var videoSourceFact = videoSettings.videoSource
+            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                videoSourceFact.value = videoSourceFact.enumValues[1]
+            }
+        }
+    }
+
     // Component.onCompleted: {
     //     console.log("newscreen pageloaded")
     //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
@@ -174,8 +184,6 @@ Item {
                 font.bold: true
             }
 
-
-
             Label {
                 width: 400
                 wrapMode: Text.WordWrap
@@ -183,7 +191,6 @@ Item {
                 color: "lightgray"
                 font.pixelSize: 16
             }
-
 
         }
 
@@ -201,12 +208,8 @@ Item {
 
     }
 
-
     property string planType: "Standard"
     property var _appSettings: QGroundControl.settingsManager.appSettings
-
-
-
 
     property var _linkManager: QGroundControl.linkManager
 
@@ -271,58 +274,6 @@ Item {
                 }
 
                 onClicked: {
-                    // var outputArea
-                    // var xhr = new XMLHttpRequest()
-                    // xhr.open("GET", "https://jsonplaceholder.typicode.com/posts/1") // Dummy URL
-                    // xhr.onreadystatechange = function() {
-                    // if (xhr.readyState === XMLHttpRequest.DONE) {
-                    // if (xhr.status === 200) {
-                    // try {
-                    // var response = JSON.parse(xhr.responseText)
-                    // outputArea = "Title: " + response.title + "\nBody: " + response.body
-                    // console.log("output",outputArea )
-                    // } catch(e) {
-                    // outputArea = "Error parsing JSON."
-                    // console.log("output",outputArea )
-                    // }
-                    // } else {
-                    // outputArea = "HTTP Error: " + xhr.status
-                    // console.log("output",outputArea )
-                    // }
-                    // }
-                    // }
-                    // xhr.send()
-
-
-                    // var outputArea
-
-
-                    // var xhr = new XMLHttpRequest()
-                    // xhr.open("POST", "https://jsonplaceholder.typicode.com/posts") // Dummy server
-                    // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
-
-                    // var data = {
-                    // title: "titleField.text",
-                    // body: "bodyField.text",
-                    // userId: 1
-                    // }
-
-                    // xhr.onreadystatechange = function() {
-                    // if (xhr.readyState === XMLHttpRequest.DONE) {
-                    // if (xhr.status === 201) {
-                    // let response = JSON.parse(xhr.responseText)
-                    // outputArea = " Data Sent!\nID: " + response.id + "\nTitle: " + response.title
-                    // console.log("outputArea :",outputArea)
-
-                    // } else {
-                    // outputArea = " Failed. HTTP Status: " + xhr.status
-                    // console.log("outputArea :",outputArea)
-                    // }
-                    // }
-                    // }
-
-                    // xhr.send(JSON.stringify(data))
-
 
                     var editingConfig = _linkManager.createConfiguration(
                                 ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
@@ -343,7 +294,9 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: true///QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"?true:false
+
+                visible: true ///QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"?true:false
+
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -373,9 +326,11 @@ Item {
                     if (videoSettings) {
                         var videoSourceFact = videoSettings.videoSource
                         if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                            videoSourceFact.value = videoSourceFact.enumValues[1]
+                            videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
+
+                    swapCamera();
 
 
 
@@ -388,7 +343,8 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: /true///QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                visible: true //QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -420,6 +376,8 @@ Item {
                         }
                     }
 
+                    swapCamera();
+
                 }
             }
 
@@ -430,7 +388,7 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: /true///QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="mapping"?true:false
+                visible: true//QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="mapping"?true:false
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -461,7 +419,6 @@ Item {
                             videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
-
                 }
             }
 
@@ -563,12 +520,12 @@ Item {
                     //     }
                     // }
 
-                    // QGCCheckBoxSlider {
-                    //     Layout.fillWidth:   true
-                    //     text:               qsTr("Automatically Connect on Start")
-                    //     checked:            editingConfig.autoConnect
-                    //     onCheckedChanged:   editingConfig.autoConnect = checked
-                    // }
+                    QGCCheckBoxSlider {
+                        Layout.fillWidth:   true
+                        text:               qsTr("Automatically Connect on Start")
+                        checked:            editingConfig.autoConnect
+                        onCheckedChanged:   editingConfig.autoConnect = checked
+                    }
 
                     // QGCCheckBoxSlider {
                     //     Layout.fillWidth:   true

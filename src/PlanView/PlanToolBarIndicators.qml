@@ -10,8 +10,6 @@ import QGroundControl.FactControls
 import QGroundControl.Palette
 import QGroundControl.UTMSP
 
-import MapGlobals 1.0
-
 // Toolbar for Plan View
 Item {
     width: missionStats.width + _margins
@@ -70,13 +68,18 @@ Item {
     property string _batteriesRequiredText:     _batteriesRequired < 0 ?        qsTr("N/A") : _batteriesRequired
 
     readonly property real _margins: ScreenTools.defaultFontPixelWidth
-
+property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     // Properties of UTM adapter
     property bool   _utmspEnabled:                       QGroundControl.utmspSupported
+
+
+
+
 
     function getMissionTime() {
         if (!_missionTime) {
             return "00:00:00"
+
         }
         var t = new Date(2021, 0, 0, 0, 0, Number(_missionTime))
         var days = Qt.formatDateTime(t, 'dd')
@@ -88,7 +91,8 @@ Item {
         } else {
             complete = days + " days " + Qt.formatTime(t, 'hh:mm:ss')
         }
-        MapGlobals.time = complete
+
+         _appSettings.time = complete
         return complete
     }
 
@@ -106,6 +110,7 @@ Item {
             rowSpacing:             _rowSpacing
             columnSpacing:          _labelToValueSpacing
             Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+            visible: false // added
 
             QGCLabel {
                 text:               qsTr("Selected Waypoint")
@@ -153,6 +158,7 @@ Item {
                 font.pointSize:         _dataFontSize
                 Layout.minimumWidth:    _smallValueWidth
             }
+
         }
 
         GridLayout {
@@ -160,6 +166,7 @@ Item {
             rowSpacing:             _rowSpacing
             columnSpacing:          _labelToValueSpacing
             Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+            visible: false // added
 
             QGCLabel {
                 text:               qsTr("Total Mission")
@@ -189,6 +196,7 @@ Item {
                 font.pointSize:         _dataFontSize
                 Layout.minimumWidth:    _largeValueWidth
             }
+
         }
 
         GridLayout {
@@ -196,7 +204,8 @@ Item {
             rowSpacing:             _rowSpacing
             columnSpacing:          _labelToValueSpacing
             Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
-            visible:                _batteryInfoAvailable
+            //visible:                _batteryInfoAvailable
+            visible: false // added
 
             QGCLabel {
                 text:               qsTr("Battery")
@@ -217,8 +226,8 @@ Item {
         QGCButton {
             id:          uploadButton
             text:        _controllerDirty ? qsTr("Upload Required") : qsTr("Upload")
-            enabled:     _utmspEnabled ? !_controllerSyncInProgress && UTMSPStateStorage.enableMissionUploadButton : !_controllerSyncInProgress
-            visible:     !_controllerOffline && !_controllerSyncInProgress
+            enabled:     _utmspEnabled ? !_controllerSyncInProgress && UTMSPStateStorage.enableMissionUploadButton : !_controllerSyncInProgressA
+            visible:     false//!_controllerOffline && !_controllerSyncInProgress
             primary:     _controllerDirty
             onClicked: {
                 if (_utmspEnabled) {
@@ -241,4 +250,3 @@ Item {
         }
     }
 }
-

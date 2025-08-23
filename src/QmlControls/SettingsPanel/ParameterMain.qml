@@ -25,9 +25,12 @@ import QGroundControl.QGCPositionManager
 import MAVLink
 
 Item {
+
     anchors.fill: parent
-property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property int selectedTabIndex: 0  // Default selected tab is "Sensor"
+
+    //Background
     Rectangle {
         anchors.fill: parent
         color: "transparent"
@@ -37,6 +40,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
             z: -10
             color: "#1b1c3e"
         }
+
         // ---- Curved Gradient Background ----
         Canvas {
             anchors.fill: parent
@@ -64,36 +68,32 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
         }
 
         Rectangle {
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                width: parent.width * 0.7
-                height: parent.height * 0.9
-                radius: width * 0.5
-                rotation: 30
-                opacity: 0.95
-                anchors.rightMargin: -width * 0.25
-                anchors.bottomMargin: -height * 0.2
-                z: -1
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: parent.width * 0.7
+            height: parent.height * 0.9
+            radius: width * 0.5
+            rotation: 30
+            opacity: 0.95
+            anchors.rightMargin: -width * 0.25
+            anchors.bottomMargin: -height * 0.2
+            z: -1
 
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
-                    GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
-                }
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
+                GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
             }
-
-
-
+        }
 
     }
 
 
-
-
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: 10
         spacing: 0
         // Selected Component Below Tab Bar
+
         Loader {
             id: tabLoader
             Layout.fillWidth: true
@@ -110,20 +110,24 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                 anchors.fill: parent
                 spacing: 10
 
-
-
                 // GridView for calibration buttons
                 GridView {
                     id: gridView
-
                     property bool buttonsEnabled: true
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.ceil(count / 3) * (cellHeight + 10) // Calculate height based on items
+                    Layout.fillHeight: true
+                    clip: true
+
+                    boundsBehavior: Flickable.StopAtBounds
+                    flickDeceleration: 2000
+                    snapMode: GridView.NoSnap
+
                     //Layout.alignment: Qt.AlignHCenter
                     cellWidth: width / 3
                     cellHeight: ScreenTools.defaultFontPixelHeight * 7
-                    clip: true
+
                     model: ListModel {
+
                         ListElement {
                             name: "Accelerometer"
                             type: "accel"
@@ -131,6 +135,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
                         ListElement {
                             name: "Compass"
                             type: "compass"
@@ -138,6 +143,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
                         ListElement {
                             name: "Level Horizon"
                             type: "level"
@@ -145,6 +151,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "Gyro"
                             type: "gyro"
@@ -152,6 +159,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "Pressure"
                             type: "pressure"
@@ -159,6 +167,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "RC Calibration"
                             type: "rc"
@@ -213,17 +222,17 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                                 if (model.status === "failure") return "#e74c3c";   // Failure: Red
 
                                 switch (model.type) {
-                                    case "accel":        return "#2980b9";  // Blue
-                                    case "compass":      return "#8e44ad";  // Purple
-                                    case "level":        return "#16a085";  // Teal
-                                    case "gyro":         return "#d35400";  // Orange
-                                    case "pressure":     return "#f39c12";  // Yellow Orange
-                                    case "rc":           return "#2c3e50";  // Navy Blue
-                                    case "flightModes":  return "#c0392b";  // Dark Red
-                                    case "esc":          return "#27ae60";  // Green
-                                    case "motors":       return "#7f8c8d";  // Gray
-                                    case "tuning":       return "#9b59b6";  // Light Purple
-                                    default:             return qgcPal.button;
+                                case "accel":        return "#2980b9";  // Blue
+                                case "compass":      return "#8e44ad";  // Purple
+                                case "level":        return "#16a085";  // Teal
+                                case "gyro":         return "#d35400";  // Orange
+                                case "pressure":     return "#f39c12";  // Yellow Orange
+                                case "rc":           return "#2c3e50";  // Navy Blue
+                                case "flightModes":  return "#c0392b";  // Dark Red
+                                case "esc":          return "#27ae60";  // Green
+                                case "motors":       return "#7f8c8d";  // Gray
+                                case "tuning":       return "#9b59b6";  // Light Purple
+                                default:             return qgcPal.button;
                                 }
                             }
 
@@ -319,7 +328,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                     }
                 }
             }
-       }
+        }
     }
 
     Component {
@@ -329,6 +338,9 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
             anchors.fill: parent
             // Help text which is shown both in the status text area prior to pressing a cal button and in the
             // pre-calibration dialog.
+
+            readonly property string simpleAccelText:    qsTr("Place your vehicle on a flat, level surface to set the accelerometer calibration.")
+
 
             readonly property string orientationHelpSet:    qsTr("If mounted in the direction of flight, select None.")
             readonly property string orientationHelpCal:    qsTr("Before calibrating make sure rotation settings are correct. ") + orientationHelpSet
@@ -494,6 +506,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             calInProgressText:  controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                             imageSource:        "qrc:///qmlimages/VehicleDown.png"
                         }
+
                         VehicleRotationCal {
                             width:              parent.indicatorWidth
                             height:             parent.indicatorHeight
@@ -503,6 +516,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             calInProgressText:  controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                             imageSource:        "qrc:///qmlimages/VehicleLeft.png"
                         }
+
                         VehicleRotationCal {
                             width:              parent.indicatorWidth
                             height:             parent.indicatorHeight
@@ -512,6 +526,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             calInProgressText:  controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                             imageSource:        "qrc:///qmlimages/VehicleRight.png"
                         }
+
                         VehicleRotationCal {
                             width:              parent.indicatorWidth
                             height:             parent.indicatorHeight
@@ -521,6 +536,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             calInProgressText:  controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                             imageSource:        "qrc:///qmlimages/VehicleNoseDown.png"
                         }
+
                         VehicleRotationCal {
                             width:              parent.indicatorWidth
                             height:             parent.indicatorHeight
@@ -530,6 +546,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             calInProgressText:  controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                             imageSource:        "qrc:///qmlimages/VehicleTailDown.png"
                         }
+
                         VehicleRotationCal {
                             width:              parent.indicatorWidth
                             height:             parent.indicatorHeight
@@ -545,15 +562,20 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                 // GridView for calibration buttons
                 GridView {
                     id: gridView
-
                     property bool buttonsEnabled: true
-
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.ceil(count / 3) * (cellHeight + 10) // Calculate height based on items
+                    Layout.fillHeight: true
+                    clip: true
+
+                    boundsBehavior: Flickable.StopAtBounds
+                    flickDeceleration: 2000
+                    snapMode: GridView.NoSnap
+
                     //Layout.alignment: Qt.AlignHCenter
                     cellWidth: width / 3
                     cellHeight: ScreenTools.defaultFontPixelHeight * 7
-                    clip: true
+
+
                     model: ListModel {
                         ListElement {
                             name: "Accelerometer"
@@ -810,14 +832,14 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                 target: controller
 
                 onUpdateCalibrationStatus: function(type, status) {
-                        for (let i = 0; i < gridView.model.count; ++i) {
-                            let item = gridView.model.get(i)
-                            if (item.type === type) {
-                                gridView.model.setProperty(i, "status", status)
-                                break
-                            }
+                    for (let i = 0; i < gridView.model.count; ++i) {
+                        let item = gridView.model.get(i)
+                        if (item.type === type) {
+                            gridView.model.setProperty(i, "status", status)
+                            break
                         }
                     }
+                }
 
                 onShowToastMessage: function(message) {
                     toastContainer.showToast(message);
@@ -837,6 +859,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
                 _orientationDialogCalType = calType
                 switch (calType) {
+
                 case _calTypeCompass:
                     _orientationsDialogShowCompass = true
                     _orientationDialogHelp = orientationHelpCal
@@ -979,6 +1002,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                     if (addComma) {
                         label += qsTr(", ")
                     }
+
                     label += sensorParams.rgCompassExternal[index] ? qsTr("external") : qsTr("internal")
                 }
                 label += ")"
@@ -1138,7 +1162,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                 }
             }
 
-            property bool _singleCompassSettingsComponentShowPriority: true
+            property bool _singleCompassSettingsComponentShowPriority : true
 
             Component {
                 id: singleCompassSettingsComponent
@@ -1223,7 +1247,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                     property int calType: -1
                     property bool showCompass: true
                     property string helpText: ""
-                    property bool simpleAccelCal: false
+                    property bool simpleAccelCal: true
 
                     function compassMask () {
                         var mask = 0
@@ -1255,7 +1279,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             console.log("Calibrating Accelerometer with simpleAccelCal:", simpleAccelCal)
                             if (controller && controller.calibrateAccel) {
                                 console.log("_orientationDialogCalType  == _calTypeAccel",calType)
-                                controller.calibrateAccel(simpleAccelCal);
+                                controller.calibrateAccel(true);
                             } else {
                                 console.log("Controller or calibrateAccel method is undefined");
                             }
@@ -1289,10 +1313,21 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                         QGCLabel {
                             width:      parent.width
                             wrapMode:   Text.WordWrap
-                            text:       _orientationDialogHelp
+                            text:       calType === _calTypeAccel ? simpleAccelText : _orientationDialogHelp
+                        }
+
+                        QGCColoredImage {
+                            source: "qrc:///qmlimages/VehicleDown.png"
+                            width: parent.width * 0.4
+                            height: width
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color : "black"
+                            visible : calType === _calTypeAccel
                         }
 
                         Column {
+                            visible: calType !== _calTypeAccel
+
                             QGCLabel { text: qsTr("Autopilot Rotation:") }
 
                             FactComboBox {
@@ -1303,7 +1338,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                         }
 
                         Column {
-                            visible: calType === _calTypeAccel
+                            visible: false //calType === _calTypeAccel
                             spacing: ScreenTools.defaultFontPixelHeight
 
                             QGCLabel {
@@ -1315,6 +1350,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                             QGCCheckBox {
                                 text: "Simple Accelerometer Calibration"
                                 onClicked: simpleAccelCal = this.checked
+                                checked:   true
                             }
                         }
 
@@ -1331,6 +1367,7 @@ property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
                         }
 
                         Column {
+
                             visible:            magneticDeclinationLabel.visible
                             anchors.margins:    ScreenTools.defaultFontPixelWidth
                             anchors.left:       parent.left

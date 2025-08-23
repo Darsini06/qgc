@@ -263,6 +263,7 @@ Rectangle {
                     }
                 }
 
+
                 QGCLabel {
                     width:                  parent.width
                     wrapMode:               Text.WordWrap
