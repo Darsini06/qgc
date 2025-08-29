@@ -211,9 +211,6 @@ Item {
         }
     }
 
-
-
-
     Component{
         id: customdialog
 
@@ -317,7 +314,7 @@ Item {
                 _root.acceptedForSave(controller.fullyQualifiedFilename(folder, filenameTextField.text, _rgExtensions))
             }
             onRejected:{
-mainWindow.filename()
+                mainWindow.filename()
             }
 
             Column {

@@ -131,6 +131,7 @@ Item {
     }
 
     function addEditingVisuals() {
+         console.log("new_addEditingVisuals()")
         if (_objMgrEditingVisuals.empty) {
             _objMgrEditingVisuals.createObjects(
                         [ dragHandlesComponent, splitHandlesComponent, centerDragHandleComponent, edgeLengthHandlesComponent ],
@@ -147,6 +148,7 @@ Item {
 
 
     function addToolbarVisuals() {
+         console.log("new_addToolbarVisuals")
         if (_objMgrToolVisuals.empty) {
             var toolbar = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
             toolbar.z = QGroundControl.zOrderWidgets
@@ -167,9 +169,6 @@ Item {
                 mapPolygon.traceMode = true
                 console.log("MapGlobals.edit2")
             }
-
-
-
 
         }
     }
@@ -250,10 +249,13 @@ Item {
     }
 
     function _handleInteractiveChanged() {
+        console.log("new_handleInteractiveChanged")
         if (interactive) {
+            console.log("new_interactive")
             addEditingVisuals()
             addToolbarVisuals()
         } else {
+             console.log("new_interactive_else")
             //mapPolygon.traceMode = false
             removeEditingVisuals()
             removeToolVisuals()
@@ -312,6 +314,7 @@ Item {
     }
 
     Component.onCompleted: {
+        console.log("new_onCompleted")
         addCommonVisuals()
         _handleInteractiveChanged()
     }
@@ -404,8 +407,6 @@ Item {
             _missionController.setCurrentPlanViewSeqNum(0, true)
         }
 
-
-
         onPromptForPlanUsageOnVehicleChange: {
             if (!_promptForPlanUsageShowing) {
                 _promptForPlanUsageShowing = true
@@ -430,6 +431,7 @@ Item {
             _circleMode = false
             mapPolygon.traceMode = true
         }
+
         function checkReadyForSaveUpload(save) {
             if (readyForSaveState() == VisualMissionItem.NotReadyForSaveData) {
                 waitingOnIncompleteDataMessage(save)
@@ -513,7 +515,6 @@ Item {
             fileDialog.openForSave()
         }
     }
-
 
     Component {
         id: polygonComponent
@@ -943,59 +944,14 @@ Item {
             width: mapControl.centerViewport.width
             height: mapControl.centerViewport.height
 
-            Platform.FileDialog {
-                        id: kmlFileDialog
-                        title: "Select KML File"
-                        nameFilters: ["KML files (*.kml)"]
-                        onAccepted: {
-                            var filePath = kmlFileDialog.file.toString()
-                            loadKmlFile(filePath)
-                        }
-                        onRejected: {
-                            console.log("KML load cancelled")
-                            MapGlobals.mark_with = "Mark_With_Manual" // Reset to default
-                        }
-                    }
-
-            function parseKML(data) {
-                // Simple KML parser - adjust based on your KML structure
-                var coordRegex = /<coordinates>([\s\S]*?)<\/coordinates>/
-                var match = coordRegex.exec(data)
-
-                if (match && match[1]) {
-                    var coords = match[1].trim().split(' ')
-                    for (var i = 0; i < coords.length; i++) {
-                        var parts = coords[i].split(',')
-                        if (parts.length >= 2) {
-                            var lon = parseFloat(parts[0])
-                            var lat = parseFloat(parts[1])
-                            mapPolygon.appendVertex(QtPositioning.coordinate(lat, lon))
-                        }
-                    }
+            Component.onCompleted: {
+                if (MapGlobals.mark_with === "KML_File" && MapGlobals.kmlPath !== "") {
+                    console.log("Loading external KML from local storage:", MapGlobals.kmlPath)
+                    mapPolygon.loadKMLOrSHPFile(MapGlobals.kmlPath)
+                    mapFitFunctions.fitMapViewportToMissionItems()
                 }
             }
 
-            function loadKmlFile(filePath) {
-                console.log("Loading KML file:", filePath)
-                var xhr = new XMLHttpRequest
-                xhr.open("GET", filePath)
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            parseKML(xhr.responseText)
-                        } else {
-                            console.log("Error loading KML file:", xhr.statusText)
-                        }
-                    }
-                }
-                xhr.send()
-            }
-
-                    Component.onCompleted: {
-                        if (MapGlobals.mark_with === "KML_File") {
-                            kmlFileDialog.open()
-                        }
-                    }
 
             PlanEditToolbar {
                 id: toolbar
@@ -1141,8 +1097,8 @@ Item {
                                 }
 
                             }
-                            else {
 
+                            else {
                                 console.log("Mark_With_Manual")
                                 // Convert the bottom-center point of controlImage to mapControl's coordinate space.
                                 var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
@@ -1165,6 +1121,7 @@ Item {
 
                         }
                     }
+
                     Button {
                         text: " Obstacle Point "
                         height: 34
@@ -1178,7 +1135,6 @@ Item {
                         }
                     }
                 }
-
 
             }
 
@@ -1281,9 +1237,6 @@ Item {
     //         }
     //     }
     // }
-
-
-
 
     Component {
         id: mobileFileSaveDialogComponent
@@ -1413,8 +1366,6 @@ Item {
                 }
             }
 
-
-
             //     Column {
             //         id:         fileSaveColumn
             //         width:      40 * ScreenTools.defaultFontPixelWidth
@@ -1532,7 +1483,6 @@ Item {
 
     Component{
         id: customdialog
-
 
         Item {
             id: customDialogItem
@@ -1689,6 +1639,10 @@ Item {
                                     _saveCurrentVertices()
                                     _circleMode = false
                                     mapPolygon.traceMode = true
+                                    if(MapGlobals.mark_with === "KML_File" ){
+
+                                    }
+
                                     mapPolygon.clear()
                                     customDialogItem.visible = false
                                     MapGlobals.editdialog = "editdialog1"

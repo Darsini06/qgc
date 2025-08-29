@@ -27,6 +27,9 @@ QtObject {
 
     property string appType: ""
 
+    property string kmlPath: ""
+
+
 
     function recenterMap() {
             if (activeFlightMap && gcsPosition.isValid) {

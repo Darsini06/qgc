@@ -246,6 +246,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QGCMapEngineManager>("QGroundControl.QGCMapEngineManager", 1, 0, "QGCMapEngineManager");
     qmlRegisterSingletonType(QUrl("qrc:/qml/MapGlobals.qml"), "MapGlobals", 1, 0, "MapGlobals");
 
+
     app.init();
 
     int exitCode = 0;

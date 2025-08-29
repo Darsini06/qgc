@@ -32,6 +32,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import Qt.labs.folderlistmodel 2.1
+import Qt.labs.platform 1.1 as Platform
 
 
 /// @brief Native QML top level window
@@ -2401,6 +2402,43 @@ ApplicationWindow {
             border.width: 1
         }
 
+        Platform.FileDialog {
+            id: kmlFileDialog
+            title: "Select KML File"
+            nameFilters: ["KML files (*.kml)"]
+            fileMode: Platform.FileDialog.OpenFile
+
+            onAccepted: {
+                console.log("Picked file (QUrl):", kmlFileDialog.file)
+
+                if (kmlFileDialog.file && kmlFileDialog.file !== "") {
+                    var fileStr = kmlFileDialog.file.toString()
+                    console.log("Picked file string:", fileStr)
+
+                    // Handle both file:// and content://
+                    var localPath = ""
+                    if (fileStr.startsWith("file://")) {
+                        localPath = fileStr.replace("file://", "")
+                    } else if (fileStr.startsWith("content://")) {
+                        // On Android you get content:// URIs
+                        localPath = fileStr   // keep as-is for now
+                    }
+
+                    console.log("Final Local Path:", localPath)
+
+                    MapGlobals.kmlPath = localPath
+                    MapGlobals.mark_with = "KML_File"
+                    MapGlobals.edit = "edit"
+                    mainWindow.showPlanView()
+                    dialog.visible = false
+                    planView.data1()
+                } else {
+                    console.log("No file selected")
+                }
+            }
+        }
+
+
         // Close button in top-right corner
         Rectangle {
             id: closeBtn
@@ -2601,7 +2639,6 @@ ApplicationWindow {
                 }
 
 
-                // KML/SHP - Dark Purple
                 Button {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width * 0.2
@@ -2645,14 +2682,18 @@ ApplicationWindow {
                     }
 
                     onClicked: {
-                        MapGlobals.mark_with = "KML_File"
-                        MapGlobals.edit = "edit"
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
+                        // MapGlobals.mark_with = "KML_File"
+                        // MapGlobals.edit = "edit"
+                        // mainWindow.showPlanView()
+                        // dialog.visible = false
+                        // planView.data1()
+                        //kmlOrSHPLoadDialog.openForLoad()
+
+                        // open native file dialog directly
+                        kmlFileDialog.open()
+
                     }
                 }
-
 
                 // Button {
                 // //Layout.fillWidth: true
@@ -2758,6 +2799,7 @@ ApplicationWindow {
 
             }
         }
+
     }
 
     function _restorePreviousVertices() {
@@ -3346,11 +3388,15 @@ ApplicationWindow {
                 QGCMouseArea {
                     fillItem: parent
                     onClicked: {
-
+                        if(!activeVehicle){
+                        //indicatorDrawer._expanded = true
                         mainWindow.showToolSelectDialog1(4)
                         mainWindow.closeIndicatorDrawer()
-
-                        //indicatorDrawer._expanded = true
+                        }else{
+                        indicatorDrawer._expanded = true
+                        //mainWindow.showToolSelectDialog1(4)
+                        mainWindow.closeIndicatorDrawer()
+                        }
                     }
                 }
             }
