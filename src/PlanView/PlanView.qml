@@ -75,39 +75,41 @@ Item {
     property string passedValue: ""
     property var selectedPlanCreator: null
 
-//     Component.onCompleted: {
-//         console.log("PlanView received planType:", _appSettings.screenplanType);
+    property var  _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
-// console.log("PlanView creater", _planMasterController.planCreators);
+    //     Component.onCompleted: {
+    //         console.log("PlanView received planType:", _appSettings.screenplanType);
 
-//         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
-//                                    editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
-//         var centerCoord = editorMap.toCoordinate(centerPoint, false)
-//         _planMasterController.planCreators[0].createPlan(centerCoord)
+    // console.log("PlanView creater", _planMasterController.planCreators);
 
-//             //createPlanRemoveAllPromptDialog.createObject(mainWindow, { mapCenter: _mapCenter(), planCreator: object }).open()
-//             //_planMasterController.planCreator[0].createPlan(mapCenter)
+    //         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
+    //                                    editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
+    //         var centerCoord = editorMap.toCoordinate(centerPoint, false)
+    //         _planMasterController.planCreators[0].createPlan(centerCoord)
 
-//     }
+    //             //createPlanRemoveAllPromptDialog.createObject(mainWindow, { mapCenter: _mapCenter(), planCreator: object }).open()
+    //             //_planMasterController.planCreator[0].createPlan(mapCenter)
+
+    //     }
     function mapclear() {
         if (_utmspEnabled) {
-                                            QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                                            UTMSPStateStorage.removeFlightPlanState = true
-                                            UTMSPStateStorage.indicatorDisplayStatus = true
-                                        }
-                                        _planMasterController.removeAll()
-                                        //_planMasterController.upload();
+            QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+            UTMSPStateStorage.removeFlightPlanState = true
+            UTMSPStateStorage.indicatorDisplayStatus = true
+        }
+        _planMasterController.removeAll()
+        //_planMasterController.upload();
         uploadload()
     }
 
     function uploadload() {
         if (_utmspEnabled) {
-                                            QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                                            UTMSPStateStorage.removeFlightPlanState = true
-                                            UTMSPStateStorage.indicatorDisplayStatus = true
-                                        }
-                                       // _planMasterController.removeAll()
-                                        _planMasterController.upload();
+            QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+            UTMSPStateStorage.removeFlightPlanState = true
+            UTMSPStateStorage.indicatorDisplayStatus = true
+        }
+        // _planMasterController.removeAll()
+        _planMasterController.upload();
     }
 
     function mapCenter() {
@@ -128,20 +130,26 @@ Item {
     function loaddata() {
         _planMasterController.loadFromSelectedFile()
         editdata.visible=true
+        MapGlobals.share_edit_visibility = true
+
     }
 
     function loaddata1() {
         _planMasterController.loadFromSelectedFile1()
         editdata.visible=false
+        MapGlobals.share_edit_visibility = false
+
     }
+
     function loaddata2() {
         //_planMasterController.loadFromSelectedFile1()
         editdata.visible=true
+        MapGlobals.share_edit_visibility = true
     }
 
-    function data1() {
+    function data1(){
         _planMasterController.data()
-         //mobileFileSaveDialogComponent.createObject(mainWindow).open()
+        //mobileFileSaveDialogComponent.createObject(mainWindow).open()
     }
 
 
@@ -189,8 +197,6 @@ Item {
         }
 
     }
-
-
 
     MapFitFunctions {
         id:                         mapFitFunctions  // The name for this id cannot be changed without breaking references outside of this code. Beware!
@@ -355,30 +361,30 @@ Item {
 
         function data() {
             // Find the SurveyPlanCreator in the list
-                                                var surveyCreator = null
-                                                for (var i = 0; i < _planMasterController.planCreators.count; i++) {
-                                                    var creator = _planMasterController.planCreators.get(i)
-                                                    if (creator.name === "Survey") { // Adjust this check based on your actual creator's name property
-                                                        surveyCreator = creator
-                                                        break
-                                                    }
-                                                }
+            var surveyCreator = null
+            for (var i = 0; i < _planMasterController.planCreators.count; i++) {
+                var creator = _planMasterController.planCreators.get(i)
+                if (creator.name === "Survey") { // Adjust this check based on your actual creator's name property
+                    surveyCreator = creator
+                    break
+                }
+            }
 
-                                                if (surveyCreator) {
-                                                    console.log("surveyCreator",surveyCreator)
-                                                    QGroundControl.saveGlobalSetting("surveyCreator", surveyCreator)
-                                                    // Calculate center coordinate
-                                                    var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
-                                                                               editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
-                                                    var centerCoord = editorMap.toCoordinate(centerPoint, false)
+            if (surveyCreator) {
+                console.log("surveyCreator",surveyCreator)
+                QGroundControl.saveGlobalSetting("surveyCreator", surveyCreator)
+                // Calculate center coordinate
+                var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
+                                           editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
+                var centerCoord = editorMap.toCoordinate(centerPoint, false)
 
-                                                    // Create the plan
-                                                    surveyCreator.createPlan(centerCoord)
+                // Create the plan
+                surveyCreator.createPlan(centerCoord)
 
 
-                                                } else {
-                                                    console.log("Survey plan creator not found")
-                                                }
+            } else {
+                console.log("Survey plan creator not found")
+            }
 
 
         }
@@ -449,9 +455,6 @@ Item {
         _missionController.insertLandItem(mapCenter(), nextIndex, true /* makeCurrentItem */)
     }
 
-
-
-
     function selectNextNotReady() {
         var foundCurrent = false
         for (var i=0; i<_missionController.visualItems.count; i++) {
@@ -462,9 +465,10 @@ Item {
             }
         }
     }
+
     QGCMapPolygonVisuals{
-           id:filename
-       }
+        id:filename
+    }
 
     QGCFileDialog {
         id:             fileDialog
@@ -503,8 +507,6 @@ Item {
         planMasterController:   _planMasterController
         //plantypes:planType
     }
-
-
 
     Item {
         id:             panel
@@ -768,22 +770,22 @@ Item {
 
 
                     // },
-                        ToolStripAction {
-                            text:       qsTr("Share")
-                            iconSource: "qrc:/InstrumentValueIcons/share-alt.svg"
-                            //enabled:    _missionController.isInsertTakeoffValid
-                            visible:    planType==="Plan"?true:false//(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover
-                            onTriggered: {
+                    ToolStripAction {
+                        text:       qsTr("Share")
+                        iconSource: "qrc:/InstrumentValueIcons/share-alt.svg"
+                        //enabled:    _missionController.isInsertTakeoffValid
+                        visible:    planType==="Plan"?true:false//(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover
+                        onTriggered: {
 
-                                dialog.open()
+                            dialog.open()
 
-                                // if(_planMasterController.currentPlanFile !== "") {
-                                //     _planMasterController.saveToCurrent()
-                                // } else {
-                                //     _planMasterController.saveToSelectedFile1()
-                                // }
-                            }
-                        },
+                            // if(_planMasterController.currentPlanFile !== "") {
+                            //     _planMasterController.saveToCurrent()
+                            // } else {
+                            //     _planMasterController.saveToSelectedFile1()
+                            // }
+                        }
+                    },
                     ToolStripAction {
                         text:       qsTr("Takeoff")
                         iconSource: "/res/takeoff.svg"
@@ -803,96 +805,96 @@ Item {
                         visible:           toolStrip._isRallyLayer || toolStrip._isMissionLayer || toolStrip._isUtmspLayer
                         checkable:          true
                     }
-                //     ToolStripAction {
-                //         text:               _missionController.isROIActive ? qsTr("Cancel ROI") : qsTr("ROI")
-                //         iconSource:         "/qmlimages/MapAddMission.svg"
-                //         enabled:            !_missionController.onlyInsertTakeoffValid
-                //         visible:            planType==="Plan"?false:toolStrip._isMissionLayer && _planMasterController.controllerVehicle.roiModeSupported
-                //         checkable:          !_missionController.isROIActive
-                //         onCheckedChanged:   _addROIOnClick = checked
-                //         onTriggered: {
-                //             if (_missionController.isROIActive) {
-                //                 toolStrip.allAddClickBoolsOff()
-                //                 insertCancelROIAfterCurrent()
-                //             }
-                //         }
-                //         property bool myAddROIOnClick: _addROIOnClick
-                //         onMyAddROIOnClickChanged: checked = _addROIOnClick
-                //     },
-                //     ToolStripAction {
-                //         text:               _singleComplexItem ? _missionController.complexMissionItemNames[0] : qsTr("Pattern")
-                //         iconSource:         "/qmlimages/MapDrawShape.svg"
-                //         enabled:            _missionController.flyThroughCommandsAllowed
-                //         visible:            planType==="Plan"?false:toolStrip._isMissionLayer
-                //         dropPanelComponent: _singleComplexItem ? undefined : patternDropPanel
-                //         onTriggered: {
-                //             toolStrip.allAddClickBoolsOff()
-                //             if (_singleComplexItem) {
-                //                 insertComplexItemAfterCurrent(_missionController.complexMissionItemNames[0])
-                //             }
-                //         }
-                //     },
-                //     ToolStripAction {
-                //         text:       _planMasterController.controllerVehicle.multiRotor ? qsTr("Return") : qsTr("Land")
-                //         iconSource: "/res/rtl.svg"
-                //         enabled:    _missionController.isInsertLandValid
-                //         visible:    planType==="Plan"?false:toolStrip._isMissionLayer || toolStrip._isUtmspLayer
-                //         onTriggered: {
-                //             toolStrip.allAddClickBoolsOff()
-                //             insertLandItemAfterCurrent()
-                //         }
-                //     },
-                //     ToolStripAction {
-                //         text:               qsTr("Center")
-                //         iconSource:         "/qmlimages/MapCenter.svg"
-                //         enabled:            true
-                //         visible:            planType==="Plan"?false:true
-                //         dropPanelComponent: centerMapDropPanel
-                //     }
+                    //     ToolStripAction {
+                    //         text:               _missionController.isROIActive ? qsTr("Cancel ROI") : qsTr("ROI")
+                    //         iconSource:         "/qmlimages/MapAddMission.svg"
+                    //         enabled:            !_missionController.onlyInsertTakeoffValid
+                    //         visible:            planType==="Plan"?false:toolStrip._isMissionLayer && _planMasterController.controllerVehicle.roiModeSupported
+                    //         checkable:          !_missionController.isROIActive
+                    //         onCheckedChanged:   _addROIOnClick = checked
+                    //         onTriggered: {
+                    //             if (_missionController.isROIActive) {
+                    //                 toolStrip.allAddClickBoolsOff()
+                    //                 insertCancelROIAfterCurrent()
+                    //             }
+                    //         }
+                    //         property bool myAddROIOnClick: _addROIOnClick
+                    //         onMyAddROIOnClickChanged: checked = _addROIOnClick
+                    //     },
+                    //     ToolStripAction {
+                    //         text:               _singleComplexItem ? _missionController.complexMissionItemNames[0] : qsTr("Pattern")
+                    //         iconSource:         "/qmlimages/MapDrawShape.svg"
+                    //         enabled:            _missionController.flyThroughCommandsAllowed
+                    //         visible:            planType==="Plan"?false:toolStrip._isMissionLayer
+                    //         dropPanelComponent: _singleComplexItem ? undefined : patternDropPanel
+                    //         onTriggered: {
+                    //             toolStrip.allAddClickBoolsOff()
+                    //             if (_singleComplexItem) {
+                    //                 insertComplexItemAfterCurrent(_missionController.complexMissionItemNames[0])
+                    //             }
+                    //         }
+                    //     },
+                    //     ToolStripAction {
+                    //         text:       _planMasterController.controllerVehicle.multiRotor ? qsTr("Return") : qsTr("Land")
+                    //         iconSource: "/res/rtl.svg"
+                    //         enabled:    _missionController.isInsertLandValid
+                    //         visible:    planType==="Plan"?false:toolStrip._isMissionLayer || toolStrip._isUtmspLayer
+                    //         onTriggered: {
+                    //             toolStrip.allAddClickBoolsOff()
+                    //             insertLandItemAfterCurrent()
+                    //         }
+                    //     },
+                    //     ToolStripAction {
+                    //         text:               qsTr("Center")
+                    //         iconSource:         "/qmlimages/MapCenter.svg"
+                    //         enabled:            true
+                    //         visible:            planType==="Plan"?false:true
+                    //         dropPanelComponent: centerMapDropPanel
+                    //     }
 
-                 ]
+                ]
             }
 
 
             Dialog {
-                            id: dialog
-                            modal: true
-                            dim: true
-                            parent:  Overlay.overlay
-                            anchors.centerIn: parent
-                            width: parent.width * 0.4   // 80% of screen width
-                            height: parent.height * 0.2 // 50% of screen height
-                            background: Rectangle {
-                                color: "white"
-                                radius: 10
-                                border.color: "black"
-                                border.width: 1
-                            }
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 20
-                                width: parent.width * 0.7
+                id: dialog
+                modal: true
+                dim: true
+                parent:  Overlay.overlay
+                anchors.centerIn: parent
+                width: parent.width * 0.4   // 80% of screen width
+                height: parent.height * 0.2 // 50% of screen height
+                background: Rectangle {
+                    color: "white"
+                    radius: 10
+                    border.color: "black"
+                    border.width: 1
+                }
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 20
+                    width: parent.width * 0.7
 
-                                Text {
-                                    text: "Are you sure you want to share the plan?"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    font.pixelSize: 14
-                                }
+                    Text {
+                        text: "Are you sure you want to share the plan?"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 14
+                    }
 
-                                Button {
-                                                text: qsTr("Share")
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                onClicked: {
-                                                    dialog.close()
-                                                    if (_planMasterController.currentPlanFile !== "") {
-                                                        _planMasterController.saveToCurrent()
-                                                    } else {
-                                                        _planMasterController.saveToSelectedFile1()
-                                                    }
-                                                }
-                                            }
+                    Button {
+                        text: qsTr("Share")
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        onClicked: {
+                            dialog.close()
+                            if (_planMasterController.currentPlanFile !== "") {
+                                _planMasterController.saveToCurrent()
+                            } else {
+                                _planMasterController.saveToSelectedFile1()
                             }
                         }
+                    }
+                }
+            }
 
             model: toolStripActionList.model
 
@@ -926,6 +928,7 @@ Item {
         }
         //-------------------------------------------------------
         // Right Panel Controls
+
         Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
@@ -1000,9 +1003,6 @@ Item {
                     highlightMoveDuration: 250
                     visible:            _editingLayer == _layerMission && !planControlColapsed
 
-
-
-
                     // // Remove items with commandName "Takeoff" when the component is completed.
                     // Component.onCompleted:
                     // {
@@ -1015,11 +1015,8 @@ Item {
                     //     }
                     // }
 
-
-
-
-
                     //-- List Elements
+
                     delegate: MissionExpand {
                         //visible: missionItem.commandName !== "Takeoff"
                         map:            editorMap
@@ -1034,7 +1031,7 @@ Item {
                                 _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
                                 missionItemDialog.currentMissionItem = object
                                 missionItemDialog.currentIndex = index
-                                            missionItemDialog.open()
+                                missionItemDialog.open()
                                 missionItemDialog.visible = true
                             }
                         }
@@ -1071,6 +1068,8 @@ Item {
                 visible:                _editingLayer == _layerRallyPoints
                 controller:             _rallyPointController
             }
+
+
             RallyPointItemEditor {
                 id:                     rallyPointEditor
                 anchors.top:            rallyPointHeader.bottom
@@ -1081,6 +1080,8 @@ Item {
                 rallyPoint:             _rallyPointController.currentRallyPoint
                 controller:             _rallyPointController
             }
+
+
             UTMSPAdapterEditor{
                 id: utmspEditor
                 enabled:                 _utmspEnabled
@@ -1096,10 +1097,8 @@ Item {
                 triggerSubmitButton:     _triggerSubmit
                 resetRegisterFlightPlan: _resetRegisterFlightPlan
             }
+
         }
-
-
-
 
         QGCLabel {
             // Elevation provider notice on top of terrain plot
@@ -1113,9 +1112,6 @@ Item {
             font.pointSize:             ScreenTools.smallFontPointSize
             text:                       qsTr("Powered by %1").arg(_licenseString)
         }
-
-
-
 
         Dialog {
             id: missionItemDialog
@@ -1193,8 +1189,8 @@ Item {
 
                             onClicked: (sequenceNumber) => {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                                // Optional
-                            }
+                                           // Optional
+                                       }
 
                             onRemove: {
                                 var removeVIIndex = missionItemDialog.currentIndex
@@ -1215,188 +1211,165 @@ Item {
         }
 
 
-        Item{
-            id:editdata
-            visible: true
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.bottomMargin: 20
-            anchors.leftMargin: 20
+        Item {
+                   id: editdata
+                   anchors.bottom: parent.bottom
+                   anchors.left: parent.left
+                   anchors.bottomMargin: 20
+                   anchors.leftMargin: 20
 
+                   Rectangle {
+                       width: 100
+                       height: 50
+                       color: "transparent"
+                       anchors.bottom: parent.bottom
+                       anchors.left: parent.left
+                       anchors.bottomMargin: 20
+                       anchors.leftMargin: 20
 
-            Rectangle {
-                width: 100
-                height: 50
-                color: "transparent"
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.bottomMargin: 20
-                anchors.leftMargin: 20
+                       Rectangle {
+                           anchors.centerIn: parent
+                           color: "#1b1c3e" // light purple
+                           radius: 20
+                           height: 40
+                           width: childrenRect.width + 20
+                           anchors.horizontalCenter: parent.horizontalCenter
 
-                Rectangle {
-                    anchors.centerIn: parent
-                    color: "#1b1c3e" // light purple
-                    radius: 20
-                    height: 40
-                    width: childrenRect.width + 20
-                    anchors.horizontalCenter: parent.horizontalCenter
+                           Row {
+                               anchors.centerIn: parent
+                               spacing: 10
 
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 10
+                               Button {
+                                   text: "Upload"
+                                   contentItem: Text {
+                                       text: parent.text
+                                       font: parent.font
+                                       color: "white" // Set text color
+                                   }
+                                   font.bold : true
+                                   background: Rectangle { color: "transparent" }
+                                   onClicked: {
+                                       console.log("Upload_data")
+                                       if (_utmspEnabled) {
+                                           QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+                                           UTMSPStateStorage.removeFlightPlanState = true
+                                           UTMSPStateStorage.indicatorDisplayStatus = true
+                                       }
+                                       _planMasterController.upload();
+                                   }
+                               }
 
+                               // ADD THE EDIT BUTTON HERE
+                               Button {
+                                   id: editButton
+                                   text: "Edit"
+                                   visible: MapGlobals.share_edit_visibility
 
+                                   // Set padding for the button (space between background border and content)
+                                   padding: 15
 
-                        // Buttons with separators
-                        // Button {
-                        //     text: "Cancel"
-                        //     contentItem: Text {
-                        //         text: parent.text
-                        //         font: parent.font
-                        //         color: "white" // Set text color
+                                   // Set the button size to accommodate icon + padding
+                                   implicitWidth: 46
+                                   implicitHeight: 46
 
-                        //     }
-                        //     font.bold: true
-                        //     background: Rectangle { color: "transparent" }
-                        //     onClicked:{
-                        //         if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
-                        //             mainWindow.cameraView()
-                        //         }else{
-                        //             if (planType === "Plan") {
-                        //                                     mainWindow.showFlyView()
-                        //                                 } else {
-                        //                                     mainWindow.showFlyView1()
-                        //                                 }
-                        //         }
-                        //     }
-                        // }
+                                   // Styling properties
+                                   background: Rectangle {
+                                       radius: width / 2 // Makes it perfectly round (circle)
+                                       color: "#1b1c3e" // light purple
+                                       border.color: "#005BBB"
+                                       border.width: 2
+                                       anchors.fill: parent
+                                       anchors.margins: 5 // External padding
+                                   }
 
+                                   contentItem: QGCColoredImage {
+                                       source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                                       width: 16
+                                       height: 16
+                                       anchors.centerIn: parent
+                                       color: "white"
+                                   }
 
-
-                        // Label { text: "|"
-                        //     color: "white"
-                        //     font.bold: true
-                        // }
-
-                        // Button {
-                        //     text: "Edit"
-                        //     font.bold: true
-                        //     background: Rectangle { color: "transparent" }
-                        //     onClicked: {
-                        //         transect.edit1()
-                        //     }
-                        // }
-                        // Label { text: "|" }
-
-                        // Button {
-                        //     text: "Split"
-                        //     font.bold: true
-                        //     background: Rectangle { color: "transparent" }
-                        // }
-                        // Label { text: "|" }
-
-                        // Button {
-                        //     text: "Push Plot"
-                        //     font.bold: true
-                        //     background: Rectangle { color: "transparent" }
-                        // }
-                        // Label { text: "|" }
-
-                        Button {
-                            text: "Share"
-                            contentItem: Text {
-                                text: parent.text
-                                font: parent.font
-                                color: "white" // Set text color
-
-                            }
-                            font.bold: true
-                            background: Rectangle { color: "transparent" }
-                            onClicked:{
-                                //dialog.open()
-                                //customdialog.createObject(mainWindow).open()
-                                console.log("shared_data")
-                                if (_utmspEnabled) {
-                                    QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                                    UTMSPStateStorage.removeFlightPlanState = true
-                                    UTMSPStateStorage.indicatorDisplayStatus = true
-                                }
-                                //_planMasterController.removeAll()
-                                _planMasterController.upload();
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-
+                                   onClicked: {
+                                       console.log("Edit button clicked in PlanView.qml")
+                                       // Add your edit functionality here
+                                       // For example, you might want to trigger editing mode
+                                       // or show an edit dialog
+                                       if (_missionController && _missionController.visualItems.count > 0) {
+                                           // Example: set the first item as current for editing
+                                           _missionController.setCurrentItem(0);
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
 
         Component{
             id: customdialog
 
 
 
-        Item {
-            id: customDialogItem
-            parent: Overlay.overlay
-            anchors.centerIn: parent
-            width: 600
-            height: 200
+            Item {
+                id: customDialogItem
+                parent: Overlay.overlay
+                anchors.centerIn: parent
+                width: 600
+                height: 200
 
-            Rectangle {
-                anchors.fill: parent
-                radius: 20
-                color: "#80ffffff"
-                border.color: "#ccccff"
-                border.width: 2
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 20
+                    color: "#80ffffff"
+                    border.color: "#ccccff"
+                    border.width: 2
 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 20
-                    anchors.margins: 20
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 20
+                        anchors.margins: 20
 
-                    // Centered Title
-                    Label {
-                        text: qsTr("Are you sure you want to share the plan?")
-                        font.bold: true
-                        font.pointSize: 16
-                        horizontalAlignment: Text.AlignHCenter
-                        width: parent.width
-                    }
-
-                    // Buttons Row
-                    Row {
-                        spacing: 30
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        Button {
-                            text: " Share"
-                            width: 100
-                            height: 34
+                        // Centered Title
+                        Label {
+                            text: qsTr("Are you sure you want to share the plan?")
                             font.bold: true
-                            background: Rectangle {
-                                radius: 20
-                                color: "#ccccff"
-                            }
-                            onClicked: {
-                                if (_planMasterController.currentPlanFile !== "") {
-                                    _planMasterController.saveToCurrent()
-                                } else {
-                                    _planMasterController.saveToSelectedFile1()
+                            font.pointSize: 16
+                            horizontalAlignment: Text.AlignHCenter
+                            width: parent.width
+                        }
+
+                        // Buttons Row
+                        Row {
+                            spacing: 30
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            Button {
+                                text: " Share"
+                                width: 100
+                                height: 34
+                                font.bold: true
+                                background: Rectangle {
+                                    radius: 20
+                                    color: "#ccccff"
                                 }
-                                customDialogItem.visible=false;
+                                onClicked: {
+                                    if (_planMasterController.currentPlanFile !== "") {
+                                        _planMasterController.saveToCurrent()
+                                    } else {
+                                        _planMasterController.saveToSelectedFile1()
+                                    }
+                                    customDialogItem.visible=false;
+                                }
+
                             }
+
 
                         }
 
-
                     }
-
                 }
             }
-        }
 
 
         }
@@ -1466,8 +1439,6 @@ Item {
             }
         }
     }
-
-
 
     function clearButtonClicked() {
         mainWindow.showMessageDialog(qsTr("Clear"),
@@ -1749,32 +1720,33 @@ Item {
             }
         }
     }
+
     function newmap() {
 
 
         var creator = _planMasterController.planCreators[0] // or selectedPlanCreator
-                if (creator) {
-                    var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
-                                               editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
-                    var centerCoord = editorMap.toCoordinate(centerPoint, false)
-                    creator.createPlan(centerCoord)
-                    console.log("No plan creator available1")
-                } else {
-                    console.log("No plan creator available")
-                }
+        if (creator) {
+            var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
+                                       editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
+            var centerCoord = editorMap.toCoordinate(centerPoint, false)
+            creator.createPlan(centerCoord)
+            console.log("No plan creator available1")
+        } else {
+            console.log("No plan creator available")
+        }
     }
 
     function _mapCenter() {
         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2), editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
         return editorMap.toCoordinate(centerPoint, false /* clipToViewPort */)
     }
+
     Connections {
         target: utmspEditor
         function onVehicleIDSent(id) {
             _vehicleID = id
         }
     }
-
 
     Connections {
         target: utmspEditor

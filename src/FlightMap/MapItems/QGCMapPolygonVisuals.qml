@@ -131,7 +131,7 @@ Item {
     }
 
     function addEditingVisuals() {
-         console.log("new_addEditingVisuals()")
+        console.log("new_addEditingVisuals()")
         if (_objMgrEditingVisuals.empty) {
             _objMgrEditingVisuals.createObjects(
                         [ dragHandlesComponent, splitHandlesComponent, centerDragHandleComponent, edgeLengthHandlesComponent ],
@@ -148,7 +148,7 @@ Item {
 
 
     function addToolbarVisuals() {
-         console.log("new_addToolbarVisuals")
+        console.log("new_addToolbarVisuals")
         if (_objMgrToolVisuals.empty) {
             var toolbar = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
             toolbar.z = QGroundControl.zOrderWidgets
@@ -255,7 +255,7 @@ Item {
             addEditingVisuals()
             addToolbarVisuals()
         } else {
-             console.log("new_interactive_else")
+            console.log("new_interactive_else")
             //mapPolygon.traceMode = false
             removeEditingVisuals()
             removeToolVisuals()
@@ -272,8 +272,6 @@ Item {
             _savedVertices.push(mapPolygon.vertexCoordinate(i))
         }
         console.log("_savedCircleMode",_savedCircleMode)
-
-
     }
 
     function edit() {
@@ -1160,7 +1158,8 @@ Item {
                             color: "#ccccff"
                         }
                         onClicked: {
-
+                            mainWindow.showFlyView()
+                            MapGlobals.editdialog = "editdialog1"
                         }
 
                     }
@@ -1639,11 +1638,9 @@ Item {
                                     _saveCurrentVertices()
                                     _circleMode = false
                                     mapPolygon.traceMode = true
-                                    if(MapGlobals.mark_with === "KML_File" ){
-
+                                    if(MapGlobals.mark_with !== "KML_File" ){
+                                        mapPolygon.clear()
                                     }
-
-                                    mapPolygon.clear()
                                     customDialogItem.visible = false
                                     MapGlobals.editdialog = "editdialog1"
                                 }

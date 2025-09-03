@@ -45,6 +45,9 @@ RowLayout {
 
     QGCButton {
         text:       qsTr("Edit")
-        onClicked:  control.clicked()
+        onClicked:  {
+            console.log("Edit in OfflineMapInfo.qml")
+            control.clicked()
+        }
     }
 }

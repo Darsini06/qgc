@@ -21,9 +21,11 @@ Rectangle {
     id:         _root
     width:      ScreenTools.defaultFontPixelWidth * 35
     height:     mainLayout.height + (_margins * 2)
-    radius:     ScreenTools.defaultFontPixelWidth / 2
-    color:      qgcPal.window
+    radius:     20//ScreenTools.defaultFontPixelWidth / 2
+    color:      "#1b1c3e"//qgcPal.window
     visible:    _utmspEnabled === true ? utmspSliderTrigger: false
+    border.width: 2//width * 0.05
+    border.color: "#005BBB"
 
     property var    guidedController
     property var    guidedValueSlider
@@ -56,6 +58,29 @@ Rectangle {
             confirmCancelled()
         }
     }
+
+        Rectangle {
+            width: 36
+            height: 36
+            radius: 18
+            color: "red"//qgcPal.primaryButton
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: 4
+
+            QGCColoredImage {
+                anchors.margins: 10
+                anchors.fill: parent
+                source: "/res/XDelete.svg"
+                fillMode: Image.PreserveAspectFit
+                color: "white"//qgcPal.text
+            }
+
+            QGCMouseArea {
+                fillItem: parent
+                onClicked: confirmCancelled()
+            }
+        }
 
     function show(immediate) {
         if (immediate) {
@@ -100,6 +125,7 @@ Rectangle {
             wrapMode:               Text.WordWrap
             font.pointSize:         ScreenTools.defaultFontPointSize
             font.bold:              true
+            color:"white"
         }
 
         QGCCheckBox {
@@ -113,32 +139,134 @@ Rectangle {
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth
 
-            SliderSwitch {
-                id:                 slider
-                confirmText:        ScreenTools.isMobile ? qsTr("Slide to confirm") : qsTr("Slide or hold spacebar")
-                Layout.fillWidth:   true
-                enabled: _utmspEnabled === true? utmspSliderTrigger : true
-                opacity: if(_utmspEnabled){utmspSliderTrigger === true ? 1 : 0.5} else{1}
+            Item {
+                        Layout.fillWidth: true
+                        height: 100
 
-                onAccept: {
-                    _root.visible = false
-                    var sliderOutputValue = 0
-                    if (guidedValueSlider.visible) {
-                        sliderOutputValue = guidedValueSlider.getOutputValue()
-                        guidedValueSlider.visible = false
-                    }
-                    hideTrigger = false
-                    guidedController.executeAction(_root.action, _root.actionData, sliderOutputValue, _root.optionChecked)
-                    if (mapIndicator) {
-                        mapIndicator.actionConfirmed()
-                        mapIndicator = undefined
+                        Rectangle {
+                            id: circularButton
+                            width: 100
+                            height: 100
+                            radius: 50
+                            color: "white"
+                            border.color: "#6a6af8"
+                            border.width: 2
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.verticalCenter: parent.verticalCenter
+
+                                QGCLabel {
+                                    id:                     messageText12
+                                    anchors.centerIn: parent
+                                       horizontalAlignment: Text.AlignHCenter
+                                       verticalAlignment: Text.AlignVCenter
+                                    wrapMode:               Text.WordWrap
+                                    font.pointSize:         ScreenTools.defaultFontPointSize
+                                    font.bold:              true
+                                    text:       qsTr("Press here")
+                                }
+
+                            MouseArea {
+                                id: holdArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+
+                                onPressed: progressTimer.start()
+                                onReleased: {
+                                    progressTimer.stop()
+                                    progressState.value = 0
+                                    progressCircle.requestPaint()
+                                }
+                                onEntered: circularButton.color = "#ccccff"
+                                onExited: circularButton.color = "white"
+                            }
+
+                            Canvas {
+                                id: progressCircle
+                                width: parent.width
+                                height: parent.height
+                                anchors.centerIn: parent
+
+                                onPaint: {
+                                    var ctx = getContext("2d")
+                                    ctx.clearRect(0, 0, width, height)
+                                    ctx.beginPath()
+                                    ctx.arc(width / 2, height / 2, 35, -Math.PI / 2, (2 * Math.PI * progressState.value) - Math.PI / 2, false)
+                                    ctx.lineWidth = 6
+                                    ctx.strokeStyle = "#2323f2"
+                                    ctx.stroke()
+                                }
+                            }
+                        }
+
+
                     }
 
-                    UTMSPStateStorage.indicatorOnMissionStatus = true
-                    UTMSPStateStorage.currentNotificationIndex = 7
-                    UTMSPStateStorage.currentStateIndex = 3
-                }
-            }
+                    Timer {
+                        id: progressTimer
+                        interval: 100
+                        repeat: true
+                        onTriggered: {
+                            if (progressState.value < 1.0) {
+                                progressState.value += 0.1
+                                progressCircle.requestPaint()
+                            } else {
+                                progressTimer.stop()
+                                progressState.value = 0
+                                progressCircle.requestPaint()
+
+                                console.log("QGCLabel clicked")
+
+
+                                _root.visible = false
+                                var sliderOutputValue = 0
+                                if (guidedValueSlider.visible) {
+                                    sliderOutputValue = guidedValueSlider.getOutputValue()
+                                    guidedValueSlider.visible = false
+                                }
+                                hideTrigger = false
+                                guidedController.executeAction(_root.action, _root.actionData, sliderOutputValue, _root.optionChecked)
+                                if (mapIndicator) {
+                                    mapIndicator.actionConfirmed()
+                                    mapIndicator = undefined
+                                }
+
+                                UTMSPStateStorage.indicatorOnMissionStatus = true
+                                UTMSPStateStorage.currentNotificationIndex = 7
+                                UTMSPStateStorage.currentStateIndex = 3
+                            }
+                        }
+                    }
+
+            // SliderSwitch {
+            //     id:                 slider
+            //     confirmText:        ScreenTools.isMobile ? qsTr("Slide to confirm") : qsTr("Slide or hold spacebar")
+            //     Layout.fillWidth:   true
+            //     enabled: _utmspEnabled === true? utmspSliderTrigger : true
+            //     opacity: if(_utmspEnabled){utmspSliderTrigger === true ? 1 : 0.5} else{1}
+
+            //     onAccept: {
+
+            //         console.log("QGCLabel clicked")
+
+
+            //         _root.visible = false
+            //         var sliderOutputValue = 0
+            //         if (guidedValueSlider.visible) {
+            //             sliderOutputValue = guidedValueSlider.getOutputValue()
+            //             guidedValueSlider.visible = false
+            //         }
+            //         hideTrigger = false
+            //         guidedController.executeAction(_root.action, _root.actionData, sliderOutputValue, _root.optionChecked)
+            //         if (mapIndicator) {
+            //             mapIndicator.actionConfirmed()
+            //             mapIndicator = undefined
+            //         }
+
+            //         UTMSPStateStorage.indicatorOnMissionStatus = true
+            //         UTMSPStateStorage.currentNotificationIndex = 7
+            //         UTMSPStateStorage.currentStateIndex = 3
+            //     }
+            // }
 
             Rectangle {
                 height: slider.height * 0.75
@@ -162,4 +290,3 @@ Rectangle {
         }
     }
 }
-

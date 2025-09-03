@@ -29,13 +29,14 @@ QtObject {
 
     property string kmlPath: ""
 
+    property bool share_edit_visibility : false
 
 
     function recenterMap() {
-            if (activeFlightMap && gcsPosition.isValid) {
-                activeFlightMap.center = gcsPosition
-                activeFlightMap.zoomLevel = 15
-            }
+        if (activeFlightMap && gcsPosition.isValid) {
+            activeFlightMap.center = gcsPosition
+            activeFlightMap.zoomLevel = 15
         }
+    }
 
 }

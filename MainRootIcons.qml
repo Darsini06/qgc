@@ -28,6 +28,8 @@ Row {
 
     property var flightMap
 
+    property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
+
     spacing: 10  // Space between icons
 
     Component.onCompleted: {
@@ -171,7 +173,7 @@ Row {
             anchors.fill: parent
             onClicked: {
 
-               iconsContainer.visible = false;
+                iconsContainer.visible = false;
 
                 if (!_mapProviderFact || !_mapTypeFact) {
                     console.error("Map provider or map type fact is not defined.");
@@ -347,14 +349,20 @@ Row {
                         anchors.fill: parent
                         onClicked: {
                             console.log("DroneRedirect clicked");
-                            MapGlobals.forceRecenter = true;
-                            MapGlobals.recenterInterval = 0;
-                            iconsContainer.visible = false;
 
-                            Qt.callLater(function() {
-                                MapGlobals.recenterInterval = 10000;
-                                MapGlobals.forceRecenter = false;
-                            });
+                            if(_activeVehicle){
+                                MapGlobals.forceRecenter = true;
+                                MapGlobals.recenterInterval = 0;
+
+                                Qt.callLater(function() {
+                                    MapGlobals.recenterInterval = 10000;
+                                    MapGlobals.forceRecenter = false;
+                                });
+                            }else {
+                                mainWindow.showToastMessage("Drone Not Connected");
+                            }
+
+                            iconsContainer.visible = false;
                         }
                     }
                 }
@@ -373,10 +381,12 @@ Row {
                             console.log("MapRedirect1 clicked");
                             MapGlobals.recenterMap();
 
-                            if(flightMap && flightMap.gcsPosition.isValid) {
-                                flightMap.center = flightMap.gcsPosition;
-                            }
+                            if(flightMap && flightMap.gcsPosition.isValid){
 
+                                flightMap.center = flightMap.gcsPosition;
+                            }/*else{
+                                mainWindow.showToastMessage("GPS Not Showed");
+                            }*/
                             iconsContainer.visible = false;
                         }
                     }

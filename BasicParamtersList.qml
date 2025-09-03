@@ -191,7 +191,7 @@ Item {
                 anchors.right:  parent.right
                 text:           qsTr("Tools")
                 onClicked:      toolsMenu.popup()
-                visible: false
+                visible: true
             }
 
             QGCMenu {

@@ -21,9 +21,6 @@ import MapGlobals 1.0
 /// Base control for both Survey and Corridor Scan map visuals
 Item {
     id: _root
-
-
-
     property var    map                                                 ///< Map control to place item in
     property bool   polygonInteractive: true
     property bool   interactive: true
@@ -48,7 +45,7 @@ Item {
     signal clicked(int sequenceNumber)
 
     function _addVisualElements() {
-         console.log("edited")
+        console.log("edited")
         var toAdd = [ fullTransectsComponent, entryTransectComponent, exitTransectComponent, entryPointComponent, exitPointComponent,
                      entryArrow1Component, entryArrow2Component, exitArrow1Component, exitArrow2Component ]
         objMgr.createObjects(toAdd, map, true /* parentObjectIsMap */)
@@ -58,7 +55,7 @@ Item {
     function edit1() {
 
         if(_root.interactive) {
-        clicked(_missionItem.sequenceNumber)
+            clicked(_missionItem.sequenceNumber)
         }
 
 
@@ -126,6 +123,8 @@ Item {
             opacity:    _root.opacity
         }
     }
+
+
     Component {
         id: exitTransectComponent
 
@@ -156,11 +155,11 @@ Item {
                 onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
 
                 Component.onCompleted: {
-                        // Automatically trigger the clicked behavior if condition is true
-                        if (_root.interactive) {
-                            _root.clicked(_missionItem.sequenceNumber)
-                        }
+                    // Automatically trigger the clicked behavior if condition is true
+                    if (_root.interactive) {
+                        _root.clicked(_missionItem.sequenceNumber)
                     }
+                }
             }
         }
     }
@@ -235,17 +234,51 @@ Item {
                 onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
 
                 Component.onCompleted: {
-                        // Automatically trigger the clicked behavior if condition is true
-                        if (_root.interactive) {
-                            _root.clicked(_missionItem.sequenceNumber)
-                        }
+                    // Automatically trigger the clicked behavior if condition is true
+                    if (_root.interactive) {
+                        _root.clicked(_missionItem.sequenceNumber)
                     }
+                }
             }
         }
     }
 
-    Button  {
+    Button {
         text: "Edit"
-        onClicked: if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+        visible: MapGlobals.share_edit_visibility
+
+        // Set padding for the button (space between background border and content)
+        padding: 15  // This adds 10px padding inside the button around the icon
+
+        // Set the button size to accommodate icon + padding
+        implicitWidth: 46  // icon width (16) + padding (10*2 = 20) = 36
+        implicitHeight: 46 // icon height (16) + padding (10*2 = 20) = 36
+
+        // Styling properties
+        background: Rectangle {
+            radius: width / 2 // Makes it perfectly round (circle)
+            color: "#1b1c3e" // light purple
+            border.color: "#005BBB"
+            border.width: 2
+
+            // Add external padding by making the background smaller than the button
+            anchors.fill: parent
+            anchors.margins: 5 // This creates 5px external padding around the rounded rectangle
+        }
+
+        contentItem: QGCColoredImage {
+            source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+            width: 16
+            height: 16
+            anchors.centerIn: parent // Center the icon within the container
+            color: "white"
+        }
+
+        onClicked: {
+            console.log("Edit in TransectStyleMapVisuals.qml")
+            if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+        }
     }
+
 }
+

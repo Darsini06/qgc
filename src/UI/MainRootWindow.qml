@@ -73,7 +73,6 @@ ApplicationWindow {
     property bool longPressTriggered: false
     property real progressValue: 0.0
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
-    property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
     property var    _flyViewSettings:           QGroundControl.settingsManager.flyViewSettings
     property var    _unitsConversion:           QGroundControl.unitsConversion
     property var _guidedController: globals.guidedControllerFlyView
@@ -432,6 +431,7 @@ ApplicationWindow {
                             font.bold: true
                             color: "black"
                         }
+
                         Text {
                             text: "(" + username + " - " + email + ")"
                             color: "black"
@@ -518,7 +518,6 @@ ApplicationWindow {
 
             // Content area with padding
             Item {
-
                 width: parent.width
                 height: parent.height - (titleLabel.implicitHeight + 14)
                 anchors.margins: 0
@@ -1348,7 +1347,7 @@ ApplicationWindow {
             // Change all parameters
             for (var i = 0; i < parameterMap.length; i++) {
                 var paramInfo = parameterMap[i]
-                var fact = _activeVehicle.getParameterFact(-1, paramInfo.name)
+                var fact = activeVehicle.getParameterFact(-1, paramInfo.name)
                 if (fact) {
                     fact.value = paramInfo.value
                     console.log("Set parameter", paramInfo.name, "to", paramInfo.value)
@@ -1389,7 +1388,7 @@ ApplicationWindow {
             radius: width / 2            // Circle
             color: "#1b1c3e"
             visible: false
-            border.width: width * 0.1    // 10% of button width
+            border.width: width * 0.05    // 10% of button width
             border.color: "#005BBB"
 
             QGCColoredImage {
@@ -1407,12 +1406,9 @@ ApplicationWindow {
                     if(_appSettings.screen==="Plan"){
                         planView.loaddata()
 
-
                     }else{
                         planView.loaddata1()
                     }
-
-
                 }
             }
         }
@@ -1479,8 +1475,6 @@ ApplicationWindow {
             }
         }
 
-
-
         Rectangle {
             id: waypointbtn
             Layout.alignment: Qt.AlignLeft
@@ -1491,8 +1485,6 @@ ApplicationWindow {
             visible:  false
             border.width: width * 0.05
             border.color: "#005BBB"
-
-
 
             QGCColoredImage {
                 id: waypointbtnicon1
@@ -1775,7 +1767,7 @@ ApplicationWindow {
                 }
 
                 QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/edit-pencile.svg"
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
                     width: 16
                     height: 16
                     anchors.top: parent.top
@@ -2015,9 +2007,9 @@ ApplicationWindow {
         UTMSPStateStorage.currentStateIndex = 3
 
         var valueInMeters = _unitsConversion.appSettingsVerticalDistanceUnitsToMeters(sliderOutputValue)
-        _activeVehicle.guidedModeTakeoff(valueInMeters)
+        activeVehicle.guidedModeTakeoff(valueInMeters)
 
-        if( _activeVehicle.armed){
+        if( activeVehicle.armed){
 
             rtlbtn.visible=true
             takeoffbtn.visible=false
@@ -2032,7 +2024,7 @@ ApplicationWindow {
 
     function executeAction2() {
         console.log("Button long-pressed! Action executed.1")
-        _activeVehicle.guidedModeRTL(false)
+        activeVehicle.guidedModeRTL(false)
         rtlbtn.visible=false
         takeoffbtn.visible=true
 
@@ -2429,6 +2421,7 @@ ApplicationWindow {
                     MapGlobals.kmlPath = localPath
                     MapGlobals.mark_with = "KML_File"
                     MapGlobals.edit = "edit"
+                    MapGlobals.share_edit_visibility = false
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
@@ -2527,6 +2520,7 @@ ApplicationWindow {
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
                         MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
                         mainWindow.showPlanView()
                         dialog.visible = false
                         planView.data1()
@@ -2578,11 +2572,20 @@ ApplicationWindow {
                     }
 
                     onClicked: {
-                        MapGlobals.mark_with = "Mark_With_Drone"
-                        MapGlobals.edit = "edit"
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
+
+                        if(activeVehicle){
+                            MapGlobals.mark_with = "Mark_With_Drone"
+                            MapGlobals.edit = "edit"
+                            mainWindow.showPlanView()
+                            dialog.visible = false
+                            planView.data1()
+                        }else {
+                         dialog.visible = false
+                         mainWindow.showToastMessage("Drone Not Connected");
+                        }
+
+                        MapGlobals.share_edit_visibility = false
+
                     }
                 }
 
@@ -2632,12 +2635,12 @@ ApplicationWindow {
                     onClicked: {
                         MapGlobals.mark_with = "Mark_With_GPS"
                         MapGlobals.edit = "edit"
+                        MapGlobals.share_edit_visibility = false
                         mainWindow.showPlanView()
                         dialog.visible = false
                         planView.data1()
                     }
                 }
-
 
                 Button {
                     Layout.alignment: Qt.AlignHCenter
@@ -3005,6 +3008,7 @@ ApplicationWindow {
 
                             }
                         }
+
                         SubMenuButton {
                             id:                 analyzeButton1
                             height:             toolSelectDialog._toolButtonHeight
@@ -3016,6 +3020,7 @@ ApplicationWindow {
 
                             }
                         }
+
                         SubMenuButton {
                             id:                 analyzeButton2
                             height:             toolSelectDialog._toolButtonHeight
@@ -3027,6 +3032,7 @@ ApplicationWindow {
 
                             }
                         }
+
                         SubMenuButton {
                             id:                 analyzeButton7
                             height:             toolSelectDialog._toolButtonHeight
@@ -3038,9 +3044,6 @@ ApplicationWindow {
 
                             }
                         }
-
-
-
                     }
                 }
             }
@@ -3146,18 +3149,18 @@ ApplicationWindow {
     //-------------------------------------------------------------------------
     //-- Critical Vehicle Message Popup
 
-    function showCriticalVehicleMessage(message) {
-        indicatorPopup.close()
-        if (criticalVehicleMessagePopup.visible || QGroundControl.videoManager.fullScreen) {
-            // We received additional wanring message while an older warning message was still displayed.
-            // When the user close the older one drop the message indicator tool so they can see the rest of them.
-            criticalVehicleMessagePopup.dropMessageIndicatorOnClose = true
-        } else {
-            criticalVehicleMessagePopup.criticalVehicleMessage      = message
-            criticalVehicleMessagePopup.dropMessageIndicatorOnClose = false
-            criticalVehicleMessagePopup.open()
-        }
-    }
+    // function showCriticalVehicleMessage(message) {
+    //     indicatorPopup.close()
+    //     if (criticalVehicleMessagePopup.visible || QGroundControl.videoManager.fullScreen) {
+    //         // We received additional wanring message while an older warning message was still displayed.
+    //         // When the user close the older one drop the message indicator tool so they can see the rest of them.
+    //         criticalVehicleMessagePopup.dropMessageIndicatorOnClose = true
+    //     } else {
+    //         criticalVehicleMessagePopup.criticalVehicleMessage      = message
+    //         criticalVehicleMessagePopup.dropMessageIndicatorOnClose = false
+    //         criticalVehicleMessagePopup.open()
+    //     }
+    // }
 
     Popup {
         id:                 criticalVehicleMessagePopup
@@ -3280,6 +3283,7 @@ ApplicationWindow {
             height: loader.height
             color:  Qt.rgba(0,0,0,0)
         }
+
         Loader {
             id:             loader
             onLoaded: {
@@ -3290,13 +3294,16 @@ ApplicationWindow {
                 indicatorPopup.x = centerX
             }
         }
+
         onOpened: {
             loader.sourceComponent = indicatorPopup.currentIndicator
         }
+
         onClosed: {
             loader.sourceComponent = null
             indicatorPopup.currentIndicator = null
         }
+
     }
 
     //-------------------------------------------------------------------------
@@ -3389,13 +3396,13 @@ ApplicationWindow {
                     fillItem: parent
                     onClicked: {
                         if(!activeVehicle){
-                        //indicatorDrawer._expanded = true
-                        mainWindow.showToolSelectDialog1(4)
-                        mainWindow.closeIndicatorDrawer()
+                            //indicatorDrawer._expanded = true
+                            mainWindow.showToolSelectDialog1(4)
+                            mainWindow.closeIndicatorDrawer()
                         }else{
-                        indicatorDrawer._expanded = true
-                        //mainWindow.showToolSelectDialog1(4)
-                        mainWindow.closeIndicatorDrawer()
+                            indicatorDrawer._expanded = true
+                            //mainWindow.showToolSelectDialog1(4)
+                            mainWindow.closeIndicatorDrawer()
                         }
                     }
                 }
