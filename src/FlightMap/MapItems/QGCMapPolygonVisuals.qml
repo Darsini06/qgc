@@ -950,7 +950,6 @@ Item {
                 }
             }
 
-
             PlanEditToolbar {
                 id: toolbar
                 anchors.horizontalCenter: mapControl.left
@@ -1030,162 +1029,196 @@ Item {
             }
 
 
-            RowLayout {
+            // Top-right buttons (Boundary + Obstacle)
+                   Column {
+                       //anchors.top: parent.top
+                       anchors.right: parent.right
+                       spacing: 0
+                       visible: mapPolygon.traceMode
 
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.topMargin: 50
-                anchors.rightMargin: 20
-                spacing: 20
-                visible: mapPolygon.traceMode
+                       Button  {
+                           id: boundryMarkingBtn
+                           text: ""
+                           width: 46
+                           height: 46
+
+                           padding: 15
+
+                           background: Rectangle {
+                               radius: width / 2
+                               color: "#1b1c3e"
+                               border.color: "#005BBB"
+                               border.width: 2
+                               anchors.fill: parent
+                               anchors.margins: 3
+                           }
+
+                           contentItem: QGCColoredImage {
+                               source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                               width: 16
+                               height: 16
+                               anchors.centerIn: parent // Center the icon within the container
+                               color: "white"
+                           }
+                           onClicked: {
+
+                                                       if(MapGlobals.mark_with === "Mark_With_GPS") {
+
+                                                           console.log("Mark_With_GPS")
+                                                           if (gcsPosition.isValid) {
+
+                                                               mapPolygon.appendVertex(gcsPosition)
+
+                                                               // if (mapPolygon) {
+                                                               // mapPolygon.appendVertex(gcsPosition)
+
+                                                               // if (isObstacleMode) {
+                                                               // addObstacleVisual()
+                                                               // } else {
+                                                               // addCommonVisuals()
+                                                               // }
+                                                               // }
+                                                           }
+
+                                                       }
+
+                                                       else if (MapGlobals.mark_with === "Mark_With_Drone"){
+
+                                                           console.log("Mark_With_Drone")
+                                                           if (activeVehicle && activeVehicleCoordinate.isValid) {
+
+                                                               mapPolygon.appendVertex(activeVehicleCoordinate)
+
+                                                               // if (mapPolygon) {
+                                                               // mapPolygon.appendVertex(activeVehicleCoordinate)
+                                                               // if (isObstacleMode) {
+                                                               // addObstacleVisual()
+                                                               // } else {
+                                                               // addCommonVisuals()
+                                                               // }
+                                                               // }
+                                                           }
+
+                                                       }
+
+                                                       else {
+                                                           console.log("Mark_With_Manual")
+                                                           // Convert the bottom-center point of controlImage to mapControl's coordinate space.
+                                                           var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
+                                                           // Then convert that point (in pixels) to a geographic coordinate.
+                                                           var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
+                                                           mapPolygon.appendVertex(bottomCoord)
 
 
-                Column {
-                    spacing: 10
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.center
-                    anchors.bottomMargin: 20
-                    visible: mapPolygon.traceMode
+                                                           // if (mapPolygon) {
+                                                           // mapPolygon.appendVertex(bottomCoord)
 
-                    Button  {
-                        text: " Boundry Marking "
-                        height: 34
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
+                                                           // if (isObstacleMode) {
+                                                           // addObstacleVisual()
+                                                           // } else {
+                                                           // addCommonVisuals()
+                                                           // }
+                                                           // }
 
-                            if(MapGlobals.mark_with === "Mark_With_GPS") {
+                                                       }
 
-                                console.log("Mark_With_GPS")
-                                if (gcsPosition.isValid) {
+                                                   }
+                       }
 
-                                    mapPolygon.appendVertex(gcsPosition)
+                       Button {
+                           id: obstacleBtn
+                           text: ""
+                           width: 46
+                           height: 46
 
-                                    // if (mapPolygon) {
-                                    // mapPolygon.appendVertex(gcsPosition)
+                           padding: 15
 
-                                    // if (isObstacleMode) {
-                                    // addObstacleVisual()
-                                    // } else {
-                                    // addCommonVisuals()
-                                    // }
-                                    // }
-                                }
+                           background: Rectangle {
+                               radius: width / 2
+                               color: "#1b1c3e"
+                               border.color: "#005BBB"
+                               border.width: 2
+                               anchors.fill: parent
+                               anchors.margins: 3
+                           }
 
-                            }
+                           contentItem: QGCColoredImage {
+                               source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                               width: 16
+                               height: 16
+                               anchors.centerIn: parent // Center the icon within the container
+                               color: "white"
+                           }
 
-                            else if (MapGlobals.mark_with === "Mark_With_Drone"){
+                           onClicked: {
+                               // Handle Obstacle click
+                           }
+                       }
 
-                                console.log("Mark_With_Drone")
-                                if (activeVehicle && activeVehicleCoordinate.isValid) {
+                       Button {
+                           id: saveBtn
+                           text: ""
+                           width: 46
+                           height: 46
 
-                                    mapPolygon.appendVertex(activeVehicleCoordinate)
+                           padding: 15
 
-                                    // if (mapPolygon) {
-                                    // mapPolygon.appendVertex(activeVehicleCoordinate)
-                                    // if (isObstacleMode) {
-                                    // addObstacleVisual()
-                                    // } else {
-                                    // addCommonVisuals()
-                                    // }
-                                    // }
-                                }
+                           background: Rectangle {
+                               radius: width / 2
+                               color: "#1b1c3e"
+                               border.color: "#005BBB"
+                               border.width: 2
+                               anchors.fill: parent
+                               anchors.margins: 3
+                           }
 
-                            }
+                           contentItem: QGCColoredImage {
+                               source: "qrc:/InstrumentValueIcons/save-disk.svg"
+                               width: 16
+                               height: 16
+                               anchors.centerIn: parent // Center the icon within the container
+                               color: "white"
+                           }
+                           onClicked: {
+                               if (mapPolygon.count < 3) {
+                                   _restorePreviousVertices()
+                               } else {
+                                   _planMasterController.saveToSelectedFile()
+                                   mainWindow.planmap()
+                               }
+                           }
+                       }
 
-                            else {
-                                console.log("Mark_With_Manual")
-                                // Convert the bottom-center point of controlImage to mapControl's coordinate space.
-                                var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
-                                // Then convert that point (in pixels) to a geographic coordinate.
-                                var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
-                                mapPolygon.appendVertex(bottomCoord)
+                       // Button {
+                       //     id: cancelBtn
+                       //     text: ""
+                       //     width: 46
+                       //     height: 46
 
+                       //     padding: 13
 
-                                // if (mapPolygon) {
-                                // mapPolygon.appendVertex(bottomCoord)
+                       //     background: Rectangle {
+                       //         radius: width / 2
+                       //         color: "#1b1c3e"
+                       //         border.color: "#005BBB"
+                       //         border.width: 2
+                       //         anchors.fill: parent
+                       //         anchors.margins: 5
+                       //     }
 
-                                // if (isObstacleMode) {
-                                // addObstacleVisual()
-                                // } else {
-                                // addCommonVisuals()
-                                // }
-                                // }
-
-                            }
-
-                        }
-                    }
-
-                    Button {
-                        text: " Obstacle Point "
-                        height: 34
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
-                            // Handle Button 2 click
-                        }
-                    }
-                }
-
-            }
-
-            RowLayout {
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.bottomMargin: 20
-                anchors.rightMargin: 20
-                spacing: 20
-                visible: mapPolygon.traceMode
-
-                Row {
-                    spacing: 30
-                    //anchors.horizontalCenter: parent.horizontalCenter
-
-                    Button {
-                        text: "Cancel"
-                        width: 100
-                        height: 40
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
-                            mainWindow.showFlyView()
-                            MapGlobals.editdialog = "editdialog1"
-                        }
-
-                    }
-
-                    Button {
-                        text: " Save "
-                        width: 100
-                        height: 40
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
-                            if (mapPolygon.count < 3) {
-                                _restorePreviousVertices()
-                            }else{
-                                _planMasterController.saveToSelectedFile()
-                                //mapPolygon.traceMode = false
-                                mainWindow.planmap()
-                            }
-                        }
-                    }
-                }
-
-            }
+                       //     contentItem: QGCColoredImage {
+                       //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                       //         width: 16
+                       //         height: 16
+                       //         anchors.centerIn: parent // Center the icon within the container
+                       //         color: "white"
+                       //     }
+                       //     onClicked: {
+                       //         mainWindow.showFlyView()
+                       //         MapGlobals.editdialog = "editdialog1"
+                       //     }
+                       // }
+                   }
 
         }
 

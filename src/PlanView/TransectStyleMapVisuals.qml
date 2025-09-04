@@ -19,6 +19,7 @@ import QGroundControl.Controls
 import QGroundControl.FlightMap
 import MapGlobals 1.0
 /// Base control for both Survey and Corridor Scan map visuals
+
 Item {
     id: _root
     property var    map                                                 ///< Map control to place item in
@@ -53,12 +54,10 @@ Item {
 
 
     function edit1() {
-
+        console.log("edited button clicked")
         if(_root.interactive) {
             clicked(_missionItem.sequenceNumber)
         }
-
-
     }
 
 
@@ -67,7 +66,7 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("edited",object.surveyAreaPolygon)
+        console.log("edited : ",object.surveyAreaPolygon)
         _addVisualElements()
         // if (_root.interactive && _missionItem.sequenceNumber === 0) {
         //     _root.clicked(_missionItem.sequenceNumber)

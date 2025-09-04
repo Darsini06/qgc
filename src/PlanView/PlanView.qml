@@ -1212,104 +1212,53 @@ Item {
 
 
         Item {
-                   id: editdata
-                   anchors.bottom: parent.bottom
-                   anchors.left: parent.left
-                   anchors.bottomMargin: 20
-                   anchors.leftMargin: 20
+            id: editdata
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.bottomMargin: 60   // increased from 20 → lifts it up
+            //anchors.leftMargin: 10
 
-                   Rectangle {
-                       width: 100
-                       height: 50
-                       color: "transparent"
-                       anchors.bottom: parent.bottom
-                       anchors.left: parent.left
-                       anchors.bottomMargin: 20
-                       anchors.leftMargin: 20
+            Button {
+                id: uploadBtn
+                text: ""
+                width: 46
+                height: 46
 
-                       Rectangle {
-                           anchors.centerIn: parent
-                           color: "#1b1c3e" // light purple
-                           radius: 20
-                           height: 40
-                           width: childrenRect.width + 20
-                           anchors.horizontalCenter: parent.horizontalCenter
+                padding: 15
 
-                           Row {
-                               anchors.centerIn: parent
-                               spacing: 10
+                background: Rectangle {
+                    radius: width / 2
+                    color: "#1b1c3e"
+                    border.color: "#005BBB"
+                    border.width: 2
+                    anchors.fill: parent
+                    anchors.margins: 5
+                }
 
-                               Button {
-                                   text: "Upload"
-                                   contentItem: Text {
-                                       text: parent.text
-                                       font: parent.font
-                                       color: "white" // Set text color
-                                   }
-                                   font.bold : true
-                                   background: Rectangle { color: "transparent" }
-                                   onClicked: {
-                                       console.log("Upload_data")
-                                       if (_utmspEnabled) {
-                                           QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                                           UTMSPStateStorage.removeFlightPlanState = true
-                                           UTMSPStateStorage.indicatorDisplayStatus = true
-                                       }
-                                       _planMasterController.upload();
-                                   }
-                               }
+                contentItem: QGCColoredImage {
+                    source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                    width: 16
+                    height: 16
+                    anchors.centerIn: parent // Center the icon within the container
+                    color: "white"
+                }
 
-                               // ADD THE EDIT BUTTON HERE
-                               Button {
-                                   id: editButton
-                                   text: "Edit"
-                                   visible: MapGlobals.share_edit_visibility
+                onClicked: {
+                    console.log("Upload_data")
+                    if (_utmspEnabled) {
+                        QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+                        UTMSPStateStorage.removeFlightPlanState = true
+                        UTMSPStateStorage.indicatorDisplayStatus = true
+                    }
+                    _planMasterController.upload();
+                }
+            }
+        }
 
-                                   // Set padding for the button (space between background border and content)
-                                   padding: 15
 
-                                   // Set the button size to accommodate icon + padding
-                                   implicitWidth: 46
-                                   implicitHeight: 46
 
-                                   // Styling properties
-                                   background: Rectangle {
-                                       radius: width / 2 // Makes it perfectly round (circle)
-                                       color: "#1b1c3e" // light purple
-                                       border.color: "#005BBB"
-                                       border.width: 2
-                                       anchors.fill: parent
-                                       anchors.margins: 5 // External padding
-                                   }
-
-                                   contentItem: QGCColoredImage {
-                                       source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                                       width: 16
-                                       height: 16
-                                       anchors.centerIn: parent
-                                       color: "white"
-                                   }
-
-                                   onClicked: {
-                                       console.log("Edit button clicked in PlanView.qml")
-                                       // Add your edit functionality here
-                                       // For example, you might want to trigger editing mode
-                                       // or show an edit dialog
-                                       if (_missionController && _missionController.visualItems.count > 0) {
-                                           // Example: set the first item as current for editing
-                                           _missionController.setCurrentItem(0);
-                                       }
-                                   }
-                               }
-                           }
-                       }
-                   }
-               }
-
-        Component{
+        Component {
             id: customdialog
-
-
 
             Item {
                 id: customDialogItem
@@ -1364,13 +1313,10 @@ Item {
 
                             }
 
-
                         }
-
                     }
                 }
             }
-
 
         }
 
