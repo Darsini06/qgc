@@ -220,12 +220,15 @@ private slots:
     void _distanceModeChanged                       (int distanceMode);
 
 private:
+
     typedef struct {
         bool imagesInTurnaround;
         bool hasTurnarounds;
         bool addTriggerAtFirstAndLastPoint;
         bool useConditionGate;
-    } BuildMissionItemsState_t;
+    }
+
+    BuildMissionItemsState_t;
 
     void    _queryTransectsPathHeightInfo                                   (void);
     void    _queryMissionItemCoordHeights                                   (void);

@@ -43,6 +43,7 @@ TransectStyleComplexItemEditor {
                 text:       qsTr("Turnaround dist")
                 visible:    !forPresets
             }
+
             FactTextField {
                 fact:               _missionItem.turnAroundDistance
                 Layout.fillWidth:   true

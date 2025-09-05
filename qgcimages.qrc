@@ -98,6 +98,10 @@
         <file alias="NewImages/droneLoading.json">src/NewImages/droneLoading.json</file>
         <file alias="NewImages/droneManFly.json">src/NewImages/droneManFly.json</file>
 
+<file alias="NewImages/DroneActionCamera.json">src/NewImages/DroneActionCamera.json</file>
+<file alias="NewImages/Droneflying.json">src/NewImages/Droneflying.json</file>
+
+
         <file alias="NewImages/vtol.png">src/NewImages/vtol.png</file>
 <file alias="NewImages/survey.png">src/NewImages/survey.png</file>
 <file alias="NewImages/communication.png">src/NewImages/communication.png</file>

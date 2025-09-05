@@ -187,7 +187,7 @@ Item {
             Label {
                 width: 400
                 wrapMode: Text.WordWrap
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                text: "Flying a drone is like holding a piece of freedom in your hands.The view from above always tells a story the ground can’t."
                 color: "lightgray"
                 font.pixelSize: 16
             }

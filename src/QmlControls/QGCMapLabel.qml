@@ -8,7 +8,9 @@ import QGroundControl.Palette
 QGCLabel {
     property var map
 
-    QGCMapPalette { id: mapPal; lightColors: map.isSatelliteMap }
+    QGCMapPalette {
+        id: mapPal; lightColors: map.isSatelliteMap
+    }
 
     color:      mapPal.text
     style:      Text.Outline

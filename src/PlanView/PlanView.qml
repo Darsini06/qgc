@@ -131,7 +131,6 @@ Item {
         _planMasterController.loadFromSelectedFile()
         editdata.visible=true
         MapGlobals.share_edit_visibility = true
-
     }
 
     function loaddata1() {
@@ -151,8 +150,6 @@ Item {
         _planMasterController.data()
         //mobileFileSaveDialogComponent.createObject(mainWindow).open()
     }
-
-
 
     ColumnLayout {
         anchors.bottom: parent.bottom

@@ -259,6 +259,7 @@ void CorridorScanComplexItem::_rebuildTransectsPhase1(void)
             if (_hasTurnaround()) {
                 QGeoCoordinate turnaroundCoord;
                 double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+                //double turnAroundDistance = 0.0; //_turnAroundDistanceFact.rawValue().toDouble();
 
                 double azimuth = transectCoords[0].azimuthTo(transectCoords[1]);
                 turnaroundCoord = transectCoords[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);

@@ -268,7 +268,9 @@ bool SurveyComplexItem::_loadV3(const QJsonObject& complexObject, int sequenceNu
     }
 
     _gridAngleFact.setRawValue          (gridObject[_jsonV3GridAngleKey].toDouble());
-    _turnAroundDistanceFact.setRawValue (gridObject[_jsonV3TurnaroundDistKey].toDouble());
+
+    //_turnAroundDistanceFact.setRawValue (gridObject[_jsonV3TurnaroundDistKey].toDouble());
+    _turnAroundDistanceFact.setRawValue (0.0);
 
     if (gridObject.contains(_jsonEntryPointKey)) {
         _entryPoint = gridObject[_jsonEntryPointKey].toInt();
@@ -832,6 +834,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         if (_hasTurnaround()) {
             QGeoCoordinate turnaroundCoord;
             double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+            //double turnAroundDistance = 0.0; //_turnAroundDistanceFact.rawValue().toDouble();
 
             double azimuth = transect[0].azimuthTo(transect[1]);
             turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
@@ -1239,6 +1242,7 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         if (_hasTurnaround()) {
             QGeoCoordinate turnaroundCoord;
             double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+            //double turnAroundDistance = 0.0; //_turnAroundDistanceFact.rawValue().toDouble();
 
             double azimuth = transect[0].azimuthTo(transect[1]);
             turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);

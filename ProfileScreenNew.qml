@@ -738,17 +738,17 @@ Item {
                         width: parent.width * 0.95
 
                         Item {
-                            width: 130
-                            height: 130
+                            width: 150
+                            height: 150
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             LottieAnimation {
                                 id: droneAnim
                                 anchors.centerIn: parent
-                                source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                                source: "qrc:/qmlimages/NewImages/Droneflying.json"
                                 autoPlay: true
                                 loops: Animation.Infinite
-                                scale: 0.3
+                                scale: 0.2
                                 onStatusChanged: console.log("Lottie Status:", status)
                             }
                         }

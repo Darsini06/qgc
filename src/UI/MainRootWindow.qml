@@ -119,8 +119,6 @@ ApplicationWindow {
         }
     }
 
-
-
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
         if (!ScreenTools.isFakeMobile && (ScreenTools.isMobile || Screen.height / ScreenTools.realPixelDensity < 120)) {
@@ -228,7 +226,6 @@ ApplicationWindow {
     function filename() {
         filename.tracemode()
     }
-
 
     /// @return true: View switches are not currently allowed
     function preventViewSwitch() {
@@ -537,7 +534,6 @@ ApplicationWindow {
 
         onClosed: dialogLoader.source = ""
     }
-
 
     function initDB() {
         var db = getDatabase();

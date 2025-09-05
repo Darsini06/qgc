@@ -132,6 +132,7 @@ void TransectStyleComplexItem::_save(QJsonObject& complexObject)
 
     innerObject[JsonHelper::jsonVersionKey] =       2;
     innerObject[turnAroundDistanceName] =           _turnAroundDistanceFact.rawValue().toDouble();
+    //innerObject[turnAroundDistanceName] =           0.0; //_turnAroundDistanceFact.rawValue().toDouble();
     innerObject[cameraTriggerInTurnAroundName] =    _cameraTriggerInTurnAroundFact.rawValue().toBool();
     innerObject[hoverAndCaptureName] =              _hoverAndCaptureFact.rawValue().toBool();
     innerObject[refly90DegreesName] =               _refly90DegreesFact.rawValue().toBool();
@@ -260,7 +261,10 @@ bool TransectStyleComplexItem::_load(const QJsonObject& complexObject, bool forP
     }
 
     // Load TransectStyleComplexItem individual values
-    _turnAroundDistanceFact.setRawValue         (innerObject[turnAroundDistanceName].toDouble());
+
+    //_turnAroundDistanceFact.setRawValue         (innerObject[turnAroundDistanceName].toDouble());
+    _turnAroundDistanceFact.setRawValue         (0.0);
+
     _cameraTriggerInTurnAroundFact.setRawValue  (innerObject[cameraTriggerInTurnAroundName].toBool());
     _hoverAndCaptureFact.setRawValue            (innerObject[hoverAndCaptureName].toBool());
     _refly90DegreesFact.setRawValue             (innerObject[refly90DegreesName].toBool());

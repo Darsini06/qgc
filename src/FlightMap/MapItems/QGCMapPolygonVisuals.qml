@@ -540,10 +540,23 @@ Item {
 
             property var _unitsConversion: QGroundControl.unitsConversion
 
-            sourceItem: Text {
-                text:     _unitsConversion.metersToAppSettingsHorizontalDistanceUnits(distance).toFixed(1) + " " +
+            sourceItem: Rectangle {
+                id: textContainer
+                height: displayText.contentHeight + 6 // Padding
+                width: displayText.contentWidth + 12 // Padding
+                radius: height / 2 // Rounded corners
+                color: "#1b1c3e" // light purple background
+                border.color: "#005BBB"
+                border.width: 1
+
+                Text {
+                    id: displayText
+                    anchors.centerIn: parent
+                    text: _unitsConversion.metersToAppSettingsHorizontalDistanceUnits(distance).toFixed(1) + " " +
                           _unitsConversion.appSettingsHorizontalDistanceUnitsString
-                color:    "black"
+                    color: "white"
+                    font.pixelSize: 8
+                }
             }
         }
     }
@@ -663,7 +676,6 @@ Item {
                     mapPolygon.adjustVertex(polygonVertex, itemCoordinate)
                 }
             }
-
             onClicked: if(_root.interactive) menu.popupVertex(polygonVertex)
         }
     }
@@ -1030,195 +1042,195 @@ Item {
 
 
             // Top-right buttons (Boundary + Obstacle)
-                   Column {
-                       //anchors.top: parent.top
-                       anchors.right: parent.right
-                       spacing: 0
-                       visible: mapPolygon.traceMode
+            Column {
+                //anchors.top: parent.top
+                anchors.right: parent.right
+                spacing: 0
+                visible: mapPolygon.traceMode
 
-                       Button  {
-                           id: boundryMarkingBtn
-                           text: ""
-                           width: 46
-                           height: 46
+                Button  {
+                    id: boundryMarkingBtn
+                    text: ""
+                    width: 46
+                    height: 46
 
-                           padding: 15
+                    padding: 15
 
-                           background: Rectangle {
-                               radius: width / 2
-                               color: "#1b1c3e"
-                               border.color: "#005BBB"
-                               border.width: 2
-                               anchors.fill: parent
-                               anchors.margins: 3
-                           }
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "#1b1c3e"
+                        border.color: "#005BBB"
+                        border.width: 2
+                        anchors.fill: parent
+                        anchors.margins: 3
+                    }
 
-                           contentItem: QGCColoredImage {
-                               source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                               width: 16
-                               height: 16
-                               anchors.centerIn: parent // Center the icon within the container
-                               color: "white"
-                           }
-                           onClicked: {
+                    contentItem: QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                        width: 16
+                        height: 16
+                        anchors.centerIn: parent // Center the icon within the container
+                        color: "white"
+                    }
+                    onClicked: {
 
-                                                       if(MapGlobals.mark_with === "Mark_With_GPS") {
+                        if(MapGlobals.mark_with === "Mark_With_GPS") {
 
-                                                           console.log("Mark_With_GPS")
-                                                           if (gcsPosition.isValid) {
+                            console.log("Mark_With_GPS")
+                            if (gcsPosition.isValid) {
 
-                                                               mapPolygon.appendVertex(gcsPosition)
+                                mapPolygon.appendVertex(gcsPosition)
 
-                                                               // if (mapPolygon) {
-                                                               // mapPolygon.appendVertex(gcsPosition)
+                                // if (mapPolygon) {
+                                // mapPolygon.appendVertex(gcsPosition)
 
-                                                               // if (isObstacleMode) {
-                                                               // addObstacleVisual()
-                                                               // } else {
-                                                               // addCommonVisuals()
-                                                               // }
-                                                               // }
-                                                           }
+                                // if (isObstacleMode) {
+                                // addObstacleVisual()
+                                // } else {
+                                // addCommonVisuals()
+                                // }
+                                // }
+                            }
 
-                                                       }
+                        }
 
-                                                       else if (MapGlobals.mark_with === "Mark_With_Drone"){
+                        else if (MapGlobals.mark_with === "Mark_With_Drone"){
 
-                                                           console.log("Mark_With_Drone")
-                                                           if (activeVehicle && activeVehicleCoordinate.isValid) {
+                            console.log("Mark_With_Drone")
+                            if (activeVehicle && activeVehicleCoordinate.isValid) {
 
-                                                               mapPolygon.appendVertex(activeVehicleCoordinate)
+                                mapPolygon.appendVertex(activeVehicleCoordinate)
 
-                                                               // if (mapPolygon) {
-                                                               // mapPolygon.appendVertex(activeVehicleCoordinate)
-                                                               // if (isObstacleMode) {
-                                                               // addObstacleVisual()
-                                                               // } else {
-                                                               // addCommonVisuals()
-                                                               // }
-                                                               // }
-                                                           }
+                                // if (mapPolygon) {
+                                // mapPolygon.appendVertex(activeVehicleCoordinate)
+                                // if (isObstacleMode) {
+                                // addObstacleVisual()
+                                // } else {
+                                // addCommonVisuals()
+                                // }
+                                // }
+                            }
 
-                                                       }
+                        }
 
-                                                       else {
-                                                           console.log("Mark_With_Manual")
-                                                           // Convert the bottom-center point of controlImage to mapControl's coordinate space.
-                                                           var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
-                                                           // Then convert that point (in pixels) to a geographic coordinate.
-                                                           var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
-                                                           mapPolygon.appendVertex(bottomCoord)
+                        else {
+                            console.log("Mark_With_Manual")
+                            // Convert the bottom-center point of controlImage to mapControl's coordinate space.
+                            var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
+                            // Then convert that point (in pixels) to a geographic coordinate.
+                            var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
+                            mapPolygon.appendVertex(bottomCoord)
 
 
-                                                           // if (mapPolygon) {
-                                                           // mapPolygon.appendVertex(bottomCoord)
+                            // if (mapPolygon) {
+                            // mapPolygon.appendVertex(bottomCoord)
 
-                                                           // if (isObstacleMode) {
-                                                           // addObstacleVisual()
-                                                           // } else {
-                                                           // addCommonVisuals()
-                                                           // }
-                                                           // }
+                            // if (isObstacleMode) {
+                            // addObstacleVisual()
+                            // } else {
+                            // addCommonVisuals()
+                            // }
+                            // }
 
-                                                       }
+                        }
 
-                                                   }
-                       }
+                    }
+                }
 
-                       Button {
-                           id: obstacleBtn
-                           text: ""
-                           width: 46
-                           height: 46
+                Button {
+                    id: obstacleBtn
+                    text: ""
+                    width: 46
+                    height: 46
 
-                           padding: 15
+                    padding: 15
 
-                           background: Rectangle {
-                               radius: width / 2
-                               color: "#1b1c3e"
-                               border.color: "#005BBB"
-                               border.width: 2
-                               anchors.fill: parent
-                               anchors.margins: 3
-                           }
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "#1b1c3e"
+                        border.color: "#005BBB"
+                        border.width: 2
+                        anchors.fill: parent
+                        anchors.margins: 3
+                    }
 
-                           contentItem: QGCColoredImage {
-                               source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                               width: 16
-                               height: 16
-                               anchors.centerIn: parent // Center the icon within the container
-                               color: "white"
-                           }
+                    contentItem: QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                        width: 16
+                        height: 16
+                        anchors.centerIn: parent // Center the icon within the container
+                        color: "white"
+                    }
 
-                           onClicked: {
-                               // Handle Obstacle click
-                           }
-                       }
+                    onClicked: {
+                        // Handle Obstacle click
+                    }
+                }
 
-                       Button {
-                           id: saveBtn
-                           text: ""
-                           width: 46
-                           height: 46
+                Button {
+                    id: saveBtn
+                    text: ""
+                    width: 46
+                    height: 46
 
-                           padding: 15
+                    padding: 15
 
-                           background: Rectangle {
-                               radius: width / 2
-                               color: "#1b1c3e"
-                               border.color: "#005BBB"
-                               border.width: 2
-                               anchors.fill: parent
-                               anchors.margins: 3
-                           }
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "#1b1c3e"
+                        border.color: "#005BBB"
+                        border.width: 2
+                        anchors.fill: parent
+                        anchors.margins: 3
+                    }
 
-                           contentItem: QGCColoredImage {
-                               source: "qrc:/InstrumentValueIcons/save-disk.svg"
-                               width: 16
-                               height: 16
-                               anchors.centerIn: parent // Center the icon within the container
-                               color: "white"
-                           }
-                           onClicked: {
-                               if (mapPolygon.count < 3) {
-                                   _restorePreviousVertices()
-                               } else {
-                                   _planMasterController.saveToSelectedFile()
-                                   mainWindow.planmap()
-                               }
-                           }
-                       }
+                    contentItem: QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/save-disk.svg"
+                        width: 16
+                        height: 16
+                        anchors.centerIn: parent // Center the icon within the container
+                        color: "white"
+                    }
+                    onClicked: {
+                        if (mapPolygon.count < 3) {
+                            _restorePreviousVertices()
+                        } else {
+                            _planMasterController.saveToSelectedFile()
+                            mainWindow.planmap()
+                        }
+                    }
+                }
 
-                       // Button {
-                       //     id: cancelBtn
-                       //     text: ""
-                       //     width: 46
-                       //     height: 46
+                // Button {
+                //     id: cancelBtn
+                //     text: ""
+                //     width: 46
+                //     height: 46
 
-                       //     padding: 13
+                //     padding: 13
 
-                       //     background: Rectangle {
-                       //         radius: width / 2
-                       //         color: "#1b1c3e"
-                       //         border.color: "#005BBB"
-                       //         border.width: 2
-                       //         anchors.fill: parent
-                       //         anchors.margins: 5
-                       //     }
+                //     background: Rectangle {
+                //         radius: width / 2
+                //         color: "#1b1c3e"
+                //         border.color: "#005BBB"
+                //         border.width: 2
+                //         anchors.fill: parent
+                //         anchors.margins: 5
+                //     }
 
-                       //     contentItem: QGCColoredImage {
-                       //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                       //         width: 16
-                       //         height: 16
-                       //         anchors.centerIn: parent // Center the icon within the container
-                       //         color: "white"
-                       //     }
-                       //     onClicked: {
-                       //         mainWindow.showFlyView()
-                       //         MapGlobals.editdialog = "editdialog1"
-                       //     }
-                       // }
-                   }
+                //     contentItem: QGCColoredImage {
+                //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                //         width: 16
+                //         height: 16
+                //         anchors.centerIn: parent // Center the icon within the container
+                //         color: "white"
+                //     }
+                //     onClicked: {
+                //         mainWindow.showFlyView()
+                //         MapGlobals.editdialog = "editdialog1"
+                //     }
+                // }
+            }
 
         }
 
@@ -1609,7 +1621,7 @@ Item {
                                     text: qsTr("Cancel")
                                     font.bold: true
                                     font.pointSize: 14
-                                    color: "white"       // ✅ Text color
+                                    color: "white"
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                     anchors.fill: parent
@@ -1617,8 +1629,8 @@ Item {
 
                                 background: Rectangle {
                                     radius: 20
-                                    color: "#1b1c3e"      // ✅ Background color
-                                    border.color: "#005BBB"  // ✅ Border color (you can change this)
+                                    color: "#1b1c3e"
+                                    border.color: "#005BBB"
                                     border.width: 2
                                 }
 
@@ -1638,7 +1650,7 @@ Item {
                                     text: "Confirm"
                                     font.bold: true
                                     font.pointSize: 14
-                                    color: "white"  // ✅ White text
+                                    color: "white"
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                     anchors.fill: parent
@@ -1646,8 +1658,8 @@ Item {
 
                                 background: Rectangle {
                                     radius: 20
-                                    color: "#1b1c3e"         // ✅ Background color
-                                    border.color: "#005BBB"  // ✅ Border color (change to what you want)
+                                    color: "#1b1c3e"
+                                    border.color: "#005BBB"
                                     border.width: 2
                                 }
 

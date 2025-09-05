@@ -117,6 +117,7 @@ ColumnLayout {
         }
 
         QGCLabel { text: qsTr("Parity") }
+
         QGCComboBox {
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [qsTr("None"), qsTr("Even"), qsTr("Odd")]
@@ -155,6 +156,7 @@ ColumnLayout {
         }
 
         QGCLabel { text: qsTr("Data Bits") }
+
         QGCComboBox {
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [ "5", "6", "7", "8" ]
@@ -163,6 +165,7 @@ ColumnLayout {
         }
 
         QGCLabel { text: qsTr("Stop Bits") }
+
         QGCComboBox {
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [ "1", "2" ]
