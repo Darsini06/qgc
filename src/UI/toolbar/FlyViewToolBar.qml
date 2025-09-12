@@ -220,6 +220,61 @@ Rectangle {
     }
 
 
+    // Item {
+    //     width: parent.width
+    //     height: parent.height
+
+    //     Rectangle {
+    //         id: curvedBackground
+    //         anchors.top: parent.top
+    //         anchors.left: parent.left
+    //         anchors.right: parent.right
+    //         anchors.leftMargin: 250
+    //         anchors.rightMargin: 200
+    //         anchors.verticalCenter: parent.verticalCenter
+    //         height: parent.height* 0.10
+    //         radius: 150
+    //         color: "#7d8df7"
+    //         antialiasing: true
+    //         clip: true
+
+    //         // Fake square top edge by overlaying a rectangle
+    //         Rectangle {
+    //             anchors.left: parent.left
+    //             anchors.right: parent.right
+    //             height: parent.height* 0.05 // same as radius
+    //             color: "#7d8df7"
+    //         }
+
+    //         Item {
+    //             anchors.fill: parent
+    //             anchors.margins: 10
+
+    //             // Centered Text
+    //             Text {
+    //                 text: "AVIATRICKS"
+    //                 font.pixelSize: 20
+    //                 font.bold: true
+    //                 color: "white"
+    //                 anchors.centerIn: parent
+    //                 opacity: 0.0
+
+    //                 SequentialAnimation on opacity {
+    //                     running: true
+    //                     loops: Animation.Infinite
+    //                     NumberAnimation { from: 0.0; to: 1.0; duration: 1000 }
+    //                     PauseAnimation { duration: 500 }
+    //                     NumberAnimation { from: 1.0; to: 0.0; duration: 1000 }
+    //                 }
+    //             }
+
+
+    //         }
+
+    //     }
+    // }
+
+
     RowLayout {
         anchors.verticalCenter:  parent.verticalCenter
         anchors.right: parent.right
@@ -230,7 +285,7 @@ Rectangle {
                                             id: batteryIndicator
                                             width:40
                                             height: 40                // Fixed height for the indicator
-                                            visible: true//activeVehicle ? true : false
+                                            visible: _activeVehicle ? true : false
                                           }
 
 
@@ -260,7 +315,11 @@ Rectangle {
         }
 
 
+
+
        Rectangle { width: 2; height: 40; color: "transparent" } // Separator
+
+
 
         // Satellite Icon
         Column {
@@ -269,7 +328,7 @@ Rectangle {
 
                        spacing: 5
                        QGCColoredImage {
-                           visible: activeVehicle ? false : true
+                           visible: _activeVehicle ? false : true
                            width: 25
                            height: 25
                            source: "/qmlimages/NewImages/satellite.png"
@@ -281,10 +340,46 @@ Rectangle {
                                                            id: gpsindicator
                                                            width:60 // Adjust width as needed
                                                            height: 50                // Fixed height for the indicator
-                                                           visible: activeVehicle ? true : false
+                                                           visible: _activeVehicle ? true : false
                                                           }
                    }
         }
+
+        // // Spray Icon
+        // Column {
+        //     spacing: 2
+        //     Text {
+
+        //         text: "Spray"
+        //         font.pixelSize: 14
+        //         color: "white"
+        //         horizontalAlignment: Text.AlignHCenter
+        //     }
+        //     Row {
+        //                 spacing: 5
+        //                 QGCColoredImage {
+        //                     //visible: activeVehicle ? false : true
+        //                     width: 20
+        //                     height: 20
+        //                     source: "/qmlimages/NewImages/satellite.png"
+        //                     color: "white"
+        //                 }
+        //                 Text {
+        //                     //visible: activeVehicle ? false : true
+        //                     text: " : N/A"
+        //                     font.pixelSize: 14
+        //                     color: "white"
+        //                     verticalAlignment: Text.AlignVCenter
+        //                 }
+
+        //                 // TelemetryRSSIIndicator {
+        //                 //                                     id: telemetryRSSIIndicator1
+        //                 //                                     width:80 // Adjust width as needed
+        //                 //                                     height: 50                // Fixed height for the indicator
+        //                 //                                     visible: activeVehicle ? true : false
+        //                 //                                   }
+        //             }
+        // }
 
 
         // Radar Icon
@@ -305,6 +400,8 @@ Rectangle {
 
 
         }
+
+
 
 
         //Rectangle { width: 2; height: 40; color: "gray" } // Separator
@@ -332,7 +429,21 @@ Rectangle {
                             }
                         }
 
-
+                        // QGCToolBarButton {
+                        //                                 id: button4
+                        //                                 Layout.preferredHeight: largeProgressBar1.height
+                        //                                 Layout.preferredWidth: 30
+                        //                                 icon.source: "/qmlimages/NewImages/settings.png"
+                        //                                 icon.width: 20
+                        //                                 icon.height: 20
+                        //                                 logo: true
+                        //                                 onClicked: mainWindow.showToolSelectDialog()
+                        //                                 transform: Rotation {
+                        //                                                 angle: 90    // ✅ Rotate icon by 90 degrees
+                        //                                                 origin.x: button4.width / 2
+                        //                                                 origin.y: button4.height / 2
+                        //                                             }
+                        //                             }
 
 
 
@@ -341,7 +452,192 @@ Rectangle {
 
     }
 
+//     Rectangle {
+//         id: statusBar
+//             width: (40 + 20) * 4 // Adjust width based on icons
+//             height: parent.height
+//             anchors.verticalCenter:  parent.verticalCenter
+//             anchors.right: parent.right
+//             color: "#A6ADFF"
 
+
+//         RowLayout {
+//             anchors.verticalCenter:  parent.verticalCenter
+//             //spacing: 5
+
+//             BatteryIndicator {
+//                                                 id: batteryIndicator
+//                                                 width:40
+//                                                 height: 40                // Fixed height for the indicator
+//                                                 visible: activeVehicle ? true : false
+//                                               }
+
+
+
+
+//             // Battery Icon
+//             Column {
+//                 Layout.alignment: Qt.AlignVCenter
+//                 visible: !activeVehicle
+
+//                 // Text {
+//                 //     text: "Battery"
+//                 //     font.pixelSize: 14
+//                 //     color: "white"
+//                 //     horizontalAlignment: Text.AlignHCenter
+//                 // }
+
+//                 Row {
+//                     spacing: 5
+//                     Image {
+//                         width: 25
+//                         height: 25
+//                         source: "/qmlimages/NewImages/battery.png"
+//                     }
+
+//                 }
+//             }
+
+
+
+
+//            //Rectangle { width: 2; height: 40; color: "gray" } // Separator
+
+
+
+//             // Satellite Icon
+//             Column {
+
+//                 Row {
+
+//                            spacing: 5
+//                            QGCColoredImage {
+//                                visible: activeVehicle ? false : true
+//                                width: 25
+//                                height: 25
+//                                source: "/qmlimages/NewImages/satellite.png"
+//                                color: "white"
+//                            }
+
+
+//                        GPSIndicator {
+//                                                                id: gpsindicator
+//                                                                width:50 // Adjust width as needed
+//                                                                height: 50                // Fixed height for the indicator
+//                                                                visible: activeVehicle ? true : false
+//                                                               }
+//                        }
+//             }
+
+
+
+
+
+//             // // Spray Icon
+//             // Column {
+//             //     spacing: 2
+//             //     Text {
+
+//             //         text: "Spray"
+//             //         font.pixelSize: 14
+//             //         color: "white"
+//             //         horizontalAlignment: Text.AlignHCenter
+//             //     }
+//             //     Row {
+//             //                 spacing: 5
+//             //                 QGCColoredImage {
+//             //                     //visible: activeVehicle ? false : true
+//             //                     width: 20
+//             //                     height: 20
+//             //                     source: "/qmlimages/NewImages/satellite.png"
+//             //                     color: "white"
+//             //                 }
+//             //                 Text {
+//             //                     //visible: activeVehicle ? false : true
+//             //                     text: " : N/A"
+//             //                     font.pixelSize: 14
+//             //                     color: "white"
+//             //                     verticalAlignment: Text.AlignVCenter
+//             //                 }
+
+//             //                 // TelemetryRSSIIndicator {
+//             //                 //                                     id: telemetryRSSIIndicator1
+//             //                 //                                     width:80 // Adjust width as needed
+//             //                 //                                     height: 50                // Fixed height for the indicator
+//             //                 //                                     visible: activeVehicle ? true : false
+//             //                 //                                   }
+//             //             }
+//             // }
+
+
+//             // Radar Icon
+//             Column {
+//                 spacing: 2
+//                 Row {
+//                             spacing: 5
+//                             QGCColoredImage {
+//                                 width: 25
+//                                 height: 25
+//                                 source: "/qmlimages/RC.svg"
+//                                 color: "white"
+//                             }
+
+//                         }
+
+
+//             }
+
+
+
+//             //Rectangle { width: 2; height: 40; color: "gray" } // Separator
+
+
+//                 Row {
+//                             spacing: 5
+
+//                             Item {
+//                                 width: 25
+//                                 height: 25
+
+//                                 Image {
+//                                     id: settingsIcon
+//                                     anchors.fill: parent
+//                                     source: "/qmlimages/NewImages/settings.png"
+//                                 }
+
+//                                 MouseArea {
+//                                     anchors.fill: parent
+//                                     onClicked: {
+//                                         mainWindow.showToolSelectDialog()
+//                                     }
+//                                 }
+//                             }
+
+//                             // QGCToolBarButton {
+//                             //                                 id: button4
+//                             //                                 Layout.preferredHeight: largeProgressBar1.height
+//                             //                                 Layout.preferredWidth: 30
+//                             //                                 icon.source: "/qmlimages/NewImages/settings.png"
+//                             //                                 icon.width: 20
+//                             //                                 icon.height: 20
+//                             //                                 logo: true
+//                             //                                 onClicked: mainWindow.showToolSelectDialog()
+//                             //                                 transform: Rotation {
+//                             //                                                 angle: 90    // ✅ Rotate icon by 90 degrees
+//                             //                                                 origin.x: button4.width / 2
+//                             //                                                 origin.y: button4.height / 2
+//                             //                                             }
+//                             //                             }
+
+
+
+// }
+
+
+//         }
+
+
+//     }
 
     // Small parameter download progress bar
     Rectangle {
@@ -438,6 +734,90 @@ Rectangle {
             }
 
         }
+
+        // Loading text
+        // QGCLabel {
+        //     anchors.top: parent.top
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        //     anchors.topMargin: ScreenTools.defaultFontPixelHeight
+        //     text: qsTr("Downloading Parameters") + (_activeVehicle ? " (" + Math.round(_activeVehicle.loadProgress * 100) + "%)" : "")
+        //     font.pointSize: ScreenTools.largeFontPointSize
+        // }
+
+
+
+
+
+
+        // // Close hint
+        // QGCLabel {
+        //     anchors.margins:    _margin
+        //     anchors.right:      parent.right
+        //     anchors.bottom:     parent.bottom
+        //     text:               qsTr("Click to hide")
+        //     font.pointSize:     ScreenTools.smallFontPointSize
+        //     opacity:            0.7
+
+        //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
+        // }
+
+        // MouseArea {
+        //     anchors.fill:   parent
+        //     onClicked:      largeProgressBar._userHide = true
+        // }
     }
+
+
+
+
+
+    // // Large parameter download progress bar
+    // Rectangle {
+    //     id:             largeProgressBar
+    //     anchors.bottom: parent.bottom
+    //     anchors.left:   parent.left
+    //     anchors.right:  parent.right
+    //     height:         parent.height
+    //     color:          qgcPal.window
+    //     visible:        _showLargeProgress
+
+    //     property bool _initialDownloadComplete: _activeVehicle ? _activeVehicle.initialConnectComplete : true
+    //     property bool _userHide:                false
+    //     property bool _showLargeProgress:       !_initialDownloadComplete && !_userHide && qgcPal.globalTheme === QGCPalette.Light
+
+    //     Connections {
+    //         target:                 QGroundControl.multiVehicleManager
+    //         function onActiveVehicleChanged(activeVehicle) { largeProgressBar._userHide = false }
+    //     }
+
+    //     Rectangle {
+    //         anchors.top:    parent.top
+    //         anchors.bottom: parent.bottom
+    //         width:          _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
+    //         color:          qgcPal.colorGreen
+    //     }
+
+    //     QGCLabel {
+    //         anchors.centerIn:   parent
+    //         text:               qsTr("Downloading")
+    //         font.pointSize:     ScreenTools.largeFontPointSize
+    //     }
+
+    //     // QGCLabel {
+    //     //     anchors.margins:    _margin
+    //     //     anchors.right:      parent.right
+    //     //     anchors.bottom:     parent.bottom
+    //     //     text:               qsTr("Click anywhere to hide")
+
+    //     //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
+    //     // }
+
+
+
+    //     // MouseArea {
+    //     //     anchors.fill:   parent
+    //     //     onClicked:      largeProgressBar._userHide = true
+    //     // }
+    // }
 
 }

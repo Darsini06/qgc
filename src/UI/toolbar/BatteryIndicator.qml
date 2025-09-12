@@ -36,7 +36,7 @@ Item {
     property bool   _showPercentage:    _indicatorDisplay.rawValue === 0
     property bool   _showVoltage:       _indicatorDisplay.rawValue === 1
     property bool   _showBoth:          _indicatorDisplay.rawValue === 2
-
+property real lastPercentage : 100  // Keep it global so it's preserved
     // Fetch battery settings
     property var batterySettings: QGroundControl.settingsManager.batteryIndicatorSettings
 
@@ -238,38 +238,59 @@ Item {
             //             return "/qmlimages/Battery.svg" // Fallback if percentage is unavailable
             //     }
             // }
-            // // function getBatteryPercentageFromVoltage(voltage) {
-            //     // Example for 3-cell LiPo battery (3S): 12.6V (100%) to 9.6V (0%)
-            //     const minVoltage = 9.6
-            //     const maxVoltage = 12.6
 
-            //     let percentage = ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100
-            //     percentage = Math.max(0, Math.min(100, percentage)) // Clamp 0-100%
-            //     return Math.round(percentage)
+
+
+
+                        function getBatteryPercentageFromVoltage(voltage) {
+                            const minVoltage = 9.6
+                            const maxVoltage = 12.6
+
+                            if (voltage < minVoltage) {
+                                lastPercentage = -1
+                                return -1  // Voltage too low
+                            }
+
+                            var currentPercentage = ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100
+                            currentPercentage = Math.max(0, Math.min(100, currentPercentage))
+                            currentPercentage = Math.floor(currentPercentage)  // Round down
+
+                            // Only allow percentage to drop
+                            if (currentPercentage < lastPercentage) {
+                                lastPercentage = currentPercentage
+                            }
+
+                            return lastPercentage
+                        }
+
+                        function resetBatteryPercentage() {
+                            lastPercentage = 100
+                        }
+
+
+            // function getBatteryPercentageFromVoltage(voltage) {
+            //     if (voltage >= 12.60) return 100
+            //     else if (voltage >= 12.45) return 95
+            //     else if (voltage >= 12.30) return 90
+            //     else if (voltage >= 12.15) return 85
+            //     else if (voltage >= 12.00) return 80
+            //     else if (voltage >= 11.85) return 75
+            //     else if (voltage >= 11.70) return 70
+            //     else if (voltage >= 11.55) return 65
+            //     else if (voltage >= 11.40) return 60
+            //     else if (voltage >= 11.25) return 55
+            //     else if (voltage >= 11.10) return 50
+            //     else if (voltage >= 10.95) return 45
+            //     else if (voltage >= 10.80) return 40
+            //     else if (voltage >= 10.65) return 35
+            //     else if (voltage >= 10.50) return 30
+            //     else if (voltage >= 10.35) return 25
+            //     else if (voltage >= 10.20) return 20
+            //     else if (voltage >= 10.05) return 15
+            //     else if (voltage >= 9.90)  return 10
+            //     else if (voltage >= 9.75)  return 5
+            //     else return 0
             // }
-            function getBatteryPercentageFromVoltage(voltage) {
-                if (voltage >= 12.60) return 100
-                else if (voltage >= 12.45) return 95
-                else if (voltage >= 12.30) return 90
-                else if (voltage >= 12.15) return 85
-                else if (voltage >= 12.00) return 80
-                else if (voltage >= 11.85) return 75
-                else if (voltage >= 11.70) return 70
-                else if (voltage >= 11.55) return 65
-                else if (voltage >= 11.40) return 60
-                else if (voltage >= 11.25) return 55
-                else if (voltage >= 11.10) return 50
-                else if (voltage >= 10.95) return 45
-                else if (voltage >= 10.80) return 40
-                else if (voltage >= 10.65) return 35
-                else if (voltage >= 10.50) return 30
-                else if (voltage >= 10.35) return 25
-                else if (voltage >= 10.20) return 20
-                else if (voltage >= 10.05) return 15
-                else if (voltage >= 9.90)  return 10
-                else if (voltage >= 9.75)  return 5
-                else return 0
-            }
 
             function getBatteryPercentageText() {
                 if (!isNaN(battery.voltage.rawValue)) {

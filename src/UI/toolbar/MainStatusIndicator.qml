@@ -68,8 +68,10 @@ RowLayout {
                     if (_activeVehicle.flying) {
                         return mainStatusLabel._flyingText
                     } else if (_activeVehicle.landing) {
+                    mainWindow.land()
                         return mainStatusLabel._landingText
                     } else {
+                        mainWindow.takeoff()
                         return mainStatusLabel._armedText
                     }
                 } else {

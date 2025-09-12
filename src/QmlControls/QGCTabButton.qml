@@ -37,13 +37,13 @@ TabButton {
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     background: Rectangle {
-        id:             backRect
-        implicitWidth:  ScreenTools.implicitButtonWidth
+        id: backRect
+        implicitWidth: ScreenTools.implicitButtonWidth
         implicitHeight: ScreenTools.implicitButtonHeight
-        //radius:         backRadius
-        border.width:   showBorder ? 1 : 0
-        border.color:   qgcPal.buttonBorder
-        color:          _showHighlight ? qgcPal.buttonHighlight : qgcPal.button
+        radius: 20//backRadius
+        border.width: showBorder ? 1 : 0
+        border.color: qgcPal.buttonBorder
+        color: "#1b1c3e"//_showHighlight ? qgcPal.buttonHighlight : qgcPal.button
     }
 
     contentItem: Item {

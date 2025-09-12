@@ -79,12 +79,6 @@ Rectangle {
                                             mainWindow.closefile()
                                         }
                 }
-
-
-
-
-
-
             }
         }
     }

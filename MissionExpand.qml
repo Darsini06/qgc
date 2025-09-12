@@ -17,10 +17,10 @@ Rectangle {
     id:             _root
     height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
     color:          "#1b1c3e"//_currentItem ? qgcPal.missionItemEditor : qgcPal.windowShade
-    radius:         _radius
+    radius:         20//_radius
     opacity:        _currentItem ? 1.0 : 0.7
-    border.width:   _readyForSave ? 0 : 2
-    border.color:   qgcPal.warningText
+    border.width:   _readyForSave ? 2 : 2
+    border.color:   _readyForSave ? "white" : qgcPal.warningText
 
     property var    map                 ///< Map control
     property var    masterController
@@ -83,45 +83,45 @@ Rectangle {
         anchors.top:        parent.top
         spacing:            _margin
 
-        Rectangle {
-            id:                     notReadyForSaveIndicator
-            anchors.verticalCenter: parent.verticalCenter
-            width:                  _hamburgerSize
-            height:                 width
-            border.width:           1
-            border.color:           qgcPal.warningText
-            color:                  "white"
-            radius:                 width / 2
-            visible:                !_readyForSave
+        // Rectangle {
+        //     id:                     notReadyForSaveIndicator
+        //     anchors.verticalCenter: parent.verticalCenter
+        //     width:                  _hamburgerSize
+        //     height:                 width
+        //     border.width:           1
+        //     border.color:           qgcPal.warningText
+        //     color:                  "white"
+        //     radius:                 width / 2
+        //     visible:                !_readyForSave
 
-            QGCLabel {
-                id:                 readyForSaveLabel
-                anchors.centerIn:   parent
-                //: Indicator in Plan view to show mission item is not ready for save/send
-                text:               qsTr("?")
-                color:              qgcPal.warningText
-                font.pointSize:     ScreenTools.smallFontPointSize
-            }
-        }
+        //     QGCLabel {
+        //         id:                 readyForSaveLabel
+        //         anchors.centerIn:   parent
+        //         //: Indicator in Plan view to show mission item is not ready for save/send
+        //         text:               qsTr("?")
+        //         color:              qgcPal.warningText
+        //         font.pointSize:     ScreenTools.smallFontPointSize
+        //     }
+        // }
 
-        QGCColoredImage {
-            id:                     deleteButton
-            anchors.verticalCenter: parent.verticalCenter
-            height:                 _hamburgerSize
-            width:                  height
-            sourceSize.height:      height
-            fillMode:               Image.PreserveAspectFit
-            mipmap:                 true
-            smooth:                 true
-            color:                  "white"//qgcPal.text
-            visible:                _currentItem && missionItem.sequenceNumber !== 0
-            source:                 "/res/TrashDelete.svg"
+        // QGCColoredImage {
+        //     id:                     deleteButton
+        //     anchors.verticalCenter: parent.verticalCenter
+        //     height:                 _hamburgerSize
+        //     width:                  height
+        //     sourceSize.height:      height
+        //     fillMode:               Image.PreserveAspectFit
+        //     mipmap:                 true
+        //     smooth:                 true
+        //     color:                  "white"//qgcPal.text
+        //     visible:                _currentItem && missionItem.sequenceNumber !== 0
+        //     source:                 "/res/TrashDelete.svg"
 
-            QGCMouseArea {
-                fillItem:   parent
-                onClicked:  remove()
-            }
-        }
+        //     QGCMouseArea {
+        //         fillItem:   parent
+        //         onClicked:  remove()
+        //     }
+        // }
 
         Item {
             id:                     commandPicker
@@ -137,8 +137,16 @@ Rectangle {
 
                 property real _padding: ScreenTools.comboBoxPadding
 
-                QGCLabel { text: missionItem.commandName
-                color:              "white"}
+                QGCLabel {
+                    text: missionItem.commandName
+                    color:              "white"
+                    horizontalAlignment:    Text.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                    Layout.fillWidth:       true
+                }
+
+
 
                 QGCColoredImage {
                     height:             ScreenTools.defaultFontPixelWidth
@@ -181,80 +189,87 @@ Rectangle {
         }
     }
 
-   QGCColoredImage {
-        id:                     hamburger
-        anchors.margins:        _margin
-        anchors.right:          parent.right
-        anchors.verticalCenter: topRowLayout.verticalCenter
-        width:                  _hamburgerSize
-        height:                 _hamburgerSize
-        sourceSize.height:      _hamburgerSize
-        source:                 "qrc:/qmlimages/Hamburger.svg"
-        //visible: (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0
-        visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
-        color:                  "white"//qgcPal.text
 
-        QGCMouseArea {
-            fillItem:   hamburger
-            onClicked: {
-                currentItemScope.focus = true
-                hamburgerMenu.popup()
-            }
 
-            QGCMenu {
-                id: hamburgerMenu
 
-                QGCMenuItem {
-                    text:           qsTr("Move to vehicle position")
-                    enabled:        _activeVehicle && missionItem.specifiesCoordinate
-                    onTriggered:    missionItem.coordinate = _activeVehicle.coordinate
 
-                    property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
-                }
 
-                QGCMenuItem {
-                    text:           qsTr("Move to previous item position")
-                    enabled:        _missionController.previousCoordinate.isValid
-                    onTriggered:    missionItem.coordinate = _missionController.previousCoordinate
-                }
+    // QGCColoredImage {
+    //      id:                     hamburger
+    //      anchors.margins:        _margin
+    //      anchors.right:          parent.right
+    //      anchors.verticalCenter: topRowLayout.verticalCenter
+    //      width:                  _hamburgerSize
+    //      height:                 _hamburgerSize
+    //      sourceSize.height:      _hamburgerSize
+    //      source:                 "qrc:/qmlimages/Hamburger.svg"
+    //      //visible: (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0
+    //      visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
+    //      color:                  "white"//qgcPal.text
 
-                QGCMenuItem {
-                    text:           qsTr("Edit position...")
-                    enabled:        missionItem.specifiesCoordinate
-                    onTriggered:    editPositionDialog.createObject(mainWindow).open()
-                }
+    //      QGCMouseArea {
+    //          fillItem:   hamburger
+    //          onClicked: {
+    //              currentItemScope.focus = true
+    //              hamburgerMenu.popup()
+    //          }
 
-                QGCMenuSeparator {
-                    //visible: missionItem.isSimpleItem && !_waypointsOnlyMode
-                }
+    //          QGCMenu {
+    //              id: hamburgerMenu
 
-                QGCMenuItem {
-                    text:       qsTr("Show all values")
-                    checkable:  true
-                    checked:    missionItem.isSimpleItem ? missionItem.rawEdit : false
-                    enabled:    missionItem.isSimpleItem && !_waypointsOnlyMode
+    //              QGCMenuItem {
+    //                  text:           qsTr("Move to vehicle position")
+    //                  enabled:        _activeVehicle && missionItem.specifiesCoordinate
+    //                  onTriggered:    missionItem.coordinate = _activeVehicle.coordinate
 
-                    onTriggered:    {
-                        if (missionItem.rawEdit) {
-                            if (missionItem.friendlyEditAllowed) {
-                                missionItem.rawEdit = false
-                            } else {
-                                mainWindow.showMessageDialog(qsTr("Mission Edit"), qsTr("You have made changes to the mission item which cannot be shown in Simple Mode"))
-                            }
-                        } else {
-                            missionItem.rawEdit = true
-                        }
-                        checked = missionItem.rawEdit
-                    }
-                }
+    //                  property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
+    //              }
 
-                QGCMenuItem {
-                    text:       qsTr("Item #%1").arg(missionItem.sequenceNumber)
-                    enabled:    false
-                }
-            }
-        }
-    }
+    //              QGCMenuItem {
+    //                  text:           qsTr("Move to previous item position")
+    //                  enabled:        _missionController.previousCoordinate.isValid
+    //                  onTriggered:    missionItem.coordinate = _missionController.previousCoordinate
+    //              }
+
+    //              QGCMenuItem {
+    //                  text:           qsTr("Edit position...")
+    //                  enabled:        missionItem.specifiesCoordinate
+    //                  onTriggered:    editPositionDialog.createObject(mainWindow).open()
+    //              }
+
+    //              QGCMenuSeparator {
+    //                  //visible: missionItem.isSimpleItem && !_waypointsOnlyMode
+    //              }
+
+    //              QGCMenuItem {
+    //                  text:       qsTr("Show all values")
+    //                  checkable:  true
+    //                  checked:    missionItem.isSimpleItem ? missionItem.rawEdit : false
+    //                  enabled:    missionItem.isSimpleItem && !_waypointsOnlyMode
+
+    //                  onTriggered:    {
+    //                      if (missionItem.rawEdit) {
+    //                          if (missionItem.friendlyEditAllowed) {
+    //                              missionItem.rawEdit = false
+    //                          } else {
+    //                              mainWindow.showMessageDialog(qsTr("Mission Edit"), qsTr("You have made changes to the mission item which cannot be shown in Simple Mode"))
+    //                          }
+    //                      } else {
+    //                          missionItem.rawEdit = true
+    //                      }
+    //                      checked = missionItem.rawEdit
+    //                  }
+    //              }
+
+    //              QGCMenuItem {
+    //                  text:       qsTr("Item #%1").arg(missionItem.sequenceNumber)
+    //                  enabled:    false
+    //              }
+    //          }
+    //      }
+    //  }
+
+
 
     /*
     QGCLabel {

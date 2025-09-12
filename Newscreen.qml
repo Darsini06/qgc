@@ -144,8 +144,9 @@ Item {
                 }
             }
 
-            Label { text: "ABOUT"; color: "white"; font.pixelSize: 15;font.bold: true }
-            Label { text: "CONTACT"; color: "white"; font.pixelSize: 15;font.bold: true }
+            // Label { text: "ABOUT"; color: "white"; font.pixelSize: 15;font.bold: true }
+            // Label { text: "CONTACT"; color: "white"; font.pixelSize: 15;font.bold: true }
+
             Item {
                 width: logout.implicitWidth
                 height: logout.implicitHeight
@@ -250,7 +251,7 @@ Item {
 
 
             Button {
-                text: " Link "
+                text: " Connect "
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                 Layout.preferredWidth: parent.width * 0.1
                 Layout.leftMargin: 10

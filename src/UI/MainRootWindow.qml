@@ -232,6 +232,16 @@ ApplicationWindow {
         return globals.validationError
     }
 
+    function takeoff(){
+        rtlbtn.visible=true
+        takeoffbtn.visible=false
+    }
+
+    function land(){
+        rtlbtn.visible=false
+        takeoffbtn.visible=true
+    }
+
     function newscreen() {
         planbtn.visible =false
         listbtn.visible = false
@@ -293,7 +303,7 @@ ApplicationWindow {
         planView.visible = false
         newscreen.visible = false
         mainrootIcons.visible=true
-        modebtn1.visible = true //activeVehicle ? true : false
+        modebtn1.visible = activeVehicle ? true : false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -313,7 +323,7 @@ ApplicationWindow {
         flyView.visible = true
         planView.visible = false
         newscreen.visible = false
-        modebtn1.visible = true //activeVehicle ? true : false
+        modebtn1.visible = activeVehicle ? true : false
         plan="Start"
         MapGlobals.edit = "edit1"
 
@@ -535,19 +545,44 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-    function initDB() {
-        var db = getDatabase();
-        db.transaction(function(tx) {// Only 'id' is the primary key now
-            tx.executeSql("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT , displayname TEXT , email TEXT , password TEXT , confirmpassword TEXT , login TEXT)");
-            tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, start_time TEXT, end_time TEXT)");
-        });
-
-        console.log("DB Created:", db);
-    }
-
     function getDatabase() {
         return LocalStorage.openDatabaseSync("QGCUserDB", "1.0", "User DB", 1000000);
     }
+
+    function initDB() {
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                // Users table - simplified
+                tx.executeSql("CREATE TABLE IF NOT EXISTS users(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    displayname TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    mobile_number TEXT,
+                    rpc_completed INTEGER DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )");
+
+                // Drone sessions table - simplified
+                tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,  // Simple reference without foreign key constraint
+                    date TEXT NOT NULL,
+                    start_time TEXT NOT NULL,
+                    end_time TEXT NOT NULL,
+                    duration INTEGER
+                )");
+
+                console.log("Database and tables created successfully");
+
+            } catch (error) {
+                console.error("Error creating database:", error);
+            }
+        });
+    }
+
 
     function saveDroneSession(date, startTime, endTime) {
         var db = getDatabase();
@@ -615,59 +650,114 @@ ApplicationWindow {
     }
 
 
-    function registerUser(username, displayname, email, password, confirmpassword) {
-        if (!username || !password) return;
+    function registerUser(username, displayname, email, password, confirmpassword, callback) {
         var db = getDatabase();
-        db.transaction(function(tx) {
+        var result = false;
 
-            var rs =tx.executeSql(
-                        "INSERT INTO users(username, displayname, email, password, confirmpassword) VALUES(?, ?, ?, ?, ?)",
-                        [username, displayname, email, password, confirmpassword]
-                        );
+        db.transaction(function(tx) {
+            // Print input values
+            console.log("=== USER REGISTRATION ATTEMPT ===");
+            console.log("Username:", username);
+            console.log("Display Name:", displayname);
+            console.log("Email:", email);
+            // Consider not logging passwords in production for security
+            console.log("Password length:", password.length);
+            console.log("Confirm Password length:", confirmpassword.length);
+
+            var rs = tx.executeSql(
+                "INSERT INTO users(username, displayname, email, password) VALUES(?, ?, ?, ?)",
+                [username, displayname, email, password]
+            );
 
             if (rs.rowsAffected > 0) {
-                console.log("Password Reset");
-                //currentView = "login";
-                mainWindow.showToastMessage("Registered successfully");
+                console.log("Registration successful!");
+                console.log("Rows affected:", rs.rowsAffected);
+                console.log("Inserted ID:", rs.insertId);
+
+                // Fetch and print the inserted record
+                var selectRs = tx.executeSql(
+                    "SELECT * FROM users WHERE id = ?",
+                    [rs.insertId]
+                );
+
+                if (selectRs.rows.length > 0) {
+                    var insertedUser = selectRs.rows.item(0);
+                    console.log("Inserted user details:");
+                    console.log("ID:", insertedUser.id);
+                    console.log("Username:", insertedUser.username);
+                    console.log("Display Name:", insertedUser.displayname);
+                    console.log("Email:", insertedUser.email);
+                    console.log("RPC Completed:", insertedUser.rpc_completed);
+                    console.log("Created At:", insertedUser.created_at);
+                }
+
+                result = true;
             } else {
-                console.log("User not found");
-                mainWindow.showToastMessage("Username already registered");
+                console.log("Registration failed - no rows affected");
+                result = false;
+            }
+
+            console.log("=== REGISTRATION COMPLETED ===");
+
+            if (callback) {
+                callback(result);
             }
         });
     }
 
-
-
-    function loginUserFunc(username, password) {
+    function loginUserFunc(username, password,callback) {
         var db = getDatabase();
+        var result = false;
+
         db.transaction(function(tx) {
             var rs = tx.executeSql("SELECT * FROM users WHERE username=? AND password=?", [username, password]);
             console.log("inserted=========",rs)
             if (rs.rows.length > 0) {
                 console.log("Login Success");
+                result = true;
                 login.visible = false;
                 mainWindow.newscreen();
-                mainWindow.showToastMessage("Login Success");
+                mainWindow.showToastMessage("Login Successfully");
                 MapGlobals.login="login"
                 QGroundControl.saveBoolGlobalSetting("login", true)
             } else {
+                result = false;
                 console.log("Invalid Credentials");
-                mainWindow.showToastMessage("Invalid Credentials");
+                mainWindow.showToastMessage("Incorrect username or password");
             }
+
+            if (callback) {
+                callback(result);
+            }
+
         });
     }
 
-    function resetPassword(username, newPass) {
+    function resetPassword(username, newPass, callback) {
         var db = getDatabase();
-        db.transaction(function(tx) {
-            var rs = tx.executeSql("UPDATE users SET password = ? WHERE username = ?", [newPass, username]);
-            if (rs.rowsAffected > 0) {
-                console.log("Password Reset");
-                currentView = "login";
-                mainWindow.showToastMessage("Password Reset");
+        db.transaction(function(tx) {  // 'tx' is the transaction object, not 'db'
+            // Check if username exists
+            var checkRs = tx.executeSql("SELECT * FROM users WHERE username = ?", [username]);
+
+            var result = {success: false, message: ""};
+
+            if (checkRs.rows.length > 0) {
+                // Update password
+                var updateRs = tx.executeSql("UPDATE users SET password = ? WHERE username = ?", [newPass, username]);
+
+                if (updateRs.rowsAffected > 0) {
+                    result.success = true;
+                    result.message = "Password reset successfully!";
+                } else {
+                    result.message = "Failed to reset password. Please try again.";
+                }
             } else {
-                console.log("User not found");
-                mainWindow.showToastMessage("User not found");
+                result.message = "Incorrect Username";
+            }
+
+            // Call the callback with the result
+            if (callback) {
+                callback(result);
             }
         });
     }
@@ -895,7 +985,7 @@ ApplicationWindow {
 
     background: Rectangle {
         anchors.fill:   parent
-        color:          QGroundControl.globalPalette.window
+        color: QGroundControl.globalPalette.window
     }
 
     QGCMapPolygonVisuals{
@@ -968,6 +1058,7 @@ ApplicationWindow {
     }
 
     function showToolSelectDialog() {
+
         if (!mainWindow.preventViewSwitch()) {
             console.log('showToolSelectDialog')
             //mainWindow.showIndicatorDrawer1(toolSelectComponent, null)
@@ -976,6 +1067,7 @@ ApplicationWindow {
     }
 
     function showToolSelectDialog1(index) {
+
         if (!mainWindow.preventViewSwitch()) {
             sideDrawer.open()
             tabBar.currentIndex = index; // 3rd index (0-based index)
@@ -1066,7 +1158,6 @@ ApplicationWindow {
                         font.pixelSize: 20
                         color: "white"
                         verticalAlignment: Text.AlignVCenter
-
                     }
                 }
 
@@ -1790,14 +1881,14 @@ ApplicationWindow {
             height: flightmode1.implicitHeight + 20 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
             color: "#1b1c3e"
-            visible: true
+            visible: activeVehicle
 
             border.width: 2
             border.color: "#005BBB"
 
             FlightModeIndicator {
                 id: flightmode1
-                visible: true
+                //visible: true
                 anchors.centerIn: parent
             }
         }
