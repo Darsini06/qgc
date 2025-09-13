@@ -22,6 +22,7 @@ Item {
   property string currentView: "profile" // options: main, accountUpdate, userGuide, record, reports, feedback, settings
 
   property string userName: ""
+  property string displayName: ""
   property string userEmail: ""
   property string name_from_db: ""
   property string mobileNo_from_db: ""
@@ -34,25 +35,28 @@ Item {
     id: sessionModel
   }
 
+  Component.onCompleted: {
+    console.log("onCompleted");
+
+    if (userName !== "") {
+      userName = QGroundControl.loadGlobalSetting("username", "")
+      loadUserDataFromMain();
+    }
+  }
+
   onVisibleChanged: {
 
-    console.log("onVisibleChanged");
-
     if (visible) {
-      userName = QGroundControl.loadGlobalSetting("name", "")
+
+      console.log("onVisibleChanged");
+
+      displayName = QGroundControl.loadGlobalSetting("name", "")
+      userName = QGroundControl.loadGlobalSetting("username", "")
       userEmail = QGroundControl.loadGlobalSetting("email", "")
 
-      if (userName !== ""){
-
-        var selectRs = tx.executeSql(
-            "SELECT * FROM users WHERE username = ?",
-            [userName]
-        );
-
-        name_from_db = selectRs.displayname;
-        mobileNo_from_db = selectRs.mobile_number ?? "";
-        email_from_db = selectRs.email;
-
+      if (userName !== "") {
+        console.log("onVisibleUserName : ",userName);
+        loadUserDataFromMain();
       }
     }
 
@@ -83,6 +87,28 @@ Item {
                             });
       }
       console.log("Datas : ",rs)
+    });
+  }
+
+
+  function loadUserDataFromMain() {
+    mainWindow.loadUserData(userName, function(userData) {
+      if (userData) {
+        // Set your profile screen properties
+        name_from_db = userData.displayname || "";
+        mobileNo_from_db = userData.mobile_number || "";
+        email_from_db = userData.email || "";
+
+        console.log("Data retrieved - Name:", name_from_db,
+                    "Email:", email_from_db,
+                    "Mobile:", mobileNo_from_db);
+      } else {
+        console.log("No user data received");
+        // Clear the fields if no data
+        name_from_db = "";
+        mobileNo_from_db = "";
+        email_from_db = "";
+      }
     });
   }
 
@@ -204,7 +230,7 @@ Item {
               // Name
               Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: userName || "Anonymous"
+                text: displayName || "Anonymous"
                 font.pointSize: 16
                 font.bold: true
                 color: "#333333"
@@ -377,347 +403,438 @@ Item {
 
     // Account Update Screen
     Rectangle {
-        color: "white"
+      color: "white"
 
-        ColumnLayout {
+      ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+
+        // Header
+        Rectangle {
+          Layout.fillWidth: true
+          Layout.preferredHeight: parent.height * 0.15
+          color: "#1b1c3e"
+
+          RowLayout {
             anchors.fill: parent
-            spacing: 0
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 10
 
-            // Header
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: parent.height * 0.15
-                color: "#1b1c3e"
+            QGCColoredImage {
+              source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+              fillMode: Image.PreserveAspectFit
+              width: 25
+              height: 25
+              color: "white"
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 20
-                    anchors.rightMargin: 20
-                    spacing: 10
-
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        fillMode: Image.PreserveAspectFit
-                        width: 25
-                        height: 25
-                        color: "white"
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                //mainWindow.profileScreen1(false)
-                                currentView = "profile"
-                            }
-                        }
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                    }
-
-                    QGCColoredImage {
-                        id: accountUpdate
-                        source: "/qmlimages/NewImages/profile.png"
-                        width: 25
-                        height: 25
-                        fillMode: Image.PreserveAspectFit
-                        color: "white"
-                    }
-
-                    Text {
-                        text: "Account Update"
-                        font.pointSize: 18
-                        color: "white"
-                        font.bold: true
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                    }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  //mainWindow.profileScreen1(false)
+                  currentView = "profile"
                 }
+              }
             }
 
-            // Account Update content area
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
-                Layout.bottomMargin: 10
-                Layout.topMargin: 10
-                spacing: 10
+            Item {
+              Layout.fillWidth: true
+            }
 
-                // First Card - Profile Info & Stats
-                Rectangle {
-                    Layout.preferredWidth: parent.width * 0.4
-                    Layout.fillHeight: true
-                    color: "white"
-                    radius: 5
-                    border.color: "#e0e0e0"
-                    border.width: 1
+            QGCColoredImage {
+              id: accountUpdate
+              source: "/qmlimages/NewImages/profile.png"
+              width: 25
+              height: 25
+              fillMode: Image.PreserveAspectFit
+              color: "white"
+            }
 
-                    Column {
+            Text {
+              text: "Account Update"
+              font.pointSize: 18
+              color: "white"
+              font.bold: true
+            }
+
+            Item {
+              Layout.fillWidth: true
+            }
+          }
+        }
+
+        // Account Update content area
+        RowLayout {
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          Layout.leftMargin: 10
+          Layout.rightMargin: 10
+          Layout.bottomMargin: 10
+          Layout.topMargin: 10
+          spacing: 10
+
+          // First Card - Profile Info & Stats
+          Rectangle {
+            Layout.preferredWidth: parent.width * 0.4
+            Layout.fillHeight: true
+            color: "white"
+            radius: 5
+            border.color: "#e0e0e0"
+            border.width: 1
+
+            Column {
+              anchors.fill: parent
+              anchors.margins: 20
+              spacing: 10
+
+              Item {
+                width: 150
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                LottieAnimation {
+                  id: droneAnim
+                  anchors.centerIn: parent
+                  source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                  autoPlay: true
+                  loops: Animation.Infinite
+                  scale: 0.3
+                  onStatusChanged: console.log("Lottie Status:", status)
+                }
+              }
+
+              Text {
+                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                wrapMode: Text.WordWrap
+                font.pixelSize: 14 // Reduced size for better fit
+                color: "black" // Changed from white to black for visibility
+                horizontalAlignment: Text.AlignHCenter
+                width: parent.width - 40 // Add some margin
+              }
+            }
+          }
+
+          // Second Card - Form
+          Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "white"
+            radius: 5
+            border.color: "#e0e0e0"
+            border.width: 1
+
+            ScrollView {
+              anchors.fill: parent
+              anchors.margins: 10
+              clip: true
+              contentWidth: availableWidth
+              ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+              Item {
+                width: parent.width
+                implicitHeight: formColumn.implicitHeight + 15 // Add padding
+
+                Column {
+                  id: formColumn
+                  width: parent.width
+                  spacing: 10
+                  anchors.centerIn: parent
+
+                  // Name Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Profi Name"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: namefield.activeFocus ? 2 : 1
+                      border.color: namefield.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: namefield
                         anchors.fill: parent
-                        anchors.margins: 20
-                        spacing: 10
+                        anchors.margins: 5
+                        placeholderText: "Enter your name"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        text: name_from_db
 
-                        Item {
-                            width: 150
-                            height: 150
-                            anchors.horizontalCenter: parent.horizontalCenter
+                        validator: RegularExpressionValidator {
+                          regularExpression: /^[a-zA-Z\s]*$/
+                        }
+                      }
+                    }
+                  }
 
-                            LottieAnimation {
-                                id: droneAnim
-                                anchors.centerIn: parent
-                                source: "qrc:/qmlimages/NewImages/droneManFly.json"
-                                autoPlay: true
-                                loops: Animation.Infinite
-                                scale: 0.3
-                                onStatusChanged: console.log("Lottie Status:", status)
-                            }
+                  // username Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Username"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: _username.activeFocus ? 2 : 1
+                      border.color: _username.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: _username
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        placeholderText: "Enter your username"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        text: userName
+
+                        validator: RegularExpressionValidator {
+                          regularExpression: /^[a-zA-Z\s]*$/
+                        }
+                      }
+                    }
+                  }
+
+
+                  // Email Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Email"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: emailField.activeFocus ? 2 : 1
+                      border.color: emailField.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: emailField
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        placeholderText: "Enter your email"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        inputMethodHints: Qt.ImhEmailCharactersOnly
+                        text: email_from_db
+                      }
+                    }
+                  }
+
+                  // Mobile Number Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Mobile Number"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: mobileField.activeFocus ? 2 : 1
+                      border.color: mobileField.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: mobileField
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        placeholderText: "Enter mobile number"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        text: mobileNo_from_db
+                      }
+                    }
+                  }
+
+                  // RPC Completion Question
+                  Column {
+                    width: parent.width * 0.95
+                    spacing: 8
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Text {
+                      text: "Have you completed the RPC?"
+                      font.pixelSize: 14
+
+                      color: "#333333"
+                    }
+
+                    Row {
+                      spacing: 30
+                      //anchors.horizontalCenter: parent.horizontalCenter
+
+                      // Yes Radio Button
+                      Row {
+                        spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Rectangle {
+                          width: 15
+                          height: 15
+                          radius: 10
+                          border.width: 2
+                          border.color: "#1b1c3e"
+                          color: rpcCompleted.checked === "Yes" ? "#1b1c3e" : "transparent"
+
+                          MouseArea {
+                            anchors.fill: parent
+                            onClicked: rpcCompleted.checked = "Yes"
+                          }
                         }
 
                         Text {
-                            text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                            wrapMode: Text.WordWrap
-                            font.pixelSize: 14 // Reduced size for better fit
-                            color: "black" // Changed from white to black for visibility
-                            horizontalAlignment: Text.AlignHCenter
-                            width: parent.width - 40 // Add some margin
+                          text: "Yes"
+                          font.pixelSize: 14
+                          color: "#333333"
+                          anchors.verticalCenter: parent.verticalCenter
+
+                          MouseArea {
+                            anchors.fill: parent
+                            onClicked: rpcCompleted.checked = "Yes"
+                          }
                         }
+                      }
+
+                      // No Radio Button
+                      Row {
+                        spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Rectangle {
+                          width: 15
+                          height: 15
+                          radius: 10
+                          border.width: 2
+                          border.color: "#1b1c3e"
+                          color: rpcCompleted.checked === "No" ? "#1b1c3e" : "transparent"
+
+                          MouseArea {
+                            anchors.fill: parent
+                            onClicked: rpcCompleted.checked = "No"
+                          }
+                        }
+
+                        Text {
+                          text: "No"
+                          font.pixelSize: 14
+                          color: "#333333"
+                          anchors.verticalCenter: parent.verticalCenter
+
+                          MouseArea {
+                            anchors.fill: parent
+                            onClicked: rpcCompleted.checked = "No"
+                          }
+                        }
+                      }
                     }
+                  }
+
+                  PropertyAnimation {
+                    id: rpcCompleted
+                    property string checked: ""
+                  }
+
+                  // Update Button
+                  Button {
+                    text: "Update"
+                    width: parent.width * 0.3
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                      if (!mainWindow.validateUsername(_username.text,_username)) return;
+                      if (!mainWindow.validateDisplayName(namefield.text,namefield)) return;
+                      if (!mainWindow.validateEmail(emailField.text,emailField)) return;
+
+                      var _rpcCompleted = rpcCompleted.checked === "Yes" ? 1 : 0;
+
+                      mainWindow.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
+                          if (result) {
+
+                              mainWindow.showToastMessage("Updated successfully!");
+
+                              currentView = "profile";
+
+                              QGroundControl.saveGlobalSetting("username", _username.text);
+                              QGroundControl.saveGlobalSetting("name", namefield.text);
+                              QGroundControl.saveGlobalSetting("email", emailField.text);
+
+                          }
+                      });
+                    }
+
+                    background: Rectangle {
+                      radius: 5
+                      color: parent.pressed ? "#218838" : "#28a745"
+                    }
+
+                    contentItem: Text {
+                      text: parent.text
+                      color: "white"
+                      font.pixelSize: 14
+                      font.bold: true
+                      horizontalAlignment: Text.AlignHCenter
+                      verticalAlignment: Text.AlignVCenter
+                    }
+                  }
+
+                  Item { height: 10 } // Spacer
                 }
-
-                // Second Card - Form
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: "white"
-                    radius: 5
-                    border.color: "#e0e0e0"
-                    border.width: 1
-
-                    ScrollView {
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        clip: true
-                        contentWidth: availableWidth
-                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                        Item {
-                            width: parent.width
-                            implicitHeight: formColumn.implicitHeight + 15 // Add padding
-
-                            Column {
-                                id: formColumn
-                                width: parent.width
-                                spacing: 15
-                                anchors.centerIn: parent
-
-                                // Name Field
-                                Rectangle {
-                                    width: parent.width * 0.95
-                                    height: 40
-                                    radius: 5
-                                    color: "white"
-                                    border.width: namefield.activeFocus ? 2 : 1
-                                    border.color: namefield.activeFocus ? "#007acc" : "#cccccc"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    TextField {
-                                        id: namefield
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        placeholderText: "Enter your name"
-                                        font.pixelSize: 14
-                                        font.family: "Arial"
-                                        color: "black"
-                                        background: null
-                                        selectByMouse: true
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        text:name_from_db
-
-                                        validator: RegularExpressionValidator {
-                                            regularExpression: /^[a-zA-Z\s]*$/
-                                        }
-                                    }
-                                }
-
-                                // Email Field
-                                Rectangle {
-                                    width: parent.width * 0.95
-                                    height: 40
-                                    radius: 5
-                                    color: "white"
-                                    border.width: emailField.activeFocus ? 2 : 1
-                                    border.color: emailField.activeFocus ? "#007acc" : "#cccccc"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    TextField {
-                                        id: emailField
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        placeholderText: "Enter your email"
-                                        font.pixelSize: 14
-                                        font.family: "Arial"
-                                        color: "black"
-                                        background: null
-                                        selectByMouse: true
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        inputMethodHints: Qt.ImhEmailCharactersOnly
-                                        text:email_from_db
-                                    }
-                                }
-
-                                // Mobile Number Field
-                                Rectangle {
-                                    width: parent.width * 0.95
-                                    height: 40
-                                    radius: 5
-                                    color: "white"
-                                    border.width: mobileField.activeFocus ? 2 : 1
-                                    border.color: mobileField.activeFocus ? "#007acc" : "#cccccc"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    TextField {
-                                        id: mobileField
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        placeholderText: "Enter mobile number"
-                                        font.pixelSize: 14
-                                        font.family: "Arial"
-                                        color: "black"
-                                        background: null
-                                        selectByMouse: true
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        inputMethodHints: Qt.ImhDigitsOnly
-                                        text:mobileNo_from_db
-                                    }
-                                }
-
-                                // RPC Completion Question
-                                Column {
-                                    width: parent.width * 0.95
-                                    spacing: 8
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    Text {
-                                        text: "Have you completed the RPC?"
-                                        font.pixelSize: 14
-
-                                        color: "#333333"
-                                    }
-
-                                    Row {
-                                        spacing: 30
-                                        //anchors.horizontalCenter: parent.horizontalCenter
-
-                                        // Yes Radio Button
-                                        Row {
-                                            spacing: 8
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            Rectangle {
-                                                width: 20
-                                                height: 20
-                                                radius: 10
-                                                border.width: 2
-                                                border.color: "#1b1c3e"
-                                                color: rpcCompleted.checked === "Yes" ? "#1b1c3e" : "transparent"
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: rpcCompleted.checked = "Yes"
-                                                }
-                                            }
-
-                                            Text {
-                                                text: "Yes"
-                                                font.pixelSize: 14
-                                                color: "#333333"
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: rpcCompleted.checked = "Yes"
-                                                }
-                                            }
-                                        }
-
-                                        // No Radio Button
-                                        Row {
-                                            spacing: 8
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            Rectangle {
-                                                width: 20
-                                                height: 20
-                                                radius: 10
-                                                border.width: 2
-                                                border.color: "#1b1c3e"
-                                                color: rpcCompleted.checked === "No" ? "#1b1c3e" : "transparent"
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: rpcCompleted.checked = "No"
-                                                }
-                                            }
-
-                                            Text {
-                                                text: "No"
-                                                font.pixelSize: 14
-                                                color: "#333333"
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    onClicked: rpcCompleted.checked = "No"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                PropertyAnimation {
-                                    id: rpcCompleted
-                                    property string checked: ""
-                                }
-
-                                // Update Button
-                                Button {
-                                    text: "Update"
-                                    width: parent.width * 0.3
-                                    height: 40
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    onClicked: {
-                                        console.log("Update Clicked")
-                                        console.log("RPC Completed:", rpcCompleted.checked ? "Yes" : "No")
-                                    }
-
-                                    background: Rectangle {
-                                        radius: 5
-                                        color: parent.pressed ? "#218838" : "#28a745"
-                                    }
-
-                                    contentItem: Text {
-                                        text: parent.text
-                                        color: "white"
-                                        font.pixelSize: 14
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-                                }
-
-                                Item { height: 10 } // Spacer
-                            }
-                        }
-                    }
-                } //SecondCaed
-
+              }
             }
+          } //SecondCaed
+
         }
+      }
     }
 
     // Reports Screen

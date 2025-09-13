@@ -466,6 +466,10 @@ Item {
                                     }
 
                                     mainWindow.loginUserFunc(loginUser.text, loginPass.text, function(result) {
+
+                                        QGroundControl.saveGlobalSetting("username", loginUser.text.trim());
+                                        console.log("userName put in SharedPreference : ",loginUser.text)
+
                                         if(result){
                                             loginUser.text = "";
                                             loginPass.text = "";
@@ -782,130 +786,12 @@ Item {
                             }
 
                             onClicked: {
-                                // Enhanced validation functions
-                                function validateNotEmpty(field, message) {
-                                    if (field.text.trim() === "") {
-                                        mainWindow.showToastMessage(message);
-                                        field.focus = true;
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                function validateUsername(username) {
-                                    if (username.trim() === "") {
-                                        mainWindow.showToastMessage("Please enter a username");
-                                        regUser.focus = true;
-                                        return false;
-                                    }
-                                    if (username.length < 3) {
-                                        mainWindow.showToastMessage("Username must be at least 3 characters long");
-                                        regUser.focus = true;
-                                        return false;
-                                    }
-                                    if (!/^[a-zA-Z\s]+$/.test(username)) {
-                                        mainWindow.showToastMessage("Username can only contain letters and spaces");
-                                        regUser.focus = true;
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                function validateDisplayName(displayName) {
-                                    if (displayName.trim() === "") {
-                                        mainWindow.showToastMessage("Please enter a display name");
-                                        regDisplay.focus = true;
-                                        return false;
-                                    }
-                                    if (displayName.length < 2) {
-                                        mainWindow.showToastMessage("Display name must be at least 2 characters long");
-                                        regDisplay.focus = true;
-                                        return false;
-                                    }
-                                    return true;
-                                }
-
-                                function validateEmail(email) {
-                                    if (email.trim() === "") {
-                                        mainWindow.showToastMessage("Please enter an email address");
-                                        regEmail.focus = true;
-                                        return false;
-                                    }
-
-                                    // Comprehensive email validation regex
-                                    var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-                                    if (!emailRegex.test(email)) {
-                                        mainWindow.showToastMessage("Please enter a valid email address");
-                                        regEmail.focus = true;
-                                        return false;
-                                    }
-
-                                    // Check for common email providers
-                                    var domain = email.split('@')[1];
-                                    if (!domain || domain.indexOf('.') === -1) {
-                                        mainWindow.showToastMessage("Please enter a valid email domain");
-                                        regEmail.focus = true;
-                                        return false;
-                                    }
-
-                                    return true;
-                                }
-
-                                function validatePassword(password) {
-                                    if (password === "") {
-                                        mainWindow.showToastMessage("Please enter a password");
-                                        regPass.focus = true;
-                                        return false;
-                                    }
-
-                                    if (password.length < 8) {
-                                        mainWindow.showToastMessage("Password must be at least 8 characters long");
-                                        regPass.focus = true;
-                                        return false;
-                                    }
-
-                                    // Check for password strength
-                                    var hasUpperCase = /[A-Z]/.test(password);
-                                    var hasLowerCase = /[a-z]/.test(password);
-                                    var hasNumbers = /[0-9]/.test(password);
-                                    var hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-                                    var strengthScore = (hasUpperCase ? 1 : 0) + (hasLowerCase ? 1 : 0) +
-                                            (hasNumbers ? 1 : 0) + (hasSpecialChar ? 1 : 0);
-
-                                    if (strengthScore < 3) {
-                                        mainWindow.showToastMessage("Password should include uppercase, lowercase, numbers, and special characters");
-                                        regPass.focus = true;
-                                        return false;
-                                    }
-
-                                    return true;
-                                }
-
-                                function validateConfirmPassword(password, confirmPassword) {
-                                    if (confirmPassword === "") {
-                                        mainWindow.showToastMessage("Please confirm your password");
-                                        regConfirm.focus = true;
-                                        return false;
-                                    }
-
-                                    if (password !== confirmPassword) {
-                                        mainWindow.showToastMessage("Passwords don't match");
-                                        regConfirm.focus = true;
-                                        return false;
-                                    }
-
-                                    return true;
-                                }
-
                                 // Execute validations in order
-                                if (!validateUsername(regUser.text)) return;
-                                if (!validateDisplayName(regDisplay.text)) return;
-                                if (!validateEmail(regEmail.text)) return;
-                                if (!validatePassword(regPass.text)) return;
-                                if (!validateConfirmPassword(regPass.text, regConfirm.text)) return;
-
+                                if (!mainWindow.validateUsername(regUser.text,regUser)) return;
+                                if (!mainWindow.validateDisplayName(regDisplay.text,regDisplay)) return;
+                                if (!mainWindow.validateEmail(regEmail.text,regEmail)) return;
+                                if (!mainWindow.validatePassword(regPass.text,regPass)) return;
+                                if (!mainWindow.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
 
                                 mainWindow.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
                                     if (result) {
@@ -913,6 +799,8 @@ Item {
                                         mainWindow.showToastMessage("Account created successfully!");
 
                                         currentView = "signin";
+
+                                        QGroundControl.saveGlobalSetting("username", regUser.text);
                                         QGroundControl.saveGlobalSetting("name", regDisplay.text);
                                         QGroundControl.saveGlobalSetting("email", regEmail.text);
 

@@ -649,7 +649,6 @@ ApplicationWindow {
         userDialog.open()
     }
 
-
     function registerUser(username, displayname, email, password, confirmpassword, callback) {
         var db = getDatabase();
         var result = false;
@@ -664,10 +663,36 @@ ApplicationWindow {
             console.log("Password length:", password.length);
             console.log("Confirm Password length:", confirmpassword.length);
 
+            // First check if username already exists
+            var usernameCheck = tx.executeSql(
+                        "SELECT id FROM users WHERE username = ?",
+                        [username]
+                        );
+
+            if (usernameCheck.rows.length > 0) {
+                console.log("Registration failed - username already exists");
+                showToastMessage("Username already exists", true);
+                if (callback) callback(false);
+                return;
+            }
+
+            // Check if email already exists
+            var emailCheck = tx.executeSql(
+                        "SELECT id FROM users WHERE email = ?",
+                        [email]
+                        );
+
+            if (emailCheck.rows.length > 0) {
+                console.log("Registration failed - email already exists");
+                showToastMessage("Email already registered", true);
+                if (callback) callback(false);
+                return;
+            }
+
             var rs = tx.executeSql(
-                "INSERT INTO users(username, displayname, email, password) VALUES(?, ?, ?, ?)",
-                [username, displayname, email, password]
-            );
+                        "INSERT INTO users(username, displayname, email, password) VALUES(?, ?, ?, ?)",
+                        [username, displayname, email, password]
+                        );
 
             if (rs.rowsAffected > 0) {
                 console.log("Registration successful!");
@@ -676,9 +701,9 @@ ApplicationWindow {
 
                 // Fetch and print the inserted record
                 var selectRs = tx.executeSql(
-                    "SELECT * FROM users WHERE id = ?",
-                    [rs.insertId]
-                );
+                            "SELECT * FROM users WHERE id = ?",
+                            [rs.insertId]
+                            );
 
                 if (selectRs.rows.length > 0) {
                     var insertedUser = selectRs.rows.item(0);
@@ -762,13 +787,13 @@ ApplicationWindow {
         });
     }
 
+    function updateUser(old_userName,new_username, newDisplayname, newEmail,mobile_no,_rpcCompleted,callback) {
 
-    function updateUser(username, newDisplayname, newEmail) {
         var db = getDatabase();
         db.transaction(function(tx) {
             var rs = tx.executeSql(
-                        "UPDATE users SET displayname = ?, email = ? WHERE username = ?",
-                        [newDisplayname, newEmail, username]
+                        "UPDATE users SET username = ?, displayname = ?,email = ?,mobile_number = ?,rpc_completed = ? WHERE username = ?",
+                        [new_username, newDisplayname, newEmail,mobile_no,_rpcCompleted,old_userName]
                         );
             if (rs.rowsAffected > 0) {
                 console.log("User updated");
@@ -779,7 +804,6 @@ ApplicationWindow {
             }
         });
     }
-
 
     function deleteUser(username) {
         var db = getDatabase();
@@ -805,6 +829,37 @@ ApplicationWindow {
             tx.executeSql("INSERT INTO userslogin(id, login) VALUES(1, '0')");
         });
         console.log("DB Created:", db);
+    }
+
+    function loadUserData(username, callback) {
+        console.log("Loading user data for:", username);
+
+        if (username !== "") {
+            var db = getDatabase();
+            db.transaction(function(tx) {
+                var selectRs = tx.executeSql(
+                            "SELECT * FROM users WHERE username = ?",
+                            [username]
+                            );
+
+                var result = null;
+                if (selectRs.rows.length > 0) {
+                    result = selectRs.rows.item(0);
+                    console.log("User data found:", result);
+                } else {
+                    console.log("No user found with username:", username);
+                }
+
+                // Call the callback with the result
+                if (callback) {
+                    callback(result);
+                }
+            });
+        } else {
+            if (callback) {
+                callback(null);
+            }
+        }
     }
 
     function profile() {
@@ -856,7 +911,6 @@ ApplicationWindow {
         });
     }
 
-
     function setLogout(userId) {
         var db = getDatabase();
 
@@ -871,6 +925,142 @@ ApplicationWindow {
 
         });
     }
+
+    function validateNotEmpty(field, fieldName, focusField) {
+        if (field.trim() === "") {
+            showToastMessage(`Please enter your ${fieldName}`);
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+        return true;
+    }
+
+    function validateUsername(username, focusField, isUpdate = false) {
+        if (!validateNotEmpty(username, "username", focusField)) return false;
+
+        if (username.length < 3) {
+            showToastMessage("Username must be at least 3 characters long");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            showToastMessage("Username can only contain letters, numbers, and underscores");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        // For account creation, you might want to check if username already exists
+        if (!isUpdate) {
+            // Simulate checking if username exists
+            if (username === "existinguser") {
+                showToastMessage("Username already taken");
+                if (focusField) focusField.focus = true;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function validateDisplayName(displayName, focusField) {
+        if (!validateNotEmpty(displayName, "display name", focusField)) return false;
+
+        if (displayName.length < 2) {
+            showToastMessage("Display name must be at least 2 characters long");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateEmail(email, focusField, isUpdate = false) {
+        if (!validateNotEmpty(email, "email address", focusField)) return false;
+
+        // Comprehensive email validation regex
+        var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+        if (!emailRegex.test(email)) {
+            showToastMessage("Please enter a valid email address");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        // For account creation, you might want to check if email already exists
+        if (!isUpdate) {
+            // Simulate checking if email exists
+            if (email === "existing@example.com") {
+                showToastMessage("Email already registered");
+                if (focusField) focusField.focus = true;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function validatePassword(password, focusField, isUpdate = false) {
+        // For update, password is optional (only validate if provided)
+        if (isUpdate && password === "") return true;
+
+        if (!validateNotEmpty(password, "password", focusField)) return false;
+
+        if (password.length < 8) {
+            showToastMessage("Password must be at least 8 characters long");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        // Check for password strength
+        var hasUpperCase = /[A-Z]/.test(password);
+        var hasLowerCase = /[a-z]/.test(password);
+        var hasNumbers = /[0-9]/.test(password);
+        var hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        var strengthScore = (hasUpperCase ? 1 : 0) + (hasLowerCase ? 1 : 0) +
+                (hasNumbers ? 1 : 0) + (hasSpecialChar ? 1 : 0);
+
+        if (strengthScore < 3) {
+            showToastMessage("Password should include uppercase, lowercase, numbers, and special characters");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateConfirmPassword(password, confirmPassword, focusField, isUpdate = false) {
+        // For update, confirm password is only required if password is provided
+        if (isUpdate && password === "" && confirmPassword === "") return true;
+
+        if (!validateNotEmpty(confirmPassword, "password confirmation", focusField)) return false;
+
+        if (password !== confirmPassword) {
+            showToastMessage("Passwords don't match");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateMobileNumber(mobile, focusField) {
+        if (!validateNotEmpty(mobile, "mobile number", focusField)) return false;
+
+        // Basic mobile number validation
+        var mobileRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        var cleanedMobile = mobile.replace(/[-\s\(\)]/g, '');
+
+        if (!mobileRegex.test(cleanedMobile)) {
+            showToastMessage("Please enter a valid mobile number");
+            if (focusField) focusField.focus = true;
+            return false;
+        }
+
+        return true;
+    }
+
 
     Item {
         id: toastContainer
@@ -2667,8 +2857,8 @@ ApplicationWindow {
                             dialog.visible = false
                             planView.data1()
                         }else {
-                         dialog.visible = false
-                         mainWindow.showToastMessage("Drone Not Connected");
+                            dialog.visible = false
+                            mainWindow.showToastMessage("Drone Not Connected");
                         }
 
                         MapGlobals.share_edit_visibility = false
