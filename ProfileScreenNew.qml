@@ -31,8 +31,20 @@ Item {
 
   property string selectedImage: ""
 
+  property string rpcCompletedStatus: ""
+
   ListModel {
     id: sessionModel
+  }
+
+  // Connect to new session signal
+  Connections {
+      target: mainWindow
+      onNewSessionAdded: {
+          console.log("New session added, refreshing...");
+          loadSessions();
+          //loadSessionStatistics();
+      }
   }
 
   Component.onCompleted: {
@@ -42,6 +54,7 @@ Item {
       userName = QGroundControl.loadGlobalSetting("username", "")
       loadUserDataFromMain();
     }
+
   }
 
   onVisibleChanged: {
@@ -49,6 +62,8 @@ Item {
     if (visible) {
 
       console.log("onVisibleChanged");
+
+      loadSessions();
 
       displayName = QGroundControl.loadGlobalSetting("name", "")
       userName = QGroundControl.loadGlobalSetting("username", "")
@@ -58,38 +73,50 @@ Item {
         console.log("onVisibleUserName : ",userName);
         loadUserDataFromMain();
       }
+
     }
 
   }
 
   onCurrentViewChanged: {
+    console.log("onCurrentViewChanged")
+
+    displayName = QGroundControl.loadGlobalSetting("name", "")
+    userName = QGroundControl.loadGlobalSetting("username", "")
+    userEmail = QGroundControl.loadGlobalSetting("email", "")
+
     if (currentView === "reports") {
       console.log("Switched to Reports view")
       loadSessions()
     }
-  }
 
-  function getDatabase() {
-    return LocalStorage.openDatabaseSync("QGCUserDB", "1.0", "User DB", 1000000);
   }
 
   function loadSessions() {
-    sessionModel.clear();
-    var db = getDatabase();
-    db.transaction(function(tx) {
-      var rs = tx.executeSql("SELECT * FROM drone_sessions ORDER BY id DESC");
-      for (var i = 0; i < rs.rows.length; i++) {
-        var row = rs.rows.item(i);
-        sessionModel.append({
-                              date: row.date,
-                              start: row.start_time,
-                              end: row.end_time
-                            });
-      }
-      console.log("Datas : ",rs)
-    });
-  }
+      console.log("Loading drone sessions...");
+      sessionModel.clear();
 
+      mainWindow.getAllSessions(function(sessions) {
+          if (sessions.length === 0) {
+              console.log("No drone sessions found");
+              return;
+          }
+
+          for (var i = 0; i < sessions.length; i++) {
+              var session = sessions[i];
+              sessionModel.append({
+                  id: session.id,
+                  date: session.date,
+                  start: session.start_time,
+                  end: session.end_time,
+                  duration: session.duration || 0,
+                  createdAt: session.created_at
+              });
+          }
+
+          console.log("Loaded", sessions.length, "sessions into model");
+      });
+  }
 
   function loadUserDataFromMain() {
     mainWindow.loadUserData(userName, function(userData) {
@@ -98,6 +125,7 @@ Item {
         name_from_db = userData.displayname || "";
         mobileNo_from_db = userData.mobile_number || "";
         email_from_db = userData.email || "";
+        profilescreen.rpcCompletedStatus = userData.rpc_completed || "";
 
         console.log("Data retrieved - Name:", name_from_db,
                     "Email:", email_from_db,
@@ -108,6 +136,7 @@ Item {
         name_from_db = "";
         mobileNo_from_db = "";
         email_from_db = "";
+        profilescreen.rpcCompletedStatus = "";
       }
     });
   }
@@ -579,6 +608,7 @@ Item {
                         }
                       }
                     }
+
                   }
 
                   // username Field
@@ -724,11 +754,11 @@ Item {
                           radius: 10
                           border.width: 2
                           border.color: "#1b1c3e"
-                          color: rpcCompleted.checked === "Yes" ? "#1b1c3e" : "transparent"
+                          color: profilescreen.rpcCompletedStatus === "Yes" ? "#1b1c3e" : "transparent"
 
                           MouseArea {
                             anchors.fill: parent
-                            onClicked: rpcCompleted.checked = "Yes"
+                            onClicked: profilescreen.rpcCompletedStatus = "Yes"
                           }
                         }
 
@@ -740,7 +770,7 @@ Item {
 
                           MouseArea {
                             anchors.fill: parent
-                            onClicked: rpcCompleted.checked = "Yes"
+                            onClicked: profilescreen.rpcCompletedStatus = "Yes"
                           }
                         }
                       }
@@ -756,11 +786,11 @@ Item {
                           radius: 10
                           border.width: 2
                           border.color: "#1b1c3e"
-                          color: rpcCompleted.checked === "No" ? "#1b1c3e" : "transparent"
+                          color: profilescreen.rpcCompletedStatus === "No" ? "#1b1c3e" : "transparent"
 
                           MouseArea {
                             anchors.fill: parent
-                            onClicked: rpcCompleted.checked = "No"
+                            onClicked: profilescreen.rpcCompletedStatus = "No"
                           }
                         }
 
@@ -779,11 +809,6 @@ Item {
                     }
                   }
 
-                  PropertyAnimation {
-                    id: rpcCompleted
-                    property string checked: ""
-                  }
-
                   // Update Button
                   Button {
                     text: "Update"
@@ -795,20 +820,19 @@ Item {
                       if (!mainWindow.validateDisplayName(namefield.text,namefield)) return;
                       if (!mainWindow.validateEmail(emailField.text,emailField)) return;
 
-                      var _rpcCompleted = rpcCompleted.checked === "Yes" ? 1 : 0;
+                      var _rpcCompleted =  profilescreen.rpcCompletedStatus === "Yes" ? 1 : 0;
 
                       mainWindow.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
-                          if (result) {
+                        if (result) {
 
-                              mainWindow.showToastMessage("Updated successfully!");
+                          QGroundControl.saveGlobalSetting("username", _username.text);
+                          QGroundControl.saveGlobalSetting("name", namefield.text);
+                          QGroundControl.saveGlobalSetting("email", emailField.text);
 
-                              currentView = "profile";
+                          mainWindow.showToastMessage("Updated successfully!");
 
-                              QGroundControl.saveGlobalSetting("username", _username.text);
-                              QGroundControl.saveGlobalSetting("name", namefield.text);
-                              QGroundControl.saveGlobalSetting("email", emailField.text);
-
-                          }
+                          currentView = "profile";
+                        }
                       });
                     }
 
@@ -839,221 +863,581 @@ Item {
 
     // Reports Screen
     Rectangle {
-      color: "#b1b3fc"
-
-      Component.onCompleted: {
-        console.log("Reports Component.onCompleted")
-        loadSessions()
-      }
+      color: "white"
 
       ColumnLayout {
         anchors.fill: parent
-        spacing: 10
-        anchors.margins: 20
+        spacing: 0
 
-        Text {
-          text: "Drone Flying Logs"
-          font.pixelSize: 22
-          font.bold: true
-          horizontalAlignment: Text.AlignHCenter
-          Layout.alignment: Qt.AlignHCenter
+        // Header
+        Rectangle {
+          Layout.fillWidth: true
+          Layout.preferredHeight: parent.height * 0.15
+          color: "#1b1c3e"
+
+          RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 10
+
+            QGCColoredImage {
+              source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+              fillMode: Image.PreserveAspectFit
+              width: 25
+              height: 25
+              color: "white"
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  //mainWindow.profileScreen1(false)
+                  currentView = "profile"
+                }
+              }
+            }
+
+            Item {
+              Layout.fillWidth: true
+            }
+
+            QGCColoredImage {
+              id: sessions
+              source: "/qmlimages/NewImages/profile.png"
+              width: 25
+              height: 25
+              fillMode: Image.PreserveAspectFit
+              color: "white"
+            }
+
+            Text {
+              text: "Session"
+              font.pointSize: 18
+              color: "white"
+              font.bold: true
+            }
+
+            Item {
+              Layout.fillWidth: true
+            }
+          }
         }
 
-        Item { Layout.preferredHeight: 20 } // Spacer
-
-        ListView {
-          id: listView
+        RowLayout {
           Layout.fillWidth: true
           Layout.fillHeight: true
-          model: sessionModel
+          Layout.leftMargin: 10
+          Layout.rightMargin: 10
+          Layout.bottomMargin: 10
+          Layout.topMargin: 10
           spacing: 10
 
-          delegate: Rectangle {
-            width: listView.width
-            height: 60
-            color: index % 2 === 0 ? "#ffffff" : "#eeeeee"
-            radius: 4
-            border.color: "#cccccc"
+          // First Card - Profile Info & Stats
+          Rectangle {
+            Layout.preferredWidth: parent.width * 0.4
+            Layout.fillHeight: true
+            color: "white"
+            radius: 5
+            border.color: "#e0e0e0"
             border.width: 1
 
-            Row {
-              anchors.verticalCenter: parent.verticalCenter
-              spacing: 20
-              padding: 10
+            Column {
+              anchors.fill: parent
+              anchors.margins: 20
+              spacing: 10
 
-              Rectangle {
-                width: 30
-                height: 30
-                radius: 15
-                color: "#007acc"
-                anchors.verticalCenter: parent.verticalCenter
+              Item {
+                width: 150
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                Text {
-                  text: index + 1
+                LottieAnimation {
+
                   anchors.centerIn: parent
-                  color: "white"
-                  font.bold: true
+                  source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                  autoPlay: true
+                  loops: Animation.Infinite
+                  scale: 0.3
+                  onStatusChanged: console.log("Lottie Status:", status)
                 }
               }
 
-              Column {
-                spacing: 4
-                anchors.verticalCenter: parent.verticalCenter
-
-                Text {
-                  text: "📅 " + date
-                  font.bold: true
-                  color: "#333333"
-                }
-
-                Row {
-                  spacing: 20
-                  Text {
-                    text: "🔌 Start: " + start
-                    color: "#444444"
-                    font.pixelSize: 14
-                  }
-                  Text {
-                    text: "🔌 End: " + end
-                    color: "#444444"
-                    font.pixelSize: 14
-                  }
-                }
+              Text {
+                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                wrapMode: Text.WordWrap
+                font.pixelSize: 14 // Reduced size for better fit
+                color: "black" // Changed from white to black for visibility
+                horizontalAlignment: Text.AlignHCenter
+                width: parent.width - 40 // Add some margin
               }
             }
           }
 
-          ScrollBar.vertical: ScrollBar { }
+          // Second Card - Form
+          Rectangle {
+              Layout.fillWidth: true
+              Layout.fillHeight: true
+              color: "white"
+              radius: 8
+              border.color: "#e0e0e0"
+              border.width: 1
+
+              ColumnLayout {
+                  anchors.fill: parent
+                  spacing: 0
+
+                  // Header
+                  Rectangle {
+                      Layout.fillWidth: true
+                      height: 50
+                      color: "#f8f9fa"
+                      radius: 8
+
+                      Row {
+                          anchors.fill: parent
+                          anchors.leftMargin: 20
+                          anchors.rightMargin: 20
+                          spacing: 15
+
+                          Text {
+                              text: "Date"
+                              font.pixelSize: 14
+                              font.bold: true
+                              color: "#2c3e50"
+                              width: parent.width * 0.3
+                              anchors.verticalCenter: parent.verticalCenter
+                          }
+
+                          Text {
+                              text: "Start Time"
+                              font.pixelSize: 14
+                              font.bold: true
+                              color: "#2c3e50"
+                              width: parent.width * 0.3
+                              anchors.verticalCenter: parent.verticalCenter
+                          }
+
+                          Text {
+                              text: "End Time"
+                              font.pixelSize: 14
+                              font.bold: true
+                              color: "#2c3e50"
+                              width: parent.width * 0.3
+                              anchors.verticalCenter: parent.verticalCenter
+                          }
+                      }
+                  }
+
+                  // List Content
+                  ScrollView {
+                      Layout.fillWidth: true
+                      Layout.fillHeight: true
+                      clip: true
+                      contentWidth: availableWidth
+                      ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                      ListView {
+                          id: listView
+                          width: parent.width
+                          model: sessionModel
+                          spacing: 8
+                          boundsBehavior: Flickable.StopAtBounds
+
+                          delegate: Rectangle {
+                              width: listView.width
+                              height: 60
+                              color: index % 2 === 0 ? "#ffffff" : "#f8f9fa"
+                              radius: 6
+
+                              Row {
+                                  anchors.fill: parent
+                                  anchors.leftMargin: 20
+                                  anchors.rightMargin: 20
+                                  spacing: 15
+
+                                  // Date Column
+                                  Text {
+                                      text: model.date || "2023-12-07"
+                                      font.pixelSize: 14
+                                      color: "#2c3e50"
+                                      width: parent.width * 0.3
+                                      anchors.verticalCenter: parent.verticalCenter
+                                      elide: Text.ElideRight
+                                  }
+
+                                  // Start Time Column
+                                  Text {
+                                      text: model.start_time || "09:30 AM"
+                                      font.pixelSize: 14
+                                      color: "#2c3e50"
+                                      width: parent.width * 0.3
+                                      anchors.verticalCenter: parent.verticalCenter
+                                      elide: Text.ElideRight
+                                  }
+
+                                  // End Time Column
+                                  Text {
+                                      text: model.end_time || "11:45 AM"
+                                      font.pixelSize: 14
+                                      color: "#2c3e50"
+                                      width: parent.width * 0.3
+                                      anchors.verticalCenter: parent.verticalCenter
+                                      elide: Text.ElideRight
+                                  }
+                              }
+
+                              // Separator line
+                              Rectangle {
+                                  anchors.bottom: parent.bottom
+                                  width: parent.width
+                                  height: 1
+                                  color: "#e0e0e0"
+                                  opacity: 0.5
+                              }
+                          }
+
+                          // Empty state
+                          Label {
+                              anchors.centerIn: parent
+                              text: "No sessions recorded yet"
+                              font.pixelSize: 16
+                              color: "#7f8c8d"
+                              visible: listView.count === 0
+                          }
+                      }
+                  }
+              }
+          }
+
         }
       }
+
     }
 
     // Feedback Screen
     Rectangle {
-      color: "#b1b3fc"
-      clip: true
+      color: "white"
 
       ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 20
+        spacing: 0
 
-        // Title
-        Text {
-          text: "Feedback Form"
-          font.pointSize: 22
-          font.bold: true
-          Layout.alignment: Qt.AlignHCenter
-        }
-
-        ScrollView {
+        // Header
+        Rectangle {
           Layout.fillWidth: true
-          Layout.fillHeight: true
-          clip: true
+          Layout.preferredHeight: parent.height * 0.15
+          color: "#1b1c3e"
 
-          ColumnLayout {
-            width: parent.width
-            spacing: 20
+          RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 10
 
-            TextField {
-              id: phoneField
-              placeholderText: "Phone Number"
-              inputMethodHints: Qt.ImhDigitsOnly
-              Layout.fillWidth: true
-            }
+            QGCColoredImage {
+              source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+              fillMode: Image.PreserveAspectFit
+              width: 25
+              height: 25
+              color: "white"
 
-            TextField {
-              id: emailField_feedback
-              placeholderText: "Email Address"
-              inputMethodHints: Qt.ImhEmailCharactersOnly
-              Layout.fillWidth: true
-            }
-
-            Rectangle {
-              Layout.fillWidth: true
-              Layout.preferredHeight: 150
-              radius: 4
-              border.width: 1
-              border.color: "#cccccc"
-
-              TextArea {
-                id: commentField
+              MouseArea {
                 anchors.fill: parent
-                anchors.margins: 8
-                wrapMode: TextEdit.Wrap
-                placeholderText: "Enter your feedback or comments"
-                font.pointSize: 14
-                background: null
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                  //mainWindow.profileScreen1(false)
+                  currentView = "profile"
+                }
               }
+            }
+
+            Item {
+              Layout.fillWidth: true
+            }
+
+            QGCColoredImage {
+              id: feedback
+              source: "/qmlimages/NewImages/profile.png"
+              width: 25
+              height: 25
+              fillMode: Image.PreserveAspectFit
+              color: "white"
             }
 
             Text {
-              text: "Upload Image"
+              text: "Feedback"
               font.pointSize: 18
+              color: "white"
               font.bold: true
-              Layout.alignment: Qt.AlignHCenter
             }
 
-            // Clickable image box
-            Rectangle {
+            Item {
               Layout.fillWidth: true
-              Layout.preferredHeight: 150
-              radius: 4
-              border.color: "gray"
-              border.width: 1
-              color: "transparent"
+            }
+          }
+        }
 
-              // Conditional: Show image or text
+        RowLayout {
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          Layout.leftMargin: 10
+          Layout.rightMargin: 10
+          Layout.bottomMargin: 10
+          Layout.topMargin: 10
+          spacing: 10
+
+          // First Card - Profile Info & Stats
+          Rectangle {
+            Layout.preferredWidth: parent.width * 0.4
+            Layout.fillHeight: true
+            color: "white"
+            radius: 5
+            border.color: "#e0e0e0"
+            border.width: 1
+
+            Column {
+              anchors.fill: parent
+              anchors.margins: 20
+              spacing: 10
+
               Item {
-                anchors.fill: parent
+                width: 150
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                // Show image if selected
-                Image {
-                  anchors.fill: parent
-                  anchors.margins: 8
-                  source: selectedImage
-                  fillMode: Image.PreserveAspectFit
-                  visible: selectedImage !== ""
-                }
+                LottieAnimation {
 
-                // Show placeholder text if image is not selected
-                Text {
-                  text: "Select Image"
                   anchors.centerIn: parent
-                  font.pointSize: 14
-                  color: "#999999"
-                  visible: selectedImage === ""
+                  source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                  autoPlay: true
+                  loops: Animation.Infinite
+                  scale: 0.3
+                  onStatusChanged: console.log("Lottie Status:", status)
                 }
+              }
 
-                // MouseArea to open FileDialog
-                MouseArea {
-                  anchors.fill: parent
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: imageDialog.open()
-                }
+              Text {
+                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                wrapMode: Text.WordWrap
+                font.pixelSize: 14 // Reduced size for better fit
+                color: "black" // Changed from white to black for visibility
+                horizontalAlignment: Text.AlignHCenter
+                width: parent.width - 40 // Add some margin
               }
             }
           }
-        }
 
-        // Send Button
-        Button {
-          id: sendButton
-          text: "Send Feedback"
-          Layout.fillWidth: true
-          Layout.preferredHeight: 50
-          onClicked: {
-            if (phoneField.text === "" || emailField.text === "" || commentField.text === "") {
-              mainWindow.showToastMessage("Please fill in all fields.")
-              return
+          // Second Card - Form
+          Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "white"
+            radius: 5
+            border.color: "#e0e0e0"
+            border.width: 1
+
+            ScrollView {
+              anchors.fill: parent
+              anchors.margins: 10
+              clip: true
+              contentWidth: availableWidth
+              ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+              Item {
+                width: parent.width
+                implicitHeight: _formColumn.implicitHeight + 15 // Add padding
+
+                Column {
+                  id: _formColumn
+                  width: parent.width
+                  spacing: 10
+                  anchors.centerIn: parent
+
+                  //Mobile Number
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Mobile Number"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: feed_mobile.activeFocus ? 2 : 1
+                      border.color: feed_mobile.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: feed_mobile
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        placeholderText: "Enter mobile number"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        inputMethodHints: Qt.ImhDigitsOnly
+
+                      }
+                    }
+                  }
+
+                  // Email Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Email"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 40
+                      radius: 8
+                      color: "white"
+                      border.width: feed_email.activeFocus ? 2 : 1
+                      border.color: feed_email.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextField {
+                        id: feed_email
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        placeholderText: "Enter your email"
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        verticalAlignment: TextInput.AlignVCenter
+                        inputMethodHints: Qt.ImhEmailCharactersOnly
+
+                      }
+                    }
+                  }
+
+                  // Feedback Field
+                  Column {
+                    width: parent.width
+                    spacing: 5
+
+                    Text {
+                      text: "Feedback"
+                      font.pixelSize: 14
+                      font.bold: true
+                      color: "#2c3e50"
+                      leftPadding: 5
+                    }
+
+                    Rectangle {
+                      width: parent.width
+                      height: 100
+                      radius: 8
+                      color: "white"
+                      border.width: feedbackArea.activeFocus ? 2 : 1
+                      border.color: feedbackArea.activeFocus ? "#3498db" : "#dcdde1"
+
+                      TextArea {
+                        id: feedbackArea
+                        anchors {
+                          left: parent.left
+                          right: parent.right
+                          top: parent.top
+                          bottom: parent.bottom
+                          margins: 5
+                        }
+                        placeholderText: "Enter your feedback here..."
+                        font.pixelSize: 14
+                        color: "#2c3e50"
+                        background: null
+                        selectByMouse: true
+                        wrapMode: TextArea.Wrap
+                        verticalAlignment: TextEdit.AlignTop
+                      }
+                    }
+
+                  }
+
+
+                  // Update Button
+                  Button {
+                    text: "Send"
+                    width: parent.width * 0.3
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+
+                      if (feedbackArea.text === "") {
+                        mainWindow.showToastMessage("Enter your valuable feedback");
+                        return;
+                      }
+
+                      var mobile = feed_mobile.text.trim();
+                      var email = feed_email.text.trim();
+                      var comments = feedbackArea.text.trim();
+
+
+                      mainWindow.insertFeedback(
+                            userName, // assuming userName is available in ProfileScreen
+                            mobile,
+                            email,
+                            comments,
+                            function(result) {
+                              if (result) {
+
+                                mainWindow.showToastMessage("Feedback sent successfully!");
+
+                                currentView = "profile";
+
+                                feed_mobile.text = "";
+                                feed_email.text = "";
+                                feedbackArea.text = "";
+
+                              } else {
+                                console.log(" Failed to send feedback");
+                                mainWindow.showToastMessage("Failed to send feedback. Please try again.");
+                              }
+                            }
+                            );
+                    }
+
+                    background: Rectangle {
+                      radius: 5
+                      color: parent.pressed ? "#218838" : "#28a745"
+                    }
+
+                    contentItem: Text {
+                      text: parent.text
+                      color: "white"
+                      font.pixelSize: 14
+                      font.bold: true
+                      horizontalAlignment: Text.AlignHCenter
+                      verticalAlignment: Text.AlignVCenter
+                    }
+                  }
+
+                  Item { height: 10 } // Spacer
+                }
+              }
+
             }
-            console.log("Phone:", phoneField.text)
-            console.log("Email:", emailField.text)
-            console.log("Comment:", commentField.text)
-            mainWindow.showToastMessage("Feedback sent successfully!")
-          }
+          } //SecondCaed
+
         }
       }
+
     }
 
     FileDialog {

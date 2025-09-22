@@ -88,33 +88,31 @@ ApplicationWindow {
     property string sessionDate: ""
     property string sessionStart: ""
     property string sessionEnd: ""
+    property bool sessionSaved: false
+    signal newSessionAdded()
 
 
     Connections {
         target: QGroundControl.multiVehicleManager
 
         onActiveVehicleChanged: {
-
-            let now = new Date()
-            let timeString = now.toLocaleTimeString()
-            let dateString = now.toLocaleDateString()
+            let now = new Date();
+            let timeString = now.toLocaleTimeString(Qt.locale(), "HH:mm:ss");
+            let dateString = now.toLocaleDateString(Qt.locale(), "yyyy-MM-dd");
 
             if (activeVehicle) {
-                sessionDate = dateString
-                sessionStart = timeString
-                console.log("Drone Connected at:", sessionStart)
+                sessionDate = dateString;
+                sessionStart = timeString;
+                console.log("Drone Connected at:", sessionStart, "on", sessionDate);
             } else {
-                sessionEnd = timeString
-                console.log("Drone Disconnected at:", sessionEnd)
-                saveDroneSession(sessionDate, sessionStart, sessionEnd)
-            }
-        }
-
-        onActiveVehicleAvailableChanged: {
-            if (QGroundControl.multiVehicleManager.activeVehicleAvailable) {
-                console.log("Active Vehicle Available at:", new Date().toLocaleString())
-            } else {
-                console.log("Active Vehicle Lost at:", new Date().toLocaleString())
+                if (sessionStart !== "") { // Only save if we have a start time
+                    sessionEnd = timeString;
+                    console.log("Drone Disconnected at:", sessionEnd);
+                    saveDroneSession(sessionDate, sessionStart, sessionEnd);
+                    // Reset for next session
+                    sessionStart = "";
+                    sessionEnd = "";
+                }
             }
         }
     }
@@ -128,17 +126,13 @@ ApplicationWindow {
             height  = ScreenTools.isMobile ? ScreenTools.screenHeight : Math.min(150 * Screen.pixelDensity, Screen.height)
         }
 
-
         initDB()
         profilelogin()
-
         profile()
-
 
         if(_appSettings.screen==="Plan"){
             plan="Plan"
             console.log("NextScreen loaded with planType:", planType)
-
         }else{
             plan="Start"
             console.log("NextScreen loaded with planType: Start")
@@ -568,12 +562,20 @@ ApplicationWindow {
                 // Drone sessions table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER,  // Simple reference without foreign key constraint
                     date TEXT NOT NULL,
                     start_time TEXT NOT NULL,
                     end_time TEXT NOT NULL,
                     duration INTEGER
                 )");
+
+                //feedback table
+                tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
+                               username TEXT,
+                               mobile_number TEXT,
+                               email TEXT,
+                               comments TEXT
+                           )");
 
                 console.log("Database and tables created successfully");
 
@@ -584,14 +586,133 @@ ApplicationWindow {
     }
 
 
-    function saveDroneSession(date, startTime, endTime) {
+    // MainRootWindow.qml
+    function insertFeedback(username, mobile_number, email, comments, callback) {
         var db = getDatabase();
         db.transaction(function(tx) {
-            tx.executeSql("INSERT INTO drone_sessions(date, start_time, end_time) VALUES(?, ?, ?)", [date, startTime, endTime]);
-            console.log("Session saved:", date, startTime, endTime)
+            try {
+
+                console.log("=== ALL FEEDBACK BEFORE INSERT ===");
+                var beforeInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
+                printFeedbackTable(beforeInsert, "BEFORE INSERT");
+
+                // Insert new feedback
+                var rs = tx.executeSql(
+                    "INSERT INTO feedback (username, mobile_number, email, comments) VALUES (?, ?, ?, ?)",
+                    [username, mobile_number, email, comments]
+                );
+
+                if (rs.rowsAffected > 0) {
+                    console.log("Feedback inserted successfully");
+
+                    // Print all data AFTER insert
+                    console.log("=== ALL FEEDBACK AFTER INSERT ===");
+                    var afterInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
+                    printFeedbackTable(afterInsert, "AFTER INSERT");
+
+                    if (callback) {
+                        callback(true);
+                    }
+                } else {
+                    console.log("Feedback insertion failed");
+                    if (callback) {
+                        callback(false);
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error inserting feedback:", error);
+                if (callback) {
+                    callback(false);
+                }
+            }
         });
     }
 
+    // Helper function to print feedback table
+    function printFeedbackTable(resultSet, label) {
+
+        console.log("ID | Username | Mobile | Email | Comments");
+        console.log("------------------------------------------");
+
+        if (resultSet.rows.length === 0) {
+            console.log("No feedback records found");
+        } else {
+            for (var i = 0; i < resultSet.rows.length; i++) {
+                var feedback = resultSet.rows.item(i);
+                // Truncate long comments for better readability
+                var truncatedComments = feedback.comments.length > 30 ?
+                                      feedback.comments.substring(0, 30) + "..." :
+                                      feedback.comments;
+
+                console.log(feedback.id + " | " +
+                           (feedback.username || "NULL") + " | " +
+                           (feedback.mobile_number || "NULL") + " | " +
+                           (feedback.email || "NULL") + " | " +
+                           truncatedComments);
+            }
+        }
+        console.log("------------------------------------------");
+    }
+
+    function saveDroneSession(date, startTime, endTime) {
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                // Calculate duration in minutes
+                var duration = calculateDuration(startTime, endTime);
+
+                // Insert session with duration
+                var rs = tx.executeSql(
+                    "INSERT INTO drone_sessions(date, start_time, end_time, duration) VALUES(?, ?, ?, ?)",
+                    [date, startTime, endTime, duration]
+                );
+
+                if (rs.rowsAffected > 0) {
+                    console.log("Session saved - ID:", rs.insertId,
+                               "Date:", date,
+                               "Start:", startTime,
+                               "End:", endTime,
+                               "Duration:", duration, "minutes");
+                    sessionSaved = true;
+                    newSessionAdded(); // Emit signal to notify other components
+                }
+
+            } catch (error) {
+                console.error("Error saving drone session:", error);
+            }
+        });
+    }
+
+
+    function calculateDuration(startTime, endTime) {
+         try {
+             // Parse times (format: "HH:mm:ss")
+             var startParts = startTime.split(':');
+             var endParts = endTime.split(':');
+
+             var startTotalSeconds = parseInt(startParts[0]) * 3600 +
+                                    parseInt(startParts[1]) * 60 +
+                                    parseInt(startParts[2] || 0);
+
+             var endTotalSeconds = parseInt(endParts[0]) * 3600 +
+                                  parseInt(endParts[1]) * 60 +
+                                  parseInt(endParts[2] || 0);
+
+             var durationSeconds = endTotalSeconds - startTotalSeconds;
+
+             if (durationSeconds < 0) {
+                 // Handle跨天的情况 (session spans midnight)
+                 durationSeconds += 24 * 3600;
+             }
+
+             return Math.round(durationSeconds / 60); // Convert to minutes
+
+         } catch (e) {
+             console.error("Error calculating duration:", e);
+             return 0;
+         }
+     }
 
     // JavaScript function to read from DB
     function loadUsersFromDB() {
@@ -647,6 +768,32 @@ ApplicationWindow {
         // });
 
         userDialog.open()
+    }
+
+    function getAllSessions(callback) {
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                var rs = tx.executeSql("SELECT * FROM drone_sessions ORDER BY date DESC, start_time DESC");
+                var sessions = [];
+
+                console.log("Found", rs.rows.length, "drone sessions in database");
+
+                for (var i = 0; i < rs.rows.length; i++) {
+                    sessions.push(rs.rows.item(i));
+                }
+
+                if (callback) {
+                    callback(sessions);
+                }
+
+            } catch (error) {
+                console.error("Error retrieving sessions:", error);
+                if (callback) {
+                    callback([]);
+                }
+            }
+        });
     }
 
     function registerUser(username, displayname, email, password, confirmpassword, callback) {
@@ -787,20 +934,53 @@ ApplicationWindow {
         });
     }
 
-    function updateUser(old_userName,new_username, newDisplayname, newEmail,mobile_no,_rpcCompleted,callback) {
-
+    function updateUser(old_userName, new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, callback) {
         var db = getDatabase();
         db.transaction(function(tx) {
+            // Print all data BEFORE update
+            console.log("=== ALL USERS BEFORE UPDATE ===");
+            var beforeUpdate = tx.executeSql("SELECT * FROM users");
+            for (var i = 0; i < beforeUpdate.rows.length; i++) {
+                var user = beforeUpdate.rows.item(i);
+                console.log("User", i + 1, "- ID:", user.id,
+                            "Username:", user.username,
+                            "Name:", user.displayname,
+                            "Email:", user.email,
+                            "Mobile:", user.mobile_number || "NULL",
+                            "RPC:", user.rpc_completed);
+            }
+
+            // Perform the update
             var rs = tx.executeSql(
-                        "UPDATE users SET username = ?, displayname = ?,email = ?,mobile_number = ?,rpc_completed = ? WHERE username = ?",
-                        [new_username, newDisplayname, newEmail,mobile_no,_rpcCompleted,old_userName]
+                        "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
+                        [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
                         );
+
             if (rs.rowsAffected > 0) {
-                console.log("User updated");
-                mainWindow.showToastMessage("User updated");
+                console.log("User updated successfully");
+                console.log("Rows affected:", rs.rowsAffected);
+
+                // Print all data AFTER update
+                console.log("=== ALL USERS AFTER UPDATE ===");
+                var afterUpdate = tx.executeSql("SELECT * FROM users");
+                for (var j = 0; j < afterUpdate.rows.length; j++) {
+                    var updatedUser = afterUpdate.rows.item(j);
+                    console.log("User", j + 1, "- ID:", updatedUser.id,
+                                "Username:", updatedUser.username,
+                                "Name:", updatedUser.displayname,
+                                "Email:", updatedUser.email,
+                                "Mobile:", updatedUser.mobile_number || "NULL",
+                                "RPC:", updatedUser.rpc_completed);
+                }
+
+                if (callback) {
+                    callback(true);
+                }
             } else {
-                console.log("User not found");
-                mainWindow.showToastMessage("User not found");
+                console.log("User not found or update failed");
+                if (callback) {
+                    callback(false);
+                }
             }
         });
     }
@@ -935,7 +1115,7 @@ ApplicationWindow {
         return true;
     }
 
-    function validateUsername(username, focusField, isUpdate = false) {
+    function validateUsername(username, focusField, isUpdate = false)   {
         if (!validateNotEmpty(username, "username", focusField)) return false;
 
         if (username.length < 3) {

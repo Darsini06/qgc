@@ -98,14 +98,14 @@ int main(int argc, char *argv[])
     // builds, so they can be executed together in the same device.
     // Stable and Daily have same QGC_APP_NAME so they would
     // not be able to run at the same time
-    const QString runguardString = QString("%1 RunGuardKey").arg(QGC_APP_NAME);
+    const QString runguardString = QString("%1 RunGuardKey").arg("AvaiatricksGCS");
 
     RunGuard guard(runguardString);
     if (!guard.tryToRun()) {
         // QApplication is necessary to use QMessageBox
         QApplication errorApp(argc, argv);
         QMessageBox::critical(nullptr, QObject::tr("Error"),
-                              QObject::tr("A second instance of %1 is already running. Please close the other instance and try again.").arg(QGC_APP_NAME)
+                              QObject::tr("A second instance of %1 is already running. Please close the other instance and try again.").arg("AvaiatricksGCS")
                               );
         return -1;
     }
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, QObject::tr("Error"),
                               QObject::tr("You are running %1 as root. "
                                           "You should not do this since it will cause other issues with %1."
-                                          "%1 will now exit.<br/><br/>").arg(QGC_APP_NAME)
+                                          "%1 will now exit.<br/><br/>").arg("AvaiatricksGCS")
                               );
         return -1;
     }

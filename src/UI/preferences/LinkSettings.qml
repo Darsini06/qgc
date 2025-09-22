@@ -145,7 +145,7 @@ SettingsPage {
         QGCPopupDialog {
             title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  true//nameField.text !== ""
+            acceptAllowed:  nameField.text !== "" //true
 
             property var originalConfig
             property var editingConfig
@@ -182,6 +182,7 @@ SettingsPage {
                     visible: true
 
                     QGCLabel { text: qsTr("Name") }
+
                     QGCTextField {
                         id:                 nameField
                         Layout.fillWidth:   true
