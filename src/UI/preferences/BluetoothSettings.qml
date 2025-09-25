@@ -27,6 +27,7 @@ ColumnLayout {
         columns:    2
         columnSpacing:  _colSpacing
         rowSpacing:     _rowSpacing
+        visible: false
 
         QGCLabel { text: qsTr("Device") }
         QGCLabel {
@@ -42,7 +43,32 @@ ColumnLayout {
         }
     }
 
-    QGCLabel { text: qsTr("Bluetooth Devices") }
+    RowLayout {
+        Layout.fillWidth: true
+
+        QGCLabel {
+            text: qsTr("Bluetooth Devices")
+            Layout.alignment: Qt.AlignLeft
+        }
+
+        Item { Layout.fillWidth: true } // Spacer to push buttons to the right
+
+        RowLayout {
+            spacing: _colSpacing
+
+            QGCButton {
+                text:       qsTr("Scan")
+                enabled:    !subEditConfig.scanning
+                onClicked:  subEditConfig.startScan()
+            }
+
+            QGCButton {
+                text:       qsTr("Stop")
+                enabled:    subEditConfig.scanning
+                onClicked:  subEditConfig.stopScan()
+            }
+        }
+    }
 
     Repeater {
         model: subEditConfig.nameList
@@ -61,21 +87,21 @@ ColumnLayout {
         }
     }
 
-    RowLayout {
-        Layout.alignment:   Qt.AlignCenter
-        spacing:            _colSpacing
+    // RowLayout {
+    //     Layout.alignment:   Qt.AlignCenter
+    //     spacing:            _colSpacing
 
-        QGCButton {
-            text:       qsTr("Scan")
-            enabled:    !subEditConfig.scanning
-            onClicked:  subEditConfig.startScan()
-        }
+    //     QGCButton {
+    //         text:       qsTr("Scan")
+    //         enabled:    !subEditConfig.scanning
+    //         onClicked:  subEditConfig.startScan()
+    //     }
 
-        QGCButton {
-            text:       qsTr("Stop")
-            enabled:    subEditConfig.scanning
-            onClicked:  subEditConfig.stopScan()
-        }
-    }
+    //     QGCButton {
+    //         text:       qsTr("Stop")
+    //         enabled:    subEditConfig.scanning
+    //         onClicked:  subEditConfig.stopScan()
+    //     }
+    // }
 
 }

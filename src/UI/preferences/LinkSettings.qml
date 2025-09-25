@@ -105,9 +105,9 @@ SettingsPage {
                     QGCMouseArea {
                         fillItem:   parent
                         onClicked:  mainWindow.showMessageDialog(
-                                        qsTr("Delete Link"), 
-                                        qsTr("Are you sure you want to delete '%1'?").arg(object.name), 
-                                        Dialog.Ok | Dialog.Cancel, 
+                                        qsTr("Delete Link"),
+                                        qsTr("Are you sure you want to delete '%1'?").arg(object.name),
+                                        Dialog.Ok | Dialog.Cancel,
                                         function () {
                                             _linkManager.removeConfiguration(object)
                                         })
@@ -133,41 +133,84 @@ SettingsPage {
             buttonText: qsTr("Add")
 
             onClicked: {
-                var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
-                linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: null }).open()
+                typeSelectionDialogComponent.createObject(mainWindow).open()
             }
         }
     }
 
+    // First Dialog - Type Selection Only
     Component {
-        id: linkDialogComponent
+        id: typeSelectionDialogComponent
+
+        QGCPopupDialog {
+            id: typeDialog
+            title: qsTr("Select Link Type")
+            buttons: false
+
+            property int selectedType: -1
+
+            topPadding: 20
+            bottomPadding: 20
+
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight / 2
+
+                Repeater {
+                    model: _linkManager.linkTypeStrings
+
+                    delegate: QGCButton {
+                        text: modelData
+                        Layout.fillWidth: true
+                        autoExclusive: true
+                        checkable: true
+
+                        onClicked: {
+                            typeDialog.selectedType = index
+                            typeDialog.close()
+                            var editingConfig = _linkManager.createConfiguration(index, "")
+                            linkConfigDialogComponent.createObject(mainWindow, {
+                                                                       editingConfig: editingConfig,
+                                                                       originalConfig: null,
+                                                                       selectedType: index
+                                                                   }).open()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Second Dialog - Configuration (without type dropdown)
+    Component {
+        id: linkConfigDialogComponent
 
         QGCPopupDialog {
             title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== "" //true
+            acceptAllowed:  nameField.text !== ""
 
             property var originalConfig
             property var editingConfig
+            property int selectedType
 
             onAccepted: {
                 linkSettingsLoader.item.saveSettings()
-                editingConfig.name = nameField.text
+                editingConfig.devName = nameField.text
+                editingConfig.name = editingConfig.devName
 
-                console.log("Bluetooth Save Button",editingConfig.name)
+                console.log("Selected Type", selectedType)
+                console.log("Bluetooth Save Button", editingConfig.devName)
 
                 if (originalConfig) {
-                    console.log("Bluetooth Save Button Edit Link",originalConfig)
+                    console.log("Bluetooth Save Button Edit Link", originalConfig)
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
-
                 } else {
                     // If it was edited, it's no longer "dynamic"
                     editingConfig.dynamic = false
                     _linkManager.endCreateConfiguration(editingConfig)
-
-                      _linkManager.createConnectedLink(editingConfig)
-
-                     console.log("Bluetooth Save Button Add New Link",originalConfig)
+                    _linkManager.createConnectedLink(editingConfig)
+                    console.log("Bluetooth Save Button Add New Link", originalConfig)
                 }
             }
 
@@ -176,48 +219,35 @@ SettingsPage {
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelHeight / 2
 
+                // // Show selected type as read-only information
+                // RowLayout {
+                //     Layout.fillWidth: true
+                //     spacing: ScreenTools.defaultFontPixelWidth
+
+                //     QGCLabel {
+                //         text: qsTr("Selected Type:")
+                //         font.bold: true
+                //     }
+
+                //     QGCLabel {
+                //         Layout.fillWidth: true
+                //         text: _linkManager.linkTypeStrings[selectedType]
+                //         color: "green"
+                //     }
+                // }
+
                 RowLayout {
-                    Layout.fillWidth:   true
-                    spacing:            ScreenTools.defaultFontPixelWidth
-                    visible: true
+                    Layout.fillWidth: true
+                    spacing: ScreenTools.defaultFontPixelWidth
+                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
                     QGCLabel { text: qsTr("Name") }
 
                     QGCTextField {
                         id:                 nameField
                         Layout.fillWidth:   true
-                        text:               editingConfig.name
+                        text:               editingConfig.devName
                         placeholderText:    qsTr("Enter name")
-                    }
-                }
-
-                QGCCheckBoxSlider {
-                    Layout.fillWidth:   true
-                    text:               qsTr("Automatically Connect on Start")
-                    checked:            editingConfig.autoConnect
-                    onCheckedChanged:   editingConfig.autoConnect = checked
-                }
-
-                // QGCCheckBoxSlider {
-                //     Layout.fillWidth:   true
-                //     text:               qsTr("High Latency")
-                //     checked:            editingConfig.highLatency
-                //     onCheckedChanged:   editingConfig.highLatency = checked
-                // }
-
-                LabelledComboBox {
-                    label:                  qsTr("Type")
-                    enabled:                originalConfig == null
-                    model:                  _linkManager.linkTypeStrings
-                    Component.onCompleted:  comboBox.currentIndex = editingConfig.linkType
-
-                    onActivated: (index) => {
-                        if (index !== editingConfig.linkType) {
-                            // Save current name
-                            var name = nameField.text
-                            // Create new link configuration
-                            editingConfig = _linkManager.createConfiguration(index, name)
-                        }
                     }
                 }
 
@@ -235,3 +265,116 @@ SettingsPage {
         }
     }
 }
+
+
+// LabelledButton {
+//     label:      qsTr("Add New Link")
+//     buttonText: qsTr("Add")
+
+//     onClicked: {
+//         var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
+//         linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: null }).open()
+//     }
+// }
+
+// Component {
+//     id: linkDialogComponent
+
+//     QGCPopupDialog {
+//         title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
+//         buttons:        Dialog.Save | Dialog.Cancel
+//         acceptAllowed:  nameField.text !== "" //true
+
+//         property var originalConfig
+//         property var editingConfig
+
+//         onAccepted: {
+//             linkSettingsLoader.item.saveSettings()
+//             editingConfig.devName = nameField.text
+//             editingConfig.name = editingConfig.devName
+
+//             console.log("Bluetooth Save Button",editingConfig.devName)
+
+//             if (originalConfig) {
+//                 console.log("Bluetooth Save Button Edit Link",originalConfig)
+//                 _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+
+//             } else {
+//                 // If it was edited, it's no longer "dynamic"
+//                 editingConfig.dynamic = false
+//                 _linkManager.endCreateConfiguration(editingConfig)
+
+//                   _linkManager.createConnectedLink(editingConfig)
+
+//                  console.log("Bluetooth Save Button Add New Link",originalConfig)
+//             }
+//         }
+
+//         onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+
+//         ColumnLayout {
+//             spacing: ScreenTools.defaultFontPixelHeight / 2
+
+//             RowLayout {
+//                 Layout.fillWidth:   true
+//                 spacing:            ScreenTools.defaultFontPixelWidth
+//                 visible: true
+
+//                 QGCLabel { text: qsTr("Name") }
+
+//                 QGCTextField  {
+//                     id:                 nameField
+//                     Layout.fillWidth:   true
+//                     text:               editingConfig.devName
+//                     placeholderText:    qsTr("Enter name")
+//                 }
+//             }
+
+//             // QGCCheckBoxSlider {
+//             //     Layout.fillWidth:   true
+//             //     text:               qsTr("Automatically Connect on Start")
+//             //     checked:            editingConfig.autoConnect
+//             //     onCheckedChanged:   editingConfig.autoConnect = checked
+//             // }
+
+//             // QGCCheckBoxSlider {
+//             //     Layout.fillWidth:   true
+//             //     text:               qsTr("High Latency")
+//             //     checked:            editingConfig.highLatency
+//             //     onCheckedChanged:   editingConfig.highLatency = checked
+//             // }
+
+//             LabelledComboBox {
+//                 label:                  qsTr("Type")
+//                 enabled:                originalConfig == null
+//                 model:                  _linkManager.linkTypeStrings
+//                 Component.onCompleted:  comboBox.currentIndex = editingConfig.linkType
+
+//                 onActivated: (index) => {
+//                     if (index !== editingConfig.linkType) {
+//                         // Save current name
+//                         var name = nameField.text
+//                         // Create new link configuration
+//                         editingConfig = _linkManager.createConfiguration(index, name)
+//                     }
+//                 }
+//             }
+
+//             Loader {
+//                 id:     linkSettingsLoader
+//                 source: subEditConfig.settingsURL
+
+//                 property var subEditConfig:         editingConfig
+//                 property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
+//                 property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
+//                 property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
+//                 property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+//             }
+//         }
+//     }
+// }
+
+
+
+
+
