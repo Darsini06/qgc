@@ -220,9 +220,9 @@ Popup {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: titleLable.implicitHeight + 20
+                height: titleLable.implicitHeight + 10
                 color: "#7F56D9"
-                radius: 20
+                radius: 15
                 Layout.alignment: Qt.AlignHCenter
 
                 // Bottom rectangle to complete rounded shape
@@ -230,7 +230,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    height: 25 // same as radius
+                    height: 15 // same as radius
                     color: "#7F56D9"
                 }
 
@@ -253,8 +253,8 @@ Popup {
                 Layout.preferredWidth:  Math.min(maxAvailableWidth, totalContentWidth)
                 Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
                 color:                  _qgcPal.window
-                Layout.leftMargin:     20
-                Layout.rightMargin:     20
+                Layout.leftMargin:     10
+                Layout.rightMargin:     10
 
                 property real maxAvailableWidth:    mainWindow.width - _contentMargin * 4
                 property real maxAvailableHeight:   mainWindow.height - titleLable.height - buttonRow.height - _contentMargin * 5
@@ -289,12 +289,15 @@ Popup {
                 Layout.fillWidth: true
                 spacing: _contentMargin
                 Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin:     20
+                Layout.bottomMargin:     10
+                Layout.leftMargin:     5
+                Layout.rightMargin:     5
+                visible: root.buttons !== false && root.buttons !== 0
 
                 QGCButton {
                     id: rejectButton
                     onClicked: _reject()
-                    Layout.minimumWidth: height * 3
+                    Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 20
                         color: "#E53935"
@@ -304,7 +307,7 @@ Popup {
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 15
+                        font.pointSize: 12
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -314,7 +317,7 @@ Popup {
                     id: acceptButton
                     primary: true
                     onClicked: _accept()
-                    Layout.minimumWidth: height * 3
+                    Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 20
                         color: "#2196F3"
@@ -324,7 +327,7 @@ Popup {
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 15
+                        font.pointSize: 12
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }

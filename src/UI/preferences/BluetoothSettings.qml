@@ -19,89 +19,148 @@ import QGroundControl.Palette
 ColumnLayout {
     spacing: _rowSpacing
 
-    function saveSettings() {
-        // No need
-    }
+    function saveSettings() { }
 
-    GridLayout {
-        columns:    2
-        columnSpacing:  _colSpacing
-        rowSpacing:     _rowSpacing
-        visible: false
+    Component.onCompleted: subEditConfig.startScan()
 
-        QGCLabel { text: qsTr("Device") }
-        QGCLabel {
-            Layout.preferredWidth:  _secondColumnWidth
-            text:                   subEditConfig.devName
-        }
-
-        QGCLabel { text: qsTr("Address") }
-
-        QGCLabel {
-            Layout.preferredWidth:  _secondColumnWidth
-            text:                   subEditConfig.address
-        }
-    }
-
+    // Header section
     RowLayout {
         Layout.fillWidth: true
 
-        QGCLabel {
-            text: qsTr("Bluetooth Devices")
-            Layout.alignment: Qt.AlignLeft
-        }
+        Item { Layout.fillWidth: true } // spacer
 
-        Item { Layout.fillWidth: true } // Spacer to push buttons to the right
-
+        // Right-aligned controls
         RowLayout {
-            spacing: _colSpacing
+            spacing: 10
+            Layout.alignment: Qt.AlignRight
 
-            QGCButton {
-                text:       qsTr("Scan")
-                enabled:    !subEditConfig.scanning
-                onClicked:  subEditConfig.startScan()
+            Text {
+                text: qsTr("Refresh")
+                color: !subEditConfig.scanning ? "blue" : "gray"
+                font.pixelSize: 12
+                font.underline: refreshMouseArea.containsMouse && !subEditConfig.scanning
+
+                MouseArea {
+                    id: refreshMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: !subEditConfig.scanning
+                    onClicked: subEditConfig.startScan()
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
             }
 
-            QGCButton {
-                text:       qsTr("Stop")
-                enabled:    subEditConfig.scanning
-                onClicked:  subEditConfig.stopScan()
+            Text {
+                text: qsTr("Stop")
+                color: subEditConfig.scanning ? "red" : "gray"
+                font.pixelSize: 12
+                font.underline: stopMouseArea.containsMouse && subEditConfig.scanning
+
+                MouseArea {
+                    id: stopMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: subEditConfig.scanning
+                    onClicked: subEditConfig.stopScan()
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
             }
         }
     }
 
-    Repeater {
-        model: subEditConfig.nameList
+    // Content area
+    Item {
+        Layout.alignment: Qt.AlignHCenter
 
-        delegate: QGCButton {
-            text:                   modelData
-            Layout.preferredWidth: _secondColumnWidth
-            autoExclusive:          true
+        property int minWidth: 220
+        Layout.preferredWidth: minWidth  // Use fixed minWidth instead of dynamic calculation
+        Layout.preferredHeight: 150
+        clip: true
 
-            onClicked: {
-                checked = true
-                if (modelData !== "") subEditConfig.devName = modelData
-                console.log("Bluetooth Device name : ",modelData)
-                QGroundControl.saveGlobalSetting("bluetooth_name", modelData)
+        // Loading state
+        Column {
+            anchors.centerIn: parent
+            spacing: 10
+            visible: subEditConfig.scanning && subEditConfig.nameList.length === 0
+
+            BusyIndicator {
+                anchors.horizontalCenter: parent.horizontalCenter
+                running: true
+            }
+
+            Text {
+                text: qsTr("Scanning for devices...")
+                color: "gray"
+                font.pixelSize: 12
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+
+        // Empty state
+        Text {
+            anchors.centerIn: parent
+            text: qsTr("No Bluetooth devices found\nClick 'Refresh' to scan again")
+            color: "gray"
+            font.pixelSize: 12
+            horizontalAlignment: Text.AlignHCenter
+            visible: !subEditConfig.scanning && subEditConfig.nameList.length === 0
+        }
+
+        // Devices list
+        ScrollView {
+            visible: subEditConfig.nameList.length > 0
+            anchors.fill: parent
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            clip: true
+
+            // Simple approach to prevent horizontal scrolling
+            contentWidth: availableWidth
+
+            ListView {
+                id: deviceList
+                spacing: 8
+                width: parent.width
+                implicitHeight: contentHeight
+
+                model: subEditConfig.nameList
+
+                delegate: Item {
+                    width: deviceList.width
+                    height: 40  // Fixed height for buttons
+
+                    Rectangle {
+                        // Visual representation of button
+                        anchors.centerIn: parent
+                        width: Math.min(deviceList.width - 40, textItem.implicitWidth + 20)
+                        height: 40
+                        radius: 20
+                        color: mouseArea.containsPress ? "#d0d0d0" : "#f0f0f0"
+                        border.color: "#a0a0a0"
+
+                        Text {
+                            id: textItem
+                            anchors.centerIn: parent
+                            text: modelData
+                            font.pixelSize: 14
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.Wrap
+                            elide: Text.ElideRight
+                            width: parent.width - 10
+                        }
+
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            onClicked: {
+                                // Handle device selection here
+                                console.log("Selected device:", modelData)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-
-    // RowLayout {
-    //     Layout.alignment:   Qt.AlignCenter
-    //     spacing:            _colSpacing
-
-    //     QGCButton {
-    //         text:       qsTr("Scan")
-    //         enabled:    !subEditConfig.scanning
-    //         onClicked:  subEditConfig.startScan()
-    //     }
-
-    //     QGCButton {
-    //         text:       qsTr("Stop")
-    //         enabled:    subEditConfig.scanning
-    //         onClicked:  subEditConfig.stopScan()
-    //     }
-    // }
-
 }

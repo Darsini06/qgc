@@ -138,7 +138,7 @@ SettingsPage {
         }
     }
 
-    // First Dialog - Type Selection Only
+    // First Dialog – Type Selection Only
     Component {
         id: typeSelectionDialogComponent
 
@@ -149,31 +149,65 @@ SettingsPage {
 
             property int selectedType: -1
 
-            topPadding: 20
-            bottomPadding: 20
-
             ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelHeight / 2
+                spacing: 5                      // we’ll control spacing ourselves
+                Layout.fillWidth: true
 
                 Repeater {
                     model: _linkManager.linkTypeStrings
+                    delegate: RowLayout {
+                        Layout.fillWidth: true        // row spans full width
+                        spacing: 15
 
-                    delegate: QGCButton {
-                        text: modelData
-                        Layout.fillWidth: true
-                        autoExclusive: true
-                        checkable: true
+                        Rectangle {
+                            width: 25
+                            height: 25
+                            radius: width/2
+                            color: "#7F56D9"
 
-                        onClicked: {
-                            typeDialog.selectedType = index
-                            typeDialog.close()
-                            var editingConfig = _linkManager.createConfiguration(index, "")
-                            linkConfigDialogComponent.createObject(mainWindow, {
-                                                                       editingConfig: editingConfig,
-                                                                       originalConfig: null,
-                                                                       selectedType: index
-                                                                   }).open()
+                            Text {
+                                anchors.centerIn: parent
+                                font.pixelSize: 14
+                                color: "white"
+                                text: index + 1
+                            }
                         }
+
+                        //Item { Layout.fillWidth: true }
+
+                        // clickable text
+                        Text {
+                            text: modelData
+                            //Layout.alignment: Qt.AlignHCenter
+                            font.pixelSize: 16
+                            color: "black"   // adjust to your theme
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    typeDialog.selectedType = index
+                                    typeDialog.close()
+                                    var editingConfig = _linkManager.createConfiguration(index, "")
+                                    linkConfigDialogComponent.createObject(mainWindow, {
+                                                                               editingConfig: editingConfig,
+                                                                               originalConfig: null,
+                                                                               selectedType: index
+                                                                           }).open()
+                                }
+                                // hoverEnabled: true
+                                // onEntered: parent.color = "blue"   // optional hover effect
+                                // onExited:  parent.color = "green"
+                            }
+                        }
+
+                         Item { Layout.fillWidth: true }
+
+                        // // full-width divider
+                        // Rectangle {
+                        //     Layout.fillWidth: true
+                        //     height: 1
+                        //     color: "#aaaaaa"  // divider colour
+                        // }
                     }
                 }
             }
@@ -181,12 +215,15 @@ SettingsPage {
     }
 
 
+
     // Second Dialog - Configuration (without type dropdown)
     Component {
         id: linkConfigDialogComponent
 
         QGCPopupDialog {
-            title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
+            title:          selectedType === 3 ? "Bluetooth Devices"
+                                               : originalConfig ? qsTr("Edit Link")
+                                               : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
             acceptAllowed:  nameField.text !== ""
 
@@ -197,62 +234,46 @@ SettingsPage {
             onAccepted: {
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.devName = nameField.text
-                editingConfig.name = editingConfig.devName
-
-                console.log("Selected Type", selectedType)
-                console.log("Bluetooth Save Button", editingConfig.devName)
+                editingConfig.name    = editingConfig.devName
 
                 if (originalConfig) {
-                    console.log("Bluetooth Save Button Edit Link", originalConfig)
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
                 } else {
-                    // If it was edited, it's no longer "dynamic"
                     editingConfig.dynamic = false
                     _linkManager.endCreateConfiguration(editingConfig)
                     _linkManager.createConnectedLink(editingConfig)
-                    console.log("Bluetooth Save Button Add New Link", originalConfig)
                 }
             }
 
             onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
 
+            // ---------- MAIN LAYOUT ----------
             ColumnLayout {
+                id: mainColumn
                 spacing: ScreenTools.defaultFontPixelHeight / 2
+                Layout.fillWidth: true
 
-                // // Show selected type as read-only information
-                // RowLayout {
-                //     Layout.fillWidth: true
-                //     spacing: ScreenTools.defaultFontPixelWidth
 
-                //     QGCLabel {
-                //         text: qsTr("Selected Type:")
-                //         font.bold: true
-                //     }
-
-                //     QGCLabel {
-                //         Layout.fillWidth: true
-                //         text: _linkManager.linkTypeStrings[selectedType]
-                //         color: "green"
-                //     }
-                // }
-
+                // ---- Name row (not shown for Bluetooth) ----
                 RowLayout {
-                    Layout.fillWidth: true
+                    Layout.fillWidth: true    // row stretches full width
                     spacing: ScreenTools.defaultFontPixelWidth
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
                     QGCLabel { text: qsTr("Name") }
 
                     QGCTextField {
-                        id:                 nameField
-                        Layout.fillWidth:   true
-                        text:               editingConfig.devName
-                        placeholderText:    qsTr("Enter name")
+                        id:               nameField
+                        Layout.fillWidth: true   // text field grows to take remaining width
+                        text:             editingConfig.devName
+                        placeholderText:  qsTr("Enter name")
                     }
                 }
 
+                // ---- Device list / settings loader ----
                 Loader {
-                    id:     linkSettingsLoader
+                    id: linkSettingsLoader
+                    Layout.fillWidth: true        // << ensures it spans the whole dialog
                     source: subEditConfig.settingsURL
 
                     property var subEditConfig:         editingConfig
@@ -264,6 +285,7 @@ SettingsPage {
             }
         }
     }
+
 }
 
 
