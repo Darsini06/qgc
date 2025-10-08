@@ -706,7 +706,7 @@ Rectangle {
                 // Vertical bounce
                 y: progressBackground.y - 20 + bounceOffset
 
-                // 🔄 Tilt the icon by 45 degrees
+                //  Tilt the icon by 45 degrees
                 rotation: 45
                 transformOrigin: Item.Center  // Rotate around center
 

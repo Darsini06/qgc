@@ -339,7 +339,7 @@ void BluetoothConfiguration::doneScanning()
 {
     if(_deviceDiscover)
     {
-        _deviceDiscover->deleteLater();
+         deleteLater();
         _deviceDiscover = nullptr;
         emit scanningChanged();
     }

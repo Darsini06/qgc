@@ -67,13 +67,13 @@ public:
     /// The link types supported by QGC
     /// Any changes here MUST be reflected in LinkManager::linkTypeStrings()
     enum LinkType {
+#ifdef QGC_ENABLE_BLUETOOTH
+        TypeBluetooth,  ///< Bluetooth Link
 #ifndef NO_SERIAL_LINK
         TypeSerial,     ///< Serial Link
 #endif
         TypeUdp,        ///< UDP Link
         TypeTcp,        ///< TCP Link
-#ifdef QGC_ENABLE_BLUETOOTH
-        TypeBluetooth,  ///< Bluetooth Link
 #endif
 #ifdef QT_DEBUG
         TypeMock,       ///< Mock Link for Unitesting

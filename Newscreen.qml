@@ -12,6 +12,8 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import MapGlobals 1.0
 import QtQuick.Layouts 1.15
+
+
 Item {
     id: mainWindow1
     anchors.fill: parent
@@ -280,7 +282,7 @@ Item {
                                 ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
                                 );
 
-                    linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: null }).open();
+                    typeSelectionDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: null }).open();
 
                 }
             }
@@ -332,8 +334,6 @@ Item {
                     }
 
                     swapCamera();
-
-
 
                 }
             }
@@ -454,116 +454,155 @@ Item {
             }
         }
 
-        Component {
-            id: linkDialogComponent
+          // First Dialog – Type Selection Only
 
-            QGCPopupDialog {
-                title:          originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
-                buttons:        Dialog.Save | Dialog.Cancel
-                //acceptAllowed:  nameField.text !== ""
+          Component {
+              id: typeSelectionDialogComponent
 
-                property var originalConfig
-                property var editingConfig
+              QGCPopupDialog {
+                  id: typeDialog
+                  title: qsTr("Select Link Type")
+                  buttons: false
+                  closeOnClickOutside: true
 
-                onAccepted: {
-                    linkSettingsLoader.item.saveSettings()
-                    //editingConfig.name = nameField.text
+                  property int selectedType: -1
 
-                    //console.log("Bluetooth Save Button",editingConfig.name)
+                  ColumnLayout {
+                      spacing: 15                     // we’ll control spacing ourselves
+                      Layout.fillWidth: true
 
-                    if (originalConfig) {
-                        console.log("Bluetooth Save Button Add New Link",originalConfig)
-                        _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+                      Repeater {
+                          model: _linkManager.linkTypeStrings
+                          delegate: RowLayout {
+                              Layout.fillWidth: true        // row spans full width
+                              spacing: 20
 
-                        if (editingConfig.link) {
-                            editingConfig.link.disconnect()
-                            editingConfig.linkChanged()
-                        } else {
-                            _linkManager.createConnectedLink(editingConfig)
+                              Rectangle {
+                                  width: 25
+                                  height: 25
+                                  radius: width/2
+                                  color: "#7F56D9"
 
-                        }
+                                  Text {
+                                      anchors.centerIn: parent
+                                      font.pixelSize: 14
+                                      color: "white"
+                                      text: index + 1
+                                  }
+                              }
 
-                    } else {
-                        // If it was edited, it's no longer "dynamic"
-                        editingConfig.dynamic = false
-                        _linkManager.endCreateConfiguration(editingConfig)
+                              //Item { Layout.fillWidth: true }
 
-                        if (editingConfig.link) {
-                            editingConfig.link.disconnect()
-                            editingConfig.linkChanged()
-                        } else {
-                            _linkManager.createConnectedLink(editingConfig)
+                              // clickable text
+                              Text {
+                                  text: modelData
+                                  //Layout.alignment: Qt.AlignHCenter
+                                  font.pixelSize: 16
+                                  color: "black"   // adjust to your theme
 
-                        }
+                                  MouseArea {
+                                      anchors.fill: parent
+                                      onClicked: {
+                                          typeDialog.selectedType = index
+                                          typeDialog.close()
+                                          var editingConfig = _linkManager.createConfiguration(index, "")
+                                          linkConfigDialogComponent.createObject(mainWindow, {
+                                                                                     editingConfig: editingConfig,
+                                                                                     originalConfig: null,
+                                                                                     selectedType: index
+                                                                                 }).open()
+                                      }
+                                      // hoverEnabled: true
+                                      // onEntered: parent.color = "blue"   // optional hover effect
+                                      // onExited:  parent.color = "green"
+                                  }
+                              }
 
-                        console.log("Bluetooth Save Button Edit Link",originalConfig)
-                    }
-                }
+                               Item { Layout.fillWidth: true }
 
-                onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+                              // // full-width divider
+                              // Rectangle {
+                              //     Layout.fillWidth: true
+                              //     height: 1
+                              //     color: "#aaaaaa"  // divider colour
+                              // }
+                          }
+                      }
+                  }
+              }
+          }
 
-                ColumnLayout {
-                    spacing: ScreenTools.defaultFontPixelHeight / 2
+          // Second Dialog - Configuration (without type dropdown)
+          Component {
+              id: linkConfigDialogComponent
 
-                    // RowLayout {
-                    //     Layout.fillWidth:   true
-                    //     spacing:            ScreenTools.defaultFontPixelWidth
+              QGCPopupDialog {
+                  title:          selectedType === 3 ? "Bluetooth Devices"
+                                                     : originalConfig ? qsTr("Edit Link")
+                                                     : qsTr("Add New Link")
+                  buttons:        Dialog.Save | Dialog.Cancel
+                  acceptAllowed:  nameField.text !== ""
 
-                    //     //QGCLabel { text: qsTr(QGroundControl.loadGlobalSetting("bluetooth_name","Name")) }
+                  property var originalConfig
+                  property var editingConfig
+                  property int selectedType
 
-                    //     QGCLabel { text: qsTr("Name") }
+                  onAccepted: {
+                      linkSettingsLoader.item.saveSettings()
+                      editingConfig.devName = nameField.text
+                      editingConfig.name    = editingConfig.devName
 
-                    //     QGCTextField {
-                    //         id:                 nameField
-                    //         Layout.fillWidth:   true
-                    //         text:               editingConfig.devName
-                    //         placeholderText:    qsTr("Enter name")
-                    //     }
-                    // }
+                      if (originalConfig) {
+                          _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+                      } else {
+                          editingConfig.dynamic = false
+                          _linkManager.endCreateConfiguration(editingConfig)
+                          _linkManager.createConnectedLink(editingConfig)
+                      }
+                  }
 
-                    QGCCheckBoxSlider {
-                        Layout.fillWidth:   true
-                        text:               qsTr("Automatically Connect on Start")
-                        checked:            editingConfig.autoConnect
-                        onCheckedChanged:   editingConfig.autoConnect = checked
-                    }
+                  onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
 
-                    // QGCCheckBoxSlider {
-                    //     Layout.fillWidth:   true
-                    //     text:               qsTr("High Latency")
-                    //     checked:            editingConfig.highLatency
-                    //     onCheckedChanged:   editingConfig.highLatency = checked
-                    // }
+                  // ---------- MAIN LAYOUT ----------
+                  ColumnLayout {
+                      id: mainColumn
+                      spacing: ScreenTools.defaultFontPixelHeight / 2
+                      Layout.fillWidth: true
 
-                    LabelledComboBox {
-                        label:                  qsTr("Type")
-                        enabled:                originalConfig == null
-                        model:                  _linkManager.linkTypeStrings
-                        Component.onCompleted:  comboBox.currentIndex = editingConfig.linkType
 
-                        onActivated: (index) => {
-                                         if (index !== editingConfig.linkType) {
-                                             // Save current name
-                                             // var name = nameField.text
-                                             // Create new link configuration
-                                             editingConfig = _linkManager.createConfiguration(index, "")
-                                         }
-                                     }
-                    }
+                      // ---- Name row (not shown for Bluetooth) ----
+                      RowLayout {
+                          Layout.fillWidth: true    // row stretches full width
+                          spacing: ScreenTools.defaultFontPixelWidth
+                          visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
-                    Loader {
-                        id:     linkSettingsLoader
-                        source: subEditConfig.settingsURL
+                          QGCLabel { text: qsTr("Name") }
 
-                        property var subEditConfig:         editingConfig
-                        property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
-                        property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
-                        property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
-                        property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
-                    }
-                }
-            }
-        }
+                          QGCTextField {
+                              id:               nameField
+                              Layout.fillWidth: true   // text field grows to take remaining width
+                              text:             editingConfig.devName
+                              placeholderText:  qsTr("Enter name")
+                          }
+                      }
+
+                      // ---- Device list / settings loader ----
+                      Loader {
+                          id: linkSettingsLoader
+                          Layout.fillWidth: true        // << ensures it spans the whole dialog
+                          source: subEditConfig.settingsURL
+
+                          property var subEditConfig:         editingConfig
+                          property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
+                          property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
+                          property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
+                          property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+                      }
+                  }
+              }
+          }
+
+
     }
 
 

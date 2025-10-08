@@ -146,18 +146,19 @@ SettingsPage {
             id: typeDialog
             title: qsTr("Select Link Type")
             buttons: false
+            closeOnClickOutside: true
 
             property int selectedType: -1
 
             ColumnLayout {
-                spacing: 5                      // we’ll control spacing ourselves
+                spacing: 15                     // we’ll control spacing ourselves
                 Layout.fillWidth: true
 
                 Repeater {
                     model: _linkManager.linkTypeStrings
                     delegate: RowLayout {
                         Layout.fillWidth: true        // row spans full width
-                        spacing: 15
+                        spacing: 20
 
                         Rectangle {
                             width: 25
@@ -213,8 +214,6 @@ SettingsPage {
             }
         }
     }
-
-
 
     // Second Dialog - Configuration (without type dropdown)
     Component {

@@ -39,6 +39,7 @@ import QGroundControl.ScreenTools
 //      behaviour by setting destroyOnClose to false if it was not created dynamically.
 //  * Dialog will automatically close after accepted/rejected signal processing. You can prevent this by setting
 //      preventClose = true prior to returning from your signal handlers.
+
 Popup {
     id:                 root
     width:  mainWindow.width
@@ -57,6 +58,7 @@ Popup {
     property var    dialogProperties
     property bool   destroyOnClose:         true
     property bool   preventClose:           false
+    property bool   closeOnClickOutside:    false  // NEW: Control close on outside click
 
     readonly property real headerMinWidth: titleLable.implicitWidth + rejectButton.width + acceptButton.width + titleLable.spacing * 2
 
@@ -72,13 +74,17 @@ Popup {
         height: mainWindow.height
 
         onClicked: {
-            if (closePolicy & Popup.CloseOnPressOutside) {
+            console.log("outside click")
+            if (closePolicy & Popup.CloseOnPressOutside && root.closeOnClickOutside) {
                 if (rejectAllowed) {
                     focus = true    // Take focus to force FactTextFields to validate
                     _reject()
                 } else if (acceptAllowed) {
                     focus = true    // Take focus to force FactTextFields to validate
                     _accept()
+                }else {
+                    // NEW: If no buttons are available, just close the dialog
+                    root.close()
                 }
             }
         }
@@ -183,9 +189,21 @@ Popup {
             rejectButton.visible = true
         }
 
+        // closePolicy = Popup.NoAutoClose
+        // if (rejectAllowed) {
+        //     closePolicy |= Popup.CloseOnEscape
+        // }
+
+
+        // NEW: Enable close on escape if reject is allowed OR closeOnClickOutside is enabled
         closePolicy = Popup.NoAutoClose
-        if (rejectAllowed) {
+        if (rejectAllowed || root.closeOnClickOutside) {
             closePolicy |= Popup.CloseOnEscape
+        }
+
+        // NEW: Enable close on outside click if the property is set
+        if (root.closeOnClickOutside) {
+            closePolicy |= Popup.CloseOnPressOutside
         }
     }
 
@@ -210,7 +228,7 @@ Popup {
         color: "#ffffff"
         radius: 20
         border.width: 1
-        border.color: "#dddddd"  // optional light border
+        border.color: "#dddddd"
         anchors.centerIn: parent
 
         ColumnLayout {
@@ -220,7 +238,7 @@ Popup {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: titleLable.implicitHeight + 10
+                height: titleLable.implicitHeight + 10  // Increased height to accommodate close button
                 color: "#7F56D9"
                 radius: 15
                 Layout.alignment: Qt.AlignHCenter
@@ -234,18 +252,64 @@ Popup {
                     color: "#7F56D9"
                 }
 
-                // Centered title
-                QGCLabel {
-                    id: titleLable
-                    text: root.title
-                    anchors.centerIn: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.bold: true
-                    color: "white"
-                    padding: 8
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: _contentMargin
+                    clip: true
+
+                    // Centered title
+                    QGCLabel {
+                        id: titleLable
+                        text: root.title
+                        //anchors.centerIn: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.bold: true
+                        color: "white"
+                        padding: 8
+                        // Adjust left margin to account for close button space
+                        //anchors.leftMargin: closeBtn.width + closeBtn.anchors.margins
+                        //anchors.rightMargin: closeBtn.width + closeBtn.anchors.margins
+                    }
+
+                    // Close button - placed at top right
+                    Rectangle {
+                        id: closeBtn
+                        width: 25
+                        height: 25
+                        radius: width / 2
+                        color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"  // Darker red on hover
+                        //anchors.right: parent.right
+                        //anchors.top: parent.top
+                        //anchors.margins: 10
+                        clip: true
+                        visible: closeOnClickOutside
+
+                        Text {
+                            text: "×"  // Using multiplication symbol for better looking X
+                            color: "white"
+                            anchors.centerIn: parent
+                            font.bold: true
+                            font.pixelSize: 18
+                        }
+
+                        MouseArea {
+                            id: closeBtnMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                close()
+                            }
+                        }
+                    }
+
                 }
+
             }
 
             Rectangle {
@@ -303,7 +367,7 @@ Popup {
                         color: "#E53935"
                     }
                     contentItem: Text {
-                        text: rejectButton.text  // bind to button text
+                        text: rejectButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
@@ -323,7 +387,7 @@ Popup {
                         color: "#2196F3"
                     }
                     contentItem: Text {
-                        text: acceptButton.text  // bind to button text
+                        text: acceptButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
@@ -333,10 +397,10 @@ Popup {
                     }
                 }
             }
-
         }
-
     }
+
+
 }
 
 // /****************************************************************************

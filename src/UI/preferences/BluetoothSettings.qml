@@ -113,8 +113,6 @@ ColumnLayout {
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
             clip: true
-
-            // Simple approach to prevent horizontal scrolling
             contentWidth: availableWidth
 
             ListView {
@@ -129,14 +127,27 @@ ColumnLayout {
                     width: deviceList.width
                     height: 40  // Fixed height for buttons
 
+                    property bool isSelected: subEditConfig.devName === modelData
+
                     Rectangle {
                         // Visual representation of button
                         anchors.centerIn: parent
                         width: Math.min(deviceList.width - 40, textItem.implicitWidth + 20)
                         height: 40
-                        radius: 20
-                        color: mouseArea.containsPress ? "#d0d0d0" : "#f0f0f0"
-                        border.color: "#a0a0a0"
+                        radius: 15
+                        color: {
+                            if (isSelected) {
+                                return "#2196F3"  // Blue background for selected item
+                            } else if (mouseArea.containsPress) {
+                                return "#d0d0d0"  // Pressed state
+                            } else if (mouseArea.containsMouse) {
+                                return "#e8e8e8"  // Hover state
+                            } else {
+                                return "#f0f0f0"  // Default state
+                            }
+                        }
+                        border.color: isSelected ? "#1976D2" : "#a0a0a0"
+                        border.width: isSelected ? 2 : 1
 
                         Text {
                             id: textItem
@@ -148,14 +159,19 @@ ColumnLayout {
                             wrapMode: Text.Wrap
                             elide: Text.ElideRight
                             width: parent.width - 10
+                            color: isSelected ? "white" : "black"  // White text for selected item
                         }
 
                         MouseArea {
                             id: mouseArea
                             anchors.fill: parent
+                            hoverEnabled: true
                             onClicked: {
-                                // Handle device selection here
-                                console.log("Selected device:", modelData)
+                                if (modelData !== "") {
+                                    subEditConfig.devName = modelData
+                                    console.log("Bluetooth Device name: ", modelData)
+                                    QGroundControl.saveGlobalSetting("bluetooth_name", modelData)
+                                }
                             }
                         }
                     }

@@ -247,63 +247,95 @@ SetupPage {
                             id: escCalibrationHolder
                             width: parent.width - (_margins * 2)
                             x: _margins
-                            spacing: ScreenTools.defaultFontPixelHeight / 2
-
-                            QGCLabel {
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                text: qsTr("WARNING: Remove props prior to calibration!")
-                                color: qgcPal.warningText
-                                font.bold: true
-                                topPadding: 0
-                                bottomPadding: ScreenTools.defaultFontPixelHeight / 2
-                            }
+                            spacing: ScreenTools.defaultFontPixelHeight / 3
 
                             Row {
                                 width: parent.width
                                 spacing: _margins
-                                //layoutDirection: Qt.LeftToRight
+                                layoutDirection: Qt.LeftToRight
 
-                                QGCButton {
-                                    id: calibrateButton
-                                    text: qsTr("Calibrate")
-                                    enabled: _escCalibration && _escCalibration.rawValue === 0
-                                    onClicked: if(_escCalibration) _escCalibration.rawValue = 3
+                                QGCLabel {
+                                    width: parent.width - calibrateButton.width - parent.spacing
+                                    wrapMode: Text.WordWrap
+                                    text: qsTr("WARNING: Remove props prior to calibration!")
+                                    color: qgcPal.warningText
+                                    font.bold: true
+                                    font.pointSize: 12
+                                    topPadding: 0
+                                    //bottomPadding: ScreenTools.defaultFontPixelHeight / 2
                                 }
 
-                                Column {
-                                    width: parent.width - calibrateButton.width - _margins
-                                    spacing: ScreenTools.defaultFontPixelHeight / 3
-                                    enabled: _escCalibration && _escCalibration.rawValue === 3
+                                // QGCButton {
+                                //     id: calibrateButton
+                                //     text: qsTr("Calibrate")
+                                //     fontWeight :Font.ExtraBold
+                                //     font.pointSize: 12
+                                //     enabled: _escCalibration && _escCalibration.rawValue === 0
+                                //     onClicked: if(_escCalibration) _escCalibration.rawValue = 3
+                                // }
 
-                                    QGCLabel {
+                                QGCLabel {
+                                    id: calibrateButton
+                                    text: qsTr("Calibrate")
+                                    //color: qgcPal.brandingPurple
+                                    font.bold: true
+                                    font.pointSize: 14
+                                    topPadding: 0
+                                    rightPadding: 20
+                                    font.underline: true
+                                    enabled: _escCalibration && _escCalibration.rawValue === 0
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            console.log("Calibrate clicked");
+                                            if(_escCalibration) {
+                                                _escCalibration.rawValue = 3;
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            Column {
+                                width: parent.width - calibrateButton.width - _margins
+                                spacing: ScreenTools.defaultFontPixelHeight / 3
+                                enabled: _escCalibration && _escCalibration.rawValue === 3
+
+                                QGCLabel {
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
+                                    text: _escCalibration ?
+                                              (_escCalibration.rawValue === 3 ?
+                                                   qsTr("Now perform these steps:") :
+                                                   qsTr("Click Calibrate to start, then:")) :
+                                              ""
+                                    font.pointSize: 14
+                                }
+
+
+                                Repeater {
+
+                                    model: [
+                                        qsTr("- Disconnect USB and battery so flight controller powers down"),
+                                        qsTr("- Connect the battery"),
+                                        qsTr("- The arming tone will be played (if the vehicle has a buzzer attached)"),
+                                        qsTr("- If using a flight controller with a safety button press it until it displays solid red"),
+                                        qsTr("- You will hear a musical tone then two beeps"),
+                                        qsTr("- A few seconds later you should hear a number of beeps (one for each battery cell you're using)"),
+                                        qsTr("- And finally a single long beep indicating the end points have been set and the ESC is calibrated"),
+                                        qsTr("- Disconnect the battery and power up again normally")
+                                    ]
+
+                                    delegate: QGCLabel {
                                         width: parent.width
                                         wrapMode: Text.WordWrap
-                                        text: _escCalibration ?
-                                                  (_escCalibration.rawValue === 3 ?
-                                                       qsTr("Now perform these steps:") :
-                                                       qsTr("Click Calibrate to start, then:")) :
-                                                  ""
-                                    }
-
-
-                                    Repeater {
-                                        model: [
-                                            qsTr("- Disconnect USB and battery so flight controller powers down"),
-                                            qsTr("- Connect the battery"),
-                                            qsTr("- The arming tone will be played (if the vehicle has a buzzer attached)"),
-                                            qsTr("- If using a flight controller with a safety button press it until it displays solid red"),
-                                            qsTr("- You will hear a musical tone then two beeps"),
-                                            qsTr("- A few seconds later you should hear a number of beeps (one for each battery cell you're using)"),
-                                            qsTr("- And finally a single long beep indicating the end points have been set and the ESC is calibrated"),
-                                            qsTr("- Disconnect the battery and power up again normally")
-                                        ]
-                                        delegate: QGCLabel {
-                                            width: parent.width
-                                            wrapMode: Text.WordWrap
-                                            text: modelData
-                                            bottomPadding: index === 7 ? ScreenTools.defaultFontPixelHeight / 2 : 0
-                                        }
+                                        text: modelData
+                                        bottomPadding: index === 7 ? ScreenTools.defaultFontPixelHeight / 2 : 0
+                                        font.pointSize: 12
                                     }
                                 }
                             }
@@ -312,6 +344,7 @@ SetupPage {
                     }
                 }
             }
+
         } // Flow
     } // Component - powerPageComponent
 

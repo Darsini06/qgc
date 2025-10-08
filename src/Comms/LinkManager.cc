@@ -515,13 +515,13 @@ QStringList LinkManager::linkTypeStrings() const
         return list;
     }
 
+#ifdef QGC_ENABLE_BLUETOOTH
+    list += tr("Bluetooth");
 #ifndef NO_SERIAL_LINK
     list += tr("Serial");
 #endif
     list += tr("UDP");
     list += tr("TCP");
-#ifdef QGC_ENABLE_BLUETOOTH
-    list += tr("Bluetooth");
 #endif
 #ifdef QT_DEBUG
     list += tr("Mock Link");
