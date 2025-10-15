@@ -152,6 +152,7 @@ private:
         StopCalibrationFailed,
         StopCalibrationCancelled
     };
+
     void _stopCalibration(StopCalibrationCode code);
     
     void _updateAndEmitShowOrientationCalArea(bool show);

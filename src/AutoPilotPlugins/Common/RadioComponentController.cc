@@ -73,8 +73,8 @@ const RadioComponentController::stateMachineEntry* RadioComponentController::_ge
     static const char* msgBeginPX4 =        QT_TR_NOOP("Lower the Throttle stick all the way down as shown in diagram.\n\n"
                                             "It is recommended to disconnect all motors for additional safety, however, the system is designed to not arm during the calibration.\n\n"
                                             "Click Next to continue");
-    static const char* msgBeginAPM =        QT_TR_NOOP("Lower the Throttle stick all the way down as shown in diagram.\nReset all transmitter trims to center.\n\n"
-                                            "Please ensure all motor power is disconnected AND all props are removed from the vehicle.\n\n"
+    static const char* msgBeginAPM =        QT_TR_NOOP("Lower the Throttle stick all the way down as shown in diagram.\nReset all transmitter trims to center.\n"
+                                            "Please ensure all motor power is disconnected AND all props are removed from the vehicle.\n"
                                             "Click Next to continue");
     static const char* msgThrottleUp =      QT_TR_NOOP("Move the Throttle stick all the way up and hold it there...");
     static const char* msgThrottleDown =    QT_TR_NOOP("Move the Throttle stick all the way down and leave it there...");
@@ -104,7 +104,7 @@ const RadioComponentController::stateMachineEntry* RadioComponentController::_ge
         { rcCalFunctionMax,                 msgComplete,        _imageThrottleDown, nullptr,                                            &RadioComponentController::_writeCalibration,   nullptr },
     };
 
-    static const stateMachineEntry rgStateMachineAPM[] = {
+    static const stateMachineEntry rgStateMachineAPM[] =    {
         //Function
         { rcCalFunctionMax,                 msgBeginAPM,        _imageHome,         &RadioComponentController::_inputCenterWaitBegin,   &RadioComponentController::_saveAllTrims,       nullptr },
         { rcCalFunctionThrottle,            msgThrottleUp,      _imageThrottleUp,   &RadioComponentController::_inputStickDetect,       nullptr,                                        nullptr },

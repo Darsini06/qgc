@@ -84,6 +84,7 @@ public:
         MAV_BATTERY_FUNCTION_AVIONICS=3, /* Avionics battery | */
         MAV_BATTERY_TYPE_PAYLOAD=4, /* Payload battery | */
     };
+
     Q_ENUM(MAV_BATTERY_FUNCTION)
 
     enum MAV_BATTERY_CHARGE_STATE
@@ -97,6 +98,7 @@ public:
        MAV_BATTERY_CHARGE_STATE_UNHEALTHY=6, /* Battery is diagnosed to be defective or an error occurred, usage is discouraged / prohibited. | */
        MAV_BATTERY_CHARGE_STATE_CHARGING=7, /* Battery is charging. | */
     };
+
     Q_ENUM(MAV_BATTERY_CHARGE_STATE)
 
     /// Sensor bits from sensors*Bits properties
@@ -128,6 +130,8 @@ public:
         //SysStatusSensorLogging =                MAV_SYS_STATUS_LOGGING,
         SysStatusSensorBattery =                MAV_SYS_STATUS_SENSOR_BATTERY,
     };
+
+
     Q_ENUM(MavlinkSysStatus)
 
     enum GRIPPER_OPTIONS {
@@ -135,6 +139,7 @@ public:
         Gripper_grab    = GRIPPER_ACTION_GRAB,
         Invalid_option  = GRIPPER_ACTIONS_ENUM_END,
     };
+
     Q_ENUM(GRIPPER_OPTIONS)
 
     enum CalibrationType {
@@ -153,10 +158,12 @@ public:
         CalibrationPX4Pressure,
         CalibrationAPMAccelSimple,
     };
+
     Q_ENUM(CalibrationType)
 
     static bool isValidChannel(uint8_t channel) { return (channel < MAVLINK_COMM_NUM_BUFFERS); }
     static bool isValidChannel(mavlink_channel_t channel) { return isValidChannel(static_cast<uint8_t>(channel)); }
 
     static mavlink_status_t* getChannelStatus(mavlink_channel_t channel) { return mavlink_get_channel_status(static_cast<uint8_t>(channel)); }
+
 };

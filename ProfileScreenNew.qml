@@ -576,7 +576,7 @@ Item {
                     spacing: 5
 
                     Text {
-                      text: "Profi Name"
+                      text: "Profile Name"
                       font.pixelSize: 14
                       font.bold: true
                       color: "#2c3e50"
@@ -833,6 +833,7 @@ Item {
 
                           currentView = "profile";
                         }
+
                       });
                     }
 
@@ -849,6 +850,7 @@ Item {
                       horizontalAlignment: Text.AlignHCenter
                       verticalAlignment: Text.AlignVCenter
                     }
+
                   }
 
                   Item { height: 10 } // Spacer
@@ -1453,6 +1455,7 @@ Item {
         }
       }
     }
+
   }
 
   Component {
@@ -1468,9 +1471,8 @@ Item {
         QGroundControl.saveBoolGlobalSetting("login", false)
         popup.visible = false
         mainWindow.profile()
-
-
       }
+
       onRejected: {
         popup.visible = false
       }
@@ -1482,7 +1484,7 @@ Item {
           Layout.fillWidth: true
         }
       }
-    }
+    }  
   }
 
 }

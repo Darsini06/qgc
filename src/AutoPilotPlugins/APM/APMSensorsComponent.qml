@@ -81,7 +81,7 @@ SetupPage {
             property real   _margins:                       ScreenTools.defaultFontPixelHeight / 2
             property bool   _compassAutoRotAvailable:       controller.parameterExists(-1, "COMPASS_AUTO_ROT")
             property Fact   _compassAutoRotFact:            controller.getParameterFact(-1, "COMPASS_AUTO_ROT", false /* reportMissing */)
-            property bool   _compassAutoRot:                _compassAutoRotAvailable ? _compassAutoRotFact.rawValue == 2 : false
+            property bool   _compassAutoRot:                _compassAutoRotAvailable ? _compassAutoRotFact.rawValue === 2 : false
             property bool   _showSimpleAccelCalOption:      false
             property bool   _doSimpleAccelCal:              false
             property var    _gcsPosition:                    QGroundControl.qgcPositionManager.gcsPosition
@@ -96,6 +96,7 @@ SetupPage {
                 _showSimpleAccelCalOption = false
 
                 _orientationDialogCalType = calType
+
                 switch (calType) {
                 case _calTypeCompass:
                     _orientationsDialogShowCompass = true
@@ -797,6 +798,7 @@ SetupPage {
                         onClicked:  controller.cancelCalibration()
                     }
                 }
+
             } // QGCFlickable - buttons
 
             /// Right column - cal area
@@ -865,6 +867,7 @@ SetupPage {
                                 calInProgressText:  controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                                 imageSource:        "qrc:///qmlimages/VehicleDown.png"
                             }
+
                             VehicleRotationCal {
                                 width:              parent.indicatorWidth
                                 height:             parent.indicatorHeight
@@ -874,6 +877,7 @@ SetupPage {
                                 calInProgressText:  controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                                 imageSource:        "qrc:///qmlimages/VehicleLeft.png"
                             }
+
                             VehicleRotationCal {
                                 width:              parent.indicatorWidth
                                 height:             parent.indicatorHeight
@@ -883,6 +887,7 @@ SetupPage {
                                 calInProgressText:  controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                                 imageSource:        "qrc:///qmlimages/VehicleRight.png"
                             }
+
                             VehicleRotationCal {
                                 width:              parent.indicatorWidth
                                 height:             parent.indicatorHeight
@@ -892,6 +897,7 @@ SetupPage {
                                 calInProgressText:  controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                                 imageSource:        "qrc:///qmlimages/VehicleNoseDown.png"
                             }
+
                             VehicleRotationCal {
                                 width:              parent.indicatorWidth
                                 height:             parent.indicatorHeight
@@ -901,6 +907,7 @@ SetupPage {
                                 calInProgressText:  controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
                                 imageSource:        "qrc:///qmlimages/VehicleTailDown.png"
                             }
+
                             VehicleRotationCal {
                                 width:              parent.indicatorWidth
                                 height:             parent.indicatorHeight

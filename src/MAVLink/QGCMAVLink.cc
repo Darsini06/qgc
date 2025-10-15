@@ -412,6 +412,7 @@ int QGCMAVLink::motorCount(MAV_TYPE mavType, uint8_t frameType)
     case MAV_TYPE_TRICOPTER:
         return 3;
     case MAV_TYPE_QUADROTOR:
+
     case MAV_TYPE_VTOL_TAILSITTER_QUADROTOR:
         return 4;
     case MAV_TYPE_HEXAROTOR:

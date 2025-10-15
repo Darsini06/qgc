@@ -605,6 +605,7 @@ Item {
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "Pressure"
                             type: "pressure"
@@ -612,6 +613,7 @@ Item {
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "RC Calibration"
                             type: "rc"
@@ -675,6 +677,7 @@ Item {
                             color: {
                                 if (model.status === "success") return "lightgreen";
                                 if (model.status === "failure") return "#ff9999";
+                                if (model.status === "inprogress") return "blue";
                                 return mouseArea.containsPress ? qgcPal.buttonHighlight : qgcPal.button;
                             }
                             radius: 5
@@ -832,6 +835,7 @@ Item {
                 target: controller
 
                 onUpdateCalibrationStatus: function(type, status) {
+                    console.log("UpdateCalibrationStatus :",type,status)
                     for (let i = 0; i < gridView.model.count; ++i) {
                         let item = gridView.model.get(i)
                         if (item.type === type) {
@@ -1276,9 +1280,8 @@ Item {
 
                     onAccepted: {
                         if (calType === _calTypeAccel) {
-                            console.log("Calibrating Accelerometer with simpleAccelCal:", simpleAccelCal)
+
                             if (controller && controller.calibrateAccel) {
-                                console.log("_orientationDialogCalType  == _calTypeAccel",calType)
                                 controller.calibrateAccel(true);
                             } else {
                                 console.log("Controller or calibrateAccel method is undefined");
@@ -1318,7 +1321,7 @@ Item {
 
                         QGCColoredImage {
                             source: "qrc:///qmlimages/VehicleDown.png"
-                            width: parent.width * 0.4
+                            width: parent.width * 0.3
                             height: width
                             anchors.horizontalCenter: parent.horizontalCenter
                             color : "black"
@@ -1432,6 +1435,7 @@ Item {
                                 text:       qsTr("Use GCS position instead")
                                 checked:    _gcsPosition.isValid
                             }
+
                             QGCCheckBox {
                                 visible:    northCalibrationManualPosition.visible && !_gcsPosition.isValid
                                 id:         useMapPositionCheckbox

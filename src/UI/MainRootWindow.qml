@@ -447,8 +447,8 @@ ApplicationWindow {
         id: dynamicCalDialog
         modal: true
         anchors.centerIn: parent
-        width: parent.width * 0.8
-        height: parent.height * 0.8
+        width: parent.width * 0.85
+        height: parent.height * 0.9
         clip: true
 
         property string dialogTitleText: ""

@@ -398,12 +398,15 @@ QString MAVLinkProtocol::getName()
 /** @return System id of this application */
 int MAVLinkProtocol::getSystemId() const
 {
+   // qDebug() << " MAVLinkProtocol::getSystemId : " << systemId;
     return systemId;
 }
 
 void MAVLinkProtocol::setSystemId(int id)
 {
     systemId = id;
+
+    qDebug() << " MAVLinkProtocol::setSystemId : " << systemId;
 }
 
 /** @return Component id of this application */

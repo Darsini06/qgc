@@ -3048,7 +3048,9 @@ void Vehicle::startCalibration(QGCMAVLink::CalibrationType calType)
     qDebug() << "Component ID:" << defaultComponentId();
 
      if (sharedLink && sharedLink.get()) {
+
  qDebug()<< "startCalibration 4 " << calType;
+
          mavlink_msg_command_long_pack_chan(_mavlink->getSystemId(),
                                             _mavlink->getComponentId(),
                                             sharedLink->mavlinkChannel(),
@@ -3059,15 +3061,16 @@ void Vehicle::startCalibration(QGCMAVLink::CalibrationType calType)
                                             0,                                // 0=first transmission of command
                                             param1, param2, param3, param4, param5, param6, param7);
 
+
           qDebug()<< "startCalibration 5 " << calType;
 
          sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
 
-          qDebug()<< "startCalibration 6 " << calType;
-    }else {
+          qDebug()<< " startCalibration 6 " << calType;
+    }
+     else {
          qCritical() << "Link is invalid. Cannot send calibration command.";
      }
-
 
 }
 

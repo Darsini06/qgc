@@ -62,10 +62,12 @@ SetupPage {
                 radius: 6
                 border.width: 1
                 border.color: "#999999"
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: selectedTab = "flightMode"
                 }
+
                 QGCLabel {
                     anchors.centerIn: parent
                     text: qsTr("Flight Mode Settings")
@@ -120,11 +122,13 @@ SetupPage {
 
                 Rectangle {
                     width: parent.width
-                    color: qgcPal.windowShade
+                    height: flightModeColumn.implicitHeight + (ScreenTools.defaultFontPixelWidth * 2) // Add padding
+                    //color: qgcPal.windowShade
 
                     Column {
                         id: flightModeColumn
                         width: parent.width - (_margins * 2)
+                        anchors.centerIn: parent
                         padding: ScreenTools.defaultFontPixelWidth
                         spacing: ScreenTools.defaultFontPixelHeight
 
@@ -142,8 +146,8 @@ SetupPage {
                                 id: modeChannelCombo
                                 width: ScreenTools.defaultFontPixelWidth * 15
                                 model: [qsTr("Not assigned"), qsTr("Channel 1"), qsTr("Channel 2"),
-                                        qsTr("Channel 3"), qsTr("Channel 4"), qsTr("Channel 5"),
-                                        qsTr("Channel 6"), qsTr("Channel 7"), qsTr("Channel 8")]
+                                    qsTr("Channel 3"), qsTr("Channel 4"), qsTr("Channel 5"),
+                                    qsTr("Channel 6"), qsTr("Channel 7"), qsTr("Channel 8")]
                                 currentIndex: _fltmodeCh.value
                                 onActivated: (index) => { _fltmodeCh.value = index }
                             }
@@ -152,21 +156,25 @@ SetupPage {
                         GridLayout {
                             rows: _customSimpleMode ? 7 : 6
                             flow: GridLayout.TopToBottom
+                            width: parent.width
                             // no fixed height, let content define it
 
                             QGCLabel { text: ""; visible: _customSimpleMode }
 
+                            //Flight Mode
                             Repeater {
                                 model: 6
                                 QGCLabel {
                                     text: qsTr("Flight Mode ") + index
-                                    color: controller.activeFlightMode == index ? "yellow" : qgcPal.text
+                                    color: controller.activeFlightMode == index ? "#7F56D9" : qgcPal.text
+                                    font.bold: controller.activeFlightMode == index ? true : false
                                     property int index: modelData + 1
                                 }
                             }
 
                             QGCLabel { text: ""; visible: _customSimpleMode }
 
+                            //Flight Mode DropDown
                             Repeater {
                                 model: 6
                                 FactComboBox {
@@ -185,6 +193,7 @@ SetupPage {
 
                             Repeater {
                                 model: controller.simpleModeEnabled
+
                                 QGCCheckBox {
                                     Layout.alignment: Qt.AlignHCenter
                                     visible: _customSimpleMode
@@ -201,6 +210,7 @@ SetupPage {
 
                             Repeater {
                                 model: controller.superSimpleModeEnabled
+
                                 QGCCheckBox {
                                     Layout.alignment: Qt.AlignHCenter
                                     visible: _customSimpleMode
@@ -217,18 +227,18 @@ SetupPage {
                             }
                         }
 
-                        RowLayout {
-                            spacing: _margins
-                            visible: controller.simpleModesSupported
+                        // RowLayout {
+                        //     spacing: _margins
+                        //     visible: controller.simpleModesSupported
 
-                            QGCLabel { text: qsTr("Simple Mode") }
+                        //     QGCLabel { text: qsTr("Simple Mode") }
 
-                            QGCComboBox {
-                                model: controller.simpleModeNames
-                                currentIndex: controller.simpleMode
-                                onActivated: (index) => { controller.simpleMode = index }
-                            }
-                        }
+                        //     QGCComboBox {
+                        //         model: controller.simpleModeNames
+                        //         currentIndex: controller.simpleMode
+                        //         onActivated: (index) => { controller.simpleMode = index }
+                        //     }
+                        // }
                     }
                 }
             }
@@ -247,17 +257,27 @@ SetupPage {
                 width: parent.width
                 spacing: ScreenTools.defaultFontPixelHeight
 
+                // This empty item pushes the content to center vertically
+                Item {
+                    width: parent.width
+                    height: 0 // This will be calculated below
+                }
+
                 Column {
                     id: channelOptColumn
                     width: parent.width
-                    anchors.margins: ScreenTools.defaultFontPixelWidth
                     spacing: ScreenTools.defaultFontPixelHeight
+                    topPadding: 15
 
                     Repeater {
                         model: _rcOptionStop - _rcOptionStart + 1
 
                         Row {
-                            spacing: ScreenTools.defaultFontPixelWidth
+                            spacing: ScreenTools.defaultFontPixelWidth * 2
+                            width: parent.width
+                            // This centers the entire row content horizontally
+                            property int rowWidth: ScreenTools.defaultFontPixelWidth * 25 // Adjust this based on your content width
+                            leftPadding: (parent.width - rowWidth) / 2.5
 
                             property int index: modelData + _rcOptionStart
                             property Fact nullFact: Fact { }
@@ -265,7 +285,7 @@ SetupPage {
                             QGCLabel {
                                 anchors.baseline: optCombo.baseline
                                 text: qsTr("Channel option %1 :").arg(index)
-                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "yellow" : qgcPal.text
+                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "#7F56D9" : qgcPal.text
                             }
 
                             FactComboBox {
@@ -277,10 +297,15 @@ SetupPage {
                         }
                     }
                 }
+
+                // This empty item balances the top one for vertical centering
+                Item {
+                    width: parent.width
+                    height: 0 // This will be calculated below
+                }
             }
         }
     }
-
 
 }
 

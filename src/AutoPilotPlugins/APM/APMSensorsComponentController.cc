@@ -82,7 +82,7 @@ APMSensorsComponentController::~APMSensorsComponentController()
 
 void APMSensorsComponentController::setCurrentCalibrationType(const QString& type)
 {
-    qDebug() << "setCurrentCalibrationType" << type;
+    qDebug() << "setCurrentCalibrationType3" << type;
     _currentCalibrationType = type;
 }
 
@@ -102,7 +102,7 @@ void APMSensorsComponentController::_startLogCalibration(void)
      qDebug()<< "_startLogCalibration 1";
     _hideAllCalAreas();
      qDebug()<< "_startLogCalibration 2";
-    connect(_vehicle, &Vehicle::textMessageReceived, this, &APMSensorsComponentController::_handleUASTextMessage);
+    connect(_vehicle, &Vehicle::textMessageReceived, this, &APMSensorsComponentController:: _handleUASTextMessage);
     qDebug()<< "_startLogCalibration 3";
     emit setAllCalButtonsEnabled(false);
     qDebug()<< "_startLogCalibration 4";
@@ -152,12 +152,14 @@ void APMSensorsComponentController::_resetInternalState(void)
     _orientationCalRightSideDone = true;
     _orientationCalTailDownSideDone = true;
     _orientationCalNoseDownSideDone = true;
+
     _orientationCalDownSideInProgress = false;
     _orientationCalUpsideDownSideInProgress = false;
     _orientationCalLeftSideInProgress = false;
     _orientationCalRightSideInProgress = false;
     _orientationCalNoseDownSideInProgress = false;
     _orientationCalTailDownSideInProgress = false;
+
     _orientationCalDownSideRotate = false;
     _orientationCalUpsideDownSideRotate = false;
     _orientationCalLeftSideRotate = false;
@@ -555,19 +557,33 @@ void APMSensorsComponentController::_handleCommandAck(mavlink_message_t& message
             switch (commandAck.result) {
             case MAV_RESULT_IN_PROGRESS:
                 _appendStatusLog(tr("In progress"));
+                qDebug() << "Inprogress";
+                emit updateCalibrationStatus(_currentCalibrationType, "inprogress");
+
                 break;
             case MAV_RESULT_ACCEPTED:
                 _appendStatusLog(tr("Successfully completed"));
-                emit showToastMessage(tr("Calibration successfully completed"));
                 emit updateCalibrationStatus(_currentCalibrationType, "success");
-                qDebug() << "setCurrentCalibrationType" << _currentCalibrationType;
+
+                if(_currentCalibrationType == "accel"){
+                   emit showToastMessage(tr("AccelCalibration Completed"));
+                }else if(_currentCalibrationType == "compass"){
+                    emit showToastMessage(tr("Compass Calibration Completed"));
+                }else if(_currentCalibrationType == "level"){
+                     emit showToastMessage(tr("LevelCalibration Completed"));
+                }else if(_currentCalibrationType == "gyro"){
+                     emit showToastMessage(tr("GyroCalibration Completed"));
+                }else if(_currentCalibrationType == "pressure"){
+                     emit showToastMessage(tr("Pressure Calibration Completed"));
+                }
+                qDebug() << "setCurrentCalibrationType1" << _currentCalibrationType;
                 _stopCalibration(StopCalibrationSuccessShowLog);
                 break;
             default:
                 _appendStatusLog(tr("Failed"));
                  emit showToastMessage(tr("Calibration Failed"));
                 emit updateCalibrationStatus(_currentCalibrationType, "failure");
-                qDebug() << "setCurrentCalibrationType" << _currentCalibrationType;
+                qDebug() << "setCurrentCalibrationType2" << _currentCalibrationType;
                 _stopCalibration(StopCalibrationFailed);
                 break;
             }

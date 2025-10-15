@@ -171,7 +171,7 @@ SetupPage {
                                     width: parent.width
                                     wrapMode: Text.WordWrap
                                     text: qsTr("Slide to the right if the copter is sluggish or slide to the left if the copter is twitchy")
-                                    font.pointSize: ScreenTools.smallFontPointSize
+                                    //font.pointSize: ScreenTools.smallFontPointSize
 
                                 }
 

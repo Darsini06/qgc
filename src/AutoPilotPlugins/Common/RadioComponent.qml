@@ -161,14 +161,14 @@ SetupPage {
                 }
             } // Component - channelMonitorDisplayComponent
 
-            // Left side column
+
             Column {
                 id:             leftColumn
                 width: parent.width
-                anchors.margins: 20
+                //anchors.margins: 10
                 // anchors.left:   parent.left
                 // anchors.right:  columnSpacer.left
-                spacing:        10
+                spacing:        8
 
                 // Row {
                 //     spacing: ScreenTools.defaultFontPixelWidth
@@ -197,6 +197,7 @@ SetupPage {
                         smooth:     true
                         source:     controller.imageHelp
                     }
+
                     // Attitude Controls
                     Column {
                         width: parent.width / 2
@@ -370,6 +371,7 @@ SetupPage {
                             }
                         }
                     }
+
                 } // Row - Buttons
 
 
