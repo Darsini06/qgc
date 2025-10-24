@@ -495,14 +495,18 @@ SetupPage {
                 case "motors":
                     showDynamicCalibrationDialog("qrc:/qml/APMMotorComponent.qml","Motors");
                     break;
+
+                case "imu":
+                    toastContainer.showToast("IMU Calibration");
+                    break;
                 }
             }
 
-            function compassCalibrationDialog(title,warningText) {
-                compassDialog.dialogTitleText = title
-                compassDialog.dialogWarningText = warningText
-                compassDialog.open()
-            }
+            // function compassCalibrationDialog(title,warningText) {
+            //     compassDialog.dialogTitleText = title
+            //     compassDialog.dialogWarningText = warningText
+            //     compassDialog.open()
+            // }
 
             function showDynamicCalibrationDialog(qmlFile,title) {
                 dynamicCalDialog.dialogTitleText = title
@@ -543,7 +547,7 @@ SetupPage {
             APMSensorsComponentController {
                 id:                         controller
                 statusLog:                  statusTextArea
-                progressBar:                progressBar
+                progressBar:                null
                 nextButton:                 nextButton
                 cancelButton:               cancelButton
                 orientationCalAreaHelpText: orientationCalAreaHelpText
@@ -642,6 +646,88 @@ SetupPage {
             Component.onCompleted: {
                 handleSetAllCalButtonsEnabled(true)
             }
+
+            Component {
+                        id: compassDialogComponent
+
+                        QGCPopupDialog {
+                            id: compassDialog
+                            title: qsTr("Compass Calibration")
+                            buttons: Dialog.Yes | Dialog.No
+
+                            property string dialogWarningText: qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
+
+                            // Expose the dialog's progress bar
+                            property alias dialogProgressBar: dialogProgressBar
+
+                            property var calibrationSettings: null  // Settings passed from orientations dialog
+
+                            onOpened: {
+                                // When dialog opens, set the controller's progressBar to use this dialog's progress bar
+                                controller.progressBar = dialogProgressBar;
+                            }
+
+                            onClosed: {
+                                // Reset the controller's progressBar when dialog closes
+                                controller.progressBar = null;
+                            }
+
+                            onAccepted: {
+                                        if (!calibrationSettings.useFastCalibration) {
+                                            console.log("Compass Calibration")
+                                            controller.calibrateCompass();
+                                        } else {
+                                            console.log("Fast Compass Calibration")
+
+                                            var lat = calibrationSettings.lat;
+                                            var lon = calibrationSettings.lon;
+
+                                            if (isNaN(lat) || isNaN(lon)) {
+                                                console.error("Invalid latitude or longitude");
+                                                return;
+                                            }
+
+                                            controller.calibrateCompassNorth(lat, lon, calibrationSettings.compassMask);
+                                        }
+                                    }
+
+                            onRejected: {
+                                console.log("Compass calibration cancelled");
+                            }
+
+                            Column {
+                                width:      50 * ScreenTools.defaultFontPixelWidth
+                                spacing:    ScreenTools.defaultFontPixelHeight
+
+                                ProgressBar {
+                                    id: dialogProgressBar
+                                    width: parent.width
+                                    height: ScreenTools.defaultFontPixelHeight * 2
+                                    //visible: controller.calibrationInProgress
+                                }
+
+                                // Warning Text
+                                QGCLabel {
+                                    text: dialogWarningText
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    width: parent.width
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    color: "black"
+                                }
+
+                                // Image
+                                QGCColoredImage {
+                                    source: "qrc:///qmlimages/VehicleDown.png"
+                                    width: parent.width * 0.25
+                                    height: width
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    color: "black"
+                                }
+                            }
+                        }
+                    }
+
 
             Connections {
                 target: controller
@@ -939,27 +1025,32 @@ SetupPage {
                             }
 
                         } else if (calType === _calTypeCompass) {
-                            console.log("calType  == _calTypeCompass",calType)
-                            if (!northCalibrationCheckBox.checked) {
-                                console.log("Compass Calibration")
-                                controller.calibrateCompass();
-                            } else {
-                                console.log("Fast Compass Calibration")
-                                var lat = parseFloat(northCalLat.text);
-                                var lon = parseFloat(northCalLon.text);
-                                if (useMapPositionCheckbox.checked) {
-                                    lat = _mapPosition.latitude;
-                                    lon = _mapPosition.longitude;
-                                }
-                                if (useGcsPositionCheckbox.checked) {
-                                    lat = _gcsPosition.latitude;
-                                    lon = _gcsPosition.longitude;
-                                }
-                                if (isNaN(lat) || isNaN(lon)) {
-                                    return;
-                                }
-                                controller.calibrateCompassNorth(lat, lon, compassMask());
+                            console.log("calType == _calTypeCompass", calType)
+
+                            // Calculate values immediately
+                            var lat = parseFloat(northCalLat.text);
+                            var lon = parseFloat(northCalLon.text);
+                            var mask = compassMask();
+
+                            if (useMapPositionCheckbox.checked) {
+                                lat = _mapPosition.latitude;
+                                lon = _mapPosition.longitude;
                             }
+                            if (useGcsPositionCheckbox.checked) {
+                                lat = _gcsPosition.latitude;
+                                lon = _gcsPosition.longitude;
+                            }
+
+                            // Open compass dialog with settings as properties
+                            var compassDialog = compassDialogComponent.createObject(mainWindow, {
+                                calibrationSettings: {
+                                    useFastCalibration: northCalibrationCheckBox.checked,
+                                    lat: lat,
+                                    lon: lon,
+                                    compassMask: mask
+                                }
+                            });
+                            compassDialog.open();
                         }
                     }
 
@@ -983,6 +1074,7 @@ SetupPage {
                         }
 
                         Column {
+
                             visible: calType !== _calTypeAccel
 
                             QGCLabel { text: qsTr("Autopilot Rotation:") }
@@ -1183,12 +1275,12 @@ SetupPage {
                 anchors.fill: parent
                 spacing: 10
 
-                ProgressBar {
-                    id: progressBar
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
-                    //visible: /*false*/ controller.calibrationInProgress
-                }
+                // ProgressBar {
+                //     id: progressBar
+                //     Layout.fillWidth: true
+                //     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                //     //visible: /*false*/ controller.calibrationInProgress
+                // }
 
                 TextArea {
                     id: statusTextArea
@@ -1309,6 +1401,7 @@ SetupPage {
 
 
                     model: ListModel {
+
                         ListElement {
                             name: "Accelerometer"
                             type: "accel"
@@ -1316,6 +1409,7 @@ SetupPage {
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
                         ListElement {
                             name: "Compass"
                             type: "compass"
@@ -1323,6 +1417,15 @@ SetupPage {
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
+                        ListElement {
+                            name: "IMU"
+                            type: "imu"
+                            indicator: true
+                            icon: "/qmlimages/NewImages/homeIcon.png"
+                            status: "none"
+                        }
+
                         ListElement {
                             name: "Level Horizon"
                             type: "level"
@@ -1330,6 +1433,7 @@ SetupPage {
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "Gyro"
                             type: "gyro"
@@ -1382,7 +1486,6 @@ SetupPage {
                             type: "tuning"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
                     }
 
@@ -1503,7 +1606,6 @@ SetupPage {
                     }
                 }
             }
-
 
         }
     }
