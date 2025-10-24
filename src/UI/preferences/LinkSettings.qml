@@ -156,6 +156,7 @@ SettingsPage {
 
                 Repeater {
                     model: _linkManager.linkTypeStrings
+
                     delegate: RowLayout {
                         Layout.fillWidth: true        // row spans full width
                         spacing: 20
@@ -231,6 +232,7 @@ SettingsPage {
             property int selectedType
 
             onAccepted: {
+
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.devName = nameField.text
                 editingConfig.name    = editingConfig.devName
