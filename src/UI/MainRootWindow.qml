@@ -14,12 +14,12 @@ import QtQuick.Layouts
 import QtQuick.Window
 
 
-
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
+
 
 import QGroundControl.UTMSP
 import QGroundControl.Palette 1.0
@@ -33,6 +33,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import Qt.labs.folderlistmodel 2.1
 import Qt.labs.platform 1.1 as Platform
+
+import "qrc:/qml/SettingsPanel"
 
 
 /// @brief Native QML top level window
@@ -539,6 +541,154 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
+    Dialog {
+        id: compassDialog
+        modal: true
+        anchors.centerIn: parent
+        width: parent.width * 0.85
+        height: parent.height * 0.9
+        closePolicy: Popup.NoAutoClose
+        clip: true
+        padding: 0
+
+        background: Rectangle {
+            radius: 14
+            color: "white"
+        }
+
+        property string dialogTitleText: ""
+        property string dialogWarningText: ""
+
+        Column {
+            anchors.fill: parent
+            spacing: 0
+            bottomPadding: 5
+
+            // --- Title Bar ---
+            Rectangle {
+                width: parent.width
+                height: 50
+                radius: 14
+                color: "#7F56D9"
+                antialiasing: true
+
+                // mask lower corners → flat against content
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 14
+                    color: "#7F56D9"
+                    radius: 0
+                }
+
+                // --- Title and Close Icon ---
+                Item {
+                    anchors.fill: parent
+
+                    // Title centered in the bar
+                    QGCLabel {
+                        text: compassDialog.dialogTitleText//qsTr("Compass Calibration")
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.pointSize: ScreenTools.mediumFontPointSize
+                        font.bold: true
+                    }
+
+                    // Close button at top-right
+                    MouseArea {
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        width: 40
+                        height: 40
+                        onClicked: compassDialog.close()
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "\u2715"
+                            color: "white"
+                            font.pixelSize: 18
+                        }
+                    }
+                }
+            }
+
+            QGCLabel {
+                text : ""
+                width: parent.width
+                height : 10
+            }
+
+            // --- Warning Text ---
+            QGCLabel {
+                id: compassWarningText
+                text: compassDialog.dialogWarningText //qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+                width: parent.width * 0.9
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: ScreenTools.defaultFontPointSize
+                color: "black"
+            }
+
+            // --- Image (centered) ---
+            QGCColoredImage {
+                source: "qrc:///qmlimages/VehicleDown.png"
+                width: parent.width * 0.25
+                height: width
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: "black"
+            }
+
+            // --- Spacer to push button down ---
+            Item {
+                Layout.fillHeight: true
+            }
+
+            // --- OK Button ---
+            QGCButton {
+                text: qsTr("DONE")
+                anchors.horizontalCenter: parent.horizontalCenter
+                background: Rectangle {
+                    color: "#7F56D9"
+                    radius: 14
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                onClicked: {
+                    // calibrationLoader.active = true
+                    // compassDialog.close()
+
+                    // // Use a small delay to ensure the loader is ready
+                    // timer.callLater(100)
+                }
+            }
+
+        }
+    }
+
+    // Timer {
+    //     id: timer
+    //     function callLater(delay) {
+    //         timer.interval = delay
+    //         timer.repeat = false
+    //         timer.start()
+    //     }
+    //     onTriggered: {
+    //         if (calibrationLoader.item && calibrationLoader.item.callShowOrientationsDialog) {
+    //             calibrationLoader.item.callShowOrientationsDialog(1)
+    //         } else {
+    //             console.warn("ParameterMain not ready yet, retrying...")
+    //             timer.callLater(100) // Retry after another 100ms
+    //         }
+    //     }
+    // }
+
     function getDatabase() {
         return LocalStorage.openDatabaseSync("QGCUserDB", "1.0", "User DB", 1000000);
     }
@@ -598,9 +748,9 @@ ApplicationWindow {
 
                 // Insert new feedback
                 var rs = tx.executeSql(
-                    "INSERT INTO feedback (username, mobile_number, email, comments) VALUES (?, ?, ?, ?)",
-                    [username, mobile_number, email, comments]
-                );
+                            "INSERT INTO feedback (username, mobile_number, email, comments) VALUES (?, ?, ?, ?)",
+                            [username, mobile_number, email, comments]
+                            );
 
                 if (rs.rowsAffected > 0) {
                     console.log("Feedback inserted successfully");
@@ -642,14 +792,14 @@ ApplicationWindow {
                 var feedback = resultSet.rows.item(i);
                 // Truncate long comments for better readability
                 var truncatedComments = feedback.comments.length > 30 ?
-                                      feedback.comments.substring(0, 30) + "..." :
-                                      feedback.comments;
+                            feedback.comments.substring(0, 30) + "..." :
+                            feedback.comments;
 
                 console.log(feedback.id + " | " +
-                           (feedback.username || "NULL") + " | " +
-                           (feedback.mobile_number || "NULL") + " | " +
-                           (feedback.email || "NULL") + " | " +
-                           truncatedComments);
+                            (feedback.username || "NULL") + " | " +
+                            (feedback.mobile_number || "NULL") + " | " +
+                            (feedback.email || "NULL") + " | " +
+                            truncatedComments);
             }
         }
         console.log("------------------------------------------");
@@ -664,16 +814,16 @@ ApplicationWindow {
 
                 // Insert session with duration
                 var rs = tx.executeSql(
-                    "INSERT INTO drone_sessions(date, start_time, end_time, duration) VALUES(?, ?, ?, ?)",
-                    [date, startTime, endTime, duration]
-                );
+                            "INSERT INTO drone_sessions(date, start_time, end_time, duration) VALUES(?, ?, ?, ?)",
+                            [date, startTime, endTime, duration]
+                            );
 
                 if (rs.rowsAffected > 0) {
                     console.log("Session saved - ID:", rs.insertId,
-                               "Date:", date,
-                               "Start:", startTime,
-                               "End:", endTime,
-                               "Duration:", duration, "minutes");
+                                "Date:", date,
+                                "Start:", startTime,
+                                "End:", endTime,
+                                "Duration:", duration, "minutes");
                     sessionSaved = true;
                     newSessionAdded(); // Emit signal to notify other components
                 }
@@ -684,35 +834,34 @@ ApplicationWindow {
         });
     }
 
-
     function calculateDuration(startTime, endTime) {
-         try {
-             // Parse times (format: "HH:mm:ss")
-             var startParts = startTime.split(':');
-             var endParts = endTime.split(':');
+        try {
+            // Parse times (format: "HH:mm:ss")
+            var startParts = startTime.split(':');
+            var endParts = endTime.split(':');
 
-             var startTotalSeconds = parseInt(startParts[0]) * 3600 +
-                                    parseInt(startParts[1]) * 60 +
-                                    parseInt(startParts[2] || 0);
+            var startTotalSeconds = parseInt(startParts[0]) * 3600 +
+                    parseInt(startParts[1]) * 60 +
+                    parseInt(startParts[2] || 0);
 
-             var endTotalSeconds = parseInt(endParts[0]) * 3600 +
-                                  parseInt(endParts[1]) * 60 +
-                                  parseInt(endParts[2] || 0);
+            var endTotalSeconds = parseInt(endParts[0]) * 3600 +
+                    parseInt(endParts[1]) * 60 +
+                    parseInt(endParts[2] || 0);
 
-             var durationSeconds = endTotalSeconds - startTotalSeconds;
+            var durationSeconds = endTotalSeconds - startTotalSeconds;
 
-             if (durationSeconds < 0) {
-                 // Handle跨天的情况 (session spans midnight)
-                 durationSeconds += 24 * 3600;
-             }
+            if (durationSeconds < 0) {
+                // Handle跨天的情况 (session spans midnight)
+                durationSeconds += 24 * 3600;
+            }
 
-             return Math.round(durationSeconds / 60); // Convert to minutes
+            return Math.round(durationSeconds / 60); // Convert to minutes
 
-         } catch (e) {
-             console.error("Error calculating duration:", e);
-             return 0;
-         }
-     }
+        } catch (e) {
+            console.error("Error calculating duration:", e);
+            return 0;
+        }
+    }
 
     // JavaScript function to read from DB
     function loadUsersFromDB() {
@@ -963,6 +1112,7 @@ ApplicationWindow {
                 // Print all data AFTER update
                 console.log("=== ALL USERS AFTER UPDATE ===");
                 var afterUpdate = tx.executeSql("SELECT * FROM users");
+
                 for (var j = 0; j < afterUpdate.rows.length; j++) {
                     var updatedUser = afterUpdate.rows.item(j);
                     console.log("User", j + 1, "- ID:", updatedUser.id,
@@ -976,8 +1126,11 @@ ApplicationWindow {
                 if (callback) {
                     callback(true);
                 }
+
             } else {
+
                 console.log("User not found or update failed");
+
                 if (callback) {
                     callback(false);
                 }
@@ -1395,13 +1548,25 @@ ApplicationWindow {
         visible : false
     }
 
+    // ParameterMain{
+    //     id : calibrationPage
+    //     visible : false
+    // }
+
+    // Loader {
+    //     id: calibrationLoader
+    //     active: false
+    //     sourceComponent: ParameterMain { id: calibrationPage }
+
+    // }
+
+
     Loader {
         id: login
         anchors.fill: parent
         source: "qrc:/qml/LoginPages/WelcomeScreen.qml"
         visible: false
     }
-
 
     // Class1 {
     //     id:                     login
@@ -1421,7 +1586,6 @@ ApplicationWindow {
         flightMap : planView.editorMap
         mapRotation: MapGlobals.mapRotation
     }
-
 
     footer: LogReplayStatusBar {
         visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
@@ -1483,11 +1647,18 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "BasicParamters.qml"; title: "Flight Modes" }//ParameterMain
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/ParameterMain.qml"; title: "Settings" }
+            ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "BasicParamters.qml"; title: "Flight Modes" }
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
             ListElement { image: "/qmlimages/NewImages/menu.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
             ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "GeneralSettings.qml"; title: "Info" }
             ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "LinkSettings.qml"; title: "Info" }
+
+            Component.onCompleted: {
+                console.log("tabModel Component.onCompleted")
+                if (globals.activeVehicle) {
+                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/ParameterMain.qml");
+                }
+            }
         }
 
         contentItem: ColumnLayout {

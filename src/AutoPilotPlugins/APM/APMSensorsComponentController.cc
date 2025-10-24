@@ -614,8 +614,12 @@ void APMSensorsComponentController::_handleMagCalProgress(mavlink_message_t& mes
         }
 
         if (_progressBar) {
+            qCDebug(APMSensorsComponentControllerVerboseLog) << "ProgressBar value set:" << (_rgCompassCalProgress[0] + _rgCompassCalProgress[1] + _rgCompassCalProgress[2]) / 100.0;
             _progressBar->setProperty("value", (float)(_rgCompassCalProgress[0] + _rgCompassCalProgress[1] + _rgCompassCalProgress[2]) / 100.0);
+        } else {
+            qWarning() << "ProgressBar is NULL!";
         }
+
     }
 }
 

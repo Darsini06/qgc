@@ -32,6 +32,7 @@ AbstractButton   {
             anchors.left:   parent.left
             text:           visible ? control.text : "X"
             visible:        control.text !== ""
+            color:"white"
         }
     
         Rectangle {

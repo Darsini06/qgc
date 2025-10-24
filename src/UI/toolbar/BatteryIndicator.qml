@@ -376,7 +376,7 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                 QGCLabel {
                     Layout.alignment:       Qt.AlignHCenter
                     width: 10
-                                        height: 20
+                    height: 20
                     //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
                     color:                  "white"
                     text:                   getBatteryVoltageText()
