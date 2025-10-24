@@ -62,14 +62,14 @@ Item {
             // _fullItem = item1IsFull ? item1 : item2
             // _pipOrWindowItem = item1IsFull ? item2 : item1
 
-            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
+            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
 
                 item1.pipState.state = item1.pipState.pipState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
                 item2.pipState.state = item2.pipState.fullState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState
                 _fullItem = item2//item1IsFull ? item1 : item2
                 _pipOrWindowItem = item1//item1IsFull ? item2 : item1
 
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"){
+            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
 
                 item1.pipState.state = item1.pipState.fullState//item1IsFull ? item1.pipState.fullState : item1.pipState.pipState
                 item2.pipState.state = item2.pipState.pipState//item1IsFull ? item2.pipState.pipState : item2.pipState.fullState

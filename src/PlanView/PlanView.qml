@@ -897,7 +897,7 @@ Item {
 
             function allAddClickBoolsOff() {
                 _addROIOnClick =        false
-                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"?true:false
+                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
             }
 
             onDropped: allAddClickBoolsOff()

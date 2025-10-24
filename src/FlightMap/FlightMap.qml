@@ -49,6 +49,10 @@ Map {
         console.log("FlightMap instance registered globally")
     }
 
+
+    property real mapRotation: 0
+
+
     function rotateMap(delta) {
         console.log("Rotating map by delta:", delta); // Debug log
         MapGlobals.mapRotation += delta  // Subtracting instead of adding to rotate in the opposite direction
@@ -202,6 +206,7 @@ Map {
 
     }
 
+
     WheelHandler {
         // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
         // Magic Mouse pretends to be a trackpad but doesn't work with PinchHandler
@@ -240,7 +245,7 @@ Map {
 
         sourceItem: Image {
             id:             mapItemImage
-            source:         isNaN(gcsHeading) ? "/res/QGCLogoFull" : "/res/QGCLogoArrow"
+            source:         isNaN(gcsHeading) ? "/res/QGCLogoFull" : "/res/QGCLogoFull"//"/res/QGCLogoArrow"
             mipmap:         true
             antialiasing:   true
             fillMode:       Image.PreserveAspectFit
@@ -253,5 +258,11 @@ Map {
             }
         }
     }
+
+    VehicleMapItem {
+        id: myVehicleItem
+        mapRotation: mapRotation  // <-- pass the rotation value
+    }
+
 
 } // Map

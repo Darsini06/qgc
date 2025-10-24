@@ -4,16 +4,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-
 import QGroundControl
+import Qt.labs.lottieqt 1.0
 import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import MapGlobals 1.0
 import QtQuick.Layouts 1.15
-
-
 Item {
     id: mainWindow1
     anchors.fill: parent
@@ -34,6 +32,54 @@ Item {
             }
         }
     }
+    function camera(){
+        camera.visible=true
+        agri.visible=false
+        mapping.visible=false
+        vtol.visible=false
+        cameraicon.visible=true
+        agriicon.visible=false
+        mappingicon.visible=false
+        vtolicon.visible=false
+        droneAnim1.visible=false
+    }
+
+    function agri(){
+        camera.visible=false
+        agri.visible=true
+        mapping.visible=false
+        vtol.visible=false
+        cameraicon.visible=false
+        agriicon.visible=true
+        mappingicon.visible=false
+        vtolicon.visible=false
+        droneAnim1.visible=false
+    }
+
+    function mapping(){
+        camera.visible=false
+        agri.visible=false
+        mapping.visible=true
+        vtol.visible=false
+        cameraicon.visible=false
+        agriicon.visible=false
+        mappingicon.visible=true
+        vtolicon.visible=false
+        droneAnim1.visible=false
+    }
+
+    function vtol(){
+        camera.visible=false
+        agri.visible=false
+        mapping.visible=false
+        vtol.visible=true
+        cameraicon.visible=false
+        agriicon.visible=false
+        mappingicon.visible=false
+        vtolicon.visible=true
+        droneAnim1.visible=false
+    }
+
 
     // Component.onCompleted: {
     //     console.log("newscreen pageloaded")
@@ -197,9 +243,29 @@ Item {
 
         }
 
+        LottieAnimation {
+          id: droneAnim1
+          source: "qrc:/qmlimages/NewImages/droneManFly.json"
+          autoPlay: true
+          loops: Animation.Infinite
+          scale: 0.3
+          onStatusChanged: console.log("Lottie Status:", status)
+          visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:false
+          anchors.right: parent.right
+          anchors.bottom: parent.bottom
+          anchors.rightMargin: 25
+          anchors.bottomMargin: 25
+          width: parent.width * 0.30
+          height: parent.height * 0.30
+        }
+
+
+
         // ---- Drone Image Placeholder ----
         Image {
+            id:cameraicon
             source: "/qmlimages/NewImages/cameradrone.png" // Replace with real image
+            visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.rightMargin: 100
@@ -207,6 +273,43 @@ Item {
             width: parent.width * 0.30
             height: parent.height * 0.30
             fillMode: Image.PreserveAspectFit
+        }
+
+        Image {
+            id:mappingicon
+            source: "/qmlimages/NewImages/survey.png" // Replace with real image
+            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 100
+            anchors.bottomMargin: 100
+            width: parent.width * 0.30
+            height: parent.height * 0.30
+            fillMode: Image.PreserveAspectFit
+        }
+        Image {
+            id:vtolicon
+            source: "/qmlimages/NewImages/vtol.png" // Replace with real image
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 100
+            anchors.bottomMargin: 100
+            width: parent.width * 0.30
+            height: parent.height * 0.30
+            fillMode: Image.PreserveAspectFit
+            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"?true:false
+        }
+        Image {
+            id:agriicon
+            source: "/qmlimages/NewImages/agri.png" // Replace with real image
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.rightMargin: 100
+            anchors.bottomMargin: 100
+            width: parent.width * 0.30
+            height: parent.height * 0.30
+            fillMode: Image.PreserveAspectFit
+            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
         }
 
     }
@@ -292,13 +395,14 @@ Item {
 
 
             Button {
+                id:camera
                 text: "Camera"
                 Layout.preferredWidth: parent.width * 0.1  // Fixed width
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
 
-                visible: true ///QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"?true:false
+                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
 
                 contentItem: Text {
                     text: parent.text
@@ -318,7 +422,7 @@ Item {
                 }
 
                 onClicked: {
-                    QGroundControl.saveGlobalSetting("loadpage", "camera")
+                    QGroundControl.saveGlobalSetting("loadpage", "Camera")
                     MapGlobals.comefrom="Camera"
                     mainWindow.cameraView()
                     QGroundControl.saveGlobalSetting("waypoint","waypoint")
@@ -334,17 +438,21 @@ Item {
                     }
 
                     swapCamera();
-
+                    camera.visible=true
+                    agri.visible=false
+                    mapping.visible=false
+                    vtol.visible=false
                 }
             }
 
             Button {
+                id:agri
                 text: "Agri"
                 Layout.preferredWidth: parent.width * 0.1
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: true //QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
 
                 contentItem: Text {
                     text: parent.text
@@ -364,7 +472,7 @@ Item {
                 }
 
                 onClicked: {
-                    QGroundControl.saveGlobalSetting("loadpage", "agri")
+                    QGroundControl.saveGlobalSetting("loadpage", "Agri")
                     mainWindow.showFlyView()
                     MapGlobals.comefrom="Plan"
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
@@ -378,18 +486,23 @@ Item {
                     }
 
                     swapCamera();
+                    camera.visible=false
+                    agri.visible=true
+                    mapping.visible=false
+                    vtol.visible=false
 
                 }
             }
 
 
             Button {
+                id:mapping
                 text: "Mapping"
                 Layout.preferredWidth: parent.width * 0.1
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: true//QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="mapping"?true:false
+                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -408,7 +521,7 @@ Item {
                 }
 
                 onClicked: {
-                    QGroundControl.saveGlobalSetting("loadpage", "mapping")
+                    QGroundControl.saveGlobalSetting("loadpage", "Mapping")
                     mainWindow.showFlyView1()
                     MapGlobals.comefrom="Start"
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
@@ -420,6 +533,55 @@ Item {
                             videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
+                    camera.visible=false
+                    agri.visible=false
+                    mapping.visible=true
+                    vtol.visible=false
+                }
+            }
+
+            Button {
+                id:vtol
+                text: "VTOL"
+                Layout.preferredWidth: parent.width * 0.1
+                Layout.rightMargin: 10
+                //font.bold: true
+                font.pixelSize: 16
+                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"?true:false
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: "white" // Set text color
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    anchors.fill: parent
+                    anchors.margins: 20
+                }
+
+                background: Rectangle {
+                    color: "#1b1c3e" // Blue color (iOS-style button)
+                    radius: 20 // Curved button
+                    border.color: "#005BBB" // Border color
+                    border.width: 2
+                }
+
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("loadpage", "VTOL")
+                    mainWindow.showFlyView1()
+                    MapGlobals.comefrom="Start"
+                    console.log("MapGlobals.comefrom",MapGlobals.comefrom)
+                    _appSettings.screen = "Start"
+                    var videoSettings = QGroundControl.settingsManager.videoSettings
+                    if (videoSettings) {
+                        var videoSourceFact = videoSettings.videoSource
+                        if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                            videoSourceFact.value = videoSourceFact.enumValues[0]
+                        }
+                    }
+                    camera.visible=false
+                    agri.visible=false
+                    mapping.visible=false
+                    vtol.visible=true
                 }
             }
 

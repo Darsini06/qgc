@@ -43,6 +43,66 @@ Item {
 
 
 
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+
+        Rectangle {
+            anchors.fill: parent
+            z: -10
+            color: "#1b1c3e"
+        }
+        // ---- Curved Gradient Background ----
+        Canvas {
+            anchors.fill: parent
+            z: -1
+            opacity: 0.95
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+
+                // 🎨 Create diagonal gradient
+                var gradient = ctx.createLinearGradient(0, 0, width, height)
+                gradient.addColorStop(0, "#14163C")
+                gradient.addColorStop(1, "#6A85FB")
+                ctx.fillStyle = gradient
+
+                // 🌀 Create a curved path from top-left to bottom-right
+                ctx.beginPath()
+                ctx.moveTo(0, 0)
+                ctx.quadraticCurveTo(width * 0.4, height * 0.1, width, height * 0.9)
+                ctx.lineTo(width, height)
+                ctx.lineTo(0, height)
+                ctx.closePath()
+                ctx.fill()
+            }
+        }
+
+        Rectangle {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: parent.width * 0.5
+            height: parent.height * 0.9
+            radius: width * 0.5
+            rotation: 30
+            opacity: 0.95
+            anchors.rightMargin: 1//-width * 0.25
+            anchors.bottomMargin: 1//-height * 0.2
+            z: -1
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
+                GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
+            }
+        }
+
+
+
+    }
+
+
+
+
     //---------------------------------------------
     //-- Header
     Row {
@@ -50,7 +110,9 @@ Item {
         anchors.left:   parent.left
         anchors.right:  parent.right
         spacing:        ScreenTools.defaultFontPixelWidth
-        visible: true
+        visible: QGroundControl.loadGlobalSetting("tab","tab")==="None"?true:false
+        anchors.margins: 20
+        height: 50
 
         Timer {
             id:         clearTimer
@@ -66,12 +128,25 @@ Item {
         QGCLabel {
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Search:")
-            visible:false
+            color:"white"
+            font.pixelSize: 20       // ✅ Bigger text
+                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
         }
 
         QGCTextField {
                     id:                 searchText
-                    placeholderText:    qsTr("Search here")
+                    height: 25               // ✅ Increase height of the input box
+                    width:150
+                            font.pixelSize: 18       // ✅ Bigger input text
+                            padding: 10              // ✅ Add some inner spacing
+                            background: Rectangle {  // ✅ Modern styled background
+                                color: "white"   // Slightly transparent white background
+                                radius: 6
+                                border.color: "#ffffff55"
+                                border.width: 1
+                            }
+                    placeholderText:    qsTr("          ")//qsTr("    Search here    ")
                     Layout.fillWidth:   true
                     text:               controller.searchText
                     onDisplayTextChanged: controller.searchText = displayText
@@ -164,9 +239,9 @@ Item {
                                            }
                 }
 
+
         QGCButton {
                                            text: qsTr("Clear")
-                                           visible:false
                                            onClicked: {
                                                if(ScreenTools.isMobile) {
                                                    Qt.inputMethod.hide();
@@ -176,23 +251,34 @@ Item {
                                            anchors.verticalCenter: parent.verticalCenter
                                        }
 
-                                       QGCCheckBox {
-                                           text:                   qsTr("Show modified only")
-                                           anchors.verticalCenter: parent.verticalCenter
-                                           checked:                controller.showModifiedOnly
-                                           onClicked:              controller.showModifiedOnly = checked
-                                           visible:                QGroundControl.multiVehicleManager.activeVehicle.px4Firmware
-                                       }
+        QGCCheckBox {
+            text: qsTr("Show modified only")
+            anchors.verticalCenter: parent.verticalCenter
+            checked: controller.showModifiedOnly
+            onClicked: controller.showModifiedOnly = checked
+            visible: QGroundControl.multiVehicleManager.activeVehicle.px4Firmware
+
+
+        }
+
                                    } // Row - Header
 
+    Row {
+        id:             header1
+        anchors.left:   parent.left
+        anchors.right:  parent.right
+        spacing:        ScreenTools.defaultFontPixelWidth
+        visible: true
+        anchors.margins: 20
+        height: 50
             QGCButton {
-                anchors.top:    header.top
-                anchors.bottom: header.bottom
                 anchors.right:  parent.right
                 text:           qsTr("Tools")
                 onClicked:      toolsMenu.popup()
                 visible: true
+                anchors.verticalCenter: parent.verticalCenter
             }
+            } // Row - Header
 
             QGCMenu {
                 id:                 toolsMenu
@@ -249,7 +335,7 @@ Item {
             /// Group buttons
             QGCFlickable {
                 id :                groupScroll
-                width:              ScreenTools.defaultFontPixelWidth * 25
+                width:              ScreenTools.defaultFontPixelWidth * 15
                 anchors.top:        header.bottom
                 anchors.bottom:     parent.bottom
                 clip:               true
@@ -262,14 +348,14 @@ Item {
                     id:             groupedViewCategoryColumn
                     anchors.left:   parent.left
                     anchors.right:  parent.right
-                    spacing:        Math.ceil(ScreenTools.defaultFontPixelHeight * 0.25)
+                    spacing:        Math.ceil(ScreenTools.defaultFontPixelHeight * 0.15)
 
                     Repeater {
                         model: controller.categories
 
                         Column {
                             Layout.fillWidth:   true
-                            spacing:            Math.ceil(ScreenTools.defaultFontPixelHeight * 0.25)
+                            spacing:            Math.ceil(ScreenTools.defaultFontPixelHeight * 0.15)
 
 
                             SectionHeader {
@@ -290,7 +376,7 @@ Item {
                                 model: categoryHeader.checked ? object.groups : 0
 
                                 QGCButton {
-                                    width:          ScreenTools.defaultFontPixelWidth * 25
+                                    width:          ScreenTools.defaultFontPixelWidth * 15
                                     text:           object.name
                                     height:         _rowHeight
                                     checked:        object == controller.currentGroup
@@ -325,9 +411,9 @@ Item {
 
                 delegate: Rectangle {
                     id: delegateRoot
-                    height: _rowHeight
+                    height: 50//_rowHeight
                     width: _rowWidth
-                    color: "white"
+                    color: "transparent"
 
                     // Store the fact for this item
                     property Fact itemFact: object
@@ -337,17 +423,17 @@ Item {
                         id: factRow
                         spacing: Math.ceil(ScreenTools.defaultFontPixelWidth * 0.5)
                         anchors.verticalCenter: parent.verticalCenter
-
                         QGCLabel {
                             id: nameLabel
-                            width: ScreenTools.defaultFontPixelWidth * 20
+                            width: ScreenTools.defaultFontPixelWidth * 15
                             text: itemFact.name
                             clip: true
+                            color: "white"
                         }
 
                         // Dynamic input display: TextField or ComboBox
                         Item {
-                            width: ScreenTools.defaultFontPixelWidth * 20
+                            width: ScreenTools.defaultFontPixelWidth * 15
                             height: valueLoader.item ? valueLoader.item.implicitHeight : 40
 
                             Loader {
@@ -429,8 +515,10 @@ Item {
 
                         QGCLabel {
                             text: itemFact.shortDescription
-                            width: ScreenTools.defaultFontPixelWidth * 20
-                            wrapMode: Text.WordWrap
+                            width: ScreenTools.defaultFontPixelWidth * 15
+                            wrapMode: Text.NoWrap
+                            elide: Text.ElideRight
+                            color: "white"
                         }
 
                         Component.onCompleted: {

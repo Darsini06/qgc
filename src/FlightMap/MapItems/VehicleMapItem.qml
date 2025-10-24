@@ -16,11 +16,11 @@ import QGroundControl
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
 import QGroundControl.Controls
-
+import MapGlobals 1.0
 /// Marker for displaying a vehicle location on the map
 MapQuickItem {
     id: _root
-
+property real mapRotation: 0
     property var    vehicle                                                         /// Vehicle object, undefined for ADSB vehicle
     property var    map
     property double altitude:       Number.NaN                                      ///< NAN to not show
@@ -60,7 +60,7 @@ MapQuickItem {
 
         Repeater {
             model: vehicle ? vehicle.gimbalController.gimbals : []
-            
+
             Item {
                 id:                           canvasItem
                 anchors.centerIn:             vehicleItem
@@ -78,6 +78,7 @@ MapQuickItem {
                     anchors.verticalCenterOffset: vehicleItem.width
                     width:                        vehicleItem.width
                     height:                       vehicleItem.height
+                    visible: false
 
                     onPaint:                      paintHeading()
 
@@ -130,7 +131,7 @@ MapQuickItem {
             transform: Rotation {
                 origin.x:       vehicleIcon.width  / 2
                 origin.y:       vehicleIcon.height / 2
-                angle:          isNaN(heading) ? 0 : heading
+                angle:          isNaN(heading) ?  0 : heading  - MapGlobals.mapRotation //60:60//0 : heading
 
                 onAngleChanged:  console.log("Vehicle Icon Angle:", angle)
             }

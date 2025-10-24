@@ -68,8 +68,9 @@ Rectangle {
                 //     mainWindow.cameraView()
 
                 // }
-                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
                     mainWindow.cameraView()
+                    mainWindow.closefile()
                 }else{
                     if (planType === "Plan") {
                                             mainWindow.showFlyView()

@@ -219,6 +219,20 @@ ApplicationWindow {
         planView.newmap()
     }
 
+    function newscreendata() {
+            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+               newscreen.camera()
+            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                newscreen.agri()
+            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                newscreen.mapping()
+            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
+                newscreen.vtol()
+            }
+
+
+        }
+
     function filename() {
         filename.tracemode()
     }

@@ -90,13 +90,13 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
         Rectangle {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            width: parent.width * 0.7
+            width: parent.width * 0.5
             height: parent.height * 0.9
             radius: width * 0.5
             rotation: 30
             opacity: 0.95
-            anchors.rightMargin: -width * 0.25
-            anchors.bottomMargin: -height * 0.2
+            anchors.rightMargin: 1//-width * 0.25
+            anchors.bottomMargin: 1//-height * 0.2
             z: -1
 
             gradient: Gradient {
@@ -819,44 +819,52 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
 
     function updateGimbalSelection(selectedGimbalIndex) {
         console.log("selected index", selectedGimbalIndex)
-        switch (selectedGimbalIndex) {
-        case 0:
-            QGroundControl.saveGlobalSetting("tab", "None")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 1:
-            QGroundControl.saveGlobalSetting("tab", "Servo Gimbal")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 2:
-            QGroundControl.saveGlobalSetting("tab", "STorM32 Gimbal")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 3:
-            QGroundControl.saveGlobalSetting("tab", "Brushless PWM Gimbal")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 4:
-            QGroundControl.saveGlobalSetting("tab", "CADDX Gimbals")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 5:
-            QGroundControl.saveGlobalSetting("tab", "Gremsy Gimbals")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 6:
-            QGroundControl.saveGlobalSetting("tab", "Xacti Gimbals")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 7:
-            QGroundControl.saveGlobalSetting("tab", "SERVO")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
-        case 8:
-            QGroundControl.saveGlobalSetting("tab", "Relay")
-            mainWindow.sideDrawer1("BasicParamtersList.qml")
-            break
+
+        if(activeVehicle){
+            switch (selectedGimbalIndex) {
+            case 0:
+                QGroundControl.saveGlobalSetting("tab", "None")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 1:
+                QGroundControl.saveGlobalSetting("tab", "Servo Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 2:
+                QGroundControl.saveGlobalSetting("tab", "STorM32 Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 3:
+                QGroundControl.saveGlobalSetting("tab", "Brushless PWM Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 4:
+                QGroundControl.saveGlobalSetting("tab", "CADDX Gimbals")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 5:
+                QGroundControl.saveGlobalSetting("tab", "Gremsy Gimbals")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 6:
+                QGroundControl.saveGlobalSetting("tab", "Xacti Gimbals")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 7:
+                QGroundControl.saveGlobalSetting("tab", "SERVO")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 8:
+                QGroundControl.saveGlobalSetting("tab", "Relay")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            }
+
+        }else{
+            mainWindow.showToastMessage("Drone Not Connected");
         }
+
+
     }
 
 }
