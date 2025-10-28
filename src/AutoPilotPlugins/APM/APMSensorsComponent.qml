@@ -232,40 +232,13 @@ SetupPage {
 
                     }
                 }
-
-                Row {
-                    id: buttonRow
-                    spacing: 20
-                    //anchors.horizontalCenter: parent.horizontalCenter
-                    //anchors.topMargin: 10
-
-                    Button {
-                        id: nextButton
-                        text: "Next"
-                        visible: false
-                        onClicked: {
-                            console.log("Next button clicked")
-                            controller.nextClicked()
-                        }
-                    }
-
-                    Button {
-                        id: cancelButton
-                        text: "Cancel"
-                        visible: false
-                        onClicked: {
-                            console.log("Cancel button clicked")
-                            controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
-                        }
-                    }
-                }
             }
         }
     }
 
 
     Component {
-        id:             sensorsPageComponent
+        id:             sensorsPageComponent1
 
         Item {
             width:  availableWidth
@@ -429,6 +402,7 @@ SetupPage {
 
             QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
+            //Waiting for Cancel Dialog
             Component {
                 id: waitForCancelDialogComponent
 
@@ -450,6 +424,7 @@ SetupPage {
                 }
             }
 
+            //Dialog for internal and external Compass and show priority drop Down
             Component {
                 id: singleCompassOnboardResultsComponent
 
@@ -513,6 +488,7 @@ SetupPage {
                 }
             }
 
+            //Dialog showed After the Compass Calibration completed
             Component {
                 id: postOnboardCompassCalibrationComponent
 
@@ -552,6 +528,7 @@ SetupPage {
                 }
             }
 
+            //Dialog showed After the Calibration completed
             Component {
                 id: postCalibrationComponent
 
@@ -584,6 +561,7 @@ SetupPage {
 
             property bool _singleCompassSettingsComponentShowPriority: true
 
+            //singleCompassSettingsComponent for set qsTr("Priority 1"), qsTr("Priority 2"), qsTr("Priority 3")
             Component {
                 id: singleCompassSettingsComponent
 
@@ -1159,7 +1137,7 @@ SetupPage {
                 } // Item - Cal display area
             } // Column - cal display
         } // Row
-    } // Component - sensorsPageComponent
+    } // Component - sensorsPageComponent1
 
 
 } // SetupPage

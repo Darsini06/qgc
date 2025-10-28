@@ -133,8 +133,13 @@ void APMSensorsComponentController::_startVisualCalibration(void)
 {
     emit setAllCalButtonsEnabled(false);
 
-    _cancelButton->setEnabled(true);
-    _nextButton->setEnabled(false);
+    if (_cancelButton) {
+        _cancelButton->setEnabled(true);
+    }
+
+    if (_nextButton) {
+        _nextButton->setEnabled(false);
+    }
 
     _resetInternalState();
     
@@ -180,8 +185,14 @@ void APMSensorsComponentController::_stopCalibration(APMSensorsComponentControll
     disconnect(_vehicle, &Vehicle::textMessageReceived, this, &APMSensorsComponentController::_handleUASTextMessage);
     
     emit setAllCalButtonsEnabled(true);
-    _nextButton->setEnabled(false);
-    _cancelButton->setEnabled(false);
+
+    if (_nextButton) {
+        _nextButton->setEnabled(false);
+    }
+
+    if (_cancelButton) {
+        _cancelButton->setEnabled(false);
+    }
 
     if (_calTypeInProgress == QGCMAVLink::CalibrationMag) {
         _restorePreviousCompassCalFitness();
@@ -345,7 +356,11 @@ void APMSensorsComponentController::calibrateAccel(bool doSimpleAccelCal)
 
     _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(false);
     _startVisualCalibration();
-    _cancelButton->setEnabled(false);
+
+    if (_cancelButton) {
+        _cancelButton->setEnabled(false);
+    }
+
     _orientationCalAreaHelpText->setProperty("text", tr("Hold still in the current orientation and press Next when ready"));
 
     // Reset all progress indication
@@ -487,7 +502,9 @@ void APMSensorsComponentController::_hideAllCalAreas(void)
 
 void APMSensorsComponentController::cancelCalibration(void)
 {
-    _cancelButton->setEnabled(false);
+    if (_cancelButton) {
+        _cancelButton->setEnabled(false);
+    }
 
     if (_calTypeInProgress == QGCMAVLink::CalibrationMag) {
         _vehicle->sendMavCommand(_vehicle->defaultComponentId(), MAV_CMD_DO_CANCEL_MAG_CAL, true /* showError */);
@@ -684,7 +701,10 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
             if (!_orientationCalDownSideInProgress) {
                 updateImages = true;
                 _orientationCalDownSideInProgress = true;
-                _nextButton->setEnabled(true);
+
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
+                }
             }
             break;
         case ACCELCAL_VEHICLE_POS_LEFT:
