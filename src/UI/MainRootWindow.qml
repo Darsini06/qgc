@@ -98,6 +98,11 @@ ApplicationWindow {
         target: QGroundControl.multiVehicleManager
 
         onActiveVehicleChanged: {
+            handleVehicleConnectionChange();
+            updateTabModel();
+        }
+
+        function handleVehicleConnectionChange() {
             let now = new Date();
             let timeString = now.toLocaleTimeString(Qt.locale(), "HH:mm:ss");
             let dateString = now.toLocaleDateString(Qt.locale(), "yyyy-MM-dd");
@@ -116,6 +121,10 @@ ApplicationWindow {
                     sessionEnd = "";
                 }
             }
+        }
+
+        function updateTabModel() {
+            tabModel.updateSettingsTab();
         }
     }
 
@@ -555,136 +564,136 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-    Dialog {
-        id: compassDialog
-        modal: true
-        anchors.centerIn: parent
-        width: parent.width * 0.85
-        height: parent.height * 0.9
-        closePolicy: Popup.NoAutoClose
-        clip: true
-        padding: 0
+    // Dialog {
+    //     id: compassDialog
+    //     modal: true
+    //     anchors.centerIn: parent
+    //     width: parent.width * 0.85
+    //     height: parent.height * 0.9
+    //     closePolicy: Popup.NoAutoClose
+    //     clip: true
+    //     padding: 0
 
-        background: Rectangle {
-            radius: 14
-            color: "white"
-        }
+    //     background: Rectangle {
+    //         radius: 14
+    //         color: "white"
+    //     }
 
-        property string dialogTitleText: ""
-        property string dialogWarningText: ""
+    //     property string dialogTitleText: ""
+    //     property string dialogWarningText: ""
 
-        Column {
-            anchors.fill: parent
-            spacing: 0
-            bottomPadding: 5
+    //     Column {
+    //         anchors.fill: parent
+    //         spacing: 0
+    //         bottomPadding: 5
 
-            // --- Title Bar ---
-            Rectangle {
-                width: parent.width
-                height: 50
-                radius: 14
-                color: "#7F56D9"
-                antialiasing: true
+    //         // --- Title Bar ---
+    //         Rectangle {
+    //             width: parent.width
+    //             height: 50
+    //             radius: 14
+    //             color: "#7F56D9"
+    //             antialiasing: true
 
-                // mask lower corners → flat against content
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 14
-                    color: "#7F56D9"
-                    radius: 0
-                }
+    //             // mask lower corners → flat against content
+    //             Rectangle {
+    //                 anchors.left: parent.left
+    //                 anchors.right: parent.right
+    //                 anchors.bottom: parent.bottom
+    //                 height: 14
+    //                 color: "#7F56D9"
+    //                 radius: 0
+    //             }
 
-                // --- Title and Close Icon ---
-                Item {
-                    anchors.fill: parent
+    //             // --- Title and Close Icon ---
+    //             Item {
+    //                 anchors.fill: parent
 
-                    // Title centered in the bar
-                    QGCLabel {
-                        text: compassDialog.dialogTitleText//qsTr("Compass Calibration")
-                        anchors.centerIn: parent
-                        color: "white"
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                    }
+    //                 // Title centered in the bar
+    //                 QGCLabel {
+    //                     text: compassDialog.dialogTitleText//qsTr("Compass Calibration")
+    //                     anchors.centerIn: parent
+    //                     color: "white"
+    //                     font.pointSize: ScreenTools.mediumFontPointSize
+    //                     font.bold: true
+    //                 }
 
-                    // Close button at top-right
-                    MouseArea {
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        width: 40
-                        height: 40
-                        onClicked: compassDialog.close()
+    //                 // Close button at top-right
+    //                 MouseArea {
+    //                     anchors.top: parent.top
+    //                     anchors.right: parent.right
+    //                     width: 40
+    //                     height: 40
+    //                     onClicked: compassDialog.close()
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: "\u2715"
-                            color: "white"
-                            font.pixelSize: 18
-                        }
-                    }
-                }
-            }
+    //                     Text {
+    //                         anchors.centerIn: parent
+    //                         text: "\u2715"
+    //                         color: "white"
+    //                         font.pixelSize: 18
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            QGCLabel {
-                text : ""
-                width: parent.width
-                height : 10
-            }
+    //         QGCLabel {
+    //             text : ""
+    //             width: parent.width
+    //             height : 10
+    //         }
 
-            // --- Warning Text ---
-            QGCLabel {
-                id: compassWarningText
-                text: compassDialog.dialogWarningText //qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width * 0.9
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: ScreenTools.defaultFontPointSize
-                color: "black"
-            }
+    //         // --- Warning Text ---
+    //         QGCLabel {
+    //             id: compassWarningText
+    //             text: compassDialog.dialogWarningText //qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
+    //             wrapMode: Text.WordWrap
+    //             horizontalAlignment: Text.AlignHCenter
+    //             width: parent.width * 0.9
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //             font.pointSize: ScreenTools.defaultFontPointSize
+    //             color: "black"
+    //         }
 
-            // --- Image (centered) ---
-            QGCColoredImage {
-                source: "qrc:///qmlimages/VehicleDown.png"
-                width: parent.width * 0.25
-                height: width
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "black"
-            }
+    //         // --- Image (centered) ---
+    //         QGCColoredImage {
+    //             source: "qrc:///qmlimages/VehicleDown.png"
+    //             width: parent.width * 0.25
+    //             height: width
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //             color: "black"
+    //         }
 
-            // --- Spacer to push button down ---
-            Item {
-                Layout.fillHeight: true
-            }
+    //         // --- Spacer to push button down ---
+    //         Item {
+    //             Layout.fillHeight: true
+    //         }
 
-            // --- OK Button ---
-            QGCButton {
-                text: qsTr("DONE")
-                anchors.horizontalCenter: parent.horizontalCenter
-                background: Rectangle {
-                    color: "#7F56D9"
-                    radius: 14
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: "white"
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: {
-                    // calibrationLoader.active = true
-                    // compassDialog.close()
+    //         // --- OK Button ---
+    //         QGCButton {
+    //             text: qsTr("DONE")
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //             background: Rectangle {
+    //                 color: "#7F56D9"
+    //                 radius: 14
+    //             }
+    //             contentItem: Text {
+    //                 text: parent.text
+    //                 color: "white"
+    //                 font.bold: true
+    //                 horizontalAlignment: Text.AlignHCenter
+    //                 verticalAlignment: Text.AlignVCenter
+    //             }
+    //             onClicked: {
+    //                 // calibrationLoader.active = true
+    //                 // compassDialog.close()
 
-                    // // Use a small delay to ensure the loader is ready
-                    // timer.callLater(100)
-                }
-            }
+    //                 // // Use a small delay to ensure the loader is ready
+    //                 // timer.callLater(100)
+    //             }
+    //         }
 
-        }
-    }
+    //     }
+    // }
 
     // Timer {
     //     id: timer
@@ -1667,10 +1676,20 @@ ApplicationWindow {
             ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "GeneralSettings.qml"; title: "Info" }
             ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "LinkSettings.qml"; title: "Info" }
 
+            // Update when activeVehicle changes
+            // onActiveVehicleChanged: {
+            //     updateSettingsTab();
+            // }
+
             Component.onCompleted: {
-                console.log("tabModel Component.onCompleted")
-                if (globals.activeVehicle) {
+                updateSettingsTab();
+            }
+
+            function updateSettingsTab() {
+                if (activeVehicle) {
                     tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/ParameterMain.qml");
+                } else {
+                    tabModel.setProperty(1, "file", "APMSensorsComponent.qml");
                 }
             }
         }

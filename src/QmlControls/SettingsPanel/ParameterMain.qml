@@ -28,7 +28,8 @@ SetupPage {
     id: calibrationPage
     pageComponent : sensorComponent
 
-
+    // In ParameterMain.qml, add this property at the top level
+    property var activeCompassDialog: null
 
     //property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     //property int selectedTabIndex: 0
@@ -70,237 +71,6 @@ SetupPage {
     //         }
     //     }
     // }
-
-
-
-    Component {
-        id: sensorComponent1
-        Item {
-            anchors.fill: parent
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 10
-
-                // GridView for calibration buttons
-                GridView {
-                    id: gridView
-                    property bool buttonsEnabled: true
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-
-                    boundsBehavior: Flickable.StopAtBounds
-                    flickDeceleration: 2000
-                    snapMode: GridView.NoSnap
-
-                    //Layout.alignment: Qt.AlignHCenter
-                    cellWidth: width / 3
-                    cellHeight: ScreenTools.defaultFontPixelHeight * 7
-
-                    model: ListModel {
-
-                        ListElement {
-                            name: "Accelerometer"
-                            type: "accel"
-                            indicator: true
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Compass"
-                            type: "compass"
-                            indicator: true
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Level Horizon"
-                            type: "level"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Gyro"
-                            type: "gyro"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Pressure"
-                            type: "pressure"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "RC Calibration"
-                            type: "rc"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Flight Modes"
-                            type: "flightModes"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "ESC Calibration"
-                            type: "esc"
-                            //globals.activeVehicle ? globals.activeVehicle.supportsMotorInterference : false
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Motors"
-                            type: "motors"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Tunning"
-                            type: "tuning"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-                    }
-
-                    delegate: Item {
-                        width: gridView.cellWidth
-                        height: gridView.cellHeight
-                        // Dynamic visibility for some buttons
-
-
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 5
-                            color: {
-                                if (model.status === "success") return "#2ecc71";   // Success: Green
-                                if (model.status === "failure") return "#e74c3c";   // Failure: Red
-
-                                switch (model.type) {
-                                case "accel":        return "#2980b9";  // Blue
-                                case "compass":      return "#8e44ad";  // Purple
-                                case "level":        return "#16a085";  // Teal
-                                case "gyro":         return "#d35400";  // Orange
-                                case "pressure":     return "#f39c12";  // Yellow Orange
-                                case "rc":           return "#2c3e50";  // Navy Blue
-                                case "flightModes":  return "#c0392b";  // Dark Red
-                                case "esc":          return "#27ae60";  // Green
-                                case "motors":       return "#7f8c8d";  // Gray
-                                case "tuning":       return "#9b59b6";  // Light Purple
-                                default:             return qgcPal.button;
-                                }
-                            }
-
-                            radius: 10
-                            border.color: qgcPal.buttonText
-                            border.width: 1
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 5
-                                width: parent.width
-
-                                // Icon above the text
-                                Image {
-                                    source: model.icon
-                                    width: 32
-                                    height: 32
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    fillMode: Image.PreserveAspectFit
-                                }
-
-                                // Label below the icon
-                                QGCLabel {
-                                    text: model.name//model.type === "pressure" ? _calibratePressureText : model.name
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    wrapMode: Text.WordWrap
-                                    font.bold: true
-                                }
-                            }
-
-                            // Indicator for calibration status
-                            Rectangle {
-                                visible: model.indicator
-                                width: ScreenTools.defaultFontPixelHeight * 0.75
-                                height: width
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 5
-                                radius: width * 0.5
-                                color: {
-                                    if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
-                                    if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
-                                    return "transparent";
-                                }
-                            }
-
-                            // QGCLabel {
-                            //     anchors.centerIn: parent
-                            //     text: {
-                            //         if (model.type === "pressure") return _calibratePressureText;
-                            //         return model.name;
-                            //     }
-                            //     color: qgcPal.buttonText
-                            // }
-
-                            MouseArea {
-                                id: mouseArea
-                                anchors.fill: parent
-                                enabled: gridView.buttonsEnabled
-                                onClicked: handleButtonClick(model.type)
-                            }
-                        }
-
-                    }
-                }
-
-                Row {
-                    id: buttonRow
-                    spacing: 20
-                    //anchors.horizontalCenter: parent.horizontalCenter
-                    //anchors.topMargin: 10
-
-                    Button {
-                        id: nextButton
-                        text: "Next"
-                        visible: false
-                        onClicked: {
-                            console.log("Next button clicked")
-                            controller.nextClicked()
-                        }
-                    }
-
-                    Button {
-                        id: cancelButton
-                        text: "Cancel"
-                        visible: false
-                        onClicked: {
-                            console.log("Cancel button clicked")
-                            controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     Component {
         id: sensorComponent
@@ -495,19 +265,29 @@ SetupPage {
                 case "motors":
                     showDynamicCalibrationDialog("qrc:/qml/APMMotorComponent.qml","Motors");
                     break;
+
+                case "imu":
+                    toastContainer.showToast("IMU Calibration");
+                    openImuCalibrationDialog();
+                    break;
                 }
             }
 
-            function compassCalibrationDialog(title,warningText) {
-                compassDialog.dialogTitleText = title
-                compassDialog.dialogWarningText = warningText
-                compassDialog.open()
-            }
+            // function compassCalibrationDialog(title,warningText) {
+            //     compassDialog.dialogTitleText = title
+            //     compassDialog.dialogWarningText = warningText
+            //     compassDialog.open()
+            // }
 
             function showDynamicCalibrationDialog(qmlFile,title) {
                 dynamicCalDialog.dialogTitleText = title
                 dialogLoader.source = qmlFile
                 dynamicCalDialog.open()
+            }
+
+            function openImuCalibrationDialog() {
+                var imuDialog = imuCalibrationDialogComponent.createObject(mainWindow);
+                imuDialog.open();
             }
 
             function compassLabel(index)
@@ -543,10 +323,10 @@ SetupPage {
             APMSensorsComponentController {
                 id:                         controller
                 statusLog:                  statusTextArea
-                progressBar:                progressBar
-                nextButton:                 nextButton
-                cancelButton:               cancelButton
-                orientationCalAreaHelpText: orientationCalAreaHelpText
+                progressBar:                null
+                nextButton:                 null//nextButton
+                cancelButton:               null//cancelButton
+                orientationCalAreaHelpText: null//orientationCalAreaHelpText
 
                 property var rgCompassCalFitness: [ controller.compass1CalFitness, controller.compass2CalFitness, controller.compass3CalFitness ]
 
@@ -570,8 +350,16 @@ SetupPage {
                 onCalibrationComplete: {
                     switch (calType) {
                     case MAVLink.CalibrationAccel:
+                        console.log("MAVLink.CalibrationAccel")
+                        break
                     case MAVLink.CalibrationMag:
                         console.log("MAVLink.CalibrationMag")
+
+                        if (activeCompassDialog) {
+                            activeCompassDialog.close();
+                            activeCompassDialog = null; // Clear the reference
+                        }
+
                         _singleCompassSettingsComponentShowPriority = true
                         postOnboardCompassCalibrationComponent.createObject(mainWindow).open()
                         break
@@ -641,6 +429,277 @@ SetupPage {
 
             Component.onCompleted: {
                 handleSetAllCalButtonsEnabled(true)
+            }
+
+            Component {
+                id: compassDialogComponent
+
+                QGCPopupDialog {
+                    id: compassDialog
+                    title: qsTr("Compass Calibration")
+                    buttons: Dialog.Ok | Dialog.Cancel
+                    preventClose : true
+
+                    property string dialogWarningText: qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
+
+                    // Expose the dialog's progress bar
+                    property alias dialogProgressBar: dialogProgressBar
+
+                    property var calibrationSettings: null  // Settings passed from orientations dialog
+
+                    onOpened: {
+                        // When dialog opens, set the controller's progressBar to use this dialog's progress bar
+                        controller.progressBar = dialogProgressBar;
+                    }
+
+                    onClosed: {
+                        // Reset the controller's progressBar when dialog closes
+                        controller.progressBar = null;
+                    }
+
+                    onAccepted: {
+                        if (!calibrationSettings.useFastCalibration) {
+                            console.log("Compass Calibration")
+                            controller.calibrateCompass();
+                        } else {
+
+                            console.log("Fast Compass Calibration")
+
+                            var lat = calibrationSettings.lat;
+                            var lon = calibrationSettings.lon;
+
+                            if (isNaN(lat) || isNaN(lon)) {
+                                console.error("Invalid latitude or longitude");
+                                return;
+                            }
+
+                            controller.calibrateCompassNorth(lat, lon, calibrationSettings.compassMask);
+                        }
+                    }
+
+                    onRejected: {
+                        console.log("Compass calibration cancelled");
+                        //controller.cancelCalibration();
+
+                    }
+
+                    Column {
+                        width:      50 * ScreenTools.defaultFontPixelWidth
+                        spacing:    ScreenTools.defaultFontPixelHeight
+
+                        ProgressBar {
+                            id: dialogProgressBar
+                            width: parent.width
+                            height: ScreenTools.defaultFontPixelHeight * 2
+                            //visible: controller.calibrationInProgress
+                        }
+
+                        // Warning Text
+                        QGCLabel {
+                            text: dialogWarningText
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                            width: parent.width
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            color: "black"
+                        }
+
+                        // Image
+                        QGCColoredImage {
+                            source: "qrc:///qmlimages/VehicleDown.png"
+                            width: parent.width * 0.25
+                            height: width
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: "black"
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: imuCalibrationDialogComponent
+
+                QGCPopupDialog {
+                    id: imuCalibrationDialog
+                    title: qsTr("IMU Calibration")
+                    buttons: Dialog.Ok | Dialog.Cancel
+                    preventClose: true
+
+                    property string dialogWarningText: qsTr("Follow the instructions to calibrate the IMU by rotating the vehicle to different positions.")
+
+                    // Expose the dialog's progress bar if needed
+                    property alias dialogProgressBar: dialogProgressBar
+                    property alias orientationCalAreaHelpText: orientationCalAreaHelpText
+                    property alias nextButton: nextButton
+                    property alias cancelButton: cancelButton
+
+                    onOpened: {
+
+                        controller.progressBar = dialogProgressBar;
+                        controller.orientationCalAreaHelpText = orientationCalAreaHelpText;
+                        controller.nextButton = nextButton;
+                        controller.cancelButton = cancelButton;
+                    }
+
+                    onClosed: {
+
+                        controller.progressBar = null;
+                        controller.orientationCalAreaHelpText = null;
+                        controller.nextButton = null;
+                        controller.cancelButton = null;
+                    }
+
+                    onAccepted: {
+                        console.log("IMU Calibration started");
+                        controller.calibrateAccel(false);
+                        // Start IMU calibration
+                        // controller.calibrateIMU();
+                    }
+
+                    onRejected: {
+                        console.log("IMU calibration cancelled");
+                        //controller.cancelCalibration();
+                    }
+
+                    Column {
+                        width:      50 * ScreenTools.defaultFontPixelWidth
+                        spacing:    ScreenTools.defaultFontPixelHeight
+
+                        Row {
+                            id: buttonRow
+                            spacing: 20
+                            //anchors.horizontalCenter: parent.horizontalCenter
+                            //anchors.topMargin: 10
+
+                            QGCButton {
+                                id:         nextButton
+                                width:      _buttonWidth
+                                text:       qsTr("Next")
+                                enabled:    false
+                                onClicked:  controller.nextClicked()
+                            }
+
+                            QGCButton {
+                                id:         cancelButton
+                                width:      _buttonWidth
+                                text:       qsTr("Cancel")
+                                visible:    false
+                                enabled:    false
+                                onClicked:  controller.cancelCalibration()
+                            }
+                        }
+
+
+                        ProgressBar {
+                            id: dialogProgressBar
+                            width: parent.width
+                            height: ScreenTools.defaultFontPixelHeight * 2
+                            // visible: controller.calibrationInProgress
+                        }
+
+                        // Warning Text
+                        QGCLabel {
+                            text: dialogWarningText
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                            width: parent.width
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            color: "black"
+                        }
+
+                        // IMU Calibration Area - Your rectangle code
+                        Rectangle {
+                            id: orientationCalArea
+                            width: parent.width
+                            visible: controller.showOrientationCalArea
+                            height: 300 // You can adjust this height as needed
+                            color: qgcPal.windowShade
+
+                            QGCLabel {
+                                id: orientationCalAreaHelpText
+                                anchors.margins: ScreenTools.defaultFontPixelWidth
+                                anchors.top: parent.top
+                                anchors.left: parent.left
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                font.pointSize: ScreenTools.mediumFontPointSize
+                                //text: controller.orientationCalAreaHelpText || qsTr("Rotate the vehicle to the shown positions")
+                            }
+
+                            Flow {
+                                anchors.topMargin: ScreenTools.defaultFontPixelWidth
+                                anchors.top: orientationCalAreaHelpText.bottom
+                                anchors.bottom: parent.bottom
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                spacing: ScreenTools.defaultFontPixelWidth
+
+                                property real indicatorWidth: (width / 3) - (spacing * 2)
+                                property real indicatorHeight: (height / 2) - spacing
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalDownSideVisible
+                                    calValid: controller.orientationCalDownSideDone
+                                    calInProgress: controller.orientationCalDownSideInProgress
+                                    calInProgressText: controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleDown.png"
+                                }
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalLeftSideVisible
+                                    calValid: controller.orientationCalLeftSideDone
+                                    calInProgress: controller.orientationCalLeftSideInProgress
+                                    calInProgressText: controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleLeft.png"
+                                }
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalRightSideVisible
+                                    calValid: controller.orientationCalRightSideDone
+                                    calInProgress: controller.orientationCalRightSideInProgress
+                                    calInProgressText: controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleRight.png"
+                                }
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalNoseDownSideVisible
+                                    calValid: controller.orientationCalNoseDownSideDone
+                                    calInProgress: controller.orientationCalNoseDownSideInProgress
+                                    calInProgressText: controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleNoseDown.png"
+                                }
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalTailDownSideVisible
+                                    calValid: controller.orientationCalTailDownSideDone
+                                    calInProgress: controller.orientationCalTailDownSideInProgress
+                                    calInProgressText: controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleTailDown.png"
+                                }
+
+                                VehicleRotationCal {
+                                    width: parent.indicatorWidth
+                                    height: parent.indicatorHeight
+                                    visible: controller.orientationCalUpsideDownSideVisible
+                                    calValid: controller.orientationCalUpsideDownSideDone
+                                    calInProgress: controller.orientationCalUpsideDownSideInProgress
+                                    calInProgressText: controller.orientationCalUpsideDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                                    imageSource: "qrc:///qmlimages/VehicleUpsideDown.png"
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             Connections {
@@ -939,27 +998,32 @@ SetupPage {
                             }
 
                         } else if (calType === _calTypeCompass) {
-                            console.log("calType  == _calTypeCompass",calType)
-                            if (!northCalibrationCheckBox.checked) {
-                                console.log("Compass Calibration")
-                                controller.calibrateCompass();
-                            } else {
-                                console.log("Fast Compass Calibration")
-                                var lat = parseFloat(northCalLat.text);
-                                var lon = parseFloat(northCalLon.text);
-                                if (useMapPositionCheckbox.checked) {
-                                    lat = _mapPosition.latitude;
-                                    lon = _mapPosition.longitude;
-                                }
-                                if (useGcsPositionCheckbox.checked) {
-                                    lat = _gcsPosition.latitude;
-                                    lon = _gcsPosition.longitude;
-                                }
-                                if (isNaN(lat) || isNaN(lon)) {
-                                    return;
-                                }
-                                controller.calibrateCompassNorth(lat, lon, compassMask());
+                            console.log("calType == _calTypeCompass", calType)
+
+                            // Calculate values immediately
+                            var lat = parseFloat(northCalLat.text);
+                            var lon = parseFloat(northCalLon.text);
+                            var mask = compassMask();
+
+                            if (useMapPositionCheckbox.checked) {
+                                lat = _mapPosition.latitude;
+                                lon = _mapPosition.longitude;
                             }
+                            if (useGcsPositionCheckbox.checked) {
+                                lat = _gcsPosition.latitude;
+                                lon = _gcsPosition.longitude;
+                            }
+
+                            // Open compass dialog with settings as properties
+                            activeCompassDialog = compassDialogComponent.createObject(mainWindow, {
+                                                                                          calibrationSettings: {
+                                                                                              useFastCalibration: northCalibrationCheckBox.checked,
+                                                                                              lat: lat,
+                                                                                              lon: lon,
+                                                                                              compassMask: mask
+                                                                                          }
+                                                                                      });
+                            activeCompassDialog.open();
                         }
                     }
 
@@ -983,6 +1047,7 @@ SetupPage {
                         }
 
                         Column {
+
                             visible: calType !== _calTypeAccel
 
                             QGCLabel { text: qsTr("Autopilot Rotation:") }
@@ -1183,12 +1248,12 @@ SetupPage {
                 anchors.fill: parent
                 spacing: 10
 
-                ProgressBar {
-                    id: progressBar
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
-                    //visible: /*false*/ controller.calibrationInProgress
-                }
+                // ProgressBar {
+                //     id: progressBar
+                //     Layout.fillWidth: true
+                //     Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 2
+                //     //visible: /*false*/ controller.calibrationInProgress
+                // }
 
                 TextArea {
                     id: statusTextArea
@@ -1201,95 +1266,95 @@ SetupPage {
                     visible: false //!controller.showOrientationCalArea
                 }
 
-                Rectangle {
-                    id: orientationCalArea
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    visible: false /*controller.showOrientationCalArea*/
-                    color: qgcPal.windowShade
+                // Rectangle {
+                //     id: orientationCalArea
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                //     visible: false /*controller.showOrientationCalArea*/
+                //     color: qgcPal.windowShade
 
-                    QGCLabel {
-                        id: orientationCalAreaHelpText
-                        anchors.margins: ScreenTools.defaultFontPixelWidth
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                    }
+                //     QGCLabel {
+                //         id: orientationCalAreaHelpText
+                //         anchors.margins: ScreenTools.defaultFontPixelWidth
+                //         anchors.top: parent.top
+                //         anchors.left: parent.left
+                //         width: parent.width
+                //         wrapMode: Text.WordWrap
+                //         font.pointSize: ScreenTools.mediumFontPointSize
+                //     }
 
-                    Flow {
-                        anchors.topMargin: ScreenTools.defaultFontPixelWidth
-                        anchors.top: orientationCalAreaHelpText.bottom
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: ScreenTools.defaultFontPixelWidth
+                //     Flow {
+                //         anchors.topMargin: ScreenTools.defaultFontPixelWidth
+                //         anchors.top: orientationCalAreaHelpText.bottom
+                //         anchors.bottom: parent.bottom
+                //         anchors.left: parent.left
+                //         anchors.right: parent.right
+                //         spacing: ScreenTools.defaultFontPixelWidth
 
-                        property real indicatorWidth: (width / 3) - (spacing * 2)
-                        property real indicatorHeight: (height / 2) - spacing
+                //         property real indicatorWidth: (width / 3) - (spacing * 2)
+                //         property real indicatorHeight: (height / 2) - spacing
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalDownSideVisible
-                            calValid:           controller.orientationCalDownSideDone
-                            calInProgress:      controller.orientationCalDownSideInProgress
-                            calInProgressText:  controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleDown.png"
-                        }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalDownSideVisible
+                //             calValid:           controller.orientationCalDownSideDone
+                //             calInProgress:      controller.orientationCalDownSideInProgress
+                //             calInProgressText:  controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleDown.png"
+                //         }
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalLeftSideVisible
-                            calValid:           controller.orientationCalLeftSideDone
-                            calInProgress:      controller.orientationCalLeftSideInProgress
-                            calInProgressText:  controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleLeft.png"
-                        }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalLeftSideVisible
+                //             calValid:           controller.orientationCalLeftSideDone
+                //             calInProgress:      controller.orientationCalLeftSideInProgress
+                //             calInProgressText:  controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleLeft.png"
+                //         }
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalRightSideVisible
-                            calValid:           controller.orientationCalRightSideDone
-                            calInProgress:      controller.orientationCalRightSideInProgress
-                            calInProgressText:  controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleRight.png"
-                        }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalRightSideVisible
+                //             calValid:           controller.orientationCalRightSideDone
+                //             calInProgress:      controller.orientationCalRightSideInProgress
+                //             calInProgressText:  controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleRight.png"
+                //         }
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalNoseDownSideVisible
-                            calValid:           controller.orientationCalNoseDownSideDone
-                            calInProgress:      controller.orientationCalNoseDownSideInProgress
-                            calInProgressText:  controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleNoseDown.png"
-                        }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalNoseDownSideVisible
+                //             calValid:           controller.orientationCalNoseDownSideDone
+                //             calInProgress:      controller.orientationCalNoseDownSideInProgress
+                //             calInProgressText:  controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleNoseDown.png"
+                //         }
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalTailDownSideVisible
-                            calValid:           controller.orientationCalTailDownSideDone
-                            calInProgress:      controller.orientationCalTailDownSideInProgress
-                            calInProgressText:  controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleTailDown.png"
-                        }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalTailDownSideVisible
+                //             calValid:           controller.orientationCalTailDownSideDone
+                //             calInProgress:      controller.orientationCalTailDownSideInProgress
+                //             calInProgressText:  controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleTailDown.png"
+                //         }
 
-                        VehicleRotationCal {
-                            width:              parent.indicatorWidth
-                            height:             parent.indicatorHeight
-                            visible:            controller.orientationCalUpsideDownSideVisible
-                            calValid:           controller.orientationCalUpsideDownSideDone
-                            calInProgress:      controller.orientationCalUpsideDownSideInProgress
-                            calInProgressText:  controller.orientationCalUpsideDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
-                            imageSource:        "qrc:///qmlimages/VehicleUpsideDown.png"
-                        }
-                    }
-                }
+                //         VehicleRotationCal {
+                //             width:              parent.indicatorWidth
+                //             height:             parent.indicatorHeight
+                //             visible:            controller.orientationCalUpsideDownSideVisible
+                //             calValid:           controller.orientationCalUpsideDownSideDone
+                //             calInProgress:      controller.orientationCalUpsideDownSideInProgress
+                //             calInProgressText:  controller.orientationCalUpsideDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
+                //             imageSource:        "qrc:///qmlimages/VehicleUpsideDown.png"
+                //         }
+                //     }
+                // }
 
                 // GridView for calibration buttons
                 GridView {
@@ -1309,6 +1374,7 @@ SetupPage {
 
 
                     model: ListModel {
+
                         ListElement {
                             name: "Accelerometer"
                             type: "accel"
@@ -1316,6 +1382,7 @@ SetupPage {
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
                         ListElement {
                             name: "Compass"
                             type: "compass"
@@ -1323,6 +1390,15 @@ SetupPage {
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
                         }
+
+                        ListElement {
+                            name: "IMU"
+                            type: "imu"
+                            indicator: true
+                            icon: "/qmlimages/NewImages/homeIcon.png"
+                            status: "none"
+                        }
+
                         ListElement {
                             name: "Level Horizon"
                             type: "level"
@@ -1330,6 +1406,7 @@ SetupPage {
                             status: "none"
 
                         }
+
                         ListElement {
                             name: "Gyro"
                             type: "gyro"
@@ -1382,7 +1459,6 @@ SetupPage {
                             type: "tuning"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
                     }
 
@@ -1476,34 +1552,34 @@ SetupPage {
                     }
                 }
 
-                Row {
-                    id: buttonRow
-                    spacing: 20
-                    //anchors.horizontalCenter: parent.horizontalCenter
-                    //anchors.topMargin: 10
+                // Row {
+                //     id: buttonRow
+                //     spacing: 20
+                //     //anchors.horizontalCenter: parent.horizontalCenter
+                //     //anchors.topMargin: 10
 
-                    Button {
-                        id: nextButton
-                        text: "Next"
-                        visible: false
-                        onClicked: {
-                            console.log("Next button clicked")
-                            controller.nextClicked()
-                        }
-                    }
+                //     Button {
+                //         id: nextButton
+                //         text: "Next"
+                //         visible: false
+                //         onClicked: {
+                //             console.log("Next button clicked")
+                //             controller.nextClicked()
+                //         }
+                //     }
 
-                    Button {
-                        id: cancelButton
-                        text: "Cancel"
-                        visible: false
-                        onClicked: {
-                            console.log("Cancel button clicked")
-                            controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
-                        }
-                    }
-                }
+                //     Button {
+                //         id: cancelButton
+                //         text: "Cancel"
+                //         visible: false
+                //         onClicked: {
+                //             console.log("Cancel button clicked")
+                //             controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
+                //         }
+                //     }
+                // }
+
             }
-
 
         }
     }
