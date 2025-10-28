@@ -413,7 +413,7 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                 model: _activeVehicle ? _activeVehicle.batteries : 0
 
                 SettingsGroupLayout {
-                    heading:        qsTr("Battery %1").arg(_activeVehicle.batteries.length === 1 ? qsTr("Status") : object.id.rawValue)
+                    heading:        qsTr("Battery Status")/*.arg(_activeVehicle.batteries.length === 1 ? qsTr("Status") : object.id.rawValue)*/
                     contentSpacing: 0
                     showDividers:   false
 
@@ -435,13 +435,13 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                     LabelledLabel {
                         label:      qsTr("Remaining")
                         labelText:  object.timeRemainingStr.value
-                        visible:    batteryValuesAvailable.timeRemainingAvailable
+                        visible:    false//batteryValuesAvailable.timeRemainingAvailable
                     }
 
                     LabelledLabel {
                         label:      qsTr("Remaining")
                         labelText:  object.percentRemaining.valueString + " " + object.percentRemaining.units
-                        visible:    batteryValuesAvailable.percentRemainingAvailable
+                        visible:    false//batteryValuesAvailable.percentRemainingAvailable
                     }
 
                     LabelledLabel {

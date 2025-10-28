@@ -68,8 +68,8 @@ Item {
                 radius: width * 0.5
                 rotation: 30
                 opacity: 0.95
-                anchors.rightMargin: -width * 0.25
-                anchors.bottomMargin: -height * 0.2
+                anchors.rightMargin: 1//-width * 0.25
+                anchors.bottomMargin: 1//-height * 0.2
                 z: -1
 
                 gradient: Gradient {

@@ -11,10 +11,11 @@ Item {
     anchors.fill: parent
 
 
-property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0")
-    property int selectedGimbalIndex: QGroundControl.loadGlobalSetting("camera","-1")
-    property int selectedGimbalIndex1: QGroundControl.loadGlobalSetting("camera1","-1")
-    property int selectedGimbalIndex2: QGroundControl.loadGlobalSetting("camera2","-1")
+property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
+    property int agrigimbal: QGroundControl.loadGlobalSetting("agrigimbal","0")
+    property int cameragimbal: QGroundControl.loadGlobalSetting("cameragimbal","-1")
+    property int cameragimbal1: QGroundControl.loadGlobalSetting("cameragimbal1","-1")
+    property int cameragimbal2: QGroundControl.loadGlobalSetting("cameragimbal2","-1")
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
     // Calculate card width to show exactly 3 per row with spacing
@@ -130,7 +131,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.bold: true
                     bottomPadding: 15
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                 }
 
                 // Grid layout for gimbal models
@@ -140,7 +141,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                     // Horizontal spacing (between columns)
                     columnSpacing: 30
                     // Vertical spacing (between rows)
@@ -161,7 +162,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.bold: true
                     bottomPadding: 15
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                 }
 
                 // Grid layout for gimbal models
@@ -171,7 +172,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?true:false
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                     // Horizontal spacing (between columns)
                     columnSpacing: 30
                     // Vertical spacing (between rows)
@@ -192,7 +193,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.bold: true
                     bottomPadding: 15
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?false:true
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?false:true
                 }
 
                 // Grid layout for gimbal models
@@ -202,7 +203,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"?false:true
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?false:true
                     // Horizontal spacing (between columns)
                     columnSpacing: 30
                     // Vertical spacing (between rows)
@@ -249,24 +250,10 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                     text: "Select camera"
                     color: "white"
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     font.bold: true
                 }
 
-                // Grid layout for cameras
+                // Grid layout for agriall
                 Grid {
                     id: gimbalGrid2
                     width: parent.width - horizontalMargin
@@ -312,12 +299,12 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: selectedGimbalIndexs === index ? "limegreen" : "transparent"
-                border.width: selectedGimbalIndexs === index ? 3 : 0
+                border.color: agriall === index ? "limegreen" : "transparent"
+                border.width: agriall === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: selectedGimbalIndexs === index
+                    visible: agriall === index
                     width: 20
                     height: 20
                     radius: 10
@@ -337,7 +324,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
 
                 // Inner shadow effect when selected
                 Rectangle {
-                    visible: selectedGimbalIndexs === index
+                    visible: agriall === index
                     anchors.fill: parent
                     radius: parent.radius
                     color: "transparent"
@@ -372,8 +359,8 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             transform: Scale {
                 origin.x: card.width/2
                 origin.y: card.height/2
-                xScale: selectedGimbalIndexs === index ? 1.03 : 1.0
-                yScale: selectedGimbalIndexs === index ? 1.03 : 1.0
+                xScale: agriall === index ? 1.03 : 1.0
+                yScale: agriall === index ? 1.03 : 1.0
                 Behavior on xScale { NumberAnimation { duration: 100 } }
                 Behavior on yScale { NumberAnimation { duration: 100 } }
             }
@@ -381,27 +368,29 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    selectedGimbalIndexs = index
-                    selectedGimbalIndex = -1
-                    selectedGimbalIndex1 = -1
-                    selectedGimbalIndex2 = -1
+                    agriall = index
+                    agrigimbal = -1
+                    cameragimbal = -1
+                    cameragimbal1 = -1
+                    cameragimbal2 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    console.log("selectedvalue", selectedGimbalIndexs)
-                    updateGimbalSelection(selectedGimbalIndexs)
-                    QGroundControl.saveGlobalSetting("cameras", selectedGimbalIndexs)
-                    QGroundControl.saveGlobalSetting("camera", -1)
-                    QGroundControl.saveGlobalSetting("camera1", -1)
-                    QGroundControl.saveGlobalSetting("camera2", -1)
+                    console.log("selectedvalue", agriall)
+                    updateGimbalSelection1(agriall)
+                    QGroundControl.saveGlobalSetting("agrigimbal", -1)
+                    QGroundControl.saveGlobalSetting("agriall", agriall)
+                    QGroundControl.saveGlobalSetting("cameragimbal", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // if (activeVehicle) {
-                    //     selectedGimbalIndex = index
-                    //     selectedGimbalIndex1 = -1
-                    //     selectedGimbalIndex2 = -1
+                    //     cameragimbal = index
+                    //     cameragimbal1 = -1
+                    //     cameragimbal2 = -1
                     //     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    //     console.log("selectedvalue", selectedGimbalIndex)
-                    //     updateGimbalSelection(selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera", selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera1", -1)
-                    //     QGroundControl.saveGlobalSetting("camera2", -1)
+                    //     console.log("selectedvalue", cameragimbal)
+                    //     updateGimbalSelection(cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // } else {
                     //     mainWindow.showToast("Device not connected")
                     // }
@@ -424,12 +413,12 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: selectedGimbalIndex === index ? "limegreen" : "transparent"
-                border.width: selectedGimbalIndex === index ? 3 : 0
+                border.color: cameragimbal === index ? "limegreen" : "transparent"
+                border.width: cameragimbal === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: selectedGimbalIndex === index
+                    visible: cameragimbal === index
                     width: 20
                     height: 20
                     radius: 10
@@ -449,7 +438,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
 
                 // Inner shadow effect when selected
                 Rectangle {
-                    visible: selectedGimbalIndex === index
+                    visible: cameragimbal === index
                     anchors.fill: parent
                     radius: parent.radius
                     color: "transparent"
@@ -484,8 +473,8 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             transform: Scale {
                 origin.x: card.width/2
                 origin.y: card.height/2
-                xScale: selectedGimbalIndex === index ? 1.03 : 1.0
-                yScale: selectedGimbalIndex === index ? 1.03 : 1.0
+                xScale: cameragimbal === index ? 1.03 : 1.0
+                yScale: cameragimbal === index ? 1.03 : 1.0
                 Behavior on xScale { NumberAnimation { duration: 100 } }
                 Behavior on yScale { NumberAnimation { duration: 100 } }
             }
@@ -493,27 +482,29 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    selectedGimbalIndexs = -1
-                    selectedGimbalIndex = index
-                    selectedGimbalIndex1 = -1
-                    selectedGimbalIndex2 = -1
+                    agriall = -1
+                    agrigimbal = index
+                    cameragimbal = -1
+                    cameragimbal1 = -1
+                    cameragimbal2 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    console.log("selectedvalue", selectedGimbalIndex)
-                    updateGimbalSelection(selectedGimbalIndex)
-                    QGroundControl.saveGlobalSetting("cameras", -1)
-                    QGroundControl.saveGlobalSetting("camera", selectedGimbalIndex)
-                    QGroundControl.saveGlobalSetting("camera1", -1)
-                    QGroundControl.saveGlobalSetting("camera2", -1)
+                    console.log("selectedvalue", agrigimbal)
+                    updateGimbalSelection1(agrigimbal+2)
+                    QGroundControl.saveGlobalSetting("agriall", -1)
+                    QGroundControl.saveGlobalSetting("agrigimbal", agrigimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // if (activeVehicle) {
-                    //     selectedGimbalIndex = index
-                    //     selectedGimbalIndex1 = -1
-                    //     selectedGimbalIndex2 = -1
+                    //     cameragimbal = index
+                    //     cameragimbal1 = -1
+                    //     cameragimbal2 = -1
                     //     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    //     console.log("selectedvalue", selectedGimbalIndex)
-                    //     updateGimbalSelection(selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera", selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera1", -1)
-                    //     QGroundControl.saveGlobalSetting("camera2", -1)
+                    //     console.log("selectedvalue", cameragimbal)
+                    //     updateGimbalSelection(cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // } else {
                     //     mainWindow.showToast("Device not connected")
                     // }
@@ -537,12 +528,12 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: selectedGimbalIndex === index ? "limegreen" : "transparent"
-                border.width: selectedGimbalIndex === index ? 3 : 0
+                border.color: cameragimbal === index ? "limegreen" : "transparent"
+                border.width: cameragimbal === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: selectedGimbalIndex === index
+                    visible: cameragimbal === index
                     width: 20
                     height: 20
                     radius: 10
@@ -562,7 +553,7 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
 
                 // Inner shadow effect when selected
                 Rectangle {
-                    visible: selectedGimbalIndex === index
+                    visible: cameragimbal === index
                     anchors.fill: parent
                     radius: parent.radius
                     color: "transparent"
@@ -597,8 +588,8 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             transform: Scale {
                 origin.x: card.width/2
                 origin.y: card.height/2
-                xScale: selectedGimbalIndex === index ? 1.03 : 1.0
-                yScale: selectedGimbalIndex === index ? 1.03 : 1.0
+                xScale: cameragimbal === index ? 1.03 : 1.0
+                yScale: cameragimbal === index ? 1.03 : 1.0
                 Behavior on xScale { NumberAnimation { duration: 100 } }
                 Behavior on yScale { NumberAnimation { duration: 100 } }
             }
@@ -606,27 +597,29 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    selectedGimbalIndexs = -1
-                    selectedGimbalIndex = index
-                    selectedGimbalIndex1 = -1
-                    selectedGimbalIndex2 = -1
+                    agriall = -1
+                    agrigimbal= -1
+                    cameragimbal = index
+                    cameragimbal1 = -1
+                    cameragimbal2 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    console.log("selectedvalue", selectedGimbalIndex)
-                    updateGimbalSelection(selectedGimbalIndex)
-                    QGroundControl.saveGlobalSetting("cameras", -1)
-                    QGroundControl.saveGlobalSetting("camera", selectedGimbalIndex)
-                    QGroundControl.saveGlobalSetting("camera1", -1)
-                    QGroundControl.saveGlobalSetting("camera2", -1)
+                    console.log("selectedvalue", cameragimbal)
+                    updateGimbalSelection(cameragimbal)
+                    QGroundControl.saveGlobalSetting("agriall", -1)
+                    QGroundControl.saveGlobalSetting("agrigimbal", agrigimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // if (activeVehicle) {
-                    //     selectedGimbalIndex = index
-                    //     selectedGimbalIndex1 = -1
-                    //     selectedGimbalIndex2 = -1
+                    //     cameragimbal = index
+                    //     cameragimbal1 = -1
+                    //     cameragimbal2 = -1
                     //     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    //     console.log("selectedvalue", selectedGimbalIndex)
-                    //     updateGimbalSelection(selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera", selectedGimbalIndex)
-                    //     QGroundControl.saveGlobalSetting("camera1", -1)
-                    //     QGroundControl.saveGlobalSetting("camera2", -1)
+                    //     console.log("selectedvalue", cameragimbal)
+                    //     updateGimbalSelection(cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // } else {
                     //     mainWindow.showToast("Device not connected")
                     // }
@@ -648,12 +641,12 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: selectedGimbalIndex1 === index ? "limegreen" : "transparent"
-                border.width: selectedGimbalIndex1 === index ? 3 : 0
+                border.color: cameragimbal1 === index ? "limegreen" : "transparent"
+                border.width: cameragimbal1 === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: selectedGimbalIndex1 === index
+                    visible: cameragimbal1 === index
                     width: 20
                     height: 20
                     radius: 10
@@ -697,27 +690,29 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    selectedGimbalIndexs = -1
-                    selectedGimbalIndex1 = index
-                    selectedGimbalIndex = -1
-                    selectedGimbalIndex2 = -1
+                    agriall = -1
+                    agrigimbal = -1
+                    cameragimbal1 = index
+                    cameragimbal = -1
+                    cameragimbal2 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    console.log("selectedvalue", selectedGimbalIndex1+4)
-                    updateGimbalSelection(selectedGimbalIndex1+4)
-                    QGroundControl.saveGlobalSetting("cameras", -1)
-                    QGroundControl.saveGlobalSetting("camera", -1)
-                    QGroundControl.saveGlobalSetting("camera1", selectedGimbalIndex1)
-                    QGroundControl.saveGlobalSetting("camera2", -1)
+                    console.log("selectedvalue", cameragimbal1+4)
+                    updateGimbalSelection(cameragimbal1+4)
+                    QGroundControl.saveGlobalSetting("agriall", -1)
+                    QGroundControl.saveGlobalSetting("agrigimbal", agrigimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal1", cameragimbal1)
+                    QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // if (activeVehicle) {
-                    //     selectedGimbalIndex1 = index
-                    //     selectedGimbalIndex = -1
-                    //     selectedGimbalIndex2 = -1
+                    //     cameragimbal1 = index
+                    //     cameragimbal = -1
+                    //     cameragimbal2 = -1
                     //     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    //     console.log("selectedvalue", selectedGimbalIndex1+4)
-                    //     updateGimbalSelection(selectedGimbalIndex1+4)
-                    //     QGroundControl.saveGlobalSetting("camera", -1)
-                    //     QGroundControl.saveGlobalSetting("camera1", selectedGimbalIndex1)
-                    //     QGroundControl.saveGlobalSetting("camera2", -1)
+                    //     console.log("selectedvalue", cameragimbal1+4)
+                    //     updateGimbalSelection(cameragimbal1+4)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal1", cameragimbal1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal2", -1)
                     // } else {
                     //     mainWindow.showToast("Device not connected")
                     // }
@@ -739,12 +734,12 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: selectedGimbalIndex2 === index ? "limegreen" : "transparent"
-                border.width: selectedGimbalIndex2 === index ? 3 : 0
+                border.color: cameragimbal2 === index ? "limegreen" : "transparent"
+                border.width: cameragimbal2 === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: selectedGimbalIndex2 === index
+                    visible: cameragimbal2 === index
                     width: 20
                     height: 20
                     radius: 10
@@ -788,27 +783,29 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    selectedGimbalIndexs = -1
-                    selectedGimbalIndex2 = index
-                    selectedGimbalIndex = -1
-                    selectedGimbalIndex1 = -1
+                    agriall = -1
+                    agrigimbal = -1
+                    cameragimbal2 = index
+                    cameragimbal = -1
+                    cameragimbal1 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    console.log("selectedvalue", selectedGimbalIndex2+7)
-                    updateGimbalSelection(selectedGimbalIndex2+7)
-                    QGroundControl.saveGlobalSetting("cameras", -1)
-                    QGroundControl.saveGlobalSetting("camera", -1)
-                    QGroundControl.saveGlobalSetting("camera1", -1)
-                    QGroundControl.saveGlobalSetting("camera2", selectedGimbalIndex2)
+                    console.log("selectedvalue", cameragimbal2+7)
+                    updateGimbalSelection(cameragimbal2+7)
+                    QGroundControl.saveGlobalSetting("agriall", -1)
+                    QGroundControl.saveGlobalSetting("agrigimbal", agrigimbal)
+                    QGroundControl.saveGlobalSetting("cameragimbal", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    QGroundControl.saveGlobalSetting("cameragimbal2", cameragimbal2)
                     // if (activeVehicle) {
-                    //     selectedGimbalIndex2 = index
-                    //     selectedGimbalIndex = -1
-                    //     selectedGimbalIndex1 = -1
+                    //     cameragimbal2 = index
+                    //     cameragimbal = -1
+                    //     cameragimbal1 = -1
                     //     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
-                    //     console.log("selectedvalue", selectedGimbalIndex2+7)
-                    //     updateGimbalSelection(selectedGimbalIndex2+7)
-                    //     QGroundControl.saveGlobalSetting("camera", -1)
-                    //     QGroundControl.saveGlobalSetting("camera1", -1)
-                    //     QGroundControl.saveGlobalSetting("camera2", selectedGimbalIndex2)
+                    //     console.log("selectedvalue", cameragimbal2+7)
+                    //     updateGimbalSelection(cameragimbal2+7)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal1", -1)
+                    //     QGroundControl.saveGlobalSetting("cameragimbal2", cameragimbal2)
                     // } else {
                     //     mainWindow.showToast("Device not connected")
                     // }
@@ -817,11 +814,11 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
         }
     }
 
-    function updateGimbalSelection(selectedGimbalIndex) {
-        console.log("selected index", selectedGimbalIndex)
+    function updateGimbalSelection(cameragimbal) {
+        console.log("selected index", cameragimbal)
 
         if(activeVehicle){
-            switch (selectedGimbalIndex) {
+            switch (cameragimbal) {
             case 0:
                 QGroundControl.saveGlobalSetting("tab", "None")
                 mainWindow.sideDrawer1("BasicParamtersList.qml")
@@ -866,5 +863,41 @@ property int selectedGimbalIndexs: QGroundControl.loadGlobalSetting("cameras","0
 
 
     }
+
+
+    function updateGimbalSelection1(cameragimbal) {
+        console.log("selected index", cameragimbal)
+
+        if(activeVehicle){
+            switch (cameragimbal) {
+            case 0:
+                QGroundControl.saveGlobalSetting("tab", "None")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 1:
+                QGroundControl.saveGlobalSetting("tab", "Spray")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 2:
+                QGroundControl.saveGlobalSetting("tab", "Servo Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 3:
+                QGroundControl.saveGlobalSetting("tab", "STorM32 Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            case 4:
+                QGroundControl.saveGlobalSetting("tab", "Brushless PWM Gimbal")
+                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                break
+            }
+
+        }else{
+            mainWindow.showToastMessage("Drone Not Connected");
+        }
+
+
+    }
+
 
 }

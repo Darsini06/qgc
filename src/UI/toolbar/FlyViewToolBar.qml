@@ -69,7 +69,10 @@ Rectangle {
             Layout.preferredHeight: viewButtonRow.height
             icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
-            onClicked:              mainWindow.newscreen()
+            onClicked:              {
+                mainWindow.newscreendata()
+                mainWindow.newscreen()
+            }
             icon.color:"white"
 
         }

@@ -149,7 +149,7 @@ public:
     virtual void guidedModeChangeHeading(Vehicle *vehicle, const QGeoCoordinate &headingCoord);
 
     /// @return The minimum takeoff altitude (relative) for guided takeoff.
-    virtual double minimumTakeoffAltitudeMeters(Vehicle* /*vehicle*/) { return 3.048; }
+    virtual double minimumTakeoffAltitudeMeters(Vehicle* /*vehicle*/) { return 1.0; }//{ return 3.048; }
 
     /// @return The maximum horizontal groundspeed for a multirotor.
     virtual double maximumHorizontalSpeedMultirotor(Vehicle* /*vehicle*/) { return NAN; }

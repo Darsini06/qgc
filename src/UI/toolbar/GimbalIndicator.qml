@@ -23,6 +23,7 @@ Item {
     width:          gimbalIndicatorIcon.width * 1.1 + gimbalTelemetryLayout.childrenRect.width + margins
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
+    visible: false
 
     property var    activeVehicle:          QGroundControl.multiVehicleManager.activeVehicle
     property var    gimbalController:       activeVehicle.gimbalController

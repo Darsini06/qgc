@@ -32,6 +32,7 @@ Item {
   property string selectedImage: ""
 
   property string rpcCompletedStatus: ""
+  property int selectedIndex:-1
 
   ListModel {
     id: sessionModel
@@ -47,13 +48,34 @@ Item {
     }
   }
 
+
+
   Component.onCompleted: {
     console.log("onCompleted");
+    if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="loadpage"){
+     QGroundControl.saveGlobalSetting("loadpage1", "-1")
+      console.log("onCompleted1");
+    }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Camera"){
+      QGroundControl.saveGlobalSetting("loadpage1", "0")
+      console.log("onCompleted2");
+    }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Agri"){
+      QGroundControl.saveGlobalSetting("loadpage1", "1")
+      console.log("onCompleted3");
+    }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Mapping"){
+      QGroundControl.saveGlobalSetting("loadpage1", "2")
+      console.log("onCompleted4");
+    }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"){
+      QGroundControl.saveGlobalSetting("loadpage1", "3")
+      console.log("onCompleted5");
+    }
+
+
 
     if (userName !== "") {
       userName = QGroundControl.loadGlobalSetting("username", "")
       loadUserDataFromMain();
     }
+
 
   }
 
@@ -521,9 +543,10 @@ Item {
              border.width: 1
 
              Column {
-               anchors.fill: parent
+               anchors.centerIn: parent
                anchors.margins: 20
                spacing: 10
+               width: parent.width - 40
 
                Item {
                  width: 150
@@ -562,13 +585,13 @@ Item {
                border.color: "#e0e0e0"
                border.width: 1
 
+property int selectedIndex: QGroundControl.loadGlobalSetting("loadpage1", "loadpage")
 
-
-               property int selectedIndex: QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="loadpage"?-1:
-QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Camera"?0:
-QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Agri"?1:
-QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Mapping"?2:
-QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"?3:-1
+//                property int selectedIndex: QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="loadpage"?-1:
+// QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Camera"?0:
+// QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Agri"?1:
+// QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Mapping"?2:
+// QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"?3:-1
                property var buttonModel: [
                        { label: "Camera", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.png" },
                        { label: "Agri", color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
@@ -602,7 +625,7 @@ QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"?3:-1
 
                        Repeater {
                            model: root.buttonModel
-
+property int key: root.selectedIndex
                            delegate: Button {
                                Layout.preferredWidth: buttonGrid.width * 0.45
                                Layout.preferredHeight: buttonGrid.height * 0.4

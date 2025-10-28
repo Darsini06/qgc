@@ -203,11 +203,11 @@ SetupPage {
                                 anchors.right: parent.right
                                 anchors.margins: 5
                                 radius: width * 0.5
-                                color: {
-                                    if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
-                                    if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
-                                    return "transparent";
-                                }
+                                // color: {
+                                //     if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
+                                //     if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
+                                //     return "transparent";
+                                // }
                             }
 
                             // QGCLabel {

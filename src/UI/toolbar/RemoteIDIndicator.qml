@@ -23,6 +23,7 @@ Item {
     width:          remoteIDIcon.width * 1.1
     anchors.top:    parent.top
     anchors.bottom: parent.bottom
+    visible: false
 
     property bool   showIndicator:      remoteIDManager.available
 

@@ -26,6 +26,7 @@ RowLayout {
     QGCLabel { 
         id:                 _label
         Layout.fillWidth:   true 
+        color: "white"
     }
 
     QGCButton {

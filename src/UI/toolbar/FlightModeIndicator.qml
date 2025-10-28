@@ -52,7 +52,9 @@ property var    _activeVehicle:             QGroundControl.multiVehicleManager.a
             color:      "white"//"black"
             MouseArea {
                 anchors.fill:   parent
-                onClicked:      mainWindow.showIndicatorDrawer(drawerComponent, control)
+                onClicked:      if(_activeVehicle){
+                                    mainWindow.showIndicatorDrawer(drawerComponent, control)
+                                }
             }
         }
     }

@@ -62,6 +62,7 @@ SettingsPage {
                 QGCLabel {
                     Layout.fillWidth:   true
                     text:               object.name
+                    color: "white"
                 }
                 QGCColoredImage {
                     height:                 ScreenTools.minTouchPixels
