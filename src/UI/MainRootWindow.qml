@@ -2684,14 +2684,23 @@ ApplicationWindow {
     }
 
     function executeAction2() {
-        console.log("Button long-pressed! Action executed.1")
-        activeVehicle.guidedModeRTL(false)
-        rtlbtn.visible=false
-        takeoffbtn.visible=true
+            console.log("Button long-pressed! Action executed.1")
+            if(activeVehicle){
+                var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
+
+                if (homeDistance > 10.0) {
+                    activeVehicle.guidedModeRTL(false)
+                } else {
+                    activeVehicle.guidedModeLand()
+                }
+
+            }
+            // rtlbtn.visible=false
+            // takeoffbtn.visible=true
 
 
-        myDialog.close()
-    }
+            myDialog.close()
+        }
 
 
 

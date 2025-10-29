@@ -110,6 +110,7 @@ QGCTileSet MapProvider::getTileCount(int zoom, double topleftLon,
     QGCTileSet set;
     set.tileX0 = long2tileX(topleftLon, zoom);
     set.tileY0 = lat2tileY(topleftLat, zoom);
+
     set.tileX1 = long2tileX(bottomRightLon, zoom);
     set.tileY1 = lat2tileY(bottomRightLat, zoom);
 

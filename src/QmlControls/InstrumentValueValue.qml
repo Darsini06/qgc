@@ -16,6 +16,7 @@ import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
 
+
 ColumnLayout {
     property var    instrumentValueData:            null
     property bool   settingsUnlocked:               false
@@ -36,13 +37,16 @@ ColumnLayout {
         id:                 label
         Layout.alignment:   Qt.AlignVCenter
         font.pointSize:     _fontSize
-        color:              "white" //instrumentValueData.isValidColor(instrumentValueData.currentColor) ? instrumentValueData.currentColor : qgcPal.text
+        color:              instrumentValueData.isValidColor(instrumentValueData.currentColor) ? instrumentValueData.currentColor : qgcPal.text
         text:               valueText()
-
-        function valueText() {
-            if (instrumentValueData.fact) {
+function valueText() {
+            if (instrumentValueData) {
+                if(instrumentValueData.text === "Distance to Home" ){
+                    QGroundControl.saveGlobalSetting("home", instrumentValueData.fact.enumOrValueString)
+                }
                 return instrumentValueData.fact.enumOrValueString + (instrumentValueData.showUnits ? " " + instrumentValueData.fact.units : "")
             } else {
+console.log("object===========1",instrumentValueData);
                 return qsTr("--.--")
             }
         }

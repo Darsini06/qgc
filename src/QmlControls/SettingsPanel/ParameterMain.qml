@@ -324,8 +324,8 @@ SetupPage {
                 id:                         controller
                 statusLog:                  statusTextArea
                 progressBar:                null
-                nextButton:                 null//nextButton
-                cancelButton:               null//cancelButton
+                nextButton:                 nextButton
+                cancelButton:               cancelButton
                 orientationCalAreaHelpText: null//orientationCalAreaHelpText
 
                 property var rgCompassCalFitness: [ controller.compass1CalFitness, controller.compass2CalFitness, controller.compass3CalFitness ]
@@ -453,8 +453,9 @@ SetupPage {
                     }
 
                     onClosed: {
+                        console.log("onClosed");
                         // Reset the controller's progressBar when dialog closes
-                        controller.progressBar = null;
+                        //controller.progressBar = null;
                     }
 
                     onAccepted: {
@@ -543,10 +544,11 @@ SetupPage {
 
                     onClosed: {
 
-                        controller.progressBar = null;
-                        controller.orientationCalAreaHelpText = null;
-                        controller.nextButton = null;
-                        controller.cancelButton = null;
+                        console.log("onClosed");
+                        // controller.progressBar = null;
+                        // controller.orientationCalAreaHelpText = null;
+                        // controller.nextButton = null;
+                        // controller.cancelButton = null;
                     }
 
                     onAccepted: {
@@ -774,11 +776,13 @@ SetupPage {
                                 height: parent.height
                                 color:  "green"
                             }
+
                             Rectangle {
                                 width:  parent.width * ((yellowMaxThreshold - greenMaxThreshold) / fitnessRange)
                                 height: parent.height
                                 color:  "yellow"
                             }
+
                             Rectangle {
                                 width:  parent.width * ((fitnessRange - yellowMaxThreshold) / fitnessRange)
                                 height: parent.height
@@ -992,6 +996,7 @@ SetupPage {
                         if (calType === _calTypeAccel) {
 
                             if (controller && controller.calibrateAccel) {
+                                console.log("calibrateAccel method");
                                 controller.calibrateAccel(true);
                             } else {
                                 console.log("Controller or calibrateAccel method is undefined");
@@ -1552,32 +1557,32 @@ SetupPage {
                     }
                 }
 
-                // Row {
-                //     id: buttonRow
-                //     spacing: 20
-                //     //anchors.horizontalCenter: parent.horizontalCenter
-                //     //anchors.topMargin: 10
+                Row {
+                    id: buttonRow
+                    spacing: 20
+                    //anchors.horizontalCenter: parent.horizontalCenter
+                    //anchors.topMargin: 10
 
-                //     Button {
-                //         id: nextButton
-                //         text: "Next"
-                //         visible: false
-                //         onClicked: {
-                //             console.log("Next button clicked")
-                //             controller.nextClicked()
-                //         }
-                //     }
+                    Button {
+                        id: nextButton
+                        text: "Next"
+                        visible: false
+                        onClicked: {
+                            console.log("Next button clicked")
+                            controller.nextClicked()
+                        }
+                    }
 
-                //     Button {
-                //         id: cancelButton
-                //         text: "Cancel"
-                //         visible: false
-                //         onClicked: {
-                //             console.log("Cancel button clicked")
-                //             controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
-                //         }
-                //     }
-                // }
+                    Button {
+                        id: cancelButton
+                        text: "Cancel"
+                        visible: false
+                        onClicked: {
+                            console.log("Cancel button clicked")
+                            controller.stopCalibration()  // Ensure this method exists in APMSensorsComponentController
+                        }
+                    }
+                }
 
             }
 

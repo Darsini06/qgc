@@ -313,6 +313,7 @@ Popup {
             }
 
             Rectangle {
+
                 Layout.fillWidth:       true
                 Layout.preferredWidth:  Math.min(maxAvailableWidth, totalContentWidth)
                 Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)

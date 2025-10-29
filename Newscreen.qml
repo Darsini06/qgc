@@ -393,7 +393,6 @@ Item {
             Item { Layout.fillWidth: true }
 
 
-
             Button {
                 id:camera
                 text: "Camera"
@@ -586,7 +585,8 @@ Item {
             }
 
         }
-          Component {
+
+        Component {
             id: logoutdialog
 
             QGCPopupDialog {
@@ -616,7 +616,7 @@ Item {
             }
         }
 
-          // First Dialog – Type Selection Only
+        // First Dialog – Type Selection Only
 
           Component {
               id: typeSelectionDialogComponent
