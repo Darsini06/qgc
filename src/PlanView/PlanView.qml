@@ -344,8 +344,6 @@ Item {
             fileDialog.nameFilters =    _planMasterController.loadNameFilters
             fileDialog.openForLoad()
         }
-
-
         function saveToSelectedFile() {
             if (!checkReadyForSaveUpload(true /* save */)) {
                 return
@@ -382,9 +380,16 @@ Item {
             } else {
                 console.log("Survey plan creator not found")
             }
+            if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
+                filename._resetPolygon()
+            }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
+                filename._resetCircle()
+            }
+
 
 
         }
+
         function saveToSelectedFile1() {
             if (!checkReadyForSaveUpload(true /* save */)) {
                 return
@@ -462,7 +467,6 @@ Item {
             }
         }
     }
-
     QGCMapPolygonVisuals{
         id:filename
     }
@@ -949,10 +953,10 @@ Item {
                     QGCTabButton {
                         text:       qsTr("Mission")
                     }
-                    // QGCTabButton {
-                    //     text:       qsTr("Fence")
-                    //     enabled:    _geoFenceController.supported
-                    // }
+                    QGCTabButton {
+                        text:       qsTr("Fence")
+                        enabled:    _geoFenceController.supported
+                    }
                     // QGCTabButton {
                     //     text:       qsTr("Rally")
                     //     enabled:    _rallyPointController.supported

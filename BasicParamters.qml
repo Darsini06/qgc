@@ -413,12 +413,12 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                 anchors.fill: parent
                 color: modelData.color
                 radius: 10
-                border.color: cameragimbal === index ? "limegreen" : "transparent"
-                border.width: cameragimbal === index ? 3 : 0
+                border.color: agrigimbal === index ? "limegreen" : "transparent"
+                border.width: agrigimbal === index ? 3 : 0
 
                 // Selection indicator (top-right corner)
                 Rectangle {
-                    visible: cameragimbal === index
+                    visible: agrigimbal === index
                     width: 20
                     height: 20
                     radius: 10
@@ -438,7 +438,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                 // Inner shadow effect when selected
                 Rectangle {
-                    visible: cameragimbal === index
+                    visible: agrigimbal === index
                     anchors.fill: parent
                     radius: parent.radius
                     color: "transparent"
@@ -473,8 +473,8 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             transform: Scale {
                 origin.x: card.width/2
                 origin.y: card.height/2
-                xScale: cameragimbal === index ? 1.03 : 1.0
-                yScale: cameragimbal === index ? 1.03 : 1.0
+                xScale: agrigimbal === index ? 1.03 : 1.0
+                yScale: agrigimbal === index ? 1.03 : 1.0
                 Behavior on xScale { NumberAnimation { duration: 100 } }
                 Behavior on yScale { NumberAnimation { duration: 100 } }
             }
@@ -482,16 +482,17 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+
                     agriall = -1
                     agrigimbal = index
-                    cameragimbal = -1
+                    cameragimbal = 1
                     cameragimbal1 = -1
                     cameragimbal2 = -1
                     QGroundControl.saveGlobalSetting("selectedGimbal", modelData.text)
                     console.log("selectedvalue", agrigimbal)
                     updateGimbalSelection1(agrigimbal+2)
                     QGroundControl.saveGlobalSetting("agriall", -1)
-                    QGroundControl.saveGlobalSetting("agrigimbal", agrigimbal)
+                    QGroundControl.saveGlobalSetting("agrigimbal", 1)
                     QGroundControl.saveGlobalSetting("cameragimbal", cameragimbal)
                     QGroundControl.saveGlobalSetting("cameragimbal1", -1)
                     QGroundControl.saveGlobalSetting("cameragimbal2", -1)

@@ -214,7 +214,7 @@ Item {
 
             LabelledFactTextField {
                 fact: _mapsSettings.maxCacheMemorySize
-            }    
+            }
         }
 
         QGCFileDialog {

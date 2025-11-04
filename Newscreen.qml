@@ -521,7 +521,7 @@ Item {
 
                 onClicked: {
                     QGroundControl.saveGlobalSetting("loadpage", "Mapping")
-                    mainWindow.showFlyView1()
+                    mainWindow.showMapping()
                     MapGlobals.comefrom="Start"
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
                     _appSettings.screen = "Start"

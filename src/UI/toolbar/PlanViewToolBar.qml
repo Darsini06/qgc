@@ -201,7 +201,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color:          qgcPal.window
+        color:          "#1b1c3e"//qgcPal.window
         visible:        _showLargeProgress
 
         property bool _userHide:                false
@@ -213,10 +213,24 @@ Rectangle {
         }
 
         Rectangle {
-            anchors.top:    parent.top
-            anchors.bottom: parent.bottom
+            // anchors.top:    parent.top
+            // anchors.bottom: parent.bottom
             width:          _controllerProgressPct * parent.width
-            color:          qgcPal.colorGreen
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 30
+            radius: 6
+        }
+
+        Rectangle {
+            id: progressFill
+            anchors.verticalCenter: progressBackground.verticalCenter
+            anchors.left: progressBackground.left
+            height: progressBackground.height
+            width: _controllerProgressPct * parent.width
+            radius: 6
+            color: "#7d8df7"
         }
 
         QGCLabel {
@@ -233,14 +247,14 @@ Rectangle {
             visible:            _controllerProgressPct === 1
         }
 
-        QGCLabel {
-            anchors.margins:    _margin
-            anchors.right:      parent.right
-            anchors.bottom:     parent.bottom
-            text:               qsTr("Click anywhere to hide")
+        // QGCLabel {
+        //     anchors.margins:    _margin
+        //     anchors.right:      parent.right
+        //     anchors.bottom:     parent.bottom
+        //     text:               qsTr("Click anywhere to hide")
 
-            property real _margin: ScreenTools.defaultFontPixelWidth / 2
-        }
+        //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
+        // }
 
         MouseArea {
             anchors.fill:   parent

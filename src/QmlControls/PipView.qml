@@ -90,17 +90,14 @@ Item {
     }
 
     function _swapPip() {
-        mainWindow.showToastMessage("message");
         var item1IsFull = false
         if (item1.pipState.state === item1.pipState.fullState) {
-            mainWindow.showToastMessage("message11");
             item1.pipState.state = item1.pipState.pipState
             item2.pipState.state = item2.pipState.fullState
             _fullItem = item2
             _pipOrWindowItem = item1
             item1IsFull = false
         } else {
-            mainWindow.showToastMessage("message65");
             item1.pipState.state = item1.pipState.fullState
             item2.pipState.state = item2.pipState.pipState
             _fullItem = item1
@@ -114,7 +111,6 @@ Item {
 
 
     function camera() {
-        mainWindow.showToastMessage("message");
         _initForItems()
         var item1IsFull = false
         tem1.pipState.state = item1.pipState.pipState

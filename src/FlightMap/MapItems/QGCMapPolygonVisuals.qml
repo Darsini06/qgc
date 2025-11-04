@@ -150,6 +150,11 @@ Item {
     function addToolbarVisuals() {
         console.log("new_addToolbarVisuals")
         if (_objMgrToolVisuals.empty) {
+            if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
+                _resetPolygon()
+            }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
+                _resetCircle()
+            }
             var toolbar = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
             toolbar.z = QGroundControl.zOrderWidgets
             var edit = MapGlobals.edit
@@ -158,6 +163,7 @@ Item {
             if(MapGlobals.edit==="edit"){
                 customdialog.createObject(mainWindow).open()
                 //customDialogItem.visible=true;
+
             }else if (MapGlobals.edit==="edit2"){
                 _saveCurrentVertices()
                 _circleMode = false
@@ -169,6 +175,8 @@ Item {
                 mapPolygon.traceMode = true
                 console.log("MapGlobals.edit2")
             }
+
+
 
         }
     }
@@ -1635,7 +1643,11 @@ Item {
                                 }
 
                                 onClicked: {
-                                    mainWindow.showFlyView()
+                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                        mainWindow.showFlyView()
+                                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                        mainWindow.showMapping()
+                                    }
                                     customDialogItem.visible = false;
                                     MapGlobals.editdialog = "editdialog1"
                                 }

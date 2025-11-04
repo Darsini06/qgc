@@ -327,6 +327,34 @@ ApplicationWindow {
         MapGlobals.edit = "edit1"
         _appSettings.username="";
         eraserbtn.visible = true
+        dialog.mappingbtn.visible= false
+        dialog.mappingcirclebtn.visible= false
+        dialog.agribtn.visible= true
+        dialog.agrigpsbtn.visible= true
+    }
+
+    function showMapping() {
+        waypointbtn.visible = true
+        camerabtn.visible = false
+        //photoVideoControl.visible = false
+        MapGlobals.save = "save1"
+        planbtn.visible = true
+        listbtn.visible = true
+        takeoffbtn.visible = true
+        //modebtn.visible = activeVehicle?false:true
+        flyView.visible = true
+        planView.visible = false
+        newscreen.visible = false
+        mainrootIcons.visible=true
+        modebtn1.visible = activeVehicle ? true : false
+        plan="Plan"
+        MapGlobals.edit = "edit1"
+        _appSettings.username="";
+        eraserbtn.visible = true
+        dialog.mappingbtn.visible= true
+        dialog.mappingcirclebtn.visible= true
+        dialog.agribtn.visible= false
+        dialog.agrigpsbtn.visible= false
     }
 
     function closefile(){
@@ -2728,6 +2756,7 @@ ApplicationWindow {
                 font.bold: true
             }
 
+            
 
 
             MouseArea {
@@ -3057,6 +3086,13 @@ ApplicationWindow {
         anchors.centerIn: parent
         width: parent.width //* 0.8 // 80% of screen width
         height: parent.height // * 0.5 // 50% of screen height
+
+        property alias mappingbtn: mappingbtn
+            property alias mappingcirclebtn: mappingcirclebtn
+        property alias agribtn: agribtn
+            property alias agrigpsbtn: agrigpsbtn
+
+
         background: Rectangle {
             color: "transparent"
             radius: 10
@@ -3124,7 +3160,13 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked:{
                     dialog.visible = false
-                    mainWindow.showFlyView()
+                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                        mainWindow.showFlyView()
+                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                        mainWindow.showMapping()
+                    }
+
+
 
                 }
             }
@@ -3141,12 +3183,131 @@ ApplicationWindow {
                 height: parent.height // Set explicit height for the row layout
                 spacing: 20
 
+                // Map Selection - Dark Blue
+                Button {
+                    id:mappingbtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+
+                    background: Rectangle {
+                        id: mapping
+                        color: "#1b2a49" // Dark Blue
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#3b6ea5"
+                        anchors.fill: parent
+                    }
+
+                    contentItem: Rectangle {
+                        radius: mapping.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/mapSelection.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Basic"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+QGroundControl.saveGlobalSetting("mapping", "basic")
+                        MapGlobals.mark_with = "Mark_With_Manual"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+
+                    }
+                }
+
+                // Drone - Dark Green
+                Button {
+                    id:mappingcirclebtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+
+                    background: Rectangle {
+                        id: mappingcircle
+                        color: "#1c3f2b" // Dark Green
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#4CAF50"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: mappingcircle.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Circular"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+
+QGroundControl.saveGlobalSetting("mapping", "circle")
+                        MapGlobals.mark_with = "Mark_With_Manual"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+                    }
+                }
+
+
 
                 // Map Selection - Dark Blue
                 Button {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width * 0.2
                     Layout.preferredHeight: parent.height * 0.4
+
 
                     background: Rectangle {
                         id: bgMap
@@ -3200,9 +3361,11 @@ ApplicationWindow {
 
                 // Drone - Dark Green
                 Button {
+                    id:agribtn
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width * 0.2
                     Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
 
                     background: Rectangle {
                         id: bgDrone
@@ -3261,9 +3424,11 @@ ApplicationWindow {
 
                 // GPS - Dark Green
                 Button {
+                    id:agrigpsbtn
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: parent.width * 0.2
                     Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
 
                     background: Rectangle {
                         id: bgGPS
