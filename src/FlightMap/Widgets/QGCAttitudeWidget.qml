@@ -41,7 +41,7 @@ Item {
     Item {
         id:             instrument
         anchors.fill:   parent
-        visible:        false
+        visible:       true //false
 
         //----------------------------------------------------
         //-- Artificial Horizon
@@ -111,7 +111,7 @@ Item {
         width: instrument.width
         height: instrument.height
         layer.enabled: true
-        visible: false
+        visible: true//false
 
         Rectangle {
             width: parent.width

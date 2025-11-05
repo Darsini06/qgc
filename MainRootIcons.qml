@@ -30,6 +30,12 @@ Row {
 
     property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
 
+    property real   _maxWidth:          ScreenTools.defaultFontPixelHeight * 15
+    property real   _innerRadius:       (width - (_topBottomMargin * 3)) / 4
+    property real   _outerRadius:       _innerRadius + _topBottomMargin
+    property real   _spacing:           ScreenTools.defaultFontPixelHeight * 0.33
+    property real   _topBottomMargin:   (width * 0.05) / 2
+
     spacing: 10  // Space between icons
 
     Component.onCompleted: {
@@ -394,6 +400,33 @@ Row {
             }
         }
     }
+
+    // Rectangle {
+    //     id:                 visualInstrument
+    //     width: _outerRadius
+    //     height:             _outerRadius * 1.8
+    //     //Layout.fillWidth:   true
+    //     radius:             _outerRadius
+    //     color:              "white"//qgcPal.window
+
+    //     QGCCompassWidget {
+    //         id:                     compass
+    //         //anchors.centerIn: parent
+    //         size:                   _innerRadius * 1.8
+    //         vehicle:                globals.activeVehicle
+    //         //anchors.verticalCenter: parent.verticalCenter
+    //     }
+    // }
+
+
+    QGCCompassWidget {
+        id:                     compass
+        //anchors.centerIn: parent
+        size:                   _innerRadius * 1.2
+        vehicle:                globals.activeVehicle
+        //anchors.verticalCenter: parent.verticalCenter
+    }
+
 
     // New confirmation dialog for clearing the map
     Component {

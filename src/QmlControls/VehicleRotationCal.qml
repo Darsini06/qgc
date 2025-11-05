@@ -32,12 +32,12 @@ Rectangle {
     color:  calInProgress ? "yellow" : (calValid ? "green" : "red")
 
     Rectangle {
-        readonly property int inset: 5
+        readonly property int inset: 3
 
         x:      inset
         y:      inset
-        width:  parent.width - (inset * 2)
-        height: parent.height - (inset * 2)
+        width:  (parent.width) - (inset * 2)
+        height: (parent.height) - (inset * 2)
         color: qgcPal.windowShade
 
         Image {
@@ -53,7 +53,7 @@ Rectangle {
             height:                 parent.height
             horizontalAlignment:    Text.AlignHCenter
             verticalAlignment:      Text.AlignBottom
-            font.pointSize:         ScreenTools.mediumFontPointSize
+            font.pointSize:         ScreenTools.defaultFontPointSize
             text:                   calInProgress ? calInProgressText : (calValid ? qsTr("Completed") : qsTr("Incomplete"))
         }
     }

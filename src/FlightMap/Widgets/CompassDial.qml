@@ -31,6 +31,8 @@ Item {
 
     QGCLabel {
         anchors.centerIn:   parent
+        font.pointSize: ScreenTools.smallFontPointSize
+        //font.bold: true
         text:               "N"
 
         transform: Translate {
@@ -41,6 +43,8 @@ Item {
 
     QGCLabel {
         anchors.centerIn:   parent
+        font.pointSize: ScreenTools.smallFontPointSize
+        //font.bold: true
         text:               "E"
 
         transform: Translate {
@@ -51,6 +55,8 @@ Item {
 
     QGCLabel {
         anchors.centerIn:   parent
+        font.pointSize: ScreenTools.smallFontPointSize
+        //font.bold: true
         text:               "S"
 
         transform: Translate {
@@ -61,6 +67,8 @@ Item {
 
     QGCLabel {
         anchors.centerIn:   parent
+        font.pointSize: ScreenTools.smallFontPointSize
+        //font.bold: true
         text:               "W"
 
         transform: Translate {
@@ -77,7 +85,7 @@ Item {
             id:                 majorTick
             x:                  size / 2
             width:              1
-            height:             ScreenTools.defaultFontPixelHeight * 0.5
+            height:             ScreenTools.defaultFontPixelHeight * 0.4
             color:              qgcPal.text
 
             transform: Rotation {
@@ -93,7 +101,7 @@ Item {
         model: 8
 
         Rectangle {
-            id:                 majorTick
+            id:                 minorTick
             x:                  size / 2
             y:                  _margin
             width:              1
