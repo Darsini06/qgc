@@ -956,6 +956,7 @@ Item {
                     QGCTabButton {
                         text:       qsTr("Fence")
                         enabled:    _geoFenceController.supported
+                        visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
                     }
                     // QGCTabButton {
                     //     text:       qsTr("Rally")
