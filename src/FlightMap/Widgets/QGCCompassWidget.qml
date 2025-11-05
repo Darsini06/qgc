@@ -19,14 +19,14 @@ Rectangle {
     id:     root
     width:  size
     height: size
-    radius: width / 0.5
-    color:  "transparent"
+    radius: width
+    color:  "white"//"transparent"
 
     property real size:                         _defaultSize
     property var  vehicle:                      null
     property bool usedByMultipleVehicleList:    false
 
-    property real _defaultSize:                 ScreenTools.defaultFontPixelHeight * (10)
+    property real _defaultSize:                 ScreenTools.defaultFontPixelHeight
     property real _sizeRatio:                   ScreenTools.isTinyScreen ? (size / _defaultSize) * 0.5 : size / _defaultSize
     property int  _fontSize:                    ScreenTools.defaultFontPointSize * _sizeRatio < 8 ? 8 : ScreenTools.defaultFontPointSize * _sizeRatio
     property real _heading:                     vehicle ? vehicle.heading.rawValue : 0
@@ -38,10 +38,10 @@ Rectangle {
     property bool _showAdditionalIndicators:    _flyViewSettings.showAdditionalIndicatorsCompass.value && !usedByMultipleVehicleList
     property bool _lockNoseUpCompass:           _flyViewSettings.lockNoseUpCompass.value
 
-    function showCOG(){
+    function showCOG() {
         if (_groundSpeed < 0.5) {
             return false
-        } else{
+        } else {
             return vehicle && _showAdditionalIndicators
         }
     }
@@ -56,7 +56,7 @@ Rectangle {
 
     function translateCenterToAngleX(radius, angle) {
         return radius * Math.sin(angle * (Math.PI / 180))
-    } 
+    }
 
     function translateCenterToAngleY(radius, angle) {
         return -radius * Math.cos(angle * (Math.PI / 180))
@@ -74,9 +74,10 @@ Rectangle {
             angle:         _lockNoseUpCompass ? -_heading : 0
         }
 
+        //North, south, ease, west, and the small black lines between these directions.
         CompassDial {
             anchors.fill: parent
-            visible: false
+            visible: true
         }
 
         CompassHeadingIndicator {

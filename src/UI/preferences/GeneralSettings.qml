@@ -206,6 +206,7 @@ SettingsPage {
                     Layout.fillWidth:   true
                     text:               qsTr("Indoor Image")
                 }
+
                 QGCLabel {
                     Layout.fillWidth:   true
                     font.pointSize:     ScreenTools.smallFontPointSize
@@ -324,10 +325,6 @@ SettingsPage {
             visible:            _useChecklist.visible && QGroundControl.corePlugin.options.preFlightChecklistUrl.toString().length
             property Fact _useChecklist:      _settingsManager.appSettings.useChecklist
         }
-
-
-
-
 
         FactCheckBoxSlider {
             Layout.fillWidth:   true

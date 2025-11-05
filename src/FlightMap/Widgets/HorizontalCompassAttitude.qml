@@ -27,6 +27,7 @@ ColumnLayout {
     property real extraValuesWidth:     _outerRadius
 
     property real   _defaultWidth:      mainWindow.width * 0.2
+
     property real   _maxWidth:          ScreenTools.defaultFontPixelHeight * 15
     property real   _innerRadius:       (width - (_topBottomMargin * 3)) / 4
     property real   _outerRadius:       _innerRadius + _topBottomMargin

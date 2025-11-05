@@ -18,9 +18,9 @@
 #include <QtPositioning/QGeoPositionInfoSource>  // For location check
 
 #ifdef Q_OS_IOS
-    #include <QtBluetooth/QBluetoothServiceDiscoveryAgent>
+#include <QtBluetooth/QBluetoothServiceDiscoveryAgent>
 #else
-    #include <QtBluetooth/QBluetoothUuid>
+#include <QtBluetooth/QBluetoothUuid>
 #endif
 
 
@@ -35,9 +35,33 @@ BluetoothLink::BluetoothLink(SharedLinkConfigurationPtr& config)
     qRegisterMetaType<QBluetoothServiceInfo>();
 }
 
+// BluetoothLink::~BluetoothLink()
+// {
+//     disconnect();
+// #ifdef Q_OS_IOS
+//     if(_discoveryAgent) {
+//         _shutDown = true;
+//         _discoveryAgent->stop();
+//         _discoveryAgent->deleteLater();
+//         _discoveryAgent = nullptr;
+//     }
+// #endif
+// }
+
 BluetoothLink::~BluetoothLink()
 {
-    disconnect();
+    // Ensure proper cleanup in destructor
+    if(_targetSocket) {
+        QObject::disconnect(_targetSocket, nullptr, nullptr, nullptr);
+        // Use fully qualified enum
+        if(_targetSocket->state() != QBluetoothSocket::SocketState::UnconnectedState) {
+            _targetSocket->disconnectFromService();
+        }
+        _targetSocket->close();
+        delete _targetSocket;
+        _targetSocket = nullptr;
+    }
+
 #ifdef Q_OS_IOS
     if(_discoveryAgent) {
         _shutDown = true;
@@ -53,14 +77,29 @@ void BluetoothLink::run()
 
 }
 
+// void BluetoothLink::_writeBytes(const QByteArray &bytes)
+// {
+//     if (_targetSocket) {
+//         if(_targetSocket->write(bytes) > 0) {
+//             emit bytesSent(this, bytes);
+//         } else {
+//             qWarning() << "Bluetooth write error";
+//         }
+//     }
+// }
+
+
 void BluetoothLink::_writeBytes(const QByteArray &bytes)
 {
-    if (_targetSocket) {
-        if(_targetSocket->write(bytes) > 0) {
+    if (_targetSocket && _targetSocket->state() == QBluetoothSocket::SocketState::ConnectedState) {
+        qint64 bytesWritten = _targetSocket->write(bytes);
+        if(bytesWritten > 0) {
             emit bytesSent(this, bytes);
         } else {
-            qWarning() << "Bluetooth write error";
+            qWarning() << "Bluetooth write error, bytes written:" << bytesWritten;
         }
+    } else {
+        qWarning() << "Cannot write - socket not connected. State:" << (_targetSocket ? static_cast<int>(_targetSocket->state()) : -1);
     }
 }
 
@@ -76,6 +115,27 @@ void BluetoothLink::readBytes()
     }
 }
 
+// void BluetoothLink::disconnect(void)
+// {
+// #ifdef Q_OS_IOS
+//     if(_discoveryAgent) {
+//         _shutDown = true;
+//         _discoveryAgent->stop();
+//         _discoveryAgent->deleteLater();
+//         _discoveryAgent = nullptr;
+//     }
+// #endif
+//     if(_targetSocket) {
+//         // This prevents stale signals from calling the link after it has been deleted
+//         QObject::disconnect(_targetSocket, &QBluetoothSocket::readyRead, this, &BluetoothLink::readBytes);
+//         _targetSocket->deleteLater();
+//         _targetSocket = nullptr;
+//         emit disconnected();
+//     }
+//     _connectState = false;
+// }
+
+
 void BluetoothLink::disconnect(void)
 {
 #ifdef Q_OS_IOS
@@ -86,15 +146,27 @@ void BluetoothLink::disconnect(void)
         _discoveryAgent = nullptr;
     }
 #endif
+
     if(_targetSocket) {
-        // This prevents stale signals from calling the link after it has been deleted
-        QObject::disconnect(_targetSocket, &QBluetoothSocket::readyRead, this, &BluetoothLink::readBytes);
-        _targetSocket->deleteLater();
+        // Disconnect all signals first
+        QObject::disconnect(_targetSocket, nullptr, nullptr, nullptr);
+
+        // Proper socket cleanup - use fully qualified enum
+        if(_targetSocket->state() != QBluetoothSocket::SocketState::UnconnectedState) {
+            _targetSocket->disconnectFromService();
+        }
+
+        // Close and delete immediately
+        _targetSocket->close();
+        delete _targetSocket;
         _targetSocket = nullptr;
+
+        qDebug() << "Bluetooth socket properly closed";
         emit disconnected();
     }
     _connectState = false;
 }
+
 
 bool BluetoothLink::_connect(void)
 {
@@ -125,23 +197,52 @@ bool BluetoothLink::_hardwareConnect()
     return true;
 }
 
+// void BluetoothLink::_createSocket()
+// {
+//     if(_targetSocket)
+//     {
+//         delete _targetSocket;
+//         _targetSocket = nullptr;
+//     }
+//     _targetSocket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol, this);
+
+//     qDebug()<< "BluetoothLink.cc _createSocket : " << _targetSocket ;
+
+//     QObject::connect(_targetSocket, &QBluetoothSocket::connected, this, &BluetoothLink::deviceConnected);
+
+//     QObject::connect(_targetSocket, &QBluetoothSocket::readyRead, this, &BluetoothLink::readBytes);
+//     QObject::connect(_targetSocket, &QBluetoothSocket::disconnected, this, &BluetoothLink::deviceDisconnected);
+
+//     QObject::connect(_targetSocket, &QBluetoothSocket::errorOccurred, this, &BluetoothLink::deviceError);
+// }
+
 void BluetoothLink::_createSocket()
 {
-    if(_targetSocket)
-    {
+    // Clean up existing socket properly
+    if(_targetSocket) {
+        QObject::disconnect(_targetSocket, nullptr, nullptr, nullptr);
+        // Use fully qualified enum
+        if(_targetSocket->state() != QBluetoothSocket::SocketState::UnconnectedState) {
+            _targetSocket->disconnectFromService();
+        }
+        _targetSocket->close();
         delete _targetSocket;
         _targetSocket = nullptr;
     }
+
     _targetSocket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol, this);
 
-    qDebug()<< "BluetoothLink.cc _createSocket : " << _targetSocket ;
+    qDebug() << "BluetoothLink.cc _createSocket : " << _targetSocket;
 
-    QObject::connect(_targetSocket, &QBluetoothSocket::connected, this, &BluetoothLink::deviceConnected);
-
-    QObject::connect(_targetSocket, &QBluetoothSocket::readyRead, this, &BluetoothLink::readBytes);
-    QObject::connect(_targetSocket, &QBluetoothSocket::disconnected, this, &BluetoothLink::deviceDisconnected);
-
-    QObject::connect(_targetSocket, &QBluetoothSocket::errorOccurred, this, &BluetoothLink::deviceError);
+    // Connect signals with proper error handling
+    QObject::connect(_targetSocket, &QBluetoothSocket::connected,
+                     this, &BluetoothLink::deviceConnected);
+    QObject::connect(_targetSocket, &QBluetoothSocket::readyRead,
+                     this, &BluetoothLink::readBytes);
+    QObject::connect(_targetSocket, &QBluetoothSocket::disconnected,
+                     this, &BluetoothLink::deviceDisconnected);
+    QObject::connect(_targetSocket, &QBluetoothSocket::errorOccurred,
+                     this, &BluetoothLink::deviceError);
 }
 
 #ifdef Q_OS_IOS
@@ -175,11 +276,20 @@ void BluetoothLink::discoveryFinished()
 }
 #endif
 
+// void BluetoothLink::deviceConnected()
+// {
+//     _connectState = true;
+//     emit connected();
+//     qDebug()<< "Bluetooth Connected";
+// }
+
 void BluetoothLink::deviceConnected()
 {
-    _connectState = true;
-    emit connected();
-    qDebug()<< "Bluetooth Connected";
+    if(_targetSocket && _targetSocket->state() == QBluetoothSocket::SocketState::ConnectedState) {
+        _connectState = true;
+        emit connected();
+        qDebug() << "Bluetooth Connected to device";
+    }
 }
 
 void BluetoothLink::deviceDisconnected()
@@ -188,11 +298,52 @@ void BluetoothLink::deviceDisconnected()
     qWarning() << "Bluetooth disconnected";
 }
 
+// void BluetoothLink::deviceError(QBluetoothSocket::SocketError error)
+// {
+//     _connectState = false;
+//     qWarning() << "Bluetooth error" << error;
+//     emit communicationError(tr("Bluetooth Link Error"), _targetSocket->errorString());
+// }
+
 void BluetoothLink::deviceError(QBluetoothSocket::SocketError error)
 {
     _connectState = false;
-    qWarning() << "Bluetooth error" << error;
-    emit communicationError(tr("Bluetooth Link Error"), _targetSocket->errorString());
+
+    QString errorString;
+    switch(error) {
+    case QBluetoothSocket::SocketError::UnknownSocketError:
+        errorString = "Unknown Socket Error";
+        break;
+    case QBluetoothSocket::SocketError::HostNotFoundError:
+        errorString = "Host Not Found";
+        break;
+    case QBluetoothSocket::SocketError::ServiceNotFoundError:
+        errorString = "Service Not Found";
+        break;
+    case QBluetoothSocket::SocketError::NetworkError:
+        errorString = "Network Error";
+        break;
+    case QBluetoothSocket::SocketError::UnsupportedProtocolError:
+        errorString = "Unsupported Protocol";
+        break;
+    case QBluetoothSocket::SocketError::MissingPermissionsError:
+        errorString = "Missing Bluetooth Permissions";
+        break;
+    default:
+        errorString = QString("Error Code: %1").arg(static_cast<int>(error));
+    }
+
+    qWarning() << "Bluetooth error:" << errorString;
+
+    // Clean up the socket on error
+    if(_targetSocket) {
+        QObject::disconnect(_targetSocket, nullptr, nullptr, nullptr);
+        _targetSocket->close();
+        _targetSocket->deleteLater();
+        _targetSocket = nullptr;
+    }
+
+    emit communicationError(tr("Bluetooth Link Error"), errorString);
 }
 
 bool BluetoothLink::isConnected() const
@@ -210,11 +361,12 @@ BluetoothConfiguration::BluetoothConfiguration(const QString& name)
 
 }
 
-BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration* source)
+BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration * source)
     : LinkConfiguration(source)
     , _deviceDiscover(nullptr)
     , _device(source->device())
 {
+
 }
 
 BluetoothConfiguration::~BluetoothConfiguration()
@@ -339,7 +491,7 @@ void BluetoothConfiguration::doneScanning()
 {
     if(_deviceDiscover)
     {
-         deleteLater();
+        deleteLater();
         _deviceDiscover = nullptr;
         emit scanningChanged();
     }

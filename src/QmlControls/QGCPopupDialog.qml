@@ -55,6 +55,10 @@ Popup {
     property bool   rejectAllowed:          rejectButton.visible
     property alias  acceptButtonEnabled:    acceptButton.enabled
     property alias  rejectButtonEnabled:    rejectButton.enabled
+
+    property alias acceptButtonAlias: acceptButton
+    property alias rejectButtonAlias: rejectButton
+
     property var    dialogProperties
     property bool   destroyOnClose:         true
     property bool   preventClose:           false
@@ -67,7 +71,7 @@ Popup {
 
     property var    _qgcPal:            QGroundControl.globalPalette
     property real   _frameSize:         ScreenTools.defaultFontPixelWidth
-    property real   _contentMargin:     ScreenTools.defaultFontPixelHeight / 2
+    property real   _contentMargin:     ScreenTools.defaultFontPixelHeight / 4
 
     background: QGCMouseArea {
         width:  mainWindow.width

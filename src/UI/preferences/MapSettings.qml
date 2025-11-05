@@ -284,6 +284,7 @@ Item {
                         checked:        !_mapEngineManager.importReplace
                         onClicked:      _mapEngineManager.importReplace = !checked
                     }
+
                     QGCRadioButton {
                         text:           qsTr("Replace existing sets")
                         checked:        _mapEngineManager.importReplace
