@@ -56,9 +56,7 @@ Item {
 
     property bool utmspActTrigger
 
-
     Component.onCompleted: {
-
         console.log("pipView.visible :", pipview.visible);
         console.log("_pipView.visible :", _pipView.visible);
     }
@@ -96,14 +94,62 @@ Item {
     FlyViewBottomRightRowLayout {
         id:                 bottomRightRowLayout
         anchors.margins:    _layoutMargin
-        anchors.bottom:     parent.bottom
-        anchors.left :      parent.left
         spacing:            _layoutSpacing
-        anchors.leftMargin: 20
+        anchors.bottom: parent.bottom
+
+        pipExpanded: _pipView.globalPipExpanded
+
+        onPipExpandedChanged: {
+            console.log("pipExpanded changed to:", pipExpanded)
+            // States handle the visual changes automatically
+
+            state = pipExpanded ? "expanded" : "shrunk"
+        }
+
+
+        // Use states instead of conditional anchors
+            states: [
+                State {
+                    name: "expanded"
+                    AnchorChanges {
+                        target: bottomRightRowLayout
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.left: undefined
+                    }
+                    PropertyChanges {
+                        target: bottomRightRowLayout
+                        anchors.leftMargin: 0
+                    }
+                },
+                State {
+                    name: "shrunk"
+                    AnchorChanges {
+                        target: bottomRightRowLayout
+                        anchors.left: parent.left
+                        anchors.horizontalCenter: undefined
+                    }
+                    PropertyChanges {
+                        target: bottomRightRowLayout
+                        anchors.leftMargin: 45
+                    }
+                }
+            ]
+
+        Component.onCompleted: {
+            state = pipExpanded ? "expanded" : "shrunk"
+            console.log("Initial state set to:", state)
+        }
+
+        anchors.horizontalCenter: pipExpanded ? parent.horizontalCenter : undefined
+        anchors.left: pipExpanded ? undefined : parent.left
+        anchors.leftMargin: pipExpanded ? 0 : 20
+
+        visible: true
 
         property real bottomEdgeRightInset:     height + _layoutMargin
         property real bottomEdgeCenterInset:    bottomEdgeRightInset
         property real rightEdgeBottomInset:     width + _layoutMargin
+
     }
 
     FlyViewMissionCompleteDialog {

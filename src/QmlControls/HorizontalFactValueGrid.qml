@@ -41,6 +41,7 @@ T.HorizontalFactValueGrid {
 
         RowLayout {
             spacing: parent.spacing
+
             RowLayout {
                 id:         labelValueColumnLayout
                 spacing:    ScreenTools.defaultFontPixelWidth * 1.25

@@ -23,6 +23,8 @@ Item {
 
     property real extraWidth: 0 ///< Extra width to add to the background rectangle
 
+    property bool pipExpanded: false
+
     // Rectangle {
     //     id:         backgroundRect
     //     width:      control.width + extraWidth
@@ -34,11 +36,18 @@ Item {
 
     //DeadMouseArea { anchors.fill: parent }
 
+    onPipExpandedChanged: {
+        console.log("=== TELEMETRY VALUES BAR DEBUG ===")
+           console.log("TelemetryValuesBar: pipExpanded changed to:", pipExpanded)
+    }
+
     ColumnLayout {
         id:                 mainLayout
         anchors.margins:    _toolsMargin
         anchors.bottom:     parent.bottom
-        anchors.left:       parent.left
+
+        anchors.horizontalCenter: control.pipExpanded ? parent.horizontalCenter : undefined
+        anchors.left: control.pipExpanded ? undefined : parent.left
 
         RowLayout {
             visible: mouseArea.containsMouse || valueArea.settingsUnlocked

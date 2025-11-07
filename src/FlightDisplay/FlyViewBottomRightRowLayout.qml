@@ -15,10 +15,20 @@ import QGroundControl.Controls
 import QGroundControl.FlightDisplay
 
 RowLayout {
+    id: bottomRightLayout
+
+    property bool pipExpanded: false
+
+    onPipExpandedChanged: {
+        console.log("=== BOTTOM RIGHT LAYOUT DEBUG ===")
+        console.log("BottomRightLayout: pipExpanded changed to:", pipExpanded)
+    }
 
     TelemetryValuesBar {
+        id: telemetryBar
         Layout.alignment:   Qt.AlignBottom
         extraWidth:         instrumentPanel.extraValuesWidth
+        pipExpanded:        bottomRightLayout.pipExpanded
     }
 
     // FlyViewInstrumentPanel {

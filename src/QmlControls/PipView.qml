@@ -7,6 +7,7 @@
  *
  ****************************************************************************/
 
+
 import QtQuick
 import QtQuick.Window
 
@@ -32,7 +33,14 @@ Item {
     property var    _pipOrWindowItem
     property alias  _windowContentItem: window.contentItem
     property alias  _pipContentItem:    pipContent
-    property bool   _isExpanded:        true
+
+    property bool _isExpanded: true
+    property bool isExpanded: _isExpanded
+
+    property bool globalPipExpanded: true
+
+    signal pipExpandedChanged(bool isExpanded)
+
     property real   _pipSize:           parent.width * 0.2
     property real   _maxSize:           0.75                // Percentage of parent control size
     property real   _minSize:           0.10
@@ -123,12 +131,20 @@ Item {
     }
 
 
-    function _setPipIsExpanded(isExpanded) {
-        QGroundControl.saveBoolGlobalSetting(_pipExpandedSettingsKey, isExpanded)
-        _isExpanded = isExpanded
-
-         console.log("_setPipIsExpanded",isExpanded);
+    function _setPipIsExpanded(isExpand) {
+        QGroundControl.saveBoolGlobalSetting(_pipExpandedSettingsKey, isExpand)
+        _isExpanded = isExpand
+        globalPipExpanded = isExpand
+        console.log("_setPipIsExpanded", isExpand)
+        // Emit the signal when state changes
+        pipExpandedChanged(isExpand)
     }
+
+    onPipExpandedChanged: {
+        console.log("=== PipView class ===")
+        console.log("PipView: pipExpandedChanged signal emitted with:", isExpanded)
+    }
+
 
     Window {
         id:         window
@@ -197,7 +213,7 @@ Item {
     //     mipmap:         true
     //     anchors.right:  parent.right
     //     anchors.top:    parent.top
-    //     visible:        _isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
+    //     visible:        isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
     //     height:         ScreenTools.defaultFontPixelHeight * 2.5
     //     width:          ScreenTools.defaultFontPixelHeight * 2.5
     //     sourceSize.height:  height

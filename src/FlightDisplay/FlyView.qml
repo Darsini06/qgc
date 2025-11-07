@@ -69,7 +69,6 @@ Item {
 
     Component.onCompleted: {
         console.log("PlanView received planType:", planType);
-
     }
 
     function _calcCenterViewPort() {
@@ -79,7 +78,7 @@ Item {
 
 
     function camerastate() {
-         console.log("FlyView camerastate");
+        console.log("FlyView camerastate");
         _pipView._initForItems()
     }
 
@@ -137,6 +136,7 @@ Item {
 
             property real leftEdgeBottomInset: visible ? width + anchors.margins : 0
             property real bottomEdgeLeftInset: visible ? height + anchors.margins : 0
+
         }
 
         FlyViewWidgetLayer {
@@ -201,7 +201,7 @@ Item {
             visible:            false
         }
 
-        Viewer3D{
+        Viewer3D {
             id:                     viewer3DWindow
             anchors.fill:           parent
         }
