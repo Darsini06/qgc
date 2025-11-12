@@ -146,8 +146,11 @@ Rectangle {
 
     QGCLabel {
         anchors.horizontalCenter:   parent.horizontalCenter
-        y:                          size * 0.74
+        y:                          size * 0.64
         text:                       vehicle ? _heading.toFixed(0) + "°" : ""
         horizontalAlignment:        Text.AlignHCenter
+        font.pointSize: ScreenTools.smallFontPointSize
+
     }
+
 }

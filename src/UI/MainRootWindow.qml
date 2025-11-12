@@ -105,7 +105,7 @@ ApplicationWindow {
         function handleVehicleConnectionChange() {
             let now = new Date();
             let timeString = now.toLocaleTimeString(Qt.locale(), "HH:mm:ss");
-            let dateString = now.toLocaleDateString(Qt.locale(), "yyyy-MM-dd");
+            let dateString = now.toLocaleDateString(Qt.locale(), "dd-MM-yyyy");
 
             if (activeVehicle) {
                 sessionDate = dateString;
@@ -114,7 +114,7 @@ ApplicationWindow {
             } else {
                 if (sessionStart !== "") { // Only save if we have a start time
                     sessionEnd = timeString;
-                    console.log("Drone Disconnected at:", sessionEnd);
+                    console.log("Drone Disconnected at:", sessionEnd,"on", sessionDate);
                     saveDroneSession(sessionDate, sessionStart, sessionEnd);
                     // Reset for next session
                     sessionStart = "";
@@ -1230,6 +1230,7 @@ ApplicationWindow {
                 if (selectRs.rows.length > 0) {
                     result = selectRs.rows.item(0);
                     console.log("User data found:", result);
+                    console.log("In MainrootWindow rpc_completed:", result.rpc_completed)
                 } else {
                     console.log("No user found with username:", username);
                 }
@@ -2066,7 +2067,7 @@ ApplicationWindow {
         anchors.topMargin: parent.height* 0.15
         anchors.leftMargin: 20
         visible: true
-        spacing: 15  // Adjust this value to control space between icons
+        spacing: 10  // Adjust this value to control space between icons
 
 
         Rectangle {
@@ -2132,6 +2133,7 @@ ApplicationWindow {
         //         }
         //     }
         // }
+
         Rectangle {
             id: takeoffbtn
             Layout.alignment: Qt.AlignLeft
@@ -2142,8 +2144,6 @@ ApplicationWindow {
             visible:  false
             border.width: width * 0.05
             border.color: "#005BBB"
-
-
 
             QGCColoredImage {
                 id: takeofficon
@@ -2341,8 +2341,6 @@ ApplicationWindow {
                 border.width: width * 0.05
                 border.color: "#005BBB"
 
-
-
                 QGCColoredImage {
                     id: flightModeIndicator12
                     source: "/qmlimages/FlightModesComponentIcon.png"
@@ -2351,10 +2349,6 @@ ApplicationWindow {
                     anchors.centerIn: parent
                     color: "white"
                 }
-
-
-
-
 
                 MouseArea {
                     anchors.fill: parent
@@ -2480,8 +2474,8 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignLeft
 
             // Base it on flight mode text's size
-            width: flightmode1.implicitWidth + 40   // 10px padding left/right
-            height: flightmode1.implicitHeight + 20 // 5px padding top/bottom
+            width: flightmode1.implicitWidth + 30   // 10px padding left/right
+            height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
             color: "#1b1c3e"
             visible: activeVehicle
@@ -2737,7 +2731,7 @@ ApplicationWindow {
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.bottomMargin: 20
+        anchors.bottomMargin: 10
         anchors.rightMargin: 20
         spacing: 20  // Adjust this value to control space between icons
 
@@ -2745,7 +2739,7 @@ ApplicationWindow {
             id: planbtn
             Layout.alignment: Qt.AlignRight
             width: 100
-            height: 40
+            height: 38
             radius: width / 2  // Makes it a circle
             color: "#1b1c3e"     // white background
             visible: false
@@ -2757,16 +2751,11 @@ ApplicationWindow {
                 font.bold: true
             }
 
-            
-
-
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
                     dialog.visible = true
                     MapGlobals.save = "save"
-
-
                 }
                 // onClicked: {
                 //     // mainWindow.showPlanView()

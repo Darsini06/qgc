@@ -47,9 +47,9 @@ ColumnLayout {
 
         function updateIcon() {
             if (instrumentValueData.rangeType === InstrumentValueData.IconSelectRange) {
-                valueIcon.source = instrumentValueData.currentIcon != "" ? iconPrefix + instrumentValueData.currentIcon : "";
+                valueIcon.source = instrumentValueData.currentIcon !== "" ? iconPrefix + instrumentValueData.currentIcon : "";
             } else if (instrumentValueData.icon) {
-                valueIcon.source = instrumentValueData.icon != "" ? iconPrefix + instrumentValueData.icon : "";
+                valueIcon.source = instrumentValueData.icon !== "" ? iconPrefix + instrumentValueData.icon : "";
             } else {
                 valueIcon.source = ""
             }

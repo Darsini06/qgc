@@ -27,7 +27,7 @@ RowLayout {
     property var    expandedPageComponent
     property bool   waitForParameters:      false
 
-    property real fontPointSize:    ScreenTools.largeFontPointSize
+    property real fontPointSize:    ScreenTools.defaultFontPointSize
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property bool allowEditMode:    true
     property bool editMode:         false
@@ -37,7 +37,7 @@ property var    _activeVehicle:             QGroundControl.multiVehicleManager.a
 
         QGCColoredImage {
             id:         flightModeIcon
-            width:      ScreenTools.defaultFontPixelWidth * 3
+            width:      ScreenTools.defaultFontPixelWidth * 2.3
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true

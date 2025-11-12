@@ -43,18 +43,26 @@ ColumnLayout {
         }
     }
 
-    TerrainProgress {
-        Layout.alignment:       Qt.AlignTop
-        Layout.preferredWidth:  _rightPanelWidth
-    }
+    // TerrainProgress {
+    //     Layout.alignment:       Qt.AlignTop
+    //     Layout.preferredWidth:  _rightPanelWidth
+    //     visible: false
+    // }
 
     // We use a Loader to load the photoVideoControlComponent only when the active vehicle is not null
     // This make it easier to implement PhotoVideoControl without having to check for the mavlink camera
     // to be null all over the place
+
+    Item {
+        Layout.fillWidth: true
+        Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 4.2
+    }
+
     Loader {
         id:                 photoVideoControlLoader
-        Layout.alignment:   Qt.AlignTop | Qt.AlignRight
-        sourceComponent:    globals.activeVehicle && _showSingleVehicleUI ? photoVideoControlComponent : undefined
+        Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+        sourceComponent: globals.activeVehicle && _showSingleVehicleUI ? photoVideoControlComponent : undefined
+
 
         property real rightEdgeCenterInset: visible ? parent.width - x : 0
 

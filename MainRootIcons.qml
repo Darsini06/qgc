@@ -17,6 +17,21 @@ import MapGlobals 1.0
 
 Row {
     id: icons_row
+
+    anchors {
+        top: parent.top
+        right: parent.right
+        topMargin: parent.height * 0.05   // adjust vertical position
+        rightMargin: Screen.width * 0.01  // slight right padding
+    }
+
+
+    spacing: parent.width * 0.01    // spacing based on screen width
+
+    // Shared responsive base
+    property real baseSize: parent.width * 0.045    // 6% of screen width
+    property real iconSize: baseSize * 1.2   // icon inside the circle
+
     property real mapRotation: 0
     property var _settingsManager: QGroundControl.settingsManager
     property var _mapsSettings: _settingsManager ? _settingsManager.mapsSettings : null
@@ -36,7 +51,6 @@ Row {
     property real   _spacing:           ScreenTools.defaultFontPixelHeight * 0.33
     property real   _topBottomMargin:   (width * 0.05) / 2
 
-    spacing: 10  // Space between icons
 
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
@@ -51,88 +65,66 @@ Row {
         iconsContainer.visible = !iconsContainer.visible;
     }
 
-    // CompassArrow
+    //  ========== COMPASS ARROW ==========
     Rectangle {
-        width: 40
-        height: 40
-        radius: width / 2   // Makes it a circle
-        color: "#1b1c3e"    // Dark blue background
+        width: baseSize
+        height: baseSize
+        radius: width / 2
+        color: "#1b1c3e"
         border.width: width * 0.05
         border.color: "#005BBB"
-        clip: true          // This ensures content stays within the circular bounds
+        clip: true
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 MapGlobals.mapRotation = 0
-
                 iconsContainer.visible = false;
             }
         }
 
         QGCColoredImage {
-            id: takeofficon
+            id: compassArrow
             source: "/qmlimages/NewImages/CompassArrow.png"
             anchors.centerIn: parent
-            width: 45
-            height: 45
+            width: iconSize
+            height: iconSize
+            fillMode: Image.PreserveAspectFit
             transform: Rotation {
-                origin.x: takeofficon.width / 2    // Changed from compassArrow to takeofficon
-                origin.y: takeofficon.height / 2   // Changed from compassArrow to takeofficon
+                origin.x: compassArrow.width / 2
+                origin.y: compassArrow.height / 2
                 angle: -MapGlobals.mapRotation
             }
         }
     }
 
+    // Erase
     // Rectangle {
     //     width: 40
     //     height: 40
-    //     radius: width / 2
-    //     color: "#B3B3B3"
+    //     radius: width / 2   // Makes it a circle
+    //     color: "#1b1c3e"    // Dark blue background
+    //     border.width: width * 0.05
+    //     border.color: "#005BBB"
+    //     clip: true          // This ensures content stays within the circular bounds
 
     //     MouseArea {
     //         anchors.fill: parent
     //         onClicked: {
-    //             // Show confirmation dialog before clearing the map
+    //             iconsContainer.visible = false;
+
     //             clearMapDialogComponent.createObject(mainWindow).open()
+
     //         }
     //     }
 
-    //     Image {
+    //     QGCColoredImage {
     //         source: "/qmlimages/NewImages/Eraser.png"
     //         anchors.centerIn: parent
     //         width: 25
     //         height: 25
     //     }
     // }
-
-    // Erase
-    Rectangle {
-        width: 40
-        height: 40
-        radius: width / 2   // Makes it a circle
-        color: "#1b1c3e"    // Dark blue background
-        border.width: width * 0.05
-        border.color: "#005BBB"
-        clip: true          // This ensures content stays within the circular bounds
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                iconsContainer.visible = false;
-
-                clearMapDialogComponent.createObject(mainWindow).open()
-
-            }
-        }
-
-        QGCColoredImage {
-            source: "/qmlimages/NewImages/Eraser.png"
-            anchors.centerIn: parent
-            width: 25
-            height: 25
-        }
-    }
 
     // Rectangle {
     //     width: 40
@@ -165,10 +157,10 @@ Row {
     // }
 
 
-    // Map Switch
+    // ========== MAP SWITCH ==========
     Rectangle {
-        width: 40
-        height: 40
+        width: baseSize
+        height: baseSize
         radius: width / 2   // Makes it a circle
         color: "#1b1c3e"    // Dark blue background
         border.width: width * 0.05
@@ -197,107 +189,20 @@ Row {
         QGCColoredImage {
             source: "/qmlimages/NewImages/MapSwitch.png"
             anchors.centerIn: parent
-            width: 25
-            height: 25
+            width: iconSize * 0.5
+            height: iconSize * 0.5
         }
     }
 
-    // Rectangle {
-    //     width: 40
-    //     height: 40
-    //     radius: width / 2
-    //     color: "#B3B3B3"
 
-    //     MouseArea {
-    //         anchors.fill: parent
-    //         onClicked: {
-    //             iconsContainer.visible = !iconsContainer.visible
-    //         }
-    //     }
-
-    //     Image {
-    //         source: "/qmlimages/NewImages/MapRedirect.png"
-    //         anchors.centerIn: parent
-    //         width: 25
-    //         height: 25
-    //     }
-
-    //     // The container that holds the two icons, initially hidden
-    //     Rectangle {
-    //         id: iconsContainer
-    //         width: 90
-    //         height: 50
-    //         radius: 10
-    //         anchors.top: parent.bottom
-    //         anchors.topMargin: 5
-    //         anchors.horizontalCenter: parent.horizontalCenter
-    //         anchors.horizontalCenterOffset: -15
-    //         border.color: "black"
-    //         border.width: 2
-    //         visible: false  // Hidden initially
-
-    //         Row {
-    //             id: iconRow
-    //             anchors.centerIn: parent
-    //             spacing: 10  // Space between the icons
-
-    //             Image {
-    //                 id: icon1
-    //                 source: "/qmlimages/NewImages/DroneRedirect.png"
-    //                 width: 45
-    //                 height: 45
-    //                 fillMode: Image.PreserveAspectFit
-
-    //                 MouseArea {
-    //                     anchors.fill: parent
-    //                     onClicked: {
-    //                         MapGlobals.forceRecenter = true
-    //                         MapGlobals.recenterInterval = 0
-
-    //                         iconsContainer.visible = false
-
-    //                         Qt.callLater(function() {
-    //                             MapGlobals.recenterInterval = 10000
-    //                             MapGlobals.forceRecenter = false
-    //                         })
-    //                     }
-    //                 }
-    //             }
-
-    //             Image {
-    //                 id: icon2
-    //                 source: "/qmlimages/NewImages/MapRedirect1.png"
-    //                 width: 25
-    //                 height: 25
-    //                 fillMode: Image.PreserveAspectFit
-    //                 y: 8
-
-    //                 MouseArea {
-    //                     anchors.fill: parent
-    //                     onClicked: {
-    //                         MapGlobals.recenterMap()
-
-    //                         if(flightMap && flightMap.gcsPosition.isValid) {
-    //                             flightMap.center = flightMap.gcsPosition
-    //                         }
-
-    //                         iconsContainer.visible = false
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // }
-
-
+    // ========== MAP REDIRECT ==========
     Rectangle {
         id : mapRedirect
-        width: 40
-        height: 40
+        width: baseSize
+        height: baseSize
         radius: width / 2
         color: "#1b1c3e"
-        border.width: 2
+        border.width: width * 0.05
         border.color: "#005BBB"
 
         MouseArea {
@@ -311,19 +216,19 @@ Row {
         QGCColoredImage {
             source: "/qmlimages/NewImages/MapRedirect.png"
             anchors.centerIn: parent
-            width: 25
-            height: 25
+            width: iconSize * 0.5
+            height: iconSize * 0.5
             color: "white"
         }
 
         Rectangle {
             id: iconsContainer
-            width: 100  // Increased for better spacing
-            height: 50
-            radius: 10
+            width: baseSize * 2
+            height: baseSize * 1
+            radius: width * 0.1
             color: "#1b1c3e"
             border.color: "#005BBB"
-            border.width: 2
+            border.width: width * 0.02
             visible: false
             z: 1000
 
@@ -331,7 +236,7 @@ Row {
             anchors {
                 top: parent.bottom
                 left: parent.right
-                topMargin: 5
+                topMargin: baseSize * 0.1
                 leftMargin: -width
 
                 // top: parent.bottom
@@ -341,13 +246,13 @@ Row {
 
             Row {
                 anchors.centerIn: parent
-                spacing: 20  // Increased spacing
+                spacing: baseSize * 0.4
 
                 QGCColoredImage {
                     id: icon1
                     source: "/qmlimages/NewImages/DroneRedirect.png"
-                    width: 25  // Restored original size
-                    height: 25
+                    width: iconSize * 0.5
+                    height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     color: "white"
 
@@ -376,8 +281,8 @@ Row {
                 QGCColoredImage {
                     id: icon2
                     source: "/qmlimages/NewImages/MapRedirect1.png"
-                    width: 25
-                    height: 25
+                    width: iconSize * 0.5
+                    height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     color: "white"
 
@@ -390,6 +295,7 @@ Row {
                             if(flightMap && flightMap.gcsPosition.isValid){
 
                                 flightMap.center = flightMap.gcsPosition;
+
                             }/*else{
                                 mainWindow.showToastMessage("GPS Not Showed");
                             }*/
@@ -401,28 +307,11 @@ Row {
         }
     }
 
-    // Rectangle {
-    //     id:                 visualInstrument
-    //     width: _outerRadius
-    //     height:             _outerRadius * 1.8
-    //     //Layout.fillWidth:   true
-    //     radius:             _outerRadius
-    //     color:              "white"//qgcPal.window
-
-    //     QGCCompassWidget {
-    //         id:                     compass
-    //         //anchors.centerIn: parent
-    //         size:                   _innerRadius * 1.8
-    //         vehicle:                globals.activeVehicle
-    //         //anchors.verticalCenter: parent.verticalCenter
-    //     }
-    // }
-
 
     QGCCompassWidget {
         id:                     compass
         //anchors.centerIn: parent
-        size:                   _innerRadius * 1.2
+        size:                   _innerRadius * 1.55
         vehicle:                globals.activeVehicle
         //anchors.verticalCenter: parent.verticalCenter
     }
@@ -560,8 +449,7 @@ Row {
 
                 mainWindow.showMessageDialog(
                             qsTr("Error"),
-                            qsTr("Failed to clear map: ") + error.toString()
-                            )
+                            qsTr("Failed to clear map: ") + error.toString())
 
             }
         }

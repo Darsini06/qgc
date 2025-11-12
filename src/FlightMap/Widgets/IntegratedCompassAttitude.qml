@@ -51,7 +51,7 @@ Item {
 
     Rectangle {
         y:      _totalAttitudeSize
-        width:  compassRadius * 2
+        width:  compassRadius * 2.8
         height: width
         radius: width / 2
         color:  qgcPal.window

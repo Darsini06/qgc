@@ -12,4 +12,5 @@ Text {
 
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
+
 }

@@ -32,9 +32,9 @@ RowLayout {
     QGCMarqueeLabel {
         id:             mainStatusLabel
         text:           mainStatusText()
-        font.pointSize: ScreenTools.largeFontPointSize
+        font.pointSize: ScreenTools.mediumFontPointSize
         implicitWidth:  maxWidth
-        maxWidth:       ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 10
+        maxWidth:       ScreenTools.defaultFontPixelWidth * ScreenTools.mediumFontPointRatio * 10
         color: "white"
 
         property string _commLostText:      qsTr("Communication Lost")

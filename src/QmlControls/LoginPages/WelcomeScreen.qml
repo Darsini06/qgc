@@ -117,7 +117,8 @@ Item {
 
                             Text {
                                 text: "Welcome Back"
-                                font.pixelSize: dp(6)
+                                //font.pixelSize: dp(6)
+                                font.pointSize:     ScreenTools.largeFontPointSize
                                 font.weight: Font.Bold
                                 color: textPrimary
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -128,7 +129,8 @@ Item {
 
                             Text {
                                 text: "Sign in to continue your journey"
-                                font.pixelSize: dp(3)
+                                //font.pixelSize: dp(3)
+                                font.pointSize:     ScreenTools.smallFontPointSize
                                 color: textSecondary
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width
@@ -164,7 +166,8 @@ Item {
 
                                 contentItem: Text {
                                     text: parent.text
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: "white"
                                     horizontalAlignment: Text.AlignHCenter
@@ -192,7 +195,8 @@ Item {
 
                                 contentItem: Text {
                                     text: parent.text
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
                                     horizontalAlignment: Text.AlignHCenter
@@ -291,7 +295,8 @@ Item {
 
                             Text {
                                 text: "Sign In"
-                                font.pixelSize: dp(6)
+                                //font.pixelSize: dp(6)
+                                font.pointSize:     ScreenTools.largeFontPointSize
                                 font.weight: Font.Bold
                                 color: textPrimary
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -299,7 +304,8 @@ Item {
 
                             Text {
                                 text: "Welcome back! Please enter your details"
-                                font.pixelSize: dp(3)
+                                //font.pixelSize: dp(3)
+                                font.pointSize: ScreenTools.smallFontPointSize
                                 color: textSecondary
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width
@@ -323,7 +329,8 @@ Item {
 
                                 Text {
                                     text: "Username"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
                                     x: parent.width * 0.25
@@ -343,7 +350,8 @@ Item {
                                         anchors.fill: parent
                                         //anchors.margins: dp(2) // 16/8=2
                                         placeholderText: "Enter your username"
-                                        font.pixelSize: dp(4)
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"//textPrimary
                                         background: null
@@ -360,7 +368,8 @@ Item {
 
                                 Text {
                                     text: "Password"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
                                     x: parent.width * 0.25
@@ -385,7 +394,8 @@ Item {
                                             //margins: dp(2)
                                         }
                                         placeholderText: "Enter your password"
-                                        font.pixelSize: dp(4)
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black" //textPrimary
                                         echoMode: showPasswordBtn.checked ? TextInput.Normal : TextInput.Password
@@ -420,7 +430,8 @@ Item {
                                 // Forgot Password
                                 Text {
                                     text: "Forgot Password?"
-                                    font.pixelSize: dp(3.5) // Adjusted size
+                                    //font.pixelSize: dp(3.5) // Adjusted size
+                                    font.pointSize:     ScreenTools.smallFontPointSize
                                     color: primaryColor
                                     x: parent.width * 0.6
 
@@ -451,7 +462,8 @@ Item {
 
                                 contentItem: Text {
                                     text: parent.text
-                                    font.pixelSize: dp(4) // Adjusted size
+                                    //font.pixelSize: dp(4) // Adjusted size
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: "white"
                                     horizontalAlignment: Text.AlignHCenter
@@ -539,7 +551,8 @@ Item {
 
                         Text {
                             text: "Create Account"
-                            font.pixelSize: dp(6)
+                            //font.pixelSize: dp(6)
+                            font.pointSize:     ScreenTools.largeFontPointSize
                             font.weight: Font.Bold
                             color: textPrimary
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -547,7 +560,8 @@ Item {
 
                         Text {
                             text: "Join us today! Please fill in your details"
-                            font.pixelSize: dp(3)
+                            //font.pixelSize: dp(3)
+                            font.pointSize:     ScreenTools.smallFontPointSize
                             color: textSecondary
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: parent.width
@@ -570,7 +584,8 @@ Item {
 
                             Text {
                                 text: "Username"
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize:     ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: textPrimary
                                 x: parent.width * 0.25
@@ -589,7 +604,8 @@ Item {
                                     id: regUser
                                     anchors.fill: parent
                                     placeholderText: "Choose a username"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     background: null
@@ -610,7 +626,8 @@ Item {
 
                             Text {
                                 text: "Display Name"
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: textPrimary
                                 x: parent.width * 0.25
@@ -629,7 +646,8 @@ Item {
                                     id: regDisplay
                                     anchors.fill: parent
                                     placeholderText: "Your display name"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     background: null
@@ -650,7 +668,8 @@ Item {
 
                             Text {
                                 text: "Email"
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: textPrimary
                                 x: parent.width * 0.25
@@ -669,7 +688,8 @@ Item {
                                     id: regEmail
                                     anchors.fill: parent
                                     placeholderText: "your.email@example.com"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     background: null
@@ -691,7 +711,8 @@ Item {
 
                             Text {
                                 text: "Password"
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: textPrimary
                                 x: parent.width * 0.25
@@ -710,7 +731,8 @@ Item {
                                     id: regPass
                                     anchors.fill: parent
                                     placeholderText: "Create a strong password"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     echoMode: TextInput.Password
@@ -728,7 +750,8 @@ Item {
 
                             Text {
                                 text: "Confirm Password"
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: textPrimary
                                 x: parent.width * 0.25
@@ -747,7 +770,8 @@ Item {
                                     id: regConfirm
                                     anchors.fill: parent
                                     placeholderText: "Confirm your password"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     echoMode: TextInput.Password
@@ -778,7 +802,8 @@ Item {
 
                             contentItem: Text {
                                 text: parent.text
-                                font.pixelSize: dp(4)
+                                //font.pixelSize: dp(4)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 color: "white"
                                 horizontalAlignment: Text.AlignHCenter
@@ -821,7 +846,8 @@ Item {
 
                             Text {
                                 text: "Already have an account?"
-                                font.pixelSize: dp(3.5)
+                                //font.pixelSize: dp(3.5)
+                                font.pointSize: ScreenTools.defaultFontPointSize
                                 color: textSecondary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -836,7 +862,8 @@ Item {
 
                                 contentItem: Text {
                                     text: parent.text
-                                    font.pixelSize: dp(3.5)
+                                    //font.pixelSize: dp(3.5)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     color: primaryColor
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
@@ -908,7 +935,8 @@ Item {
 
                             Text {
                                 text: "Reset Password"
-                                font.pixelSize: dp(6)
+                                //font.pixelSize: dp(6)
+                                font.pointSize: ScreenTools.largeFontPointSize
                                 font.weight: Font.Bold
                                 color: textPrimary
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -916,7 +944,8 @@ Item {
 
                             Text {
                                 text: "Enter your username and new password"
-                                font.pixelSize: dp(3)
+                                //font.pixelSize: dp(3)
+                                font.pointSize: ScreenTools.smallFontPointSize
                                 color: textSecondary
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: parent.width
@@ -939,7 +968,8 @@ Item {
 
                                 Text {
                                     text: "Username"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
                                     x: parent.width * 0.25
@@ -958,7 +988,8 @@ Item {
                                         id: resetUser
                                         anchors.fill: parent
                                         placeholderText: "Enter your username"
-                                        font.pixelSize: dp(4)
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize: ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"
                                         background: null
@@ -975,7 +1006,8 @@ Item {
 
                                 Text {
                                     text: "New Password"
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
                                     x: parent.width * 0.25
@@ -994,7 +1026,8 @@ Item {
                                         id: newPassword
                                         anchors.fill: parent
                                         placeholderText: "Enter your new password"
-                                        font.pixelSize: dp(4)
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize: ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"
                                         echoMode: TextInput.Password
@@ -1025,7 +1058,8 @@ Item {
 
                                 contentItem: Text {
                                     text: parent.text
-                                    font.pixelSize: dp(4)
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: "white"
                                     horizontalAlignment: Text.AlignHCenter
