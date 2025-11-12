@@ -1247,12 +1247,14 @@ Item {
 
                 onClicked: {
                     console.log("Upload_data")
-                    if (_utmspEnabled) {
-                        QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                        UTMSPStateStorage.removeFlightPlanState = true
-                        UTMSPStateStorage.indicatorDisplayStatus = true
-                    }
-                    _planMasterController.upload();
+                    toolStrip.allAddClickBoolsOff()
+                    insertLandItemAfterCurrent()
+                    // if (_utmspEnabled) {
+                    //     QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+                    //     UTMSPStateStorage.removeFlightPlanState = true
+                    //     UTMSPStateStorage.indicatorDisplayStatus = true
+                    // }
+                    // _planMasterController.upload();
                 }
             }
         }

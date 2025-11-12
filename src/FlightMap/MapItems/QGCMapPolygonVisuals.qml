@@ -54,6 +54,11 @@ Item {
     property real _zorderDragHandle:    QGroundControl.zOrderMapItems + 3   // Highest to prevent splitting when items overlap
     property real _zorderSplitHandle:   QGroundControl.zOrderMapItems + 2
     property real _zorderCenterHandle:  QGroundControl.zOrderMapItems + 1   // Lowest such that drag or split takes precedence
+
+
+
+
+
     property var    _planMasterController:              planMasterController
     readonly property string _polygonToolsText: qsTr("")//("Polygon Tools")
     readonly property string _traceText:        qsTr("")//qsTr("Click in the map to add vertices. Click 'Done Tracing' when finished.")
@@ -62,7 +67,7 @@ Item {
 
     property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property var activeVehicleCoordinate: activeVehicle ? activeVehicle.coordinate : QtPositioning.coordinate()
-
+property bool   mapping:                false
     // Drawer {
     //           id: arrowDrawer
     //           edge: Qt.RightEdge
@@ -503,7 +508,7 @@ Item {
             }
             fileDialog.title =          qsTr("Save Plan")
             fileDialog.planFiles =      true
-            fileDialog.nameFilters =    _planMasterController.saveNameFilters1
+            fileDialog.nameFilters =    _planMasterController.saveNameFilters
             fileDialog.openForSave()
         }
 
@@ -1239,6 +1244,49 @@ Item {
                 //     }
                 // }
             }
+            Column {
+                //anchors.top: parent.top
+                anchors.right: parent.right
+                spacing: 0
+                visible: mapping
+
+
+                Button {
+                    id: saveBtn1
+                    text: ""
+                    width: 46
+                    height: 46
+
+                    padding: 15
+
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "#1b1c3e"
+                        border.color: "#005BBB"
+                        border.width: 2
+                        anchors.fill: parent
+                        anchors.margins: 3
+                    }
+
+                    contentItem: QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/save-disk.svg"
+                        width: 16
+                        height: 16
+                        anchors.centerIn: parent // Center the icon within the container
+                        color: "white"
+                    }
+                    onClicked: {
+                        if (mapPolygon.count < 3) {
+                            _restorePreviousVertices()
+                        } else {
+                            _planMasterController.saveToSelectedFile1()
+                            mainWindow.planmap()
+                        }
+                    }
+                }
+
+
+            }
 
         }
 
@@ -1311,6 +1359,7 @@ Item {
 
                 _appSettings.username = concatenatedText;
                 console.log(concatenatedText);
+                console.log("confirm action");
 
 
 
@@ -1685,21 +1734,44 @@ Item {
                                         return
                                     }
 
-                                    let concatenatedText = filenameTextField.text.substring(0, 3) +
-                                        filenameTextField1.text.substring(0, 3) +
-                                        filenameTextField2.text.substring(0, 3)
+                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                        let concatenatedText = filenameTextField.text.substring(0, 3) +
+                                            filenameTextField1.text.substring(0, 3) +
+                                            filenameTextField2.text.substring(0, 3)
 
-                                    _appSettings.username = concatenatedText
-                                    console.log(concatenatedText)
+                                        _appSettings.username = concatenatedText
+                                        console.log(concatenatedText)
 
-                                    _saveCurrentVertices()
-                                    _circleMode = false
-                                    mapPolygon.traceMode = true
-                                    if(MapGlobals.mark_with !== "KML_File" ){
-                                        mapPolygon.clear()
+                                        _saveCurrentVertices()
+                                        _circleMode = false
+                                        mapPolygon.traceMode = true
+                                        if(MapGlobals.mark_with !== "KML_File" ){
+                                            mapPolygon.clear()
+                                        }
+                                        customDialogItem.visible = false
+                                        MapGlobals.editdialog = "editdialog1"
+                                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                        let concatenatedText = filenameTextField.text.substring(0, 3) +
+                                            filenameTextField1.text.substring(0, 3) +
+                                            filenameTextField2.text.substring(0, 3)
+
+                                        _appSettings.username = concatenatedText
+                                        console.log(concatenatedText)
+                                        if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
+                                            _resetPolygon()
+                                        }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
+                                            _resetCircle()
+                                        }
+                                        //_saveCurrentVertices()
+                                        //_circleMode = false
+                                        //mapPolygon.traceMode = true
+                                        mapping=true
+
+                                        customDialogItem.visible = false
+                                        MapGlobals.editdialog = "editdialog1"
                                     }
-                                    customDialogItem.visible = false
-                                    MapGlobals.editdialog = "editdialog1"
+
+
                                 }
                             }
                         }

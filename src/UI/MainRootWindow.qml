@@ -1,4 +1,4 @@
-/****************************************************************************
+ /****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -2187,6 +2187,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    planView.mapclear()
                     mainWindow.showPlanView()
                     QGroundControl.saveGlobalSetting("planupload", "planupload")
                 }
@@ -3230,6 +3231,7 @@ ApplicationWindow {
                     }
 
                     onClicked: {
+                        planView.mapclear()
 QGroundControl.saveGlobalSetting("mapping", "basic")
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
@@ -3288,7 +3290,7 @@ QGroundControl.saveGlobalSetting("mapping", "basic")
                     }
 
                     onClicked: {
-
+planView.mapclear()
 QGroundControl.saveGlobalSetting("mapping", "circle")
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
@@ -3348,6 +3350,8 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                     }
 
                     onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
+                        planView.mapclear()
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
                         MapGlobals.editdialog = "editdialog"
@@ -3407,6 +3411,8 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                     onClicked: {
 
                         if(activeVehicle){
+                            QGroundControl.saveGlobalSetting("mapping", "agri")
+                            planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_Drone"
                             MapGlobals.edit = "edit"
                             mainWindow.showPlanView()
@@ -3468,6 +3474,8 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                     }
 
                     onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
+                        planView.mapclear()
                         MapGlobals.mark_with = "Mark_With_GPS"
                         MapGlobals.edit = "edit"
                         MapGlobals.share_edit_visibility = false
@@ -3520,6 +3528,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                     }
 
                     onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
                         // MapGlobals.mark_with = "KML_File"
                         // MapGlobals.edit = "edit"
                         // mainWindow.showPlanView()
