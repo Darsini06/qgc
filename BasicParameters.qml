@@ -822,39 +822,39 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             switch (cameragimbal) {
             case 0:
                 QGroundControl.saveGlobalSetting("tab", "None")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 1:
                 QGroundControl.saveGlobalSetting("tab", "Servo Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 2:
                 QGroundControl.saveGlobalSetting("tab", "STorM32 Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 3:
                 QGroundControl.saveGlobalSetting("tab", "Brushless PWM Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 4:
                 QGroundControl.saveGlobalSetting("tab", "CADDX Gimbals")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 5:
                 QGroundControl.saveGlobalSetting("tab", "Gremsy Gimbals")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 6:
                 QGroundControl.saveGlobalSetting("tab", "Xacti Gimbals")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 7:
                 QGroundControl.saveGlobalSetting("tab", "SERVO")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 8:
                 QGroundControl.saveGlobalSetting("tab", "Relay")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             }
 
@@ -873,23 +873,23 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             switch (cameragimbal) {
             case 0:
                 QGroundControl.saveGlobalSetting("tab", "None")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 1:
                 QGroundControl.saveGlobalSetting("tab", "Spray")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 2:
                 QGroundControl.saveGlobalSetting("tab", "Servo Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 3:
                 QGroundControl.saveGlobalSetting("tab", "STorM32 Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             case 4:
                 QGroundControl.saveGlobalSetting("tab", "Brushless PWM Gimbal")
-                mainWindow.sideDrawer1("BasicParamtersList.qml")
+                mainWindow.sideDrawer1("BasicParametersList.qml")
                 break
             }
 

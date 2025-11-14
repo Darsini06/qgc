@@ -214,11 +214,11 @@ Row {
         }
 
         QGCColoredImage {
-            source: "/qmlimages/NewImages/MapRedirect.png"
+            source: "/qmlimages/NewImages/gps.png"
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color: "white"
+            color: "transparent"
         }
 
         Rectangle {

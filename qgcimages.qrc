@@ -52,14 +52,14 @@
         <file alias="APM/BrandImageSub">src/FirmwarePlugin/APM/APMBrandImageSub.png</file>
         <file alias="NewImages/SearchIcon.png">src/NewImages/searchIcon.png</file>
         <file alias="NewImages/CompassArrow.png">src/NewImages/compass_arrow.png</file>
-        <file alias="NewImages/Eraser.png">src/NewImages/eraser.png</file>
+        <file alias="NewImages/map_eraser.png">src/NewImages/map_eraser.png</file>
         <file alias="NewImages/MapSwitch.png">src/NewImages/mapswitch.png</file>
         <file alias="NewImages/MapRedirect.png">src/NewImages/redirect.png</file>
         <file alias="NewImages/DroneRedirect.png">src/NewImages/drone_redirect.png</file>
         <file alias="NewImages/MapRedirect1.png">src/NewImages/map_redirect.png</file>
-        <file alias="NewImages/RCCallibration.png">src/NewImages/RCCallibration.png</file>
+        <file alias="NewImages/callibration.png">src/NewImages/callibration.png</file>
         <file alias="NewImages/parameterSettings.png">src/NewImages/parameterSettings.png</file>
-        <file alias="NewImages/menu.png">src/NewImages/menu.png</file>
+        <file alias="NewImages/failsafe.png">src/NewImages/failsafe.png</file>
         <file alias="NewImages/diamond.png">src/NewImages/diamond.png</file>
 
         <file alias="NewImages/profile.png">src/NewImages/profile.png</file>
@@ -108,6 +108,20 @@
 <file alias="NewImages/agri.png">src/NewImages/agri.png</file>
 <file alias="NewImages/cameradrone.png">src/NewImages/cameradrone.png</file>
 <file alias="NewImages/aviatrickslogo.png">src/NewImages/aviatrickslogo.png</file>
+
+<file alias="NewImages/gps.png">src/NewImages/gps.png</file>
+<file alias="NewImages/landing.png">src/NewImages/landing.png</file>
+<file alias="NewImages/location.png">src/NewImages/location.png</file>
+<file alias="NewImages/logout.png">src/NewImages/logout.png</file>
+<file alias="NewImages/notification.png">src/NewImages/notification.png</file>
+<file alias="NewImages/obstacle.png">src/NewImages/obstacle.png</file>
+<file alias="NewImages/privacy_policy.png">src/NewImages/privacy_policy.png</file>
+<file alias="NewImages/savefile.png">src/NewImages/savefile.png</file>
+<file alias="NewImages/savedfiles.png">src/NewImages/savedfiles.png</file>
+<file alias="NewImages/select_drone_type.png">src/NewImages/select_drone_type.png</file>
+<file alias="NewImages/terms_condition.png">src/NewImages/terms_condition.png</file>
+<file alias="NewImages/commlinks.png">src/NewImages/commlinks.png</file>
+
 
     
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>

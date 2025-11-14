@@ -137,9 +137,14 @@ ApplicationWindow {
             height  = ScreenTools.isMobile ? ScreenTools.screenHeight : Math.min(150 * Screen.pixelDensity, Screen.height)
         }
 
+        //Initialize the Database and Create Tables
         initDB()
+
         profilelogin()
         profile()
+
+        //Print all Session Table Datas.Just For Reference
+        printSessionTable()
 
         if(_appSettings.screen==="Plan"){
             plan="Plan"
@@ -238,8 +243,6 @@ ApplicationWindow {
             }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
                 newscreen.vtol()
             }
-
-
         }
 
     function filename() {
@@ -734,7 +737,7 @@ ApplicationWindow {
     //         if (calibrationLoader.item && calibrationLoader.item.callShowOrientationsDialog) {
     //             calibrationLoader.item.callShowOrientationsDialog(1)
     //         } else {
-    //             console.warn("ParameterMain not ready yet, retrying...")
+    //             console.warn("CalibrationSettings not ready yet, retrying...")
     //             timer.callLater(100) // Retry after another 100ms
     //         }
     //     }
@@ -748,6 +751,7 @@ ApplicationWindow {
         var db = getDatabase();
         db.transaction(function(tx) {
             try {
+
                 // Users table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS users(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -760,6 +764,7 @@ ApplicationWindow {
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )");
 
+
                 // Drone sessions table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -768,6 +773,7 @@ ApplicationWindow {
                     end_time TEXT NOT NULL,
                     duration INTEGER
                 )");
+
 
                 //feedback table
                 tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (
@@ -830,7 +836,7 @@ ApplicationWindow {
         });
     }
 
-    // Helper function to print feedback table
+    // Just print the feedback table
     function printFeedbackTable(resultSet, label) {
 
         console.log("ID | Username | Mobile | Email | Comments");
@@ -885,6 +891,39 @@ ApplicationWindow {
         });
     }
 
+
+    // Just print the Session table
+    function printSessionTable() {
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                var resultSet = tx.executeSql("SELECT * FROM drone_sessions ORDER BY id");
+
+                console.log("ID | date | start_time | end_time | duration");
+                console.log("------------------------------------------");
+
+                if (resultSet.rows.length === 0) {
+                    console.log("No Session records found");
+                } else {
+                    for (var i = 0; i < resultSet.rows.length; i++) {
+                        var session = resultSet.rows.item(i);
+                        console.log(
+                            session.id + " | " +
+                            (session.date || "NULL") + " | " +
+                            (session.start_time || "NULL") + " | " +
+                            (session.end_time || "NULL") + " | " +
+                            (session.duration || "NULL")
+                        );
+                    }
+                }
+
+                console.log("------------------------------------------");
+            } catch (error) {
+                console.error("Error reading drone session:", error);
+            }
+        });
+    }
+
     function calculateDuration(startTime, endTime) {
         try {
             // Parse times (format: "HH:mm:ss")
@@ -902,7 +941,7 @@ ApplicationWindow {
             var durationSeconds = endTotalSeconds - startTotalSeconds;
 
             if (durationSeconds < 0) {
-                // Handle跨天的情况 (session spans midnight)
+                // Handle(session spans midnight)
                 durationSeconds += 24 * 3600;
             }
 
@@ -1600,7 +1639,7 @@ ApplicationWindow {
         visible : false
     }
 
-    // ParameterMain{
+    // CalibrationSettings{
     //     id : calibrationPage
     //     visible : false
     // }
@@ -1608,7 +1647,7 @@ ApplicationWindow {
     // Loader {
     //     id: calibrationLoader
     //     active: false
-    //     sourceComponent: ParameterMain { id: calibrationPage }
+    //     sourceComponent: CalibrationSettings { id: calibrationPage }
 
     // }
 
@@ -1699,11 +1738,11 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "BasicParamters.qml"; title: "Flight Modes" }
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
-            ListElement { image: "/qmlimages/NewImages/menu.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
-            ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "GeneralSettings.qml"; title: "Info" }
-            ListElement { image: "/qmlimages/NewImages/diamond.png"; file: "LinkSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "BasicParameters.qml"; title: "Flight Modes" }
+            ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
+            ListElement { image: "/qmlimages/NewImages/settings.png"; file: "GeneralSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/commlinks.png"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
             // onActiveVehicleChanged: {
@@ -1716,7 +1755,7 @@ ApplicationWindow {
 
             function updateSettingsTab() {
                 if (activeVehicle) {
-                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/ParameterMain.qml");
+                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
                 } else {
                     tabModel.setProperty(1, "file", "APMSensorsComponent.qml");
                 }
@@ -1802,7 +1841,8 @@ ApplicationWindow {
                                 width: tabBar.currentIndex === index ? 18 : 18
                                 height: tabBar.currentIndex === index ? 18 : 18
                                 source: model.image
-                                color: tabBar.currentIndex === index ? "#1b1c3e" : "white"
+                                //color: tabBar.currentIndex === index ? "#1b1c3e" : "white"
+                                color: tabBar.currentIndex === index ? "transparent" : "white"
                             }
 
                             // Rectangle {
@@ -1888,7 +1928,7 @@ ApplicationWindow {
     //     ListModel {
     //         id: tabModel
     //         ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "qrc:/qml/SettingsPanel/RCCallibarationTab.qml" ;title: "Radio" }
-    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/ParameterMain.qml" ;title: "Flight Modes"}
+    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
     //         ListElement { image: "/qmlimages/NewImages/menu.png";  file: "" ;title: "Settings" }
     //         ListElement { image: "/qmlimages/NewImages/diamond.png";  file: "" ;title: "Diamond" }
     //         ListElement { image: "/qmlimages/NewImages/CompassArrow.png";  file: "" ; title: "Info"}
@@ -2083,11 +2123,11 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: flightModeIndicator2
-                source: "/qmlimages/NewImages/log.png"
+                source: "/qmlimages/NewImages/savedfiles.png" //"/qmlimages/NewImages/log.png"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                color: "transparent"
             }
 
             MouseArea {
@@ -2209,11 +2249,11 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: eraserbtnicon
-                source: "/qmlimages/NewImages/Eraser.png"
+                source: "/qmlimages/NewImages/map_eraser.png"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                color: "transparent"
             }
 
 
@@ -2303,7 +2343,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: rtlbtnicon
-                source: "/res/rtl.svg"
+                source: "/qmlimages/NewImages/landing.png"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
@@ -2314,7 +2354,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    myDialog.imageSource = "/res/rtl.svg";  // Set the image dynamically
+                    myDialog.imageSource = "/qmlimages/NewImages/landing.png";  // Set the image dynamically
                     myDialog.dialogText = "RTL Mode"; // Set the text dynamically
                     myDialog.open()
 

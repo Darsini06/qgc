@@ -31,10 +31,14 @@ Item {
 
     property string selectedImage: ""
 
-
-    property int selectedIndex:-1
-
     property real iconBaseSize: Math.min(Screen.width, Screen.height) * 0.1
+
+    property int totalMinutes: 0
+    property int missionsCompleted: 0
+    property string totalDurationFormatted: "0h 0m"
+
+    property string droneType: "loadpage"
+
 
     ListModel {
         id: sessionModel
@@ -52,24 +56,7 @@ Item {
 
 
     Component.onCompleted: {
-        console.log("onCompleted");
-        if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="loadpage"){
-            QGroundControl.saveGlobalSetting("loadpage1", "-1")
-            console.log("onCompleted1");
-        }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Camera"){
-            QGroundControl.saveGlobalSetting("loadpage1", "0")
-            console.log("onCompleted2");
-        }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Agri"){
-            QGroundControl.saveGlobalSetting("loadpage1", "1")
-            console.log("onCompleted3");
-        }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Mapping"){
-            QGroundControl.saveGlobalSetting("loadpage1", "2")
-            console.log("onCompleted4");
-        }else if(QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"){
-            QGroundControl.saveGlobalSetting("loadpage1", "3")
-            console.log("onCompleted5");
-        }
-
+        console.log("ProfileScreen outer onCompleted",droneType);
         if (userName !== "") {
             userName = QGroundControl.loadGlobalSetting("username", "")
             loadUserDataFromMain();
@@ -83,6 +70,9 @@ Item {
             console.log("onVisibleChanged");
 
             loadSessions();
+
+            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
+            console.log("ProfileScreenNew droneType",droneType);
 
             displayName = QGroundControl.loadGlobalSetting("name", "")
             userName = QGroundControl.loadGlobalSetting("username", "")
@@ -106,7 +96,6 @@ Item {
             console.log("Switched to Reports view")
             loadSessions()
         }
-
     }
 
     function loadSessions() {
@@ -147,10 +136,37 @@ Item {
                       );
                   }
 
+             updateSessionStats();
+
         });
+
+
     }
 
+    function updateSessionStats() {
+        var total = 0;
+
+        for (var i = 0; i < sessionModel.count; i++) {
+            var item = sessionModel.get(i);
+            total += Number(item.duration || 0);
+        }
+
+        totalMinutes = total;
+        missionsCompleted = sessionModel.count;
+
+        // Convert minutes → hours + minutes
+        var hours = Math.floor(total / 60);
+        var minutes = total % 60;
+        totalDurationFormatted = hours + "h " + minutes + "m";
+
+        console.log("== Session Stats ==");
+        console.log("Total Duration:", totalDurationFormatted);
+        console.log("Missions Completed:", missionsCompleted);
+    }
+
+
     function loadUserDataFromMain() {
+
         mainWindow.loadUserData(userName, function(userData) {
             if (userData) {
                 // Set your profile screen properties
@@ -178,7 +194,6 @@ Item {
             }
         });
     }
-
 
     function to12Hour(time24) {
         if (!time24) return "";
@@ -243,7 +258,7 @@ Item {
                                 onClicked: {
                                     mainWindow.profileScreen1(false)
                                     currentView = "main"
-                                    mainWindow.newscreendata()
+                                   // mainWindow.newscreendata()
                                 }
                             }
                         }
@@ -305,15 +320,17 @@ Item {
                                 width: 80
                                 height: 80
                                 radius: 40
-                                color: "#f0f0f0"
+                                color: "transparent"
 
                                 QGCColoredImage {
                                     anchors.centerIn: parent
-                                    source: "/qmlimages/NewImages/profile.png"
-                                    width: 40
-                                    height: 40
+                                    source: "/qmlimages/NewImages/profileImage.png"
+                                    width: 80
+                                    height: 80
                                     fillMode: Image.PreserveAspectFit
-                                    color: "#666666"
+                                    //color: "#666666"
+                                    color: "transparent"
+
                                 }
                             }
 
@@ -333,7 +350,6 @@ Item {
                                 font.pointSize: ScreenTools.smallFontPointSize
                                 color: "#666666"
                             }
-
 
                             // Stats Section
                             ColumnLayout {
@@ -356,7 +372,7 @@ Item {
                                         Layout.fillWidth: true
                                     }
                                     Text {
-                                        text: "127.5 hrs"
+                                        text: totalDurationFormatted
                                         font.pointSize: ScreenTools.smallFontPointSize
                                         font.bold: true
                                         color: "#2c3e50"
@@ -379,7 +395,7 @@ Item {
                                         Layout.fillWidth: true
                                     }
                                     Text {
-                                        text: "45"
+                                        text: missionsCompleted
                                         font.pointSize: ScreenTools.smallFontPointSize
                                         font.bold: true
                                         color: "#2c3e50"
@@ -387,27 +403,27 @@ Item {
                                 }
 
                                 // Distance Covered
-                                RowLayout {
-                                    spacing: 10
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/travel-walk.svg"
-                                        width: 20
-                                        height: 20
-                                        color: "#2c3e50"
-                                    }
-                                    Text {
-                                        text: "Distance Covered"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        color: "#666666"
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        text: "256 km"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
-                                    }
-                                }
+                                // RowLayout {
+                                //     spacing: 10
+                                //     QGCColoredImage {
+                                //         source: "qrc:/InstrumentValueIcons/travel-walk.svg"
+                                //         width: 20
+                                //         height: 20
+                                //         color: "#2c3e50"
+                                //     }
+                                //     Text {
+                                //         text: "Distance Covered"
+                                //         font.pointSize: ScreenTools.smallFontPointSize
+                                //         color: "#666666"
+                                //         Layout.fillWidth: true
+                                //     }
+                                //     Text {
+                                //         text: "256 km"
+                                //         font.pointSize: ScreenTools.smallFontPointSize
+                                //         font.bold: true
+                                //         color: "#2c3e50"
+                                //     }
+                                // }
                             }
                         }
                     }
@@ -434,12 +450,12 @@ Item {
 
                                 model: ListModel {
                                     ListElement { icon: "/qmlimages/NewImages/accountUpdate.png"; name: " Account Update "; screen: "accountUpdate" }
-                                    ListElement { icon: "/qmlimages/NewImages/reports.png"; name: " Privacy Policy "; screen: "privacy_policy" }
-                                    ListElement { icon: "/qmlimages/NewImages/feedback.png"; name: "Terms & Conditions"; screen: "terms&conditions" }
+                                    ListElement { icon: "/qmlimages/NewImages/privacy_policy.png"; name: " Privacy Policy "; screen: "privacy_policy" }
+                                    ListElement { icon: "/qmlimages/NewImages/terms_condition.png"; name: "Terms & Conditions"; screen: "terms&conditions" }
                                     ListElement { icon: "/qmlimages/NewImages/feedback.png"; name: "Feedback"; screen: "feedback" }
                                     ListElement { icon: "/qmlimages/NewImages/feedback.png"; name: "Reports"; screen: "reports" }
-                                    ListElement { icon: "/qmlimages/NewImages/settings.png"; name: "Logout"; screen: "logout" }
-                                    ListElement { icon: "/qmlimages/NewImages/settings.png"; name: "Select Drone"; screen: "drone" }
+                                    ListElement { icon: "/qmlimages/NewImages/select_drone_type.png"; name: "Select Drone"; screen: "drone" }
+                                    ListElement { icon: "/qmlimages/NewImages/logout.png"; name: "Logout"; screen: "logout" }
                                 }
 
 
@@ -456,7 +472,7 @@ Item {
                                             source: model.icon
                                             width: 20
                                             height: 20
-                                            color: "black"
+                                            color: "transparent"
                                         }
 
                                         Text {
@@ -537,11 +553,11 @@ Item {
 
                         QGCColoredImage {
                             id: accountUpdate
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/accountUpdate.png"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -970,11 +986,11 @@ Item {
 
                         QGCColoredImage {
                             id: privacypolicy
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/privacy_policy.png"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -1036,11 +1052,11 @@ Item {
 
                         QGCColoredImage {
                             id: termsconditions
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/terms_condition.png"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -1102,11 +1118,11 @@ Item {
 
                         QGCColoredImage {
                             id: feedback
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/feedback.png"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -1431,7 +1447,7 @@ Item {
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -1724,11 +1740,11 @@ Item {
 
                         QGCColoredImage {
                             id: drone
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/select_drone_type.png"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "white"
+                            color: "transparent"
                         }
 
                         Text {
@@ -1806,13 +1822,8 @@ Item {
                         border.color: "#e0e0e0"
                         border.width: 1
 
-                        property int selectedIndex: QGroundControl.loadGlobalSetting("loadpage1", "loadpage")
+                        property int selectedIndex: -1
 
-                        //                property int selectedIndex: QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="loadpage"?-1:
-                        // QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Camera"?0:
-                        // QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Agri"?1:
-                        // QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="Mapping"?2:
-                        // QGroundControl.loadGlobalSetting("loadpage", "loadpage")==="VTOL"?3:-1
                         property var buttonModel: [
                             { label: "Camera", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.png" },
                             { label: "Agri", color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
@@ -1820,15 +1831,22 @@ Item {
                             { label: "VTOL", color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
                         ]
 
-                        Component.onCompleted: {
-                            var currentPage = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
-                            for (var i = 0; i < buttonModel.length; i++) {
-                                if (buttonModel[i].label === currentPage) {
-                                    selectedIndex = i
-                                    break
+                        onVisibleChanged: if (visible) {
+                            var saved = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
+
+                            if (saved === "loadpage") {
+                                selectedIndex = -1
+                            } else {
+                                for (var i = 0; i < buttonModel.length; i++) {
+                                    if (buttonModel[i].label === saved) {
+                                        selectedIndex = i
+                                        break
+                                    }
                                 }
                             }
                         }
+
+
                         Column {
                             anchors.centerIn: parent
                             spacing: 20
@@ -1893,7 +1911,7 @@ Item {
                                             anchors.fill: parent
 
                                             QGCColoredImage {
-                                                visible: root.selectedIndex === index
+                                                visible: root.selectedIndex !== -1 && root.selectedIndex === index
                                                 source: "qrc:/qmlimages/check.svg"
                                                 width: iconBaseSize * 0.5
                                                 height: iconBaseSize * 0.5
@@ -1930,6 +1948,7 @@ Item {
                     }
 
                 }
+
             }
         }
 
@@ -1959,11 +1978,11 @@ Item {
 
             onAccepted: {
                 QGroundControl.saveBoolGlobalSetting("login", false)
+                QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                 popup.visible = false
-                mainWindow.profile()
-
-
+                mainWindow.profile()  
             }
+
             onRejected: {
                 popup.visible = false
             }

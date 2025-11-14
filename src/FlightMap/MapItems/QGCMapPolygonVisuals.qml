@@ -1037,7 +1037,7 @@ property bool   mapping:                false
 
             Image {
                 id: controlImage
-                source: "qrc:/InstrumentValueIcons/location.svg"
+                source: "/qmlimages/NewImages/location.png"
                 anchors.centerIn: parent  // Centers both horizontally and vertically
                 width: 32
                 height: 32
@@ -1198,12 +1198,14 @@ property bool   mapping:                false
                     }
 
                     contentItem: QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/save-disk.svg"
+                        //source: "qrc:/InstrumentValueIcons/save-disk.svg"
+                        source: "/qmlimages/NewImages/savefile.png"
                         width: 16
                         height: 16
                         anchors.centerIn: parent // Center the icon within the container
                         color: "white"
                     }
+
                     onClicked: {
                         if (mapPolygon.count < 3) {
                             _restorePreviousVertices()

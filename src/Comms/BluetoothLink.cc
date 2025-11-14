@@ -15,6 +15,7 @@
 #include <QtBluetooth/QBluetoothServiceInfo>
 
 #include <QBluetoothLocalDevice>
+#include <QTimer>
 #include <QtPositioning/QGeoPositionInfoSource>  // For location check
 
 #ifdef Q_OS_IOS
@@ -192,7 +193,18 @@ bool BluetoothLink::_hardwareConnect()
 #else
     qDebug()<< "BluetoothLink.cc _hardwareConnect";
     _createSocket();
-    _targetSocket->connectToService(QBluetoothAddress(_bluetoothConfig->device().address), QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::SerialPort));
+
+    //_targetSocket->connectToService(QBluetoothAddress(_bluetoothConfig->device().address), QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::SerialPort));
+
+    // Delay the connect to allow Android to resolve services
+    QTimer::singleShot(1000, this, [this]() {
+        qDebug() << "Attempting Bluetooth connect to service after delay...";
+        _targetSocket->connectToService(
+            QBluetoothAddress(_bluetoothConfig->device().address),
+            QBluetoothUuid(QBluetoothUuid::ServiceClassUuid::SerialPort)
+            );
+    });
+
 #endif
     return true;
 }

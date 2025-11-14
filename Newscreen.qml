@@ -23,6 +23,17 @@ Item {
     property var    _fullItem
     property var    _pipOrWindowItem
 
+    property string droneType: "loadpage"
+
+    onVisibleChanged : {
+        if (visible) {
+            console.log("NewScreen onVisibleChanged");
+            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
+            console.log("droneType",droneType);
+        }
+    }
+
+
     function swapCamera(){
         var videoSettings = QGroundControl.settingsManager.videoSettings
         if (videoSettings) {
@@ -32,6 +43,7 @@ Item {
             }
         }
     }
+
     function camera(){
         camera.visible=true
         agri.visible=false
@@ -250,7 +262,7 @@ Item {
           loops: Animation.Infinite
           scale: 0.3
           onStatusChanged: console.log("Lottie Status:", status)
-          visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:false
+          visible:droneType ==="loadpage"?true:false
           anchors.right: parent.right
           anchors.bottom: parent.bottom
           anchors.rightMargin: 25
@@ -265,7 +277,7 @@ Item {
         Image {
             id:cameraicon
             source: "/qmlimages/NewImages/cameradrone.png" // Replace with real image
-            visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
+            visible: droneType ==="Camera"?true:false
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.rightMargin: 100
@@ -278,7 +290,7 @@ Item {
         Image {
             id:mappingicon
             source: "/qmlimages/NewImages/survey.png" // Replace with real image
-            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+            visible: droneType ==="Mapping"?true:false
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.rightMargin: 100
@@ -287,6 +299,7 @@ Item {
             height: parent.height * 0.30
             fillMode: Image.PreserveAspectFit
         }
+
         Image {
             id:vtolicon
             source: "/qmlimages/NewImages/vtol.png" // Replace with real image
@@ -297,8 +310,9 @@ Item {
             width: parent.width * 0.30
             height: parent.height * 0.30
             fillMode: Image.PreserveAspectFit
-            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"?true:false
+            visible: droneType ==="VTOL"?true:false
         }
+
         Image {
             id:agriicon
             source: "/qmlimages/NewImages/agri.png" // Replace with real image
@@ -309,7 +323,7 @@ Item {
             width: parent.width * 0.30
             height: parent.height * 0.30
             fillMode: Image.PreserveAspectFit
-            visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+            visible: droneType ==="Agri"?true:false
         }
 
     }
@@ -381,6 +395,7 @@ Item {
 
                 onClicked: {
                         //QGroundControl.saveGlobalSetting("loadpage", "loadpage")
+
                     var editingConfig = _linkManager.createConfiguration(
                                 ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
                                 );
@@ -401,7 +416,7 @@ Item {
                 //font.bold: true
                 font.pixelSize: 16
 
-                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
+                visible: droneType==="loadpage" ? true : droneType==="Camera" ? true : false
 
                 contentItem: Text {
                     text: parent.text
@@ -437,10 +452,10 @@ Item {
                     }
 
                     swapCamera();
-                    camera.visible=true
-                    agri.visible=false
-                    mapping.visible=false
-                    vtol.visible=false
+                    // camera.visible=true
+                    // agri.visible=false
+                    // mapping.visible=false
+                    // vtol.visible=false
                 }
             }
 
@@ -451,7 +466,7 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+                visible: droneType==="loadpage"?true:droneType==="Agri"?true:false
 
                 contentItem: Text {
                     text: parent.text
@@ -485,14 +500,13 @@ Item {
                     }
 
                     swapCamera();
-                    camera.visible=false
-                    agri.visible=true
-                    mapping.visible=false
-                    vtol.visible=false
+                    // camera.visible=false
+                    // agri.visible=true
+                    // mapping.visible=false
+                    // vtol.visible=false
 
                 }
             }
-
 
             Button {
                 id:mapping
@@ -501,7 +515,7 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                visible: droneType==="loadpage"?true:droneType==="Mapping"?true:false
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -532,10 +546,10 @@ Item {
                             videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
-                    camera.visible=false
-                    agri.visible=false
-                    mapping.visible=true
-                    vtol.visible=false
+                    // camera.visible=false
+                    // agri.visible=false
+                    // mapping.visible=true
+                    // vtol.visible=false
                 }
             }
 
@@ -546,7 +560,7 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="loadpage"?true:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"?true:false
+                visible: droneType ==="loadpage"?true:droneType ==="VTOL"?true:false
                 contentItem: Text {
                     text: parent.text
                     font: parent.font
@@ -577,10 +591,10 @@ Item {
                             videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
-                    camera.visible=false
-                    agri.visible=false
-                    mapping.visible=false
-                    vtol.visible=true
+                    // camera.visible=false
+                    // agri.visible=false
+                    // mapping.visible=false
+                    // vtol.visible=true
                 }
             }
 
@@ -597,11 +611,11 @@ Item {
 
                 onAccepted: {
                     QGroundControl.saveBoolGlobalSetting("login", false)
+                    QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                     popup.visible = false
                     mainWindow.profile()
-
-
                 }
+
                 onRejected: {
                     popup.visible = false
                 }

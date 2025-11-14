@@ -798,6 +798,7 @@ Item {
                             _triggerSubmit = true
                         }
                     },
+
                     ToolStripAction {
                         id:                 addWaypointRallyPointAction
                         text:               _editingLayer == _layerRallyPoints ? qsTr("Rally Point") : qsTr("Waypoint")
@@ -901,7 +902,7 @@ Item {
 
             function allAddClickBoolsOff() {
                 _addROIOnClick =        false
-                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"?true:false
+                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping" ? true : false
             }
 
             onDropped: allAddClickBoolsOff()
@@ -1258,8 +1259,6 @@ Item {
                 }
             }
         }
-
-
 
         Component {
             id: customdialog

@@ -28,7 +28,7 @@ SetupPage {
     id: calibrationPage
     pageComponent : sensorComponent
 
-    // In ParameterMain.qml, add this property at the top level
+    // In CalibrationSettings.qml, add this property at the top level
     property var activeCompassDialog: null
 
     //property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
