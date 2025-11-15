@@ -1592,8 +1592,8 @@ property bool   mapping:                false
             modal: true
             dim: true
             anchors.centerIn: parent
-            width: parent.width * 0.8
-            height: parent.height * 0.6
+            width: parent.width //* 0.8
+            height: parent.height //* 0.6
 
             background: Rectangle {
                 color: "#661B1C3E"
@@ -1722,10 +1722,13 @@ property bool   mapping:                false
                         }
                         contentItem: Text {
                             text: "Cancel"
-                            anchors.centerIn: parent
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
                             color: "white"
                             font.bold: true
                             font.pointSize: 14
+
                         }
                         onClicked: {
                             customDialog.visible = false
@@ -1750,7 +1753,9 @@ property bool   mapping:                false
                         }
                         contentItem: Text {
                             text: "Confirm"
-                            anchors.centerIn: parent
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
                             color: "white"
                             font.bold: true
                             font.pointSize: 14

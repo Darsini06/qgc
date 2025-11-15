@@ -65,6 +65,8 @@ ApplicationWindow {
         visible:            text !== ""
     }
 
+
+
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
     property var someParameter
