@@ -903,11 +903,9 @@ Item {
 
             function allAddClickBoolsOff() {
                 _addROIOnClick =        false
-<<<<<<< HEAD
+
                 addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping" ? true : false
-=======
-                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"||"Mapping"?true:false
->>>>>>> 4d1b38e5e (Initial commit for local)
+
             }
 
             onDropped: allAddClickBoolsOff()
@@ -1263,38 +1261,38 @@ Item {
             }
 
             Button {
-                            id: uploadBtn1
-                            //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
-                            text: ""
-                            width: 46
-                            height: 46
-                            anchors.left: uploadBtn.right
-                                    anchors.leftMargin: 10
-                                    anchors.bottom: uploadBtn.bottom
-                            padding: 15
+                id: uploadBtn1
+                //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                text: ""
+                width: 46
+                height: 46
+                anchors.left: uploadBtn.right
+                anchors.leftMargin: 10
+                anchors.bottom: uploadBtn.bottom
+                padding: 15
 
-                            background: Rectangle {
-                                radius: width / 2
-                                color: "#1b1c3e"
-                                border.color: "#005BBB"
-                                border.width: 2
-                                anchors.fill: parent
-                                anchors.margins: 5
-                            }
+                background: Rectangle {
+                    radius: width / 2
+                    color: "#1b1c3e"
+                    border.color: "#005BBB"
+                    border.width: 2
+                    anchors.fill: parent
+                    anchors.margins: 5
+                }
 
-                            contentItem: QGCColoredImage {
-                                source: "/res/rtl.svg"
-                                width: 16
-                                height: 16
-                                anchors.centerIn: parent // Center the icon within the container
-                                color: "white"
-                            }
+                contentItem: QGCColoredImage {
+                    source: "/res/rtl.svg"
+                    width: 16
+                    height: 16
+                    anchors.centerIn: parent // Center the icon within the container
+                    color: "white"
+                }
 
-                            onClicked: {
-                                toolStrip.allAddClickBoolsOff()
-                                insertLandItemAfterCurrent()
-                            }
-                        }
+                onClicked: {
+                    toolStrip.allAddClickBoolsOff()
+                    insertLandItemAfterCurrent()
+                }
+            }
 
         }
 
