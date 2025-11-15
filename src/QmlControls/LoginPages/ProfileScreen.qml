@@ -1,117 +1,289 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
+import QtQml
 import QtQuick.Layouts
 
 import QGroundControl
+import QGroundControl.ScreenTools
+import QGroundControl.Vehicle
 import QGroundControl.Controls
 import QGroundControl.FactControls
-import QGroundControl.ScreenTools
 import QGroundControl.Palette
-import MapGlobals 1.0
 
 
-Item {
+/// Mission item edit control
+Rectangle {
+    id:             _root
+    height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
+    color:          "#1b1c3e"//_currentItem ? qgcPal.missionItemEditor : qgcPal.windowShade
+    radius:         _radius
+    opacity:        _currentItem ? 1.0 : 0.7
+    border.width:   _readyForSave ? 0 : 2
+    border.color:   qgcPal.warningText
 
-    id:             profile1
-    anchors.fill: parent
+    property var    map                 ///< Map control
+    property var    masterController
+    property var    missionItem         ///< MissionItem associated with this editor
+    property bool   readOnly            ///< true: read only view, false: full editing view
 
-    Rectangle {
-        anchors.fill: parent
-        color: "#f5f5f5"
-        radius: 10
-        border.color: "lightgray"
+    signal clicked
+    signal remove
+    signal selectNextNotReadyItem
 
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 20
-            spacing: 20
+    property var    _masterController:          masterController
+    property var    _missionController:         _masterController.missionController
+    property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey")
+    property color  _outerTextColor:            "white"//_currentItem ? qgcPal.primaryButtonText : qgcPal.text
+    property bool   _noMissionItemsAdded:       ListView.view.model.count === 1
+    property real   _sectionSpacer:             ScreenTools.defaultFontPixelWidth / 2  // spacing between section headings
+    property bool   _singleComplexItem:         _missionController.complexMissionItemNames.length === 1
+    property bool   _readyForSave:              missionItem.readyForSaveState === VisualMissionItem.ReadyForSave
 
-            // Profile Header
+    readonly property real  _editFieldWidth:    Math.min(width - _innerMargin * 2, ScreenTools.defaultFontPixelWidth * 12)
+    readonly property real  _margin:            ScreenTools.defaultFontPixelWidth / 2
+    readonly property real  _innerMargin:       2
+    readonly property real  _radius:            ScreenTools.defaultFontPixelWidth / 2
+    readonly property real  _hamburgerSize:     commandPicker.height * 0.75
+    readonly property real  _trashSize:         commandPicker.height * 0.75
+    readonly property bool  _waypointsOnlyMode: QGroundControl.corePlugin.options.missionWaypointsOnly
+
+    QGCPalette {
+        id: qgcPal
+        colorGroupEnabled: enabled
+    }
+
+    FocusScope {
+        id:             currentItemScope
+        anchors.fill:   parent
+
+        MouseArea {
+            anchors.fill:   parent
+            onClicked: {
+                console.log("missionitem",currentItemScope)
+                currentItemScope.focus = true
+                _root.clicked()
+            }
+        }
+    }
+
+    Component {
+        id: editPositionDialog
+
+        EditPositionDialog {
+            coordinate:             missionItem.isSurveyItem ?  missionItem.centerCoordinate : missionItem.coordinate
+            onCoordinateChanged:    missionItem.isSurveyItem ?  missionItem.centerCoordinate = coordinate : missionItem.coordinate = coordinate
+        }
+    }
+
+    Row {
+        id:                 topRowLayout
+        anchors.margins:    _margin
+        anchors.left:       parent.left
+        anchors.top:        parent.top
+        spacing:            _margin
+
+        Rectangle {
+            id:                     notReadyForSaveIndicator
+            anchors.verticalCenter: parent.verticalCenter
+            width:                  _hamburgerSize
+            height:                 width
+            border.width:           1
+            border.color:           qgcPal.warningText
+            color:                  "white"
+            radius:                 width / 2
+            visible:                !_readyForSave
+
+            QGCLabel {
+                id:                 readyForSaveLabel
+                anchors.centerIn:   parent
+                //: Indicator in Plan view to show mission item is not ready for save/send
+                text:               qsTr("?")
+                color:              qgcPal.warningText
+                font.pointSize:     ScreenTools.smallFontPointSize
+            }
+        }
+
+        QGCColoredImage {
+            id:                     deleteButton
+            anchors.verticalCenter: parent.verticalCenter
+            height:                 _hamburgerSize
+            width:                  height
+            sourceSize.height:      height
+            fillMode:               Image.PreserveAspectFit
+            mipmap:                 true
+            smooth:                 true
+            color:                  "white"//qgcPal.text
+            visible:                _currentItem && missionItem.sequenceNumber !== 0
+            source:                 "/res/TrashDelete.svg"
+
+            QGCMouseArea {
+                fillItem:   parent
+                onClicked:  remove()
+            }
+        }
+
+        Item {
+            id:                     commandPicker
+            anchors.verticalCenter: parent.verticalCenter
+            height:                 ScreenTools.implicitComboBoxHeight
+            width:                  innerLayout.width
+            visible:                !commandLabel.visible
+
             RowLayout {
-                spacing: 10
-                Layout.alignment: Qt.AlignLeft
+                id:                     innerLayout
+                anchors.verticalCenter: parent.verticalCenter
+                spacing:                _padding
 
-                Image {
-                    source: "/qmlimages/NewImages/profileImage.png" // replace with your asset
-                    width: 60
-                    height: 60
-                    fillMode: Image.PreserveAspectFit
-                    clip: true
-                    smooth: true
-                }
+                property real _padding: ScreenTools.comboBoxPadding
 
-                ColumnLayout {
-                    spacing: 4
-                    Text {
-                        text: "Flytutor Technologies"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    Text {
-                        text: "Owner"
-                        color: "gray"
-                        font.pointSize: 12
-                    }
-                }
+                QGCLabel { text: missionItem.commandName
+                color:              "white"}
 
-                Item { Layout.fillWidth: true }
-
-                Image {
-                    source: "/qmlimages/NewImages/goldMedal.png" // replace with your badge image
-                    width: 50
-                    height: 50
-                    fillMode: Image.PreserveAspectFit
+                QGCColoredImage {
+                    height:             ScreenTools.defaultFontPixelWidth
+                    width:              height
+                    fillMode:           Image.PreserveAspectFit
+                    smooth:             true
+                    antialiasing:       true
+                    color:              "white"//qgcPal.text
+                    source:             "/qmlimages/arrow-down.png"
                 }
             }
 
-            // Menu Section
-            Repeater {
-                model: ListModel {
-                    ListElement { icon: "/qmlimages/NewImages/accountUpdate.png"; label: "Account Update" }
-                    ListElement { icon: "/qmlimages/NewImages/userGuide.png"; label: "User Guide" }
-                    ListElement { icon: "/qmlimages/NewImages/record.png"; label: "Record" }
-                    ListElement { icon: "/qmlimages/NewImages/reports.png"; label: "Reports" }
-                    ListElement { icon: "/qmlimages/NewImages/feedback.png"; label: "Feedback" }
-                    ListElement { icon: "/qmlimages/NewImages/accountUpdate.png"; label: "Settings" }
+            QGCMouseArea {
+                fillItem:   parent
+                onClicked:  commandDialog.createObject(mainWindow).open()
+            }
+
+            Component {
+                id: commandDialog
+
+                MissionCommandDialog {
+                    vehicle:                    masterController.controllerVehicle
+                    missionItem:                _root.missionItem
+                    map:                        _root.map
+                    // FIXME: Disabling fly through commands doesn't work since you may need to change from an RTL to something else
+                    flyThroughCommandsAllowed:  true //_missionController.flyThroughCommandsAllowed
+                }
+            }
+        }
+
+        QGCLabel {
+            id:                     commandLabel
+            anchors.verticalCenter: parent.verticalCenter
+            width:                  commandPicker.width
+            height:                 commandPicker.height
+            visible:                !missionItem.isCurrentItem || !missionItem.isSimpleItem || _waypointsOnlyMode || missionItem.isTakeoffItem
+            verticalAlignment:      Text.AlignVCenter
+            text:                   missionItem.commandName
+            color:                  _outerTextColor
+        }
+    }
+
+   QGCColoredImage {
+        id:                     hamburger
+        anchors.margins:        _margin
+        anchors.right:          parent.right
+        anchors.verticalCenter: topRowLayout.verticalCenter
+        width:                  _hamburgerSize
+        height:                 _hamburgerSize
+        sourceSize.height:      _hamburgerSize
+        source:                 "qrc:/qmlimages/Hamburger.svg"
+        //visible: (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0
+        visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
+        color:                  "white"//qgcPal.text
+
+        QGCMouseArea {
+            fillItem:   hamburger
+            onClicked: {
+                currentItemScope.focus = true
+                hamburgerMenu.popup()
+            }
+
+            QGCMenu {
+                id: hamburgerMenu
+
+                QGCMenuItem {
+                    text:           qsTr("Move to vehicle position")
+                    enabled:        _activeVehicle && missionItem.specifiesCoordinate
+                    onTriggered:    missionItem.coordinate = _activeVehicle.coordinate
+
+                    property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
                 }
 
-                delegate: RowLayout {
-                    spacing: 10
-                    height: 40
-                    width: parent.width
+                QGCMenuItem {
+                    text:           qsTr("Move to previous item position")
+                    enabled:        _missionController.previousCoordinate.isValid
+                    onTriggered:    missionItem.coordinate = _missionController.previousCoordinate
+                }
 
-                    Image {
-                        source: icon
-                        width: 24
-                        height: 24
-                        fillMode: Image.PreserveAspectFit
+                QGCMenuItem {
+                    text:           qsTr("Edit position...")
+                    enabled:        missionItem.specifiesCoordinate
+                    onTriggered:    editPositionDialog.createObject(mainWindow).open()
+                }
+
+                QGCMenuSeparator {
+                    //visible: missionItem.isSimpleItem && !_waypointsOnlyMode
+                }
+
+                QGCMenuItem {
+                    text:       qsTr("Show all values")
+                    checkable:  true
+                    checked:    missionItem.isSimpleItem ? missionItem.rawEdit : false
+                    enabled:    missionItem.isSimpleItem && !_waypointsOnlyMode
+
+                    onTriggered:    {
+                        if (missionItem.rawEdit) {
+                            if (missionItem.friendlyEditAllowed) {
+                                missionItem.rawEdit = false
+                            } else {
+                                mainWindow.showMessageDialog(qsTr("Mission Edit"), qsTr("You have made changes to the mission item which cannot be shown in Simple Mode"))
+                            }
+                        } else {
+                            missionItem.rawEdit = true
+                        }
+                        checked = missionItem.rawEdit
                     }
+                }
 
-                    Text {
-                        text: label
-                        font.pointSize: 12
-                        Layout.fillWidth: true
-                    }
-
-                    Text {
-                        text: ">"
-                        font.pointSize: 14
-                        color: "gray"
-                    }
-
-                    // MouseArea {
-                    //     anchors.fill: parent
-                    //     onClicked: {
-                    //         console.log("Clicked", label)
-                    //     }
-                    // }
+                QGCMenuItem {
+                    text:       qsTr("Item #%1").arg(missionItem.sequenceNumber)
+                    enabled:    false
                 }
             }
         }
     }
-}
 
+    /*
+    QGCLabel {
+        id:                     notReadyForSaveLabel
+        anchors.margins:        _margin
+        anchors.left:           notReadyForSaveIndicator.right
+        anchors.right:          parent.right
+        anchors.top:            commandPicker.bottom
+        visible:                _currentItem && !_readyForSave
+        text:                   missionItem.readyForSaveState === VisualMissionItem.NotReadyForSaveTerrain ?
+                                    qsTr("Incomplete: Waiting on terrain data.") :
+                                    qsTr("Incomplete: Item not fully specified.")
+        wrapMode:               Text.WordWrap
+        horizontalAlignment:    Text.AlignHCenter
+        color:                  qgcPal.warningText
+    }
+
+*/
+
+    Loader {
+        id:                 editorLoader
+        anchors.margins:    _innerMargin
+        anchors.left:       parent.left
+        anchors.top:        topRowLayout.bottom
+        source:             _currentItem ? missionItem.editorQml : ""//missionItem.editorQml
+        visible:            false//_currentItem
+
+        property var    masterController:   _masterController
+        property real   availableWidth:     _root.width - (anchors.margins * 2) ///< How wide the editor should be
+        property var    editorRoot:         _root
+    }
+} // Rectangle

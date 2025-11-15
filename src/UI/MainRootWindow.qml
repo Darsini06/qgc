@@ -65,7 +65,6 @@ ApplicationWindow {
         visible:            text !== ""
     }
 
-
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
     property var someParameter
@@ -85,8 +84,6 @@ ApplicationWindow {
 
 
     property string edit:""
-
-
     property string sessionDate: ""
     property string sessionStart: ""
     property string sessionEnd: ""
@@ -271,6 +268,7 @@ ApplicationWindow {
         rtlbtn.visible = false
         flyView.visible = false
         planView.visible = false
+
         newscreen.visible = true
         //modebtn.visible = false
         modebtn1.visible = false
@@ -2229,6 +2227,7 @@ ApplicationWindow {
                 onClicked: {
                     planView.mapclear()
                     mainWindow.showPlanView()
+
                     QGroundControl.saveGlobalSetting("planupload", "planupload")
                 }
             }

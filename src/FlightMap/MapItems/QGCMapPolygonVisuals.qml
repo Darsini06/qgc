@@ -1587,202 +1587,214 @@ property bool   mapping:                false
     Component{
         id: customdialog
 
-        Item {
-            id: customDialogItem
-            anchors.fill: parent
+        Dialog {
+            id: customDialog
+            modal: true
+            dim: true
+            anchors.centerIn: parent
+            width: parent.width * 0.8
+            height: parent.height * 0.6
+
+            background: Rectangle {
+                color: "#661B1C3E"
+                radius: 15
+                border.color: "#005BBB"
+                border.width: 2
+            }
+
+            // 🔴 Close Button
             Rectangle {
-                anchors.fill: parent
-                color: "transparent"
+                id: closeBtn
+                width: 30
+                height: 30
+                radius: 15
+                color: "red"
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 10
 
-                Rectangle {
+                Text {
+                    text: "X"
                     anchors.centerIn: parent
-                    width: 400
-                    height: 300
-                    radius: 15
-                    color: "#991B1C3E"
-                    border.color: "#005BBB"
-                    border.width: 2
+                    color: "white"
+                    font.bold: true
+                }
 
-                    Column {
-                        anchors.fill: parent
-                        anchors.margins: 20
-                        spacing: 15
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        customDialog.visible = false
+                        if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                            mainWindow.showFlyView()
+                        } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                            mainWindow.showMapping()
+                        }
+                        MapGlobals.editdialog = "editdialog1"
+                    }
+                }
+            }
 
-                        // Title
-                        Label {
-                            text: qsTr("Set Ground Name3")
-                            font.bold: true
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+                width: parent.width * 0.8
+
+                // Title
+                Label {
+                    text: qsTr("Set Ground Name")
+                    font.bold: true
+                    color: "white"
+                    font.pointSize: 16
+                    horizontalAlignment: Text.AlignHCenter
+                    width: parent.width
+                }
+
+                // Name Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
+                    Label {
+                        text: qsTr("Name:")
+                        Layout.preferredWidth: 100
+                        color: "white"
+                        font.bold: true
+                        font.pointSize: 14
+                    }
+                    TextField {
+                        id: nameField
+                        Layout.fillWidth: true
+                        placeholderText: qsTr("Enter your name")
+                    }
+                }
+
+                // Phone Number Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
+                    Label {
+                        text: qsTr("Ph No:")
+                        Layout.preferredWidth: 100
+                        color: "white"
+                        font.bold: true
+                        font.pointSize: 14
+                    }
+                    TextField {
+                        id: phoneField
+                        Layout.fillWidth: true
+                        placeholderText: qsTr("Enter 10-digit phone no")
+                        validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                        inputMethodHints: Qt.ImhDigitsOnly
+                    }
+                }
+
+                // Ground Name Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
+                    Label {
+                        text: qsTr("Ground Name:")
+                        Layout.preferredWidth: 100
+                        color: "white"
+                        font.bold: true
+                        font.pointSize: 14
+                    }
+                    TextField {
+                        id: groundField
+                        Layout.fillWidth: true
+                        placeholderText: qsTr("Enter ground name")
+                    }
+                }
+
+                // Buttons Row
+                Row {
+                    spacing: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Button {
+                        text: qsTr("Cancel")
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 20
+                            color: "#1b1c3e"
+                            border.color: "#005BBB"
+                            border.width: 2
+                        }
+                        contentItem: Text {
+                            text: "Cancel"
+                            anchors.centerIn: parent
                             color: "white"
+                            font.bold: true
                             font.pointSize: 14
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            width: parent.width
+                        }
+                        onClicked: {
+                            customDialog.visible = false
+                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                mainWindow.showFlyView()
+                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                mainWindow.showMapping()
+                            }
+                            MapGlobals.editdialog = "editdialog1"
+                        }
+                    }
+
+                    Button {
+                        text: qsTr("Confirm")
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 20
+                            color: "#1b1c3e"
+                            border.color: "#005BBB"
+                            border.width: 2
+                        }
+                        contentItem: Text {
+                            text: "Confirm"
+                            anchors.centerIn: parent
+                            color: "white"
+                            font.bold: true
+                            font.pointSize: 14
                         }
 
-                        // Name Field
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 10
-
-                            Label { text: qsTr("Name :"); Layout.preferredWidth: 80;font.bold: true
-                                font.pointSize: 14
-                                color: "white"}
-                            TextField {
-                                id: filenameTextField
-                                Layout.fillWidth: true
+                        onClicked: {
+                            if (nameField.text.length < 3 ||
+                                phoneField.text.length < 3 ||
+                                groundField.text.length < 3) {
+                                mainWindow.showToastMessage("Please fill all fields")
+                                return
                             }
+
+                            let concatenatedText = nameField.text.substring(0,3) +
+                                                   phoneField.text.substring(0,3) +
+                                                   groundField.text.substring(0,3)
+
+                            _appSettings.username = concatenatedText
+                            console.log("Username:", concatenatedText)
+
+                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                _saveCurrentVertices()
+                                _circleMode = false
+                                mapPolygon.traceMode = true
+                                if(MapGlobals.mark_with !== "KML_File" ){
+                                    mapPolygon.clear()
+                                }
+                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
+                                    _resetPolygon()
+                                } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
+                                    _resetCircle()
+                                }
+                                mapping = true
+                            }
+
+                            customDialog.visible = false
+                            MapGlobals.editdialog = "editdialog1"
                         }
-
-
-                        // Phone Number Field
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 10
-
-                            Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80;font.bold: true
-                                font.pointSize: 14
-                                color: "white"}
-                            TextField {
-                                id: filenameTextField1
-                                Layout.fillWidth: true
-                                validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                                inputMethodHints: Qt.ImhDigitsOnly
-                            }
-                        }
-
-                        // Ground Name Field
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 10
-
-                            Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80;font.bold: true
-                                font.pointSize: 14
-                                color: "white"}
-                            TextField {
-                                id: filenameTextField2
-                                Layout.fillWidth: true
-                            }
-                        }
-
-
-                        // Buttons
-                        Row {
-                            spacing: 30
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Button {
-                                text: "Cancel"
-                                width: 100
-                                height: 34
-                                font.bold: true
-
-                                contentItem: Text {
-                                    text: qsTr("Cancel")
-                                    font.bold: true
-                                    font.pointSize: 14
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    anchors.fill: parent
-                                }
-
-                                background: Rectangle {
-                                    radius: 20
-                                    color: "#1b1c3e"
-                                    border.color: "#005BBB"
-                                    border.width: 2
-                                }
-
-                                onClicked: {
-                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                        mainWindow.showFlyView()
-                                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                        mainWindow.showMapping()
-                                    }
-                                    customDialogItem.visible = false;
-                                    MapGlobals.editdialog = "editdialog1"
-                                }
-                            }
-
-
-                            Button {
-                                width: 100
-                                height: 34
-
-                                contentItem: Text {
-                                    text: "Confirm"
-                                    font.bold: true
-                                    font.pointSize: 14
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    anchors.fill: parent
-                                }
-
-                                background: Rectangle {
-                                    radius: 20
-                                    color: "#1b1c3e"
-                                    border.color: "#005BBB"
-                                    border.width: 2
-                                }
-
-                                onClicked: {
-                                    if (filenameTextField.text.length < 3 ||
-                                            filenameTextField1.text.length < 3 ||
-                                            filenameTextField2.text.length < 3) {
-
-                                        mobileFileSaveDialog.preventClose = true
-                                        mainWindow.showToastMessage("Please fill all fields")
-                                        return
-                                    }
-
-                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                        let concatenatedText = filenameTextField.text.substring(0, 3) +
-                                            filenameTextField1.text.substring(0, 3) +
-                                            filenameTextField2.text.substring(0, 3)
-
-                                        _appSettings.username = concatenatedText
-                                        console.log(concatenatedText)
-
-                                        _saveCurrentVertices()
-                                        _circleMode = false
-                                        mapPolygon.traceMode = true
-                                        if(MapGlobals.mark_with !== "KML_File" ){
-                                            mapPolygon.clear()
-                                        }
-                                        customDialogItem.visible = false
-                                        MapGlobals.editdialog = "editdialog1"
-                                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                        let concatenatedText = filenameTextField.text.substring(0, 3) +
-                                            filenameTextField1.text.substring(0, 3) +
-                                            filenameTextField2.text.substring(0, 3)
-
-                                        _appSettings.username = concatenatedText
-                                        console.log(concatenatedText)
-                                        if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-                                            _resetPolygon()
-                                        }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-                                            _resetCircle()
-                                        }
-                                        //_saveCurrentVertices()
-                                        //_circleMode = false
-                                        //mapPolygon.traceMode = true
-                                        mapping=true
-
-                                        customDialogItem.visible = false
-                                        MapGlobals.editdialog = "editdialog1"
-                                    }
-
-
-                                }
-                            }
-                        }
-
-
                     }
                 }
             }
         }
+
     }
 
 
