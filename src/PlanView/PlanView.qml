@@ -76,6 +76,7 @@ Item {
     property var selectedPlanCreator: null
 
     property var  _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+    property string droneType: "loadpage"
 
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
@@ -205,6 +206,7 @@ Item {
 
     onVisibleChanged: {
         if(visible) {
+            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
             editorMap.zoomLevel = QGroundControl.flightMapZoom
             editorMap.center    = QGroundControl.flightMapPosition
             if (!_planMasterController.containsItems) {
@@ -905,7 +907,7 @@ Item {
             function allAddClickBoolsOff() {
                 _addROIOnClick =        false
 
-                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping" ? true : false
+                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
 
             }
 
@@ -958,13 +960,14 @@ Item {
                     width:      parent.width
                     visible:    QGroundControl.corePlugin.options.enablePlanViewSelector  && !_utmspEnabled
                     Component.onCompleted: currentIndex = 0
+
                     QGCTabButton {
                         text:       qsTr("Mission")
                     }
                     QGCTabButton {
                         text:       qsTr("Fence")
                         enabled:    _geoFenceController.supported
-                        visible:QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                        visible: droneType==="Mapping"?true:false
                     }
                     // QGCTabButton {
                     //     text:       qsTr("Rally")

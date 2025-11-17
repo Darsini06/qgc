@@ -68,6 +68,17 @@ Item {
     property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property var activeVehicleCoordinate: activeVehicle ? activeVehicle.coordinate : QtPositioning.coordinate()
 property bool   mapping:                false
+
+    property string droneType: "loadpage"
+
+    onVisibleChanged : {
+        if (visible) {
+            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
+            if(droneType==="Mapping"){
+                mapping = true
+            }
+        }
+    }
     // Drawer {
     //           id: arrowDrawer
     //           edge: Qt.RightEdge
@@ -166,8 +177,9 @@ property bool   mapping:                false
             console.log("MapGlobals.edit")
             console.log("MapGlobals.edit",MapGlobals.edit)
             if(MapGlobals.edit==="edit"){
-                customdialog.createObject(mainWindow).open()
-                //customDialogItem.visible=true;
+                if(QGroundControl.loadGlobalSetting("load","load")==="load"){
+                    customdialog.createObject(mainWindow).open()
+                }
 
             }else if (MapGlobals.edit==="edit2"){
                 _saveCurrentVertices()
@@ -1059,7 +1071,7 @@ property bool   mapping:                false
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapPolygon.traceMode
+                visible: mapPolygon.traceMode===true && droneType==="Agri"?true:false
 
                 Button  {
                     id: boundryMarkingBtn
@@ -1150,35 +1162,35 @@ property bool   mapping:                false
                     }
                 }
 
-                Button {
-                    id: obstacleBtn
-                    text: ""
-                    width: 46
-                    height: 46
+                // Button {
+                //     id: obstacleBtn
+                //     text: ""
+                //     width: 46
+                //     height: 46
 
-                    padding: 15
+                //     padding: 15
 
-                    background: Rectangle {
-                        radius: width / 2
-                        color: "#1b1c3e"
-                        border.color: "#005BBB"
-                        border.width: 2
-                        anchors.fill: parent
-                        anchors.margins: 3
-                    }
+                //     background: Rectangle {
+                //         radius: width / 2
+                //         color: "#1b1c3e"
+                //         border.color: "#005BBB"
+                //         border.width: 2
+                //         anchors.fill: parent
+                //         anchors.margins: 3
+                //     }
 
-                    contentItem: QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                        width: 16
-                        height: 16
-                        anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
-                    }
+                //     contentItem: QGCColoredImage {
+                //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                //         width: 16
+                //         height: 16
+                //         anchors.centerIn: parent // Center the icon within the container
+                //         color: "white"
+                //     }
 
-                    onClicked: {
-                        // Handle Obstacle click
-                    }
-                }
+                //     onClicked: {
+                //         // Handle Obstacle click
+                //     }
+                // }
 
                 Button {
                     id: saveBtn
@@ -1250,8 +1262,96 @@ property bool   mapping:                false
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapping
+                visible: mapping===true && droneType==="Mapping"?true:false
 
+                Button  {
+                    id: boundryMarkingBtn1
+                    text: ""
+                    width: 46
+                    height: 46
+
+                    padding: 15
+
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "#1b1c3e"
+                        border.color: "#005BBB"
+                        border.width: 2
+                        anchors.fill: parent
+                        anchors.margins: 3
+                    }
+
+                    contentItem: QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                        width: 16
+                        height: 16
+                        anchors.centerIn: parent // Center the icon within the container
+                        color: "white"
+                    }
+                    onClicked: {
+
+                        if(MapGlobals.mark_with === "Mark_With_GPS") {
+
+                            console.log("Mark_With_GPS")
+                            if (gcsPosition.isValid) {
+
+                                mapPolygon.appendVertex(gcsPosition)
+
+                                // if (mapPolygon) {
+                                // mapPolygon.appendVertex(gcsPosition)
+
+                                // if (isObstacleMode) {
+                                // addObstacleVisual()
+                                // } else {
+                                // addCommonVisuals()
+                                // }
+                                // }
+                            }
+
+                        }
+
+                        else if (MapGlobals.mark_with === "Mark_With_Drone"){
+
+                            console.log("Mark_With_Drone")
+                            if (activeVehicle && activeVehicleCoordinate.isValid) {
+
+                                mapPolygon.appendVertex(activeVehicleCoordinate)
+
+                                // if (mapPolygon) {
+                                // mapPolygon.appendVertex(activeVehicleCoordinate)
+                                // if (isObstacleMode) {
+                                // addObstacleVisual()
+                                // } else {
+                                // addCommonVisuals()
+                                // }
+                                // }
+                            }
+
+                        }
+
+                        else {
+                            console.log("Mark_With_Manual")
+                            // Convert the bottom-center point of controlImage to mapControl's coordinate space.
+                            var bottomPoint = mapControl.mapFromItem(controlImage, controlImage.width / 2, controlImage.height);
+                            // Then convert that point (in pixels) to a geographic coordinate.
+                            var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
+                            mapPolygon.appendVertex(bottomCoord)
+
+
+                            // if (mapPolygon) {
+                            // mapPolygon.appendVertex(bottomCoord)
+
+                            // if (isObstacleMode) {
+                            // addObstacleVisual()
+                            // } else {
+                            // addCommonVisuals()
+                            // }
+                            // }
+
+                        }
+
+                    }
+                }
 
                 Button {
                     id: saveBtn1
@@ -1592,8 +1692,8 @@ property bool   mapping:                false
             modal: true
             dim: true
             anchors.centerIn: parent
-            width: parent.width * 0.8
-            height: parent.height * 0.6
+            width: parent.width //* 0.8
+            height: parent.height //* 0.6
 
             background: Rectangle {
                 color: "#661B1C3E"
@@ -1722,12 +1822,16 @@ property bool   mapping:                false
                         }
                         contentItem: Text {
                             text: "Cancel"
-                            anchors.centerIn: parent
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
                             color: "white"
                             font.bold: true
                             font.pointSize: 14
+
                         }
                         onClicked: {
+                            QGroundControl.saveGlobalSetting("load", "load")
                             customDialog.visible = false
                             if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                                 mainWindow.showFlyView()
@@ -1750,13 +1854,16 @@ property bool   mapping:                false
                         }
                         contentItem: Text {
                             text: "Confirm"
-                            anchors.centerIn: parent
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
                             color: "white"
                             font.bold: true
                             font.pointSize: 14
                         }
 
                         onClicked: {
+                            QGroundControl.saveGlobalSetting("load", "load1")
                             if (nameField.text.length < 3 ||
                                 phoneField.text.length < 3 ||
                                 groundField.text.length < 3) {
@@ -1785,6 +1892,7 @@ property bool   mapping:                false
                                     _resetCircle()
                                 }
                                 mapping = true
+
                             }
 
                             customDialog.visible = false
