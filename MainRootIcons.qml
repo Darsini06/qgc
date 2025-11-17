@@ -51,6 +51,9 @@ Row {
     property real   _spacing:           ScreenTools.defaultFontPixelHeight * 0.33
     property real   _topBottomMargin:   (width * 0.05) / 2
 
+    //PlanViewReference
+    property var planViewRef
+
 
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
@@ -98,64 +101,32 @@ Row {
         }
     }
 
+
     // Erase
-    // Rectangle {
-    //     width: 40
-    //     height: 40
-    //     radius: width / 2   // Makes it a circle
-    //     color: "#1b1c3e"    // Dark blue background
-    //     border.width: width * 0.05
-    //     border.color: "#005BBB"
-    //     clip: true          // This ensures content stays within the circular bounds
+    Rectangle {
+        width: baseSize
+        height: baseSize
+        radius: width / 2   // Makes it a circle
+        color: "#1b1c3e"    // Dark blue background
+        border.width: width * 0.05
+        border.color: "#005BBB"
+        clip: true          // This ensures content stays within the circular bounds
 
-    //     MouseArea {
-    //         anchors.fill: parent
-    //         onClicked: {
-    //             iconsContainer.visible = false;
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                planViewRef.mapclear()
+            }
+        }
 
-    //             clearMapDialogComponent.createObject(mainWindow).open()
-
-    //         }
-    //     }
-
-    //     QGCColoredImage {
-    //         source: "/qmlimages/NewImages/Eraser.png"
-    //         anchors.centerIn: parent
-    //         width: 25
-    //         height: 25
-    //     }
-    // }
-
-    // Rectangle {
-    //     width: 40
-    //     height: 40
-    //     radius: width / 2
-    //     color: "#B3B3B3"
-
-    //     MouseArea {
-    //         anchors.fill: parent
-    //         onClicked: {
-    //             if (!_mapProviderFact || !_mapTypeFact) {
-    //                 console.error("Map provider or map type fact is not defined.");
-    //                 return;
-    //             }
-    //             var mapTypes = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue);
-    //             if (mapTypes.length === 0) return;
-    //             var currentIndex = mapTypes.indexOf(_mapTypeFact.rawValue);
-    //             if (currentIndex === -1) currentIndex = 0;
-    //             var nextIndex = (currentIndex + 1) % mapTypes.length;
-    //             _mapTypeFact.rawValue = mapTypes[nextIndex];
-    //         }
-    //     }
-
-    //     Image {
-    //         source: "/qmlimages/NewImages/MapSwitch.png"
-    //         anchors.centerIn: parent
-    //         width: 25
-    //         height: 25
-    //     }
-    // }
-
+        QGCColoredImage {
+            source: "/qmlimages/NewImages/map_eraser.png"
+            anchors.centerIn: parent
+            width: iconSize * 0.5
+            height: iconSize * 0.5
+            color : "transparent"
+        }
+    }
 
     // ========== MAP SWITCH ==========
     Rectangle {
@@ -317,28 +288,28 @@ Row {
     }
 
 
-    // New confirmation dialog for clearing the map
-    Component {
-        id: clearMapDialogComponent
+    // // New confirmation dialog for clearing the map
+    // Component {
+    //     id: clearMapDialogComponent
 
-        QGCPopupDialog {
-            title: qsTr("Clear Map")
-            buttons: Dialog.Yes | Dialog.No
+    //     QGCPopupDialog {
+    //         title: qsTr("Clear Map")
+    //         buttons: Dialog.Yes | Dialog.No
 
-            onAccepted: {
-                clearMap()
-                close()
-            }
+    //         onAccepted: {
+    //             clearMap()
+    //             close()
+    //         }
 
-            ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelWidth
-                QGCLabel {
-                    text: qsTr("Are you sure you want to clear the map?")
-                    Layout.fillWidth: true
-                }
-            }
-        }
-    }
+    //         ColumnLayout {
+    //             spacing: ScreenTools.defaultFontPixelWidth
+    //             QGCLabel {
+    //                 text: qsTr("Are you sure you want to clear the map?")
+    //                 Layout.fillWidth: true
+    //             }
+    //         }
+    //     }
+    // }
 
     // Import dialog component (kept for reference)
     Component {

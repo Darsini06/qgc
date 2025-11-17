@@ -92,6 +92,7 @@ Item {
 
     //     }
     function mapclear() {
+        console.log("MapClear")
         if (_utmspEnabled) {
             QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
             UTMSPStateStorage.removeFlightPlanState = true
@@ -938,9 +939,11 @@ Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
             //visible: false
+
             DeadMouseArea {
                 anchors.fill:   parent
             }
+
             Column {
                 id:                 rightControls
                 spacing:            ScreenTools.defaultFontPixelHeight * 0.5
@@ -948,6 +951,7 @@ Item {
                 anchors.right:      parent.right
                 anchors.top:        parent.top
                 //-------------------------------------------------------
+
                 // Mission Controls (Expanded)
                 QGCTabBar {
                     id:         layerTabBar

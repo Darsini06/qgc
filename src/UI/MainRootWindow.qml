@@ -275,7 +275,7 @@ ApplicationWindow {
         mainrootIcons.visible = false
 
         waypointbtn.visible = false
-        eraserbtn.visible = false
+        //eraserbtn.visible = false
     }
 
     function showPlanView() {
@@ -290,7 +290,7 @@ ApplicationWindow {
         mainrootIcons.visible = false
 
         waypointbtn.visible = false
-        eraserbtn.visible = false
+        //eraserbtn.visible = false
     }
 
     function cameraView() {
@@ -306,7 +306,7 @@ ApplicationWindow {
         newscreen.visible = false
 
         waypointbtn.visible = true
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
 
     }
 
@@ -327,7 +327,7 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
         dialog.mappingbtn.visible= false
         dialog.mappingcirclebtn.visible= false
         dialog.agribtn.visible= true
@@ -351,7 +351,7 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
         dialog.mappingbtn.visible= true
         dialog.mappingcirclebtn.visible= true
         dialog.agribtn.visible= false
@@ -376,7 +376,7 @@ ApplicationWindow {
         MapGlobals.edit = "edit1"
 
         waypointbtn.visible = false
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
     }
 
     function showTool(toolTitle, toolSource, toolIcon) {
@@ -1674,6 +1674,7 @@ ApplicationWindow {
         anchors.rightMargin: 15
         flightMap : planView.editorMap
         mapRotation: MapGlobals.mapRotation
+        planViewRef: planView
     }
 
     footer: LogReplayStatusBar {
@@ -2233,37 +2234,37 @@ ApplicationWindow {
             }
         }
 
-        Rectangle {
-            id: eraserbtn
-            Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
-            height: width                 // Keep it square
-            radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
-            visible:  false
-            border.width: width * 0.05
-            border.color: "#005BBB"
+        // Rectangle {
+        //     id: eraserbtn
+        //     Layout.alignment: Qt.AlignLeft
+        //     width: parent.width * 0.05    // 8% of parent width
+        //     height: width                 // Keep it square
+        //     radius: width / 2   // Makes it a circle
+        //     color: "#1b1c3e"      // white background
+        //     visible:  false
+        //     border.width: width * 0.05
+        //     border.color: "#005BBB"
 
 
 
-            QGCColoredImage {
-                id: eraserbtnicon
-                source: "/qmlimages/NewImages/map_eraser.png"
-                width: parent.width * 0.5   // 60% of button size
-                height: width
-                anchors.centerIn: parent
-                color: "transparent"
-            }
+        //     QGCColoredImage {
+        //         id: eraserbtnicon
+        //         source: "/qmlimages/NewImages/map_eraser.png"
+        //         width: parent.width * 0.5   // 60% of button size
+        //         height: width
+        //         anchors.centerIn: parent
+        //         color: "transparent"
+        //     }
 
 
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    planView.mapclear()
-                }
-            }
-        }
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             planView.mapclear()
+        //         }
+        //     }
+        // }
 
         Rectangle {
             id: camerabtn

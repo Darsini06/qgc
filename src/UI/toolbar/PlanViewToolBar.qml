@@ -90,59 +90,60 @@ Rectangle {
     }
 
 
-    Item {
-        width: parent.width
-        height: parent.height
+    // Item {
+    //     width: parent.width
+    //     height: parent.height
 
-        Rectangle {
-            id: curvedBackground
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 300
-            anchors.rightMargin: 300
-            anchors.verticalCenter: parent.verticalCenter
-            height: parent.height * 0.10
-            radius: 150
-            color: "#7d8df7"
-            antialiasing: true
-            clip: true
+    //     Rectangle {
+    //         id: curvedBackground
+    //         anchors.top: parent.top
+    //         anchors.left: parent.left
+    //         anchors.right: parent.right
+    //         anchors.bottom: parent.bottom
+    //         anchors.leftMargin: 300
+    //         anchors.rightMargin: 300
+    //         anchors.verticalCenter: parent.verticalCenter
+    //         height: parent.height * 0.10
+    //         radius: 150
+    //         color: "#7d8df7"
+    //         antialiasing: true
+    //         clip: true
 
-            // Fake square top edge
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: parent.height * 0.50
-                color: "#7d8df7"
-            }
+    //         // Fake square top edge
+    //         Rectangle {
+    //             anchors.left: parent.left
+    //             anchors.right: parent.right
+    //             height: parent.height * 0.50
+    //             color: "#7d8df7"
+    //         }
 
-            Item {
-                anchors.fill: parent
-                anchors.topMargin:30
-                anchors.bottomMargin:10
-                anchors.bottom: parent.bottom
+    //         Item {
+    //             anchors.fill: parent
+    //             anchors.topMargin:30
+    //             anchors.bottomMargin:10
+    //             anchors.bottom: parent.bottom
 
-                // Centered Image (instead of text)
-                Image {
-                    source: "/qmlimages/NewImages/aviatrickslogo.png"  // Change path if needed
-                    anchors.centerIn: parent
-                    width: 500
-                    height: 250
-                    fillMode: Image.PreserveAspectFit
-                    opacity: 1.0//0.0
+    //             // Centered Image (instead of text)
+    //             Image {
+    //                 source: "/qmlimages/NewImages/aviatrickslogo.png"  // Change path if needed
+    //                 anchors.centerIn: parent
+    //                 width: 500
+    //                 height: 250
+    //                 fillMode: Image.PreserveAspectFit
+    //                 opacity: 1.0//0.0
 
-                    // SequentialAnimation on opacity {
-                    //     running: true
-                    //     loops: Animation.Infinite
-                    //     NumberAnimation { from: 0.0; to: 1.0; duration: 1000 }
-                    //     PauseAnimation { duration: 500 }
-                    //     NumberAnimation { from: 1.0; to: 0.0; duration: 1000 }
-                    // }
-                }
-            }
-        }
-    }
+    //                 // SequentialAnimation on opacity {
+    //                 //     running: true
+    //                 //     loops: Animation.Infinite
+    //                 //     NumberAnimation { from: 0.0; to: 1.0; duration: 1000 }
+    //                 //     PauseAnimation { duration: 500 }
+    //                 //     NumberAnimation { from: 1.0; to: 0.0; duration: 1000 }
+    //                 // }
+    //             }
+    //         }
+    //     }
+    // }
+
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -179,6 +180,7 @@ Rectangle {
             }
         }
     }
+
     Rectangle {
         id:             largeProgressBar1
         anchors.bottom: parent.bottom
@@ -197,8 +199,8 @@ Rectangle {
             Layout.alignment:        Qt.AlignRight
         }
 
-
     }
+
     // Large mission download progress bar
     Rectangle {
         id:             largeProgressBar
@@ -266,6 +268,7 @@ Rectangle {
             onClicked:      largeProgressBar._userHide = true
         }
     }
+
     // Progress bar
     Connections {
         target: planMasterController.missionController
