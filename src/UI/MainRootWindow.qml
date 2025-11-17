@@ -2133,6 +2133,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     if(_appSettings.screen==="Plan"){
                         planView.loaddata()
 
@@ -2227,10 +2228,11 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint")
                     planView.mapclear()
                     mainWindow.showPlanView()
 
-                    QGroundControl.saveGlobalSetting("planupload", "planupload")
+
                 }
             }
         }
@@ -2795,9 +2797,16 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    QGroundControl.saveGlobalSetting("load", "load")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
                 }
+
+
+
+
+
                 // onClicked: {
                 //     // mainWindow.showPlanView()
                 //     // //viewer3DWindow.close()
