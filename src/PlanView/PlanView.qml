@@ -136,8 +136,8 @@ Item {
 
     function loaddata1() {
         _planMasterController.loadFromSelectedFile1()
-        editdata.visible=false
-        MapGlobals.share_edit_visibility = false
+        editdata.visible=true
+        MapGlobals.share_edit_visibility = true
 
     }
 
@@ -312,11 +312,13 @@ Item {
 
         function upload() {
             if (!checkReadyForSaveUpload(false /* save */)) {
+                console.log("upload_clicked")
                 return
             }
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
                 sendToVehicle()
+                console.log("upload_clicked1")
                 break
             case MissionController.SendToVehiclePreCheckStateActiveMission:
                 mainWindow.showMessageDialog(qsTr("Send To Vehicle"), qsTr("Current mission must be paused prior to uploading a new Plan"))
@@ -481,8 +483,14 @@ Item {
 
         onAcceptedForSave: (file) => {
                                if (planFiles) {
-                                   _planMasterController.saveToFile1(file)
-                                   mainWindow.showFlyView()
+
+                                   if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                       _planMasterController.saveToFile1(file)
+                                       mainWindow.showFlyView()
+                                   } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                       _planMasterController.saveToFile(file)
+                                       mainWindow.showMapping()
+                                   }
                                } else {
                                    _planMasterController.saveToKml(file)
                                }
@@ -1253,13 +1261,13 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Upload_data")
                     if (_utmspEnabled) {
                         QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
                         UTMSPStateStorage.removeFlightPlanState = true
                         UTMSPStateStorage.indicatorDisplayStatus = true
                     }
                     _planMasterController.upload();
+                     console.log("Upload_data")
                 }
             }
 

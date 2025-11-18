@@ -1053,7 +1053,7 @@ property bool   mapping:                false
                 anchors.centerIn: parent  // Centers both horizontally and vertically
                 width: 32
                 height: 32
-                visible: mapPolygon.traceMode && MapGlobals.mark_with === "Mark_With_Manual"
+                visible: (mapPolygon.traceMode || mapping) && MapGlobals.mark_with === "Mark_With_Manual"
 
 
                 // MouseArea {
@@ -1071,7 +1071,7 @@ property bool   mapping:                false
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapPolygon.traceMode===true && droneType==="Agri"?true:false
+                visible: mapPolygon.traceMode
 
                 Button  {
                     id: boundryMarkingBtn
@@ -1262,7 +1262,7 @@ property bool   mapping:                false
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapping===true && droneType==="Mapping"?true:false
+                visible: mapping
 
                 Button  {
                     id: boundryMarkingBtn1
@@ -1289,6 +1289,7 @@ property bool   mapping:                false
                         color: "white"
                     }
                     onClicked: {
+                        console.log("Mapping clicked")
 
                         if(MapGlobals.mark_with === "Mark_With_GPS") {
 
@@ -1378,11 +1379,14 @@ property bool   mapping:                false
                         color: "white"
                     }
                     onClicked: {
+                        console.log("Mapping clicked")
                         if (mapPolygon.count < 3) {
                             _restorePreviousVertices()
                         } else {
                             _planMasterController.saveToSelectedFile1()
+
                             mainWindow.planmap()
+                            mainWindow.showMapping()
                         }
                     }
                 }
@@ -1886,12 +1890,13 @@ property bool   mapping:                false
                                     mapPolygon.clear()
                                 }
                             } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                mapping = true
                                 if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
                                     _resetPolygon()
                                 } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
                                     _resetCircle()
                                 }
-                                mapping = true
+
 
                             }
 

@@ -2227,7 +2227,7 @@ ApplicationWindow {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
+                onClicked: {    2
                     QGroundControl.saveGlobalSetting("waypoint", "waypoint")
                     planView.mapclear()
                     mainWindow.showPlanView()
