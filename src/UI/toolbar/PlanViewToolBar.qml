@@ -49,6 +49,7 @@ Rectangle {
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom
         spacing:                ScreenTools.defaultFontPixelWidth / 2
+
         QGCToolBarButton {
             id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
@@ -69,6 +70,12 @@ Rectangle {
 
                 // }
 
+                //waypoint visible logic
+                QGroundControl.saveGlobalSetting("waypoint", "")
+
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+
                 if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
                     mainWindow.cameraView()
                     mainWindow.closefile()
@@ -87,6 +94,7 @@ Rectangle {
                 }
             }
         }
+
     }
 
 

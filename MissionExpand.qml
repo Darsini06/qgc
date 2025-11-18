@@ -161,7 +161,10 @@ Rectangle {
 
             QGCMouseArea {
                 fillItem:   parent
-                onClicked:  commandDialog.createObject(mainWindow).open()
+                onClicked:  {
+                    console.log("MissionCommandDialog opened")
+                    commandDialog.createObject(mainWindow).open()
+                }
             }
 
             Component {
