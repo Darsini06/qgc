@@ -1268,7 +1268,7 @@ Item {
                 }
 
                 contentItem: QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
+                    source: "/qmlimages/NewImages/fileupload.svg"
                     width: 16
                     height: 16
                     anchors.centerIn: parent // Center the icon within the container

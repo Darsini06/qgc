@@ -452,10 +452,10 @@ Item {
                                     ListElement { icon: "/qmlimages/NewImages/accountUpdate.png"; name: " Account Update "; screen: "accountUpdate" }
                                     ListElement { icon: "/qmlimages/NewImages/privacy_policy.png"; name: " Privacy Policy "; screen: "privacy_policy" }
                                     ListElement { icon: "/qmlimages/NewImages/terms_condition.png"; name: "Terms & Conditions"; screen: "terms&conditions" }
-                                    ListElement { icon: "/qmlimages/NewImages/feedback.png"; name: "Feedback"; screen: "feedback" }
-                                    ListElement { icon: "/qmlimages/NewImages/feedback.png"; name: "Reports"; screen: "reports" }
+                                    ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Feedback"; screen: "feedback" }
+                                    ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Reports"; screen: "reports" }
                                     ListElement { icon: "/qmlimages/NewImages/select_drone_type.png"; name: "Select Drone"; screen: "drone" }
-                                    ListElement { icon: "/qmlimages/NewImages/logout.png"; name: "Logout"; screen: "logout" }
+                                    ListElement { icon: "/qmlimages/NewImages/logout.svg"; name: "Logout"; screen: "logout" }
                                 }
 
 

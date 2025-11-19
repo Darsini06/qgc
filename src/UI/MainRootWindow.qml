@@ -1739,10 +1739,10 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "BasicParameters.qml"; title: "Flight Modes" }
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Flight Modes" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
-            ListElement { image: "/qmlimages/NewImages/settings.png"; file: "GeneralSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Diamond" }
+            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "Info" }
             ListElement { image: "/qmlimages/NewImages/commlinks.png"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
@@ -1929,7 +1929,7 @@ ApplicationWindow {
     //     ListModel {
     //         id: tabModel
     //         ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "qrc:/qml/SettingsPanel/RCCallibarationTab.qml" ;title: "Radio" }
-    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
+    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
     //         ListElement { image: "/qmlimages/NewImages/menu.png";  file: "" ;title: "Settings" }
     //         ListElement { image: "/qmlimages/NewImages/diamond.png";  file: "" ;title: "Diamond" }
     //         ListElement { image: "/qmlimages/NewImages/CompassArrow.png";  file: "" ; title: "Info"}
@@ -2254,7 +2254,7 @@ ApplicationWindow {
 
         //     QGCColoredImage {
         //         id: eraserbtnicon
-        //         source: "/qmlimages/NewImages/map_eraser.png"
+        //         source: "/qmlimages/NewImages/map_eraser.svg"
         //         width: parent.width * 0.5   // 60% of button size
         //         height: width
         //         anchors.centerIn: parent
@@ -2317,7 +2317,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: landbtnicon
-                source: "/qmlimages/NewImages/return.png"
+                source: "/qmlimages/NewImages/return.svg"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
@@ -2328,7 +2328,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
 
-                    myDialog.imageSource = "/qmlimages/NewImages/return.png";  // Set the image dynamically
+                    myDialog.imageSource = "/qmlimages/NewImages/return.svg";  // Set the image dynamically
                     myDialog.dialogText = "Land Mode"; // Set the text dynamically
                     myDialog.open()
                 }

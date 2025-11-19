@@ -1209,7 +1209,7 @@ Item {
 
                     contentItem: QGCColoredImage {
                         //source: "qrc:/InstrumentValueIcons/save-disk.svg"
-                        source: "/qmlimages/NewImages/savefile.png"
+                        source: "/qmlimages/NewImages/savefile.svg"
                         width: 16
                         height: 16
                         anchors.centerIn: parent // Center the icon within the container

@@ -120,7 +120,7 @@ Row {
         }
 
         QGCColoredImage {
-            source: "/qmlimages/NewImages/map_eraser.png"
+            source: "/qmlimages/NewImages/map_eraser.svg"
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5

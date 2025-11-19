@@ -319,7 +319,7 @@ Rectangle {
                     visible: _activeVehicle ? false : true
                     width: 25
                     height: 25
-                    source: "/qmlimages/NewImages/satellite.png"
+                    source: "/qmlimages/NewImages/satellite.svg"
                     color: "white"
                 }
 
@@ -405,7 +405,7 @@ Rectangle {
                 QGCColoredImage {
                     id: settingsIcon
                     anchors.fill: parent
-                    source: "/qmlimages/NewImages/settings.png"
+                    source: "/qmlimages/NewImages/settings.svg"
                     color:"white"
                 }
 
