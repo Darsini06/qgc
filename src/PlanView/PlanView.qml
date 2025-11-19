@@ -78,6 +78,10 @@ Item {
     property var  _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property string droneType: "loadpage"
 
+    property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypoint","") === "waypoint"
+    property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+
+
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
 
@@ -92,7 +96,34 @@ Item {
     //             //_planMasterController.planCreator[0].createPlan(mapCenter)
 
     //     }
+
+    Component.onCompleted: {
+        QGroundControl.saveGlobalSetting("waypoint", "");  // reset when entering PlanView
+        QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+    }
+
+    onVisibleChanged: {
+
+        if(visible) {
+            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
+            editorMap.zoomLevel = QGroundControl.flightMapZoom
+            editorMap.center    = QGroundControl.flightMapPosition
+
+            if (!_planMasterController.containsItems) {
+                toolStrip.simulateClick(toolStrip.fileButtonIndex)
+            }
+
+            showReturnWaypoint = QGroundControl.loadGlobalSetting("waypoint","") === "waypoint"
+            console.log("showReturnWaypoint : ",showReturnWaypoint)
+
+            returnWaypointEnabled = QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+            console.log("returnWaypointEnabled : ",returnWaypointEnabled)
+
+        }
+    }
+
     function mapclear() {
+        console.log("MapClear")
         if (_utmspEnabled) {
             QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
             UTMSPStateStorage.removeFlightPlanState = true
@@ -125,7 +156,6 @@ Item {
     property bool _firstFenceLoadComplete:      false
     property bool _firstRallyLoadComplete:      false
     property bool _firstLoadComplete:           false
-
 
 
     function loaddata() {
@@ -170,7 +200,6 @@ Item {
             visible: true
 
 
-
             QGCColoredImage {
                 source: "qrc:/InstrumentValueIcons/share-alt.svg"
                 width: 24
@@ -201,17 +230,6 @@ Item {
         map:                        editorMap
         usePlannedHomePosition:     true
         planMasterController:       _planMasterController
-    }
-
-    onVisibleChanged: {
-        if(visible) {
-            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
-            editorMap.zoomLevel = QGroundControl.flightMapZoom
-            editorMap.center    = QGroundControl.flightMapPosition
-            if (!_planMasterController.containsItems) {
-                toolStrip.simulateClick(toolStrip.fileButtonIndex)
-            }
-        }
     }
 
 
@@ -948,9 +966,11 @@ Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
             //visible: false
+
             DeadMouseArea {
                 anchors.fill:   parent
             }
+
             Column {
                 id:                 rightControls
                 spacing:            ScreenTools.defaultFontPixelHeight * 0.5
@@ -958,6 +978,7 @@ Item {
                 anchors.right:      parent.right
                 anchors.top:        parent.top
                 //-------------------------------------------------------
+
                 // Mission Controls (Expanded)
                 QGCTabBar {
                     id:         layerTabBar
@@ -1063,6 +1084,7 @@ Item {
                     }
                 }
             }
+
             // GeoFence Editor
             GeoFenceEditor {
                 anchors.top:            rightControls.bottom
@@ -1192,6 +1214,7 @@ Item {
                     clip: true
 
                     flickableDirection: Flickable.VerticalFlick
+
                     Column {
                         id: editorContent
                         width: flickableEditor.width
@@ -1267,13 +1290,19 @@ Item {
                         UTMSPStateStorage.indicatorDisplayStatus = true
                     }
                     _planMasterController.upload();
+<<<<<<< HEAD
                      console.log("Upload_data")
+=======
+                    console.log("Upload_data")
+>>>>>>> Qgc_project/dharun_branch
                 }
             }
 
             Button {
-                id: uploadBtn1
+                id: returnWaypoint
                 //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                visible: showReturnWaypoint
+                enabled: returnWaypointEnabled
                 text: ""
                 width: 46
                 height: 46
@@ -1300,8 +1329,14 @@ Item {
                 }
 
                 onClicked: {
+
+                    console.log("returnWaypoint clicked")
+
                     toolStrip.allAddClickBoolsOff()
                     insertLandItemAfterCurrent()
+
+                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+                    returnWaypointEnabled = false
                 }
             }
 
@@ -1360,9 +1395,7 @@ Item {
                                     }
                                     customDialogItem.visible=false;
                                 }
-
                             }
-
                         }
                     }
                 }

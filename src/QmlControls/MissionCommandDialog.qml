@@ -95,6 +95,7 @@ QGCPopupDialog {
                     onClicked: {
                         missionItem.setMapCenterHintForCommandChange(map.center)
                         missionItem.command = mavCmdInfo.command
+                        console.log("MissionCommandDialog class",mavCmdInfo.friendlyName)
                         root.close()
                     }
                 }

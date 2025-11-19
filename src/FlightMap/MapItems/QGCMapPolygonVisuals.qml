@@ -59,7 +59,7 @@ Item {
 
 
 
-    property var    _planMasterController:              planMasterController
+    property var _planMasterController:              planMasterController
     readonly property string _polygonToolsText: qsTr("")//("Polygon Tools")
     readonly property string _traceText:        qsTr("")//qsTr("Click in the map to add vertices. Click 'Done Tracing' when finished.")
     property var gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
@@ -67,7 +67,7 @@ Item {
 
     property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property var activeVehicleCoordinate: activeVehicle ? activeVehicle.coordinate : QtPositioning.coordinate()
-property bool   mapping:                false
+    property bool   mapping:                false
 
     property string droneType: "loadpage"
 
@@ -79,6 +79,7 @@ property bool   mapping:                false
             }
         }
     }
+
     // Drawer {
     //           id: arrowDrawer
     //           edge: Qt.RightEdge
@@ -123,7 +124,6 @@ property bool   mapping:                false
 
 
 
-
     function addCommonVisuals() {
         console.log("addCommonVisuals method")
         if (_objMgrCommonVisuals.empty) {
@@ -132,10 +132,9 @@ property bool   mapping:                false
     }
 
 
-
-    function dailogclose() {
-        customDialogItem.visible=false;
-    }
+    // function dailogclose() {
+    //     customDialogItem.visible=false;
+    // }
 
     function tracemode() {
         mapPolygon.traceMode = false
@@ -160,7 +159,6 @@ property bool   mapping:                false
         console.log("removeEditingVisuals method")
         _objMgrEditingVisuals.destroyObjects()
     }
-
 
 
     function addToolbarVisuals() {
@@ -1071,7 +1069,11 @@ property bool   mapping:                false
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
+<<<<<<< HEAD
                 visible: mapPolygon.traceMode
+=======
+                visible: mapPolygon.traceMode//===true && droneType==="Agri"?true:false
+>>>>>>> Qgc_project/dharun_branch
 
                 Button  {
                     id: boundryMarkingBtn
@@ -1119,7 +1121,7 @@ property bool   mapping:                false
 
                         }
 
-                        else if (MapGlobals.mark_with === "Mark_With_Drone"){
+                        else if (MapGlobals.mark_with === "Mark_With_Drone") {
 
                             console.log("Mark_With_Drone")
                             if (activeVehicle && activeVehicleCoordinate.isValid) {

@@ -166,52 +166,52 @@ Rectangle {
         }
     }
 
-    Item {
-        anchors.fill: parent
+    // Item {
+    //     anchors.fill: parent
 
-        Rectangle {
-            id: curvedBackground
-            anchors {
-                top: parent.top
-                // left: parent.left
-                // right: parent.right
-                verticalCenter: parent.verticalCenter
-                horizontalCenter: parent.horizontalCenter
-                // leftMargin: parent.width * 0.15     // 15% of screen width
-                // rightMargin: parent.width * 0.15
-            }
+    //     Rectangle {
+    //         id: curvedBackground
+    //         anchors {
+    //             top: parent.top
+    //             // left: parent.left
+    //             // right: parent.right
+    //             verticalCenter: parent.verticalCenter
+    //             horizontalCenter: parent.horizontalCenter
+    //             // leftMargin: parent.width * 0.15     // 15% of screen width
+    //             // rightMargin: parent.width * 0.15
+    //         }
 
-            height: parent.height * 0.25            // 25% of available height
-            width: parent.width * 0.3              // 30% of total width
-            radius: width / 2                       // keep smooth curve
-            color: "#7d8df7"
-            antialiasing: true
-            clip: true
+    //         height: parent.height * 0.25            // 25% of available height
+    //         width: parent.width * 0.3              // 30% of total width
+    //         radius: width / 2                       // keep smooth curve
+    //         color: "#7d8df7"
+    //         antialiasing: true
+    //         clip: true
 
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: parent.height * 0.5
-                color: "#7d8df7"
-            }
+    //         Rectangle {
+    //             anchors.left: parent.left
+    //             anchors.right: parent.right
+    //             height: parent.height * 0.5
+    //             color: "#7d8df7"
+    //         }
 
-            Item {
-                anchors {
-                    fill: parent
-                    topMargin: parent.height * 0.3
-                    bottomMargin: parent.height * 0.05
-                }
+    //         Item {
+    //             anchors {
+    //                 fill: parent
+    //                 topMargin: parent.height * 0.3
+    //                 bottomMargin: parent.height * 0.05
+    //             }
 
-                Image {
-                    source: "/qmlimages/NewImages/aviatrickslogo.png"
-                    anchors.centerIn: parent
-                    width: parent.width * 5
-                    height: parent.height * 5
-                    fillMode: Image.PreserveAspectFit
-                }
-            }
-        }
-    }
+    //             Image {
+    //                 source: "/qmlimages/NewImages/aviatrickslogo.png"
+    //                 anchors.centerIn: parent
+    //                 width: parent.width * 5
+    //                 height: parent.height * 5
+    //                 fillMode: Image.PreserveAspectFit
+    //             }
+    //         }
+    //     }
+    // }
 
     // Item {
     //     width: parent.width

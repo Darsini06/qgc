@@ -437,13 +437,15 @@ Item {
 
                 onClicked: {
                     QGroundControl.saveGlobalSetting("loadpage", "Camera")
-                    MapGlobals.comefrom="Camera"
+                    MapGlobals.comefrom = "Camera"
                     mainWindow.cameraView()
                     QGroundControl.saveGlobalSetting("waypoint","waypoint")
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
                     //_appSettings.screen = "Plan"
                     //pipview.camera()
+
                     var videoSettings = QGroundControl.settingsManager.videoSettings
+
                     if (videoSettings) {
                         var videoSourceFact = videoSettings.videoSource
                         if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
@@ -491,7 +493,9 @@ Item {
                     MapGlobals.comefrom="Plan"
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
                     _appSettings.screen = "Plan"
+
                     var videoSettings = QGroundControl.settingsManager.videoSettings
+
                     if (videoSettings) {
                         var videoSourceFact = videoSettings.videoSource
                         if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
@@ -539,13 +543,18 @@ Item {
                     MapGlobals.comefrom="Start"
                     console.log("MapGlobals.comefrom",MapGlobals.comefrom)
                     _appSettings.screen = "Start"
+
                     var videoSettings = QGroundControl.settingsManager.videoSettings
+
                     if (videoSettings) {
                         var videoSourceFact = videoSettings.videoSource
                         if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
                             videoSourceFact.value = videoSourceFact.enumValues[0]
                         }
                     }
+
+                    swapCamera();
+
                     // camera.visible=false
                     // agri.visible=false
                     // mapping.visible=true

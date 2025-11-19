@@ -277,7 +277,7 @@ ApplicationWindow {
         mainrootIcons.visible = false
 
         waypointbtn.visible = false
-        eraserbtn.visible = false
+        //eraserbtn.visible = false
     }
 
     function showPlanView() {
@@ -292,7 +292,7 @@ ApplicationWindow {
         mainrootIcons.visible = false
 
         waypointbtn.visible = false
-        eraserbtn.visible = false
+        //eraserbtn.visible = false
     }
 
     function cameraView() {
@@ -308,7 +308,7 @@ ApplicationWindow {
         newscreen.visible = false
 
         waypointbtn.visible = true
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
 
     }
 
@@ -329,7 +329,7 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
         dialog.mappingbtn.visible= false
         dialog.mappingcirclebtn.visible= false
         dialog.agribtn.visible= true
@@ -353,7 +353,7 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
         dialog.mappingbtn.visible= true
         dialog.mappingcirclebtn.visible= true
         dialog.agribtn.visible= false
@@ -378,7 +378,7 @@ ApplicationWindow {
         MapGlobals.edit = "edit1"
 
         waypointbtn.visible = false
-        eraserbtn.visible = true
+        //eraserbtn.visible = true
     }
 
     function showTool(toolTitle, toolSource, toolIcon) {
@@ -1676,6 +1676,7 @@ ApplicationWindow {
         anchors.rightMargin: 15
         flightMap : planView.editorMap
         mapRotation: MapGlobals.mapRotation
+        planViewRef: planView
     }
 
     footer: LogReplayStatusBar {
@@ -1755,7 +1756,7 @@ ApplicationWindow {
 
             function updateSettingsTab() {
                 if (activeVehicle) {
-                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(1, "file", "CalibrationSettings.qml");
                 } else {
                     tabModel.setProperty(1, "file", "APMSensorsComponent.qml");
                 }
@@ -2133,7 +2134,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     if(_appSettings.screen==="Plan"){
                         planView.loaddata()
 
@@ -2232,42 +2233,43 @@ ApplicationWindow {
                     planView.mapclear()
                     mainWindow.showPlanView()
 
+                   waypointDescriptionDialog.createObject(mainWindow).open()
 
                 }
             }
         }
 
-        Rectangle {
-            id: eraserbtn
-            Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
-            height: width                 // Keep it square
-            radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
-            visible:  false
-            border.width: width * 0.05
-            border.color: "#005BBB"
+        // Rectangle {
+        //     id: eraserbtn
+        //     Layout.alignment: Qt.AlignLeft
+        //     width: parent.width * 0.05    // 8% of parent width
+        //     height: width                 // Keep it square
+        //     radius: width / 2   // Makes it a circle
+        //     color: "#1b1c3e"      // white background
+        //     visible:  false
+        //     border.width: width * 0.05
+        //     border.color: "#005BBB"
 
 
 
-            QGCColoredImage {
-                id: eraserbtnicon
-                source: "/qmlimages/NewImages/map_eraser.png"
-                width: parent.width * 0.5   // 60% of button size
-                height: width
-                anchors.centerIn: parent
-                color: "transparent"
-            }
+        //     QGCColoredImage {
+        //         id: eraserbtnicon
+        //         source: "/qmlimages/NewImages/map_eraser.png"
+        //         width: parent.width * 0.5   // 60% of button size
+        //         height: width
+        //         anchors.centerIn: parent
+        //         color: "transparent"
+        //     }
 
 
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    planView.mapclear()
-                }
-            }
-        }
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             planView.mapclear()
+        //         }
+        //     }
+        // }
 
         Rectangle {
             id: camerabtn
@@ -2535,6 +2537,57 @@ ApplicationWindow {
 
     }
 
+    Component {
+          id: waypointDescriptionDialog
+
+          QGCPopupDialog {
+              id: popup
+              title: qsTr(" Do You know ? ")
+
+              buttons: Dialog.Ok | Dialog.Cancel
+
+              onAccepted: {
+                  popup.visible = false
+              }
+
+              onRejected: {
+
+                   popup.visible = false
+
+                  QGroundControl.saveGlobalSetting("waypoint", "")
+
+                  //waypoint enable disable logic
+                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+
+                  if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                      mainWindow.cameraView()
+                      mainWindow.closefile()
+                  }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                      mainWindow.showMapping()
+                      mainWindow.closefile()
+                  }
+                  else{
+                      if (planType === "Plan") {
+                                              mainWindow.showFlyView()
+                                              mainWindow.closefile()
+                                          } else {
+                                              mainWindow.showFlyView1()
+                                              mainWindow.closefile()
+                                          }
+                  }
+
+              }
+
+              ColumnLayout {
+                  spacing: ScreenTools.defaultFontPixelWidth
+                  QGCLabel {
+                      text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
+                      Layout.fillWidth: true
+                  }
+              }
+          }
+      }
+
     Dialog {
         id: myDialog
         width: 320
@@ -2798,13 +2851,10 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     QGroundControl.saveGlobalSetting("load", "load")
-                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
                 }
-
-
-
 
 
                 // onClicked: {
@@ -4244,6 +4294,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
             _expanded                               = false;
             indicatorDrawerLoader.sourceComponent   = indicatorDrawer.sourceComponent
         }
+
         onClosed: {
             _expanded                               = false
             indicatorItem                           = undefined
@@ -4251,6 +4302,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
         }
 
         background: Item {
+
             Rectangle {
                 id:             backgroundRect
                 anchors.fill:   parent

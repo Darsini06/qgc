@@ -48,7 +48,8 @@ Node {
     }
 
 
-    function getItemName(missionItem){
+    function getItemName(missionItem)
+    {
         if(isLaunchItem(missionItem) || isReturnToLaunchItem(missionItem)){
             return qsTr("L");
         }
@@ -57,7 +58,8 @@ Node {
             return qsTr("T"); //Takeoff
         }
 
-        if(missionItem.specifiesCoordinate){
+        if(missionItem.specifiesCoordinate) {
+
             switch(missionItem.command){
             case 16:
                 return qsTr("W"); //Waypoint

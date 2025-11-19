@@ -77,6 +77,7 @@ Rectangle {
     }
 
     Row {
+
         id:                 topRowLayout
         anchors.margins:    _margin
         anchors.left:       parent.left
@@ -119,7 +120,12 @@ Rectangle {
 
             QGCMouseArea {
                 fillItem:   parent
-                onClicked:  remove()
+                onClicked:  {
+                    console.log("delete icon pressed",missionItem.commandName)
+                    remove()
+
+                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+                }
             }
         }
 
@@ -138,7 +144,7 @@ Rectangle {
                 property real _padding: ScreenTools.comboBoxPadding
 
                 QGCLabel { text: missionItem.commandName
-                color:              "white"}
+                    color:              "white"}
 
                 QGCColoredImage {
                     height:             ScreenTools.defaultFontPixelWidth
@@ -153,7 +159,10 @@ Rectangle {
 
             QGCMouseArea {
                 fillItem:   parent
-                onClicked:  commandDialog.createObject(mainWindow).open()
+                onClicked:  {
+
+                    commandDialog.createObject(mainWindow).open()
+                }
             }
 
             Component {
@@ -181,7 +190,7 @@ Rectangle {
         }
     }
 
-   QGCColoredImage {
+    QGCColoredImage {
         id:                     hamburger
         anchors.margins:        _margin
         anchors.right:          parent.right
