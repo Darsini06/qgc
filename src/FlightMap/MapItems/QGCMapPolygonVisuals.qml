@@ -1069,11 +1069,8 @@ Item {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-<<<<<<< HEAD
+
                 visible: mapPolygon.traceMode
-=======
-                visible: mapPolygon.traceMode//===true && droneType==="Agri"?true:false
->>>>>>> Qgc_project/dharun_branch
 
                 Button  {
                     id: boundryMarkingBtn

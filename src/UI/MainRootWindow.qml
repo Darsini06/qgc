@@ -2134,7 +2134,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     if(_appSettings.screen==="Plan"){
                         planView.loaddata()
 
@@ -2230,6 +2230,8 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                    QGroundControl.saveGlobalSetting("waypointvisible", "waypointvisible")
+                    QGroundControl.saveGlobalSetting("waypointMark", "true")
                     planView.mapclear()
                     mainWindow.showPlanView()
 
@@ -2548,13 +2550,15 @@ ApplicationWindow {
 
               onAccepted: {
                   popup.visible = false
+                  QGroundControl.saveGlobalSetting("waypointMark", "true")
+                  MapGlobals.waypoint="waypoint"
               }
 
               onRejected: {
-
+MapGlobals.waypoint="waypoint1"
                    popup.visible = false
 
-                  QGroundControl.saveGlobalSetting("waypoint", "")
+
 
                   //waypoint enable disable logic
                   QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
@@ -2851,7 +2855,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     QGroundControl.saveGlobalSetting("load", "load")
-                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
                 }

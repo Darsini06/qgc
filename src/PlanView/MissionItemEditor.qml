@@ -10,7 +10,7 @@ import QGroundControl.Vehicle
 import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.Palette
-
+import MapGlobals 1.0
 
 /// Mission item edit control
 Rectangle {
@@ -121,10 +121,19 @@ Rectangle {
             QGCMouseArea {
                 fillItem:   parent
                 onClicked:  {
-                    console.log("delete icon pressed",missionItem.commandName)
-                    remove()
 
-                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+                    console.log("delete icon pressed",missionItem.commandName)
+                    if(missionItem.commandName==="Takeoff"){
+                        takeoffremoveddialog.createObject(mainWindow).open()
+                    }else{
+                        remove()
+                    }
+
+
+
+
+
+
                 }
             }
         }
@@ -189,6 +198,58 @@ Rectangle {
             color:                  _outerTextColor
         }
     }
+
+
+    Component {
+          id: takeoffremoveddialog
+
+          QGCPopupDialog {
+              id: popup
+              title: qsTr(" Are you sure you want to delete Takeoff ? ")
+
+              buttons: Dialog.Ok | Dialog.Cancel
+
+              onAccepted: {
+                  popup.visible = false
+                  //waypoint enable disable logic
+                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+
+                  if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                      mainWindow.cameraView()
+                      mainWindow.closefile()
+                  }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                      mainWindow.showMapping()
+                      mainWindow.closefile()
+                  }
+                  else{
+                      if (planType === "Plan") {
+                                              mainWindow.showFlyView()
+                                              mainWindow.closefile()
+                                          } else {
+                                              mainWindow.showFlyView1()
+                                              mainWindow.closefile()
+                                          }
+                  }
+              }
+
+              onRejected: {
+                   popup.visible = false
+
+
+
+
+
+              }
+
+              ColumnLayout {
+                  spacing: ScreenTools.defaultFontPixelWidth
+                  QGCLabel {
+                      text: qsTr("If Takeoff removed means already marked waypoint will be cleared and automaticaly went to homepage")
+                      Layout.fillWidth: true
+                  }
+              }
+          }
+      }
 
     QGCColoredImage {
         id:                     hamburger
