@@ -81,16 +81,11 @@ Item {
     property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
-<<<<<<< HEAD
-
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
     property real iconSize: baseSize * 1.2   // icon inside the circle
 
-
-=======
->>>>>>> Qgc_project/dharun_branch_system
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
 
@@ -126,13 +121,11 @@ Item {
             console.log("showReturnWaypoint : ",showReturnWaypoint)
 
             returnWaypointEnabled = QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
-<<<<<<< HEAD
+
             console.log("returnWaypointEnabled in PlanView : ",returnWaypointEnabled)
 
-=======
-            console.log("returnWaypointEnabled : ",returnWaypointEnabled)
             waypointMark = QGroundControl.loadGlobalSetting("waypointMark", "true") === "true"
->>>>>>> Qgc_project/dharun_branch_system
+
         }
     }
 
@@ -182,11 +175,9 @@ Item {
     function loaddata1() {
 
         _planMasterController.loadFromSelectedFile1()
-<<<<<<< HEAD
+
         editdata.visible= true
-=======
-        editdata.visible=true
->>>>>>> Qgc_project/dharun_branch_system
+
         MapGlobals.share_edit_visibility = true
 
     }
@@ -1270,34 +1261,24 @@ Item {
                                     removeVIIndex--
                                 }
 
-<<<<<<< HEAD
                                 console.log("currentMissionItem.commandName : ",missionItemDialog.currentMissionItem.commandName)
 
-                                if(missionItemDialog.currentMissionItem.commandName === "Return To Launch"){
-                                    returnWaypointEnabled = true
-                                }
 
-=======
                                 if(missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
                                     console.log("clicked rtl")
 
                                     QGroundControl.saveGlobalSetting("waypoint", "waypoint")
 
-
-
-
-
-
                                     MapGlobals.waypoint="waypoint"
                                     returnWaypointEnabled=true
                                     waypointMark=true
-                                }
-                                if(missionItemDialog.currentMissionItem.commandName==="Takeoff"){
+                                }else if(missionItemDialog.currentMissionItem.commandName==="Takeoff"){
                                     console.log("clicked takeoff")
                                     QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
                                     mapclear()
                                 }
->>>>>>> Qgc_project/dharun_branch_system
+
+
                                 missionItemDialog.close()
                             }
 
@@ -1422,7 +1403,6 @@ Item {
                         anchors.fill: parent
 
                     }
-<<<<<<< HEAD
 
                     contentItem: QGCColoredImage {
                         source: "/qmlimages/NewImages/fileupload.svg"
@@ -1483,12 +1463,11 @@ Item {
                         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
                         returnWaypointEnabled = false
                     }
-=======
+
                     _planMasterController.upload();
 
                     console.log("Upload_data")
 
->>>>>>> Qgc_project/dharun_branch_system
                 }
             }
         }
@@ -1534,8 +1513,6 @@ Item {
                     color : "transparent"
                 }
 
-<<<<<<< HEAD
-=======
                 onClicked: {
                     waypointMark=false
                     // MapGlobals.waypoint="waypoint1"
@@ -1547,7 +1524,7 @@ Item {
                     QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
                     returnWaypointEnabled = false
                 }
->>>>>>> Qgc_project/dharun_branch_system
+
             }
 
         }

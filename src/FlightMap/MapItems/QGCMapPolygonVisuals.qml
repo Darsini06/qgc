@@ -1899,10 +1899,6 @@ Item {
                                 } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
                                     _resetCircle()
                                 }
-<<<<<<< HEAD
-=======
-
->>>>>>> Qgc_project/dharun_branch_system
 
                             }
 

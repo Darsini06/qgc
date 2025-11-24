@@ -121,10 +121,6 @@ Rectangle {
             QGCMouseArea {
                 fillItem:   parent
                 onClicked:  {
-<<<<<<< HEAD
-                    remove()
-=======
-
                     console.log("delete icon pressed",missionItem.commandName)
                     if(missionItem.commandName==="Takeoff"){
                         takeoffremoveddialog.createObject(mainWindow).open()
@@ -132,12 +128,6 @@ Rectangle {
                         remove()
                     }
 
-
-
-
-
-
->>>>>>> Qgc_project/dharun_branch_system
                 }
             }
         }
