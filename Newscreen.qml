@@ -448,7 +448,7 @@ Item {
                 Layout.rightMargin: 10
                 //font.bold: true
                 font.pixelSize: 16
-                visible: droneType==="loadpage"?true:droneType==="Agri"?true:false
+                visible: droneType==="Agri"?true:false
 
                 contentItem: Text {
                     text: parent.text

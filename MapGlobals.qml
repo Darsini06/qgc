@@ -28,6 +28,7 @@ QtObject {
     property string appType: ""
 
     property string kmlPath: ""
+    property string waypoint: "waypoint"
 
     property bool share_edit_visibility : false
 

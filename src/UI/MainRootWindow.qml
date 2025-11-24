@@ -2233,6 +2233,8 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                    QGroundControl.saveGlobalSetting("waypointvisible", "waypointvisible")
+                    QGroundControl.saveGlobalSetting("waypointMark", "true")
                     planView.mapclear()
                     mainWindow.showPlanView()
 
@@ -2553,6 +2555,7 @@ ApplicationWindow {
 
             buttons: Dialog.Ok | Dialog.Cancel
 
+<<<<<<< HEAD
             onAccepted: {
                 popup.visible = false
             }
@@ -2562,6 +2565,19 @@ ApplicationWindow {
                 popup.visible = false
 
                 QGroundControl.saveGlobalSetting("waypoint", "")
+=======
+              onAccepted: {
+                  popup.visible = false
+                  QGroundControl.saveGlobalSetting("waypointMark", "true")
+                  MapGlobals.waypoint="waypoint"
+              }
+
+              onRejected: {
+MapGlobals.waypoint="waypoint1"
+                   popup.visible = false
+
+
+>>>>>>> Qgc_project/dharun_branch_system
 
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")

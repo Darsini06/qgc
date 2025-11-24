@@ -1051,7 +1051,7 @@ Item {
                 anchors.centerIn: parent  // Centers both horizontally and vertically
                 width: 32
                 height: 32
-                visible: mapPolygon.traceMode && MapGlobals.mark_with === "Mark_With_Manual"
+                visible: (mapPolygon.traceMode || mapping) && MapGlobals.mark_with === "Mark_With_Manual"
 
 
                 // MouseArea {
@@ -1069,6 +1069,10 @@ Item {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
+<<<<<<< HEAD
+=======
+
+>>>>>>> Qgc_project/dharun_branch_system
                 visible: mapPolygon.traceMode
 
                 Button  {
@@ -1288,6 +1292,7 @@ Item {
                     }
 
                     onClicked: {
+                        console.log("Mapping clicked")
 
                         if(MapGlobals.mark_with === "Mark_With_GPS") {
 
@@ -1377,11 +1382,14 @@ Item {
                         color: "white"
                     }
                     onClicked: {
+                        console.log("Mapping clicked")
                         if (mapPolygon.count < 3) {
                             _restorePreviousVertices()
                         } else {
                             _planMasterController.saveToSelectedFile1()
+
                             mainWindow.planmap()
+                            mainWindow.showMapping()
                         }
                     }
                 }
@@ -1891,6 +1899,10 @@ Item {
                                 } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
                                     _resetCircle()
                                 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> Qgc_project/dharun_branch_system
 
                             }
 

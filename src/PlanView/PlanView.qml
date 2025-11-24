@@ -78,8 +78,10 @@ Item {
     property var  _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
     property string droneType: "loadpage"
 
-    property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypoint","") === "waypoint"
+    property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
+    property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+<<<<<<< HEAD
 
 
     // Shared responsive base
@@ -87,6 +89,8 @@ Item {
     property real iconSize: baseSize * 1.2   // icon inside the circle
 
 
+=======
+>>>>>>> Qgc_project/dharun_branch_system
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
 
@@ -103,7 +107,7 @@ Item {
     //     }
 
     Component.onCompleted: {
-        QGroundControl.saveGlobalSetting("waypoint", "");  // reset when entering PlanView
+        QGroundControl.saveGlobalSetting("waypointvisible", "");  // reset when entering PlanView
         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
     }
 
@@ -118,12 +122,17 @@ Item {
                 toolStrip.simulateClick(toolStrip.fileButtonIndex)
             }
 
-            showReturnWaypoint = QGroundControl.loadGlobalSetting("waypoint","") === "waypoint"
+            showReturnWaypoint = QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
             console.log("showReturnWaypoint : ",showReturnWaypoint)
 
             returnWaypointEnabled = QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+<<<<<<< HEAD
             console.log("returnWaypointEnabled in PlanView : ",returnWaypointEnabled)
 
+=======
+            console.log("returnWaypointEnabled : ",returnWaypointEnabled)
+            waypointMark = QGroundControl.loadGlobalSetting("waypointMark", "true") === "true"
+>>>>>>> Qgc_project/dharun_branch_system
         }
     }
 
@@ -173,7 +182,11 @@ Item {
     function loaddata1() {
 
         _planMasterController.loadFromSelectedFile1()
+<<<<<<< HEAD
         editdata.visible= true
+=======
+        editdata.visible=true
+>>>>>>> Qgc_project/dharun_branch_system
         MapGlobals.share_edit_visibility = true
 
     }
@@ -337,11 +350,13 @@ Item {
 
         function upload() {
             if (!checkReadyForSaveUpload(false /* save */)) {
+                console.log("upload_clicked")
                 return
             }
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
                 sendToVehicle()
+                console.log("upload_clicked1")
                 break
             case MissionController.SendToVehiclePreCheckStateActiveMission:
                 mainWindow.showMessageDialog(qsTr("Send To Vehicle"), qsTr("Current mission must be paused prior to uploading a new Plan"))
@@ -377,7 +392,7 @@ Item {
             }
             fileDialog.title =          qsTr("Save Plan")
             fileDialog.planFiles =      true
-            fileDialog.nameFilters =    _planMasterController.saveNameFilters1
+            fileDialog.nameFilters =    _planMasterController.saveNameFilters
             fileDialog.openForSave()
         }
 
@@ -506,8 +521,14 @@ Item {
 
         onAcceptedForSave: (file) => {
                                if (planFiles) {
-                                   _planMasterController.saveToFile1(file)
-                                   mainWindow.showFlyView()
+
+                                   if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                       _planMasterController.saveToFile1(file)
+                                       mainWindow.showFlyView()
+                                   } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                       _planMasterController.saveToFile(file)
+                                       mainWindow.showMapping()
+                                   }
                                } else {
                                    _planMasterController.saveToKml(file)
                                }
@@ -588,7 +609,12 @@ Item {
                               switch (_editingLayer) {
                                   case _layerMission:
                                   if (addWaypointRallyPointAction.checked) {
-                                      insertSimpleItemAfterCurrent(coordinate)
+
+                                      if(waypointMark){
+                                          insertSimpleItemAfterCurrent(coordinate)
+                                      }
+
+
                                   } else if (_addROIOnClick) {
                                       insertROIAfterCurrent(coordinate)
                                       _addROIOnClick = false
@@ -931,7 +957,13 @@ Item {
             function allAddClickBoolsOff() {
                 _addROIOnClick =        false
 
-                addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
+
+                if(waypointMark===true){
+                    console.log("waypointMark",waypointMark)
+                    addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
+}
+
+
 
             }
 
@@ -1238,12 +1270,34 @@ Item {
                                     removeVIIndex--
                                 }
 
+<<<<<<< HEAD
                                 console.log("currentMissionItem.commandName : ",missionItemDialog.currentMissionItem.commandName)
 
                                 if(missionItemDialog.currentMissionItem.commandName === "Return To Launch"){
                                     returnWaypointEnabled = true
                                 }
 
+=======
+                                if(missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
+                                    console.log("clicked rtl")
+
+                                    QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+
+
+
+
+
+
+                                    MapGlobals.waypoint="waypoint"
+                                    returnWaypointEnabled=true
+                                    waypointMark=true
+                                }
+                                if(missionItemDialog.currentMissionItem.commandName==="Takeoff"){
+                                    console.log("clicked takeoff")
+                                    QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
+                                    mapclear()
+                                }
+>>>>>>> Qgc_project/dharun_branch_system
                                 missionItemDialog.close()
                             }
 
@@ -1368,6 +1422,7 @@ Item {
                         anchors.fill: parent
 
                     }
+<<<<<<< HEAD
 
                     contentItem: QGCColoredImage {
                         source: "/qmlimages/NewImages/fileupload.svg"
@@ -1428,6 +1483,12 @@ Item {
                         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
                         returnWaypointEnabled = false
                     }
+=======
+                    _planMasterController.upload();
+
+                    console.log("Upload_data")
+
+>>>>>>> Qgc_project/dharun_branch_system
                 }
             }
         }
@@ -1473,6 +1534,20 @@ Item {
                     color : "transparent"
                 }
 
+<<<<<<< HEAD
+=======
+                onClicked: {
+                    waypointMark=false
+                    // MapGlobals.waypoint="waypoint1"
+                    // QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    console.log("returnWaypoint clicked")
+
+                    toolStrip.allAddClickBoolsOff()
+                    insertLandItemAfterCurrent()
+                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+                    returnWaypointEnabled = false
+                }
+>>>>>>> Qgc_project/dharun_branch_system
             }
 
         }
