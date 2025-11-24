@@ -82,6 +82,11 @@ Item {
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
 
 
+    // Shared responsive base
+    property real baseSize: parent.width * 0.045    // 6% of screen width
+    property real iconSize: baseSize * 1.2   // icon inside the circle
+
+
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
 
@@ -117,10 +122,11 @@ Item {
             console.log("showReturnWaypoint : ",showReturnWaypoint)
 
             returnWaypointEnabled = QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
-            console.log("returnWaypointEnabled : ",returnWaypointEnabled)
+            console.log("returnWaypointEnabled in PlanView : ",returnWaypointEnabled)
 
         }
     }
+
 
     function mapclear() {
         console.log("MapClear")
@@ -165,9 +171,10 @@ Item {
     }
 
     function loaddata1() {
+
         _planMasterController.loadFromSelectedFile1()
-        editdata.visible=false
-        MapGlobals.share_edit_visibility = false
+        editdata.visible= true
+        MapGlobals.share_edit_visibility = true
 
     }
 
@@ -1230,6 +1237,13 @@ Item {
                                 if (removeVIIndex >= _missionController.visualItems.count) {
                                     removeVIIndex--
                                 }
+
+                                console.log("currentMissionItem.commandName : ",missionItemDialog.currentMissionItem.commandName)
+
+                                if(missionItemDialog.currentMissionItem.commandName === "Return To Launch"){
+                                    returnWaypointEnabled = true
+                                }
+
                                 missionItemDialog.close()
                             }
 
@@ -1243,92 +1257,227 @@ Item {
         }
 
 
+        // Item {
+        //     id: editdata
+        //     anchors.bottom: parent.bottom
+        //     anchors.left: parent.left
+        //     anchors.bottomMargin: 60   // increased from 20 → lifts it up
+        //     anchors.leftMargin: 10
+
+        //     Button {
+        //         id: uploadBtn
+        //         text: ""
+        //         width: 46
+        //         height: 46
+
+        //         //padding: 15
+
+        //         background: Rectangle {
+        //             radius: width / 2
+        //             color: "#1b1c3e"
+        //             border.color: "#005BBB"
+        //             border.width: 2
+        //             anchors.fill: parent
+        //             anchors.margins: 5
+        //         }
+
+        //         contentItem: QGCColoredImage {
+        //             source: "/qmlimages/NewImages/fileupload.svg"
+        //             width: 16
+        //             height: 16
+        //             anchors.centerIn: parent // Center the icon within the container
+        //             color: "white"
+        //         }
+
+        //         onClicked: {
+        //             if (_utmspEnabled) {
+        //                 QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+        //                 UTMSPStateStorage.removeFlightPlanState = true
+        //                 UTMSPStateStorage.indicatorDisplayStatus = true
+        //             }
+        //             _planMasterController.upload();
+        //             console.log("Upload_data")
+        //         }
+        //     }
+
+        //     Button {
+        //         id: returnWaypoint
+        //         //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+        //         visible: showReturnWaypoint
+        //         enabled: returnWaypointEnabled
+        //         text: ""
+        //         width: 46
+        //         height: 46
+        //         anchors.left: uploadBtn.right
+        //         anchors.leftMargin: 10
+        //         anchors.bottom: uploadBtn.bottom
+        //         //padding: 15
+
+        //         background: Rectangle {
+        //             radius: width / 2
+        //             color: "#1b1c3e"
+        //             border.color: "#005BBB"
+        //             border.width: 2
+        //             anchors.fill: parent
+        //             anchors.margins: 5
+        //         }
+
+        //         contentItem: QGCColoredImage {
+        //             source: "/res/rtl.svg"
+        //             width: 16
+        //             height: 16
+        //             anchors.centerIn: parent // Center the icon within the container
+        //             color: "white"
+        //         }
+
+        //         onClicked: {
+
+        //             console.log("returnWaypoint clicked")
+
+        //             toolStrip.allAddClickBoolsOff()
+        //             insertLandItemAfterCurrent()
+
+        //             QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+        //             returnWaypointEnabled = false
+        //         }
+        //     }
+
+        // }
+
+
         Item {
             id: editdata
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.bottomMargin: 60   // increased from 20 → lifts it up
-            //anchors.leftMargin: 10
+            anchors.bottomMargin: 60
+            anchors.leftMargin: 10
 
-            Button {
-                id: uploadBtn
-                text: ""
-                width: 46
-                height: 46
+            Row {
+                spacing: 10    // space between the two buttons
 
-                padding: 15
+                // ========== Upload Button ==========
+                Button {
+                    width: baseSize
+                    height: baseSize
 
-                background: Rectangle {
-                    radius: width / 2
-                    color: "#1b1c3e"
-                    border.color: "#005BBB"
-                    border.width: 2
-                    anchors.fill: parent
-                    anchors.margins: 5
-                }
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
+                        anchors.fill: parent
 
-                contentItem: QGCColoredImage {
-                    source: "/qmlimages/NewImages/fileupload.svg"
-                    width: 16
-                    height: 16
-                    anchors.centerIn: parent // Center the icon within the container
-                    color: "white"
-                }
-
-                onClicked: {
-                    if (_utmspEnabled) {
-                        QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
-                        UTMSPStateStorage.removeFlightPlanState = true
-                        UTMSPStateStorage.indicatorDisplayStatus = true
                     }
-                    _planMasterController.upload();
-                    console.log("Upload_data")
+
+                    contentItem: QGCColoredImage {
+                        source: "/qmlimages/NewImages/fileupload.svg"
+                        width: iconSize
+                        height: iconSize
+                        anchors.centerIn: parent
+
+                        color: "black"
+
+                    }
+
+                    onClicked: {
+                        console.log("Upload clicked")
+
+                        if(_activeVehicle) {
+                            if (_utmspEnabled) {
+                                QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+                                UTMSPStateStorage.removeFlightPlanState = true
+                                UTMSPStateStorage.indicatorDisplayStatus = true
+                            }
+                            _planMasterController.upload()
+                        } else {
+                             mainWindow.showToastMessage("Drone Not Connected");
+                        }
+
+
+                    }
+                }
+
+                // ========== Return Waypoint Button ==========
+                Button {
+                    width: baseSize
+                    height: baseSize
+
+                    visible: showReturnWaypoint
+                    enabled: returnWaypointEnabled
+
+                    background: Rectangle {
+                        radius: width / 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
+                        anchors.fill: parent
+                    }
+
+                    contentItem: QGCColoredImage {
+                        source: "/res/rtl.svg"
+                        width: iconSize
+                        height: iconSize
+                        anchors.centerIn: parent
+                        color: "black"
+                    }
+
+                    onClicked: {
+                        console.log("Return waypoint clicked")
+                        toolStrip.allAddClickBoolsOff()
+                        insertLandItemAfterCurrent()
+                        QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+                        returnWaypointEnabled = false
+                    }
                 }
             }
+        }
 
-            Button {
-                id: returnWaypoint
-                //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
-                visible: showReturnWaypoint
-                enabled: returnWaypointEnabled
-                text: ""
-                width: 46
-                height: 46
-                anchors.left: uploadBtn.right
-                anchors.leftMargin: 10
-                anchors.bottom: uploadBtn.bottom
-                padding: 15
 
-                background: Rectangle {
-                    radius: width / 2
-                    color: "#1b1c3e"
-                    border.color: "#005BBB"
-                    border.width: 2
+
+        Item {
+
+            id: compassNorth
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin:  10
+            anchors.leftMargin: 8
+
+            Rectangle {
+                width: baseSize
+                height: baseSize
+                radius: width / 2
+                color: "white"//"white"//"#1b1c3e"
+                //border.width: width * 0.05
+                //border.color: "white"//"white"//"#005BBB"
+                clip: true
+
+                MouseArea {
                     anchors.fill: parent
-                    anchors.margins: 5
+                    onClicked: {
+                        MapGlobals.mapRotation = 0
+                    }
                 }
 
-                contentItem: QGCColoredImage {
-                    source: "/res/rtl.svg"
-                    width: 16
-                    height: 16
-                    anchors.centerIn: parent // Center the icon within the container
-                    color: "white"
+                QGCColoredImage {
+                    id: compassArrow
+                    source: "/qmlimages/NewImages/cardinal_point.svg"
+                    anchors.centerIn: parent
+                    width: iconSize * 0.65
+                    height: iconSize * 0.65
+                    fillMode: Image.PreserveAspectFit
+                    transform: Rotation {
+                        origin.x: compassArrow.width / 2
+                        origin.y: compassArrow.height / 2
+                        angle: -MapGlobals.mapRotation
+                    }
+                    color : "transparent"
                 }
 
-                onClicked: {
-
-                    console.log("returnWaypoint clicked")
-
-                    toolStrip.allAddClickBoolsOff()
-                    insertLandItemAfterCurrent()
-
-                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
-                    returnWaypointEnabled = false
-                }
             }
 
         }
+
+
 
         Component {
             id: customdialog

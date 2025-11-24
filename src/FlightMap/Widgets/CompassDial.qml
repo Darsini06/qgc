@@ -32,7 +32,7 @@ Item {
     QGCLabel {
         anchors.centerIn:   parent
         font.pointSize: ScreenTools.smallFontPointSize
-        //font.bold: true
+        font.bold: true
         text:               "N"
 
         transform: Translate {
@@ -87,6 +87,7 @@ Item {
             width:              1
             height:             ScreenTools.defaultFontPixelHeight * 0.4
             color:              qgcPal.text
+
 
             transform: Rotation {
                 origin.x:   0

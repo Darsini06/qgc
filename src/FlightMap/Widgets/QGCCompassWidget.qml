@@ -101,6 +101,7 @@ Rectangle {
             }
         }
 
+
         Image {
             id:                 nextWPPointer
             source:             "/qmlimages/compassDottedLine.svg"
@@ -150,7 +151,6 @@ Rectangle {
         text:                       vehicle ? _heading.toFixed(0) + "°" : ""
         horizontalAlignment:        Text.AlignHCenter
         font.pointSize: ScreenTools.smallFontPointSize
-
     }
 
 }

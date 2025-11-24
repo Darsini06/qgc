@@ -121,10 +121,7 @@ Rectangle {
             QGCMouseArea {
                 fillItem:   parent
                 onClicked:  {
-                    console.log("delete icon pressed",missionItem.commandName)
                     remove()
-
-                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
                 }
             }
         }

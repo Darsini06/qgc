@@ -1,4 +1,4 @@
- /****************************************************************************
+/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -233,16 +233,16 @@ ApplicationWindow {
     }
 
     function newscreendata() {
-            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-               newscreen.camera()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                newscreen.agri()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                newscreen.mapping()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
-                newscreen.vtol()
-            }
+        if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+            newscreen.camera()
+        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+            newscreen.agri()
+        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+            newscreen.mapping()
+        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
+            newscreen.vtol()
         }
+    }
 
     function filename() {
         filename.tracemode()
@@ -908,12 +908,12 @@ ApplicationWindow {
                     for (var i = 0; i < resultSet.rows.length; i++) {
                         var session = resultSet.rows.item(i);
                         console.log(
-                            session.id + " | " +
-                            (session.date || "NULL") + " | " +
-                            (session.start_time || "NULL") + " | " +
-                            (session.end_time || "NULL") + " | " +
-                            (session.duration || "NULL")
-                        );
+                                    session.id + " | " +
+                                    (session.date || "NULL") + " | " +
+                                    (session.start_time || "NULL") + " | " +
+                                    (session.end_time || "NULL") + " | " +
+                                    (session.duration || "NULL")
+                                    );
                     }
                 }
 
@@ -1771,7 +1771,7 @@ ApplicationWindow {
             Rectangle  {
                 Layout.preferredHeight: ScreenTools.toolbarHeight
                 Layout.fillWidth: true
-                color: "#1b1c3e"
+                color:  "#1b1c3e"
 
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
@@ -1819,7 +1819,7 @@ ApplicationWindow {
                 currentIndex: 0
 
                 background: Rectangle {
-                    color: "#1b1c3e"
+                    color:  "#1b1c3e"
                 }
 
                 Repeater {
@@ -1842,7 +1842,7 @@ ApplicationWindow {
                                 width: tabBar.currentIndex === index ? 18 : 18
                                 height: tabBar.currentIndex === index ? 18 : 18
                                 source: model.image
-                                //color: tabBar.currentIndex === index ? "#1b1c3e" : "white"
+                                //color: tabBar.currentIndex === index ?  "white"//"#1b1c3e" : "white"
                                 color: tabBar.currentIndex === index ? "transparent" : "white"
                             }
 
@@ -2050,7 +2050,7 @@ ApplicationWindow {
     //     background: Rectangle {
     //         color: "#007AFF"  // Blue color (iOS-style button)
     //         radius: 20  // Curved button
-    //         border.color: "#005BBB"  // Border color
+    //         border.color:  "white"//"#005BBB"  // Border color
     //         border.width: 2
     //     }
     //         onClicked: {
@@ -2117,24 +2117,25 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color: "#1b1c3e"
+            color:  "white"//"#1b1c3e"
             visible: false
             border.width: width * 0.05    // 10% of button width
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: flightModeIndicator2
-                source: "/qmlimages/NewImages/savedfiles.png" //"/qmlimages/NewImages/log.png"
+                source: "/qmlimages/NewImages/savefile.svg" //"/qmlimages/NewImages/log.png"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "transparent"
+                //color: "transparent"
+                color : "black"
             }
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     if(_appSettings.screen==="Plan"){
                         planView.loaddata()
 
@@ -2152,10 +2153,10 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2            // Circle
-        //     color: "#1b1c3e"
+        //     color:  "white"//"#1b1c3e"
         //     visible: true
         //     border.width: width * 0.05    // 10% of button width
-        //     border.color: "#005BBB"
+        //     border.color:  "white"//"#005BBB"
 
         //     QGCColoredImage {
         //         id: takeofficon
@@ -2182,24 +2183,25 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
+            color:  "white"//"#1b1c3e"      // white background
             visible:  false
             border.width: width * 0.05
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: takeofficon
-                source: "/qmlimages/NewImages/takeOff.png"
-                width: parent.width * 0.5   // 60% of button size
+                source: "/qmlimages/NewImages/takeOff.svg"
+                width: parent.width * 0.6   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                //color: "white"
+                color : "black"
             }
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }
@@ -2212,18 +2214,19 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
+            color:  "white"//"#1b1c3e"      // white background
             visible:  false
             border.width: width * 0.05
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: waypointbtnicon1
                 source: "/qmlimages/MapAddMission.svg"
-                width: parent.width * 0.5   // 60% of button size
+                width: parent.width * 0.6   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                //color: "white"
+                color : "black"
             }
 
             MouseArea {
@@ -2233,7 +2236,7 @@ ApplicationWindow {
                     planView.mapclear()
                     mainWindow.showPlanView()
 
-                   waypointDescriptionDialog.createObject(mainWindow).open()
+                    waypointDescriptionDialog.createObject(mainWindow).open()
 
                 }
             }
@@ -2245,10 +2248,10 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2   // Makes it a circle
-        //     color: "#1b1c3e"      // white background
+        //     color:  "white"//"#1b1c3e"      // white background
         //     visible:  false
         //     border.width: width * 0.05
-        //     border.color: "#005BBB"
+        //     border.color:  "white"//"#005BBB"
 
 
 
@@ -2277,10 +2280,10 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
+            color:  "white"//"#1b1c3e"      // white background
             visible:  false
             border.width: width * 0.05
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: camerabtnicon
@@ -2288,11 +2291,13 @@ ApplicationWindow {
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                //color: "white"
+                color : "black"
             }
 
             MouseArea {
                 anchors.fill: parent
+
                 onClicked: {
                     // //whatsappImageSlider.visible=true
                     // mainWindow.showToastMessage("Camera clicked");
@@ -2310,10 +2315,10 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
+            color:  "white"//"#1b1c3e"      // white background
             visible:  false
             border.width: width * 0.05
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: landbtnicon
@@ -2321,7 +2326,8 @@ ApplicationWindow {
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                //color: "white"
+                color : "black"
             }
 
             MouseArea {
@@ -2341,10 +2347,10 @@ ApplicationWindow {
             width: parent.width * 0.05    // 8% of parent width
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color: "#1b1c3e"      // white background
+            color:  "white"//"#1b1c3e"      // white background
             visible:  false
             border.width: width * 0.05
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             QGCColoredImage {
                 id: rtlbtnicon
@@ -2352,7 +2358,8 @@ ApplicationWindow {
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
-                color: "white"
+                //color: "white"
+                color : "black"
             }
 
 
@@ -2381,10 +2388,10 @@ ApplicationWindow {
                 width: parent.width * 0.05    // 8% of parent width
                 height: width                 // Keep it square
                 radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
+                color:  "white"//"#1b1c3e"      // white background
                 visible:  false
                 border.width: width * 0.05
-                border.color: "#005BBB"
+                border.color:  "white"//"#005BBB"
 
                 QGCColoredImage {
                     id: flightModeIndicator12
@@ -2522,11 +2529,11 @@ ApplicationWindow {
             width: flightmode1.implicitWidth + 30   // 10px padding left/right
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
-            color: "#1b1c3e"
+            color:  "white"//"#1b1c3e"
             visible: activeVehicle
 
             border.width: 2
-            border.color: "#005BBB"
+            border.color:  "white"//"#005BBB"
 
             FlightModeIndicator {
                 id: flightmode1
@@ -2538,55 +2545,55 @@ ApplicationWindow {
     }
 
     Component {
-          id: waypointDescriptionDialog
+        id: waypointDescriptionDialog
 
-          QGCPopupDialog {
-              id: popup
-              title: qsTr(" Do You know ? ")
+        QGCPopupDialog {
+            id: popup
+            title: qsTr(" Do You know ? ")
 
-              buttons: Dialog.Ok | Dialog.Cancel
+            buttons: Dialog.Ok | Dialog.Cancel
 
-              onAccepted: {
-                  popup.visible = false
-              }
+            onAccepted: {
+                popup.visible = false
+            }
 
-              onRejected: {
+            onRejected: {
 
-                   popup.visible = false
+                popup.visible = false
 
-                  QGroundControl.saveGlobalSetting("waypoint", "")
+                QGroundControl.saveGlobalSetting("waypoint", "")
 
-                  //waypoint enable disable logic
-                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                  if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                      mainWindow.cameraView()
-                      mainWindow.closefile()
-                  }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                      mainWindow.showMapping()
-                      mainWindow.closefile()
-                  }
-                  else{
-                      if (planType === "Plan") {
-                                              mainWindow.showFlyView()
-                                              mainWindow.closefile()
-                                          } else {
-                                              mainWindow.showFlyView1()
-                                              mainWindow.closefile()
-                                          }
-                  }
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                    mainWindow.cameraView()
+                    mainWindow.closefile()
+                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    mainWindow.showMapping()
+                    mainWindow.closefile()
+                }
+                else{
+                    if (planType === "Plan") {
+                        mainWindow.showFlyView()
+                        mainWindow.closefile()
+                    } else {
+                        mainWindow.showFlyView1()
+                        mainWindow.closefile()
+                    }
+                }
 
-              }
+            }
 
-              ColumnLayout {
-                  spacing: ScreenTools.defaultFontPixelWidth
-                  QGCLabel {
-                      text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
-                      Layout.fillWidth: true
-                  }
-              }
-          }
-      }
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
 
     Dialog {
         id: myDialog
@@ -2803,23 +2810,23 @@ ApplicationWindow {
     }
 
     function executeAction2() {
-            console.log("Button long-pressed! Action executed.1")
-            if(activeVehicle){
-                var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
+        console.log("Button long-pressed! Action executed.1")
+        if(activeVehicle){
+            var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
 
-                if (homeDistance > 10.0) {
-                    activeVehicle.guidedModeRTL(false)
-                } else {
-                    activeVehicle.guidedModeLand()
-                }
-
+            if (homeDistance > 10.0) {
+                activeVehicle.guidedModeRTL(false)
+            } else {
+                activeVehicle.guidedModeLand()
             }
-            // rtlbtn.visible=false
-            // takeoffbtn.visible=true
 
-
-            myDialog.close()
         }
+        // rtlbtn.visible=false
+        // takeoffbtn.visible=true
+
+
+        myDialog.close()
+    }
 
 
 
@@ -2837,12 +2844,12 @@ ApplicationWindow {
             width: 100
             height: 38
             radius: width / 2  // Makes it a circle
-            color: "#1b1c3e"     // white background
+            color:  "white"//"#1b1c3e"     // white background
             visible: false
 
             Text {
                 text: " + New Plot "
-                color: "white"
+                color: "black"
                 anchors.centerIn: parent
                 font.bold: true
             }
@@ -2851,7 +2858,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     QGroundControl.saveGlobalSetting("load", "load")
-                    //QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
                 }
@@ -2927,7 +2934,7 @@ ApplicationWindow {
     //                 Layout.preferredHeight: parent.height* 0.4
 
     //                 background: Rectangle {
-    //                     color: "#1b1c3e"
+    //                     color:  "white"//"#1b1c3e"
     //                     radius: 12
     //                 }
 
@@ -2971,7 +2978,7 @@ ApplicationWindow {
     //                 Layout.preferredHeight: parent.height* 0.4
 
     //                 background: Rectangle {
-    //                     color: "#1b1c3e"
+    //                     color:  "white"//"#1b1c3e"
     //                     radius: 12
     //                 }
 
@@ -3016,7 +3023,7 @@ ApplicationWindow {
     //                 Layout.preferredHeight: parent.height* 0.4
 
     //                 background: Rectangle {
-    //                     color: "#1b1c3e"
+    //                     color:  "white"//"#1b1c3e"
     //                     radius: 12
     //                 }
 
@@ -3083,7 +3090,7 @@ ApplicationWindow {
     //             //                             }
     //             //                         }
     //             //         background: Rectangle {
-    //             //             color: "#1b1c3e"
+    //             //             color:  "white"//"#1b1c3e"
     //             //             radius: 8
     //             //         }
     //             //         onClicked: {
@@ -3121,7 +3128,7 @@ ApplicationWindow {
     //             //                             }
     //             //                         }
     //             //         background: Rectangle {
-    //             //             color: "#1b1c3e"
+    //             //             color:  "white"//"#1b1c3e"
     //             //             radius: 8
     //             //         }
     //             //         onClicked: console.log("Option 2 clicked")
@@ -3153,7 +3160,7 @@ ApplicationWindow {
     //             //                             }
     //             //                         }
     //             //         background: Rectangle {
-    //             //             color: "#1b1c3e"
+    //             //             color:  "white"//"#1b1c3e"
     //             //             radius: 8
     //             //         }
     //             //         onClicked: console.log("Option 2 clicked")
@@ -3178,9 +3185,9 @@ ApplicationWindow {
         height: parent.height // * 0.5 // 50% of screen height
 
         property alias mappingbtn: mappingbtn
-            property alias mappingcirclebtn: mappingcirclebtn
+        property alias mappingcirclebtn: mappingcirclebtn
         property alias agribtn: agribtn
-            property alias agrigpsbtn: agrigpsbtn
+        property alias agrigpsbtn: agrigpsbtn
 
 
         background: Rectangle {
@@ -3321,7 +3328,7 @@ ApplicationWindow {
 
                     onClicked: {
                         planView.mapclear()
-QGroundControl.saveGlobalSetting("mapping", "basic")
+                        QGroundControl.saveGlobalSetting("mapping", "basic")
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
                         MapGlobals.editdialog = "editdialog"
@@ -3379,8 +3386,8 @@ QGroundControl.saveGlobalSetting("mapping", "basic")
                     }
 
                     onClicked: {
-planView.mapclear()
-QGroundControl.saveGlobalSetting("mapping", "circle")
+                        planView.mapclear()
+                        QGroundControl.saveGlobalSetting("mapping", "circle")
                         MapGlobals.mark_with = "Mark_With_Manual"
                         MapGlobals.edit = "edit"
                         MapGlobals.editdialog = "editdialog"
@@ -3657,7 +3664,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                 // }
                 // }
                 // background: Rectangle {
-                // color: "#1b1c3e"
+                // color:  "white"//"#1b1c3e"
                 // radius: 8
                 // }
                 // onClicked: {
@@ -3695,7 +3702,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                 // }
                 // }
                 // background: Rectangle {
-                // color: "#1b1c3e"
+                // color:  "white"//"#1b1c3e"
                 // radius: 8
                 // }
                 // onClicked: console.log("Option 2 clicked")
@@ -3727,7 +3734,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
                 // }
                 // }
                 // background: Rectangle {
-                // color: "#1b1c3e"
+                // color:  "white"//"#1b1c3e"
                 // radius: 8
                 // }
                 // onClicked: console.log("Option 2 clicked")

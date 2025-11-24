@@ -55,10 +55,10 @@
         <file alias="NewImages/SearchIcon.png">src/NewImages/searchIcon.png</file>
         <file alias="NewImages/CompassArrow.png">src/NewImages/compass_arrow.png</file>
         <file alias="NewImages/map_eraser.svg">src/NewImages/map_eraser.svg</file>
-        <file alias="NewImages/MapSwitch.png">src/NewImages/mapswitch.png</file>
+        <file alias="NewImages/map_switch.svg">src/NewImages/map_switch.svg</file>
         <file alias="NewImages/redirect.svg">src/NewImages/redirect.svg</file>
-        <file alias="NewImages/DroneRedirect.png">src/NewImages/drone_redirect.png</file>
-        <file alias="NewImages/MapRedirect1.png">src/NewImages/map_redirect.png</file>
+        <file alias="NewImages/drone_redirect.svg">src/NewImages/drone_redirect.svg</file>
+        <file alias="NewImages/map_redirect.svg">src/NewImages/map_redirect.svg</file>
         <file alias="NewImages/callibration.png">src/NewImages/callibration.png</file>
         <file alias="NewImages/parameterSettings.svg">src/NewImages/parameterSettings.svg</file>
         <file alias="NewImages/failsafe.svg">src/NewImages/failsafe.svg</file>
@@ -68,8 +68,8 @@
         <file alias="NewImages/teams.png">src/NewImages/teams.png</file>
         <file alias="NewImages/goldMedal.png">src/NewImages/goldMedal.png</file>
         <file alias="NewImages/blackMedal.png">src/NewImages/blackMedal.png</file>
-        <file alias="NewImages/feedback.png">src/NewImages/feedback.png</file>
-        <file alias="NewImages/reports.png">src/NewImages/reports.png</file>
+        <file alias="NewImages/feedback.svg">src/NewImages/feedback.svg</file>
+        <file alias="NewImages/feedback_color.svg">src/NewImages/feedback_color.svg</file>
         <file alias="NewImages/recordLogs.png">src/NewImages/recordLogs.png</file>
         <file alias="NewImages/profileImage.png">src/NewImages/profileImage.png</file>
         <file alias="NewImages/homeIcon.png">src/NewImages/homeIcon.png</file>
@@ -104,13 +104,14 @@
         <file alias="NewImages/gps.png">src/NewImages/gps.png</file>
         <file alias="NewImages/landing.png">src/NewImages/landing.png</file>
         <file alias="NewImages/location.png">src/NewImages/location.png</file>
-        <file alias="NewImages/logout.svg">src/NewImages/logout.svg</file>      
+        <file alias="NewImages/logout.svg">src/NewImages/logout.svg</file>     
+        <file alias="NewImages/logout_color.svg">src/NewImages/logout_color.svg</file>     
         <file alias="NewImages/notification.png">src/NewImages/notification.png</file>
         <file alias="NewImages/obstacle.png">src/NewImages/obstacle.png</file>
         <file alias="NewImages/privacy_policy.png">src/NewImages/privacy_policy.png</file>
         <file alias="NewImages/savefile.svg">src/NewImages/savefile.svg</file>
         <file alias="NewImages/savedfiles.png">src/NewImages/savedfiles.png</file>
-        <file alias="NewImages/select_drone_type.png">src/NewImages/select_drone_type.png</file>
+        <file alias="NewImages/select_drone_type_color.svg">src/NewImages/select_drone_type_color.svg</file>
         <file alias="NewImages/terms_condition.png">src/NewImages/terms_condition.png</file>
         <file alias="NewImages/commlinks.png">src/NewImages/commlinks.png</file>
         <file alias="NewImages/autonomous.svg">src/NewImages/autonomous.svg</file>
@@ -122,6 +123,9 @@
         <file alias="NewImages/total_hours.svg">src/NewImages/total_hours.svg</file>
         <file alias="NewImages/terms_condition_black.svg">src/NewImages/terms_condition_black.svg</file>
         <file alias="NewImages/select_drone_type_black.svg">src/NewImages/select_drone_type_black.svg</file>
+        <file alias="NewImages/cardinal_point.svg">src/NewImages/cardinal_point.svg</file>
+        <file alias="NewImages/report_color.svg">src/NewImages/report_color.svg</file>
+        <file alias="NewImages/report.svg">src/NewImages/report.svg</file>
         
 
 

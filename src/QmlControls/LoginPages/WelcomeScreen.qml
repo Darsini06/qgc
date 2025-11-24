@@ -625,7 +625,7 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             Text {
-                                text: "Display Name"
+                                text: "Profile Name"
                                 //font.pixelSize: dp(4)
                                 font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium

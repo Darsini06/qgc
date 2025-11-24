@@ -1069,7 +1069,7 @@ Item {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapPolygon.traceMode//===true && droneType==="Agri"?true:false
+                visible: mapPolygon.traceMode
 
                 Button  {
                     id: boundryMarkingBtn
@@ -1260,7 +1260,7 @@ Item {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-                visible: mapping===true && droneType==="Mapping"?true:false
+                visible: mapping
 
                 Button  {
                     id: boundryMarkingBtn1
@@ -1286,6 +1286,7 @@ Item {
                         anchors.centerIn: parent // Center the icon within the container
                         color: "white"
                     }
+
                     onClicked: {
 
                         if(MapGlobals.mark_with === "Mark_With_GPS") {
@@ -1884,12 +1885,12 @@ Item {
                                     mapPolygon.clear()
                                 }
                             } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                mapping = true
                                 if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
                                     _resetPolygon()
                                 } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
                                     _resetCircle()
                                 }
-                                mapping = true
 
                             }
 

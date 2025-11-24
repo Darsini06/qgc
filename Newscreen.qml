@@ -256,27 +256,31 @@ Item {
         }
 
         LottieAnimation {
-          id: droneAnim1
-          source: "qrc:/qmlimages/NewImages/droneManFly.json"
-          autoPlay: true
-          loops: Animation.Infinite
-          scale: 0.3
-          onStatusChanged: console.log("Lottie Status:", status)
-          visible:droneType ==="loadpage"?true:false
-          anchors.right: parent.right
-          anchors.bottom: parent.bottom
-          anchors.rightMargin: 25
-          anchors.bottomMargin: 25
-          width: parent.width * 0.30
-          height: parent.height * 0.30
-        }
+            id: droneAnim1
+            source: "qrc:/qmlimages/NewImages/droneManFly.json"
+            autoPlay: true
+            loops: Animation.Infinite
+            visible: droneType === "loadpage"
 
+            scale: 0.3
+
+            // RIGHT side + CENTER vertically  ✔
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            // Responsive margins  ✔
+            anchors.rightMargin: Screen.width * 0.008
+
+            // width: parent.width * 0.30
+            // height: parent.height * 0.30
+
+        }
 
 
         // ---- Drone Image Placeholder ----
         Image {
             id:cameraicon
-            source: "/qmlimages/NewImages/cameradrone.png" // Replace with real image
+            source: "/qmlimages/NewImages/cameradrone.svg" // Replace with real image
             visible: droneType ==="Camera"?true:false
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -336,30 +340,6 @@ Item {
     Rectangle {
         color: "transparent"
         anchors.fill: parent
-
-        // ColumnLayout {
-        // anchors.centerIn: parent
-        // spacing: 20 // Space between image and text
-
-        // Image {
-        // id: droneImage
-        // width: 80
-        // height: 80
-        // //<file alias="NEWIMAGE/Droneimage">src/Newimages/droneImage.png</file>
-        // source: "qrc:/InstrumentValueIcons/drone.svg"
-        // sourceSize.width: width
-        // sourceSize.height: height
-        // fillMode: Image.PreserveAspectFit
-        // Layout.alignment: Qt.AlignHCenter
-        // }
-
-
-        // Text {
-        // text: "Welcome to the new screen!"
-        // font.pixelSize: 24
-        // Layout.alignment: Qt.AlignHCenter
-        // }
-        // }
 
         RowLayout {
             anchors.bottom: parent.bottom
@@ -786,9 +766,5 @@ Item {
                   }
               }
           }
-
-
     }
-
-
 }

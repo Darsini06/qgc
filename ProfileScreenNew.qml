@@ -449,12 +449,12 @@ Item {
                                 Layout.fillHeight: true
 
                                 model: ListModel {
-                                    ListElement { icon: "/qmlimages/NewImages/accountUpdate.png"; name: " Account Update "; screen: "accountUpdate" }
-                                    ListElement { icon: "/qmlimages/NewImages/privacy_policy.png"; name: " Privacy Policy "; screen: "privacy_policy" }
-                                    ListElement { icon: "/qmlimages/NewImages/terms_condition.png"; name: "Terms & Conditions"; screen: "terms&conditions" }
+                                    ListElement { icon: "/qmlimages/NewImages/accountUpdate_black.svg"; name: " Account Update "; screen: "accountUpdate" }
+                                    ListElement { icon: "/qmlimages/NewImages/privacy_policy_black.svg"; name: " Privacy Policy "; screen: "privacy_policy" }
+                                    ListElement { icon: "/qmlimages/NewImages/terms_condition_black.svg"; name: "Terms & Conditions"; screen: "terms&conditions" }
                                     ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Feedback"; screen: "feedback" }
-                                    ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Reports"; screen: "reports" }
-                                    ListElement { icon: "/qmlimages/NewImages/select_drone_type.png"; name: "Select Drone"; screen: "drone" }
+                                    ListElement { icon: "/qmlimages/NewImages/report.svg"; name: "Reports"; screen: "reports" }
+                                    ListElement { icon: "/qmlimages/NewImages/select_drone_type_black.svg"; name: "Select Application"; screen: "drone" }
                                     ListElement { icon: "/qmlimages/NewImages/logout.svg"; name: "Logout"; screen: "logout" }
                                 }
 
@@ -553,11 +553,11 @@ Item {
 
                         QGCColoredImage {
                             id: accountUpdate
-                            source: "/qmlimages/NewImages/accountUpdate.png"
+                            source: "/qmlimages/NewImages/accountUpdate_black.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
@@ -986,11 +986,11 @@ Item {
 
                         QGCColoredImage {
                             id: privacypolicy
-                            source: "/qmlimages/NewImages/privacy_policy.png"
+                            source: "/qmlimages/NewImages/privacy_policy_black.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
@@ -1052,11 +1052,11 @@ Item {
 
                         QGCColoredImage {
                             id: termsconditions
-                            source: "/qmlimages/NewImages/terms_condition.png"
+                            source: "/qmlimages/NewImages/terms_condition_black.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
@@ -1118,11 +1118,11 @@ Item {
 
                         QGCColoredImage {
                             id: feedback
-                            source: "/qmlimages/NewImages/feedback.png"
+                            source: "/qmlimages/NewImages/feedback.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
@@ -1443,15 +1443,15 @@ Item {
 
                         QGCColoredImage {
                             id: sessions
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/report.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
-                            text: "Session"
+                            text: "Report"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             color: "white"
                             font.bold: true
@@ -1740,15 +1740,15 @@ Item {
 
                         QGCColoredImage {
                             id: drone
-                            source: "/qmlimages/NewImages/select_drone_type.png"
+                            source: "/qmlimages/NewImages/select_drone_type_black.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
-                            color: "transparent"
+                            color: "white"
                         }
 
                         Text {
-                            text: "Select Drone"
+                            text: "Select Application"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             color: "white"
                             font.bold: true
@@ -1825,7 +1825,7 @@ Item {
                         property int selectedIndex: -1
 
                         property var buttonModel: [
-                            { label: "Camera", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.png" },
+                            { label: "Camera", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
                             { label: "Agri", color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
                             { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" },
                             { label: "VTOL", color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }

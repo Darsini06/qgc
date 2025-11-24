@@ -73,9 +73,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "#1b1c3e"
-        border.width: width * 0.05
-        border.color: "#005BBB"
+        color: "white"//"white"//"#1b1c3e"
+        //border.width: width * 0.05
+        //border.color: "white"//"white"//"#005BBB"
         clip: true
 
         MouseArea {
@@ -86,19 +86,26 @@ Row {
             }
         }
 
+        // CompassDial {
+        //     anchors.fill: parent
+        //     visible: true
+        // }
+
         QGCColoredImage {
             id: compassArrow
-            source: "/qmlimages/NewImages/CompassArrow.png"
+            source: "/qmlimages/NewImages/cardinal_point.svg"
             anchors.centerIn: parent
-            width: iconSize
-            height: iconSize
+            width: iconSize * 0.65
+            height: iconSize * 0.65
             fillMode: Image.PreserveAspectFit
             transform: Rotation {
                 origin.x: compassArrow.width / 2
                 origin.y: compassArrow.height / 2
                 angle: -MapGlobals.mapRotation
             }
+            color : "transparent"
         }
+
     }
 
 
@@ -107,9 +114,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "#1b1c3e"    // Dark blue background
+        color: "white"//"#1b1c3e"    // Dark blue background
         border.width: width * 0.05
-        border.color: "#005BBB"
+        border.color: "white"//"#005BBB"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
@@ -133,9 +140,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "#1b1c3e"    // Dark blue background
+        color: "white"//"#1b1c3e"    // Dark blue background
         border.width: width * 0.05
-        border.color: "#005BBB"
+        border.color: "white"//"#005BBB"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
@@ -158,10 +165,11 @@ Row {
         }
 
         QGCColoredImage {
-            source: "/qmlimages/NewImages/MapSwitch.png"
+            source: "/qmlimages/NewImages/map_switch.svg"
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
+            color : "black"
         }
     }
 
@@ -172,9 +180,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "#1b1c3e"
+        color: "white"//"#1b1c3e"
         border.width: width * 0.05
-        border.color: "#005BBB"
+        border.color: "white"//"#005BBB"
 
         MouseArea {
             anchors.fill: parent
@@ -185,11 +193,12 @@ Row {
         }
 
         QGCColoredImage {
-            source: "/qmlimages/NewImages/gps.png"
+            source: "/qmlimages/NewImages/redirect.svg"
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color: "transparent"
+            //color: "transparent"
+            color : "black"
         }
 
         Rectangle {
@@ -197,8 +206,8 @@ Row {
             width: baseSize * 2
             height: baseSize * 1
             radius: width * 0.1
-            color: "#1b1c3e"
-            border.color: "#005BBB"
+            color: "white"//"#1b1c3e"
+            border.color: "white"//"#005BBB"
             border.width: width * 0.02
             visible: false
             z: 1000
@@ -221,11 +230,12 @@ Row {
 
                 QGCColoredImage {
                     id: icon1
-                    source: "/qmlimages/NewImages/DroneRedirect.png"
+                    source: "/qmlimages/NewImages/drone_redirect.svg"
                     width: iconSize * 0.5
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
-                    color: "white"
+                    //color: "white"
+                    color : "black"
 
                     MouseArea {
                         anchors.fill: parent
@@ -251,11 +261,12 @@ Row {
 
                 QGCColoredImage {
                     id: icon2
-                    source: "/qmlimages/NewImages/MapRedirect1.png"
+                    source: "/qmlimages/NewImages/map_redirect.svg"
                     width: iconSize * 0.5
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
-                    color: "white"
+                    //color: "white"
+                    color : "black"
 
                     MouseArea {
                         anchors.fill: parent
@@ -283,7 +294,8 @@ Row {
         id:                     compass
         //anchors.centerIn: parent
         size:                   _innerRadius * 1.55
-        vehicle:                globals.activeVehicle
+        vehicle:                _activeVehicle
+        visible :               !_activeVehicle
         //anchors.verticalCenter: parent.verticalCenter
     }
 
@@ -324,6 +336,7 @@ Row {
                 fileDialog.title = qsTr("Import Tiles")
                 fileDialog.openForLoad()
             }
+
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth / 2
 
@@ -332,6 +345,7 @@ Row {
                     checked: !_mapEngineManager.importReplace
                     onClicked: _mapEngineManager.importReplace = !checked
                 }
+
                 QGCRadioButton {
                     text: qsTr("Replace existing sets")
                     checked: _mapEngineManager.importReplace
