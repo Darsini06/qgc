@@ -1,4 +1,4 @@
- /****************************************************************************
+/****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -4252,7 +4252,6 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
         indicatorDrawer.indicatorItem = indicatorItem
         indicatorDrawer.open()
     }
-
     function showIndicatorDrawer1(drawerComponent, indicatorItem) {
         indicatorDrawer.isRightAligned = true;
         indicatorDrawer.sourceComponent = drawerComponent
@@ -4266,8 +4265,7 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
 
     Popup {
         id:             indicatorDrawer
-        x:              isRightAligned ? mainWindow.contentItem.width - contentItem.implicitWidth - _margins
-                                       : calcXPosition()
+        x:              isRightAligned ? mainWindow.contentItem.width - contentItem.implicitWidth - _margins : calcXPosition()
         y:              ScreenTools.toolbarHeight + _margins
         leftInset:      0
         rightInset:     0

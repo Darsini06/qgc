@@ -164,11 +164,11 @@ Item {
     function addToolbarVisuals() {
         console.log("new_addToolbarVisuals")
         if (_objMgrToolVisuals.empty) {
-            if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-                _resetPolygon()
-            }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-                _resetCircle()
-            }
+            // if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
+            //     _resetPolygon()
+            // }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
+            //     _resetCircle()
+            // }
             var toolbar = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
             toolbar.z = QGroundControl.zOrderWidgets
             var edit = MapGlobals.edit
@@ -1757,7 +1757,7 @@ Item {
                     spacing: 10
                     width: parent.width
                     Label {
-                        text: qsTr("Name:")
+                        text: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):qsTr("Project Name:")
                         Layout.preferredWidth: 100
                         color: "white"
                         font.bold: true
@@ -1766,7 +1766,7 @@ Item {
                     TextField {
                         id: nameField
                         Layout.fillWidth: true
-                        placeholderText: qsTr("Enter your name")
+                        placeholderText: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):qsTr("Enter your project name")
                     }
                 }
 
@@ -1774,6 +1774,7 @@ Item {
                 RowLayout {
                     spacing: 10
                     width: parent.width
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
                     Label {
                         text: qsTr("Ph No:")
                         Layout.preferredWidth: 100
@@ -1794,6 +1795,7 @@ Item {
                 RowLayout {
                     spacing: 10
                     width: parent.width
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
                     Label {
                         text: qsTr("Ground Name:")
                         Layout.preferredWidth: 100
@@ -1867,21 +1869,18 @@ Item {
 
                         onClicked: {
                             QGroundControl.saveGlobalSetting("load", "load1")
-                            if (nameField.text.length < 3 ||
-                                phoneField.text.length < 3 ||
-                                groundField.text.length < 3) {
-                                mainWindow.showToastMessage("Please fill all fields")
-                                return
-                            }
-
-                            let concatenatedText = nameField.text.substring(0,3) +
-                                                   phoneField.text.substring(0,3) +
-                                                   groundField.text.substring(0,3)
-
-                            _appSettings.username = concatenatedText
-                            console.log("Username:", concatenatedText)
-
                             if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                if (nameField.text.length < 3 ||
+                                    phoneField.text.length < 3 ||
+                                    groundField.text.length < 3) {
+                                    mainWindow.showToastMessage("Please fill all fields")
+                                    return
+                                }
+                                let concatenatedText = nameField.text.substring(0,3) +
+                                                       phoneField.text.substring(0,3) +
+                                                       groundField.text.substring(0,3)
+
+                                _appSettings.username = concatenatedText
                                 _saveCurrentVertices()
                                 _circleMode = false
                                 mapPolygon.traceMode = true
@@ -1889,6 +1888,16 @@ Item {
                                     mapPolygon.clear()
                                 }
                             } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+
+                                if (nameField.text.length < 3 ) {
+                                    mainWindow.showToastMessage("Please fill all fields")
+                                    return
+                                }
+
+                                let concatenatedText = nameField.text.substring(0,10)
+
+                                _appSettings.username = concatenatedText
+                                console.log("Username:", concatenatedText)
                                 mapping = true
                                 if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
                                     _resetPolygon()

@@ -210,6 +210,7 @@ Rectangle {
               buttons: Dialog.Ok | Dialog.Cancel
 
               onAccepted: {
+                  remove()
                   popup.visible = false
                   //waypoint enable disable logic
                   QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
