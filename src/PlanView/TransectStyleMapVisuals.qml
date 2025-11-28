@@ -71,7 +71,7 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("edited : ",object.surveyAreaPolygon)
+        //console.log("edited : ",object.surveyAreaPolygon)
         _addVisualElements()
         // if (_root.interactive && _missionItem.sequenceNumber === 0) {
         //     _root.clicked(_missionItem.sequenceNumber)
@@ -286,7 +286,7 @@ Item {
         Button {
             id: editBtn
             padding: 0
-
+            visible: MapGlobals.share_edit_visibility
             implicitWidth: baseSize
             implicitHeight: baseSize
 

@@ -1743,7 +1743,7 @@ ApplicationWindow {
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
             ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Diamond" }
             ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "Info" }
-            ListElement { image: "/qmlimages/NewImages/commlinks.png"; file: "LinkSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
             // onActiveVehicleChanged: {
@@ -1783,7 +1783,7 @@ ApplicationWindow {
                         id: backArrow
                         width: 30
                         height: 25
-                        source: "/qmlimages/NewImages/leftArrow.png"
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
                         color: "white"
 
                         MouseArea {

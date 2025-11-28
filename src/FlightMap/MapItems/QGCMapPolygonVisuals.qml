@@ -55,10 +55,6 @@ Item {
     property real _zorderSplitHandle:   QGroundControl.zOrderMapItems + 2
     property real _zorderCenterHandle:  QGroundControl.zOrderMapItems + 1   // Lowest such that drag or split takes precedence
 
-
-
-
-
     property var _planMasterController:              planMasterController
     readonly property string _polygonToolsText: qsTr("")//("Polygon Tools")
     readonly property string _traceText:        qsTr("")//qsTr("Click in the map to add vertices. Click 'Done Tracing' when finished.")
@@ -190,9 +186,6 @@ Item {
                 mapPolygon.traceMode = true
                 console.log("MapGlobals.edit2")
             }
-
-
-
         }
     }
 
@@ -628,7 +621,7 @@ Item {
             id:             mapQuickItem
             anchorPoint.x:  sourceItem.width / 2
             anchorPoint.y:  sourceItem.height / 2
-            visible:        false//!_circleMode
+            visible:        !_circleMode
 
             property int vertexIndex
 
@@ -1069,10 +1062,6 @@ Item {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
-<<<<<<< HEAD
-=======
-
->>>>>>> Qgc_project/dharun_branch_system
                 visible: mapPolygon.traceMode
 
                 Button  {
@@ -1085,9 +1074,9 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#1b1c3e"
-                        border.color: "#005BBB"
-                        border.width: 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
                         anchors.fill: parent
                         anchors.margins: 3
                     }
@@ -1097,8 +1086,9 @@ Item {
                         width: 16
                         height: 16
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                        color: "black"
                     }
+
                     onClicked: {
 
                         if(MapGlobals.mark_with === "Mark_With_GPS") {
@@ -1204,9 +1194,9 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#1b1c3e"
-                        border.color: "#005BBB"
-                        border.width: 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
                         anchors.fill: parent
                         anchors.margins: 3
                     }
@@ -1217,7 +1207,7 @@ Item {
                         width: 16
                         height: 16
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                        color: "black"
                     }
 
                     onClicked: {
@@ -1961,8 +1951,6 @@ Item {
                 radiusDragHandle.coordinate = Qt.binding(function() { return _circleRadiusDragCoord })
                 var radiusDragIndicator = radiusDragAreaComponent.createObject(mapControl, { "itemIndicator": radiusDragHandle, "itemCoordinate": _circleRadiusDragCoord })
                 _objMgr.addObject(radiusDragIndicator)
-
-
 
             }
         }

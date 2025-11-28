@@ -78,7 +78,6 @@
         <file alias="NewImages/leftArrow.png">src/NewImages/leftArrow.png</file>
         <file alias="NewImages/mapSelection.png">src/NewImages/mapSelection.png</file>
         <file alias="NewImages/droneGpsMarking.png">src/NewImages/droneGpsMarking.png</file>
-        <file alias="NewImages/kmlFile.png">src/NewImages/kmlFile.png</file>
         <file alias="NewImages/log.png">src/NewImages/log.png</file>
         <file alias="NewImages/return.svg">src/NewImages/return.svg</file>
         <file alias="NewImages/satellite.svg">src/NewImages/satellite.svg</file>
@@ -113,7 +112,7 @@
         <file alias="NewImages/savedfiles.png">src/NewImages/savedfiles.png</file>
         <file alias="NewImages/select_drone_type_color.svg">src/NewImages/select_drone_type_color.svg</file>
         <file alias="NewImages/terms_condition.png">src/NewImages/terms_condition.png</file>
-        <file alias="NewImages/commlinks.png">src/NewImages/commlinks.png</file>
+        <file alias="NewImages/commlinks.svg">src/NewImages/commlinks.svg</file>
         <file alias="NewImages/autonomous.svg">src/NewImages/autonomous.svg</file>
         <file alias="NewImages/fileupload.svg">src/NewImages/fileupload.svg</file>
         <file alias="NewImages/gps_navigation.svg">src/NewImages/gps_navigation.svg</file>
@@ -126,6 +125,32 @@
         <file alias="NewImages/cardinal_point.svg">src/NewImages/cardinal_point.svg</file>
         <file alias="NewImages/report_color.svg">src/NewImages/report_color.svg</file>
         <file alias="NewImages/report.svg">src/NewImages/report.svg</file>
+        <file alias="NewImages/camera_Application.svg">src/NewImages/camera_Application.svg</file>
+        <file alias="NewImages/agri_Application.svg">src/NewImages/agri_Application.svg</file>
+        <file alias="NewImages/mapping_Application.svg">src/NewImages/mapping_Application.svg</file>
+        <file alias="NewImages/reset_password.svg">src/NewImages/reset_password.svg</file>
+        <file alias="NewImages/password_visible.svg">src/NewImages/password_visible.svg</file>
+        <file alias="NewImages/password_hidden.svg">src/NewImages/password_hidden.svg</file>
+        <file alias="NewImages/password.svg">src/NewImages/password.svg</file>
+        <file alias="NewImages/userProfile_icon.svg">src/NewImages/userProfile_icon.svg</file>
+        <file alias="NewImages/createAccount.svg">src/NewImages/createAccount.svg</file>
+        <file alias="NewImages/signIn.svg">src/NewImages/signIn.svg</file>
+        <file alias="NewImages/phone.svg">src/NewImages/phone.svg</file>
+        <file alias="NewImages/gmail.svg">src/NewImages/gmail.svg</file>
+        <file alias="NewImages/missionComplete.svg">src/NewImages/missionComplete.svg</file>
+        <file alias="NewImages/mission_complete.svg">src/NewImages/mission_complete.svg</file>
+        <file alias="NewImages/user_profile.svg">src/NewImages/user_profile.svg</file>
+        <file alias="NewImages/agri_drone.svg">src/NewImages/agri_drone.svg</file>
+        <file alias="NewImages/kmlFile.svg">src/NewImages/kmlFile.svg</file>
+        <file alias="NewImages/boundaryMarkingIcon.svg">src/NewImages/boundaryMarkingIcon.svg</file>
+        <file alias="NewImages/point_mark.svg">src/NewImages/point_mark.svg</file>
+        <file alias="NewImages/nature_background.webp">src/NewImages/nature_background.webp</file>
+        <file alias="NewImages/selectOption_lottie.json">src/NewImages/selectOption_lottie.json</file>
+        <file alias="NewImages/report_lottie.json">src/NewImages/report_lottie.json</file>
+        <file alias="NewImages/feedback_lottie.json">src/NewImages/feedback_lottie.json</file>
+        <file alias="NewImages/login_lottie.json">src/NewImages/login_lottie.json</file>
+        <file alias="NewImages/point_mark.svg">src/NewImages/point_mark.svg</file>
+        <file alias="NewImages/VTOL_application.svg">src/NewImages/VTOL_application.svg</file>
         
 
 

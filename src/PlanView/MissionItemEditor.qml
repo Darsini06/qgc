@@ -127,7 +127,6 @@ Rectangle {
                     }else{
                         remove()
                     }
-
                 }
             }
         }
@@ -195,55 +194,51 @@ Rectangle {
 
 
     Component {
-          id: takeoffremoveddialog
+        id: takeoffremoveddialog
 
-          QGCPopupDialog {
-              id: popup
-              title: qsTr(" Are you sure you want to delete Takeoff ? ")
+        QGCPopupDialog {
+            id: popup
+            title: qsTr(" Are you sure you want to delete Takeoff ? ")
 
-              buttons: Dialog.Ok | Dialog.Cancel
+            buttons: Dialog.Ok | Dialog.Cancel
 
-              onAccepted: {
-                  popup.visible = false
-                  //waypoint enable disable logic
-                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+            onAccepted: {
+                remove()
+                popup.visible = false
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                  if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                      mainWindow.cameraView()
-                      mainWindow.closefile()
-                  }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                      mainWindow.showMapping()
-                      mainWindow.closefile()
-                  }
-                  else{
-                      if (planType === "Plan") {
-                                              mainWindow.showFlyView()
-                                              mainWindow.closefile()
-                                          } else {
-                                              mainWindow.showFlyView1()
-                                              mainWindow.closefile()
-                                          }
-                  }
-              }
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                    mainWindow.cameraView()
+                    mainWindow.closefile()
+                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    mainWindow.showMapping()
+                    mainWindow.closefile()
+                }
+                else{
+                    if (planType === "Plan") {
+                        mainWindow.showFlyView()
+                        mainWindow.closefile()
+                    } else {
+                        mainWindow.showFlyView1()
+                        mainWindow.closefile()
+                    }
+                }
+            }
 
-              onRejected: {
-                   popup.visible = false
+            onRejected: {
+                popup.visible = false
+            }
 
-
-
-
-
-              }
-
-              ColumnLayout {
-                  spacing: ScreenTools.defaultFontPixelWidth
-                  QGCLabel {
-                      text: qsTr("If Takeoff removed means already marked waypoint will be cleared and automaticaly went to homepage")
-                      Layout.fillWidth: true
-                  }
-              }
-          }
-      }
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("If Takeoff removed means already marked waypoint will be cleared and automaticaly went to homepage")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
 
     QGCColoredImage {
         id:                     hamburger

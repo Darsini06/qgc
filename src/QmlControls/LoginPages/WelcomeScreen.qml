@@ -147,9 +147,9 @@ Item {
 
                             Button {
                                 id: signInBtn
-                                text: "Sign In"
                                 width: parent.width
                                 height: dp(10)
+                                text: "Sign In"
 
                                 background: Rectangle {
                                     radius: dp(1.5)
@@ -164,14 +164,29 @@ Item {
                                     }
                                 }
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                                contentItem: Item {
+                                    anchors.fill: parent
+                                    // clip: true
+
+                                    Row {
+                                        anchors.centerIn: parent      // now centers correctly
+                                        spacing: dp(2)
+
+                                        Text {
+                                            text: signInBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/signIn.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 20
+                                            height: 20
+                                        }
+                                    }
                                 }
 
                                 onClicked: {
@@ -193,14 +208,30 @@ Item {
                                     border.color: borderColor
                                 }
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                                contentItem: Item {
+                                    anchors.fill: parent
+                                    // clip: true
+
+                                    Row {
+                                        anchors.centerIn: parent      // now centers correctly
+                                        spacing: dp(1)
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/createAccount.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 22
+                                            height: 22
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Text {
+                                            text: signUpBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                    }
                                 }
 
                                 onClicked: {
@@ -265,6 +296,7 @@ Item {
                     }
                 }
             }
+
             ScrollView {
                 anchors {
                     top: parent.top
@@ -326,14 +358,27 @@ Item {
                                 spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-
-                                Text {
-                                    text: "Username"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                Row {
+                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.25
+                                    spacing: dp(1)
+
+                                    Text {
+                                        text: "Username"
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
+                                        font.weight: Font.Medium
+                                        color: textPrimary
+                                        x: parent.width * 0.25
+                                    }
+
+                                    QGCColoredImage {
+                                        source: "/qmlimages/NewImages/userProfile_icon.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                        width: 16
+                                        height: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
                                 }
 
                                 Rectangle {
@@ -366,13 +411,27 @@ Item {
                                 spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                Text {
-                                    text: "Password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                Row {
+                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.25
+                                    spacing: dp(1)
+
+                                    Text {
+                                        text: "Password"
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
+                                        font.weight: Font.Medium
+                                        color: textPrimary
+                                        //x: parent.width * 0.25
+                                    }
+
+                                    QGCColoredImage {
+                                        source: "/qmlimages/NewImages/password.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                        width: 16
+                                        height: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
                                 }
 
                                 Rectangle {
@@ -460,14 +519,39 @@ Item {
                                     color: loginBtn.pressed ? primaryHover : primaryColor
                                 }
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    //font.pixelSize: dp(4) // Adjusted size
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                                // contentItem: Text {
+                                //     text: parent.text
+                                //     //font.pixelSize: dp(4) // Adjusted size
+                                //     font.pointSize:     ScreenTools.defaultFontPointSize
+                                //     font.weight: Font.Medium
+                                //     color: "white"
+                                //     horizontalAlignment: Text.AlignHCenter
+                                //     verticalAlignment: Text.AlignVCenter
+                                // }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+                                    // clip: true
+
+                                    Row {
+                                        anchors.centerIn: parent      // now centers correctly
+                                        spacing: dp(2)
+
+                                        Text {
+                                            text: loginBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/signIn.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 20
+                                            height: 20
+                                        }
+                                    }
                                 }
 
                                 onClicked: {
@@ -582,13 +666,27 @@ Item {
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "Username"
-                                //font.pixelSize: dp(4)
-                                font.pointSize:     ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: textPrimary
+
+                            Row {
+                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.25
+                                spacing: dp(1)
+
+                                Text {
+                                    text: "Username"
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    color: textPrimary
+                                }
+
+                                QGCColoredImage {
+                                    source: "/qmlimages/NewImages/userProfile_icon.svg"
+                                    fillMode: Image.PreserveAspectFit
+                                    width: 16
+                                    height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
                             }
 
                             Rectangle {
@@ -624,13 +722,27 @@ Item {
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "Profile Name"
-                                //font.pixelSize: dp(4)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: textPrimary
+                            Row {
+                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.25
+                                spacing: dp(1)
+
+                                Text {
+                                    text: "Profile Name"
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    color: textPrimary
+
+                                }
+
+                                QGCColoredImage {
+                                    source: "/qmlimages/NewImages/userProfile_icon.svg"
+                                    fillMode: Image.PreserveAspectFit
+                                    width: 16
+                                    height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
                             }
 
                             Rectangle {
@@ -666,13 +778,26 @@ Item {
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "Email"
-                                //font.pixelSize: dp(4)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: textPrimary
+                            Row {
+                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.25
+                                spacing: dp(1)
+
+                                Text {
+                                    text: "Email"
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    color: textPrimary
+                                }
+
+                                QGCColoredImage {
+                                    source: "/qmlimages/NewImages/gmail.svg"
+                                    fillMode: Image.PreserveAspectFit
+                                    width: 16
+                                    height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
                             }
 
                             Rectangle {
@@ -709,13 +834,26 @@ Item {
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "Password"
-                                //font.pixelSize: dp(4)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: textPrimary
+                            Row {
+                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.25
+                                spacing: dp(1)
+
+                                Text {
+                                    text: "Password"
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    color: textPrimary
+                                }
+
+                                QGCColoredImage {
+                                    source: "/qmlimages/NewImages/password.svg"
+                                    fillMode: Image.PreserveAspectFit
+                                    width: 16
+                                    height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
                             }
 
                             Rectangle {
@@ -748,13 +886,26 @@ Item {
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "Confirm Password"
-                                //font.pixelSize: dp(4)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: textPrimary
+                            Row {
+                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.25
+                                spacing: dp(1)
+
+                                Text {
+                                    text: "Confirm Password"
+                                    //font.pixelSize: dp(4)
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    color: textPrimary
+                                }
+
+                                QGCColoredImage {
+                                    source: "/qmlimages/NewImages/password.svg"
+                                    fillMode: Image.PreserveAspectFit
+                                    width: 16
+                                    height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
                             }
 
                             Rectangle {
@@ -800,14 +951,30 @@ Item {
                                 color: signUpActionBtn.pressed ? primaryHover : primaryColor
                             }
 
-                            contentItem: Text {
-                                text: parent.text
-                                //font.pixelSize: dp(4)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                font.weight: Font.Medium
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
+                            contentItem: Item {
+                                anchors.fill: parent
+                                // clip: true
+
+                                Row {
+                                    anchors.centerIn: parent      // now centers correctly
+                                    spacing: dp(1)
+
+                                    QGCColoredImage {
+                                        source: "/qmlimages/NewImages/createAccount.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                        width: 22
+                                        height: 22
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        text: signUpBtn.text
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.weight: Font.Medium
+                                        color: "white"
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
                             }
 
                             onClicked: {
@@ -842,7 +1009,7 @@ Item {
 
                         Row {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: dp(0.5)
+                            spacing: dp(8)
 
                             Text {
                                 text: "Already have an account?"
@@ -853,25 +1020,46 @@ Item {
                             }
 
                             Button {
+                                id: signInAccount
                                 text: "Sign In"
                                 width: undefined
+                                anchors.verticalCenter: parent.verticalCenter
 
                                 background: Rectangle {
                                     color: "transparent"
                                 }
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    //font.pixelSize: dp(3.5)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    color: primaryColor
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                                contentItem: Item {
+                                    anchors.fill: parent
+                                    // clip: true
+
+                                    Row {
+                                        anchors.centerIn: parent      // now centers correctly
+                                        spacing: dp(1)
+
+                                        Text {
+                                            text: signInAccount.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                            horizontalAlignment: Text.AlignHCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/signIn.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 15
+                                            height: 15
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
                                 }
 
                                 onClicked: currentView = "signin"
                             }
                         }
+
                     }
                 }
             }
@@ -966,13 +1154,27 @@ Item {
                                 spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                Text {
-                                    text: "Username"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                Row {
+                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.25
+                                    spacing: dp(1)
+
+                                    Text {
+                                        text: "Username"
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
+                                        font.weight: Font.Medium
+                                        color: textPrimary
+                                        x: parent.width * 0.25
+                                    }
+
+                                    QGCColoredImage {
+                                        source: "/qmlimages/NewImages/userProfile_icon.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                        width: 16
+                                        height: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
                                 }
 
                                 Rectangle {
@@ -1004,13 +1206,28 @@ Item {
                                 spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                Text {
-                                    text: "New Password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+
+                                Row {
+                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.25
+                                    spacing: dp(1)
+
+                                    Text {
+                                        text: "New Password"
+                                        //font.pixelSize: dp(4)
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
+                                        font.weight: Font.Medium
+                                        color: textPrimary
+                                        //x: parent.width * 0.25
+                                    }
+
+                                    QGCColoredImage {
+                                        source: "/qmlimages/NewImages/password.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                        width: 16
+                                        height: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
                                 }
 
                                 Rectangle {
@@ -1047,7 +1264,7 @@ Item {
                             Button {
                                 id: resetBtn
                                 text: "Reset Password"
-                                width: parent.width * 0.5  // Increased width for better visibility
+                                width: parent.width * 0.3
                                 height: dp(10)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -1056,14 +1273,39 @@ Item {
                                     color: resetBtn.pressed ? primaryHover : primaryColor
                                 }
 
-                                contentItem: Text {
-                                    text: parent.text
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
+                                // contentItem: Text {
+                                //     text: parent.text
+                                //     //font.pixelSize: dp(4)
+                                //     font.pointSize: ScreenTools.defaultFontPointSize
+                                //     font.weight: Font.Medium
+                                //     color: "white"
+                                //     horizontalAlignment: Text.AlignHCenter
+                                //     verticalAlignment: Text.AlignVCenter
+                                // }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+                                    // clip: true
+
+                                    Row {
+                                        anchors.centerIn: parent      // now centers correctly
+                                        spacing: dp(2)
+
+                                        Text {
+                                            text: resetBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/reset_password.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 20
+                                            height: 20
+                                        }
+                                    }
                                 }
 
                                 onClicked: {

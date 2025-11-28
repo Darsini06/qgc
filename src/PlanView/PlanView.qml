@@ -168,7 +168,7 @@ Item {
 
     function loaddata() {
         _planMasterController.loadFromSelectedFile()
-        editdata.visible=true
+        fileUploadbtn.visible=true
         MapGlobals.share_edit_visibility = true
     }
 
@@ -176,7 +176,7 @@ Item {
 
         _planMasterController.loadFromSelectedFile1()
 
-        editdata.visible= true
+        fileUploadbtn.visible= true
 
         MapGlobals.share_edit_visibility = true
 
@@ -184,11 +184,11 @@ Item {
 
     function loaddata2() {
         //_planMasterController.loadFromSelectedFile1()
-        editdata.visible=true
+        fileUploadbtn.visible=true
         MapGlobals.share_edit_visibility = true
     }
 
-    function data1(){
+    function data1() {
         _planMasterController.data()
         //mobileFileSaveDialogComponent.createObject(mainWindow).open()
     }
@@ -952,7 +952,7 @@ Item {
                 if(waypointMark===true){
                     console.log("waypointMark",waypointMark)
                     addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
-}
+                }
 
 
 
@@ -1392,6 +1392,7 @@ Item {
 
                 // ========== Upload Button ==========
                 Button {
+                    id: fileUploadbtn
                     width: baseSize
                     height: baseSize
 
@@ -1401,7 +1402,6 @@ Item {
                         //border.color: "#005BBB"
                         //border.width: 2
                         anchors.fill: parent
-
                     }
 
                     contentItem: QGCColoredImage {
@@ -1409,7 +1409,6 @@ Item {
                         width: iconSize
                         height: iconSize
                         anchors.centerIn: parent
-
                         color: "black"
 
                     }
@@ -1425,10 +1424,8 @@ Item {
                             }
                             _planMasterController.upload()
                         } else {
-                             mainWindow.showToastMessage("Drone Not Connected");
+                            mainWindow.showToastMessage("Drone Not Connected");
                         }
-
-
                     }
                 }
 
@@ -1457,16 +1454,16 @@ Item {
                     }
 
                     onClicked: {
-                        console.log("Return waypoint clicked")
+                        waypointMark=false
+                        // MapGlobals.waypoint="waypoint1"
+                        // QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                        console.log("returnWaypoint clicked")
+
                         toolStrip.allAddClickBoolsOff()
                         insertLandItemAfterCurrent()
                         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
                         returnWaypointEnabled = false
                     }
-
-                    _planMasterController.upload();
-
-                    console.log("Upload_data")
 
                 }
             }
@@ -1512,19 +1509,6 @@ Item {
                     }
                     color : "transparent"
                 }
-
-                onClicked: {
-                    waypointMark=false
-                    // MapGlobals.waypoint="waypoint1"
-                    // QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
-                    console.log("returnWaypoint clicked")
-
-                    toolStrip.allAddClickBoolsOff()
-                    insertLandItemAfterCurrent()
-                    QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
-                    returnWaypointEnabled = false
-                }
-
             }
 
         }

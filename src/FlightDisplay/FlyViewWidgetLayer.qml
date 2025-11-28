@@ -57,7 +57,7 @@ Item {
     property bool utmspActTrigger
 
     Component.onCompleted: {
-        console.log("pipView.visible :", pipview.visible);
+        //console.log("pipView.visible :", pipview.visible);
         console.log("_pipView.visible :", _pipView.visible);
     }
 
