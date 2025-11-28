@@ -280,7 +280,7 @@ Item {
                         onClicked: {
                             //saveOptionsDialog.close()
                             saveOptionsDialog.visible=false;
-                            customdialog1.createObject(mainWindow).open()
+                            customdialogedit.createObject(mainWindow).open()
                         }
                     }
                 }
@@ -490,121 +490,187 @@ Item {
                 }
             }
 
+
+
     Component{
-        id: customdialog1
+        id: customdialogedit
 
+        Dialog {
+            id: customDialog
+            modal: true
+            dim: true
+            anchors.centerIn: parent
+            width: parent.width //* 0.8
+            height: parent.height //* 0.6
 
-        Item {
-               id: customDialogItem
-               anchors.fill: parent
-        Rectangle {
-            anchors.fill: parent
-            color: "transparent"
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 400
-                        height: 300
-                radius: 10
-                color: "#80ffffff"
-                border.color: "#ccccff"
+            background: Rectangle {
+                color: "#661B1C3E"
+                radius: 15
+                border.color: "#005BBB"
                 border.width: 2
+            }
 
-                Column {
+            // 🔴 Close Button
+            Rectangle {
+                id: closeBtn
+                width: 30
+                height: 30
+                radius: 15
+                color: "red"
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 10
+
+                Text {
+                    text: "X"
+                    anchors.centerIn: parent
+                    color: "white"
+                    font.bold: true
+                }
+
+                MouseArea {
                     anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 15
+                    onClicked: {
+                        customDialog.visible = false
+                    }
+                }
+            }
 
-                    // Title
+            Column {
+                anchors.centerIn: parent
+                spacing: 20
+                width: parent.width * 0.8
+
+                // Title
+                Label {
+                    text: qsTr("Set Ground Name")
+                    font.bold: true
+                    color: "white"
+                    font.pointSize: 16
+                    horizontalAlignment: Text.AlignHCenter
+                    width: parent.width
+                }
+
+                // Name Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
                     Label {
-                        text: qsTr("Set Ground Name1")
+                        text: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):qsTr("Project Name:")
+                        Layout.preferredWidth: 100
+                        color: "white"
                         font.bold: true
                         font.pointSize: 14
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        width: parent.width
                     }
-
-                    // Name Field
-                    RowLayout {
+                    TextField {
+                        id: nameField
                         Layout.fillWidth: true
-                        spacing: 10
-
-                        Label { text: qsTr("Name :"); Layout.preferredWidth: 80;font.bold: true
-                        font.pointSize: 14}
-                        TextField {
-                            id: filenameTextField
-                            Layout.fillWidth: true
-                        }
+                        placeholderText: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):qsTr("Enter your project name")
                     }
+                }
 
-                    // Phone Number Field
-                    RowLayout {
+                // Phone Number Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                    Label {
+                        text: qsTr("Ph No:")
+                        Layout.preferredWidth: 100
+                        color: "white"
+                        font.bold: true
+                        font.pointSize: 14
+                    }
+                    TextField {
+                        id: phoneField
                         Layout.fillWidth: true
-                        spacing: 10
-
-                        Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80;font.bold: true
-                        font.pointSize: 14}
-                        TextField {
-                            id: filenameTextField1
-                            Layout.fillWidth: true
-                            validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                            inputMethodHints: Qt.ImhDigitsOnly
-                        }
+                        placeholderText: qsTr("Enter 10-digit phone no")
+                        validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                        inputMethodHints: Qt.ImhDigitsOnly
                     }
+                }
 
-                    // Ground Name Field
-                    RowLayout {
+                // Ground Name Field
+                RowLayout {
+                    spacing: 10
+                    width: parent.width
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                    Label {
+                        text: qsTr("Ground Name:")
+                        Layout.preferredWidth: 100
+                        color: "white"
+                        font.bold: true
+                        font.pointSize: 14
+                    }
+                    TextField {
+                        id: groundField
                         Layout.fillWidth: true
-                        spacing: 10
-
-                        Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80;font.bold: true
-                        font.pointSize: 14}
-                        TextField {
-                            id: filenameTextField2
-                            Layout.fillWidth: true
-                        }
+                        placeholderText: qsTr("Enter ground name")
                     }
+                }
 
-                    // Buttons
-                    Row {
-                        spacing: 30
-                        anchors.horizontalCenter: parent.horizontalCenter
+                // Buttons Row
+                Row {
+                    spacing: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-                        Button {
+                    Button {
+                        text: qsTr("Cancel")
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 20
+                            color: "#1b1c3e"
+                            border.color: "#005BBB"
+                            border.width: 2
+                        }
+                        contentItem: Text {
                             text: "Cancel"
-                            width: 100
-                            height: 34
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                            color: "white"
                             font.bold: true
-                            background: Rectangle {
-                                radius: 20
-                                color: "#ccccff"
-                            }
-                            onClicked: {
-                                //customdialog.visible = false;
-                                customDialogItem.visible=false;
-                            }
+                            font.pointSize: 14
 
                         }
+                        onClicked: {
+                            customDialog.visible = false
+                        }
+                    }
 
-                        Button {
+                    Button {
+                        text: qsTr("Confirm")
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            radius: 20
+                            color: "#1b1c3e"
+                            border.color: "#005BBB"
+                            border.width: 2
+                        }
+                        contentItem: Text {
                             text: "Confirm"
-                            width: 100
-                            height: 34
+                            anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                            color: "white"
                             font.bold: true
-                            background: Rectangle {
-                                radius: 20
-                                color: "#ccccff"
-                            }
-                            onClicked: {
-                                if (filenameTextField.text.length < 3 || filenameTextField1.text.length < 3 || filenameTextField2.text.length < 3) {
+                            font.pointSize: 14
+                        }
+
+                        onClicked: {
+
+
+                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                if (nameField.text.length < 3 || phoneField.text.length < 3 || groundField.text.length < 3) {
                                         mobileFileSaveDialog.preventClose = true
                                         return
                                     }
 
-                                let concatenatedText = filenameTextField.text.substring(0, 3) +
-                                                           filenameTextField1.text.substring(0, 3) +
-                                                           filenameTextField2.text.substring(0, 3);
+                                let concatenatedText = nameField.text.substring(0, 3) +
+                                                           phoneField.text.substring(0, 3) +
+                                                           groundField.text.substring(0, 3);
 
 
             _appSettings.username = concatenatedText;
@@ -613,15 +679,33 @@ Item {
 
 
                                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+
+                                if (nameField.text.length < 3 ) {
+                                        mobileFileSaveDialog.preventClose = true
+                                        return
+                                    }
+
+                                let concatenatedText = nameField.text.substring(0, 10);
+
+
+            _appSettings.username = concatenatedText;
+                                   console.log(concatenatedText);
+
+
+
+                               _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+
+
                             }
+
+                            customDialog.visible = false
                         }
                     }
-
-
                 }
             }
         }
-}
+
     }
 
 }

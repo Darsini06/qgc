@@ -38,6 +38,24 @@ private slots:
     void _cacheReply(QGCCacheTile *tile);
     void _cacheError(QGCMapTask::TaskType type, QStringView errorString);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 private:
     static void _initDataFromResources();
 

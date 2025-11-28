@@ -4257,7 +4257,6 @@ ApplicationWindow {
         indicatorDrawer.indicatorItem = indicatorItem
         indicatorDrawer.open()
     }
-
     function showIndicatorDrawer1(drawerComponent, indicatorItem) {
         indicatorDrawer.isRightAligned = true;
         indicatorDrawer.sourceComponent = drawerComponent
@@ -4271,8 +4270,7 @@ ApplicationWindow {
 
     Popup {
         id:             indicatorDrawer
-        x:              isRightAligned ? mainWindow.contentItem.width - contentItem.implicitWidth - _margins
-                                       : calcXPosition()
+        x:              isRightAligned ? mainWindow.contentItem.width - contentItem.implicitWidth - _margins : calcXPosition()
         y:              ScreenTools.toolbarHeight + _margins
         leftInset:      0
         rightInset:     0

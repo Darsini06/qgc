@@ -202,11 +202,19 @@ Rectangle {
 
             buttons: Dialog.Ok | Dialog.Cancel
 
+<<<<<<< HEAD
             onAccepted: {
                 remove()
                 popup.visible = false
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+=======
+              onAccepted: {
+                  remove()
+                  popup.visible = false
+                  //waypoint enable disable logic
+                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+>>>>>>> Qgc_project/dharun_branch_system
 
                 if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
                     mainWindow.cameraView()
