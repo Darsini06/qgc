@@ -33,14 +33,13 @@ Item {
     property var    _appSettings:       QGroundControl.settingsManager.appSettings
     property var    _controller:        controller
     property Fact rc7OptionFact: controller.getParameterFact(-1, "MNT1_TYPE")
-     property Fact cameratype: controller.getParameterFact(-1, "CAM1_TYPE")
-     property Fact mnt1pitchmax: controller.getParameterFact(-1, "MNT1_PITCH_MAX")
+    property Fact cameratype: controller.getParameterFact(-1, "CAM1_TYPE")
+    property Fact mnt1pitchmax: controller.getParameterFact(-1, "MNT1_PITCH_MAX")
 
 
     ParameterEditorController {
         id: controller
     }
-
 
 
     Rectangle {

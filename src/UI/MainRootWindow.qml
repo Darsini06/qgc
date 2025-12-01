@@ -65,8 +65,6 @@ ApplicationWindow {
         visible:            text !== ""
     }
 
-
-
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
     property var someParameter
@@ -595,154 +593,8 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-    // Dialog {
-    //     id: compassDialog
-    //     modal: true
-    //     anchors.centerIn: parent
-    //     width: parent.width * 0.85
-    //     height: parent.height * 0.9
-    //     closePolicy: Popup.NoAutoClose
-    //     clip: true
-    //     padding: 0
 
-    //     background: Rectangle {
-    //         radius: 14
-    //         color: "white"
-    //     }
-
-    //     property string dialogTitleText: ""
-    //     property string dialogWarningText: ""
-
-    //     Column {
-    //         anchors.fill: parent
-    //         spacing: 0
-    //         bottomPadding: 5
-
-    //         // --- Title Bar ---
-    //         Rectangle {
-    //             width: parent.width
-    //             height: 50
-    //             radius: 14
-    //             color: "#7F56D9"
-    //             antialiasing: true
-
-    //             // mask lower corners → flat against content
-    //             Rectangle {
-    //                 anchors.left: parent.left
-    //                 anchors.right: parent.right
-    //                 anchors.bottom: parent.bottom
-    //                 height: 14
-    //                 color: "#7F56D9"
-    //                 radius: 0
-    //             }
-
-    //             // --- Title and Close Icon ---
-    //             Item {
-    //                 anchors.fill: parent
-
-    //                 // Title centered in the bar
-    //                 QGCLabel {
-    //                     text: compassDialog.dialogTitleText//qsTr("Compass Calibration")
-    //                     anchors.centerIn: parent
-    //                     color: "white"
-    //                     font.pointSize: ScreenTools.mediumFontPointSize
-    //                     font.bold: true
-    //                 }
-
-    //                 // Close button at top-right
-    //                 MouseArea {
-    //                     anchors.top: parent.top
-    //                     anchors.right: parent.right
-    //                     width: 40
-    //                     height: 40
-    //                     onClicked: compassDialog.close()
-
-    //                     Text {
-    //                         anchors.centerIn: parent
-    //                         text: "\u2715"
-    //                         color: "white"
-    //                         font.pixelSize: 18
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         QGCLabel {
-    //             text : ""
-    //             width: parent.width
-    //             height : 10
-    //         }
-
-    //         // --- Warning Text ---
-    //         QGCLabel {
-    //             id: compassWarningText
-    //             text: compassDialog.dialogWarningText //qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
-    //             wrapMode: Text.WordWrap
-    //             horizontalAlignment: Text.AlignHCenter
-    //             width: parent.width * 0.9
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             font.pointSize: ScreenTools.defaultFontPointSize
-    //             color: "black"
-    //         }
-
-    //         // --- Image (centered) ---
-    //         QGCColoredImage {
-    //             source: "qrc:///qmlimages/VehicleDown.png"
-    //             width: parent.width * 0.25
-    //             height: width
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             color: "black"
-    //         }
-
-    //         // --- Spacer to push button down ---
-    //         Item {
-    //             Layout.fillHeight: true
-    //         }
-
-    //         // --- OK Button ---
-    //         QGCButton {
-    //             text: qsTr("DONE")
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             background: Rectangle {
-    //                 color: "#7F56D9"
-    //                 radius: 14
-    //             }
-    //             contentItem: Text {
-    //                 text: parent.text
-    //                 color: "white"
-    //                 font.bold: true
-    //                 horizontalAlignment: Text.AlignHCenter
-    //                 verticalAlignment: Text.AlignVCenter
-    //             }
-    //             onClicked: {
-    //                 // calibrationLoader.active = true
-    //                 // compassDialog.close()
-
-    //                 // // Use a small delay to ensure the loader is ready
-    //                 // timer.callLater(100)
-    //             }
-    //         }
-
-    //     }
-    // }
-
-    // Timer {
-    //     id: timer
-    //     function callLater(delay) {
-    //         timer.interval = delay
-    //         timer.repeat = false
-    //         timer.start()
-    //     }
-    //     onTriggered: {
-    //         if (calibrationLoader.item && calibrationLoader.item.callShowOrientationsDialog) {
-    //             calibrationLoader.item.callShowOrientationsDialog(1)
-    //         } else {
-    //             console.warn("CalibrationSettings not ready yet, retrying...")
-    //             timer.callLater(100) // Retry after another 100ms
-    //         }
-    //     }
-    // }
-
+    // Starting of DB code
     function getDatabase() {
         return LocalStorage.openDatabaseSync("QGCUserDB", "1.0", "User DB", 1000000);
     }
@@ -791,7 +643,6 @@ ApplicationWindow {
             }
         });
     }
-
 
     // MainRootWindow.qml
     function insertFeedback(username, mobile_number, email, comments, callback) {
@@ -862,6 +713,7 @@ ApplicationWindow {
         console.log("------------------------------------------");
     }
 
+    //saveDroneSession
     function saveDroneSession(date, startTime, endTime) {
         var db = getDatabase();
         db.transaction(function(tx) {
@@ -891,7 +743,6 @@ ApplicationWindow {
         });
     }
 
-
     // Just print the Session table
     function printSessionTable() {
         var db = getDatabase();
@@ -918,12 +769,14 @@ ApplicationWindow {
                 }
 
                 console.log("------------------------------------------");
+
             } catch (error) {
                 console.error("Error reading drone session:", error);
             }
         });
     }
 
+    //calculate the duration from startsession to end session
     function calculateDuration(startTime, endTime) {
         try {
             // Parse times (format: "HH:mm:ss")
