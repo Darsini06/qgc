@@ -79,8 +79,6 @@ ApplicationWindow {
     property var _guidedController: globals.guidedControllerFlyView
     property int    actionTakeoff
     signal loadPlanFile()
-    // Reference the existing FlightMap instance (defined in another QML file)
-    //property alias mainFlightMap: mainFlightMap
 
 
     property string edit:""
@@ -88,7 +86,7 @@ ApplicationWindow {
     property string sessionStart: ""
     property string sessionEnd: ""
     property bool sessionSaved: false
-    signal newSessionAdded()
+
 
 
     Connections {
@@ -112,7 +110,7 @@ ApplicationWindow {
                 if (sessionStart !== "") { // Only save if we have a start time
                     sessionEnd = timeString;
                     console.log("Drone Disconnected at:", sessionEnd,"on", sessionDate);
-                    saveDroneSession(sessionDate, sessionStart, sessionEnd);
+                    MapGlobals.saveDroneSession(sessionDate, sessionStart, sessionEnd);
                     // Reset for next session
                     sessionStart = "";
                     sessionEnd = "";
@@ -125,6 +123,7 @@ ApplicationWindow {
         }
     }
 
+
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
         if (!ScreenTools.isFakeMobile && (ScreenTools.isMobile || Screen.height / ScreenTools.realPixelDensity < 120)) {
@@ -134,14 +133,20 @@ ApplicationWindow {
             height  = ScreenTools.isMobile ? ScreenTools.screenHeight : Math.min(150 * Screen.pixelDensity, Screen.height)
         }
 
-        //Initialize the Database and Create Tables
-        initDB()
+        // Reference Variable for MainRootWindow
+        MapGlobals.rootWindow = mainWindow
+        MapGlobals.loginLoader = login
+        MapGlobals.newscreen   = newscreen
+        MapGlobals.modeBtn1    = modebtn1
 
-        profilelogin()
-        profile()
+        //Initialize the Database and Create Tables
+        MapGlobals.initDB()
+
+        //profilelogin()
+        MapGlobals.profile()
 
         //Print all Session Table Datas.Just For Reference
-        printSessionTable()
+        MapGlobals.printSessionTable()
 
         if(_appSettings.screen==="Plan"){
             plan="Plan"
@@ -149,11 +154,8 @@ ApplicationWindow {
         }else{
             plan="Start"
             console.log("NextScreen loaded with planType: Start")
-
         }
 
-        // Start the sequence of first run prompt(s)
-        //firstRunPromptManager.nextPrompt()
     }
 
     /* QtObject {
@@ -230,17 +232,17 @@ ApplicationWindow {
         planView.newmap()
     }
 
-    function newscreendata() {
-        if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-            newscreen.camera()
-        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-            newscreen.agri()
-        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-            newscreen.mapping()
-        }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
-            newscreen.vtol()
-        }
-    }
+    // function newscreendata() {
+    //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+    //         newscreen.camera()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+    //         newscreen.agri()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+    //         newscreen.mapping()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
+    //         newscreen.vtol()
+    //     }
+    // }
 
     function filename() {
         filename.tracemode()
@@ -441,61 +443,61 @@ ApplicationWindow {
         }
     }
 
-    ListModel {
-        id: userModel
-    }
+    // ListModel {
+    //     id: userModel
+    // }
 
-    Dialog {
-        id: userDialog
-        modal: true
-        width: parent.width * 0.9
-        height: parent.height * 0.6
-        standardButtons: Dialog.Ok
+    // Dialog {
+    //     id: userDialog
+    //     modal: true
+    //     width: parent.width * 0.9
+    //     height: parent.height * 0.6
+    //     standardButtons: Dialog.Ok
 
-        contentItem: ColumnLayout {
-            anchors.fill: parent
-            spacing: 10
+    //     contentItem: ColumnLayout {
+    //         anchors.fill: parent
+    //         spacing: 10
 
-            Label {
-                text: "User List"
-                font.bold: true
-                font.pointSize: 16
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment: Qt.AlignHCenter
-            }
+    //         Label {
+    //             text: "User List"
+    //             font.bold: true
+    //             font.pointSize: 16
+    //             horizontalAlignment: Text.AlignHCenter
+    //             Layout.alignment: Qt.AlignHCenter
+    //         }
 
-            ListView {
-                id: userList
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                model: userModel
-                clip: true
+    //         ListView {
+    //             id: userList
+    //             Layout.fillWidth: true
+    //             Layout.fillHeight: true
+    //             model: userModel
+    //             clip: true
 
-                delegate: Rectangle {
-                    width: userList.width
-                    height: 50
-                    color: index % 2 === 0 ? "#f0f0f0" : "#ffffff"
+    //             delegate: Rectangle {
+    //                 width: userList.width
+    //                 height: 50
+    //                 color: index % 2 === 0 ? "#f0f0f0" : "#ffffff"
 
-                    Row {
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 10
-                        padding: 10
+    //                 Row {
+    //                     anchors.verticalCenter: parent.verticalCenter
+    //                     spacing: 10
+    //                     padding: 10
 
-                        Text {
-                            text: id + " " + displayname
-                            font.bold: true
-                            color: "black"
-                        }
+    //                     Text {
+    //                         text: id + " " + displayname
+    //                         font.bold: true
+    //                         color: "black"
+    //                     }
 
-                        Text {
-                            text: "(" + username + " - " + email + ")"
-                            color: "black"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     Text {
+    //                         text: "(" + username + " - " + email + ")"
+    //                         color: "black"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     Dialog {
         id: dynamicCalDialog
@@ -593,751 +595,32 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-
     // Starting of DB code
-    function getDatabase() {
-        return LocalStorage.openDatabaseSync("QGCUserDB", "1.0", "User DB", 1000000);
-    }
 
-    function initDB() {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-
-                // Users table - simplified
-                tx.executeSql("CREATE TABLE IF NOT EXISTS users(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    displayname TEXT NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL,
-                    mobile_number TEXT,
-                    rpc_completed INTEGER DEFAULT 0,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )");
-
-
-                // Drone sessions table - simplified
-                tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    date TEXT NOT NULL,
-                    start_time TEXT NOT NULL,
-                    end_time TEXT NOT NULL,
-                    duration INTEGER
-                )");
-
-
-                //feedback table
-                tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (
-                               id INTEGER PRIMARY KEY AUTOINCREMENT,
-                               username TEXT,
-                               mobile_number TEXT,
-                               email TEXT,
-                               comments TEXT
-                           )");
-
-                console.log("Database and tables created successfully");
-
-            } catch (error) {
-                console.error("Error creating database:", error);
-            }
-        });
-    }
-
-    // MainRootWindow.qml
-    function insertFeedback(username, mobile_number, email, comments, callback) {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-
-                console.log("=== ALL FEEDBACK BEFORE INSERT ===");
-                var beforeInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
-                printFeedbackTable(beforeInsert, "BEFORE INSERT");
-
-                // Insert new feedback
-                var rs = tx.executeSql(
-                            "INSERT INTO feedback (username, mobile_number, email, comments) VALUES (?, ?, ?, ?)",
-                            [username, mobile_number, email, comments]
-                            );
-
-                if (rs.rowsAffected > 0) {
-                    console.log("Feedback inserted successfully");
-
-                    // Print all data AFTER insert
-                    console.log("=== ALL FEEDBACK AFTER INSERT ===");
-                    var afterInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
-                    printFeedbackTable(afterInsert, "AFTER INSERT");
-
-                    if (callback) {
-                        callback(true);
-                    }
-                } else {
-                    console.log("Feedback insertion failed");
-                    if (callback) {
-                        callback(false);
-                    }
-                }
-
-            } catch (error) {
-                console.error("Error inserting feedback:", error);
-                if (callback) {
-                    callback(false);
-                }
-            }
-        });
-    }
-
-    // Just print the feedback table
-    function printFeedbackTable(resultSet, label) {
-
-        console.log("ID | Username | Mobile | Email | Comments");
-        console.log("------------------------------------------");
-
-        if (resultSet.rows.length === 0) {
-            console.log("No feedback records found");
-        } else {
-            for (var i = 0; i < resultSet.rows.length; i++) {
-                var feedback = resultSet.rows.item(i);
-                // Truncate long comments for better readability
-                var truncatedComments = feedback.comments.length > 30 ?
-                            feedback.comments.substring(0, 30) + "..." :
-                            feedback.comments;
-
-                console.log(feedback.id + " | " +
-                            (feedback.username || "NULL") + " | " +
-                            (feedback.mobile_number || "NULL") + " | " +
-                            (feedback.email || "NULL") + " | " +
-                            truncatedComments);
-            }
-        }
-        console.log("------------------------------------------");
-    }
-
-    //saveDroneSession
-    function saveDroneSession(date, startTime, endTime) {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-                // Calculate duration in minutes
-                var duration = calculateDuration(startTime, endTime);
-
-                // Insert session with duration
-                var rs = tx.executeSql(
-                            "INSERT INTO drone_sessions(date, start_time, end_time, duration) VALUES(?, ?, ?, ?)",
-                            [date, startTime, endTime, duration]
-                            );
-
-                if (rs.rowsAffected > 0) {
-                    console.log("Session saved - ID:", rs.insertId,
-                                "Date:", date,
-                                "Start:", startTime,
-                                "End:", endTime,
-                                "Duration:", duration, "minutes");
-                    sessionSaved = true;
-                    newSessionAdded(); // Emit signal to notify other components
-                }
-
-            } catch (error) {
-                console.error("Error saving drone session:", error);
-            }
-        });
-    }
-
-    // Just print the Session table
-    function printSessionTable() {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-                var resultSet = tx.executeSql("SELECT * FROM drone_sessions ORDER BY id");
-
-                console.log("ID | date | start_time | end_time | duration");
-                console.log("------------------------------------------");
-
-                if (resultSet.rows.length === 0) {
-                    console.log("No Session records found");
-                } else {
-                    for (var i = 0; i < resultSet.rows.length; i++) {
-                        var session = resultSet.rows.item(i);
-                        console.log(
-                                    session.id + " | " +
-                                    (session.date || "NULL") + " | " +
-                                    (session.start_time || "NULL") + " | " +
-                                    (session.end_time || "NULL") + " | " +
-                                    (session.duration || "NULL")
-                                    );
-                    }
-                }
-
-                console.log("------------------------------------------");
-
-            } catch (error) {
-                console.error("Error reading drone session:", error);
-            }
-        });
-    }
-
-    //calculate the duration from startsession to end session
-    function calculateDuration(startTime, endTime) {
-        try {
-            // Parse times (format: "HH:mm:ss")
-            var startParts = startTime.split(':');
-            var endParts = endTime.split(':');
-
-            var startTotalSeconds = parseInt(startParts[0]) * 3600 +
-                    parseInt(startParts[1]) * 60 +
-                    parseInt(startParts[2] || 0);
-
-            var endTotalSeconds = parseInt(endParts[0]) * 3600 +
-                    parseInt(endParts[1]) * 60 +
-                    parseInt(endParts[2] || 0);
-
-            var durationSeconds = endTotalSeconds - startTotalSeconds;
-
-            if (durationSeconds < 0) {
-                // Handle(session spans midnight)
-                durationSeconds += 24 * 3600;
-            }
-
-            return Math.round(durationSeconds / 60); // Convert to minutes
-
-        } catch (e) {
-            console.error("Error calculating duration:", e);
-            return 0;
-        }
-    }
-
-    // JavaScript function to read from DB
-    function loadUsersFromDB() {
-
-        var db = getDatabase();
-        userModel.clear();
-        db.transaction(function(tx) {
-            var rs = tx.executeSql("SELECT * FROM users");
-            console.log("inserted=========",rs)
-
-            for (let i = 0; i < rs.rows.length; i++) {
-                let row = rs.rows.item(i);
-                console.log("inserted=========",row.username)
-                userModel.append({
-                                     id: row.id,
-                                     username: row.username,
-                                     displayname: row.displayname,
-                                     email: row.email
-                                 });
-            }
-            // if (rs.rows.length > 0) {
-            //     console.log("Login Success");
-            //     login.visible = false;
-            //     mainWindow.newscreen();
-            //     mainWindow.showToastMessage("Login Success");
-            // } else {
-            //     console.log("Invalid Credentials");
-            //     mainWindow.showToastMessage("Invalid Credentials");
-            // }
-        });
-
-
-        // var db = getDatabase();
-
-        // // Clear model before loading new data
-        // userModel.clear();
-
-        // db.transaction(function(tx) {
-
-        //     tx.executeSql("SELECT * FROM users", [], function(tx, results) {
-
-        //     console.log("results==========",results.rows.length)
-        //         for (let i = 0; i < results.rows.length; i++) {
-        //             let row = results.rows.item(i);
-        //             userModel.append({
-        //                 id: row.id,
-        //                 username: row.username,
-        //                 displayname: row.displayname,
-        //                 email: row.email
-        //             });
-        //         }
-        //     });
-        // });
-
-        userDialog.open()
-    }
-
-    function getAllSessions(callback) {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-                var rs = tx.executeSql("SELECT * FROM drone_sessions ORDER BY date DESC, start_time DESC");
-                var sessions = [];
-
-                console.log("Found", rs.rows.length, "drone sessions in database");
-
-                for (var i = 0; i < rs.rows.length; i++) {
-                    sessions.push(rs.rows.item(i));
-                }
-
-                if (callback) {
-                    callback(sessions);
-                }
-
-            } catch (error) {
-                console.error("Error retrieving sessions:", error);
-                if (callback) {
-                    callback([]);
-                }
-            }
-        });
-    }
-
-    function registerUser(username, displayname, email, password, confirmpassword, callback) {
-        var db = getDatabase();
-        var result = false;
-
-        db.transaction(function(tx) {
-            // Print input values
-            console.log("=== USER REGISTRATION ATTEMPT ===");
-            console.log("Username:", username);
-            console.log("Display Name:", displayname);
-            console.log("Email:", email);
-            // Consider not logging passwords in production for security
-            console.log("Password length:", password.length);
-            console.log("Confirm Password length:", confirmpassword.length);
-
-            // First check if username already exists
-            var usernameCheck = tx.executeSql(
-                        "SELECT id FROM users WHERE username = ?",
-                        [username]
-                        );
-
-            if (usernameCheck.rows.length > 0) {
-                console.log("Registration failed - username already exists");
-                showToastMessage("Username already exists", true);
-                if (callback) callback(false);
-                return;
-            }
-
-            // Check if email already exists
-            var emailCheck = tx.executeSql(
-                        "SELECT id FROM users WHERE email = ?",
-                        [email]
-                        );
-
-            if (emailCheck.rows.length > 0) {
-                console.log("Registration failed - email already exists");
-                showToastMessage("Email already registered", true);
-                if (callback) callback(false);
-                return;
-            }
-
-            var rs = tx.executeSql(
-                        "INSERT INTO users(username, displayname, email, password) VALUES(?, ?, ?, ?)",
-                        [username, displayname, email, password]
-                        );
-
-            if (rs.rowsAffected > 0) {
-                console.log("Registration successful!");
-                console.log("Rows affected:", rs.rowsAffected);
-                console.log("Inserted ID:", rs.insertId);
-
-                // Fetch and print the inserted record
-                var selectRs = tx.executeSql(
-                            "SELECT * FROM users WHERE id = ?",
-                            [rs.insertId]
-                            );
-
-                if (selectRs.rows.length > 0) {
-                    var insertedUser = selectRs.rows.item(0);
-                    console.log("Inserted user details:");
-                    console.log("ID:", insertedUser.id);
-                    console.log("Username:", insertedUser.username);
-                    console.log("Display Name:", insertedUser.displayname);
-                    console.log("Email:", insertedUser.email);
-                    console.log("RPC Completed:", insertedUser.rpc_completed);
-                    console.log("Created At:", insertedUser.created_at);
-                }
-
-                result = true;
-            } else {
-                console.log("Registration failed - no rows affected");
-                result = false;
-            }
-
-            console.log("=== REGISTRATION COMPLETED ===");
-
-            if (callback) {
-                callback(result);
-            }
-        });
-    }
-
-    function loginUserFunc(username, password,callback) {
-        var db = getDatabase();
-        var result = false;
-
-        db.transaction(function(tx) {
-            var rs = tx.executeSql("SELECT * FROM users WHERE username=? AND password=?", [username, password]);
-            console.log("inserted=========",rs)
-            if (rs.rows.length > 0) {
-                console.log("Login Success");
-                result = true;
-                login.visible = false;
-                mainWindow.newscreen();
-                mainWindow.showToastMessage("Login Successfully");
-                MapGlobals.login="login"
-                QGroundControl.saveBoolGlobalSetting("login", true)
-            } else {
-                result = false;
-                console.log("Invalid Credentials");
-                mainWindow.showToastMessage("Incorrect username or password");
-            }
-
-            if (callback) {
-                callback(result);
-            }
-
-        });
-    }
-
-    function resetPassword(username, newPass, callback) {
-        var db = getDatabase();
-        db.transaction(function(tx) {  // 'tx' is the transaction object, not 'db'
-            // Check if username exists
-            var checkRs = tx.executeSql("SELECT * FROM users WHERE username = ?", [username]);
-
-            var result = {success: false, message: ""};
-
-            if (checkRs.rows.length > 0) {
-                // Update password
-                var updateRs = tx.executeSql("UPDATE users SET password = ? WHERE username = ?", [newPass, username]);
-
-                if (updateRs.rowsAffected > 0) {
-                    result.success = true;
-                    result.message = "Password reset successfully!";
-                } else {
-                    result.message = "Failed to reset password. Please try again.";
-                }
-            } else {
-                result.message = "Incorrect Username";
-            }
-
-            // Call the callback with the result
-            if (callback) {
-                callback(result);
-            }
-        });
-    }
-
-    function updateUser(old_userName, new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, callback) {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            // Print all data BEFORE update
-            console.log("=== ALL USERS BEFORE UPDATE ===");
-            var beforeUpdate = tx.executeSql("SELECT * FROM users");
-            for (var i = 0; i < beforeUpdate.rows.length; i++) {
-                var user = beforeUpdate.rows.item(i);
-                console.log("User", i + 1, "- ID:", user.id,
-                            "Username:", user.username,
-                            "Name:", user.displayname,
-                            "Email:", user.email,
-                            "Mobile:", user.mobile_number || "NULL",
-                            "RPC:", user.rpc_completed);
-            }
-
-            // Perform the update
-            var rs = tx.executeSql(
-                        "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
-                        [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
-                        );
-
-            if (rs.rowsAffected > 0) {
-                console.log("User updated successfully");
-                console.log("Rows affected:", rs.rowsAffected);
-
-                // Print all data AFTER update
-                console.log("=== ALL USERS AFTER UPDATE ===");
-                var afterUpdate = tx.executeSql("SELECT * FROM users");
-
-                for (var j = 0; j < afterUpdate.rows.length; j++) {
-                    var updatedUser = afterUpdate.rows.item(j);
-                    console.log("User", j + 1, "- ID:", updatedUser.id,
-                                "Username:", updatedUser.username,
-                                "Name:", updatedUser.displayname,
-                                "Email:", updatedUser.email,
-                                "Mobile:", updatedUser.mobile_number || "NULL",
-                                "RPC:", updatedUser.rpc_completed);
-                }
-
-                if (callback) {
-                    callback(true);
-                }
-
-            } else {
-
-                console.log("User not found or update failed");
-
-                if (callback) {
-                    callback(false);
-                }
-            }
-        });
-    }
-
-    function deleteUser(username) {
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            var rs = tx.executeSql(
-                        "DELETE FROM users WHERE username = ?",
-                        [username]
-                        );
-            if (rs.rowsAffected > 0) {
-                console.log("User deleted");
-                mainWindow.showToastMessage("User deleted");
-            } else {
-                console.log("User not found");
-                mainWindow.showToastMessage("User not found");
-            }
-        });
-    }
-
-    function profilelogin() {
-        var db = getDatabase();
-        db.transaction(function(tx) {// Only 'id' is the primary key now
-            tx.executeSql("CREATE TABLE IF NOT EXISTS userslogin(id INTEGER , login TEXT  )");
-            tx.executeSql("INSERT INTO userslogin(id, login) VALUES(1, '0')");
-        });
-        console.log("DB Created:", db);
-    }
-
-    function loadUserData(username, callback) {
-        console.log("Loading user data for:", username);
-
-        if (username !== "") {
-            var db = getDatabase();
-            db.transaction(function(tx) {
-                var selectRs = tx.executeSql(
-                            "SELECT * FROM users WHERE username = ?",
-                            [username]
-                            );
-
-                var result = null;
-                if (selectRs.rows.length > 0) {
-                    result = selectRs.rows.item(0);
-                    console.log("User data found:", result);
-                    console.log("In MainrootWindow rpc_completed:", result.rpc_completed)
-                } else {
-                    console.log("No user found with username:", username);
-                }
-
-                // Call the callback with the result
-                if (callback) {
-                    callback(result);
-                }
-            });
-        } else {
-            if (callback) {
-                callback(null);
-            }
-        }
-    }
-
-    function profile() {
-        var loginpage= QGroundControl.loadBoolGlobalSetting("login",false)
-        if(loginpage===true){
-            login.visible = false;
-            mainWindow.newscreen();
-            QGroundControl.saveBoolGlobalSetting("login", true)
-            modebtn1.visible = false
-
-        }else{
-            login.visible = true;
-            newscreen.visible = false
-            console.log("Invalid Credentials");
-            QGroundControl.saveBoolGlobalSetting("login", false)
-        }
-
-        // var db = getDatabase();
-        // db.transaction(function(tx) {
-        //     var rs = tx.executeSql("SELECT * FROM userslogin WHERE login = 1");
-
-        //     if (rs.rows.length > 0) {
-        //         login.visible = false;
-        //         mainWindow.newscreen();
-
-
-        //     } else {
-        //         login.visible = true;
-        //         newscreen.visible = false
-        //         console.log("Invalid Credentials");
-        //     }
-        // });
-    }
-
-    function setLogin(userId) {
-        console.log("setLogin========");
-
-        var db = getDatabase();
-
-        db.transaction(function(tx) {
-
-            var rs = tx.executeSql("UPDATE userslogin SET login = 1 WHERE id = ?", [userId]);
-            if (rs.rowsAffected > 0) {
-                console.log("Password Reset");
-            } else {
-                console.log("User not found");
-            }
-
-        });
-    }
-
-    function setLogout(userId) {
-        var db = getDatabase();
-
-        db.transaction(function(tx) {
-
-            var rs = tx.executeSql("UPDATE userslogin SET login = 0 WHERE id = ?", [userId]);
-            if (rs.rowsAffected > 0) {
-                console.log("Password Reset");
-            } else {
-                console.log("User not found");
-            }
-
-        });
-    }
-
-    function validateNotEmpty(field, fieldName, focusField) {
-        if (field.trim() === "") {
-            showToastMessage(`Please enter your ${fieldName}`);
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-        return true;
-    }
-
-    function validateUsername(username, focusField, isUpdate = false)   {
-        if (!validateNotEmpty(username, "username", focusField)) return false;
-
-        if (username.length < 3) {
-            showToastMessage("Username must be at least 3 characters long");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-            showToastMessage("Username can only contain letters, numbers, and underscores");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        // For account creation, you might want to check if username already exists
-        if (!isUpdate) {
-            // Simulate checking if username exists
-            if (username === "existinguser") {
-                showToastMessage("Username already taken");
-                if (focusField) focusField.focus = true;
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function validateDisplayName(displayName, focusField) {
-        if (!validateNotEmpty(displayName, "display name", focusField)) return false;
-
-        if (displayName.length < 2) {
-            showToastMessage("Display name must be at least 2 characters long");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        return true;
-    }
-
-    function validateEmail(email, focusField, isUpdate = false) {
-        if (!validateNotEmpty(email, "email address", focusField)) return false;
-
-        // Comprehensive email validation regex
-        var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-        if (!emailRegex.test(email)) {
-            showToastMessage("Please enter a valid email address");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        // For account creation, you might want to check if email already exists
-        if (!isUpdate) {
-            // Simulate checking if email exists
-            if (email === "existing@example.com") {
-                showToastMessage("Email already registered");
-                if (focusField) focusField.focus = true;
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function validatePassword(password, focusField, isUpdate = false) {
-        // For update, password is optional (only validate if provided)
-        if (isUpdate && password === "") return true;
-
-        if (!validateNotEmpty(password, "password", focusField)) return false;
-
-        if (password.length < 8) {
-            showToastMessage("Password must be at least 8 characters long");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        // Check for password strength
-        var hasUpperCase = /[A-Z]/.test(password);
-        var hasLowerCase = /[a-z]/.test(password);
-        var hasNumbers = /[0-9]/.test(password);
-        var hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-        var strengthScore = (hasUpperCase ? 1 : 0) + (hasLowerCase ? 1 : 0) +
-                (hasNumbers ? 1 : 0) + (hasSpecialChar ? 1 : 0);
-
-        if (strengthScore < 3) {
-            showToastMessage("Password should include uppercase, lowercase, numbers, and special characters");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        return true;
-    }
-
-    function validateConfirmPassword(password, confirmPassword, focusField, isUpdate = false) {
-        // For update, confirm password is only required if password is provided
-        if (isUpdate && password === "" && confirmPassword === "") return true;
-
-        if (!validateNotEmpty(confirmPassword, "password confirmation", focusField)) return false;
-
-        if (password !== confirmPassword) {
-            showToastMessage("Passwords don't match");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        return true;
-    }
-
-    function validateMobileNumber(mobile, focusField) {
-        if (!validateNotEmpty(mobile, "mobile number", focusField)) return false;
-
-        // Basic mobile number validation
-        var mobileRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        var cleanedMobile = mobile.replace(/[-\s\(\)]/g, '');
-
-        if (!mobileRegex.test(cleanedMobile)) {
-            showToastMessage("Please enter a valid mobile number");
-            if (focusField) focusField.focus = true;
-            return false;
-        }
-
-        return true;
-    }
-
+    // // JavaScript function to read from DB
+    // function loadUsersFromDB() {
+
+    //     var db = MapGlobals.getDatabase();
+    //     userModel.clear();
+    //     db.transaction(function(tx) {
+    //         var rs = tx.executeSql("SELECT * FROM users");
+    //         console.log("inserted=========",rs)
+
+    //         for (let i = 0; i < rs.rows.length; i++) {
+    //             let row = rs.rows.item(i);
+    //             console.log("inserted=========",row.username)
+    //             userModel.append({
+    //                                  id: row.id,
+    //                                  username: row.username,
+    //                                  displayname: row.displayname,
+    //                                  email: row.email
+    //                              });
+    //         }
+
+    //     });
+
+    //     userDialog.open()
+    // }
 
     Item {
         id: toastContainer
@@ -2013,7 +1296,7 @@ ApplicationWindow {
 
         //     QGCColoredImage {
         //         id: takeofficon
-        //         source: "/qmlimages/NewImages/takeOff.png"
+        //         source: "/qmlimages/NewImages/takeOff.svg"
         //         width: parent.width * 0.5   // 60% of button size
         //         height: width
         //         anchors.centerIn: parent
@@ -2023,7 +1306,7 @@ ApplicationWindow {
         //     MouseArea {
         //         anchors.fill: parent
         //         onClicked: {
-        //             myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+        //             myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
         //             myDialog.dialogText = "settings"
         //             myDialog.open()
         //         }
@@ -2142,7 +1425,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: camerabtnicon
-                source: "/qmlimages/NewImages/takeOff.png"
+                source: "/qmlimages/NewImages/takeOff.svg"
                 width: parent.width * 0.5   // 60% of button size
                 height: width
                 anchors.centerIn: parent
@@ -2156,7 +1439,7 @@ ApplicationWindow {
                 onClicked: {
                     // //whatsappImageSlider.visible=true
                     // mainWindow.showToastMessage("Camera clicked");
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }
@@ -2225,153 +1508,6 @@ ApplicationWindow {
                     myDialog.dialogText = "RTL Mode"; // Set the text dynamically
                     myDialog.open()
 
-                }
-            }
-        }
-
-        RowLayout {
-            id: modeRow
-            spacing: 10  // Adjust the spacing between buttons
-            Layout.alignment: Qt.AlignLeft
-
-            property bool extraButtonsVisible: false  // Toggle visibility of extra buttons
-
-
-            Rectangle {
-                id: modebtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color:  "white"//"#1b1c3e"      // white background
-                visible:  false
-                border.width: width * 0.05
-                border.color:  "white"//"#005BBB"
-
-                QGCColoredImage {
-                    id: flightModeIndicator12
-                    source: "/qmlimages/FlightModesComponentIcon.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (activeVehicle) {
-                            // Show confirmation dialog
-                            confirmDialog.open()
-                        } else {
-                            console.log("No active vehicle")
-                        }
-
-                    }
-                }
-            }
-
-
-            // Extra buttons
-            Rectangle {
-                id: extraBtn1
-                width: 50
-                height: 50
-                radius: width / 2
-                color: "white"
-                visible: modeRow.extraButtonsVisible  // Controlled by modebtn
-
-                Text {
-                    text: "A"
-                    color: "white"
-                    font.bold: true
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        console.log("Extra button 1 clicked");
-                    }
-                }
-            }
-
-            Rectangle {
-                id: extraBtn2
-                width: 50
-                height: 50
-                radius: width / 2
-                color: "white"
-                visible: modeRow.extraButtonsVisible
-
-                Text {
-                    text: "M"
-                    color: "white"
-                    font.bold: true
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        console.log("Extra button 2 clicked");
-                    }
-                }
-            }
-
-            Rectangle {
-                id: extraBtn3
-                width: 50
-                height: 50
-                radius: width / 2
-                color: "white"
-                visible: modeRow.extraButtonsVisible
-
-                Text {
-                    text: "AB"
-                    color: "white"
-                    font.bold: true
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        console.log("Extra button 3 clicked");
-                    }
-                }
-            }
-
-            Rectangle {
-                id: extraBtn4
-                width: 50
-                height: 50
-                radius: width / 2
-                color: "white"
-                visible: modeRow.extraButtonsVisible
-
-                Text {
-                    text: "M"
-                    color: "white"
-                    font.bold: true
-                    anchors.centerIn: parent
-                }
-
-                QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                    width: 16
-                    height: 16
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    anchors.margins: 5
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        console.log("Extra button 3 clicked");
-                    }
                 }
             }
         }
@@ -2931,7 +2067,7 @@ ApplicationWindow {
     //             //                     spacing: 10
     //             //                     anchors.centerIn: parent
     //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeoff.png"
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
     //             //                                 width: 50
     //             //                                 height: 50
     //             //                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -2969,7 +2105,7 @@ ApplicationWindow {
     //             //                     spacing: 10
     //             //                     anchors.centerIn: parent
     //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeoff.png"
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
     //             //                                 width: 50
     //             //                                 height: 50
     //             //                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -3001,7 +2137,7 @@ ApplicationWindow {
     //             //                     spacing: 10
     //             //                     anchors.centerIn: parent
     //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeoff.png"
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
     //             //                                 width: 50
     //             //                                 height: 50
     //             //                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -3459,7 +2595,7 @@ ApplicationWindow {
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/kmlFile.png"
+                                source: "/qmlimages/NewImages/kmlFile.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -3505,7 +2641,7 @@ ApplicationWindow {
                 // spacing: 10
                 // anchors.centerIn: parent
                 // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
+                // source: "/qmlimages/NewImages/takeOff.svg"
                 // width: 50
                 // height: 50
                 // anchors.horizontalCenter: parent.horizontalCenter
@@ -3543,7 +2679,7 @@ ApplicationWindow {
                 // spacing: 10
                 // anchors.centerIn: parent
                 // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
+                // source: "/qmlimages/NewImages/takeOff.svg"
                 // width: 50
                 // height: 50
                 // anchors.horizontalCenter: parent.horizontalCenter
@@ -3575,7 +2711,7 @@ ApplicationWindow {
                 // spacing: 10
                 // anchors.centerIn: parent
                 // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
+                // source: "/qmlimages/NewImages/takeOff.svg"
                 // width: 50
                 // height: 50
                 // anchors.horizontalCenter: parent.horizontalCenter

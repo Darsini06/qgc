@@ -74,9 +74,7 @@ Rectangle {
                 mainWindow.newscreen()
             }
             icon.color:"white"
-
         }
-
 
         MainStatusIndicator {
             Layout.preferredHeight: viewButtonRow.height
@@ -89,13 +87,9 @@ Rectangle {
             visible:            _activeVehicle && _communicationLost
             leftPadding : ScreenTools.defaultFontPixelWidth
             rightPadding :ScreenTools.defaultFontPixelWidth
-
-
         }
 
     }
-
-
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -295,10 +289,11 @@ Rectangle {
 
             Row {
                 spacing: 5
+
                 Image {
                     width: 25
                     height: 25
-                    source: "/qmlimages/NewImages/battery.png"
+                    source: "/qmlimages/NewImages/Battery.svg"
                 }
 
             }

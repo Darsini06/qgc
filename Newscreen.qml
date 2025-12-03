@@ -745,7 +745,7 @@ Item {
                     QGroundControl.saveBoolGlobalSetting("login", false)
                     QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                     popup.visible = false
-                    mainWindow.profile()
+                    MapGlobals.profile()
                 }
 
                 onRejected: {

@@ -15,6 +15,8 @@ import QtQuick.Controls 2.15
 import QtQuick.LocalStorage 2.0
 import QtQuick.Layouts 1.15
 
+import MapGlobals 1.0
+
 Item {
     id: root
     anchors.fill: parent
@@ -561,7 +563,7 @@ Item {
                                         return;
                                     }
 
-                                    mainWindow.loginUserFunc(loginUser.text, loginPass.text, function(result) {
+                                    MapGlobals.loginUserFunc(loginUser.text, loginPass.text, function(result) {
 
                                         QGroundControl.saveGlobalSetting("username", loginUser.text.trim());
                                         console.log("userName put in SharedPreference : ",loginUser.text)
@@ -979,13 +981,13 @@ Item {
 
                             onClicked: {
                                 // Execute validations in order
-                                if (!mainWindow.validateUsername(regUser.text,regUser)) return;
-                                if (!mainWindow.validateDisplayName(regDisplay.text,regDisplay)) return;
-                                if (!mainWindow.validateEmail(regEmail.text,regEmail)) return;
-                                if (!mainWindow.validatePassword(regPass.text,regPass)) return;
-                                if (!mainWindow.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
+                                if (!MapGlobals.validateUsername(regUser.text,regUser)) return;
+                                if (!MapGlobals.validateDisplayName(regDisplay.text,regDisplay)) return;
+                                if (!MapGlobals.validateEmail(regEmail.text,regEmail)) return;
+                                if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
+                                if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
 
-                                mainWindow.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
+                                MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
                                     if (result) {
 
                                         mainWindow.showToastMessage("Account created successfully!");
@@ -1326,7 +1328,7 @@ Item {
                                     resetBtn.text = "Resetting...";
 
                                     // Call the resetPassword function with a callback
-                                    mainWindow.resetPassword(resetUser.text, newPassword.text, function(result) {
+                                    MapGlobals.resetPassword(resetUser.text, newPassword.text, function(result) {
                                         if (result.success) {
                                             mainWindow.showToastMessage(result.message);
                                             currentView = "signin";

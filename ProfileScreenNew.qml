@@ -47,6 +47,7 @@ Item {
     // Connect to new session signal
     Connections {
         target: mainWindow
+
         onNewSessionAdded: {
             console.log("New session added, refreshing...");
             loadSessions();
@@ -102,7 +103,7 @@ Item {
         console.log("Loading drone sessions...");
         sessionModel.clear();
 
-        mainWindow.getAllSessions(function(sessions) {
+        MapGlobals.getAllSessions(function(sessions) {
             if (sessions.length === 0) {
                 console.log("No drone sessions found");
                 return;
@@ -167,7 +168,7 @@ Item {
 
     function loadUserDataFromMain() {
 
-        mainWindow.loadUserData(userName, function(userData) {
+        MapGlobals.loadUserData(userName, function(userData) {
             if (userData) {
                 // Set your profile screen properties
                 name_from_db = userData.displayname || "";
@@ -897,14 +898,14 @@ Item {
                                         height: 40
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onClicked: {
-                                            if (!mainWindow.validateUsername(_username.text,_username)) return;
-                                            if (!mainWindow.validateDisplayName(namefield.text,namefield)) return;
-                                            if (!mainWindow.validateEmail(emailField.text,emailField)) return;
+                                            if (!MapGlobals.validateUsername(_username.text,_username)) return;
+                                            if (!MapGlobals.validateDisplayName(namefield.text,namefield)) return;
+                                            if (!MapGlobals.validateEmail(emailField.text,emailField)) return;
 
                                             var _rpcCompleted =  rpcCompletedStatus //=== "Yes" ? 1 : 0;
                                             console.log("_rpcCompleted : ",_rpcCompleted)
 
-                                            mainWindow.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
+                                            MapGlobals.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
                                                 if (result) {
 
                                                     QGroundControl.saveGlobalSetting("username", _username.text);
@@ -1349,7 +1350,7 @@ Item {
                                             var comments = feedbackArea.text.trim();
 
 
-                                            mainWindow.insertFeedback(
+                                            MapGlobals.insertFeedback(
                                                         userName, // assuming userName is available in ProfileScreen
                                                         mobile,
                                                         email,
@@ -1980,7 +1981,7 @@ Item {
                 QGroundControl.saveBoolGlobalSetting("login", false)
                 QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                 popup.visible = false
-                mainWindow.profile()  
+                MapGlobals.profile()
             }
 
             onRejected: {
