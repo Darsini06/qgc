@@ -83,6 +83,10 @@ Item {
             anchors.fill:   parent
             contentWidth:   mainLayout.width
             contentHeight:  mainLayout.height
+            boundsBehavior: Flickable.OvershootBounds   // SMOOTH FEEL
+
+                flickDeceleration: 100                     // optional - more smooth
+                maximumFlickVelocity: 6000                  // optional - faster/smoother
 
             ColumnLayout {
                 id:         mainLayout

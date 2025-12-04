@@ -58,466 +58,507 @@ Item {
     property bool utmspActTrigger
 
     Component.onCompleted: {
-        console.log("pipView.visible :", pipview.visible);
-        console.log("_pipView.visible :", _pipView.visible);
+        //console.log("pipView.visible :", pipview.visible);
+        //console.log("_pipView.visible :", _pipView.visible);
     }
 
 
+    // LEFT SIDE BUTTON COLUMN
     ColumnLayout {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.topMargin: parent.height* 0.15
-            anchors.leftMargin: 20
-            visible: true
-            spacing: 10  // Adjust this value to control space between icons
+        id: leftColumn
+        width: 100     // VERY IMPORTANT FIX ✔
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 20
+        anchors.leftMargin: 20
+        spacing: 10
 
+        // ----- Saved Files Button -----
+        Rectangle {
+            id: listbtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
 
-            Rectangle {
-                id: listbtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2            // Circle
-                color: "#1b1c3e"
-                visible: true
-                border.width: width * 0.05    // 10% of button width
-                border.color: "#005BBB"
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/savedfiles.png"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "transparent"
+            }
 
-                QGCColoredImage {
-                    id: flightModeIndicator2
-                    source: "/qmlimages/NewImages/savedfiles.png" //"/qmlimages/NewImages/log.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "transparent"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
-                        if(_appSettings.screen==="Plan"){
-                            planView.loaddata()
-
-                        }else{
-                            planView.loaddata1()
-                        }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    if(_appSettings.screen==="Plan") {
+                        planView.loaddata()
+                    } else {
+                        planView.loaddata1()
                     }
                 }
             }
+        }
 
+        // ----- Takeoff -----
+        Rectangle {
+            id: takeoffbtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
 
-            // Rectangle {
-            //     id: takeoffbtn
-            //     Layout.alignment: Qt.AlignLeft
-            //     width: parent.width * 0.05    // 8% of parent width
-            //     height: width                 // Keep it square
-            //     radius: width / 2            // Circle
-            //     color: "#1b1c3e"
-            //     visible: true
-            //     border.width: width * 0.05    // 10% of button width
-            //     border.color: "#005BBB"
-
-            //     QGCColoredImage {
-            //         id: takeofficon
-            //         source: "/qmlimages/NewImages/takeOff.png"
-            //         width: parent.width * 0.5   // 60% of button size
-            //         height: width
-            //         anchors.centerIn: parent
-            //         color: "white"
-            //     }
-
-            //     MouseArea {
-            //         anchors.fill: parent
-            //         onClicked: {
-            //             myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
-            //             myDialog.dialogText = "settings"
-            //             myDialog.open()
-            //         }
-            //     }
-            // }
-
-            Rectangle {
-                id: takeoffbtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
-                visible:  true
-                border.width: width * 0.05
-                border.color: "#005BBB"
-
-                QGCColoredImage {
-                    id: takeofficon
-                    source: "/qmlimages/NewImages/takeOff.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
-                        myDialog.dialogText = "settings"
-                        myDialog.open()
-                    }
-                }
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/takeOff.png"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "white"
             }
 
-            Rectangle {
-                id: waypointbtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
-                visible:  true
-                border.width: width * 0.05
-                border.color: "#005BBB"
-
-                QGCColoredImage {
-                    id: waypointbtnicon1
-                    source: "/qmlimages/MapAddMission.svg"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("waypoint", "waypoint")
-                        QGroundControl.saveGlobalSetting("waypointvisible", "waypointvisible")
-                        QGroundControl.saveGlobalSetting("waypointMark", "true")
-                        planView.mapclear()
-                        mainWindow.showPlanView()
-
-                       waypointDescriptionDialog.createObject(mainWindow).open()
-
-                    }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.dialogText = "settings"
+                    myDialog.open()
                 }
             }
+        }
 
-            // Rectangle {
-            //     id: eraserbtn
-            //     Layout.alignment: Qt.AlignLeft
-            //     width: parent.width * 0.05    // 8% of parent width
-            //     height: width                 // Keep it square
-            //     radius: width / 2   // Makes it a circle
-            //     color: "#1b1c3e"      // white background
-            //     visible:  false
-            //     border.width: width * 0.05
-            //     border.color: "#005BBB"
+        // ----- Waypoint -----
+        Rectangle {
+            id: waypointbtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
 
-
-
-            //     QGCColoredImage {
-            //         id: eraserbtnicon
-            //         source: "/qmlimages/NewImages/map_eraser.png"
-            //         width: parent.width * 0.5   // 60% of button size
-            //         height: width
-            //         anchors.centerIn: parent
-            //         color: "transparent"
-            //     }
-
-
-
-            //     MouseArea {
-            //         anchors.fill: parent
-            //         onClicked: {
-            //             planView.mapclear()
-            //         }
-            //     }
-            // }
-
-            Rectangle {
-                id: camerabtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
-                visible:  true
-                border.width: width * 0.05
-                border.color: "#005BBB"
-
-                QGCColoredImage {
-                    id: camerabtnicon
-                    source: "/qmlimages/NewImages/takeOff.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        // //whatsappImageSlider.visible=true
-                        // mainWindow.showToastMessage("Camera clicked");
-                        myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
-                        myDialog.dialogText = "settings"
-                        myDialog.open()
-                    }
-                }
+            QGCColoredImage {
+                source: "/qmlimages/MapAddMission.svg"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "white"
             }
 
-
-            Rectangle {
-                id: landbtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
-                visible:  true
-                border.width: width * 0.05
-                border.color: "#005BBB"
-
-                QGCColoredImage {
-                    id: landbtnicon
-                    source: "/qmlimages/NewImages/return.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-
-                        myDialog.imageSource = "/qmlimages/NewImages/return.png";  // Set the image dynamically
-                        myDialog.dialogText = "Land Mode"; // Set the text dynamically
-                        myDialog.open()
-                    }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                    QGroundControl.saveGlobalSetting("waypointvisible", "waypointvisible")
+                    QGroundControl.saveGlobalSetting("waypointMark", "true")
+                    planView.mapclear()
+                    mainWindow.showPlanView()
+                    waypointDescriptionDialog.createObject(mainWindow).open()
                 }
             }
+        }
 
-            Rectangle {
-                id: rtlbtn
-                Layout.alignment: Qt.AlignLeft
-                width: parent.width * 0.05    // 8% of parent width
-                height: width                 // Keep it square
-                radius: width / 2   // Makes it a circle
-                color: "#1b1c3e"      // white background
-                visible:  true
-                border.width: width * 0.05
-                border.color: "#005BBB"
+        // ----- Camera -----
+        Rectangle {
+            id: camerabtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
 
-                QGCColoredImage {
-                    id: rtlbtnicon
-                    source: "/qmlimages/NewImages/landing.png"
-                    width: parent.width * 0.5   // 60% of button size
-                    height: width
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        myDialog.imageSource = "/qmlimages/NewImages/landing.png";  // Set the image dynamically
-                        myDialog.dialogText = "RTL Mode"; // Set the text dynamically
-                        myDialog.open()
-
-                    }
-                }
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/takeOff.png"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "white"
             }
 
-            RowLayout {
-                id: modeRow
-                spacing: 10  // Adjust the spacing between buttons
-                Layout.alignment: Qt.AlignLeft
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.dialogText = "settings"
+                    myDialog.open()
+                }
+            }
+        }
 
-                property bool extraButtonsVisible: false  // Toggle visibility of extra buttons
+        // ----- Land -----
+        Rectangle {
+            id: landbtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
 
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/return.png"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/return.png"
+                    myDialog.dialogText = "Land Mode"
+                    myDialog.open()
+                }
+            }
+        }
+
+        Dialog {
+            id: myDialog
+            width: 320
+            height: 300
+            property string imageSource: "/res/default.svg" // Default image
+            property string dialogText: "Default Text" // Default text
+
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
+
+            background: Rectangle {
+                color: "#ccccff"
+                radius: 50
+                border.color: "#6a6af8"
+                border.width: 5
+                clip: true
+            }
+
+            QtObject {
+                id: progressState
+                property real value: 0.0
+            }
+
+            QtObject {
+                id: takeoffSettings
+                property real sliderOutputValue: 1.0
+            }
+
+            contentItem: ColumnLayout {
+                width: parent.width
+                height: parent.height
+                spacing: 10
+                anchors.centerIn: parent
+
+                Text {
+
+                    text: myDialog.dialogText==="settings"?"Takeoff Altitude: " + takeoffSettings.sliderOutputValue + " m":myDialog.dialogText+"/n add data"
+                    font.pixelSize: 16
+                    color: "black"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
 
                 Rectangle {
-                    id: modebtn
-                    Layout.alignment: Qt.AlignLeft
-                    width: parent.width * 0.05    // 8% of parent width
-                    height: width                 // Keep it square
-                    radius: width / 2   // Makes it a circle
-                    color: "#1b1c3e"      // white background
-                    visible:  true
-                    border.width: width * 0.05
-                    border.color: "#005BBB"
+                    id: circularButton
+                    width: 80
+                    height: 80
+                    radius: 40
+                    color: "white"
+                    border.color: "#6a6af8"
+                    border.width: 2
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-                    QGCColoredImage {
-                        id: flightModeIndicator12
-                        source: "/qmlimages/FlightModesComponentIcon.png"
-                        width: parent.width * 0.5   // 60% of button size
-                        height: width
+                    Image {
+                        source: myDialog.imageSource
+                        width: 24
+                        height: 24
                         anchors.centerIn: parent
-                        color: "white"
                     }
 
                     MouseArea {
+                        id: holdArea
                         anchors.fill: parent
-                        onClicked: {
-                            if (activeVehicle) {
-                                // Show confirmation dialog
-                                confirmDialog.open()
-                            } else {
-                                console.log("No active vehicle")
+                        hoverEnabled: true
+
+                        onPressed: progressTimer.start()
+                        onReleased: {
+                            progressTimer.stop()
+                            progressState.value = 0
+                            progressCircle.requestPaint()
+                        }
+                        onEntered: circularButton.color = "#ccccff"
+                        onExited: circularButton.color = "white"
+                    }
+
+                    Canvas {
+                        id: progressCircle
+                        width: parent.width
+                        height: parent.height
+                        anchors.centerIn: parent
+
+                        onPaint: {
+                            var ctx = getContext("2d")
+                            ctx.clearRect(0, 0, width, height)
+                            ctx.beginPath()
+                            ctx.arc(
+                                        width / 2, height / 2,
+                                        35, -Math.PI / 2,
+                                        (2 * Math.PI * progressState.value) - Math.PI / 2,
+                                        false
+                                        )
+                            ctx.lineWidth = 6
+                            ctx.strokeStyle = "#2323f2"
+                            ctx.stroke()
+                        }
+                    }
+                }
+
+                RowLayout {
+                    spacing: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: myDialog.dialogText==="settings"?true:false
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        color: "#ccccff"
+                        radius: 10
+                        border.color: "#6a6af8"
+                        border.width: 2
+
+                        Text {
+                            text: "-"
+                            font.pixelSize: 24
+                            color: "black"
+                            font.bold: true
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (takeoffSettings.sliderOutputValue > 1.0) {
+                                    takeoffSettings.sliderOutputValue = Math.round((takeoffSettings.sliderOutputValue - 0.1) * 10) / 10
+                                }
                             }
-
                         }
                     }
-                }
 
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        color: "#ccccff"
+                        radius: 10
+                        border.color: "#6a6af8"
+                        border.width: 2
 
-                // Extra buttons
-                Rectangle {
-                    id: extraBtn1
-                    width: 50
-                    height: 50
-                    radius: width / 2
-                    color: "white"
-                    visible: modeRow.extraButtonsVisible  // Controlled by modebtn
-
-                    Text {
-                        text: "A"
-                        color: "white"
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("Extra button 1 clicked");
+                        Text {
+                            text: "+"
+                            font.pixelSize: 24
+                            color: "black"
+                            font.bold: true
+                            anchors.centerIn: parent
                         }
-                    }
-                }
 
-                Rectangle {
-                    id: extraBtn2
-                    width: 50
-                    height: 50
-                    radius: width / 2
-                    color: "white"
-                    visible: modeRow.extraButtonsVisible
-
-                    Text {
-                        text: "M"
-                        color: "white"
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("Extra button 2 clicked");
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id: extraBtn3
-                    width: 50
-                    height: 50
-                    radius: width / 2
-                    color: "white"
-                    visible: modeRow.extraButtonsVisible
-
-                    Text {
-                        text: "AB"
-                        color: "white"
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("Extra button 3 clicked");
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id: extraBtn4
-                    width: 50
-                    height: 50
-                    radius: width / 2
-                    color: "white"
-                    visible: modeRow.extraButtonsVisible
-
-                    Text {
-                        text: "M"
-                        color: "white"
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                        width: 16
-                        height: 16
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        anchors.margins: 5
-                        color: "white"
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("Extra button 3 clicked");
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (takeoffSettings.sliderOutputValue < 120) {
+                                    takeoffSettings.sliderOutputValue = Math.round((takeoffSettings.sliderOutputValue + 0.1) * 10) / 10
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            Rectangle {
-                id: modebtn1
-                Layout.alignment: Qt.AlignLeft
 
-                // Base it on flight mode text's size
-                width: flightmode1.implicitWidth + 30   // 10px padding left/right
-                height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
-                radius: height / 2   // pill/capsule shaped
-                color: "#1b1c3e"
-                visible: activeVehicle
-
-                border.width: 2
-                border.color: "#005BBB"
-
-                FlightModeIndicator {
-                    id: flightmode1
-                    //visible: true
-                    anchors.centerIn: parent
+            Timer {
+                id: progressTimer
+                interval: 100
+                repeat: true
+                onTriggered: {
+                    if (progressState.value < 1.0) {
+                        progressState.value += 0.1
+                        progressCircle.requestPaint()
+                    } else {
+                        progressTimer.stop()
+                        progressState.value = 0
+                        progressCircle.requestPaint()
+                        myDialog.dialogText==="settings"?executeAction1():executeAction2()
+                    }
                 }
             }
-
         }
 
 
+        function executeAction1() {
 
+
+            console.log("Button long-pressed! Action executed.")
+            // _guidedController.closeAll()
+            // _guidedController.confirmAction(3)
+
+            var sliderOutputValue = 0
+            sliderOutputValue = takeoffSettings.sliderOutputValue
+            console.log("takeoffSettings.sliderOutputValue",sliderOutputValue)
+
+            //guidedController.executeAction(flightModeIndicatorBg1.action, flightModeIndicatorBg1.actionData, sliderOutputValue, flightModeIndicatorBg1.optionChecked)
+            if (mapIndicator) {
+                mapIndicator.actionConfirmed()
+                mapIndicator = undefined
+            }
+
+            UTMSPStateStorage.indicatorOnMissionStatus = true
+            UTMSPStateStorage.currentNotificationIndex = 7
+            UTMSPStateStorage.currentStateIndex = 3
+
+            var valueInMeters = _unitsConversion.appSettingsVerticalDistanceUnitsToMeters(sliderOutputValue)
+            activeVehicle.guidedModeTakeoff(valueInMeters)
+
+            if( activeVehicle.armed){
+
+                rtlbtn.visible=true
+                takeoffbtn.visible=false
+            }
+
+
+
+
+
+            myDialog.close()
+        }
+
+        function executeAction2() {
+                console.log("Button long-pressed! Action executed.1")
+                if(activeVehicle){
+                    var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
+
+                    if (homeDistance > 10.0) {
+                        activeVehicle.guidedModeRTL(false)
+                    } else {
+                        activeVehicle.guidedModeLand()
+                    }
+
+                }
+                // rtlbtn.visible=false
+                // takeoffbtn.visible=true
+
+
+                myDialog.close()
+            }
+
+
+        // ----- RTL -----
+        Rectangle {
+            id: rtlbtn
+            Layout.alignment: Qt.AlignLeft
+            width: leftColumn.width * 0.55
+            height: width
+            radius: width / 2
+            color: "#1b1c3e"
+            border.width: width * 0.05
+            border.color: "#005BBB"
+
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/landing.png"
+                anchors.centerIn: parent
+                width: parent.width * 0.5
+                height: width
+                color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/landing.png"
+                    myDialog.dialogText = "RTL Mode"
+                    myDialog.open()
+                }
+            }
+        }
+
+        // ----- Flight mode row -----
+        RowLayout {
+            id: modeRow
+            spacing: 10
+            Layout.alignment: Qt.AlignLeft
+            property bool extraButtonsVisible: false
+
+            Rectangle {
+                id: modebtn
+                width: leftColumn.width * 0.55
+                height: width
+                radius: width / 2
+                color: "#1b1c3e"
+                border.width: width * 0.05
+                border.color: "#005BBB"
+
+                QGCColoredImage {
+                    source: "/qmlimages/FlightModesComponentIcon.png"
+                    anchors.centerIn: parent
+                    width: parent.width * 0.5
+                    height: width
+                    color: "white"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (activeVehicle)
+                            confirmDialog.open()
+                        else
+                            console.log("No active vehicle")
+                    }
+                }
+            }
+        }
+
+        // ----- Flight mode text -----
+        Rectangle {
+            id: modebtn1
+            Layout.alignment: Qt.AlignLeft
+            width: flightmode1.implicitWidth + 30
+            height: flightmode1.implicitHeight + 15
+            radius: height / 2
+            color: "#1b1c3e"
+            border.width: 2
+            border.color: "#005BBB"
+            visible: activeVehicle
+
+            FlightModeIndicator {
+                id: flightmode1
+                anchors.centerIn: parent
+            }
+        }
+    }
+
+
+
+    // RIGHT SIDE BOTTOM BUTTON
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.bottomMargin: 10
         anchors.rightMargin: 20
-        spacing: 20  // Adjust this value to control space between icons
+        spacing: 20
 
         Rectangle {
             id: planbtn1
             Layout.alignment: Qt.AlignRight
             width: 100
             height: 38
-            radius: width / 2  // Makes it a circle
-            color: "#1b1c3e"     // white background
-            visible: true
+            radius: width / 2
+            color: "#1b1c3e"
 
             Text {
                 text: " + New Plot "
@@ -534,17 +575,11 @@ Item {
                     dialog.visible = true
                     MapGlobals.save = "save"
                 }
-
-
-                // onClicked: {
-                //     // mainWindow.showPlanView()
-                //     // //viewer3DWindow.close()
-
-                // }
             }
         }
-
     }
+
+
     Dialog {
         id: dialog
         modal: true
@@ -1006,108 +1041,6 @@ QGroundControl.saveGlobalSetting("mapping", "circle")
 
                     }
                 }
-
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height* 0.4 // Ensure height is taken from parent
-                // //text: "Map Selection"
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Map Selection"
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color: "#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: {
-                // console.log("Option 1 clicked")
-                // MapGlobals.edit = "edit"
-                // mainWindow.showPlanView()
-                // dialog.visible = false
-                // planView.data1()
-                // }
-                // }
-
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-                // //text: "Drone GPS"
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Drone GPS"
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color: "#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: console.log("Option 2 clicked")
-                // }
-
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-                // //text: "Load KML/SHP..."
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeoff.png"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Load KML/SHP..."
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color: "#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: console.log("Option 2 clicked")
-                // }
 
             }
         }
