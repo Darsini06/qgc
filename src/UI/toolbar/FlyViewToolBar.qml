@@ -74,9 +74,7 @@ Rectangle {
                 mainWindow.newscreen()
             }
             icon.color:"white"
-
         }
-
 
         MainStatusIndicator {
             Layout.preferredHeight: viewButtonRow.height
@@ -89,13 +87,9 @@ Rectangle {
             visible:            _activeVehicle && _communicationLost
             leftPadding : ScreenTools.defaultFontPixelWidth
             rightPadding :ScreenTools.defaultFontPixelWidth
-
-
         }
 
     }
-
-
 
     QGCFlickable {
         id:                     toolsFlickable
@@ -295,10 +289,11 @@ Rectangle {
 
             Row {
                 spacing: 5
+
                 Image {
                     width: 25
                     height: 25
-                    source: "/qmlimages/NewImages/battery.png"
+                    source: "/qmlimages/NewImages/Battery.svg"
                 }
 
             }
@@ -319,7 +314,7 @@ Rectangle {
                     visible: _activeVehicle ? false : true
                     width: 25
                     height: 25
-                    source: "/qmlimages/NewImages/satellite.png"
+                    source: "/qmlimages/NewImages/satellite.svg"
                     color: "white"
                 }
 
@@ -405,7 +400,7 @@ Rectangle {
                 QGCColoredImage {
                     id: settingsIcon
                     anchors.fill: parent
-                    source: "/qmlimages/NewImages/settings.png"
+                    source: "/qmlimages/NewImages/settings.svg"
                     color:"white"
                 }
 

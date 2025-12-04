@@ -43,6 +43,11 @@ Item {
     property var    _entryCoordinate
     property var    _exitCoordinate
 
+    // Shared responsive base
+    property real baseSize: parent.width * 0.045    // 6% of screen width
+    property real iconSize: baseSize    // icon inside the circle
+
+
     signal clicked(int sequenceNumber)
 
     function _addVisualElements() {
@@ -66,15 +71,13 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("edited : ",object.surveyAreaPolygon)
+        //console.log("edited : ",object.surveyAreaPolygon)
         _addVisualElements()
         // if (_root.interactive && _missionItem.sequenceNumber === 0) {
         //     _root.clicked(_missionItem.sequenceNumber)
         // }
         clicked(_missionItem.sequenceNumber)
     }
-
-
 
     Component.onDestruction: {
 
@@ -242,40 +245,74 @@ Item {
         }
     }
 
-    Button {
-        text: "Edit"
-        visible: MapGlobals.share_edit_visibility
+    // Button {
+    //     id: editBtn
 
-        // Set padding for the button (space between background border and content)
-        padding: 15  // This adds 10px padding inside the button around the icon
+    //     text: "Edit"
+    //     visible: MapGlobals.share_edit_visibility
 
-        // Set the button size to accommodate icon + padding
-        implicitWidth: 46  // icon width (16) + padding (10*2 = 20) = 36
-        implicitHeight: 46 // icon height (16) + padding (10*2 = 20) = 36
+    //     padding: 15
+    //     implicitWidth: 46
+    //     implicitHeight: 46
 
-        // Styling properties
-        background: Rectangle {
-            radius: width / 2 // Makes it perfectly round (circle)
-            color: "#1b1c3e" // light purple
-            border.color: "#005BBB"
-            border.width: 2
+    //     background: Rectangle {
+    //         radius: width / 2
+    //         color: "#1b1c3e"
+    //         border.color: "#005BBB"
+    //         border.width: 2
+    //     }
 
-            // Add external padding by making the background smaller than the button
-            anchors.fill: parent
-            anchors.margins: 5 // This creates 5px external padding around the rounded rectangle
-        }
+    //     contentItem: QGCColoredImage {
+    //         source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+    //         width: 16
+    //         height: 16
+    //         anchors.centerIn: parent
+    //         color: "white"
+    //     }
 
-        contentItem: QGCColoredImage {
-            source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-            width: 16
-            height: 16
-            anchors.centerIn: parent // Center the icon within the container
-            color: "white"
-        }
+    //     onClicked: {
+    //                 console.log("Edit in TransectStyleMapVisuals.qml")
+    //                 if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+    //             }
+    // }
 
-        onClicked: {
-            console.log("Edit in TransectStyleMapVisuals.qml")
-            if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+    Item {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin: 50
+        anchors.topMargin: 10
+
+        Button {
+            id: editBtn
+            padding: 0
+            visible: MapGlobals.share_edit_visibility
+            implicitWidth: baseSize
+            implicitHeight: baseSize
+
+            background: Rectangle {
+                radius: width / 2
+                color: "white"//"#1b1c3e"
+                //border.color: "#005BBB"
+                //border.width: 2
+            }
+
+            contentItem: Item {
+                anchors.fill: parent
+
+                QGCColoredImage {
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                    width: iconSize * 0.5
+                    height: iconSize * 0.5
+                    anchors.centerIn: parent
+                    color: "black"
+                }
+            }
+
+            onClicked: {
+                console.log("Edit clicked")
+                if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+            }
         }
     }
 

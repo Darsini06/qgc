@@ -65,8 +65,6 @@ ApplicationWindow {
         visible:            text !== ""
     }
 
-
-
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
     property var someParameter
@@ -81,8 +79,6 @@ ApplicationWindow {
     property var _guidedController: globals.guidedControllerFlyView
     property int    actionTakeoff
     signal loadPlanFile()
-    // Reference the existing FlightMap instance (defined in another QML file)
-    //property alias mainFlightMap: mainFlightMap
 
 
     property string edit:""
@@ -90,7 +86,7 @@ ApplicationWindow {
     property string sessionStart: ""
     property string sessionEnd: ""
     property bool sessionSaved: false
-    signal newSessionAdded()
+
 
 
     Connections {
@@ -114,7 +110,7 @@ ApplicationWindow {
                 if (sessionStart !== "") { // Only save if we have a start time
                     sessionEnd = timeString;
                     console.log("Drone Disconnected at:", sessionEnd,"on", sessionDate);
-                    saveDroneSession(sessionDate, sessionStart, sessionEnd);
+                    MapGlobals.saveDroneSession(sessionDate, sessionStart, sessionEnd);
                     // Reset for next session
                     sessionStart = "";
                     sessionEnd = "";
@@ -127,6 +123,7 @@ ApplicationWindow {
         }
     }
 
+
     Component.onCompleted: {
         //-- Full screen on mobile or tiny screens
         if (!ScreenTools.isFakeMobile && (ScreenTools.isMobile || Screen.height / ScreenTools.realPixelDensity < 120)) {
@@ -136,14 +133,20 @@ ApplicationWindow {
             height  = ScreenTools.isMobile ? ScreenTools.screenHeight : Math.min(150 * Screen.pixelDensity, Screen.height)
         }
 
-        //Initialize the Database and Create Tables
-        initDB()
+        // Reference Variable for MainRootWindow
+        MapGlobals.rootWindow = mainWindow
+        MapGlobals.loginLoader = login
+        MapGlobals.newscreen   = newscreen
+        MapGlobals.modeBtn1    = modebtn1
 
-        profilelogin()
-        profile()
+        //Initialize the Database and Create Tables
+        MapGlobals.initDB()
+
+        //profilelogin()
+        MapGlobals.profile()
 
         //Print all Session Table Datas.Just For Reference
-        printSessionTable()
+        MapGlobals.printSessionTable()
 
         if(_appSettings.screen==="Plan"){
             plan="Plan"
@@ -151,11 +154,8 @@ ApplicationWindow {
         }else{
             plan="Start"
             console.log("NextScreen loaded with planType: Start")
-
         }
 
-        // Start the sequence of first run prompt(s)
-        //firstRunPromptManager.nextPrompt()
     }
 
     /* QtObject {
@@ -232,17 +232,17 @@ ApplicationWindow {
         planView.newmap()
     }
 
-    function newscreendata() {
-            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-               newscreen.camera()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                newscreen.agri()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                newscreen.mapping()
-            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
-                newscreen.vtol()
-            }
-        }
+    // function newscreendata() {
+    //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+    //         newscreen.camera()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+    //         newscreen.agri()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+    //         newscreen.mapping()
+    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
+    //         newscreen.vtol()
+    //     }
+    // }
 
     function filename() {
         filename.tracemode()
@@ -442,61 +442,61 @@ ApplicationWindow {
         }
     }
 
-    ListModel {
-        id: userModel
-    }
+    // ListModel {
+    //     id: userModel
+    // }
 
-    Dialog {
-        id: userDialog
-        modal: true
-        width: parent.width * 0.9
-        height: parent.height * 0.6
-        standardButtons: Dialog.Ok
+    // Dialog {
+    //     id: userDialog
+    //     modal: true
+    //     width: parent.width * 0.9
+    //     height: parent.height * 0.6
+    //     standardButtons: Dialog.Ok
 
-        contentItem: ColumnLayout {
-            anchors.fill: parent
-            spacing: 10
+    //     contentItem: ColumnLayout {
+    //         anchors.fill: parent
+    //         spacing: 10
 
-            Label {
-                text: "User List"
-                font.bold: true
-                font.pointSize: 16
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment: Qt.AlignHCenter
-            }
+    //         Label {
+    //             text: "User List"
+    //             font.bold: true
+    //             font.pointSize: 16
+    //             horizontalAlignment: Text.AlignHCenter
+    //             Layout.alignment: Qt.AlignHCenter
+    //         }
 
-            ListView {
-                id: userList
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                model: userModel
-                clip: true
+    //         ListView {
+    //             id: userList
+    //             Layout.fillWidth: true
+    //             Layout.fillHeight: true
+    //             model: userModel
+    //             clip: true
 
-                delegate: Rectangle {
-                    width: userList.width
-                    height: 50
-                    color: index % 2 === 0 ? "#f0f0f0" : "#ffffff"
+    //             delegate: Rectangle {
+    //                 width: userList.width
+    //                 height: 50
+    //                 color: index % 2 === 0 ? "#f0f0f0" : "#ffffff"
 
-                    Row {
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 10
-                        padding: 10
+    //                 Row {
+    //                     anchors.verticalCenter: parent.verticalCenter
+    //                     spacing: 10
+    //                     padding: 10
 
-                        Text {
-                            text: id + " " + displayname
-                            font.bold: true
-                            color: "black"
-                        }
+    //                     Text {
+    //                         text: id + " " + displayname
+    //                         font.bold: true
+    //                         color: "black"
+    //                     }
 
-                        Text {
-                            text: "(" + username + " - " + email + ")"
-                            color: "black"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     Text {
+    //                         text: "(" + username + " - " + email + ")"
+    //                         color: "black"
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     Dialog {
         id: dynamicCalDialog
@@ -594,137 +594,34 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-    // Dialog {
-    //     id: compassDialog
-    //     modal: true
-    //     anchors.centerIn: parent
-    //     width: parent.width * 0.85
-    //     height: parent.height * 0.9
-    //     closePolicy: Popup.NoAutoClose
-    //     clip: true
-    //     padding: 0
+    // Starting of DB code
 
-    //     background: Rectangle {
-    //         radius: 14
-    //         color: "white"
-    //     }
+    // // JavaScript function to read from DB
+    // function loadUsersFromDB() {
 
-    //     property string dialogTitleText: ""
-    //     property string dialogWarningText: ""
+    //     var db = MapGlobals.getDatabase();
+    //     userModel.clear();
+    //     db.transaction(function(tx) {
+    //         var rs = tx.executeSql("SELECT * FROM users");
+    //         console.log("inserted=========",rs)
 
-    //     Column {
-    //         anchors.fill: parent
-    //         spacing: 0
-    //         bottomPadding: 5
-
-    //         // --- Title Bar ---
-    //         Rectangle {
-    //             width: parent.width
-    //             height: 50
-    //             radius: 14
-    //             color: "#7F56D9"
-    //             antialiasing: true
-
-    //             // mask lower corners → flat against content
-    //             Rectangle {
-    //                 anchors.left: parent.left
-    //                 anchors.right: parent.right
-    //                 anchors.bottom: parent.bottom
-    //                 height: 14
-    //                 color: "#7F56D9"
-    //                 radius: 0
-    //             }
-
-    //             // --- Title and Close Icon ---
-    //             Item {
-    //                 anchors.fill: parent
-
-    //                 // Title centered in the bar
-    //                 QGCLabel {
-    //                     text: compassDialog.dialogTitleText//qsTr("Compass Calibration")
-    //                     anchors.centerIn: parent
-    //                     color: "white"
-    //                     font.pointSize: ScreenTools.mediumFontPointSize
-    //                     font.bold: true
-    //                 }
-
-    //                 // Close button at top-right
-    //                 MouseArea {
-    //                     anchors.top: parent.top
-    //                     anchors.right: parent.right
-    //                     width: 40
-    //                     height: 40
-    //                     onClicked: compassDialog.close()
-
-    //                     Text {
-    //                         anchors.centerIn: parent
-    //                         text: "\u2715"
-    //                         color: "white"
-    //                         font.pixelSize: 18
-    //                     }
-    //                 }
-    //             }
+    //         for (let i = 0; i < rs.rows.length; i++) {
+    //             let row = rs.rows.item(i);
+    //             console.log("inserted=========",row.username)
+    //             userModel.append({
+    //                                  id: row.id,
+    //                                  username: row.username,
+    //                                  displayname: row.displayname,
+    //                                  email: row.email
+    //                              });
     //         }
 
-    //         QGCLabel {
-    //             text : ""
-    //             width: parent.width
-    //             height : 10
-    //         }
+    //     });
 
-    //         // --- Warning Text ---
-    //         QGCLabel {
-    //             id: compassWarningText
-    //             text: compassDialog.dialogWarningText //qsTr("Avoid any metal objects nearby while the compass calibration is in progress.\n\nThe compass calibration involves six positions, as shown in the images below.")
-    //             wrapMode: Text.WordWrap
-    //             horizontalAlignment: Text.AlignHCenter
-    //             width: parent.width * 0.9
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             font.pointSize: ScreenTools.defaultFontPointSize
-    //             color: "black"
-    //         }
-
-    //         // --- Image (centered) ---
-    //         QGCColoredImage {
-    //             source: "qrc:///qmlimages/VehicleDown.png"
-    //             width: parent.width * 0.25
-    //             height: width
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             color: "black"
-    //         }
-
-    //         // --- Spacer to push button down ---
-    //         Item {
-    //             Layout.fillHeight: true
-    //         }
-
-    //         // --- OK Button ---
-    //         QGCButton {
-    //             text: qsTr("DONE")
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             background: Rectangle {
-    //                 color: "#7F56D9"
-    //                 radius: 14
-    //             }
-    //             contentItem: Text {
-    //                 text: parent.text
-    //                 color: "white"
-    //                 font.bold: true
-    //                 horizontalAlignment: Text.AlignHCenter
-    //                 verticalAlignment: Text.AlignVCenter
-    //             }
-    //             onClicked: {
-    //                 // calibrationLoader.active = true
-    //                 // compassDialog.close()
-
-    //                 // // Use a small delay to ensure the loader is ready
-    //                 // timer.callLater(100)
-    //             }
-    //         }
-
-    //     }
+    //     userDialog.open()
     // }
 
+<<<<<<< HEAD
     // Timer {
     //     id: timer
     //     function callLater(delay) {
@@ -1485,6 +1382,8 @@ ApplicationWindow {
     }
 
 
+=======
+>>>>>>> Qgc_project/simplify_branch
     Item {
         id: toastContainer
         anchors.bottom: parent.bottom
@@ -1719,11 +1618,11 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "BasicParameters.qml"; title: "Flight Modes" }
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Flight Modes" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.png"; file: "APMSafetyComponent.qml"; title: "Diamond" }
-            ListElement { image: "/qmlimages/NewImages/settings.png"; file: "GeneralSettings.qml"; title: "Info" }
-            ListElement { image: "/qmlimages/NewImages/commlinks.png"; file: "LinkSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Diamond" }
+            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
             // onActiveVehicleChanged: {
@@ -1751,7 +1650,7 @@ ApplicationWindow {
             Rectangle  {
                 Layout.preferredHeight: ScreenTools.toolbarHeight
                 Layout.fillWidth: true
-                color: "#1b1c3e"
+                color:  "#1b1c3e"
 
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
@@ -1763,7 +1662,7 @@ ApplicationWindow {
                         id: backArrow
                         width: 30
                         height: 25
-                        source: "/qmlimages/NewImages/leftArrow.png"
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
                         color: "white"
 
                         MouseArea {
@@ -1799,7 +1698,7 @@ ApplicationWindow {
                 currentIndex: 0
 
                 background: Rectangle {
-                    color: "#1b1c3e"
+                    color:  "#1b1c3e"
                 }
 
                 Repeater {
@@ -1822,7 +1721,7 @@ ApplicationWindow {
                                 width: tabBar.currentIndex === index ? 18 : 18
                                 height: tabBar.currentIndex === index ? 18 : 18
                                 source: model.image
-                                //color: tabBar.currentIndex === index ? "#1b1c3e" : "white"
+                                //color: tabBar.currentIndex === index ?  "white"//"#1b1c3e" : "white"
                                 color: tabBar.currentIndex === index ? "transparent" : "white"
                             }
 
@@ -1909,7 +1808,7 @@ ApplicationWindow {
     //     ListModel {
     //         id: tabModel
     //         ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "qrc:/qml/SettingsPanel/RCCallibarationTab.qml" ;title: "Radio" }
-    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.png"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
+    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
     //         ListElement { image: "/qmlimages/NewImages/menu.png";  file: "" ;title: "Settings" }
     //         ListElement { image: "/qmlimages/NewImages/diamond.png";  file: "" ;title: "Diamond" }
     //         ListElement { image: "/qmlimages/NewImages/CompassArrow.png";  file: "" ; title: "Info"}
@@ -2030,7 +1929,7 @@ ApplicationWindow {
     //     background: Rectangle {
     //         color: "#007AFF"  // Blue color (iOS-style button)
     //         radius: 20  // Curved button
-    //         border.color: "#005BBB"  // Border color
+    //         border.color:  "white"//"#005BBB"  // Border color
     //         border.width: 2
     //     }
     //         onClicked: {
@@ -2080,60 +1979,1512 @@ ApplicationWindow {
         }
     }
 
+<<<<<<< HEAD
+=======
+    ColumnLayout {
+        id:columnbtn
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.topMargin: parent.height* 0.15
+        anchors.leftMargin: 20
+        visible: true
+        spacing: 10  // Adjust this value to control space between icons
+
+
+        Rectangle {
+            id: listbtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2            // Circle
+            color:  "white"//"#1b1c3e"
+            visible: false
+            border.width: width * 0.05    // 10% of button width
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: flightModeIndicator2
+                source: "/qmlimages/NewImages/savefile.svg" //"/qmlimages/NewImages/log.png"
+                width: parent.width * 0.5   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "transparent"
+                color : "black"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    if(_appSettings.screen==="Plan"){
+                        planView.loaddata()
+
+                    }else{
+                        planView.loaddata1()
+                    }
+                }
+            }
+        }
+
+
+        // Rectangle {
+        //     id: takeoffbtn
+        //     Layout.alignment: Qt.AlignLeft
+        //     width: parent.width * 0.05    // 8% of parent width
+        //     height: width                 // Keep it square
+        //     radius: width / 2            // Circle
+        //     color:  "white"//"#1b1c3e"
+        //     visible: true
+        //     border.width: width * 0.05    // 10% of button width
+        //     border.color:  "white"//"#005BBB"
+
+        //     QGCColoredImage {
+        //         id: takeofficon
+        //         source: "/qmlimages/NewImages/takeOff.svg"
+        //         width: parent.width * 0.5   // 60% of button size
+        //         height: width
+        //         anchors.centerIn: parent
+        //         color: "white"
+        //     }
+
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+        //             myDialog.dialogText = "settings"
+        //             myDialog.open()
+        //         }
+        //     }
+        // }
+
+        Rectangle {
+            id: takeoffbtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  "white"//"#1b1c3e"      // white background
+            visible:  false
+            border.width: width * 0.05
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: takeofficon
+                source: "/qmlimages/NewImages/takeOff.svg"
+                width: parent.width * 0.6   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "white"
+                color : "black"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+                    myDialog.dialogText = "settings"
+                    myDialog.open()
+                }
+            }
+        }
+
+        Rectangle {
+            id: waypointbtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  "white"//"#1b1c3e"      // white background
+            visible:  false
+            border.width: width * 0.05
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: waypointbtnicon1
+                source: "/qmlimages/MapAddMission.svg"
+                width: parent.width * 0.6   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "white"
+                color : "black"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                    QGroundControl.saveGlobalSetting("waypointvisible", "waypointvisible")
+                    QGroundControl.saveGlobalSetting("waypointMark", "true")
+                    planView.mapclear()
+                    mainWindow.showPlanView()
+
+                    waypointDescriptionDialog.createObject(mainWindow).open()
+
+                }
+            }
+        }
+
+        // Rectangle {
+        //     id: eraserbtn
+        //     Layout.alignment: Qt.AlignLeft
+        //     width: parent.width * 0.05    // 8% of parent width
+        //     height: width                 // Keep it square
+        //     radius: width / 2   // Makes it a circle
+        //     color:  "white"//"#1b1c3e"      // white background
+        //     visible:  false
+        //     border.width: width * 0.05
+        //     border.color:  "white"//"#005BBB"
+
+
+
+        //     QGCColoredImage {
+        //         id: eraserbtnicon
+        //         source: "/qmlimages/NewImages/map_eraser.svg"
+        //         width: parent.width * 0.5   // 60% of button size
+        //         height: width
+        //         anchors.centerIn: parent
+        //         color: "transparent"
+        //     }
+
+
+
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             planView.mapclear()
+        //         }
+        //     }
+        // }
+
+        Rectangle {
+            id: camerabtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  "white"//"#1b1c3e"      // white background
+            visible:  false
+            border.width: width * 0.05
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: camerabtnicon
+                source: "/qmlimages/NewImages/takeOff.svg"
+                width: parent.width * 0.5   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "white"
+                color : "black"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    // //whatsappImageSlider.visible=true
+                    // mainWindow.showToastMessage("Camera clicked");
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+                    myDialog.dialogText = "settings"
+                    myDialog.open()
+                }
+            }
+        }
+
+
+        Rectangle {
+            id: landbtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  "white"//"#1b1c3e"      // white background
+            visible:  false
+            border.width: width * 0.05
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: landbtnicon
+                source: "/qmlimages/NewImages/return.svg"
+                width: parent.width * 0.5   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "white"
+                color : "black"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+
+                    myDialog.imageSource = "/qmlimages/NewImages/return.svg";  // Set the image dynamically
+                    myDialog.dialogText = "Land Mode"; // Set the text dynamically
+                    myDialog.open()
+                }
+            }
+        }
+
+        Rectangle {
+            id: rtlbtn
+            Layout.alignment: Qt.AlignLeft
+            width: parent.width * 0.05    // 8% of parent width
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  "white"//"#1b1c3e"      // white background
+            visible:  false
+            border.width: width * 0.05
+            border.color:  "white"//"#005BBB"
+
+            QGCColoredImage {
+                id: rtlbtnicon
+                source: "/qmlimages/NewImages/landing.png"
+                width: parent.width * 0.5   // 60% of button size
+                height: width
+                anchors.centerIn: parent
+                //color: "white"
+                color : "black"
+            }
+
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    myDialog.imageSource = "/qmlimages/NewImages/landing.png";  // Set the image dynamically
+                    myDialog.dialogText = "RTL Mode"; // Set the text dynamically
+                    myDialog.open()
+
+                }
+            }
+        }
+
+        Rectangle {
+            id: modebtn1
+            Layout.alignment: Qt.AlignLeft
+
+            // Base it on flight mode text's size
+            width: flightmode1.implicitWidth + 30   // 10px padding left/right
+            height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
+            radius: height / 2   // pill/capsule shaped
+            color:  "white"//"#1b1c3e"
+            visible: activeVehicle
+
+            border.width: 2
+            border.color:  "white"//"#005BBB"
+
+            FlightModeIndicator {
+                id: flightmode1
+                //visible: true
+                anchors.centerIn: parent
+            }
+        }
+
+    }
+>>>>>>> Qgc_project/simplify_branch
 
     Component {
-          id: waypointDescriptionDialog
+        id: waypointDescriptionDialog
 
-          QGCPopupDialog {
-              id: popup
-              title: qsTr(" Do You know ? ")
+        QGCPopupDialog {
+            id: popup
+            title: qsTr(" Do You know ? ")
 
-              buttons: Dialog.Ok | Dialog.Cancel
+            buttons: Dialog.Ok | Dialog.Cancel
 
-              onAccepted: {
-                  popup.visible = false
-                  QGroundControl.saveGlobalSetting("waypointMark", "true")
-                  MapGlobals.waypoint="waypoint"
-              }
+            onAccepted: {
+                popup.visible = false
+                QGroundControl.saveGlobalSetting("waypointMark", "true")
+                MapGlobals.waypoint="waypoint"
+            }
 
-              onRejected: {
-MapGlobals.waypoint="waypoint1"
-                   popup.visible = false
+            onRejected: {
+                MapGlobals.waypoint="waypoint1"
+                popup.visible = false
+
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                    mainWindow.cameraView()
+                    mainWindow.closefile()
+                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    mainWindow.showMapping()
+                    mainWindow.closefile()
+                }
+                else{
+                    if (planType === "Plan") {
+                        mainWindow.showFlyView()
+                        mainWindow.closefile()
+                    } else {
+                        mainWindow.showFlyView1()
+                        mainWindow.closefile()
+                    }
+                }
+
+            }
+
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
+
+<<<<<<< HEAD
+=======
+    Dialog {
+        id: myDialog
+        width: 320
+        height: 300
+        property string imageSource: "/res/default.svg" // Default image
+        property string dialogText: "Default Text" // Default text
+
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+
+        background: Rectangle {
+            color: "#ccccff"
+            radius: 50
+            border.color: "#6a6af8"
+            border.width: 5
+            clip: true
+        }
+
+        QtObject {
+            id: progressState
+            property real value: 0.0
+        }
+
+        QtObject {
+            id: takeoffSettings
+            property real sliderOutputValue: 1.0
+        }
+
+        contentItem: ColumnLayout {
+            width: parent.width
+            height: parent.height
+            spacing: 10
+            anchors.centerIn: parent
+
+            Text {
+
+                text: myDialog.dialogText==="settings"?"Takeoff Altitude: " + takeoffSettings.sliderOutputValue + " m":myDialog.dialogText+"/n add data"
+                font.pixelSize: 16
+                color: "black"
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Rectangle {
+                id: circularButton
+                width: 80
+                height: 80
+                radius: 40
+                color: "white"
+                border.color: "#6a6af8"
+                border.width: 2
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Image {
+                    source: myDialog.imageSource
+                    width: 24
+                    height: 24
+                    anchors.centerIn: parent
+                }
+
+                MouseArea {
+                    id: holdArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onPressed: progressTimer.start()
+                    onReleased: {
+                        progressTimer.stop()
+                        progressState.value = 0
+                        progressCircle.requestPaint()
+                    }
+                    onEntered: circularButton.color = "#ccccff"
+                    onExited: circularButton.color = "white"
+                }
+
+                Canvas {
+                    id: progressCircle
+                    width: parent.width
+                    height: parent.height
+                    anchors.centerIn: parent
+
+                    onPaint: {
+                        var ctx = getContext("2d")
+                        ctx.clearRect(0, 0, width, height)
+                        ctx.beginPath()
+                        ctx.arc(
+                                    width / 2, height / 2,
+                                    35, -Math.PI / 2,
+                                    (2 * Math.PI * progressState.value) - Math.PI / 2,
+                                    false
+                                    )
+                        ctx.lineWidth = 6
+                        ctx.strokeStyle = "#2323f2"
+                        ctx.stroke()
+                    }
+                }
+            }
+
+            RowLayout {
+                spacing: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: myDialog.dialogText==="settings"?true:false
+                Rectangle {
+                    width: 40
+                    height: 40
+                    color: "#ccccff"
+                    radius: 10
+                    border.color: "#6a6af8"
+                    border.width: 2
+
+                    Text {
+                        text: "-"
+                        font.pixelSize: 24
+                        color: "black"
+                        font.bold: true
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (takeoffSettings.sliderOutputValue > 1.0) {
+                                takeoffSettings.sliderOutputValue = Math.round((takeoffSettings.sliderOutputValue - 0.1) * 10) / 10
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 40
+                    height: 40
+                    color: "#ccccff"
+                    radius: 10
+                    border.color: "#6a6af8"
+                    border.width: 2
+
+                    Text {
+                        text: "+"
+                        font.pixelSize: 24
+                        color: "black"
+                        font.bold: true
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (takeoffSettings.sliderOutputValue < 120) {
+                                takeoffSettings.sliderOutputValue = Math.round((takeoffSettings.sliderOutputValue + 0.1) * 10) / 10
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        Timer {
+            id: progressTimer
+            interval: 100
+            repeat: true
+            onTriggered: {
+                if (progressState.value < 1.0) {
+                    progressState.value += 0.1
+                    progressCircle.requestPaint()
+                } else {
+                    progressTimer.stop()
+                    progressState.value = 0
+                    progressCircle.requestPaint()
+                    myDialog.dialogText==="settings"?executeAction1():executeAction2()
+                }
+            }
+        }
+    }
+
+
+    function executeAction1() {
+
+
+        console.log("Button long-pressed! Action executed.")
+        // _guidedController.closeAll()
+        // _guidedController.confirmAction(3)
+
+        var sliderOutputValue = 0
+        sliderOutputValue = takeoffSettings.sliderOutputValue
+        console.log("takeoffSettings.sliderOutputValue",sliderOutputValue)
+
+        //guidedController.executeAction(flightModeIndicatorBg1.action, flightModeIndicatorBg1.actionData, sliderOutputValue, flightModeIndicatorBg1.optionChecked)
+        if (mapIndicator) {
+            mapIndicator.actionConfirmed()
+            mapIndicator = undefined
+        }
+
+        UTMSPStateStorage.indicatorOnMissionStatus = true
+        UTMSPStateStorage.currentNotificationIndex = 7
+        UTMSPStateStorage.currentStateIndex = 3
+
+        var valueInMeters = _unitsConversion.appSettingsVerticalDistanceUnitsToMeters(sliderOutputValue)
+        activeVehicle.guidedModeTakeoff(valueInMeters)
+
+        if( activeVehicle.armed){
+
+            rtlbtn.visible=true
+            takeoffbtn.visible=false
+        }
 
 
 
-                  //waypoint enable disable logic
-                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                  if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                      mainWindow.cameraView()
-                      mainWindow.closefile()
-                  }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                      mainWindow.showMapping()
-                      mainWindow.closefile()
-                  }
-                  else{
-                      if (planType === "Plan") {
-                                              mainWindow.showFlyView()
-                                              mainWindow.closefile()
-                                          } else {
-                                              mainWindow.showFlyView1()
-                                              mainWindow.closefile()
-                                          }
-                  }
 
-              }
+        myDialog.close()
+    }
 
-              ColumnLayout {
-                  spacing: ScreenTools.defaultFontPixelWidth
-                  QGCLabel {
-                      text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
-                      Layout.fillWidth: true
-                  }
-              }
-          }
-      }
+    function executeAction2() {
+        console.log("Button long-pressed! Action executed.1")
+        if(activeVehicle){
+            var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
 
+            if (homeDistance > 10.0) {
+                activeVehicle.guidedModeRTL(false)
+            } else {
+                activeVehicle.guidedModeLand()
+            }
+
+        }
+        // rtlbtn.visible=false
+        // takeoffbtn.visible=true
+
+
+        myDialog.close()
+    }
+
+
+
+
+    ColumnLayout {
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.bottomMargin: 10
+        anchors.rightMargin: 20
+        spacing: 20  // Adjust this value to control space between icons
+
+        Rectangle {
+            id: planbtn
+            Layout.alignment: Qt.AlignRight
+            width: 100
+            height: 38
+            radius: width / 2  // Makes it a circle
+            color:  "white"//"#1b1c3e"     // white background
+            visible: false
+
+            Text {
+                text: " + New Plot "
+                color: "black"
+                anchors.centerIn: parent
+                font.bold: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    QGroundControl.saveGlobalSetting("load", "load")
+                    QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                    dialog.visible = true
+                    MapGlobals.save = "save"
+                }
+
+
+                // onClicked: {
+                //     // mainWindow.showPlanView()
+                //     // //viewer3DWindow.close()
+
+                // }
+            }
+        }
+
+    }
+
+
+    // Dialog {
+    //     id: dialog
+    //     modal: true
+    //     dim: true
+    //     anchors.centerIn: parent
+    //     width: parent.width //* 0.8   // 80% of screen width
+    //     height: parent.height // * 0.5 // 50% of screen height
+    //     background: Rectangle {
+    //         color: "transparent"
+    //         radius: 10
+    //         border.color: "white"
+    //         border.width: 1
+    //     }
+
+    //     // Close button in top-right corner
+    //     Rectangle {
+    //         id: closeBtn
+    //         width: 30
+    //         height: 30
+    //         radius: width / 2
+    //         color: "red"
+    //         anchors.right: parent.right
+    //         anchors.top: parent.top
+    //         anchors.margins: 10
+
+    //         Text {
+    //             text: "X"
+    //             color: "white"
+    //             anchors.centerIn: parent
+    //             font.bold: true
+    //         }
+
+    //         MouseArea {
+    //             anchors.fill: parent
+    //             onClicked:{
+    //                 dialog.visible = false
+    //                 mainWindow.showFlyView()
+
+    //             }
+    //         }
+    //     }
+
+    //     Column {
+    //         anchors.centerIn: parent
+    //         spacing: 20
+    //         width: parent.width * 0.9
+    //         height: parent.height
+
+    //         RowLayout {
+    //             width: parent.width
+    //             height: parent.height  // Set explicit height for the row layout
+    //             spacing: 20
+
+    //             Button {
+    //                 Layout.alignment: Qt.AlignHCenter
+    //                 Layout.preferredWidth: parent.width* 0.2
+    //                 Layout.preferredHeight: parent.height* 0.4
+
+    //                 background: Rectangle {
+    //                     color:  "white"//"#1b1c3e"
+    //                     radius: 12
+    //                 }
+
+    //                 contentItem: Item {
+    //                     anchors.fill: parent
+
+    //                     Column {
+    //                         spacing: 8
+    //                         anchors.centerIn: parent   // ✅ Center both icon and text vertically and horizontally
+
+    //                         Image {
+    //                             source: "/qmlimages/NewImages/mapSelection.png"  // Replace with actual icon
+    //                             width: 50
+    //                             height: 50
+    //                             fillMode: Image.PreserveAspectFit
+    //                             anchors.horizontalCenter: parent.horizontalCenter}
+
+    //                         Text {
+    //                             text: "Map Selection"
+    //                             color: "white"
+    //                             font.pixelSize: 16
+    //                             font.bold: true
+    //                             horizontalAlignment: Text.AlignHCenter
+    //                             verticalAlignment: Text.AlignVCenter
+    //                             anchors.horizontalCenter: parent.horizontalCenter}
+    //                     }
+    //                 }
+    //                 onClicked: {
+    //                     console.log("Option 1 clicked")
+    //                     MapGlobals.mark_with = "Mark_With_Manual"
+    //                     MapGlobals.edit = "edit"
+    //                     MapGlobals.editdialog = "editdialog"
+    //                     mainWindow.showPlanView()
+    //                     dialog.visible = false
+    //                     planView.data1()
+    //                 }
+    //             }
+    //             Button {
+    //                 Layout.alignment: Qt.AlignHCenter
+    //                 Layout.preferredWidth: parent.width* 0.2
+    //                 Layout.preferredHeight: parent.height* 0.4
+
+    //                 background: Rectangle {
+    //                     color:  "white"//"#1b1c3e"
+    //                     radius: 12
+    //                 }
+
+    //                 contentItem: Item {
+    //                     anchors.fill: parent
+
+    //                     Column {
+    //                         spacing: 8
+    //                         anchors.centerIn: parent   // ✅ Center both icon and text vertically and horizontally
+
+    //                         Image {
+    //                             source: "/qmlimages/NewImages/droneGpsMarking.png"  // Replace with actual icon
+    //                             width: 50
+    //                             height: 50
+    //                             fillMode: Image.PreserveAspectFit
+    //                             anchors.horizontalCenter: parent.horizontalCenter
+    //                         }
+
+    //                         Text {
+    //                             text: "Drone GPS"
+    //                             color: "white"
+    //                             font.pixelSize: 16
+    //                             font.bold: true
+    //                             horizontalAlignment: Text.AlignHCenter
+    //                             verticalAlignment: Text.AlignVCenter
+    //                             anchors.horizontalCenter: parent.horizontalCenter
+    //                         }
+    //                     }
+    //                 }
+
+    //                 onClicked: {
+    //                     MapGlobals.mark_with = "Mark_With_Drone"
+    //                     MapGlobals.edit = "edit"
+    //                     mainWindow.showPlanView()
+    //                     dialog.visible = false
+    //                     planView.data1()
+    //                 }
+    //             }
+    //             Button {
+    //                 Layout.alignment: Qt.AlignHCenter
+    //                 Layout.preferredWidth: parent.width* 0.2
+    //                 Layout.preferredHeight: parent.height* 0.4
+
+    //                 background: Rectangle {
+    //                     color:  "white"//"#1b1c3e"
+    //                     radius: 12
+    //                 }
+
+    //                 contentItem: Item {
+    //                     anchors.fill: parent
+
+    //                     Column {
+    //                         spacing: 8
+    //                         anchors.centerIn: parent
+
+    //                         Image {
+    //                             source: "/qmlimages/NewImages/kmlFile.png"
+    //                             width: 50
+    //                             height: 50
+    //                             fillMode: Image.PreserveAspectFit
+    //                             anchors.horizontalCenter: parent.horizontalCenter
+    //                         }
+
+    //                         Text {
+    //                             text: "Load KML/SHP..."
+    //                             color: "white"
+    //                             font.pixelSize: 16
+    //                             font.bold: true
+    //                             horizontalAlignment: Text.AlignHCenter
+    //                             verticalAlignment: Text.AlignVCenter
+    //                             anchors.horizontalCenter: parent.horizontalCenter
+    //                         }
+    //                     }
+    //                 }
+
+    //                 onClicked: {
+    //                     MapGlobals.mark_with = "Mark_With_GPS"
+    //                     MapGlobals.edit = "edit"
+    //                     mainWindow.showPlanView()
+    //                     dialog.visible = false
+    //                     planView.data1()
+    //                 }
+    //             }
+
+
+    //             //     Button {
+    //             //         //Layout.fillWidth: true
+    //             //         Layout.alignment: Qt.AlignHCenter
+    //             //         Layout.preferredWidth: parent.width* 0.2
+    //             //         Layout.preferredHeight: parent.height* 0.4 // Ensure height is taken from parent
+    //             //         //text: "Map Selection"
+    //             //         contentItem: Column {
+    //             //             width: parent.width
+    //             //                     height: parent.height
+    //             //                     spacing: 10
+    //             //                     anchors.centerIn: parent
+    //             //                             Image {
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
+    //             //                                 width: 50
+    //             //                                 height: 50
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                             Text {
+    //             //                                 text: "Map Selection"
+    //             //                                 color: "white"
+    //             //                                 horizontalAlignment: Text.AlignHCenter
+    //             //                                 font.bold: true
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                         }
+    //             //         background: Rectangle {
+    //             //             color:  "white"//"#1b1c3e"
+    //             //             radius: 8
+    //             //         }
+    //             //         onClicked: {
+    //             //             console.log("Option 1 clicked")
+    //             //             MapGlobals.edit = "edit"
+    //             //             mainWindow.showPlanView()
+    //             //             dialog.visible = false
+    //             //             planView.data1()
+    //             //         }
+    //             //     }
+
+    //             //     Button {
+    //             //         //Layout.fillWidth: true
+    //             //         Layout.alignment: Qt.AlignHCenter
+    //             //         Layout.preferredWidth: parent.width* 0.2
+    //             //         Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
+    //             //         //text: "Drone GPS"
+    //             //         contentItem: Column {
+    //             //             width: parent.width
+    //             //                     height: parent.height
+    //             //                     spacing: 10
+    //             //                     anchors.centerIn: parent
+    //             //                             Image {
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
+    //             //                                 width: 50
+    //             //                                 height: 50
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                             Text {
+    //             //                                 text: "Drone GPS"
+    //             //                                 color: "white"
+    //             //                                 horizontalAlignment: Text.AlignHCenter
+    //             //                                 font.bold: true
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                         }
+    //             //         background: Rectangle {
+    //             //             color:  "white"//"#1b1c3e"
+    //             //             radius: 8
+    //             //         }
+    //             //         onClicked: console.log("Option 2 clicked")
+    //             //     }
+
+    //             //     Button {
+    //             //         //Layout.fillWidth: true
+    //             //         Layout.alignment: Qt.AlignHCenter
+    //             //         Layout.preferredWidth: parent.width* 0.2
+    //             //         Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
+    //             //         //text: "Load KML/SHP..."
+    //             //         contentItem: Column {
+    //             //             width: parent.width
+    //             //                     height: parent.height
+    //             //                     spacing: 10
+    //             //                     anchors.centerIn: parent
+    //             //                             Image {
+    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
+    //             //                                 width: 50
+    //             //                                 height: 50
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                             Text {
+    //             //                                 text: "Load KML/SHP..."
+    //             //                                 color: "white"
+    //             //                                 horizontalAlignment: Text.AlignHCenter
+    //             //                                 font.bold: true
+    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
+    //             //                             }
+    //             //                         }
+    //             //         background: Rectangle {
+    //             //             color:  "white"//"#1b1c3e"
+    //             //             radius: 8
+    //             //         }
+    //             //         onClicked: console.log("Option 2 clicked")
+    //             //     }
+
+    //         }
+    //     }
+    // }
+
+
+    // onClicked: {
+    // dialog.visible = true
+    // MapGlobals.save = "save"
+    // }
+
+    Dialog {
+        id: dialog
+        modal: true
+        dim: true
+        anchors.centerIn: parent
+        width: parent.width //* 0.8 // 80% of screen width
+        height: parent.height // * 0.5 // 50% of screen height
+
+        property alias mappingbtn: mappingbtn
+        property alias mappingcirclebtn: mappingcirclebtn
+        property alias agribtn: agribtn
+        property alias agrigpsbtn: agrigpsbtn
+
+
+        background: Rectangle {
+            color: "transparent"
+            radius: 10
+            border.color: "white"
+            border.width: 1
+        }
+
+        Platform.FileDialog {
+            id: kmlFileDialog
+            title: "Select KML File"
+            nameFilters: ["KML files (*.kml)"]
+            fileMode: Platform.FileDialog.OpenFile
+
+            onAccepted: {
+                console.log("Picked file (QUrl):", kmlFileDialog.file)
+
+                if (kmlFileDialog.file && kmlFileDialog.file !== "") {
+                    var fileStr = kmlFileDialog.file.toString()
+                    console.log("Picked file string:", fileStr)
+
+                    // Handle both file:// and content://
+                    var localPath = ""
+                    if (fileStr.startsWith("file://")) {
+                        localPath = fileStr.replace("file://", "")
+                    } else if (fileStr.startsWith("content://")) {
+                        // On Android you get content:// URIs
+                        localPath = fileStr   // keep as-is for now
+                    }
+
+                    console.log("Final Local Path:", localPath)
+
+                    MapGlobals.kmlPath = localPath
+                    MapGlobals.mark_with = "KML_File"
+                    MapGlobals.edit = "edit"
+                    MapGlobals.share_edit_visibility = false
+                    mainWindow.showPlanView()
+                    dialog.visible = false
+                    planView.data1()
+                } else {
+                    console.log("No file selected")
+                }
+            }
+        }
+
+
+        // Close button in top-right corner
+        Rectangle {
+            id: closeBtn
+            width: 30
+            height: 30
+            radius: width / 2
+            color: "red"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 10
+
+            Text {
+                text: "X"
+                color: "white"
+                anchors.centerIn: parent
+                font.bold: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked:{
+                    dialog.visible = false
+                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                        mainWindow.showFlyView()
+                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                        mainWindow.showMapping()
+                    }
+
+
+
+                }
+            }
+        }
+
+        Column {
+            anchors.centerIn: parent
+            spacing: 20
+            width: parent.width * 0.9
+            height: parent.height
+
+            RowLayout {
+                width: parent.width
+                height: parent.height // Set explicit height for the row layout
+                spacing: 20
+
+                // Map Selection - Dark Blue
+                Button {
+                    id:mappingbtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+
+                    background: Rectangle {
+                        id: mapping
+                        color: "#1b2a49" // Dark Blue
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#3b6ea5"
+                        anchors.fill: parent
+                    }
+
+                    contentItem: Rectangle {
+                        radius: mapping.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/mapSelection.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Basic"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        planView.mapclear()
+                        QGroundControl.saveGlobalSetting("mapping", "basic")
+                        MapGlobals.mark_with = "Mark_With_Manual"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+
+                    }
+                }
+
+                // Drone - Dark Green
+                Button {
+                    id:mappingcirclebtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+
+                    background: Rectangle {
+                        id: mappingcircle
+                        color: "#1c3f2b" // Dark Green
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#4CAF50"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: mappingcircle.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Circular"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        planView.mapclear()
+                        QGroundControl.saveGlobalSetting("mapping", "circle")
+                        MapGlobals.mark_with = "Mark_With_Manual"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+                    }
+                }
+
+
+
+                // Map Selection - Dark Blue
+                Button {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+
+
+                    background: Rectangle {
+                        id: bgMap
+                        color: "#1b2a49" // Dark Blue
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#3b6ea5"
+                        anchors.fill: parent
+                    }
+
+                    contentItem: Rectangle {
+                        radius: bgMap.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/mapSelection.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Map Selection"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
+                        planView.mapclear()
+                        MapGlobals.mark_with = "Mark_With_Manual"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.editdialog = "editdialog"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+
+                    }
+                }
+
+                // Drone - Dark Green
+                Button {
+                    id:agribtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+
+                    background: Rectangle {
+                        id: bgDrone
+                        color: "#1c3f2b" // Dark Green
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#4CAF50"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: bgDrone.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Mark with Drone"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+
+                        if(activeVehicle){
+                            QGroundControl.saveGlobalSetting("mapping", "agri")
+                            planView.mapclear()
+                            MapGlobals.mark_with = "Mark_With_Drone"
+                            MapGlobals.edit = "edit"
+                            mainWindow.showPlanView()
+                            dialog.visible = false
+                            planView.data1()
+                        }else {
+                            dialog.visible = false
+                            mainWindow.showToastMessage("Drone Not Connected");
+                        }
+
+                        MapGlobals.share_edit_visibility = false
+
+                    }
+                }
+
+                // GPS - Dark Green
+                Button {
+                    id:agrigpsbtn
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+
+                    background: Rectangle {
+                        id: bgGPS
+                        color: "#1b2a49" // Dark Green
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#3b6ea5"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: bgGPS.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Mark with GPS"
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
+                        planView.mapclear()
+                        MapGlobals.mark_with = "Mark_With_GPS"
+                        MapGlobals.edit = "edit"
+                        MapGlobals.share_edit_visibility = false
+                        mainWindow.showPlanView()
+                        dialog.visible = false
+                        planView.data1()
+                    }
+                }
+
+                Button {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width * 0.2
+                    Layout.preferredHeight: parent.height * 0.4
+
+                    background: Rectangle {
+                        id: bgKml
+                        color: "#2e1437" // Dark Purple
+                        radius: 12
+                        border.width: width * 0.02
+                        border.color: "#9b59b6"
+                    }
+
+                    contentItem: Rectangle {
+                        radius: bgKml.radius
+                        color: "transparent"
+                        anchors.fill: parent
+
+                        Column {
+                            spacing: 8
+                            anchors.centerIn: parent
+
+                            Image {
+                                source: "/qmlimages/NewImages/kmlFile.svg"
+                                width: 50
+                                height: 50
+                                fillMode: Image.PreserveAspectFit
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Text {
+                                text: "Load KML/SHP..."
+                                color: "white"
+                                font.pixelSize: 16
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                    }
+
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("mapping", "agri")
+                        // MapGlobals.mark_with = "KML_File"
+                        // MapGlobals.edit = "edit"
+                        // mainWindow.showPlanView()
+                        // dialog.visible = false
+                        // planView.data1()
+                        //kmlOrSHPLoadDialog.openForLoad()
+
+                        // open native file dialog directly
+                        kmlFileDialog.open()
+
+                    }
+                }
+
+                // Button {
+                // //Layout.fillWidth: true
+                // Layout.alignment: Qt.AlignHCenter
+                // Layout.preferredWidth: parent.width* 0.2
+                // Layout.preferredHeight: parent.height* 0.4 // Ensure height is taken from parent
+                // //text: "Map Selection"
+                // contentItem: Column {
+                // width: parent.width
+                // height: parent.height
+                // spacing: 10
+                // anchors.centerIn: parent
+                // Image {
+                // source: "/qmlimages/NewImages/takeOff.svg"
+                // width: 50
+                // height: 50
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // Text {
+                // text: "Map Selection"
+                // color: "white"
+                // horizontalAlignment: Text.AlignHCenter
+                // font.bold: true
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // }
+                // background: Rectangle {
+                // color:  "white"//"#1b1c3e"
+                // radius: 8
+                // }
+                // onClicked: {
+                // console.log("Option 1 clicked")
+                // MapGlobals.edit = "edit"
+                // mainWindow.showPlanView()
+                // dialog.visible = false
+                // planView.data1()
+                // }
+                // }
+
+                // Button {
+                // //Layout.fillWidth: true
+                // Layout.alignment: Qt.AlignHCenter
+                // Layout.preferredWidth: parent.width* 0.2
+                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
+                // //text: "Drone GPS"
+                // contentItem: Column {
+                // width: parent.width
+                // height: parent.height
+                // spacing: 10
+                // anchors.centerIn: parent
+                // Image {
+                // source: "/qmlimages/NewImages/takeOff.svg"
+                // width: 50
+                // height: 50
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // Text {
+                // text: "Drone GPS"
+                // color: "white"
+                // horizontalAlignment: Text.AlignHCenter
+                // font.bold: true
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // }
+                // background: Rectangle {
+                // color:  "white"//"#1b1c3e"
+                // radius: 8
+                // }
+                // onClicked: console.log("Option 2 clicked")
+                // }
+
+                // Button {
+                // //Layout.fillWidth: true
+                // Layout.alignment: Qt.AlignHCenter
+                // Layout.preferredWidth: parent.width* 0.2
+                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
+                // //text: "Load KML/SHP..."
+                // contentItem: Column {
+                // width: parent.width
+                // height: parent.height
+                // spacing: 10
+                // anchors.centerIn: parent
+                // Image {
+                // source: "/qmlimages/NewImages/takeOff.svg"
+                // width: 50
+                // height: 50
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // Text {
+                // text: "Load KML/SHP..."
+                // color: "white"
+                // horizontalAlignment: Text.AlignHCenter
+                // font.bold: true
+                // anchors.horizontalCenter: parent.horizontalCenter
+                // }
+                // }
+                // background: Rectangle {
+                // color:  "white"//"#1b1c3e"
+                // radius: 8
+                // }
+                // onClicked: console.log("Option 2 clicked")
+                // }
+
+            }
+        }
+
+    }
+
+>>>>>>> Qgc_project/simplify_branch
     function _restorePreviousVertices() {
         mapPolygon.beginReset()
         mapPolygon.clear()

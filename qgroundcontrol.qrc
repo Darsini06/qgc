@@ -314,7 +314,7 @@
         <file alias="QGroundControl/FlightDisplay/FlyViewInsetViewer.qml">src/FlightDisplay/FlyViewInsetViewer.qml</file>
         <file alias="SettingsPanel/RCCallibarationTab.qml">src/QmlControls/SettingsPanel/RCCallibarationTab.qml</file>
         <file alias="SettingsPanel/ChannelSet.qml">src/QmlControls/SettingsPanel/ChannelSet.qml</file>
-        <file alias="SettingsPanel/ParameterMain.qml">src/QmlControls/SettingsPanel/CalibrationSettings.qml</file>
+        <file alias="SettingsPanel/CalibrationSettings.qml">src/QmlControls/SettingsPanel/CalibrationSettings.qml</file>
         <file alias="SettingsPanel/BatteryTab.qml">src/QmlControls/SettingsPanel/BatteryTab.qml</file>
         <file alias="SettingsPanel/SparayTab.qml">src/QmlControls/SettingsPanel/SparayTab.qml</file>
         <file alias="LoginPages/WelcomeScreen.qml">src/QmlControls/LoginPages/WelcomeScreen.qml</file>

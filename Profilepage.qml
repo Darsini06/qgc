@@ -263,7 +263,7 @@ Item {
 
                              if (regPass.text === regConfirm.text) {
                                 // registerUser(regUser.text, regPass.text)
-                                mainWindow.registerUser(regUser.text,regDisplay.text,regEmail.text, regPass.text,regConfirm.text)
+                                MapGlobals.registerUser(regUser.text,regDisplay.text,regEmail.text, regPass.text,regConfirm.text)
                                  currentView = "signin"
                             } else {
                                 console.log("Passwords don't match")

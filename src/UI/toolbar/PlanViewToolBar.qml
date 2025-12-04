@@ -201,7 +201,7 @@ Rectangle {
         QGCToolBarButton {
             id:                     currentButton
             Layout.preferredHeight: largeProgressBar1.height
-            icon.source:            "/qmlimages/NewImages/settings.png"
+            icon.source:            "/qmlimages/NewImages/settings.svg"
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
             Layout.alignment:        Qt.AlignRight

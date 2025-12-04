@@ -21,7 +21,7 @@ import QGroundControl.FactSystem
 
 import QGroundControl.Controllers
 import QGroundControl.ArduPilot
-import QGroundControl.QGCPositionManager
+
 import MAVLink
 
 SetupPage {
@@ -487,7 +487,6 @@ SetupPage {
                             type: "level"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
 
                         ListElement {
@@ -495,7 +494,6 @@ SetupPage {
                             type: "gyro"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
 
                         ListElement {
@@ -503,7 +501,6 @@ SetupPage {
                             type: "pressure"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
 
                         ListElement {
@@ -511,7 +508,6 @@ SetupPage {
                             type: "rc"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
 
                         ListElement {
@@ -519,7 +515,6 @@ SetupPage {
                             type: "flightModes"
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
-
                         }
 
                         ListElement {
