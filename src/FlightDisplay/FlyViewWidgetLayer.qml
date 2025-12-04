@@ -59,11 +59,9 @@ Item {
 
     Component.onCompleted: {
         //console.log("pipView.visible :", pipview.visible);
-<<<<<<< HEAD
-        //console.log("_pipView.visible :", _pipView.visible);
-=======
+
         console.log("_pipView.visible :", _pipView.visible);
->>>>>>> Qgc_project/simplify_branch
+
     }
 
 
