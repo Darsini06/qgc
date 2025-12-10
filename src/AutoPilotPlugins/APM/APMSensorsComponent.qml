@@ -37,7 +37,7 @@ SetupPage {
             height: availableHeight
             ColumnLayout {
                 anchors.fill: parent
-                spacing: 10
+                spacing: 20
 
                 // GridView for calibration buttons
                 GridView {
@@ -52,8 +52,8 @@ SetupPage {
                     snapMode: GridView.NoSnap
 
                     //Layout.alignment: Qt.AlignHCenter
-                    cellWidth: width / 3
-                    cellHeight: ScreenTools.defaultFontPixelHeight * 7
+                    cellWidth: width / 4
+                    cellHeight: ScreenTools.defaultFontPixelHeight * 15
 
                     model: ListModel {
 

@@ -87,7 +87,7 @@ Item {
         Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                width: parent.width * 0.7
+                width: parent.width * 0.5
                 height: parent.height * 0.9
                 radius: width * 0.5
                 rotation: 30

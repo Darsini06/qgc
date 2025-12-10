@@ -61,8 +61,127 @@ Item {
         //console.log("pipView.visible :", pipview.visible);
 
         console.log("_pipView.visible :", _pipView.visible);
+        MapGlobals.modeBtn1    = modebtn1
 
     }
+
+    function newscreen() {
+            planbtn.visible =false
+            listbtn.visible = false
+            takeoffbtn.visible = false
+            rtlbtn.visible = false
+            flyView.visible = false
+            planView.visible = false
+
+            newscreen.visible = true
+            //modebtn.visible = false
+            modebtn1.visible = false
+            mainrootIcons.visible = false
+
+            waypointbtn.visible = false
+            //eraserbtn.visible = false
+        }
+
+        function showPlanView() {
+            planbtn.visible =false
+            listbtn.visible = false
+            takeoffbtn.visible = false
+            rtlbtn.visible = false
+            //modebtn.visible = false
+            flyView.visible = false
+            planView.visible = true
+            modebtn1.visible = false
+            mainrootIcons.visible = false
+
+            waypointbtn.visible = false
+            //eraserbtn.visible = false
+        }
+
+        function cameraView() {
+            planbtn.visible = false
+            listbtn.visible = false
+            takeoffbtn.visible = true
+            rtlbtn.visible = false
+            //modebtn.visible = false
+            flyView.visible = true
+            planView.visible = false
+            modebtn1.visible = false
+            mainrootIcons.visible = false
+            newscreen.visible = false
+
+            waypointbtn.visible = true
+            //eraserbtn.visible = true
+
+        }
+
+        function showFlyView() {
+            waypointbtn.visible = false
+            camerabtn.visible = false
+            //photoVideoControl.visible = false
+            MapGlobals.save = "save1"
+            planbtn.visible = true
+            listbtn.visible = true
+            takeoffbtn.visible = true
+            //modebtn.visible = activeVehicle?false:true
+            flyView.visible = true
+            planView.visible = false
+            newscreen.visible = false
+            mainrootIcons.visible=true
+            modebtn1.visible = activeVehicle ? true : false
+            plan="Plan"
+            MapGlobals.edit = "edit1"
+            _appSettings.username="";
+            //eraserbtn.visible = true
+            dialog.mappingbtn.visible= false
+            dialog.mappingcirclebtn.visible= false
+            dialog.agribtn.visible= true
+            dialog.agrigpsbtn.visible= true
+        }
+
+        function showMapping() {
+            waypointbtn.visible = true
+            camerabtn.visible = false
+            //photoVideoControl.visible = false
+            MapGlobals.save = "save1"
+            planbtn.visible = true
+            listbtn.visible = true
+            takeoffbtn.visible = true
+            //modebtn.visible = activeVehicle?false:true
+            flyView.visible = true
+            planView.visible = false
+            newscreen.visible = false
+            mainrootIcons.visible=true
+            modebtn1.visible = activeVehicle ? true : false
+            plan="Plan"
+            MapGlobals.edit = "edit1"
+            _appSettings.username="";
+            //eraserbtn.visible = true
+            dialog.mappingbtn.visible= true
+            dialog.mappingcirclebtn.visible= true
+            dialog.agribtn.visible= false
+            dialog.agrigpsbtn.visible= false
+        }
+
+        function closefile(){
+            filename.dailogclose()
+        }
+
+        function showFlyView1() {
+            MapGlobals.save = "save1"
+            planbtn.visible = true
+            listbtn.visible = true
+            takeoffbtn.visible = true
+            //modebtn.visible = activeVehicle?false:true
+            flyView.visible = true
+            planView.visible = false
+            newscreen.visible = false
+            modebtn1.visible = activeVehicle ? true : false
+            plan="Start"
+            MapGlobals.edit = "edit1"
+
+            waypointbtn.visible = false
+            //eraserbtn.visible = true
+        }
 
 
     // LEFT SIDE BUTTON COLUMN
@@ -119,7 +238,7 @@ Item {
             border.color: "#005BBB"
 
             QGCColoredImage {
-                source: "/qmlimages/NewImages/takeOff.png"
+                source: "/qmlimages/NewImages/takeOff.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: width
@@ -129,7 +248,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }
@@ -180,7 +299,7 @@ Item {
             border.color: "#005BBB"
 
             QGCColoredImage {
-                source: "/qmlimages/NewImages/takeOff.png"
+                source: "/qmlimages/NewImages/takeOff.svg"
                 anchors.centerIn: parent
                 width: parent.width * 0.5
                 height: width
@@ -190,7 +309,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.png"
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }

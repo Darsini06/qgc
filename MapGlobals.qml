@@ -597,19 +597,21 @@ QtObject {
 
     function profile() {
 
+        console.log("map globals login common")
         var loginpage= QGroundControl.loadBoolGlobalSetting("login",false)
-
+console.log("map globals login common",loginpage)
         if(loginpage===true){
             loginLoader.visible = false;
             rootWindow.newscreen();
             QGroundControl.saveBoolGlobalSetting("login", true)
             modeBtn1.visible = false
-
+console.log("map globals login if")
         }else{
             loginLoader.visible = true;
             newscreen.visible = false
             console.log("Invalid Credentials");
             QGroundControl.saveBoolGlobalSetting("login", false)
+            console.log("map globals login else")
         }
     }
 
@@ -672,5 +674,37 @@ QtObject {
             }
         });
     }
+
+    function loadUserData(username, callback) {
+            console.log("Loading user data for:", username);
+
+            if (username !== "") {
+                var db = getDatabase();
+                db.transaction(function(tx) {
+                    var selectRs = tx.executeSql(
+                                "SELECT * FROM users WHERE username = ?",
+                                [username]
+                                );
+
+                    var result = null;
+                    if (selectRs.rows.length > 0) {
+                        result = selectRs.rows.item(0);
+                        console.log("User data found:", result);
+                        console.log("In MainrootWindow rpc_completed:", result.rpc_completed)
+                    } else {
+                        console.log("No user found with username:", username);
+                    }
+
+                    // Call the callback with the result
+                    if (callback) {
+                        callback(result);
+                    }
+                });
+            } else {
+                if (callback) {
+                    callback(null);
+                }
+            }
+        }
 
 }
