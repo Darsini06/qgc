@@ -39,8 +39,8 @@ QtObject {
 
     //MainRootWindow reference variables.
     property var rootWindow
-    property var loginLoader
-    property var newscreen
+    //property var loginLoader
+    //property var newscreen
     property var modeBtn1
 
     property string login: ""
@@ -577,7 +577,7 @@ QtObject {
             if (rs.rows.length > 0) {
                 console.log("Login Success");
                 result = true;
-                loginLoader.visible = false;
+                //loginLoader.visible = false;
                 rootWindow.newscreen();
                 rootWindow.showToastMessage("Login Successfully");
                 login="login"
@@ -595,19 +595,57 @@ QtObject {
         });
     }
 
+
+    function loadUserData(username, callback) {
+        console.log("Loading user data for:", username);
+
+        if (username !== "") {
+            var db = getDatabase();
+            db.transaction(function(tx) {
+                var selectRs = tx.executeSql(
+                            "SELECT * FROM users WHERE username = ?",
+                            [username]
+                            );
+
+                var result = null;
+                if (selectRs.rows.length > 0) {
+                    result = selectRs.rows.item(0);
+                    console.log("User data found:", result);
+                    console.log("In MainrootWindow rpc_completed:", result.rpc_completed)
+                } else {
+                    console.log("No user found with username:", username);
+                }
+
+                // Call the callback with the result
+                if (callback) {
+                    callback(result);
+                }
+            });
+        } else {
+            if (callback) {
+                callback(null);
+            }
+        }
+    }
+
     function profile() {
+
+        console.log("profile method MapGLobals")
 
         var loginpage= QGroundControl.loadBoolGlobalSetting("login",false)
 
-        if(loginpage===true){
-            loginLoader.visible = false;
+        if(loginpage===true) {
+            console.log("profile method MapGLobals inside the IF")
+            //loginLoader.visible = false;
             rootWindow.newscreen();
             QGroundControl.saveBoolGlobalSetting("login", true)
             modeBtn1.visible = false
 
-        }else{
-            loginLoader.visible = true;
-            newscreen.visible = false
+        } else {
+            console.log("profile method MapGLobals inside the Else")
+            //loginLoader.visible = true;
+            //newscreen.visible = false
+            rootWindow.openWelcomeScreen();
             console.log("Invalid Credentials");
             QGroundControl.saveBoolGlobalSetting("login", false)
         }

@@ -237,36 +237,37 @@ Rectangle {
                         }
                     }
 
-            // SliderSwitch {
-            //     id:                 slider
-            //     confirmText:        ScreenTools.isMobile ? qsTr("Slide to confirm") : qsTr("Slide or hold spacebar")
-            //     Layout.fillWidth:   true
-            //     enabled: _utmspEnabled === true? utmspSliderTrigger : true
-            //     opacity: if(_utmspEnabled){utmspSliderTrigger === true ? 1 : 0.5} else{1}
-
-            //     onAccept: {
-
-            //         console.log("QGCLabel clicked")
+            SliderSwitch {
+                id:                 slider
+                confirmText:        ScreenTools.isMobile ? qsTr("Slide to confirm") : qsTr("Slide or hold spacebar")
+                Layout.fillWidth:   true
+                enabled: _utmspEnabled === true? utmspSliderTrigger : true
+                opacity: if(_utmspEnabled){utmspSliderTrigger === true ? 1 : 0.5} else{1}
 
 
-            //         _root.visible = false
-            //         var sliderOutputValue = 0
-            //         if (guidedValueSlider.visible) {
-            //             sliderOutputValue = guidedValueSlider.getOutputValue()
-            //             guidedValueSlider.visible = false
-            //         }
-            //         hideTrigger = false
-            //         guidedController.executeAction(_root.action, _root.actionData, sliderOutputValue, _root.optionChecked)
-            //         if (mapIndicator) {
-            //             mapIndicator.actionConfirmed()
-            //             mapIndicator = undefined
-            //         }
+                onAccept: {
 
-            //         UTMSPStateStorage.indicatorOnMissionStatus = true
-            //         UTMSPStateStorage.currentNotificationIndex = 7
-            //         UTMSPStateStorage.currentStateIndex = 3
-            //     }
-            // }
+                    console.log("QGCLabel clicked")
+
+
+                    _root.visible = false
+                    var sliderOutputValue = 0
+                    if (guidedValueSlider.visible) {
+                        sliderOutputValue = guidedValueSlider.getOutputValue()
+                        guidedValueSlider.visible = false
+                    }
+                    hideTrigger = false
+                    guidedController.executeAction(_root.action, _root.actionData, sliderOutputValue, _root.optionChecked)
+                    if (mapIndicator) {
+                        mapIndicator.actionConfirmed()
+                        mapIndicator = undefined
+                    }
+
+                    UTMSPStateStorage.indicatorOnMissionStatus = true
+                    UTMSPStateStorage.currentNotificationIndex = 7
+                    UTMSPStateStorage.currentStateIndex = 3
+                }
+            }
 
             Rectangle {
                 height: slider.height * 0.75

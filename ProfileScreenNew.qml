@@ -21,9 +21,9 @@ Item {
     anchors.fill: parent
     property string currentView: "profile" // options: main, accountUpdate, userGuide, record, reports, feedback, settings
 
-    property string userName: ""
-    property string displayName: ""
-    property string userEmail: ""
+    property string userName: QGroundControl.loadGlobalSetting("username", "")
+    property string displayName: QGroundControl.loadGlobalSetting("name", "")
+    property string userEmail: QGroundControl.loadGlobalSetting("email", "")
     property string name_from_db: ""
     property string mobileNo_from_db: ""
     property string email_from_db: ""
@@ -46,12 +46,11 @@ Item {
 
     // Connect to new session signal
     Connections {
-        target: mainWindow
+        target: MapGlobals
 
         onNewSessionAdded: {
             console.log("New session added, refreshing...");
             loadSessions();
-            //loadSessionStatistics();
         }
     }
 
@@ -257,9 +256,8 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    mainWindow.profileScreen1(false)
-                                    currentView = "main"
-                                   // mainWindow.newscreendata()
+                                   // mainWindow.profileScreen1(false)
+                                    mainWindow.openNewScreen();
                                 }
                             }
                         }
@@ -542,7 +540,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }
@@ -975,7 +973,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }
@@ -1041,7 +1039,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }
@@ -1107,7 +1105,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }
@@ -1432,7 +1430,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }
@@ -1729,7 +1727,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    //mainWindow.profileScreen1(false)
+
                                     currentView = "profile"
                                 }
                             }

@@ -2353,6 +2353,8 @@ bool MissionController::_isROICancelItem(SimpleMissionItem* simpleItem)
 
 void MissionController::setCurrentPlanViewSeqNum(int sequenceNumber, bool force)
 {
+    qDebug() << "MissionController::setCurrentPlanViewSeqNum()";
+
     if (_visualItems && (force || sequenceNumber != _currentPlanViewSeqNum)) {
         qCDebug(MissionControllerLog) << "setCurrentPlanViewSeqNum";
         bool    foundLand =             false;

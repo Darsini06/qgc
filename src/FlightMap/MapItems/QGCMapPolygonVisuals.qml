@@ -33,6 +33,7 @@ Item {
     property int selectedVertexIndex : -1                   // Will store the MapQuickItem the user clicked
     property var    mapControl                                  ///< Map control to place item in
     property var    mapPolygon                                  ///< QGCMapPolygon object
+
     property bool   interactive:        mapPolygon.interactive
     property color  interiorColor:      "transparent"
     property color  altColor:           "transparent"
@@ -56,6 +57,9 @@ Item {
     property real _zorderCenterHandle:  QGroundControl.zOrderMapItems + 1   // Lowest such that drag or split takes precedence
 
     property var _planMasterController:              planMasterController
+    property var _missionController:              planMasterController.missionController
+
+
     readonly property string _polygonToolsText: qsTr("")//("Polygon Tools")
     readonly property string _traceText:        qsTr("")//qsTr("Click in the map to add vertices. Click 'Done Tracing' when finished.")
     property var gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
@@ -417,6 +421,7 @@ Item {
         flyView:    false
 
         Component.onCompleted: {
+            console.log("QgcMapPolygon PlanMasterController .onCompleted")
             _planMasterController.start()
             _missionController.setCurrentPlanViewSeqNum(0, true)
         }

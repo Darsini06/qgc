@@ -23,7 +23,7 @@ Item {
     property var    _fullItem
     property var    _pipOrWindowItem
 
-    property string droneType: "loadpage"
+    property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
     onVisibleChanged : {
         if (visible) {
@@ -45,9 +45,9 @@ Item {
     }
 
     function camera(){
-        camera.visible=true
+        camera.visible = true
         agri.visible=false
-        mapping.visible=false
+        mapping.visible = false
         vtol.visible=false
         cameraicon.visible=true
         agriicon.visible=false
@@ -91,62 +91,6 @@ Item {
         vtolicon.visible=true
         droneAnim1.visible=false
     }
-
-
-    // Component.onCompleted: {
-    //     console.log("newscreen pageloaded")
-    //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="camera"){
-    //         mainWindow.showToastMessage("Camera");
-    //         MapGlobals.comefrom="Camera"
-    //         mainWindow.cameraView()
-    //         QGroundControl.saveGlobalSetting("waypoint","waypoint")
-    //         console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-    //         var videoSettings = QGroundControl.settingsManager.videoSettings
-    //                                     if (videoSettings) {
-    //                                         var videoSourceFact = videoSettings.videoSource
-    //                                         if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-    //                                             videoSourceFact.value = videoSourceFact.enumValues[1]
-    //                                         }
-    //                                     }
-    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="agri"){
-    //         mainWindow.showToastMessage("agri");
-    //         mainWindow.showFlyView()
-    //         MapGlobals.comefrom="Plan"
-    //         console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-    //         _appSettings.screen = "Plan"
-    //         var videoSettings1 = QGroundControl.settingsManager.videoSettings1
-    //         if (videoSettings1) {
-    //             var videoSourceFact1 = videoSettings1.videoSource
-    //             if (videoSourceFact1 && videoSourceFact1.enumValues.length > 1) {
-    //                 videoSourceFact1.value = videoSourceFact1.enumValues[0]
-    //             }
-    //         }
-    //     }
-    //     else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="mapping"){
-    //         mainWindow.showToastMessage("mapping");
-    //         mainWindow.showFlyView1()
-    //         MapGlobals.comefrom="Start"
-    //         console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-    //         _appSettings.screen = "Start"
-    //         var videoSettings2 = QGroundControl.settingsManager.videoSettings2
-    //         if (videoSettings2) {
-    //             var videoSourceFact2 = videoSettings2.videoSource
-    //             if (videoSourceFact2 && videoSourceFact2.enumValues.length > 1) {
-    //                 videoSourceFact2.value = videoSourceFact2.enumValues[0]
-    //             }
-    //         }
-    //             }
-    // }
-
-
-    // Image {
-    //     anchors.fill: parent
-    //     source: "/res/NoVideoBackground.jpg" // Replace with your image path
-    //     fillMode: Image.PreserveAspectCrop
-    //     z: -1 // Keep it behind everything else
-    // }
-
-
 
     Rectangle {
         width: Screen.width
@@ -202,7 +146,8 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.profileScreen1(true)
+                        //mainWindow.profileScreen1(true)
+                        mainWindow.openProfileScreen();
                     }
                 }
             }
@@ -350,66 +295,6 @@ Item {
             anchors.right: parent.right
             anchors.bottomMargin: 20
             spacing: 20
-
-            //  Button {
-            //      id : connectbtn
-            //      text: " Connect "
-            //      Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-            //      Layout.bottomMargin: parent.height * 0.1
-            //      implicitWidth: parent.width * 0.1
-
-            //      //Layout.preferredWidth: parent.width * 0.13
-            //      //Layout.leftMargin: 10
-            //      //font.bold: true
-            //      //font.pixelSize: 16
-
-
-            //      contentItem: Item {
-            //          anchors.fill: parent
-
-            //          // clip: true
-
-            //          Row {
-            //              anchors.centerIn: parent
-            //              //anchors.margins: 20
-            //              spacing: 3
-
-            //              Text {
-            //                  text: connectbtn.text
-            //                  font.pointSize: ScreenTools.defaultFontPointSize
-            //                  font.weight: Font.Medium
-            //                  color: "white"
-            //                  verticalAlignment: Text.AlignVCenter
-            //              }
-
-            //              QGCColoredImage {
-            //                  source: "/qmlimages/NewImages/commlinks.svg"
-            //                  fillMode: Image.PreserveAspectFit
-            //                  width: 20
-            //                  height: 20
-            //              }
-            //          }
-            //      }
-
-            //      background: Rectangle {
-            //          color: "#1b1c3e" // Blue color (iOS-style button)
-            //          radius: 20 // Curved button
-            //          border.color: "#005BBB" // Border color
-            //          border.width: 2
-            //      }
-
-            //      onClicked: {
-            //          //QGroundControl.saveGlobalSetting("loadpage", "loadpage")
-
-            //          var editingConfig = _linkManager.createConfiguration(
-            //                      ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
-            //                      );
-
-            //          typeSelectionDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: null }).open();
-
-            //      }
-
-            //  }
 
             Button {
                 id: connectbtn
