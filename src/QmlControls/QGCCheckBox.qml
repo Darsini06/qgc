@@ -9,7 +9,7 @@ CheckBox {
     spacing:        _noText ? 0 : ScreenTools.defaultFontPixelWidth
     focusPolicy:    Qt.ClickFocus
 
-    property color  textColor:          _qgcPal.text
+    property color  textColor:          "white"//_qgcPal.text
     property bool   textBold:           false
     property real   textFontPointSize:  ScreenTools.defaultFontPointSize
 

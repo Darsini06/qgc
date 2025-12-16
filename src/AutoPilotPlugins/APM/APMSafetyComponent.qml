@@ -22,12 +22,15 @@ SetupPage {
     id:             safetyPage
     pageComponent:  safetyPageComponent
 
+
+property bool   showBorder:         true
     Component {
         id: safetyPageComponent
 
         ColumnLayout {
             id:         flowLayout
             width:      availableWidth
+            //width:  flowLayout.width *0.8
             //spacing:    _margins
             Layout.fillWidth:   true
             anchors.horizontalCenter: parent.horizontalCenter
@@ -143,7 +146,8 @@ SetupPage {
             }
 
             Column {
-                spacing: _margins / 2
+                spacing: _margins
+                Layout.fillWidth:   true
                 visible: _batt1MonitorEnabled
 
                 QGCLabel {
@@ -155,7 +159,10 @@ SetupPage {
                 Rectangle {
                     width:  battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
                     height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
-                    color:  ggcPal.windowShade
+                    color:              "transparent"
+                    border.color:       QGroundControl.globalPalette.groupBorder
+                    border.width:       showBorder ? 1 : 0
+                    radius:             ScreenTools.defaultFontPixelHeight / 2
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Loader {
@@ -179,18 +186,24 @@ SetupPage {
 
 
             Column {
-                spacing: _margins / 2
+                spacing: _margins
+                Layout.fillWidth:   true
                 visible: _batt2MonitorEnabled
 
                 QGCLabel {
                     text:       qsTr("Battery2 Failsafe Triggers")
                     font.bold:   true
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
                     width:  battery2FailsafeLoader.x + battery2FailsafeLoader.width + _margins
                     height: battery2FailsafeLoader.y + battery2FailsafeLoader.height + _margins
-                    color:  ggcPal.windowShade
+                    color:              "transparent"
+                    border.color:       QGroundControl.globalPalette.groupBorder
+                    border.width:       showBorder ? 1 : 0
+                    radius:             ScreenTools.defaultFontPixelHeight / 2
 
                     Loader {
                         id:                 battery2FailsafeLoader
@@ -215,7 +228,8 @@ SetupPage {
                 id: planeGeneralFS
 
                 Column {
-                    spacing: _margins / 2
+                    spacing: _margins
+                    Layout.fillWidth:   true
 
                     property Fact _failsafeThrEnable:   controller.getParameterFact(-1, "THR_FAILSAFE")
                     property Fact _failsafeThrValue:    controller.getParameterFact(-1, "THR_FS_VALUE")
@@ -224,12 +238,17 @@ SetupPage {
                     QGCLabel {
                         text:       qsTr("Failsafe Triggers")
                         font.bold:   true
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     Rectangle {
+                        anchors.horizontalCenter: parent.horizontalCenter
                         width:  fsColumn.x + fsColumn.width + _margins
                         height: fsColumn.y + fsColumn.height + _margins
-                        color:  qgcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
                         ColumnLayout {
                             id:                 fsColumn
@@ -265,13 +284,15 @@ SetupPage {
 
             Loader {
                 sourceComponent: controller.vehicle.fixedWing ? planeGeneralFS : undefined
+                Layout.fillWidth:   true
             }
 
             Component {
                 id: roverGeneralFS
 
                 Column {
-                    spacing: _margins / 2
+                    spacing: _margins
+                    Layout.fillWidth:   true
 
                     property Fact _failsafeGCSEnable:   controller.getParameterFact(-1, "FS_GCS_ENABLE")
                     property Fact _failsafeThrEnable:   controller.getParameterFact(-1, "FS_THR_ENABLE")
@@ -283,13 +304,20 @@ SetupPage {
                         id:         failsafeLabel
                         text:       qsTr("Failsafe Triggers")
                         font.bold:   true
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 20
+                        color: "white"
                     }
 
                     Rectangle {
                         id:     failsafeSettings
                         width:  fsGrid.x + fsGrid.width + _margins
                         height: fsGrid.y + fsGrid.height + _margins
-                        color:  ggcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
+                        anchors.horizontalCenter: parent.horizontalCenter
 
                         GridLayout {
                             id:                 fsGrid
@@ -298,27 +326,31 @@ SetupPage {
                             anchors.top:        parent.top
                             columns:            2
 
-                            QGCLabel { text: qsTr("Ground Station failsafe:") }
+                            QGCLabel { text: qsTr("Ground Station failsafe:")
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeGCSEnable
                                 indexModel:         false
                             }
 
-                            QGCLabel { text: qsTr("Throttle failsafe:") }
+                            QGCLabel { text: qsTr("Throttle failsafe:")
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeThrEnable
                                 indexModel:         false
                             }
 
-                            QGCLabel { text: qsTr("PWM threshold:") }
+                            QGCLabel { text: qsTr("PWM threshold:")
+                            color: "white"}
                             FactTextField {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeThrValue
                             }
 
-                            QGCLabel { text: qsTr("Failsafe Crash Check:") }
+                            QGCLabel { text: qsTr("Failsafe Crash Check:")
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeCrashCheck
@@ -331,13 +363,15 @@ SetupPage {
 
             Loader {
                 sourceComponent: _roverFirmware ? roverGeneralFS : undefined
+                Layout.fillWidth:   true
             }
 
             Component {
                 id: copterGeneralFS
 
                 Column {
-                    spacing: _margins / 2
+                    Layout.fillWidth:   true
+                    spacing: _margins
 
                     property Fact _failsafeGCSEnable:               controller.getParameterFact(-1, "FS_GCS_ENABLE")
                     property Fact _failsafeBattLowAct:              controller.getParameterFact(-1, "r.BATT_FS_LOW_ACT", false /* reportMissing */)
@@ -348,13 +382,20 @@ SetupPage {
 
                     QGCLabel {
                         text:       qsTr("General Failsafe Triggers")
+                        font.pixelSize: 20
+                                        color: "white"
                         font.bold:   true
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     Rectangle {
+                        anchors.horizontalCenter: parent.horizontalCenter
                         width:  generalFailsafeColumn.x + generalFailsafeColumn.width + _margins
                         height: generalFailsafeColumn.y + generalFailsafeColumn.height + _margins
-                        color:  ggcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
                         Column {
                             id:                 generalFailsafeColumn
@@ -368,14 +409,16 @@ SetupPage {
                                 rowSpacing:     _margins
                                 columns:        2
 
-                                QGCLabel { text: qsTr("Ground Station failsafe:") }
+                                QGCLabel { text: qsTr("Ground Station failsafe:")
+                                color: "white"}
                                 FactComboBox {
                                     fact:               _failsafeGCSEnable
                                     indexModel:         false
                                     Layout.fillWidth:   true
                                 }
 
-                                QGCLabel { text: qsTr("Throttle failsafe:") }
+                                QGCLabel { text: qsTr("Throttle failsafe:")
+                                color: "white"}
                                 QGCComboBox {
                                     model:              [qsTr("Disabled"), qsTr("Always RTL"),
                                         qsTr("Continue with Mission in Auto Mode"), qsTr("Always Land")]
@@ -385,7 +428,8 @@ SetupPage {
                                     onActivated: (index) => { _failsafeThrEnable.value = index }
                                 }
 
-                                QGCLabel { text: qsTr("PWM threshold:") }
+                                QGCLabel { text: qsTr("PWM threshold:")
+                                color: "white"}
                                 FactTextField {
                                     fact:               _failsafeThrValue
                                     showUnits:          true
@@ -399,13 +443,15 @@ SetupPage {
 
             Loader {
                 sourceComponent: controller.vehicle.multiRotor ? copterGeneralFS : undefined
+                Layout.fillWidth:   true
             }
 
             Component {
                 id: copterGeoFence
 
                 Column {
-                    spacing: _margins / 2
+                    spacing: _margins
+                    Layout.fillWidth:   true
 
                     property Fact _fenceAction: controller.getParameterFact(-1, "FENCE_ACTION")
                     property Fact _fenceAltMax: controller.getParameterFact(-1, "FENCE_ALT_MAX")
@@ -420,13 +466,20 @@ SetupPage {
 
                     QGCLabel {
                         text:           qsTr("GeoFence")
+                        font.pixelSize: 20
+                                        color: "white"
                         font.bold:      true
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
 
                     Rectangle {
+                        anchors.horizontalCenter: parent.horizontalCenter
                         width:  mainLayout.width + (_margins * 2)
                         height: mainLayout.height + (_margins * 2)
-                        color:  ggcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
                         ColumnLayout {
                             id:         mainLayout
@@ -509,6 +562,7 @@ SetupPage {
 
                                 QGCLabel {
                                     text: qsTr("Breach action")
+                                    color: "white"
                                 }
 
                                 FactComboBox {
@@ -518,6 +572,7 @@ SetupPage {
 
                                 QGCLabel {
                                     text: qsTr("Fence margin")
+                                    color: "white"
                                 }
 
                                 FactTextField {
@@ -531,13 +586,15 @@ SetupPage {
 
             Loader {
                 sourceComponent: controller.vehicle.multiRotor ? copterGeoFence : undefined
+                Layout.fillWidth:   true
             }
 
             Component {
                 id: copterRTL
 
                 Column {
-                    spacing: _margins / 2
+                    spacing: _margins
+                    Layout.fillWidth:   true
 
                     property Fact _landSpeedFact:   controller.getParameterFact(-1, "LAND_SPEED")
                     property Fact _rtlAltFact:      controller.getParameterFact(-1, "RTL_ALT")
@@ -548,13 +605,20 @@ SetupPage {
                         id:             rtlLabel
                         text:           qsTr("Return to Launch")
                         font.bold:      true
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 20
+                                        color: "white"
                     }
 
                     Rectangle {
                         id:     rtlSettings
                         width:  landSpeedField.x + landSpeedField.width + _margins
                         height: landSpeedField.y + landSpeedField.height + _margins
-                        color:  ggcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
+                        anchors.horizontalCenter: parent.horizontalCenter
 
                         QGCColoredImage {
                             id:                 icon
@@ -627,6 +691,7 @@ SetupPage {
                             anchors.left:       returnAtCurrentRadio.left
                             anchors.baseline:   rltAltFinalField.baseline
                             text:               qsTr("Final land stage altitude:")
+                            color: "white"
                         }
 
                         FactTextField {
@@ -642,6 +707,7 @@ SetupPage {
                             anchors.left:       returnAtCurrentRadio.left
                             anchors.baseline:   landSpeedField.baseline
                             text:               qsTr("Final land stage descent speed:")
+                            color: "white"
                         }
 
                         FactTextField {
@@ -658,13 +724,15 @@ SetupPage {
 
             Loader {
                 sourceComponent: controller.vehicle.multiRotor ? copterRTL : undefined
+                Layout.fillWidth:   true
             }
 
             Component {
                 id: planeRTL
 
                 Column {
-                    spacing: _margins / 2
+                    spacing: _margins
+                    Layout.fillWidth:   true
 
                     property Fact _rtlAltFact: {
                         if (controller.firmwareMajorVersion < 4 || (controller.firmwareMajorVersion === 4 && controller.firmwareMinorVersion < 5)) {
@@ -677,12 +745,19 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Return to Launch")
                         font.bold:      true
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 20
+                                        color: "white"
                     }
 
                     Rectangle {
                         width:  rltAltField.x + rltAltField.width + _margins
                         height: rltAltField.y + rltAltField.height + _margins
-                        color:  qgcPal.windowShade
+                        color:              "transparent"
+                        border.color:       QGroundControl.globalPalette.groupBorder
+                        border.width:       showBorder ? 1 : 0
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
+                        anchors.horizontalCenter: parent.horizontalCenter
 
                         QGCRadioButton {
                             id:                 returnAtCurrentRadio
@@ -721,6 +796,7 @@ SetupPage {
 
             Loader {
                 sourceComponent: controller.vehicle.fixedWing ? planeRTL : undefined
+                Layout.fillWidth:   true
             }
 
             Column {
@@ -731,12 +807,17 @@ SetupPage {
                     text:           qsTr("Arming Checks")
                     font.bold:      true
                     anchors.horizontalCenter: parent.horizontalCenter
+                    font.pixelSize: 20
+                                    color: "white"
                 }
 
                 Rectangle {
                     width:  flowLayout.width *0.8
                     height: armingCheckInnerColumn.height + (_margins * 2)
-                    color:  ggcPal.windowShade
+                    color:              "transparent"
+                    border.color:       QGroundControl.globalPalette.groupBorder
+                    border.width:       showBorder ? 1 : 0
+                    radius:             ScreenTools.defaultFontPixelHeight / 2
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Column {
