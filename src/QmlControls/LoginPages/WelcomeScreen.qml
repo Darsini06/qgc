@@ -50,7 +50,7 @@ Item {
         anchors.fill: parent
         gradient: Gradient {
             GradientStop { position: 0.0; color: backgroundColor }
-            GradientStop { position: 1.0; color: isDarkMode ? "#9caeff" : "#e2e8f0" }
+            GradientStop { position: 1.0; color: isDarkMode ? "#020617" : "#e2e8f0" }
         }
     }
 
@@ -268,7 +268,6 @@ Item {
 
         // SIGN IN SCREEN
         Item {
-
             // Back arrow at top left with margins
             Item {
                 anchors {
@@ -284,7 +283,7 @@ Item {
                 QGCColoredImage {
                     anchors.centerIn: parent
                     source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                    //fillMode: Image.PreserveAspectFit
+                    fillMode: Image.PreserveAspectFit
                     width: 25
                     height: 25
                 }
@@ -300,27 +299,31 @@ Item {
                 }
             }
 
-            Flickable {
-                id: flick
+            ScrollView {
                 anchors {
-                    fill: parent
-                    topMargin: dp(12)       // Avoid overlap with back arrow
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                    topMargin: dp(12) // Add top margin to avoid overlapping with back button
                 }
                 clip: true
+                contentWidth: -1 // Let content determine width
 
-                contentWidth: parent.width
-                contentHeight: signInColumn.implicitHeight + dp(50)
+                // Container to ensure proper centering
+                Item {
+                    width: parent.width
+                    height: Math.max(signInColumn.implicitHeight, parent.height)
 
                     Column {
                         id: signInColumn
                         width: parent.width * 0.85
                         spacing: dp(4)
-                        anchors.top: parent.top
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.centerIn: parent
 
                         // Header
                         Column {
-                           width: parent.width
+                            width: parent.width
                             spacing: dp(2)
                             anchors.horizontalCenter: parent.horizontalCenter
 
@@ -355,7 +358,7 @@ Item {
                             Column {
                                 width: parent.width
                                 spacing: dp(2)
-                                //anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
 
                                 Row {
                                     //anchors.horizontalCenter: parent.horizontalCenter
@@ -408,7 +411,7 @@ Item {
                             Column {
                                 width: parent.width
                                 spacing: dp(2)
-                                //anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
 
                                 Row {
                                     //anchors.horizontalCenter: parent.horizontalCenter
@@ -518,16 +521,6 @@ Item {
                                     color: loginBtn.pressed ? primaryHover : primaryColor
                                 }
 
-                                // contentItem: Text {
-                                //     text: parent.text
-                                //     //font.pixelSize: dp(4) // Adjusted size
-                                //     font.pointSize:     ScreenTools.defaultFontPointSize
-                                //     font.weight: Font.Medium
-                                //     color: "white"
-                                //     horizontalAlignment: Text.AlignHCenter
-                                //     verticalAlignment: Text.AlignVCenter
-                                // }
-
                                 contentItem: Item {
                                     anchors.fill: parent
                                     // clip: true
@@ -574,6 +567,7 @@ Item {
                             }
                         }
                     }
+                }
             }
         }
 
@@ -614,7 +608,7 @@ Item {
                 }
             }
 
-            Flickable {
+            ScrollView {
                 anchors.fill: parent
                 clip: true
                 contentWidth: -1
@@ -731,6 +725,7 @@ Item {
                                     font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.weight: Font.Medium
                                     color: textPrimary
+
                                 }
 
                                 QGCColoredImage {
