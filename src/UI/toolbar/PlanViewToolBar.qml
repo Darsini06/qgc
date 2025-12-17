@@ -228,6 +228,7 @@ Rectangle {
         }
 
         Rectangle {
+            id: progressBackground
             // anchors.top:    parent.top
             // anchors.bottom: parent.bottom
             width:          _controllerProgressPct * parent.width

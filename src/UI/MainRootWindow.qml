@@ -135,8 +135,8 @@ ApplicationWindow {
 
         // Reference Variable for MainRootWindow
         MapGlobals.rootWindow = mainWindow
-        MapGlobals.loginLoader = login
-        MapGlobals.newscreen   = newscreen
+        //MapGlobals.loginLoader = login
+        //MapGlobals.newscreen   = newscreen
         MapGlobals.modeBtn1    = modebtn1
 
         //Initialize the Database and Create Tables
@@ -232,18 +232,6 @@ ApplicationWindow {
         planView.newmap()
     }
 
-    // function newscreendata() {
-    //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-    //         newscreen.camera()
-    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-    //         newscreen.agri()
-    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-    //         newscreen.mapping()
-    //     }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="VTOL"){
-    //         newscreen.vtol()
-    //     }
-    // }
-
     function filename() {
         filename.tracemode()
     }
@@ -264,20 +252,20 @@ ApplicationWindow {
     }
 
     function newscreen() {
+
         planbtn.visible =false
         listbtn.visible = false
         takeoffbtn.visible = false
         rtlbtn.visible = false
         flyView.visible = false
         planView.visible = false
-
-        newscreen.visible = true
-        //modebtn.visible = false
         modebtn1.visible = false
         mainrootIcons.visible = false
-
         waypointbtn.visible = false
-        //eraserbtn.visible = false
+
+        //newscreen.visible = true
+        mainWindow.openNewScreen()
+
     }
 
     function showPlanView() {
@@ -298,32 +286,32 @@ ApplicationWindow {
     function cameraView() {
         planbtn.visible = false
         listbtn.visible = false
-        takeoffbtn.visible = true
         rtlbtn.visible = false
-        //modebtn.visible = false
-        flyView.visible = true
         planView.visible = false
         modebtn1.visible = false
         mainrootIcons.visible = false
-        newscreen.visible = false
+
+        //newscreen.visible = false
+        mainWindow.closeScreens();
 
         waypointbtn.visible = true
-        //eraserbtn.visible = true
-
+        flyView.visible = true
+        takeoffbtn.visible = true
     }
 
     function showFlyView() {
         waypointbtn.visible = false
         camerabtn.visible = false
-        //photoVideoControl.visible = false
         MapGlobals.save = "save1"
         planbtn.visible = true
         listbtn.visible = true
         takeoffbtn.visible = true
-        //modebtn.visible = activeVehicle?false:true
         flyView.visible = true
         planView.visible = false
-        newscreen.visible = false
+
+        //newscreen.visible = false
+         mainWindow.closeScreens();
+
         mainrootIcons.visible=true
         modebtn1.visible = activeVehicle ? true : false
         plan="Plan"
@@ -347,7 +335,10 @@ ApplicationWindow {
         //modebtn.visible = activeVehicle?false:true
         flyView.visible = true
         planView.visible = false
-        newscreen.visible = false
+
+        //newscreen.visible = false
+        mainWindow.closeScreens();
+
         mainrootIcons.visible=true
         modebtn1.visible = activeVehicle ? true : false
         plan="Plan"
@@ -360,7 +351,7 @@ ApplicationWindow {
         dialog.agrigpsbtn.visible= false
     }
 
-    function closefile(){
+    function closefile() {
         filename.dailogclose()
     }
 
@@ -372,7 +363,10 @@ ApplicationWindow {
         //modebtn.visible = activeVehicle?false:true
         flyView.visible = true
         planView.visible = false
-        newscreen.visible = false
+
+        //newscreen.visible = false
+        mainWindow.closeScreens();
+
         modebtn1.visible = activeVehicle ? true : false
         plan="Start"
         MapGlobals.edit = "edit1"
@@ -417,7 +411,6 @@ ApplicationWindow {
 
     // This variant is only meant to be called by QGCApplication
     function _showMessageDialog(dialogTitle, dialogText) {
-
         showMessageDialog(dialogTitle, dialogText)
     }
 
@@ -430,11 +423,11 @@ ApplicationWindow {
         toastContainer.showToast(text)
     }
 
-    function profileScreen1(comesFrom) {
-        console.log("profileScreen1==========")
-        profileScreen.visible = comesFrom
-        newscreen.visible = !comesFrom
-    }
+    // function profileScreen1(comesFrom) {
+    //     console.log("profileScreen1==========")
+    //     profileScreen.visible = comesFrom
+    //     newscreen.visible = !comesFrom
+    // }
 
     Component {
         id: simpleMessageDialogComponent
@@ -756,48 +749,13 @@ ApplicationWindow {
         planType: plan
     }
 
-    // ProfileScreenNew {
-    //     id: profileScreen
-    //     anchors.fill: parent
-    //     visible:false
-    // }
 
-    // FlyViewToolBar {
-    //     id: toolbar
-    //     visible: false
-    // }
-
-    // Newscreen {
-    //     id:                     newscreen
-    //     anchors.fill:           parent
-    //     visible : false
-    // }
-
-    // CalibrationSettings{
-    //     id : calibrationPage
-    //     visible : false
-    // }
-
-    // Loader {
-    //     id: calibrationLoader
-    //     active: false
-    //     sourceComponent: CalibrationSettings { id: calibrationPage }
-
-    // }
+    Loader {
+        id: pageLoader
+        anchors.fill: parent
+    }
 
 
-    // Loader {
-    //     id: login
-    //     anchors.fill: parent
-    //     source: "qrc:/qml/LoginPages/WelcomeScreen.qml"
-    //     visible: false
-    // }
-
-    // Class1 {
-    //     id:                     login
-    //     anchors.fill:           parent
-    //     visible : false
-    // }
 
     MainRootIcons {
         id:             mainrootIcons
@@ -816,6 +774,24 @@ ApplicationWindow {
     footer: LogReplayStatusBar {
         visible: QGroundControl.settingsManager.flyViewSettings.showLogReplayStatusBar.rawValue
     }
+
+
+    function openWelcomeScreen() {
+        pageLoader.source = "qrc:/qml/LoginPages/WelcomeScreen.qml"
+    }
+
+    function openNewScreen() {
+        pageLoader.source = "qrc:/qml/Newscreen.qml"
+    }
+
+    function openProfileScreen() {
+        pageLoader.source = "qrc:/qml/ProfileScreenNew.qml"
+    }
+
+    function closeScreens() {
+        pageLoader.source = ""
+    }
+
 
     function showToolSelectDialog() {
 
@@ -839,7 +815,6 @@ ApplicationWindow {
         console.log("qmlFile",)
         sideDrawer.pushView(qmlFile)
     }
-
 
     Drawer {
         id: sideDrawer
@@ -1029,170 +1004,6 @@ ApplicationWindow {
         }
     }
 
-    // Drawer {
-    //     id: sideDrawer
-    //     width: parent.width * 0.6
-    //     height: parent.height
-    //     interactive: true
-    //     edge: Qt.RightEdge
-
-
-    //     background: Rectangle{
-    //         color: "black"
-    //         opacity: 0.8
-    //     }
-
-    //     // Navigation stack for the drawer content
-    //     property var navigationStack: []
-    //     property var rootDrawer: sideDrawer
-
-    //     // Function to push a new QML file onto the stack
-    //     function pushView(qmlFile) {
-    //         navigationStack.push(qmlFile);
-    //         loaders.source = qmlFile;
-    //     }
-
-    //     // Function to pop the current view
-    //     function popView() {
-    //         if (navigationStack.length > 1) {
-    //             navigationStack.pop();
-    //             loaders.source = navigationStack[navigationStack.length - 1];
-    //         }
-    //     }
-
-    //     ListModel {
-    //         id: tabModel
-    //         ListElement { image: "/qmlimages/NewImages/RCCallibration.png"; file: "qrc:/qml/SettingsPanel/RCCallibarationTab.qml" ;title: "Radio" }
-    //         ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "qrc:/qml/SettingsPanel/CalibrationSettings.qml" ;title: "Flight Modes"}
-    //         ListElement { image: "/qmlimages/NewImages/menu.png";  file: "" ;title: "Settings" }
-    //         ListElement { image: "/qmlimages/NewImages/diamond.png";  file: "" ;title: "Diamond" }
-    //         ListElement { image: "/qmlimages/NewImages/CompassArrow.png";  file: "" ; title: "Info"}
-    //     }
-
-
-    //     RowLayout {
-    //         anchors.fill: parent
-    //         spacing: 0
-
-    //         // Vertical Tab Bar
-    //         TabBar {
-    //             id: tabBar
-    //             Layout.preferredWidth: 50
-    //             Layout.fillHeight: true
-    //             currentIndex: 0
-
-    //             background: Rectangle {
-    //                 color: "black"
-    //                 opacity: 0.9
-    //             }
-
-    //             contentItem: ListView {
-    //                 orientation: ListView.Vertical
-    //                 boundsBehavior: Flickable.StopAtBounds
-    //                 model: tabBar.contentModel
-    //                 currentIndex: tabBar.currentIndex
-    //                 interactive: false
-
-    //                 highlightMoveDuration: 0
-    //                 //highlightRangeMode: ListView.ApplyRange
-    //                 //preferredHighlightBegin: 40
-    //                 //preferredHighlightEnd: height - 40
-
-    //                 // Key Change: Calculate spacing to distribute tabs evenly
-    //                 spacing: (height - (tabModel.count * 35)) / (tabModel.count + 1)
-    //                 topMargin: spacing
-    //                 bottomMargin: spacing
-    //             }
-
-    //             Repeater {
-    //                 model: tabModel
-    //                 delegate: TabButton {
-    //                     width: tabBar.width
-    //                     text: title
-    //                     // Ensure proper vertical sizing
-    //                     implicitHeight: 35
-
-    //                     background: Rectangle {
-    //                         color: "transparent"
-    //                     }
-
-    //                     contentItem: QGCColoredImage {
-    //                         anchors.centerIn: parent
-    //                         source: model.image //tabBar.currentIndex === index ? model.image : model.unselected
-    //                         color : tabBar.currentIndex === index ? "#33ffd4" : "white"
-    //                     }
-    //                     onClicked: loaders.source = model.file
-    //                 }
-    //             }
-    //         }
-
-    //         Rectangle {
-    //             Layout.preferredWidth: 1  // Line thickness
-    //             Layout.fillHeight: true
-    //             color: "grey"
-    //             // anchors.left: tabBar.right
-    //             //     anchors.right: parent.right
-    //             //     anchors.leftMargin: 15
-    //             //     anchors.rightMargin: 15
-    //         }
-
-    //         Rectangle {
-    //             color: "transparent"
-    //             Layout.fillWidth: true
-    //             Layout.fillHeight: true
-
-    //             Loader {
-    //                 id: loaders
-    //                 anchors.fill: parent
-    //                 source: tabModel.get(tabBar.currentIndex).file
-    //             }
-
-    //             // Update loader on tab change
-    //             Connections {
-    //                 target: tabBar
-    //                 onCurrentIndexChanged: loaders.source = tabModel.get(tabBar.currentIndex).file
-    //             }
-    //         }
-
-    //     }
-    // }
-
-
-    // Button {
-    //     text: activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
-    //     Layout.rightMargin: 40
-    //     font.bold: true
-    //     font.pixelSize: 16
-    //     visible:activeVehicle ? false : true
-    //     anchors.left: parent.left
-    //     anchors.bottom: parent.bottom
-    //     anchors.leftMargin: 20   // Left padding
-    //                 anchors.rightMargin: 40  // Right padding
-    //                 anchors.topMargin: 10    // Top padding
-    //                 anchors.bottomMargin: 10
-    //     contentItem: Text {
-    //         text: parent.text
-    //         font: parent.font
-    //         color: "white"  // Set text color
-    //         horizontalAlignment: Text.AlignHCenter
-    //         verticalAlignment: Text.AlignVCenter
-    //         anchors.leftMargin: 40   // Left padding
-    //                     anchors.rightMargin: 40  // Right padding
-    //                     anchors.topMargin: 10    // Top padding
-    //                     anchors.bottomMargin: 10 // Bottom padding
-    //     }
-    //     background: Rectangle {
-    //         color: "#007AFF"  // Blue color (iOS-style button)
-    //         radius: 20  // Curved button
-    //         border.color:  "white"//"#005BBB"  // Border color
-    //         border.width: 2
-    //     }
-    //         onClicked: {
-    //             if (!mainWindow.preventViewSwitch()) {
-    //                 mainWindow.showIndicatorDrawer(toolSelectComponents, null)
-    //             }
-    //         }
-    //     }
 
     property var parameterMap: [
         { name: "MNT1_TYPE", value: "BrushlessPWM" },
@@ -1588,7 +1399,7 @@ ApplicationWindow {
         id: myDialog
         width: 320
         height: 300
-        property string imageSource: "/res/default.svg" // Default image
+        property string imageSource: "/qmlimages/NewImages/takeOff.svg" // Default image
         property string dialogText: "Default Text" // Default text
 
         x: (parent.width - width) / 2
@@ -1763,7 +1574,6 @@ ApplicationWindow {
 
     function executeAction1() {
 
-
         console.log("Button long-pressed! Action executed.")
         // _guidedController.closeAll()
         // _guidedController.confirmAction(3)
@@ -1791,10 +1601,6 @@ ApplicationWindow {
             takeoffbtn.visible=false
         }
 
-
-
-
-
         myDialog.close()
     }
 
@@ -1816,9 +1622,6 @@ ApplicationWindow {
 
         myDialog.close()
     }
-
-
-
 
     ColumnLayout {
         anchors.bottom: parent.bottom
@@ -1862,308 +1665,6 @@ ApplicationWindow {
         }
 
     }
-
-
-    // Dialog {
-    //     id: dialog
-    //     modal: true
-    //     dim: true
-    //     anchors.centerIn: parent
-    //     width: parent.width //* 0.8   // 80% of screen width
-    //     height: parent.height // * 0.5 // 50% of screen height
-    //     background: Rectangle {
-    //         color: "transparent"
-    //         radius: 10
-    //         border.color: "white"
-    //         border.width: 1
-    //     }
-
-    //     // Close button in top-right corner
-    //     Rectangle {
-    //         id: closeBtn
-    //         width: 30
-    //         height: 30
-    //         radius: width / 2
-    //         color: "red"
-    //         anchors.right: parent.right
-    //         anchors.top: parent.top
-    //         anchors.margins: 10
-
-    //         Text {
-    //             text: "X"
-    //             color: "white"
-    //             anchors.centerIn: parent
-    //             font.bold: true
-    //         }
-
-    //         MouseArea {
-    //             anchors.fill: parent
-    //             onClicked:{
-    //                 dialog.visible = false
-    //                 mainWindow.showFlyView()
-
-    //             }
-    //         }
-    //     }
-
-    //     Column {
-    //         anchors.centerIn: parent
-    //         spacing: 20
-    //         width: parent.width * 0.9
-    //         height: parent.height
-
-    //         RowLayout {
-    //             width: parent.width
-    //             height: parent.height  // Set explicit height for the row layout
-    //             spacing: 20
-
-    //             Button {
-    //                 Layout.alignment: Qt.AlignHCenter
-    //                 Layout.preferredWidth: parent.width* 0.2
-    //                 Layout.preferredHeight: parent.height* 0.4
-
-    //                 background: Rectangle {
-    //                     color:  "white"//"#1b1c3e"
-    //                     radius: 12
-    //                 }
-
-    //                 contentItem: Item {
-    //                     anchors.fill: parent
-
-    //                     Column {
-    //                         spacing: 8
-    //                         anchors.centerIn: parent   // ✅ Center both icon and text vertically and horizontally
-
-    //                         Image {
-    //                             source: "/qmlimages/NewImages/mapSelection.png"  // Replace with actual icon
-    //                             width: 50
-    //                             height: 50
-    //                             fillMode: Image.PreserveAspectFit
-    //                             anchors.horizontalCenter: parent.horizontalCenter}
-
-    //                         Text {
-    //                             text: "Map Selection"
-    //                             color: "white"
-    //                             font.pixelSize: 16
-    //                             font.bold: true
-    //                             horizontalAlignment: Text.AlignHCenter
-    //                             verticalAlignment: Text.AlignVCenter
-    //                             anchors.horizontalCenter: parent.horizontalCenter}
-    //                     }
-    //                 }
-    //                 onClicked: {
-    //                     console.log("Option 1 clicked")
-    //                     MapGlobals.mark_with = "Mark_With_Manual"
-    //                     MapGlobals.edit = "edit"
-    //                     MapGlobals.editdialog = "editdialog"
-    //                     mainWindow.showPlanView()
-    //                     dialog.visible = false
-    //                     planView.data1()
-    //                 }
-    //             }
-    //             Button {
-    //                 Layout.alignment: Qt.AlignHCenter
-    //                 Layout.preferredWidth: parent.width* 0.2
-    //                 Layout.preferredHeight: parent.height* 0.4
-
-    //                 background: Rectangle {
-    //                     color:  "white"//"#1b1c3e"
-    //                     radius: 12
-    //                 }
-
-    //                 contentItem: Item {
-    //                     anchors.fill: parent
-
-    //                     Column {
-    //                         spacing: 8
-    //                         anchors.centerIn: parent   // ✅ Center both icon and text vertically and horizontally
-
-    //                         Image {
-    //                             source: "/qmlimages/NewImages/droneGpsMarking.png"  // Replace with actual icon
-    //                             width: 50
-    //                             height: 50
-    //                             fillMode: Image.PreserveAspectFit
-    //                             anchors.horizontalCenter: parent.horizontalCenter
-    //                         }
-
-    //                         Text {
-    //                             text: "Drone GPS"
-    //                             color: "white"
-    //                             font.pixelSize: 16
-    //                             font.bold: true
-    //                             horizontalAlignment: Text.AlignHCenter
-    //                             verticalAlignment: Text.AlignVCenter
-    //                             anchors.horizontalCenter: parent.horizontalCenter
-    //                         }
-    //                     }
-    //                 }
-
-    //                 onClicked: {
-    //                     MapGlobals.mark_with = "Mark_With_Drone"
-    //                     MapGlobals.edit = "edit"
-    //                     mainWindow.showPlanView()
-    //                     dialog.visible = false
-    //                     planView.data1()
-    //                 }
-    //             }
-    //             Button {
-    //                 Layout.alignment: Qt.AlignHCenter
-    //                 Layout.preferredWidth: parent.width* 0.2
-    //                 Layout.preferredHeight: parent.height* 0.4
-
-    //                 background: Rectangle {
-    //                     color:  "white"//"#1b1c3e"
-    //                     radius: 12
-    //                 }
-
-    //                 contentItem: Item {
-    //                     anchors.fill: parent
-
-    //                     Column {
-    //                         spacing: 8
-    //                         anchors.centerIn: parent
-
-    //                         Image {
-    //                             source: "/qmlimages/NewImages/kmlFile.png"
-    //                             width: 50
-    //                             height: 50
-    //                             fillMode: Image.PreserveAspectFit
-    //                             anchors.horizontalCenter: parent.horizontalCenter
-    //                         }
-
-    //                         Text {
-    //                             text: "Load KML/SHP..."
-    //                             color: "white"
-    //                             font.pixelSize: 16
-    //                             font.bold: true
-    //                             horizontalAlignment: Text.AlignHCenter
-    //                             verticalAlignment: Text.AlignVCenter
-    //                             anchors.horizontalCenter: parent.horizontalCenter
-    //                         }
-    //                     }
-    //                 }
-
-    //                 onClicked: {
-    //                     MapGlobals.mark_with = "Mark_With_GPS"
-    //                     MapGlobals.edit = "edit"
-    //                     mainWindow.showPlanView()
-    //                     dialog.visible = false
-    //                     planView.data1()
-    //                 }
-    //             }
-
-
-    //             //     Button {
-    //             //         //Layout.fillWidth: true
-    //             //         Layout.alignment: Qt.AlignHCenter
-    //             //         Layout.preferredWidth: parent.width* 0.2
-    //             //         Layout.preferredHeight: parent.height* 0.4 // Ensure height is taken from parent
-    //             //         //text: "Map Selection"
-    //             //         contentItem: Column {
-    //             //             width: parent.width
-    //             //                     height: parent.height
-    //             //                     spacing: 10
-    //             //                     anchors.centerIn: parent
-    //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
-    //             //                                 width: 50
-    //             //                                 height: 50
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                             Text {
-    //             //                                 text: "Map Selection"
-    //             //                                 color: "white"
-    //             //                                 horizontalAlignment: Text.AlignHCenter
-    //             //                                 font.bold: true
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                         }
-    //             //         background: Rectangle {
-    //             //             color:  "white"//"#1b1c3e"
-    //             //             radius: 8
-    //             //         }
-    //             //         onClicked: {
-    //             //             console.log("Option 1 clicked")
-    //             //             MapGlobals.edit = "edit"
-    //             //             mainWindow.showPlanView()
-    //             //             dialog.visible = false
-    //             //             planView.data1()
-    //             //         }
-    //             //     }
-
-    //             //     Button {
-    //             //         //Layout.fillWidth: true
-    //             //         Layout.alignment: Qt.AlignHCenter
-    //             //         Layout.preferredWidth: parent.width* 0.2
-    //             //         Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-    //             //         //text: "Drone GPS"
-    //             //         contentItem: Column {
-    //             //             width: parent.width
-    //             //                     height: parent.height
-    //             //                     spacing: 10
-    //             //                     anchors.centerIn: parent
-    //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
-    //             //                                 width: 50
-    //             //                                 height: 50
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                             Text {
-    //             //                                 text: "Drone GPS"
-    //             //                                 color: "white"
-    //             //                                 horizontalAlignment: Text.AlignHCenter
-    //             //                                 font.bold: true
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                         }
-    //             //         background: Rectangle {
-    //             //             color:  "white"//"#1b1c3e"
-    //             //             radius: 8
-    //             //         }
-    //             //         onClicked: console.log("Option 2 clicked")
-    //             //     }
-
-    //             //     Button {
-    //             //         //Layout.fillWidth: true
-    //             //         Layout.alignment: Qt.AlignHCenter
-    //             //         Layout.preferredWidth: parent.width* 0.2
-    //             //         Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-    //             //         //text: "Load KML/SHP..."
-    //             //         contentItem: Column {
-    //             //             width: parent.width
-    //             //                     height: parent.height
-    //             //                     spacing: 10
-    //             //                     anchors.centerIn: parent
-    //             //                             Image {
-    //             //                                 source: "/qmlimages/NewImages/takeOff.svg"
-    //             //                                 width: 50
-    //             //                                 height: 50
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                             Text {
-    //             //                                 text: "Load KML/SHP..."
-    //             //                                 color: "white"
-    //             //                                 horizontalAlignment: Text.AlignHCenter
-    //             //                                 font.bold: true
-    //             //                                 anchors.horizontalCenter: parent.horizontalCenter
-    //             //                             }
-    //             //                         }
-    //             //         background: Rectangle {
-    //             //             color:  "white"//"#1b1c3e"
-    //             //             radius: 8
-    //             //         }
-    //             //         onClicked: console.log("Option 2 clicked")
-    //             //     }
-
-    //         }
-    //     }
-    // }
-
-
-    // onClicked: {
-    // dialog.visible = true
-    // MapGlobals.save = "save"
-    // }
 
     Dialog {
         id: dialog
@@ -2979,7 +2480,6 @@ ApplicationWindow {
         }
     }
 
-
     Drawer {
         id:             toolDrawer
         width:          mainWindow.width
@@ -3074,22 +2574,6 @@ ApplicationWindow {
             }
         }
     }
-
-    //-------------------------------------------------------------------------
-    //-- Critical Vehicle Message Popup
-
-    // function showCriticalVehicleMessage(message) {
-    //     indicatorPopup.close()
-    //     if (criticalVehicleMessagePopup.visible || QGroundControl.videoManager.fullScreen) {
-    //         // We received additional wanring message while an older warning message was still displayed.
-    //         // When the user close the older one drop the message indicator tool so they can see the rest of them.
-    //         criticalVehicleMessagePopup.dropMessageIndicatorOnClose = true
-    //     } else {
-    //         criticalVehicleMessagePopup.criticalVehicleMessage      = message
-    //         criticalVehicleMessagePopup.dropMessageIndicatorOnClose = false
-    //         criticalVehicleMessagePopup.open()
-    //     }
-    // }
 
     Popup {
         id:                 criticalVehicleMessagePopup
@@ -3244,6 +2728,7 @@ ApplicationWindow {
         indicatorDrawer.indicatorItem = indicatorItem
         indicatorDrawer.open()
     }
+
     function showIndicatorDrawer1(drawerComponent, indicatorItem) {
         indicatorDrawer.isRightAligned = true;
         indicatorDrawer.sourceComponent = drawerComponent

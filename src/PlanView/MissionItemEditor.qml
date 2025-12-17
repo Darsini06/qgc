@@ -145,8 +145,10 @@ Rectangle {
 
                 property real _padding: ScreenTools.comboBoxPadding
 
-                QGCLabel { text: missionItem.commandName
-                    color:              "white"}
+                QGCLabel {
+                    text: missionItem.commandName
+                    color: "white"
+                }
 
                 QGCColoredImage {
                     height:             ScreenTools.defaultFontPixelWidth
@@ -202,11 +204,11 @@ Rectangle {
 
             buttons: Dialog.Ok | Dialog.Cancel
 
-              onAccepted: {
-                  remove()
-                  popup.visible = false
-                  //waypoint enable disable logic
-                  QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+            onAccepted: {
+                remove()
+                popup.visible = false
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
                 if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
                     mainWindow.cameraView()

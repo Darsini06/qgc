@@ -521,16 +521,6 @@ Item {
                                     color: loginBtn.pressed ? primaryHover : primaryColor
                                 }
 
-                                // contentItem: Text {
-                                //     text: parent.text
-                                //     //font.pixelSize: dp(4) // Adjusted size
-                                //     font.pointSize:     ScreenTools.defaultFontPointSize
-                                //     font.weight: Font.Medium
-                                //     color: "white"
-                                //     horizontalAlignment: Text.AlignHCenter
-                                //     verticalAlignment: Text.AlignVCenter
-                                // }
-
                                 contentItem: Item {
                                     anchors.fill: parent
                                     // clip: true

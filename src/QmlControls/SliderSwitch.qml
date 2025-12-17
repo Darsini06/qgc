@@ -12,6 +12,7 @@ Rectangle {
     implicitHeight: label.height * 2.5
     radius:         height /2
     color:          qgcPal.windowShade
+    visible: false //changed in 04.12.2025 by Dharun
 
     signal accept   ///< Action confirmed
 

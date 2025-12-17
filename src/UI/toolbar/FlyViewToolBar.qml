@@ -275,29 +275,28 @@ Rectangle {
             visible: _activeVehicle ? true : false
         }
 
-        // Battery Icon
-        Column {
-            Layout.alignment: Qt.AlignVCenter
-            visible: !activeVehicle
+        // // Battery Icon
+        // Column {
+        //     Layout.alignment: Qt.AlignVCenter
+        //     visible: !activeVehicle
 
-            // Text {
-            //     text: "Battery"
-            //     font.pixelSize: 14
-            //     color: "white"
-            //     horizontalAlignment: Text.AlignHCenter
-            // }
+        //     // Text {
+        //     //     text: "Battery"
+        //     //     font.pixelSize: 14
+        //     //     color: "white"
+        //     //     horizontalAlignment: Text.AlignHCenter
+        //     // }
 
-            Row {
-                spacing: 5
+        //     Row {
+        //         spacing: 5
 
-                Image {
-                    width: 25
-                    height: 25
-                    source: "/qmlimages/NewImages/Battery.svg"
-                }
-
-            }
-        }
+        //         Image {
+        //             width: 25
+        //             height: 25
+        //             source: "/qmlimages/Battery.svg"
+        //         }
+        //     }
+        // }
 
 
         Rectangle { width: 2; height: 40; color: "transparent" } // Separator

@@ -502,6 +502,7 @@ Item {
             }
         }
     }
+
     QGCMapPolygonVisuals{
         id:filename
     }
