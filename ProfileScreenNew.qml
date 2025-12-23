@@ -7,6 +7,8 @@ import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.LocalStorage 2.0
 
+import QtWebView 1.1
+
 import Qt.labs.lottieqt 1.0
 
 import QGroundControl
@@ -39,6 +41,9 @@ Item {
 
     property string droneType: "loadpage"
 
+    property bool privacyLoading: true
+
+
 
     ListModel {
         id: sessionModel
@@ -53,7 +58,6 @@ Item {
             loadSessions();
         }
     }
-
 
     Component.onCompleted: {
         console.log("ProfileScreen outer onCompleted",droneType);
@@ -95,6 +99,8 @@ Item {
         if (currentView === "reports") {
             console.log("Switched to Reports view")
             loadSessions()
+        }else if (currentView === "privacy_policy") {
+            privacyLoader.active = true
         }
     }
 
@@ -124,22 +130,21 @@ Item {
 
             //Just for get Print Statement
             for (var j = 0; j < sessionModel.count; j++) {
-                      var item = sessionModel.get(j);
-                      console.log(
-                          "Session", j + 1, ":",
-                          "ID:", item.id,
-                          "Date:", item.date,
-                          "Start:", item.start_time,
-                          "End:", item.end_time,
-                          "Duration:", item.duration,
-                          "CreatedAt:", item.created_at
-                      );
-                  }
+                var item = sessionModel.get(j);
+                console.log(
+                            "Session", j + 1, ":",
+                            "ID:", item.id,
+                            "Date:", item.date,
+                            "Start:", item.start_time,
+                            "End:", item.end_time,
+                            "Duration:", item.duration,
+                            "CreatedAt:", item.created_at
+                            );
+            }
 
-             updateSessionStats();
+            updateSessionStats();
 
         });
-
 
     }
 
@@ -213,22 +218,51 @@ Item {
     }
 
 
-    StackLayout {
+    Loader {
+        id: pageLoader
         anchors.fill: parent
+        asynchronous: true
+        active: true
+        visible: true
 
-        currentIndex: {
-            if (currentView === "profile") return 0
-            else if (currentView === "accountUpdate") return 1
-            else if (currentView === "privacy_policy") return 2
-            else if (currentView === "terms&conditions") return 3
-            else if (currentView === "feedback") return 4
-            else if (currentView === "reports") return 5
-            else if (currentView === "drone") return 6
-            else return 0
+        property var pageCache: ({ })
+
+        sourceComponent: {
+            if (!pageCache[currentView]) {
+                switch (currentView) {
+                case "profile": pageCache[currentView] = profilePage; break
+                case "accountUpdate": pageCache[currentView] = accountUpdatePage; break
+                case "privacy_policy": pageCache[currentView] = privacyPage; break
+                case "terms&conditions": pageCache[currentView] = termsPage; break
+                case "feedback": pageCache[currentView] = feedbackPage; break
+                case "reports": pageCache[currentView] = reportsPage; break
+                case "drone": pageCache[currentView] = dronePage; break
+                default: pageCache[currentView] = profilePage
+                }
+            }
+            return pageCache[currentView]
         }
+    }
 
-        //Profile Screen
+    Rectangle {
+        anchors.fill: parent
+        color: "#00000030"
+        visible: pageLoader.status === Loader.Loading
+        z: 99
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: true
+        }
+    }
+
+
+    //Profile Screen
+    Component {
+        id: profilePage
+
         Item {
+            anchors.fill: parent
             ColumnLayout {
                 anchors.fill: parent
                 spacing: 10
@@ -256,7 +290,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                   // mainWindow.profileScreen1(false)
+                                    // mainWindow.profileScreen1(false)
                                     mainWindow.openNewScreen();
                                 }
                             }
@@ -400,29 +434,6 @@ Item {
                                         color: "#2c3e50"
                                     }
                                 }
-
-                                // Distance Covered
-                                // RowLayout {
-                                //     spacing: 10
-                                //     QGCColoredImage {
-                                //         source: "qrc:/InstrumentValueIcons/travel-walk.svg"
-                                //         width: 20
-                                //         height: 20
-                                //         color: "#2c3e50"
-                                //     }
-                                //     Text {
-                                //         text: "Distance Covered"
-                                //         font.pointSize: ScreenTools.smallFontPointSize
-                                //         color: "#666666"
-                                //         Layout.fillWidth: true
-                                //     }
-                                //     Text {
-                                //         text: "256 km"
-                                //         font.pointSize: ScreenTools.smallFontPointSize
-                                //         font.bold: true
-                                //         color: "#2c3e50"
-                                //     }
-                                // }
                             }
                         }
                     }
@@ -496,6 +507,11 @@ Item {
                                             if (model.screen === "logout") {
                                                 logoutdialog.createObject(mainWindow).open()
                                             } else {
+
+                                                if(model.screen === "privacy_policy"){
+                                                    privacyLoading = true
+                                                }
+
                                                 currentView = model.screen // This updates StackLayout.currentIndex
                                             }
                                         }
@@ -504,51 +520,53 @@ Item {
                             }
 
                         }
+
                     }
                 }
             }
         }
 
-        // Account Update Screen
-        Rectangle {
-            color: "white"
+    }
 
-            ColumnLayout {
+    // Account Update Screen
+    Component {
+        id: accountUpdatePage
+
+        Item {
+            anchors.fill: parent
+
+            Rectangle {
                 anchors.fill: parent
-                spacing: 0
+                color: "white"
 
                 // Header
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
+                    id: header
+                    width: parent.width
+                    height: parent.height * 0.15
                     color: "#1b1c3e"
 
-                    RowLayout {
-                        anchors.fill: parent
+                    QGCColoredImage {
+                        id: backArrow
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 25
+                        height: 25
+                        color: "white"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
                         anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 10
 
-                        QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-
-                                    currentView = "profile"
-                                }
-                            }
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: currentView = "profile"
                         }
+                    }
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 8
 
                         QGCColoredImage {
                             id: accountUpdate
@@ -562,30 +580,28 @@ Item {
                         Text {
                             text: "Account Update"
                             font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
                             font.bold: true
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
+                            color: "white"
+                            verticalAlignment: Text.AlignVCenter
                         }
                     }
                 }
 
                 // Account Update content area
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.bottomMargin: 10
-                    Layout.topMargin: 10
-                    spacing: 10
+                Item {
+                    anchors.top: header.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
 
                     // First Card - Profile Info & Stats
                     Rectangle {
-                        Layout.preferredWidth: parent.width * 0.4
-                        Layout.fillHeight: true
+                        id: leftCard
+                        width: parent.width * 0.4
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
                         color: "white"
                         radius: 5
                         border.color: "#e0e0e0"
@@ -625,8 +641,11 @@ Item {
 
                     // Second Card - Form
                     Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: leftCard.right
+                        anchors.right: parent.right
+                        anchors.leftMargin: 10
                         color: "white"
                         radius: 5
                         border.color: "#e0e0e0"
@@ -636,522 +655,618 @@ Item {
                             anchors.fill: parent
                             anchors.margins: 10
                             clip: true
-                            contentWidth: availableWidth
+                            //contentWidth: availableWidth
                             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
-                            Item {
+                            Column {
+                                id: formColumn
                                 width: parent.width
-                                implicitHeight: formColumn.implicitHeight + 15 // Add padding
+                                spacing: 10
 
+                                // Name Field
                                 Column {
-                                    id: formColumn
                                     width: parent.width
-                                    spacing: 10
-                                    anchors.centerIn: parent
+                                    spacing: 5
 
-                                    // Name Field
-                                    Column {
+                                    Text {
+                                        text: "Profile Name"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        color: "#2c3e50"
+                                        leftPadding: 5
+                                    }
+
+                                    Rectangle {
                                         width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Profile Name"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: namefield.activeFocus ? 2 : 1
-                                            border.color: namefield.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: namefield
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter your name"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                text: name_from_db
-
-                                                validator: RegularExpressionValidator {
-                                                    regularExpression: /^[a-zA-Z\s]*$/
-                                                }
-                                            }
-                                        }
-
-                                    }
-
-                                    // username Field
-                                    Column {
-                                        width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Username"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: _username.activeFocus ? 2 : 1
-                                            border.color: _username.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: _username
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter your username"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                text: userName
-
-                                                validator: RegularExpressionValidator {
-                                                    regularExpression: /^[a-zA-Z\s]*$/
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    // Email Field
-                                    Column {
-                                        width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Email"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: emailField.activeFocus ? 2 : 1
-                                            border.color: emailField.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: emailField
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter your email"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                inputMethodHints: Qt.ImhEmailCharactersOnly
-                                                text: email_from_db
-                                            }
-                                        }
-                                    }
-
-                                    // Mobile Number Field
-                                    Column {
-                                        width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Mobile Number"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: mobileField.activeFocus ? 2 : 1
-                                            border.color: mobileField.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: mobileField
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter mobile number"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                inputMethodHints: Qt.ImhDigitsOnly
-                                                text: mobileNo_from_db
-                                            }
-                                        }
-                                    }
-
-                                    // RPC Completion Question
-                                    Column {
-                                        width: parent.width * 0.95
-                                        spacing: 8
-                                        anchors.horizontalCenter: parent.horizontalCenter
-
-                                        Text {
-                                            text: "Have you completed the RPC?"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-
-                                            color: "#333333"
-                                        }
-
-                                        Row {
-                                            spacing: 30
-                                            //anchors.horizontalCenter: parent.horizontalCenter
-
-                                            // Yes Radio Button
-                                            Row {
-                                                spacing: 8
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                Rectangle {
-                                                    width: 15
-                                                    height: 15
-                                                    radius: 10
-                                                    border.width: 2
-                                                    border.color: "#1b1c3e"
-                                                    color: rpcCompletedStatus === 1 ? "#1b1c3e" : "transparent"
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: rpcCompletedStatus = 1
-                                                    }
-                                                }
-
-                                                Text {
-                                                    text: "Yes"
-                                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                                    color: "#333333"
-                                                    anchors.verticalCenter: parent.verticalCenter
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: rpcCompletedStatus = 1
-                                                    }
-                                                }
-                                            }
-
-                                            // No Radio Button
-                                            Row {
-                                                spacing: 8
-                                                anchors.verticalCenter: parent.verticalCenter
-
-                                                Rectangle {
-                                                    width: 15
-                                                    height: 15
-                                                    radius: 10
-                                                    border.width: 2
-                                                    border.color: "#1b1c3e"
-                                                    color: rpcCompletedStatus === 0 ? "#1b1c3e" : "transparent"
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: rpcCompletedStatus = 0
-                                                    }
-                                                }
-
-                                                Text {
-                                                    text: "No"
-                                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                                    color: "#333333"
-                                                    anchors.verticalCenter: parent.verticalCenter
-
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: rpcCompleted.checked = "No"
-                                                    }
-                                                }
-                                            }
-                                        }
-
-
-                                    }
-
-                                    // Update Button
-                                    Button {
-                                        text: "Update"
-                                        width: parent.width * 0.3
                                         height: 40
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        onClicked: {
-                                            if (!MapGlobals.validateUsername(_username.text,_username)) return;
-                                            if (!MapGlobals.validateDisplayName(namefield.text,namefield)) return;
-                                            if (!MapGlobals.validateEmail(emailField.text,emailField)) return;
+                                        radius: 8
+                                        color: "white"
+                                        border.width: namefield.activeFocus ? 2 : 1
+                                        border.color: namefield.activeFocus ? "#3498db" : "#dcdde1"
 
-                                            var _rpcCompleted =  rpcCompletedStatus //=== "Yes" ? 1 : 0;
-                                            console.log("_rpcCompleted : ",_rpcCompleted)
-
-                                            MapGlobals.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
-                                                if (result) {
-
-                                                    QGroundControl.saveGlobalSetting("username", _username.text);
-                                                    QGroundControl.saveGlobalSetting("name", namefield.text);
-                                                    QGroundControl.saveGlobalSetting("email", emailField.text);
-
-                                                    mainWindow.showToastMessage("Updated successfully!");
-
-                                                    currentView = "profile";
-                                                }
-                                            });
-                                        }
-
-                                        background: Rectangle {
-                                            radius: 5
-                                            color: parent.pressed ? "#218838" : "#28a745"
-                                        }
-
-                                        contentItem: Text {
-                                            text: parent.text
-                                            color: "white"
+                                        TextField {
+                                            id: namefield
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter your name"
                                             font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            horizontalAlignment: Text.AlignHCenter
-                                            verticalAlignment: Text.AlignVCenter
+                                            color: "#2c3e50"
+                                            background: null
+                                            selectByMouse: true
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            text: name_from_db
+
+                                            validator: RegularExpressionValidator {
+                                                regularExpression: /^[a-zA-Z\s]*$/
+                                            }
                                         }
                                     }
 
-                                    Item { height: 10 } // Spacer
                                 }
+
+                                // username Field
+                                Column {
+                                    width: parent.width
+                                    spacing: 5
+
+                                    Text {
+                                        text: "Username"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        color: "#2c3e50"
+                                        leftPadding: 5
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 40
+                                        radius: 8
+                                        color: "white"
+                                        border.width: _username.activeFocus ? 2 : 1
+                                        border.color: _username.activeFocus ? "#3498db" : "#dcdde1"
+
+                                        TextField {
+                                            id: _username
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter your username"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            color: "#2c3e50"
+                                            background: null
+                                            selectByMouse: true
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            text: userName
+
+                                            validator: RegularExpressionValidator {
+                                                regularExpression: /^[a-zA-Z\s]*$/
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Email Field
+                                Column {
+                                    width: parent.width
+                                    spacing: 5
+
+                                    Text {
+                                        text: "Email"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        color: "#2c3e50"
+                                        leftPadding: 5
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 40
+                                        radius: 8
+                                        color: "white"
+                                        border.width: emailField.activeFocus ? 2 : 1
+                                        border.color: emailField.activeFocus ? "#3498db" : "#dcdde1"
+
+                                        TextField {
+                                            id: emailField
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter your email"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            color: "#2c3e50"
+                                            background: null
+                                            selectByMouse: true
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            inputMethodHints: Qt.ImhEmailCharactersOnly
+                                            text: email_from_db
+                                        }
+                                    }
+                                }
+
+                                // Mobile Number Field
+                                Column {
+                                    width: parent.width
+                                    spacing: 5
+
+                                    Text {
+                                        text: "Mobile Number"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        color: "#2c3e50"
+                                        leftPadding: 5
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 40
+                                        radius: 8
+                                        color: "white"
+                                        border.width: mobileField.activeFocus ? 2 : 1
+                                        border.color: mobileField.activeFocus ? "#3498db" : "#dcdde1"
+
+                                        TextField {
+                                            id: mobileField
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter mobile number"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            color: "#2c3e50"
+                                            background: null
+                                            selectByMouse: true
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            inputMethodHints: Qt.ImhDigitsOnly
+                                            text: mobileNo_from_db
+                                        }
+                                    }
+                                }
+
+                                // RPC Completion Question
+                                Column {
+                                    width: parent.width * 0.95
+                                    spacing: 8
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Text {
+                                        text: "Have you completed the RPC?"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+
+                                        color: "#333333"
+                                    }
+
+                                    Row {
+                                        spacing: 30
+                                        //anchors.horizontalCenter: parent.horizontalCenter
+
+                                        // Yes Radio Button
+                                        Row {
+                                            spacing: 8
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Rectangle {
+                                                width: 15
+                                                height: 15
+                                                radius: 10
+                                                border.width: 2
+                                                border.color: "#1b1c3e"
+                                                color: rpcCompletedStatus === 1 ? "#1b1c3e" : "transparent"
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: rpcCompletedStatus = 1
+                                                }
+                                            }
+
+                                            Text {
+                                                text: "Yes"
+                                                font.pointSize: ScreenTools.defaultFontPointSize
+                                                color: "#333333"
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: rpcCompletedStatus = 1
+                                                }
+                                            }
+                                        }
+
+                                        // No Radio Button
+                                        Row {
+                                            spacing: 8
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Rectangle {
+                                                width: 15
+                                                height: 15
+                                                radius: 10
+                                                border.width: 2
+                                                border.color: "#1b1c3e"
+                                                color: rpcCompletedStatus === 0 ? "#1b1c3e" : "transparent"
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: rpcCompletedStatus = 0
+                                                }
+                                            }
+
+                                            Text {
+                                                text: "No"
+                                                font.pointSize: ScreenTools.defaultFontPointSize
+                                                color: "#333333"
+                                                anchors.verticalCenter: parent.verticalCenter
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: rpcCompleted.checked = "No"
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+                                }
+
+                                // Update Button
+                                Button {
+                                    text: "Update"
+                                    width: parent.width * 0.3
+                                    height: 40
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    onClicked: {
+                                        if (!MapGlobals.validateUsername(_username.text,_username)) return;
+                                        if (!MapGlobals.validateDisplayName(namefield.text,namefield)) return;
+                                        if (!MapGlobals.validateEmail(emailField.text,emailField)) return;
+
+                                        var _rpcCompleted =  rpcCompletedStatus //=== "Yes" ? 1 : 0;
+                                        console.log("_rpcCompleted : ",_rpcCompleted)
+
+                                        MapGlobals.updateUser(userName,_username.text, namefield.text, emailField.text,mobileField.text,_rpcCompleted, function(result) {
+                                            if (result) {
+
+                                                QGroundControl.saveGlobalSetting("username", _username.text);
+                                                QGroundControl.saveGlobalSetting("name", namefield.text);
+                                                QGroundControl.saveGlobalSetting("email", emailField.text);
+
+                                                mainWindow.showToastMessage("Updated successfully!");
+
+                                                currentView = "profile";
+                                            }
+                                        });
+                                    }
+
+                                    background: Rectangle {
+                                        radius: 5
+                                        color: parent.pressed ? "#218838" : "#28a745"
+                                    }
+
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: "white"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
+
+                                Item { height: 10 } // Spacer
                             }
+
                         }
                     } //SecondCaed
 
                 }
+
             }
+
         }
+    }
 
-        // Privacy Policy
-        Rectangle {
-            color: "white"
+    // Privacy Policy
+    Component {
+        id: privacyPage
 
-            ColumnLayout {
+        Item {
+            anchors.fill: parent
+
+            Rectangle {
                 anchors.fill: parent
-                spacing: 0
+                color: "white"
 
-                // Header
+                /* ================= HEADER ================= */
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
+                    id: header
+                    width: parent.width
+                    height: parent.height * 0.15
                     color: "#1b1c3e"
 
-                    RowLayout {
-                        anchors.fill: parent
+                    // Back arrow (left center)
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 25
+                        height: 25
+                        color: "white"
+                        anchors.left: parent.left
                         anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 10
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-
-                                    currentView = "profile"
-                                }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                currentView = "profile"
+                                privacyLoader.active = false
+                                privacyLoading = true
                             }
                         }
+                    }
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
+                    // Center title + icon
+                    Row {
+                        spacing: 8
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
                         QGCColoredImage {
-                            id: privacypolicy
                             source: "/qmlimages/NewImages/privacy_policy_black.svg"
                             width: 25
                             height: 25
-                            fillMode: Image.PreserveAspectFit
                             color: "white"
                         }
 
                         Text {
                             text: "Privacy Policy"
                             font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
                             font.bold: true
+                            color: "white"
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+
+                /* ================= CONTENT AREA ================= */
+                Item {
+                    anchors.top: header.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+
+                    // White background (prevents flash)
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "white"
+                    }
+
+                    /* ===== WEBVIEW LOADER ===== */
+                    Loader {
+                        id: privacyLoader
+                        anchors.fill: parent
+                        active: currentView === "privacy_policy"
+                        visible: !privacyLoading
+                        asynchronous: true
+
+                        onActiveChanged: {
+                            if (active)
+                                privacyLoading = true
                         }
 
-                        Item {
-                            Layout.fillWidth: true
+                        sourceComponent: WebView {
+                            anchors.fill: parent
+                            url: "https://www.nithra.mobi/privacy.php"
+
+                            onLoadingChanged: function(loadRequest) {
+                                if (loadRequest.status === WebView.LoadStartedStatus) {
+                                    privacyLoading = true
+                                } else if (loadRequest.status === WebView.LoadSucceededStatus ||
+                                           loadRequest.status === WebView.LoadFailedStatus) {
+                                    privacyLoading = false
+                                }
+                            }
+                        }
+                    }
+
+                    /* ===== LOADING INDICATOR ===== */
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#00000020"
+                        visible: privacyLoading
+                        z: 10
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: true
+                            width: 40
+                            height: 40
                         }
                     }
                 }
             }
-
         }
+    }
 
-        // Terms & Conditions
-        Rectangle {
-            color: "white"
+    // Terms & Conditions
+    Component {
+        id: termsPage
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
+        Item {
+            anchors.fill: parent
+            Rectangle {
+                color: "white"
 
-                // Header
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
-                    color: "#1b1c3e"
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 0
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 10
+                    // Header
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Screen.height * 0.15
+                        color: "#1b1c3e"
 
-                        QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 20
+                            anchors.rightMargin: 20
+                            spacing: 10
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
+                            QGCColoredImage {
+                                source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                                fillMode: Image.PreserveAspectFit
+                                width: 25
+                                height: 25
+                                color: "white"
 
-                                    currentView = "profile"
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        //termsconditionsLoader.active = false
+                                        currentView = "profile"
+                                    }
                                 }
                             }
-                        }
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
+                            Item {
+                                Layout.fillWidth: true
+                            }
 
-                        QGCColoredImage {
-                            id: termsconditions
-                            source: "/qmlimages/NewImages/terms_condition_black.svg"
-                            width: 25
-                            height: 25
-                            fillMode: Image.PreserveAspectFit
-                            color: "white"
-                        }
+                            QGCColoredImage {
+                                id: termsconditions
+                                source: "/qmlimages/NewImages/terms_condition_black.svg"
+                                width: 25
+                                height: 25
+                                fillMode: Image.PreserveAspectFit
+                                color: "white"
+                            }
 
-                        Text {
-                            text: "Terms & Conditions"
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
-                            font.bold: true
-                        }
+                            Text {
+                                text: "Terms & Conditions"
+                                font.pointSize: ScreenTools.mediumFontPointSize
+                                color: "white"
+                                font.bold: true
+                            }
 
-                        Item {
-                            Layout.fillWidth: true
+                            Item {
+                                Layout.fillWidth: true
+                            }
                         }
                     }
+
+                    // // Content Area
+                    // Item {
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+
+                    //     // WebView Loader (LAZY LOAD)
+                    //     Loader {
+                    //         id: termsconditionsLoader
+                    //         anchors.fill: parent
+                    //         active: currentView === "privacy_policy"
+
+                    //         sourceComponent: WebView {
+                    //             anchors.fill: parent
+                    //             url: "https://www.nithra.mobi/privacy.php"
+
+                    //             onLoadingChanged: function(loadRequest) {
+                    //                 if (loadRequest.status === WebView.LoadStartedStatus) {
+                    //                     privacyLoading = true
+                    //                 } else if (loadRequest.status === WebView.LoadSucceededStatus ||
+                    //                            loadRequest.status === WebView.LoadFailedStatus) {
+                    //                     privacyLoading = false
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+
+                    //     // Center Loader
+                    //     BusyIndicator {
+                    //         running: privacyLoading
+                    //         visible: privacyLoading
+                    //         anchors.centerIn: parent
+                    //         width: 40
+                    //         height: 40
+                    //     }
+                    // }
+
                 }
+
             }
 
         }
 
-        // Feedback Screen
-        Rectangle {
-            color: "white"
 
-            ColumnLayout {
+    }
+
+    // Feedback Screen
+    Component {
+        id: feedbackPage
+
+        Item {
+            anchors.fill: parent
+
+            Rectangle {
                 anchors.fill: parent
-                spacing: 0
+                color: "white"
 
-                // Header
+                /* ================= HEADER ================= */
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
+                    id: header
+                    width: parent.width
+                    height: parent.height * 0.15
                     color: "#1b1c3e"
 
-                    RowLayout {
-                        anchors.fill: parent
+                    // Back Arrow (Left Center)
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 25
+                        height: 25
+                        color: "white"
+                        anchors.left: parent.left
                         anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 10
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: currentView = "profile"
+                        }
+                    }
+
+                    // Center Title
+                    Row {
+                        spacing: 8
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
                         QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-
-                                    currentView = "profile"
-                                }
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        QGCColoredImage {
-                            id: feedback
                             source: "/qmlimages/NewImages/feedback.svg"
                             width: 25
                             height: 25
-                            fillMode: Image.PreserveAspectFit
                             color: "white"
                         }
 
                         Text {
                             text: "Feedback"
                             font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
                             font.bold: true
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
+                            color: "white"
                         }
                     }
                 }
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.bottomMargin: 10
-                    Layout.topMargin: 10
-                    spacing: 10
+                /* ================= CONTENT ================= */
+                Item {
+                    anchors.top: header.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
 
-                    // First Card - Profile Info & Stats
+                    /* ===== LEFT CARD ===== */
                     Rectangle {
-                        Layout.preferredWidth: parent.width * 0.4
-                        Layout.fillHeight: true
-                        color: "white"
+                        id: leftCard
+                        width: parent.width * 0.4
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
                         radius: 5
+                        color: "white"
                         border.color: "#e0e0e0"
                         border.width: 1
 
@@ -1166,33 +1281,34 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 LottieAnimation {
-
                                     anchors.centerIn: parent
                                     source: "qrc:/qmlimages/NewImages/droneManFly.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
                                     scale: 0.3
-                                    onStatusChanged: console.log("Lottie Status:", status)
                                 }
                             }
 
                             Text {
                                 text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
                                 wrapMode: Text.WordWrap
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: "black" // Changed from white to black for visibility
                                 horizontalAlignment: Text.AlignHCenter
-                                width: parent.width - 40 // Add some margin
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                color: "black"
+                                width: parent.width - 40
                             }
                         }
                     }
 
-                    // Second Card - Form
+                    /* ===== RIGHT CARD ===== */
                     Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        color: "white"
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: leftCard.right
+                        anchors.right: parent.right
+                        anchors.leftMargin: 10
                         radius: 5
+                        color: "white"
                         border.color: "#e0e0e0"
                         border.width: 1
 
@@ -1200,285 +1316,194 @@ Item {
                             anchors.fill: parent
                             anchors.margins: 10
                             clip: true
-                            contentWidth: availableWidth
                             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
-                            Item {
+                            Column {
                                 width: parent.width
-                                implicitHeight: _formColumn.implicitHeight + 15 // Add padding
+                                spacing: 10
 
+                                /* ===== Mobile ===== */
                                 Column {
-                                    id: _formColumn
+                                    spacing: 5
                                     width: parent.width
-                                    spacing: 10
-                                    anchors.centerIn: parent
 
-                                    //Mobile Number
-                                    Column {
+                                    Text { text: "Mobile Number"; font.bold: true }
+
+                                    Rectangle {
                                         width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Mobile Number"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: feed_mobile.activeFocus ? 2 : 1
-                                            border.color: feed_mobile.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: feed_mobile
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter mobile number"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                inputMethodHints: Qt.ImhDigitsOnly
-
-                                            }
-                                        }
-                                    }
-
-                                    // Email Field
-                                    Column {
-                                        width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Email"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 40
-                                            radius: 8
-                                            color: "white"
-                                            border.width: feed_email.activeFocus ? 2 : 1
-                                            border.color: feed_email.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextField {
-                                                id: feed_email
-                                                anchors.fill: parent
-                                                anchors.margins: 5
-                                                placeholderText: "Enter your email"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                verticalAlignment: TextInput.AlignVCenter
-                                                inputMethodHints: Qt.ImhEmailCharactersOnly
-
-                                            }
-                                        }
-                                    }
-
-                                    // Feedback Field
-                                    Column {
-                                        width: parent.width
-                                        spacing: 5
-
-                                        Text {
-                                            text: "Feedback"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            color: "#2c3e50"
-                                            leftPadding: 5
-                                        }
-
-                                        Rectangle {
-                                            width: parent.width
-                                            height: 100
-                                            radius: 8
-                                            color: "white"
-                                            border.width: feedbackArea.activeFocus ? 2 : 1
-                                            border.color: feedbackArea.activeFocus ? "#3498db" : "#dcdde1"
-
-                                            TextArea {
-                                                id: feedbackArea
-                                                anchors {
-                                                    left: parent.left
-                                                    right: parent.right
-                                                    top: parent.top
-                                                    bottom: parent.bottom
-                                                    margins: 5
-                                                }
-                                                placeholderText: "Enter your feedback here..."
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                background: null
-                                                selectByMouse: true
-                                                wrapMode: TextArea.Wrap
-                                                verticalAlignment: TextEdit.AlignTop
-                                            }
-                                        }
-
-                                    }
-
-
-                                    // Update Button
-                                    Button {
-                                        text: "Send"
-                                        width: parent.width * 0.3
                                         height: 40
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        onClicked: {
+                                        radius: 8
+                                        border.width: feed_mobile.activeFocus ? 2 : 1
+                                        border.color: feed_mobile.activeFocus ? "#3498db" : "#dcdde1"
 
-                                            if (feedbackArea.text === "") {
-                                                mainWindow.showToastMessage("Enter your valuable feedback");
-                                                return;
-                                            }
-
-                                            var mobile = feed_mobile.text.trim();
-                                            var email = feed_email.text.trim();
-                                            var comments = feedbackArea.text.trim();
-
-
-                                            MapGlobals.insertFeedback(
-                                                        userName, // assuming userName is available in ProfileScreen
-                                                        mobile,
-                                                        email,
-                                                        comments,
-                                                        function(result) {
-                                                            if (result) {
-
-                                                                mainWindow.showToastMessage("Feedback sent successfully!");
-
-                                                                currentView = "profile";
-
-                                                                feed_mobile.text = "";
-                                                                feed_email.text = "";
-                                                                feedbackArea.text = "";
-
-                                                            } else {
-                                                                console.log(" Failed to send feedback");
-                                                                mainWindow.showToastMessage("Failed to send feedback. Please try again.");
-                                                            }
-                                                        }
-                                                        );
-                                        }
-
-                                        background: Rectangle {
-                                            radius: 5
-                                            color: parent.pressed ? "#218838" : "#28a745"
-                                        }
-
-                                        contentItem: Text {
-                                            text: parent.text
-                                            color: "white"
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.bold: true
-                                            horizontalAlignment: Text.AlignHCenter
-                                            verticalAlignment: Text.AlignVCenter
+                                        TextField {
+                                            id: feed_mobile
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter mobile number"
+                                            inputMethodHints: Qt.ImhDigitsOnly
+                                            background: null
                                         }
                                     }
-
-                                    Item { height: 10 } // Spacer
                                 }
+
+                                /* ===== Email ===== */
+                                Column {
+                                    spacing: 5
+                                    width: parent.width
+
+                                    Text { text: "Email"; font.bold: true }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 40
+                                        radius: 8
+                                        border.width: feed_email.activeFocus ? 2 : 1
+                                        border.color: feed_email.activeFocus ? "#3498db" : "#dcdde1"
+
+                                        TextField {
+                                            id: feed_email
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter your email"
+                                            inputMethodHints: Qt.ImhEmailCharactersOnly
+                                            background: null
+                                        }
+                                    }
+                                }
+
+                                /* ===== Feedback ===== */
+                                Column {
+                                    spacing: 5
+                                    width: parent.width
+
+                                    Text { text: "Feedback"; font.bold: true }
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 100
+                                        radius: 8
+                                        border.width: feedbackArea.activeFocus ? 2 : 1
+                                        border.color: feedbackArea.activeFocus ? "#3498db" : "#dcdde1"
+
+                                        TextArea {
+                                            id: feedbackArea
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            placeholderText: "Enter your feedback here..."
+                                            wrapMode: TextArea.Wrap
+                                            background: null
+                                        }
+                                    }
+                                }
+
+                                /* ===== Button ===== */
+                                Button {
+                                    text: "Send"
+                                    width: parent.width * 0.3
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    onClicked: {
+                                        if (feedbackArea.text === "") {
+                                            mainWindow.showToastMessage("Enter your valuable feedback");
+                                            return;
+                                        }
+
+                                        MapGlobals.insertFeedback(
+                                                    userName,
+                                                    feed_mobile.text,
+                                                    feed_email.text,
+                                                    feedbackArea.text,
+                                                    function(ok) {
+                                                        if (ok) {
+                                                            mainWindow.showToastMessage("Feedback sent successfully!");
+                                                            currentView = "profile";
+                                                        } else {
+                                                            mainWindow.showToastMessage("Failed to send feedback");
+                                                        }
+                                                    }
+                                                    );
+                                    }
+                                }
+
+                                Item { height: 10 }
                             }
-
                         }
-                    } //SecondCaed
-
+                    }
                 }
             }
-
         }
+    }
 
-        // Reports Screen
-        Rectangle {
-            color: "white"
+    // Reports Screen
+    Component {
+        id: reportsPage
 
-            ColumnLayout {
+        Item {
+            anchors.fill: parent
+
+            Rectangle {
                 anchors.fill: parent
-                spacing: 0
+                color: "white"
 
-                // Header
+                /* ================= HEADER ================= */
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
+                    id: header
+                    width: parent.width
+                    height: parent.height * 0.15
                     color: "#1b1c3e"
 
-                    RowLayout {
-                        anchors.fill: parent
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 25; height: 25
+                        color: "white"
+                        anchors.left: parent.left
                         anchors.leftMargin: 20
-                        anchors.rightMargin: 20
-                        spacing: 10
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: currentView = "profile"
+                        }
+                    }
+
+                    Row {
+                        spacing: 8
+                        anchors.centerIn: parent
 
                         QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-
-                                    currentView = "profile"
-                                }
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        QGCColoredImage {
-                            id: sessions
                             source: "/qmlimages/NewImages/report.svg"
-                            width: 25
-                            height: 25
-                            fillMode: Image.PreserveAspectFit
+                            width: 25; height: 25
                             color: "white"
                         }
 
                         Text {
                             text: "Report"
+                            font.bold: true
                             font.pointSize: ScreenTools.mediumFontPointSize
                             color: "white"
-                            font.bold: true
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
                         }
                     }
                 }
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.bottomMargin: 10
-                    Layout.topMargin: 10
-                    spacing: 10
+                /* ================= CONTENT ================= */
+                Item {
+                    anchors.top: header.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
 
-                    // First Card - Profile Info & Stats
+                    /* ===== LEFT CARD ===== */
                     Rectangle {
-                        Layout.preferredWidth: parent.width * 0.4
-                        Layout.fillHeight: true
-                        color: "white"
+                        id: reportLeft
+                        width: parent.width * 0.4
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
                         radius: 5
                         border.color: "#e0e0e0"
-                        border.width: 1
+                        color: "white"
 
                         Column {
                             anchors.fill: parent
@@ -1486,204 +1511,111 @@ Item {
                             spacing: 10
 
                             Item {
-                                width: 150
-                                height: 150
+                                width: 150; height: 150
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 LottieAnimation {
-
                                     anchors.centerIn: parent
                                     source: "qrc:/qmlimages/NewImages/droneManFly.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
                                     scale: 0.3
-                                    onStatusChanged: console.log("Lottie Status:", status)
                                 }
                             }
 
                             Text {
                                 text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
                                 wrapMode: Text.WordWrap
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: "black" // Changed from white to black for visibility
                                 horizontalAlignment: Text.AlignHCenter
-                                width: parent.width - 40 // Add some margin
+                                color: "black"
+                                width: parent.width - 40
                             }
                         }
                     }
 
-                    // Second Card - Form
+                    /* ===== RIGHT CARD ===== */
                     Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        color: "white"
-                        radius: 8
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: reportLeft.right
+                        anchors.right: parent.right
+                        anchors.leftMargin: 10
+                        radius: 5
                         border.color: "#e0e0e0"
-                        border.width: 1
+                        color: "white"
 
-                        ColumnLayout {
+                        /* Wrapper instead of Column */
+                        Item {
                             anchors.fill: parent
                             anchors.margins: 8
-                            spacing: 0
 
-                            // Inner Header
+                            /* ===== TABLE HEADER ===== */
                             Rectangle {
-                                Layout.fillWidth: true
+                                id: tableHeader
+                                width: parent.width
                                 height: 40
+                                radius: 6
                                 color: "#f8f9fa"
-                                radius: 8
 
                                 Row {
                                     anchors.fill: parent
-                                    anchors.leftMargin: 20
-                                    anchors.rightMargin: 20
+                                    anchors.margins: 20
                                     spacing: 15
 
                                     Text {
                                         text: "Date"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
                                         width: parent.width * 0.3
-                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.bold: true
                                     }
-
                                     Text {
                                         text: "Start Time"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
                                         width: parent.width * 0.3
-                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.bold: true
                                     }
-
                                     Text {
                                         text: "End Time"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
                                         width: parent.width * 0.3
-                                        anchors.verticalCenter: parent.verticalCenter
+                                        font.bold: true
                                     }
                                 }
                             }
 
-                            // List Content
+                            /* ===== LIST AREA ===== */
                             ScrollView {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                clip: true
-                                contentWidth: availableWidth
+                                anchors.top: tableHeader.bottom
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                anchors.topMargin: 6
                                 ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
                                 ListView {
                                     id: listView
                                     width: parent.width
                                     model: sessionModel
-                                    spacing: 8
-                                    boundsBehavior: Flickable.StopAtBounds
+                                    spacing: 6
 
                                     delegate: Rectangle {
                                         width: listView.width
                                         height: 40
-                                        color: index % 2 === 0 ? "#ffffff" : "#f8f9fa"
                                         radius: 6
+                                        color: index % 2 ? "#f8f9fa" : "#ffffff"
 
                                         Row {
                                             anchors.fill: parent
-                                            anchors.leftMargin: 20
-                                            anchors.rightMargin: 20
+                                            anchors.margins: 20
                                             spacing: 15
 
-                                            // Date Column
-                                            Text {
-                                                text: model.date || "NA"
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                width: parent.width * 0.3
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                elide: Text.ElideRight
-                                            }
-
-                                            // Start Time Column
-
-                                            // Text {
-                                            //     text: model.start_time || "NA"
-                                            //     font.pointSize: ScreenTools.defaultFontPointSize
-                                            //     color: "#2c3e50"
-                                            //     width: parent.width * 0.3
-                                            //     anchors.verticalCenter: parent.verticalCenter
-                                            //     elide: Text.ElideRight
-                                            // }
-
-                                            Text {
-                                                text: {
-                                                    var parts = model.start_time.split(":")
-                                                    if (parts.length < 2) return model.start_time
-                                                    var hour = parseInt(parts[0])
-                                                    var minute = parts[1]
-                                                    var second = parts[2]
-                                                    var ampm = hour >= 12 ? "PM" : "AM"
-                                                    hour = hour % 12
-                                                    if (hour === 0) hour = 12
-                                                    return hour + ":" + minute + ":" + second + " " + ampm
-                                                }
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                width: parent.width * 0.3
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                elide: Text.ElideRight
-                                            }
-
-
-                                            // End Time Column
-
-                                            // Text {
-                                            //     text: model.end_time || "NA"
-                                            //     font.pointSize: ScreenTools.defaultFontPointSize
-                                            //     color: "#2c3e50"
-                                            //     width: parent.width * 0.3
-                                            //     anchors.verticalCenter: parent.verticalCenter
-                                            //     elide: Text.ElideRight
-                                            // }
-
-                                            Text {
-                                                text: {
-                                                    var parts = model.end_time.split(":")
-                                                    if (parts.length < 2) return model.start_time
-                                                    var hour = parseInt(parts[0])
-                                                    var minute = parts[1]
-                                                    var second = parts[2]
-                                                    var ampm = hour >= 12 ? "PM" : "AM"
-                                                    hour = hour % 12
-                                                    if (hour === 0) hour = 12
-                                                    return hour + ":" + minute + ":" + second + " " + ampm
-                                                }
-                                                font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#2c3e50"
-                                                width: parent.width * 0.3
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                elide: Text.ElideRight
-                                            }
-
-                                        }
-
-                                        // Separator line
-                                        Rectangle {
-                                            anchors.bottom: parent.bottom
-                                            width: parent.width
-                                            height: 1
-                                            color: "#e0e0e0"
-                                            opacity: 0.5
+                                            Text { text: model.date || "NA"; width: parent.width * 0.3 }
+                                            Text { text: model.start_time || "NA"; width: parent.width * 0.3 }
+                                            Text { text: model.end_time || "NA"; width: parent.width * 0.3 }
                                         }
                                     }
 
-                                    // Empty state
+                                    /* Empty State */
                                     Label {
                                         anchors.centerIn: parent
                                         text: "No sessions recorded yet"
-                                        font.pixelSize: 16
-                                        color: "#7f8c8d"
                                         visible: listView.count === 0
                                     }
                                 }
@@ -1693,275 +1625,235 @@ Item {
 
                 }
             }
-
         }
+    }
 
-        // Select Drone Screen
-        Rectangle {
-            color: "white"
+    Component {
+        id: dronePage
 
-            ColumnLayout {
+        Item {
+            id: root
+            anchors.fill: parent
+
+            Rectangle {
                 anchors.fill: parent
-                spacing: 0
+                color: "white"
 
-                // Header
+                /* ================= HEADER ================= */
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
+                    id: header
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: parent.height * 0.15
                     color: "#1b1c3e"
 
-                    RowLayout {
-                        anchors.fill: parent
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 25
+                        height: 25
+                        color: "white"
+                        anchors.left: parent.left
                         anchors.leftMargin: 20
-                        anchors.rightMargin: 20
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: currentView = "profile"
+                        }
+                    }
+
+                    Row {
+                        anchors.centerIn: parent
                         spacing: 10
 
                         QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
-                            color: "white"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-
-                                    currentView = "profile"
-                                }
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        QGCColoredImage {
-                            id: drone
                             source: "/qmlimages/NewImages/select_drone_type_black.svg"
                             width: 25
                             height: 25
-                            fillMode: Image.PreserveAspectFit
                             color: "white"
                         }
 
                         Text {
                             text: "Select Application"
                             font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
                             font.bold: true
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
+                            color: "white"
                         }
                     }
                 }
 
-                // Select Drone Screen content area
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 10
-                    Layout.bottomMargin: 10
-                    Layout.topMargin: 10
-                    spacing: 10
+                /* ================= CONTENT ================= */
+                Item {
+                    anchors.top: header.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
 
-                    // First Card - Lottie file
+                    /* -------- LEFT CARD -------- */
                     Rectangle {
-                        Layout.preferredWidth: parent.width * 0.4
-                        Layout.fillHeight: true
-                        color: "white"
+                        id: reportLeft
+                        width: parent.width * 0.4
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
                         radius: 5
                         border.color: "#e0e0e0"
-                        border.width: 1
+                        color: "white"
 
                         Column {
-                            anchors.centerIn: parent
+                            anchors.fill: parent
                             anchors.margins: 20
                             spacing: 10
-                            width: parent.width - 40
 
                             Item {
-                                width: 150
-                                height: 150
+                                width: 150; height: 150
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 LottieAnimation {
-                                    id: droneAnim1
                                     anchors.centerIn: parent
                                     source: "qrc:/qmlimages/NewImages/droneManFly.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
                                     scale: 0.3
-                                    onStatusChanged: console.log("Lottie Status:", status)
                                 }
                             }
 
                             Text {
                                 text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
                                 wrapMode: Text.WordWrap
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: "black" // Changed from white to black for visibility
                                 horizontalAlignment: Text.AlignHCenter
-                                width: parent.width - 40 // Add some margin
+                                color: "black"
+                                width: parent.width - 40
                             }
                         }
                     }
 
-                    // Second Card - Drone Categories
+                    /* -------- RIGHT CARD -------- */
                     Rectangle {
-                        id: root // <-- IMPORTANT
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        color: "white"
+                        id: rightCard
+                        anchors.left: reportLeft.right
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.leftMargin: 10
                         radius: 5
+                        color: "white"
                         border.color: "#e0e0e0"
-                        border.width: 1
 
+                        /* ---- STATE ---- */
                         property int selectedIndex: -1
 
                         property var buttonModel: [
-                            { label: "Camera", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
-                            { label: "Agri", color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
+                            { label: "Camera",  color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
+                            { label: "Agri",    color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
                             { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" },
-                            { label: "VTOL", color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
+                            { label: "VTOL",    color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
                         ]
 
-                        onVisibleChanged: if (visible) {
+                        Component.onCompleted: {
                             var saved = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
-
-                            if (saved === "loadpage") {
-                                selectedIndex = -1
-                            } else {
-                                for (var i = 0; i < buttonModel.length; i++) {
-                                    if (buttonModel[i].label === saved) {
-                                        selectedIndex = i
-                                        break
-                                    }
+                            for (var i = 0; i < buttonModel.length; i++) {
+                                if (buttonModel[i].label === saved) {
+                                    selectedIndex = i
+                                    break
                                 }
                             }
                         }
 
-
-                        Column {
+                        Grid {
                             anchors.centerIn: parent
+                            columns: 2
                             spacing: 20
-                            width: parent.width * 0.95
-                            height: parent.height * 0.95
+                            width: parent.width * 0.9
+                            height: parent.height * 0.9
 
-                            GridLayout {
-                                id: buttonGrid
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                columns: 2
-                                columnSpacing: 20
-                                rowSpacing: 20
-                                width: parent.width
-                                height: parent.height
+                            Repeater {
+                                model: rightCard.buttonModel
 
-                                Repeater {
-                                    model: root.buttonModel
-                                    property int key: root.selectedIndex
-                                    delegate: Button {
-                                        Layout.preferredWidth: buttonGrid.width * 0.45
-                                        Layout.preferredHeight: buttonGrid.height * 0.4
+                                Button {
+                                    width: parent.width * 0.45
+                                    height: parent.height * 0.45
 
-                                        background: Rectangle {
-                                            id: bg
-                                            color: modelData.color
-                                            radius: 12
-                                            border.width: width * 0.02
-                                            border.color: root.selectedIndex === index ? "yellow" : modelData.border
+                                    padding: 0
+                                    leftPadding: 0
+                                    rightPadding: 0
+                                    topPadding: 0
+                                    bottomPadding: 0
 
-                                            anchors.fill: parent
-                                        }
+                                    background: Rectangle {
+                                        anchors.fill: parent
+                                        radius: 12
+                                        color: modelData.color
+                                        border.width: 2
+                                        border.color: rightCard.selectedIndex === index
+                                                      ? "yellow"
+                                                      : modelData.border
+                                    }
 
-                                        contentItem: Item {
-                                            anchors.fill: parent
+                                    contentItem: Item {
+                                        anchors.fill: parent
+                                        Column {
+                                            anchors.centerIn: parent
+                                            spacing: 10
 
-                                            Column {
-                                                anchors.centerIn: parent
-                                                spacing: iconBaseSize * 0.2
+                                            Image {
+                                                source: modelData.image
+                                                width: 48
+                                                height: 48
+                                                fillMode: Image.PreserveAspectFit
+                                            }
 
-                                                Image {
-                                                    source: modelData.image
-                                                    width: iconBaseSize * 1.5
-                                                    height: iconBaseSize * 1.5
-                                                    fillMode: Image.PreserveAspectFit
-                                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                                }
-
-                                                Text {
-                                                    text: modelData.label
-                                                    color: "white"
-                                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                                    font.bold: true
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    anchors.horizontalCenter: parent.horizontalCenter
-                                                }
+                                            Text {
+                                                text: modelData.label
+                                                color: "white"
+                                                font.bold: true
                                             }
                                         }
 
+                                    }
 
-                                        Item {
-                                            anchors.fill: parent
 
-                                            QGCColoredImage {
-                                                visible: root.selectedIndex !== -1 && root.selectedIndex === index
-                                                source: "qrc:/qmlimages/check.svg"
-                                                width: iconBaseSize * 0.5
-                                                height: iconBaseSize * 0.5
-                                                anchors.top: parent.top
-                                                anchors.right: parent.right
-                                                anchors.topMargin: 8
-                                                anchors.rightMargin: 8
-                                                color: "green"
 
-                                                Rectangle {
-                                                    anchors.centerIn: parent
-                                                    width: iconBaseSize * 0.6
-                                                    height: iconBaseSize * 0.6
-                                                    radius: 14
-                                                    color: "white"
-                                                    border.color: "green"
-                                                    border.width: 2
-                                                    z: -1
-                                                }
-                                            }
-                                        }
+                                    QGCColoredImage {
+                                        visible: rightCard.selectedIndex === index
+                                        source: "qrc:/qmlimages/check.svg"
+                                        width: 18
+                                        height: 18
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.margins: 8
+                                        color: "green"
+                                    }
 
-                                        onClicked: {
-                                            root.selectedIndex = index  // <-- FIXED
-                                            console.log("Selected:", modelData.label)
-                                            QGroundControl.saveGlobalSetting("loadpage", modelData.label)
-                                            mainWindow.showToastMessage(modelData.label + " Selected")
-                                            currentView = "profile"
-                                        }
+                                    onClicked: {
+                                        rightCard.selectedIndex = index
+                                        QGroundControl.saveGlobalSetting("loadpage", modelData.label)
+                                        mainWindow.showToastMessage(modelData.label + " Selected")
+                                        currentView = "profile"
                                     }
                                 }
                             }
                         }
+
                     }
-
                 }
-
             }
         }
+    }
 
-        FileDialog {
-            id: imageDialog
-            title: "Choose Image"
-            nameFilters: ["*.png", "*.jpg", "*.jpeg"]
-            onAccepted: {
-                if (imageDialog.currentFile !== "") {
-                    selectedImage = imageDialog.currentFile
-                    console.log("Selected image path:", selectedImage)
-                } else {
-                    console.warn("No image selected.")
-                }
+    FileDialog {
+        id: imageDialog
+        title: "Choose Image"
+        nameFilters: ["*.png", "*.jpg", "*.jpeg"]
+        onAccepted: {
+            if (imageDialog.currentFile !== "") {
+                selectedImage = imageDialog.currentFile
+                console.log("Selected image path:", selectedImage)
+            } else {
+                console.warn("No image selected.")
             }
         }
     }

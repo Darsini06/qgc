@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <Bluetooth_class/bluetooth_class.h>
 
+
 #include "QGCApplication.h"
 #include "QGC.h"
 #include "AppMessages.h"
@@ -91,10 +92,10 @@ void sigHandler(int s)
 
 int main(int argc, char *argv[])
 {
-  qDebug() << "Starting QGroundControl...";
+    qDebug() << "Starting QGroundControl...";
 
 #ifndef __mobile__
-    // We make the runguard key different for custom and non custom
+        // We make the runguard key different for custom and non custom
     // builds, so they can be executed together in the same device.
     // Stable and Daily have same QGC_APP_NAME so they would
     // not be able to run at the same time
@@ -216,6 +217,7 @@ int main(int argc, char *argv[])
 
     // --- Create the QGCApplication instance ---
     QGCApplication app(argc, argv, /*runUnitTests*/ false);
+
     QQmlApplicationEngine engine;
 
     //   qDebug() << "Initializing QML engine...";
