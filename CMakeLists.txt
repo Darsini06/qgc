@@ -186,6 +186,7 @@ find_package(Qt6
         TextToSpeech
         Widgets
         Xml
+        WebView #Newly Added Webview by Dharun
     OPTIONAL_COMPONENTS
         LinguistTools
         MultimediaQuickPrivate
@@ -462,10 +463,12 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Quick
         Qt6::Widgets
         Qt6::Svg # Used to import QSvgPlugin
+        Qt6::WebView # Use for WebView
         QGC
         QmlControls
         Utilities
 )
+
 if(QGC_BUILD_TESTING)
     add_subdirectory(test)
     target_link_libraries(${PROJECT_NAME} PRIVATE qgctest)
