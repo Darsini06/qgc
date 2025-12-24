@@ -41,7 +41,7 @@ TabButton {
         implicitWidth: ScreenTools.implicitButtonWidth
         implicitHeight: ScreenTools.implicitButtonHeight
         radius: 20//backRadius
-        border.width: showBorder ? 1 : 0
+        border.width: _showHighlight ? 1 : 0
         border.color: qgcPal.buttonBorder
         color: "#1b1c3e"//_showHighlight ? qgcPal.buttonHighlight : qgcPal.button
     }
@@ -70,7 +70,7 @@ TabButton {
             text:                   control.text
             font.pointSize:         control.pointSize
             font.family:            ScreenTools.normalFontFamily
-            color:                  _showHighlight ? qgcPal.buttonHighlightText : qgcPal.buttonText
+            color:                  _showHighlight ? qgcPal.buttonHighlightText : qgcPal.buttonHighlightText
             visible:                !_showIcon
         }
     }

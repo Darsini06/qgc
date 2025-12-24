@@ -27,7 +27,7 @@ QGCFlickable {
         anchors.right:  parent.right
         height: geoFenceItems.y + geoFenceItems.height + (_margin * 2)
         radius: _radius
-        color:  qgcPal.missionItemEditor
+        color:  "#1b1c3e"//qgcPal.missionItemEditor
 
         QGCLabel {
             id:                 geoFenceLabel
@@ -232,7 +232,7 @@ QGCFlickable {
                     GridLayout {
                         anchors.left:       parent.left
                         anchors.right:      parent.right
-                        columns:            4
+                        columns:            2
                         flow:               GridLayout.TopToBottom
                         visible:            polygonSection.checked && myGeoFenceController.circles.count > 0
 
@@ -249,6 +249,32 @@ QGCFlickable {
                                 checked:            object.inclusion
                                 onClicked:          object.inclusion = checked
                                 Layout.alignment:   Qt.AlignHCenter
+                            }
+
+                            QGCRadioButton {
+                                checked:            _interactive
+                                Layout.alignment:   Qt.AlignHCenter
+
+                                property bool _interactive: object.interactive
+
+                                on_InteractiveChanged: checked = _interactive
+
+                                onClicked: {
+                                    myGeoFenceController.clearAllInteractive()
+                                    object.interactive = checked
+                                }
+                            }
+
+                            FactTextField {
+                                fact:               object.radius
+                                Layout.fillWidth:   true
+                                Layout.alignment:   Qt.AlignHCenter
+                            }
+
+                            QGCButton {
+                                text:               qsTr("Del")
+                                Layout.alignment:   Qt.AlignHCenter
+                                onClicked:          myGeoFenceController.deleteCircle(index)
                             }
                         }
 
