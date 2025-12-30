@@ -10,10 +10,10 @@
 
 #include "GPSProvider.h"
 #include "QGCLoggingCategory.h"
-#include "Drivers/src/ubx.h"
-#include "Drivers/src/sbf.h"
-#include "Drivers/src/ashtech.h"
-#include "Drivers/src/base_station.h"
+#include <ubx.h>
+#include <sbf.h>
+#include <ashtech.h>
+#include <base_station.h>
 #include "definitions.h"
 
 #ifdef Q_OS_ANDROID
@@ -25,22 +25,22 @@
 #define GPS_RECEIVE_TIMEOUT 1200
 
 //#define SIMULATE_RTCM_OUTPUT //if defined, generate simulated RTCM messages
-                               //additionally make sure to call connectGPS(""), eg. from QGCToolbox.cc
+//additionally make sure to call connectGPS(""), eg. from QGCToolbox.cc
 
 
 void GPSProvider::run()
 {
 #ifdef SIMULATE_RTCM_OUTPUT
-        const int fakeMsgLengths[3] = { 30, 170, 240 };
-        uint8_t* fakeData = new uint8_t[fakeMsgLengths[2]];
-        while (!_requestStop) {
-            for (int i = 0; i < 3; ++i) {
-                gotRTCMData((uint8_t*) fakeData, fakeMsgLengths[i]);
-                msleep(4);
-            }
-            msleep(100);
+    const int fakeMsgLengths[3] = { 30, 170, 240 };
+    uint8_t* fakeData = new uint8_t[fakeMsgLengths[2]];
+    while (!_requestStop) {
+        for (int i = 0; i < 3; ++i) {
+            gotRTCMData((uint8_t*) fakeData, fakeMsgLengths[i]);
+            msleep(4);
         }
-        delete[] fakeData;
+        msleep(100);
+    }
+    delete[] fakeData;
 #endif /* SIMULATE_RTCM_OUTPUT */
 
     if (_serial) delete _serial;
@@ -87,7 +87,21 @@ void GPSProvider::run()
             gpsDriver = new GPSDriverSBF(&callbackEntry, this, &_reportGpsPos, _pReportSatInfo, 5);
             baudrate = 0; // auto-configure
         } else {
-            gpsDriver = new GPSDriverUBX(GPSDriverUBX::Interface::UART, &callbackEntry, this, &_reportGpsPos, _pReportSatInfo);
+            GPSDriverUBX::Settings ubxSettings{};
+            ubxSettings.dynamic_model  = 7;
+            ubxSettings.heading_offset = 0.0f;
+            ubxSettings.uart2_baudrate = 0;
+            ubxSettings.ppk_output     = false;
+            ubxSettings.mode           = GPSDriverUBX::UBXMode::Normal;
+
+            gpsDriver = new GPSDriverUBX(
+                GPSDriverUBX::Interface::UART,
+                &callbackEntry,
+                this,
+                &_reportGpsPos,
+                _pReportSatInfo,
+                ubxSettings
+                );
             baudrate = 0; // auto-configure
         }
         gpsDriver->setSurveyInSpecs(_surveyInAccMeters * 10000.0f, _surveryInDurationSecs);
@@ -194,45 +208,45 @@ int GPSProvider::callbackEntry(GPSCallbackType type, void *data1, int data2, voi
 int GPSProvider::callback(GPSCallbackType type, void *data1, int data2)
 {
     switch (type) {
-        case GPSCallbackType::readDeviceData: {
-            if (_serial->bytesAvailable() == 0) {
-                int timeout = *((int *) data1);
-                if (!_serial->waitForReadyRead(timeout))
-                    return 0; //timeout
-            }
-            return (int)_serial->read((char*) data1, data2);
+    case GPSCallbackType::readDeviceData: {
+        if (_serial->bytesAvailable() == 0) {
+            int timeout = *((int *) data1);
+            if (!_serial->waitForReadyRead(timeout))
+                return 0; //timeout
         }
-        case GPSCallbackType::writeDeviceData:
-            if (_serial->write((char*) data1, data2) >= 0) {
-                if (_serial->waitForBytesWritten(-1))
-                    return data2;
-            }
-            return -1;
-
-        case GPSCallbackType::setBaudrate:
-            return _serial->setBaudRate(data2) ? 0 : -1;
-
-        case GPSCallbackType::gotRTCMMessage:
-            gotRTCMData((uint8_t*) data1, data2);
-            break;
-
-        case GPSCallbackType::surveyInStatus:
-        {
-            SurveyInStatus* status = (SurveyInStatus*)data1;
-            qCDebug(RTKGPSLog) << "Position: " << status->latitude << status->longitude << status->altitude;
-
-            qCDebug(RTKGPSLog) << QString("Survey-in status: %1s cur accuracy: %2mm valid: %3 active: %4").arg(status->duration).arg(status->mean_accuracy).arg((int)(status->flags & 1)).arg((int)((status->flags>>1) & 1));
-            emit surveyInStatus(status->duration, status->mean_accuracy, status->latitude, status->longitude, status->altitude, (int)(status->flags & 1), (int)((status->flags>>1) & 1));
+        return (int)_serial->read((char*) data1, data2);
+    }
+    case GPSCallbackType::writeDeviceData:
+        if (_serial->write((char*) data1, data2) >= 0) {
+            if (_serial->waitForBytesWritten(-1))
+                return data2;
         }
-            break;
+        return -1;
 
-        case GPSCallbackType::setClock:
-            /* do nothing */
-            break;
+    case GPSCallbackType::setBaudrate:
+        return _serial->setBaudRate(data2) ? 0 : -1;
 
-        case GPSCallbackType::gotRelativePositionMessage:
-            /* do nothing */
-            break;
+    case GPSCallbackType::gotRTCMMessage:
+        gotRTCMData((uint8_t*) data1, data2);
+        break;
+
+    case GPSCallbackType::surveyInStatus:
+    {
+        SurveyInStatus* status = (SurveyInStatus*)data1;
+        qCDebug(RTKGPSLog) << "Position: " << status->latitude << status->longitude << status->altitude;
+
+        qCDebug(RTKGPSLog) << QString("Survey-in status: %1s cur accuracy: %2mm valid: %3 active: %4").arg(status->duration).arg(status->mean_accuracy).arg((int)(status->flags & 1)).arg((int)((status->flags>>1) & 1));
+        emit surveyInStatus(status->duration, status->mean_accuracy, status->latitude, status->longitude, status->altitude, (int)(status->flags & 1), (int)((status->flags>>1) & 1));
+    }
+    break;
+
+    case GPSCallbackType::setClock:
+        /* do nothing */
+        break;
+
+    case GPSCallbackType::gotRelativePositionMessage:
+        /* do nothing */
+        break;
     }
 
     return 0;

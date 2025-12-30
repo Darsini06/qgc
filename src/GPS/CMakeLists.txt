@@ -48,7 +48,10 @@ target_link_libraries(GPSDrivers
         Utilities
 )
 
-target_include_directories(GPSDrivers PUBLIC ${px4-gpsdrivers_SOURCE_DIR})
+target_include_directories(GPSDrivers PUBLIC
+    ${px4-gpsdrivers_SOURCE_DIR}
+    ${px4-gpsdrivers_SOURCE_DIR}/src
+)
 
 target_compile_definitions(GPSDrivers PUBLIC GPS_DEFINITIONS_HEADER=<${CMAKE_CURRENT_SOURCE_DIR}/definitions.h>)
 
