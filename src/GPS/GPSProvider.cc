@@ -102,6 +102,10 @@ void GPSProvider::run()
                 _pReportSatInfo,
                 ubxSettings
                 );
+<<<<<<< HEAD
+=======
+
+>>>>>>> ad12a8e84970aede50c5f087214a61f4718e87d5
             baudrate = 0; // auto-configure
         }
         gpsDriver->setSurveyInSpecs(_surveyInAccMeters * 10000.0f, _surveryInDurationSecs);

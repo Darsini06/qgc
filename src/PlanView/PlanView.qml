@@ -193,6 +193,8 @@ Item {
         //mobileFileSaveDialogComponent.createObject(mainWindow).open()
     }
 
+
+
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left

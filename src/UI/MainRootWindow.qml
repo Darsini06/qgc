@@ -738,9 +738,7 @@ ApplicationWindow {
     FlyView {
         id:                     flyView
         anchors.fill:           parent
-        utmspSendActTrigger:    _utmspSendActTrigger
-        planType: plan
-        visible: false
+
     }
 
 
@@ -751,35 +749,16 @@ ApplicationWindow {
         planType: plan
     }
 
-
     FlyViewToolBar {
-        id: toolbar
-        visible: false
+        id:         toolbar
+        visible:    false
     }
-
-    // ProfileScreenNew {
-    //     id: profileScreen
-    //     anchors.fill: parent
-    //     visible:false
-    // }
-
-    // Newscreen {
-    //     id:                     newscreen
-    //     anchors.fill:           parent
-    //     visible : false
-    // }
-
-    // Loader {
-    //     id: login
-    //     anchors.fill: parent
-    //     source: "qrc:/qml/LoginPages/WelcomeScreen.qml"
-    //     visible: false
-    // }
 
     Loader {
         id: pageLoader
         anchors.fill: parent
     }
+
 
 
     MainRootIcons {

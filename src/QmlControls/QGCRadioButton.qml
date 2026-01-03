@@ -39,7 +39,7 @@ RadioButton {
         font.family:        control.font.pointSize
         font.pointSize:     control.font.pointSize
         font.bold:          control.font.bold
-        color:              control.textColor
+        color:              "white"//control.textColor
         opacity:            enabled ? 1.0 : 0.3
         verticalAlignment:  Text.AlignVCenter
         leftPadding:        control.indicator.width + (_noText ? 0 : ScreenTools.defaultFontPixelWidth * 0.25)

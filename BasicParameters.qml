@@ -215,6 +215,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     }
                 }
 
+
                 // Header
                 Text {
                     width: parent.width

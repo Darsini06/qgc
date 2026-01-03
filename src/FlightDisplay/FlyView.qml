@@ -99,6 +99,10 @@ Item {
         visible:    !QGroundControl.videoManager.fullScreen
     }
 
+
+
+
+
     Item {
         id:                 mapHolder
         anchors.top:        toolbar.bottom

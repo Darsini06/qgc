@@ -63,7 +63,7 @@ Item {
         Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                width: parent.width * 0.7
+                width: parent.width * 0.5
                 height: parent.height * 0.9
                 radius: width * 0.5
                 rotation: 30
@@ -83,6 +83,10 @@ Item {
             anchors.fill:   parent
             contentWidth:   mainLayout.width
             contentHeight:  mainLayout.height
+            boundsBehavior: Flickable.OvershootBounds   // SMOOTH FEEL
+
+                flickDeceleration: 100                     // optional - more smooth
+                maximumFlickVelocity: 6000                  // optional - faster/smoother
 
             ColumnLayout {
                 id:         mainLayout

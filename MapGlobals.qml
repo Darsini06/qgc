@@ -630,6 +630,7 @@ QtObject {
 
     function profile() {
 
+
         console.log("profile method MapGLobals")
 
         var loginpage= QGroundControl.loadBoolGlobalSetting("login",false)
@@ -646,8 +647,10 @@ QtObject {
             //loginLoader.visible = true;
             //newscreen.visible = false
             rootWindow.openWelcomeScreen();
+
             console.log("Invalid Credentials");
             QGroundControl.saveBoolGlobalSetting("login", false)
+            console.log("map globals login else")
         }
     }
 
@@ -710,5 +713,6 @@ QtObject {
             }
         });
     }
+
 
 }

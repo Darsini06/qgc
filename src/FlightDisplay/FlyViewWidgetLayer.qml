@@ -20,13 +20,13 @@ import QtQml.Models
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.Controllers
-import QGroundControl.Controls
 import QGroundControl.FactSystem
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 import QGroundControl.Palette
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
+import Qt.labs.platform 1.1 as Platform
 
 // This is the ui overlay layer for the widgets/tools for Fly View
 Item {
@@ -56,9 +56,13 @@ Item {
 
     property bool utmspActTrigger
 
+
     Component.onCompleted: {
         //console.log("pipView.visible :", pipview.visible);
+
         console.log("_pipView.visible :", _pipView.visible);
+        MapGlobals.modeBtn1    = modebtn1
+
     }
 
 
