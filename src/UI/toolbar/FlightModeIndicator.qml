@@ -41,7 +41,7 @@ property var    _activeVehicle:             QGroundControl.multiVehicleManager.a
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true
-            color:      "white"//"black"
+            color:      "black"
             source:     "/qmlimages/FlightModesComponentIcon.png"
         }
 
@@ -49,7 +49,7 @@ property var    _activeVehicle:             QGroundControl.multiVehicleManager.a
             text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
             font.pointSize:     fontPointSize
             Layout.alignment:   Qt.AlignCenter
-            color:      "white"//"black"
+            color:      "black"
             MouseArea {
                 anchors.fill:   parent
                 onClicked:      if(_activeVehicle){

@@ -10,10 +10,10 @@
 
 #include "GPSProvider.h"
 #include "QGCLoggingCategory.h"
-#include "Drivers/src/ubx.h"
-#include "Drivers/src/sbf.h"
-#include "Drivers/src/ashtech.h"
-#include "Drivers/src/base_station.h"
+#include <ubx.h>
+#include <sbf.h>
+#include <ashtech.h>
+#include <base_station.h>
 #include "definitions.h"
 
 #ifdef Q_OS_ANDROID
@@ -87,7 +87,22 @@ void GPSProvider::run()
             gpsDriver = new GPSDriverSBF(&callbackEntry, this, &_reportGpsPos, _pReportSatInfo, 5);
             baudrate = 0; // auto-configure
         } else {
-            gpsDriver = new GPSDriverUBX(GPSDriverUBX::Interface::UART, &callbackEntry, this, &_reportGpsPos, _pReportSatInfo);
+            GPSDriverUBX::Settings ubxSettings{};
+            ubxSettings.dynamic_model  = 7;
+            ubxSettings.heading_offset = 0.0f;
+            ubxSettings.uart2_baudrate = 0;
+            ubxSettings.ppk_output     = false;
+            ubxSettings.mode           = GPSDriverUBX::UBXMode::Normal;
+
+            gpsDriver = new GPSDriverUBX(
+                GPSDriverUBX::Interface::UART,
+                &callbackEntry,
+                this,
+                &_reportGpsPos,
+                _pReportSatInfo,
+                ubxSettings
+                );
+
             baudrate = 0; // auto-configure
         }
         gpsDriver->setSurveyInSpecs(_surveyInAccMeters * 10000.0f, _surveryInDurationSecs);

@@ -12,7 +12,7 @@
 
 
 #include "GPSPositionMessage.h"
-#include "Drivers/src/gps_helper.h"
+#include <gps_helper.h>
 
 #include <QtCore/QString>
 #include <QtCore/QThread>

@@ -82,21 +82,24 @@ property bool   showBorder:         true
                         columnSpacing:  _margins
                         rowSpacing:     _margins
                         columns:        2
-                        QGCLabel { text: qsTr("Low action:") }
+                        QGCLabel { text: qsTr("Low action:")
+                        color: "white"}
                         FactComboBox {
                             fact:               failsafeBattLowAct
                             indexModel:         false
                             Layout.fillWidth:   true
                         }
 
-                        QGCLabel { text: qsTr("Critical action:") }
+                        QGCLabel { text: qsTr("Critical action:")
+                        color: "white"}
                         FactComboBox {
                             fact:               failsafeBattCritAct
                             indexModel:         false
                             Layout.fillWidth:   true
                         }
 
-                        QGCLabel { text: qsTr("Low voltage threshold:") }
+                        QGCLabel { text: qsTr("Low voltage threshold:")
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattLowVoltage
                             showUnits:          true
@@ -104,21 +107,24 @@ property bool   showBorder:         true
                         }
 
 
-                        QGCLabel { text: qsTr("Critical voltage threshold:") }
+                        QGCLabel { text: qsTr("Critical voltage threshold:")
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattCritVoltage
                             showUnits:          true
                             Layout.fillWidth:   true
                         }
 
-                        QGCLabel { text: qsTr("Low mAh threshold:") }
+                        QGCLabel { text: qsTr("Low mAh threshold:")
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattLowMah
                             showUnits:          true
                             Layout.fillWidth:   true
                         }
 
-                        QGCLabel { text: qsTr("Critical mAh threshold:") }
+                        QGCLabel { text: qsTr("Critical mAh threshold:")
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattCritMah
                             showUnits:          true
@@ -136,6 +142,7 @@ property bool   showBorder:         true
 
                     QGCLabel {
                         text: _restartRequired
+                        color: "white"
                     }
 
                     QGCButton {

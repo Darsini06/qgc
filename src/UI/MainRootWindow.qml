@@ -749,6 +749,10 @@ ApplicationWindow {
         planType: plan
     }
 
+    FlyViewToolBar {
+        id:         toolbar
+        visible:    false
+    }
 
     Loader {
         id: pageLoader

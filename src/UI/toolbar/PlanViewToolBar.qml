@@ -274,7 +274,32 @@ Rectangle {
 
         MouseArea {
             anchors.fill:   parent
-            onClicked:      largeProgressBar._userHide = true
+            onClicked:      {
+                largeProgressBar._userHide = true
+
+                QGroundControl.saveGlobalSetting("waypointvisible", "")
+
+                //waypoint enable disable logic
+                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                    mainWindow.cameraView()
+                    mainWindow.closefile()
+                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    mainWindow.showMapping()
+                    mainWindow.closefile()
+                }
+                else{
+                    if (planType === "Plan") {
+                                            mainWindow.showFlyView()
+                                            mainWindow.closefile()
+                                        } else {
+                                            mainWindow.showFlyView1()
+                                            mainWindow.closefile()
+                                        }
+                }
+
+            }
         }
     }
 
