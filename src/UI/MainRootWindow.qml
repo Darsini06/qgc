@@ -738,6 +738,7 @@ ApplicationWindow {
     FlyView {
         id:                     flyView
         anchors.fill:           parent
+        visible:        false
 
     }
 

@@ -87,6 +87,7 @@ void GPSProvider::run()
             gpsDriver = new GPSDriverSBF(&callbackEntry, this, &_reportGpsPos, _pReportSatInfo, 5);
             baudrate = 0; // auto-configure
         } else {
+
             GPSDriverUBX::Settings ubxSettings{};
             ubxSettings.dynamic_model  = 7;
             ubxSettings.heading_offset = 0.0f;
@@ -102,12 +103,11 @@ void GPSProvider::run()
                 _pReportSatInfo,
                 ubxSettings
                 );
-<<<<<<< HEAD
-=======
 
->>>>>>> ad12a8e84970aede50c5f087214a61f4718e87d5
             baudrate = 0; // auto-configure
+
         }
+
         gpsDriver->setSurveyInSpecs(_surveyInAccMeters * 10000.0f, _surveryInDurationSecs);
 
         if (_useFixedBaseLoction) {
