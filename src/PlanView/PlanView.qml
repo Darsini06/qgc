@@ -1411,7 +1411,6 @@ Item {
                         height: iconSize
                         anchors.centerIn: parent
                         color: "black"
-
                     }
 
                     onClicked: {
@@ -1465,7 +1464,6 @@ Item {
                         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
                         returnWaypointEnabled = false
                     }
-
                 }
             }
         }
@@ -1601,14 +1599,15 @@ Item {
         MapScale {
             id:                     mapScale
             anchors.margins:        _toolsMargin
-            anchors.bottom:         terrainStatus.visible ? terrainStatus.top : parent.bottom
+            //anchors.bottom:         terrainStatus.visible ? terrainStatus.top : parent.bottom
+            anchors.top:            parent.top
             anchors.left:           toolStrip.y + toolStrip.height + _toolsMargin > mapScale.y ? toolStrip.right: parent.left
             mapControl:             editorMap
             buttonsOnLeft:          true
-            terrainButtonVisible:   _editingLayer === _layerMission
+            terrainButtonVisible:   false//_editingLayer === _layerMission
             terrainButtonChecked:   terrainStatus.visible
             onTerrainButtonClicked: terrainStatus.toggleVisible()
-            visible:false
+            visible:true
         }
     }
 

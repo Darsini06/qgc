@@ -278,9 +278,9 @@ Row {
 
                                 flightMap.center = flightMap.gcsPosition;
 
-                            }/*else{
-                                mainWindow.showToastMessage("GPS Not Showed");
-                            }*/
+                            }else{
+                                mainWindow.showToastMessage("GPS Not Set");
+                            }
                             iconsContainer.visible = false;
                         }
                     }
@@ -295,7 +295,7 @@ Row {
         //anchors.centerIn: parent
         size:                   _innerRadius * 1.55
         vehicle:                _activeVehicle
-        visible :               !_activeVehicle
+        visible :               _activeVehicle
         //anchors.verticalCenter: parent.verticalCenter
     }
 

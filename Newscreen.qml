@@ -655,7 +655,9 @@ Item {
             QGCPopupDialog {
                 id: typeDialog
                 title: qsTr("Select Link Type")
-                buttons: false
+                buttons: 0
+                showButtons: false
+                //close icon condition
                 closeOnClickOutside: true
 
                 property int selectedType: -1

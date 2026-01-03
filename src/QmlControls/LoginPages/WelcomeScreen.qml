@@ -60,7 +60,6 @@ Item {
                                                 : (currentView === "signin" ? 1
                                                                             : (currentView === "signup" ? 2
                                                                                                         : 3))
-
         // WELCOME SCREEN
         Item {
             ScrollView {
@@ -480,10 +479,14 @@ Item {
                                             color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
                                         }
 
-                                        contentItem: Text {
-                                            text: parent.checked ? "👁️" : "👁️‍🗨️"
-                                            font.pixelSize: dp(3) // Adjusted size
-                                            anchors.centerIn: parent
+                                        contentItem: QGCColoredImage {
+                                            anchors.fill: parent
+                                            anchors.margins: dp(1)
+                                            fillMode: Image.PreserveAspectFit
+                                            source: parent.checked
+                                                    ? "/qmlimages/NewImages/password_visible.svg"
+                                                    : "/qmlimages/NewImages/password_hidden.svg"
+                                            color: "black"
                                         }
                                     }
                                 }
@@ -859,16 +862,50 @@ Item {
 
                                 TextField {
                                     id: regPass
-                                    anchors.fill: parent
-                                    placeholderText: "Create a strong password"
+                                    anchors {
+                                        left: parent.left
+                                        right: showPasswordBtn_crtAc.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        //margins: dp(2)
+                                    }
+                                    placeholderText: "Enter your password"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
-                                    color: "black"
-                                    echoMode: TextInput.Password
+                                    color: "black" //textPrimary
+                                    echoMode: showPasswordBtn_crtAc.checked ? TextInput.Normal : TextInput.Password
                                     background: null
                                     selectByMouse: true
                                 }
+
+                                Button {
+                                    id: showPasswordBtn_crtAc
+                                    width: dp(6) // Adjusted size
+                                    height: dp(6)
+                                    anchors {
+                                        right: parent.right
+                                        verticalCenter: parent.verticalCenter
+                                        margins: dp(1)
+                                    }
+                                    checkable: true
+
+                                    background: Rectangle {
+                                        radius: dp(0.75) // 6/8=0.75
+                                        color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
+                                    }
+
+                                    contentItem: QGCColoredImage {
+                                        anchors.fill: parent
+                                        anchors.margins: dp(1)
+                                        fillMode: Image.PreserveAspectFit
+                                        source: parent.checked
+                                                ? "/qmlimages/NewImages/password_visible.svg"
+                                                : "/qmlimages/NewImages/password_hidden.svg"
+                                        color: "black"
+                                    }
+                                }
+
                             }
                         }
 
@@ -911,15 +948,49 @@ Item {
 
                                 TextField {
                                     id: regConfirm
-                                    anchors.fill: parent
+                                    anchors {
+                                        left: parent.left
+                                        right: confirmPswBtn.left
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        //margins: dp(2)
+                                    }
                                     placeholderText: "Confirm your password"
                                     //font.pixelSize: dp(4)
                                     font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
-                                    echoMode: TextInput.Password
+                                    echoMode: confirmPswBtn.checked ? TextInput.Normal : TextInput.Password
                                     background: null
                                     selectByMouse: true
+                                }
+
+
+                                Button {
+                                    id: confirmPswBtn
+                                    width: dp(6) // Adjusted size
+                                    height: dp(6)
+                                    anchors {
+                                        right: parent.right
+                                        verticalCenter: parent.verticalCenter
+                                        margins: dp(1)
+                                    }
+                                    checkable: true
+
+                                    background: Rectangle {
+                                        radius: dp(0.75) // 6/8=0.75
+                                        color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
+                                    }
+
+                                    contentItem: QGCColoredImage {
+                                        anchors.fill: parent
+                                        anchors.margins: dp(1)
+                                        fillMode: Image.PreserveAspectFit
+                                        source: parent.checked
+                                                ? "/qmlimages/NewImages/password_visible.svg"
+                                                : "/qmlimages/NewImages/password_hidden.svg"
+                                        color: "black"
+                                    }
                                 }
                             }
                         }
@@ -1233,15 +1304,49 @@ Item {
 
                                     TextField {
                                         id: newPassword
-                                        anchors.fill: parent
+                                        anchors {
+                                            left: parent.left
+                                            right: newPasswors_resetbtn.left
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                            //margins: dp(2)
+                                        }
                                         placeholderText: "Enter your new password"
                                         //font.pixelSize: dp(4)
                                         font.pointSize: ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"
-                                        echoMode: TextInput.Password
+                                        echoMode: newPasswors_resetbtn.checked ? TextInput.Normal : TextInput.Password
                                         background: null
                                         selectByMouse: true
+                                    }
+
+
+                                    Button {
+                                        id: newPasswors_resetbtn
+                                        width: dp(6) // Adjusted size
+                                        height: dp(6)
+                                        anchors {
+                                            right: parent.right
+                                            verticalCenter: parent.verticalCenter
+                                            margins: dp(1)
+                                        }
+                                        checkable: true
+
+                                        background: Rectangle {
+                                            radius: dp(0.75) // 6/8=0.75
+                                            color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
+                                        }
+
+                                        contentItem: QGCColoredImage {
+                                            anchors.fill: parent
+                                            anchors.margins: dp(1)
+                                            fillMode: Image.PreserveAspectFit
+                                            source: parent.checked
+                                                    ? "/qmlimages/NewImages/password_visible.svg"
+                                                    : "/qmlimages/NewImages/password_hidden.svg"
+                                            color: "black"
+                                        }
                                     }
                                 }
                             }

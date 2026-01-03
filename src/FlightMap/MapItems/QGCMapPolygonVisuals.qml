@@ -71,6 +71,14 @@ Item {
 
     property string droneType: "loadpage"
 
+
+    // Base size relative to screen
+    property real baseSize: Math.min(Screen.width, Screen.height) * 0.06
+
+    // Button & icon sizes
+    property real buttonSize: Math.max(45, Math.min(baseSize, 64))
+    property real iconSize: buttonSize * 0.2
+
     onVisibleChanged : {
         if (visible) {
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
@@ -1072,10 +1080,10 @@ Item {
                 Button  {
                     id: boundryMarkingBtn
                     text: ""
-                    width: 46
-                    height: 46
+                    width: buttonSize
+                    height: buttonSize
 
-                    padding: 15
+                    padding: 10
 
                     background: Rectangle {
                         radius: width / 2
@@ -1087,9 +1095,9 @@ Item {
                     }
 
                     contentItem: QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                        width: 16
-                        height: 16
+                        source: "/qmlimages/NewImages/boundaryMarkingIcon.svg"
+                        width: iconSize
+                        height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
                         color: "black"
                     }
@@ -1192,10 +1200,10 @@ Item {
                 Button {
                     id: saveBtn
                     text: ""
-                    width: 46
-                    height: 46
+                    width: buttonSize
+                    height: buttonSize
 
-                    padding: 15
+                    padding: 12
 
                     background: Rectangle {
                         radius: width / 2
@@ -1209,8 +1217,8 @@ Item {
                     contentItem: QGCColoredImage {
                         //source: "qrc:/InstrumentValueIcons/save-disk.svg"
                         source: "/qmlimages/NewImages/savefile.svg"
-                        width: 16
-                        height: 16
+                        width: iconSize
+                        height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
                         color: "black"
                     }
@@ -1218,7 +1226,7 @@ Item {
                     onClicked: {
                         if (mapPolygon.count < 3) {
                             _restorePreviousVertices()
-                        } else {
+                        }else {
                             _planMasterController.saveToSelectedFile()
                             mainWindow.planmap()
                         }
@@ -1255,35 +1263,37 @@ Item {
                 //     }
                 // }
             }
+
+            //only for Mapping
             Column {
                 //anchors.top: parent.top
                 anchors.right: parent.right
                 spacing: 0
                 visible: mapping
 
-                Button  {
+                Button {
                     id: boundryMarkingBtn1
                     text: ""
-                    width: 46
-                    height: 46
+                    width: buttonSize
+                    height: buttonSize
 
-                    padding: 15
+                    padding: 10
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#1b1c3e"
-                        border.color: "#005BBB"
-                        border.width: 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
                     contentItem: QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                        width: 16
-                        height: 16
+                        source: "/qmlimages/NewImages/boundaryMarkingIcon.svg"
+                        width: iconSize
+                        height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                        color: "black"
                     }
 
                     onClicked: {
@@ -1355,26 +1365,26 @@ Item {
                 Button {
                     id: saveBtn1
                     text: ""
-                    width: 46
-                    height: 46
+                    width: buttonSize
+                    height: buttonSize
 
-                    padding: 15
+                    padding: 12
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#1b1c3e"
-                        border.color: "#005BBB"
-                        border.width: 2
+                        color: "white"//"#1b1c3e"
+                        //border.color: "#005BBB"
+                        //border.width: 2
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
                     contentItem: QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/save-disk.svg"
-                        width: 16
-                        height: 16
+                        source: "/qmlimages/NewImages/savefile.svg"
+                        width: iconSize
+                        height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                        color: "black"
                     }
                     onClicked: {
                         console.log("Mapping clicked")

@@ -73,6 +73,9 @@ Popup {
     property real   _frameSize:         ScreenTools.defaultFontPixelWidth
     property real   _contentMargin:     ScreenTools.defaultFontPixelHeight / 4
 
+    property bool showButtons: true
+
+
     background: QGCMouseArea {
         width:  mainWindow.width
         height: mainWindow.height
@@ -101,6 +104,7 @@ Popup {
     }
 
     onAboutToShow: setupDialogButtons(buttons)
+
     onClosed: {
         Qt.inputMethod.hide()
         if (destroyOnClose) {
@@ -134,8 +138,25 @@ Popup {
     QGCPalette { id: qgcPal; colorGroupEnabled: parent.enabled }
 
     function setupDialogButtons(buttons) {
+
+        //Reset State
         acceptButton.visible = false
         rejectButton.visible = false
+        acceptButton.enabled = true
+        rejectButton.enabled = true
+
+
+        // NO BUTTON MODE (Bluetooth dialog, etc.)
+        if (!root.showButtons || buttons === 0) {
+            closePolicy = Popup.NoAutoClose
+
+            if (root.closeOnClickOutside) {
+                closePolicy |= Popup.CloseOnPressOutside
+                closePolicy |= Popup.CloseOnEscape
+            }
+            return
+        }
+
         // Accept role buttons
         if (buttons & Dialog.Ok) {
             acceptButton.text = qsTr("Ok")
@@ -148,9 +169,6 @@ Popup {
             acceptButton.visible = true
         } else if (buttons & Dialog.Apply) {
             acceptButton.text = qsTr("Apply")
-            acceptButton.visible = true
-        } else if (buttons & Dialog.Open) {
-            acceptButton.text = qsTr("Open")
             acceptButton.visible = true
         } else if (buttons & Dialog.SaveAll) {
             acceptButton.text = qsTr("Save All")
@@ -193,19 +211,16 @@ Popup {
             rejectButton.visible = true
         }
 
-        // closePolicy = Popup.NoAutoClose
-        // if (rejectAllowed) {
-        //     closePolicy |= Popup.CloseOnEscape
-        // }
+        if (rejectButton.text !== "") {
+            rejectButton.visible = true
+        }
 
-
-        // NEW: Enable close on escape if reject is allowed OR closeOnClickOutside is enabled
         closePolicy = Popup.NoAutoClose
-        if (rejectAllowed || root.closeOnClickOutside) {
+
+        if (rejectButton.visible || root.closeOnClickOutside) {
             closePolicy |= Popup.CloseOnEscape
         }
 
-        // NEW: Enable close on outside click if the property is set
         if (root.closeOnClickOutside) {
             closePolicy |= Popup.CloseOnPressOutside
         }
@@ -230,9 +245,9 @@ Popup {
         width: mainLayout.implicitWidth
         height: mainLayout.implicitHeight
         color: "#ffffff"
-        radius: 20
-        border.width: 1
-        border.color: "#dddddd"
+        radius: 12
+        //border.width: 1
+        //border.color: "#dddddd"
         anchors.centerIn: parent
 
         ColumnLayout {
@@ -242,12 +257,12 @@ Popup {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: titleLable.implicitHeight + 10  // Increased height to accommodate close button
+                height: titleLable.implicitHeight + 5  // Increased height to accommodate close button
                 color: "#7F56D9"
-                radius: 15
+                radius: 12
                 Layout.alignment: Qt.AlignHCenter
 
-                // Bottom rectangle to complete rounded shape
+                //Bottom rectangle to complete rounded shape
                 Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -326,7 +341,12 @@ Popup {
                 Layout.rightMargin:     10
 
                 property real maxAvailableWidth:    mainWindow.width - _contentMargin * 4
-                property real maxAvailableHeight:   mainWindow.height - titleLable.height - buttonRow.height - _contentMargin * 5
+                property real maxAvailableHeight:
+                    mainWindow.height
+                    - titleLable.height
+                    - (buttonRow.visible ? buttonRow.implicitHeight : 0)
+                    - _contentMargin * 5
+
                 property real totalContentWidth:    dialogContentParent.childrenRect.width + _contentMargin * 2
                 property real totalContentHeight:   dialogContentParent.childrenRect.height + _contentMargin * 2
 
@@ -356,19 +376,26 @@ Popup {
             RowLayout {
                 id: buttonRow
                 Layout.fillWidth: true
+                Layout.preferredHeight: visible ? implicitHeight : 0
+                Layout.maximumHeight: visible ? implicitHeight : 0
+                Layout.minimumHeight: visible ? implicitHeight : 0
+
                 spacing: _contentMargin
                 Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin:     10
-                Layout.leftMargin:     5
-                Layout.rightMargin:     5
-                visible: root.buttons !== false && root.buttons !== 0
+                Layout.bottomMargin: visible ? 10 : 0
+                Layout.leftMargin:  visible ? 5  : 0
+                Layout.rightMargin: visible ? 5  : 0
+
+                visible: root.showButtons && root.buttons !== 0
+
 
                 QGCButton {
                     id: rejectButton
+                    visible: root.showButtons && (root.buttons & Dialog.Cancel)
                     onClicked: _reject()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 20
+                        radius: 15
                         color: "#E53935"
                     }
                     contentItem: Text {
@@ -384,11 +411,12 @@ Popup {
 
                 QGCButton {
                     id: acceptButton
+                    visible: root.showButtons && (root.buttons & Dialog.Ok)
                     primary: true
                     onClicked: _accept()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 20
+                        radius: 15
                         color: "#2196F3"
                     }
                     contentItem: Text {
@@ -402,6 +430,7 @@ Popup {
                     }
                 }
             }
+
         }
     }
 

@@ -447,6 +447,7 @@ void BluetoothConfiguration::stopScan()
 void BluetoothConfiguration::startScan()
 {
     QBluetoothLocalDevice localDevice;
+
     if (localDevice.hostMode() == QBluetoothLocalDevice::HostPoweredOff) {
         qDebug() << "Bluetooth is OFF. Requesting system to turn it ON...";
         localDevice.powerOn();
