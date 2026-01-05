@@ -11,6 +11,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
+
 #include <QtBluetooth/QBluetoothDeviceInfo>
 #include <QtBluetooth/QBluetoothSocket>
 
@@ -21,6 +22,7 @@
     class QBluetoothServiceInfo;
     class QBluetoothServiceDiscoveryAgent;
 #endif
+
 class QBluetoothDeviceDiscoveryAgent;
 
 class BluetoothData
@@ -104,12 +106,20 @@ signals:
     void scanningChanged(void);
     void bluetoothOff();
 
+    //check whether the Location on or off Toast
+    void showToast(const QString& message);
+
+
 private:
+
+    bool _isLocationEnabled();
+
     QBluetoothDeviceDiscoveryAgent* _deviceDiscover = nullptr;
     BluetoothData                   _device;
     QStringList                     _nameList;
     QList<BluetoothData>            _deviceList;
 };
+
 
 class BluetoothLink : public LinkInterface
 {

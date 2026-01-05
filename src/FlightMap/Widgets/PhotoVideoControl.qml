@@ -24,7 +24,7 @@ import QGroundControl.FactControls
 
 Rectangle {
     width:      mainLayout.width + (_margins * 2)
-    height:     mainLayout.height + (_margins)
+    height:     mainLayout.height + (_margins * 0.5)
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    _camera.capturesVideo || _camera.capturesPhotos
@@ -79,7 +79,7 @@ Rectangle {
             spacing: 0//_margins //* 2
 
             ColumnLayout {
-                spacing: _margins
+                spacing: _margins * 0.5
 
                 // Camera name
                 QGCLabel {
@@ -91,7 +91,7 @@ Rectangle {
                 // Photo/Video Mode Selector
                 Rectangle {
                     Layout.alignment:   Qt.AlignHCenter
-                    width:              ScreenTools.defaultFontPixelWidth * 8
+                    width:              ScreenTools.defaultFontPixelWidth * 7
                     height:             width / 2
                     color:              qgcPal.windowShadeLight
                     radius:             height * 0.5

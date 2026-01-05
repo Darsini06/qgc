@@ -742,6 +742,15 @@ Item {
                 property var editingConfig
                 property int selectedType
 
+                Connections {
+                       target: editingConfig
+                       enabled: editingConfig !== null
+
+                       function onShowToast(message) {
+                           mainWindow.showToastMessage(message)
+                       }
+                   }
+
                 onAccepted: {
                     linkSettingsLoader.item.saveSettings()
                     editingConfig.devName = nameField.text
@@ -796,5 +805,6 @@ Item {
                 }
             }
         }
+
     }
 }

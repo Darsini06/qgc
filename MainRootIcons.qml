@@ -292,7 +292,7 @@ Row {
     QGCCompassWidget {
         id:                     compass
         //anchors.centerIn: parent
-        size:                   _innerRadius * 1.55
+        size:                   _innerRadius * 1.5
         vehicle:                _activeVehicle
         visible :               _activeVehicle
         //anchors.verticalCenter: parent.verticalCenter

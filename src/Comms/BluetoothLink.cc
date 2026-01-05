@@ -10,11 +10,12 @@
 #include "BluetoothLink.h"
 #include "DeviceInfo.h"
 
+#include <QBluetoothLocalDevice>
 #include <QtBluetooth/QBluetoothDeviceDiscoveryAgent>
 #include <QtBluetooth/QBluetoothSocket>
 #include <QtBluetooth/QBluetoothServiceInfo>
 
-#include <QBluetoothLocalDevice>
+
 #include <QTimer>
 #include <QtPositioning/QGeoPositionInfoSource>  // For location check
 
@@ -23,6 +24,13 @@
 #else
 #include <QtBluetooth/QBluetoothUuid>
 #endif
+
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#include <QJniEnvironment>
+#endif
+
+
 
 
 // #include <QAndroidJniObject>
@@ -446,6 +454,17 @@ void BluetoothConfiguration::stopScan()
 
 void BluetoothConfiguration::startScan()
 {
+
+#ifdef Q_OS_ANDROID
+    // Check Location
+    if (!_isLocationEnabled()) {
+        qDebug() << "Please turn ON Location to scan Bluetooth devices";
+        emit showToast(tr("Please turn ON Location to scan Bluetooth devices"));
+        return;
+    }
+#endif
+
+    // Check Bluetooth
     QBluetoothLocalDevice localDevice;
 
     if (localDevice.hostMode() == QBluetoothLocalDevice::HostPoweredOff) {
@@ -454,6 +473,7 @@ void BluetoothConfiguration::startScan()
         return;
     }
 
+    // Start scan
     if(!_deviceDiscover) {
         _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
         connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,  this, &BluetoothConfiguration::deviceDiscovered);
@@ -468,6 +488,39 @@ void BluetoothConfiguration::startScan()
     emit nameListChanged();
     _deviceDiscover->start();
 }
+
+bool BluetoothConfiguration::_isLocationEnabled()
+{
+#ifdef Q_OS_ANDROID
+    QJniObject context =
+        QJniObject::callStaticObjectMethod(
+            "org/qtproject/qt/android/QtNative",
+            "getContext",
+            "()Landroid/content/Context;");
+
+    if (!context.isValid())
+        return false;
+
+    QJniObject locationService =
+        context.callObjectMethod(
+            "getSystemService",
+            "(Ljava/lang/String;)Ljava/lang/Object;",
+            QJniObject::fromString("location").object<jstring>());
+
+    if (!locationService.isValid())
+        return false;
+
+    jboolean enabled =
+        locationService.callMethod<jboolean>(
+            "isLocationEnabled",
+            "()Z");
+
+    return enabled;
+#else
+    return true;
+#endif
+}
+
 
 
 void BluetoothConfiguration::deviceDiscovered(QBluetoothDeviceInfo info)

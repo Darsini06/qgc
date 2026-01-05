@@ -125,6 +125,7 @@ ApplicationWindow {
 
 
     Component.onCompleted: {
+
         //-- Full screen on mobile or tiny screens
         if (!ScreenTools.isFakeMobile && (ScreenTools.isMobile || Screen.height / ScreenTools.realPixelDensity < 120)) {
             mainWindow.showFullScreen()
@@ -310,7 +311,7 @@ ApplicationWindow {
         planView.visible = false
 
         //newscreen.visible = false
-         mainWindow.closeScreens();
+        mainWindow.closeScreens();
 
         mainrootIcons.visible=true
         modebtn1.visible = activeVehicle ? true : false
@@ -617,13 +618,15 @@ ApplicationWindow {
 
     Item {
         id: toastContainer
-        anchors.bottom: parent.bottom
+        parent: Overlay.overlay   // THIS IS THE KEY TO SHOW THE TOST UPPER IN ANY COMPONENTS
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+
         width: parent.width
         height: 40
         visible: false
-        z: 1000 // Make sure it's above other components
+        z: 10000
 
         Rectangle {
             id: toastBackground
@@ -632,8 +635,7 @@ ApplicationWindow {
             radius: 10
             color: "#323232"
             opacity: 0.9
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.centerIn: parent
 
             Text {
                 id: toastText
@@ -731,7 +733,7 @@ ApplicationWindow {
         color: QGroundControl.globalPalette.window
     }
 
-    QGCMapPolygonVisuals{
+    QGCMapPolygonVisuals {
         id:filename
     }
 
@@ -739,9 +741,7 @@ ApplicationWindow {
         id:                     flyView
         anchors.fill:           parent
         visible:        false
-
     }
-
 
     PlanView {
         id:             planView
@@ -759,8 +759,6 @@ ApplicationWindow {
         id: pageLoader
         anchors.fill: parent
     }
-
-
 
     MainRootIcons {
         id:             mainrootIcons
