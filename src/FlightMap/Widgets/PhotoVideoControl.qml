@@ -24,10 +24,13 @@ import QGroundControl.FactControls
 
 Rectangle {
     width:      mainLayout.width + (_margins * 2)
-    height:     mainLayout.height + (_margins * 0.5)
+    height:     mainLayout.height + (_margins * 0.8)
     color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
     radius:     _margins
     visible:    _camera.capturesVideo || _camera.capturesPhotos
+
+    anchors.top: parent.top
+    anchors.topMargin: ScreenTools.defaultFontPixelHeight * 0.8
 
     property real   _margins:                   ScreenTools.defaultFontPixelHeight / 2
     property real   _smallMargins:              ScreenTools.defaultFontPixelWidth / 2
@@ -76,10 +79,10 @@ Rectangle {
         }
         
         ColumnLayout {
-            spacing: 0//_margins //* 2
+            spacing: 0
 
             ColumnLayout {
-                spacing: _margins * 0.5
+                spacing: _margins * 0.8
 
                 // Camera name
                 QGCLabel {
@@ -175,7 +178,7 @@ Rectangle {
                         property bool _isShootingInVideoMode:   (!_cameraInPhotoMode && _camera.videoCaptureStatus === MavlinkCameraControl.VIDEO_CAPTURE_STATUS_RUNNING)
                         property bool _isShootingInCurrentMode: _cameraInPhotoMode ? _isShootingInPhotoMode : _isShootingInVideoMode
                         property bool _isShootingInOtherMode:   _cameraInPhotoMode ? _isShootingInVideoMode : _isShootingInPhotoMode
-                        property bool _canShootInCurrentMode:   _isShootingInOtherMode ? 
+                        property bool _canShootInCurrentMode:   _isShootingInOtherMode ?
                                                                     (_cameraInPhotoMode ? _camera.photosInVideoMode : _camera.videoInPhotoMode) :
                                                                     true
                     }

@@ -203,7 +203,7 @@ SettingsPage {
                             }
                         }
 
-                         Item { Layout.fillWidth: true }
+                        Item { Layout.fillWidth: true }
 
                         // // full-width divider
                         // Rectangle {
