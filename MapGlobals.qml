@@ -51,6 +51,8 @@ QtObject {
         if (activeFlightMap && gcsPosition.isValid) {
             activeFlightMap.center = gcsPosition
             activeFlightMap.zoomLevel = 15
+        }else {
+            rootWindow.showToastMessage("GPS Not Set");
         }
     }
 

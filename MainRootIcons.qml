@@ -278,7 +278,7 @@ Row {
                                 flightMap.center = flightMap.gcsPosition;
 
                             }else{
-                                mainWindow.showToastMessage("GPS Not Set");
+
                             }
                             iconsContainer.visible = false;
                         }
