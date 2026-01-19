@@ -339,39 +339,34 @@ Item {
                                 }
 
                                 // Create Account text
-                                Item {
-                                    width: parent.width
-                                    height: implicitHeight
+                                Row {
+                                    //width: parent.width
+                                    spacing: dp(1)
+                                    anchors.horizontalCenter: parent.horizontalCenter
 
-                                    Row {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        spacing: dp(1)
+                                    Text {
+                                        text: "Don't have an account?"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        color: textSecondary
+                                    }
 
-                                        Text {
-                                            text: "Don't have an account?"
-                                            font.pointSize: ScreenTools.smallFontPointSize
-                                            color: textSecondary
-                                        }
+                                    Text {
+                                        text: "Sign Up"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        color: primaryColor
+                                        font.weight: Font.Medium
 
-                                        Text {
-                                            text: "Sign Up"
-                                            font.pointSize: ScreenTools.smallFontPointSize
-                                            color: primaryColor
-                                            font.weight: Font.Medium
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    currentView = "signup"
-                                                    loginUser.text = ""
-                                                    loginPass.text = ""
-                                                }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                currentView = "signup"
+                                                loginUser.text = ""
+                                                loginPass.text = ""
                                             }
                                         }
                                     }
                                 }
-
 
                                 // Forgot Password
                                 Text {
@@ -402,870 +397,564 @@ Item {
 
             }
 
-
-        }
-
-        // SIGN IN SCREEN
-        Item {
-            // Back arrow at top left with margins
-            Item {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    margins: dp(10) // Outer margins
-                }
-
-                width: dp(10)
-                height: dp(10)
-                z: 1 // Ensure it's above the ScrollView
-
-                QGCColoredImage {
-                    anchors.centerIn: parent
-                    source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                    fillMode: Image.PreserveAspectFit
-                    width: 25
-                    height: 25
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        currentView = "welcome"
-                        loginUser.text = "";
-                        loginPass.text = "";
-                    }
-                }
-            }
-
-            ScrollView {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                    bottom: parent.bottom
-                    topMargin: dp(12) // Add top margin to avoid overlapping with back button
-                }
-                clip: true
-                contentWidth: -1 // Let content determine width
-
-                // Container to ensure proper centering
-                //      Item {
-                //          width: parent.width
-                //          height: Math.max(signInColumn.implicitHeight, parent.height)
-
-                //          Column {
-                //              id: signInColumn
-                //              width: parent.width * 0.85
-                //              spacing: dp(4)
-                //              anchors.centerIn: parent
-
-                //              // Header
-                //              Column {
-                //                  width: parent.width
-                //                  spacing: dp(2)
-                //                  anchors.horizontalCenter: parent.horizontalCenter
-
-                //                  Text {
-                //                      text: "Sign In"
-                //                      //font.pixelSize: dp(6)
-                //                      font.pointSize:     ScreenTools.largeFontPointSize
-                //                      font.weight: Font.Bold
-                //                      color: textPrimary
-                //                      anchors.horizontalCenter: parent.horizontalCenter
-                //                  }
-
-                //                  Text {
-                //                      text: "Welcome back! Please enter your details"
-                //                      //font.pixelSize: dp(3)
-                //                      font.pointSize: ScreenTools.smallFontPointSize
-                //                      color: textSecondary
-                //                      anchors.horizontalCenter: parent.horizontalCenter
-                //                      width: parent.width
-                //                      wrapMode: Text.Wrap
-                //                      horizontalAlignment: Text.AlignHCenter
-                //                  }
-                //              }
-
-                //              // Form
-                //              Column {
-                //                  width: parent.width
-                //                  spacing: dp(4)
-                //                  anchors.horizontalCenter: parent.horizontalCenter
-
-                //                  // Username Field
-                //                  Column {
-                //                      width: parent.width
-                //                      spacing: dp(2)
-                //                      anchors.horizontalCenter: parent.horizontalCenter
-
-                //                      Row {
-                //                          //anchors.horizontalCenter: parent.horizontalCenter
-                //                          x: parent.width * 0.25
-                //                          spacing: dp(1)
-
-                //                          Text {
-                //                              text: "Username"
-                //                              //font.pixelSize: dp(4)
-                //                              font.pointSize:     ScreenTools.defaultFontPointSize
-                //                              font.weight: Font.Medium
-                //                              color: textPrimary
-                //                              x: parent.width * 0.25
-                //                          }
-
-                //                          QGCColoredImage {
-                //                              source: "/qmlimages/NewImages/userProfile_icon.svg"
-                //                              fillMode: Image.PreserveAspectFit
-                //                              width: 16
-                //                              height: 16
-                //                              anchors.verticalCenter: parent.verticalCenter
-                //                          }
-                //                      }
-
-                //                      Rectangle {
-                //                          width: parent.width * 0.5
-                //                          height: dp(10) // Use dp instead of relative height
-                //                          radius: dp(1) // 8/8=1
-                //                          color: surfaceColor
-                //                          border.width: loginUser.activeFocus ? 2 : 1
-                //                          border.color: loginUser.activeFocus ? primaryColor : borderColor
-                //                          anchors.horizontalCenter: parent.horizontalCenter
-
-                //                          TextField {
-                //                              id: loginUser
-                //                              anchors.fill: parent
-                //                              //anchors.margins: dp(2) // 16/8=2
-                //                              placeholderText: "Enter your username"
-                //                              //font.pixelSize: dp(4)
-                //                              font.pointSize:     ScreenTools.defaultFontPointSize
-                //                              font.family: "Arial"
-                //                              color: "black"//textPrimary
-                //                              background: null
-                //                              selectByMouse: true
-                //                          }
-                //                      }
-                //                  }
-
-                //                  // Password Field
-                //                  Column {
-                //                      width: parent.width
-                //                      spacing: dp(2)
-                //                      anchors.horizontalCenter: parent.horizontalCenter
-
-                //                      Row {
-                //                          //anchors.horizontalCenter: parent.horizontalCenter
-                //                          x: parent.width * 0.25
-                //                          spacing: dp(1)
-
-                //                          Text {
-                //                              text: "Password"
-                //                              //font.pixelSize: dp(4)
-                //                              font.pointSize:     ScreenTools.defaultFontPointSize
-                //                              font.weight: Font.Medium
-                //                              color: textPrimary
-                //                              //x: parent.width * 0.25
-                //                          }
-
-                //                          QGCColoredImage {
-                //                              source: "/qmlimages/NewImages/password.svg"
-                //                              fillMode: Image.PreserveAspectFit
-                //                              width: 16
-                //                              height: 16
-                //                              anchors.verticalCenter: parent.verticalCenter
-                //                          }
-                //                      }
-
-                //                      Rectangle {
-                //                          width: parent.width * 0.5
-                //                          height: dp(10) // Use dp instead of relative height
-                //                          radius: dp(1)
-                //                          color: surfaceColor
-                //                          border.width: loginPass.activeFocus ? 2 : 1
-                //                          border.color: loginPass.activeFocus ? primaryColor : borderColor
-                //                          anchors.horizontalCenter: parent.horizontalCenter
-
-                //                          TextField {
-                //                              id: loginPass
-                //                              anchors {
-                //                                  left: parent.left
-                //                                  right: showPasswordBtn.left
-                //                                  top: parent.top
-                //                                  bottom: parent.bottom
-                //                                  //margins: dp(2)
-                //                              }
-                //                              placeholderText: "Enter your password"
-                //                              //font.pixelSize: dp(4)
-                //                              font.pointSize:     ScreenTools.defaultFontPointSize
-                //                              font.family: "Arial"
-                //                              color: "black" //textPrimary
-                //                              echoMode: showPasswordBtn.checked ? TextInput.Normal : TextInput.Password
-                //                              background: null
-                //                              selectByMouse: true
-                //                          }
-
-                //                          Button {
-                //                              id: showPasswordBtn
-                //                              width: dp(6) // Adjusted size
-                //                              height: dp(6)
-                //                              anchors {
-                //                                  right: parent.right
-                //                                  verticalCenter: parent.verticalCenter
-                //                                  margins: dp(1)
-                //                              }
-                //                              checkable: true
-
-                //                              background: Rectangle {
-                //                                  radius: dp(0.75) // 6/8=0.75
-                //                                  color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
-                //                              }
-
-                //                              contentItem: QGCColoredImage {
-                //                                  anchors.fill: parent
-                //                                  anchors.margins: dp(1)
-                //                                  fillMode: Image.PreserveAspectFit
-                //                                  source: parent.checked
-                //                                          ? "/qmlimages/NewImages/password_visible.svg"
-                //                                          : "/qmlimages/NewImages/password_hidden.svg"
-                //                                  color: "black"
-                //                              }
-                //                          }
-                //                      }
-
-                //                      // Forgot Password
-                //                      Text {
-                //                          text: "Forgot Password?"
-                //                          //font.pixelSize: dp(3.5) // Adjusted size
-                //                          font.pointSize:     ScreenTools.smallFontPointSize
-                //                          color: primaryColor
-                //                          x: parent.width * 0.6
-
-                //                          MouseArea {
-                //                              anchors.fill: parent
-                //                              cursorShape: Qt.PointingHandCursor
-                //                              onClicked: {
-                //                                  currentView = "reset"
-                //                                  loginUser.text = "";
-                //                                  loginPass.text = "";
-                //                              }
-                //                          }
-                //                      }
-                //                  }
-
-                //                  // Sign In Button
-                //                  Button {
-                //                      id: loginBtn
-                //                      text: "Sign In"
-                //                      width: parent.width * 0.2
-                //                      height: dp(10) // Adjusted size
-                //                      anchors.horizontalCenter: parent.horizontalCenter
-
-                //                      background: Rectangle {
-                //                          radius: dp(1)
-                //                          color: loginBtn.pressed ? primaryHover : primaryColor
-                //                      }
-
-                //                      contentItem: Item {
-                //                          anchors.fill: parent
-                //                          // clip: true
-
-                //                          Row {
-                //                              anchors.centerIn: parent      // now centers correctly
-                //                              spacing: dp(2)
-
-                //                              Text {
-                //                                  text: loginBtn.text
-                //                                  font.pointSize: ScreenTools.defaultFontPointSize
-                //                                  font.weight: Font.Medium
-                //                                  color: "white"
-                //                                  verticalAlignment: Text.AlignVCenter
-                //                              }
-
-                //                              QGCColoredImage {
-                //                                  source: "/qmlimages/NewImages/signIn.svg"
-                //                                  fillMode: Image.PreserveAspectFit
-                //                                  width: 20
-                //                                  height: 20
-                //                              }
-                //                          }
-                //                      }
-
-                //                      onClicked: {
-
-                //                          if (loginUser.text.trim() === "" || loginPass.text === "") {
-                //                              mainWindow.showToastMessage("Please fill all fields");
-                //                              return;
-                //                          }
-
-                //                          MapGlobals.loginUserFunc(loginUser.text, loginPass.text, function(result) {
-
-                //                              QGroundControl.saveGlobalSetting("username", loginUser.text.trim());
-                //                              console.log("userName put in SharedPreference : ",loginUser.text)
-
-                //                              if(result){
-                //                                  loginUser.text = "";
-                //                                  loginPass.text = "";
-                //                              }
-                //                          });
-                //                      }
-                //                  }
-                //              }
-                //          }
-                //      }
-
-            }
-
         }
 
         // SIGN UP SCREEN
         Item {
-            // Back arrow at top left with margins
-            Item {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    margins: dp(10)
-                }
-                width: dp(10)
-                height: dp(10)
-                z: 10 // Ensure it's above the ScrollView
+            anchors.fill: parent
 
-                QGCColoredImage {
-                    anchors.centerIn: parent
-                    source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                    fillMode: Image.PreserveAspectFit
-                    width: 25
-                    height: 25
+            Row {
+                width: parent.width
+                height: parent.height
+                spacing: 0
 
-                    MouseArea {
+                // LEFT SIDE IMAGE
+                Item {
+                    width: parent.width * 0.45
+                    height: parent.height
+
+                    Image {
                         anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-
-                            currentView = "welcome"
-
-                            regUser.text = "";
-                            regDisplay.text = "";
-                            regEmail.text = "";
-                            regPass.text = "";
-                            regConfirm.text = "";
-                        }
+                        source: "/qmlimages/NewImages/nature_background.webp"
+                        fillMode: Image.PreserveAspectCrop
                     }
                 }
-            }
 
-            ScrollView {
-                anchors.fill: parent
-                clip: true
-                contentWidth: -1
+                Item {
+                    id: scrollcontent
+                    width: parent.width * 0.55
+                    height: parent.height
+                    clip: true
 
-                Column {
-                    id: signUpColumn
-                    width: parent.width * 0.85
-                    spacing: dp(4)
-                    anchors.horizontalCenter: parent.horizontalCenter
 
-                    // Header
-                    Column {
-                        width: parent.width
-                        spacing: dp(2)
-                        anchors.horizontalCenter: parent.horizontalCenter
+                    Flickable {
+                        id: flickable
+                        anchors.fill: parent
+                        contentWidth: width
+                        contentHeight: signUpColumn.height + dp(40) // Add padding
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
 
-                        Text {
-                            text: "Create Account"
-                            //font.pixelSize: dp(6)
-                            font.pointSize:     ScreenTools.largeFontPointSize
-                            font.weight: Font.Bold
-                            color: textPrimary
-                            anchors.horizontalCenter: parent.horizontalCenter
+                        ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AsNeeded
                         }
 
-                        Text {
-                            text: "Join us today! Please fill in your details"
-                            //font.pixelSize: dp(3)
-                            font.pointSize:     ScreenTools.smallFontPointSize
-                            color: textSecondary
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-
-                    // Form Fields
-                    Column {
-                        width: parent.width
-                        spacing: dp(4)
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        // Username
                         Column {
-                            width: parent.width
-                            spacing: dp(2)
+                            id: signUpColumn
+                            width: flickable.width * 0.85
+                            spacing: dp(4)
+
+                            anchors.top: parent.top
+                            anchors.topMargin: dp(6)
                             anchors.horizontalCenter: parent.horizontalCenter
 
-
-                            Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
-                                x: parent.width * 0.25
-                                spacing: dp(1)
+                            // Header
+                            Column {
+                                width: parent.width
+                                spacing: dp(1.5)
 
                                 Text {
-                                    text: "Username"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
+                                    text: "Create Account"
+                                    //font.pixelSize: dp(6)
+                                    font.pointSize:     ScreenTools.largeFontPointSize
+                                    font.weight: Font.Bold
                                     color: textPrimary
+                                    width: parent.width
+                                    wrapMode: Text.Wrap
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
-
-                                QGCColoredImage {
-                                    source: "/qmlimages/NewImages/userProfile_icon.svg"
-                                    fillMode: Image.PreserveAspectFit
-                                    width: 16
-                                    height: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            Rectangle {
-                                width: parent.width * 0.5
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regUser.activeFocus ? 2 : 1
-                                border.color: regUser.activeFocus ? primaryColor : borderColor
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                TextField {
-                                    id: regUser
-                                    anchors.fill: parent
-                                    placeholderText: "Choose a username"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black"
-                                    background: null
-                                    selectByMouse: true
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /^[a-zA-Z\s]*$/ // Allows only letters and spaces
-                                    }
-                                }
-                            }
-                        }
-
-                        // Display Name
-                        Column {
-                            width: parent.width
-                            spacing: dp(2)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
-                                x: parent.width * 0.25
-                                spacing: dp(1)
 
                                 Text {
-                                    text: "Profile Name"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
-
-                                }
-
-                                QGCColoredImage {
-                                    source: "/qmlimages/NewImages/userProfile_icon.svg"
-                                    fillMode: Image.PreserveAspectFit
-                                    width: 16
-                                    height: 16
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Join us today! Please fill in your details"
+                                    //font.pixelSize: dp(3)
+                                    font.pointSize:     ScreenTools.smallFontPointSize
+                                    color: textSecondary
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    width: parent.width
+                                    wrapMode: Text.Wrap
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                             }
 
-                            Rectangle {
-                                width: parent.width * 0.5
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regDisplay.activeFocus ? 2 : 1
-                                border.color: regDisplay.activeFocus ? primaryColor : borderColor
+                            Item { height: dp(10) } // Spacer
+
+                            // Form Fields
+                            Column {
+                                width: parent.width
+                                spacing: dp(5)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                TextField {
-                                    id: regDisplay
-                                    anchors.fill: parent
-                                    placeholderText: "Your display name"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black"
-                                    background: null
-                                    selectByMouse: true
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /^[a-zA-Z\s]*$/ // Allows only letters and spaces
-                                    }
-                                }
-                            }
-                        }
-
-                        // Email
-                        Column {
-                            width: parent.width
-                            spacing: dp(2)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
-                                x: parent.width * 0.25
-                                spacing: dp(1)
-
-                                Text {
-                                    text: "Email"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
-                                }
-
-                                QGCColoredImage {
-                                    source: "/qmlimages/NewImages/gmail.svg"
-                                    fillMode: Image.PreserveAspectFit
-                                    width: 16
-                                    height: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            Rectangle {
-                                width: parent.width * 0.5
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regEmail.activeFocus ? 2 : 1
-                                border.color: regEmail.activeFocus ? primaryColor : borderColor
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                TextField {
-                                    id: regEmail
-                                    anchors.fill: parent
-                                    placeholderText: "your.email@example.com"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black"
-                                    background: null
-                                    selectByMouse: true
-
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /^[a-zA-Z0-9@._-]*$/ // Email allowed characters
-                                    }
-                                    inputMethodHints: Qt.ImhEmailCharactersOnly
-                                }
-                            }
-                        }
-
-                        // Password
-                        Column {
-                            width: parent.width
-                            spacing: dp(2)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
-                                x: parent.width * 0.25
-                                spacing: dp(1)
-
-                                Text {
-                                    text: "Password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
-                                }
-
-                                QGCColoredImage {
-                                    source: "/qmlimages/NewImages/password.svg"
-                                    fillMode: Image.PreserveAspectFit
-                                    width: 16
-                                    height: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            Rectangle {
-                                width: parent.width * 0.5
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regPass.activeFocus ? 2 : 1
-                                border.color: regPass.activeFocus ? primaryColor : borderColor
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                TextField {
-                                    id: regPass
-                                    anchors {
-                                        left: parent.left
-                                        right: showPasswordBtn_crtAc.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                        //margins: dp(2)
-                                    }
-                                    placeholderText: "Enter your password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black" //textPrimary
-                                    echoMode: showPasswordBtn_crtAc.checked ? TextInput.Normal : TextInput.Password
-                                    background: null
-                                    selectByMouse: true
-                                }
-
-                                Button {
-                                    id: showPasswordBtn_crtAc
-                                    width: dp(6) // Adjusted size
-                                    height: dp(6)
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        margins: dp(1)
-                                    }
-                                    checkable: true
-
-                                    background: Rectangle {
-                                        radius: dp(0.75) // 6/8=0.75
-                                        color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
-                                    }
-
-                                    contentItem: QGCColoredImage {
-                                        anchors.fill: parent
-                                        anchors.margins: dp(1)
-                                        fillMode: Image.PreserveAspectFit
-                                        source: parent.checked
-                                                ? "/qmlimages/NewImages/password_visible.svg"
-                                                : "/qmlimages/NewImages/password_hidden.svg"
-                                        color: "black"
-                                    }
-                                }
-
-                            }
-                        }
-
-                        // Confirm Password
-                        Column {
-                            width: parent.width
-                            spacing: dp(2)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
-                                x: parent.width * 0.25
-                                spacing: dp(1)
-
-                                Text {
-                                    text: "Confirm Password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    color: textPrimary
-                                }
-
-                                QGCColoredImage {
-                                    source: "/qmlimages/NewImages/password.svg"
-                                    fillMode: Image.PreserveAspectFit
-                                    width: 16
-                                    height: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            Rectangle {
-                                width: parent.width * 0.5
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regConfirm.activeFocus ? 2 : 1
-                                border.color: regConfirm.activeFocus ? primaryColor : borderColor
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                TextField {
-                                    id: regConfirm
-                                    anchors {
-                                        left: parent.left
-                                        right: confirmPswBtn.left
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                        //margins: dp(2)
-                                    }
-                                    placeholderText: "Confirm your password"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black"
-                                    echoMode: confirmPswBtn.checked ? TextInput.Normal : TextInput.Password
-                                    background: null
-                                    selectByMouse: true
-                                }
-
-
-                                Button {
-                                    id: confirmPswBtn
-                                    width: dp(6) // Adjusted size
-                                    height: dp(6)
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        margins: dp(1)
-                                    }
-                                    checkable: true
-
-                                    background: Rectangle {
-                                        radius: dp(0.75) // 6/8=0.75
-                                        color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
-                                    }
-
-                                    contentItem: QGCColoredImage {
-                                        anchors.fill: parent
-                                        anchors.margins: dp(1)
-                                        fillMode: Image.PreserveAspectFit
-                                        source: parent.checked
-                                                ? "/qmlimages/NewImages/password_visible.svg"
-                                                : "/qmlimages/NewImages/password_hidden.svg"
-                                        color: "black"
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Action Buttons
-                    Column {
-                        width: parent.width
-                        spacing: dp(3)
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        Button {
-                            id: signUpActionBtn
-                            text: "Create Account"
-                            width: parent.width * 0.5
-                            height: dp(10)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            background: Rectangle {
-                                radius: dp(1)
-                                color: signUpActionBtn.pressed ? primaryHover : primaryColor
-                            }
-
-                            contentItem: Item {
-                                anchors.fill: parent
-                                // clip: true
-
-                                Row {
-                                    anchors.centerIn: parent      // now centers correctly
-                                    spacing: dp(1)
-
-                                    QGCColoredImage {
-                                        source: "/qmlimages/NewImages/createAccount.svg"
-                                        fillMode: Image.PreserveAspectFit
-                                        width: 22
-                                        height: 22
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Text {
-                                        text: signUpBtn.text
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.weight: Font.Medium
-                                        color: "white"
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-                                }
-                            }
-
-                            onClicked: {
-                                // Execute validations in order
-                                if (!MapGlobals.validateUsername(regUser.text,regUser)) return;
-                                if (!MapGlobals.validateDisplayName(regDisplay.text,regDisplay)) return;
-                                if (!MapGlobals.validateEmail(regEmail.text,regEmail)) return;
-                                if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
-                                if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
-
-                                MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
-                                    if (result) {
-
-                                        mainWindow.showToastMessage("Account created successfully!");
-
-                                        currentView = "signin";
-
-                                        QGroundControl.saveGlobalSetting("username", regUser.text);
-                                        QGroundControl.saveGlobalSetting("name", regDisplay.text);
-                                        QGroundControl.saveGlobalSetting("email", regEmail.text);
-
-                                        regUser.text = "";
-                                        regDisplay.text = "";
-                                        regEmail.text = "";
-                                        regPass.text = "";
-                                        regConfirm.text = "";
-                                    }
-                                });
-
-                            }
-                        }
-
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: dp(8)
-
-                            Text {
-                                text: "Already have an account?"
-                                //font.pixelSize: dp(3.5)
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: textSecondary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Button {
-                                id: signInAccount
-                                text: "Sign In"
-                                width: undefined
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                background: Rectangle {
-                                    color: "transparent"
-                                }
-
-                                contentItem: Item {
-                                    anchors.fill: parent
-                                    // clip: true
+                                // Username
+                                Column {
+                                    width: parent.width
+                                    spacing: dp(2)
+                                    //anchors.horizontalCenter: parent.horizontalCenter
 
                                     Row {
-                                        anchors.centerIn: parent      // now centers correctly
+                                        x: parent.width * 0.05
                                         spacing: dp(1)
 
                                         Text {
-                                            text: signInAccount.text
-                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            text: "Username"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
                                             font.weight: Font.Medium
-                                            color: "white"
-                                            verticalAlignment: Text.AlignVCenter
-                                            horizontalAlignment: Text.AlignHCenter
+                                            color: textPrimary
                                         }
 
                                         QGCColoredImage {
-                                            source: "/qmlimages/NewImages/signIn.svg"
+                                            source: "/qmlimages/NewImages/userProfile_icon.svg"
                                             fillMode: Image.PreserveAspectFit
-                                            width: 15
-                                            height: 15
+                                            width: 16
+                                            height: 16
                                             anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width * 0.9
+                                        height: dp(10)
+                                        radius: dp(1)
+                                        color: surfaceColor
+                                        border.width: regUser.activeFocus ? 2 : 1
+                                        border.color: regUser.activeFocus ? primaryColor : borderColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        TextField {
+                                            id: regUser
+                                            anchors.fill: parent
+                                            placeholderText: "Choose a username"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black"
+                                            background: null
+                                            selectByMouse: true
+
+                                            validator: RegularExpressionValidator {
+                                                regularExpression: /^[a-zA-Z\s]*$/ // Allows only letters and spaces
+                                            }
                                         }
                                     }
                                 }
 
-                                onClicked: currentView = "signin"
+                                // Display Name
+                                Column {
+                                    width: parent.width
+                                    spacing: dp(2)
+                                    //anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Row {
+                                        //anchors.horizontalCenter: parent.horizontalCenter
+                                        x: parent.width * 0.05
+                                        spacing: dp(1)
+
+                                        Text {
+                                            text: "Profile Name"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: textPrimary
+
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/userProfile_icon.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 16
+                                            height: 16
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width * 0.9
+                                        height: dp(10)
+                                        radius: dp(1)
+                                        color: surfaceColor
+                                        border.width: regDisplay.activeFocus ? 2 : 1
+                                        border.color: regDisplay.activeFocus ? primaryColor : borderColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        TextField {
+                                            id: regDisplay
+                                            anchors.fill: parent
+                                            placeholderText: "Your display name"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black"
+                                            background: null
+                                            selectByMouse: true
+
+                                            validator: RegularExpressionValidator {
+                                                regularExpression: /^[a-zA-Z\s]*$/ // Allows only letters and spaces
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Email
+                                Column {
+                                    width: parent.width
+                                    spacing: dp(2)
+                                    //anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Row {
+                                        //anchors.horizontalCenter: parent.horizontalCenter
+                                        x: parent.width * 0.05
+                                        spacing: dp(1)
+
+                                        Text {
+                                            text: "Email"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: textPrimary
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/gmail.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 16
+                                            height: 16
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width * 0.9
+                                        height: dp(10)
+                                        radius: dp(1)
+                                        color: surfaceColor
+                                        border.width: regEmail.activeFocus ? 2 : 1
+                                        border.color: regEmail.activeFocus ? primaryColor : borderColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        TextField {
+                                            id: regEmail
+                                            anchors.fill: parent
+                                            placeholderText: "your.email@example.com"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black"
+                                            background: null
+                                            selectByMouse: true
+
+                                            validator: RegularExpressionValidator {
+                                                regularExpression: /^[a-zA-Z0-9@._-]*$/ // Email allowed characters
+                                            }
+                                            inputMethodHints: Qt.ImhEmailCharactersOnly
+                                        }
+                                    }
+                                }
+
+                                // Password
+                                Column {
+                                    width: parent.width
+                                    spacing: dp(2)
+                                    //anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Row {
+                                        //anchors.horizontalCenter: parent.horizontalCenter
+                                        x: parent.width * 0.05
+                                        spacing: dp(1)
+
+                                        Text {
+                                            text: "Password"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: textPrimary
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/password.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 16
+                                            height: 16
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width * 0.9
+                                        height: dp(10)
+                                        radius: dp(1)
+                                        color: surfaceColor
+                                        border.width: regPass.activeFocus ? 2 : 1
+                                        border.color: regPass.activeFocus ? primaryColor : borderColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        TextField {
+                                            id: regPass
+                                            anchors {
+                                                left: parent.left
+                                                right: showPasswordBtn_crtAc.left
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                                //margins: dp(2)
+                                            }
+                                            placeholderText: "Enter your password"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black" //textPrimary
+                                            echoMode: showPasswordBtn_crtAc.checked ? TextInput.Normal : TextInput.Password
+                                            background: null
+                                            selectByMouse: true
+                                        }
+
+                                        Button {
+                                            id: showPasswordBtn_crtAc
+                                            width: dp(6) // Adjusted size
+                                            height: dp(6)
+                                            anchors {
+                                                right: parent.right
+                                                verticalCenter: parent.verticalCenter
+                                                margins: dp(1)
+                                            }
+                                            checkable: true
+
+                                            background: Rectangle {
+                                                radius: dp(0.75) // 6/8=0.75
+                                                color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
+                                            }
+
+                                            contentItem: QGCColoredImage {
+                                                anchors.fill: parent
+                                                anchors.margins: dp(1)
+                                                fillMode: Image.PreserveAspectFit
+                                                source: parent.checked
+                                                        ? "/qmlimages/NewImages/password_visible.svg"
+                                                        : "/qmlimages/NewImages/password_hidden.svg"
+                                                color: "black"
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                // Confirm Password
+                                Column {
+                                    width: parent.width
+                                    spacing: dp(2)
+                                    //anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Row {
+                                        //anchors.horizontalCenter: parent.horizontalCenter
+                                        x: parent.width * 0.05
+                                        spacing: dp(1)
+
+                                        Text {
+                                            text: "Confirm Password"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: textPrimary
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/password.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 16
+                                            height: 16
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: parent.width * 0.9
+                                        height: dp(10)
+                                        radius: dp(1)
+                                        color: surfaceColor
+                                        border.width: regConfirm.activeFocus ? 2 : 1
+                                        border.color: regConfirm.activeFocus ? primaryColor : borderColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        TextField {
+                                            id: regConfirm
+                                            anchors {
+                                                left: parent.left
+                                                right: confirmPswBtn.left
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                                //margins: dp(2)
+                                            }
+                                            placeholderText: "Confirm your password"
+                                            //font.pixelSize: dp(4)
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black"
+                                            echoMode: confirmPswBtn.checked ? TextInput.Normal : TextInput.Password
+                                            background: null
+                                            selectByMouse: true
+                                        }
+
+
+                                        Button {
+                                            id: confirmPswBtn
+                                            width: dp(6) // Adjusted size
+                                            height: dp(6)
+                                            anchors {
+                                                right: parent.right
+                                                verticalCenter: parent.verticalCenter
+                                                margins: dp(1)
+                                            }
+                                            checkable: true
+
+                                            background: Rectangle {
+                                                radius: dp(0.75) // 6/8=0.75
+                                                color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
+                                            }
+
+                                            contentItem: QGCColoredImage {
+                                                anchors.fill: parent
+                                                anchors.margins: dp(1)
+                                                fillMode: Image.PreserveAspectFit
+                                                source: parent.checked
+                                                        ? "/qmlimages/NewImages/password_visible.svg"
+                                                        : "/qmlimages/NewImages/password_hidden.svg"
+                                                color: "black"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Action Buttons
+                            Column {
+                                width: parent.width
+                                spacing: dp(3)
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                Button {
+                                    id: signUpActionBtn
+                                    text: "Create Account"
+                                    width: parent.width * 0.5
+                                    height: dp(10)
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    background: Rectangle {
+                                        radius: dp(1)
+                                        color: signUpActionBtn.pressed ? primaryHover : primaryColor
+                                    }
+
+                                    contentItem: Item {
+                                        anchors.fill: parent
+                                        // clip: true
+
+                                        Row {
+                                            anchors.centerIn: parent      // now centers correctly
+                                            spacing: dp(1)
+
+                                            QGCColoredImage {
+                                                source: "/qmlimages/NewImages/createAccount.svg"
+                                                fillMode: Image.PreserveAspectFit
+                                                width: 22
+                                                height: 22
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            Text {
+                                                text: signUpBtn.text
+                                                font.pointSize: ScreenTools.defaultFontPointSize
+                                                font.weight: Font.Medium
+                                                color: "white"
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+                                        }
+                                    }
+
+                                    onClicked: {
+                                        // Execute validations in order
+                                        if (!MapGlobals.validateUsername(regUser.text,regUser)) return;
+                                        if (!MapGlobals.validateDisplayName(regDisplay.text,regDisplay)) return;
+                                        if (!MapGlobals.validateEmail(regEmail.text,regEmail)) return;
+                                        if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
+                                        if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
+
+                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
+                                            if (result) {
+
+                                                mainWindow.showToastMessage("Account created successfully!");
+
+                                                currentView = "signin";
+
+                                                QGroundControl.saveGlobalSetting("username", regUser.text);
+                                                QGroundControl.saveGlobalSetting("name", regDisplay.text);
+                                                QGroundControl.saveGlobalSetting("email", regEmail.text);
+
+                                                regUser.text = "";
+                                                regDisplay.text = "";
+                                                regEmail.text = "";
+                                                regPass.text = "";
+                                                regConfirm.text = "";
+                                            }
+                                        });
+
+                                    }
+                                }
+
+                                Row {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: dp(8)
+
+                                    Text {
+                                        text: "Already have an account?"
+                                        //font.pixelSize: dp(3.5)
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        color: textSecondary
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Button {
+                                        id: signInAccount
+                                        text: "Sign In"
+                                        width: undefined
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        background: Rectangle {
+                                            color: "transparent"
+                                        }
+
+                                        contentItem: Item {
+                                            anchors.fill: parent
+                                            // clip: true
+
+                                            Row {
+                                                anchors.centerIn: parent      // now centers correctly
+                                                spacing: dp(1)
+
+                                                Text {
+                                                    text: signInAccount.text
+                                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                                    font.weight: Font.Medium
+                                                    color: "white"
+                                                    verticalAlignment: Text.AlignVCenter
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                }
+
+                                                QGCColoredImage {
+                                                    source: "/qmlimages/NewImages/signIn.svg"
+                                                    fillMode: Image.PreserveAspectFit
+                                                    width: 15
+                                                    height: 15
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+                                        }
+
+                                        onClicked: currentView = "signin"
+                                    }
+                                }
+
                             }
                         }
 
                     }
+
                 }
             }
         }
