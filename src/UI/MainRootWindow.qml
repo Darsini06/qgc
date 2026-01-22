@@ -868,7 +868,7 @@ ApplicationWindow {
 
             function updateSettingsTab() {
                 if (activeVehicle) {
-                    tabModel.setProperty(1, "file", "CalibrationSettings.qml");
+                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
                 } else {
                     tabModel.setProperty(1, "file", "APMSensorsComponent.qml");
                 }
