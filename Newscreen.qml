@@ -25,6 +25,8 @@ Item {
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
+    property color app_color: "#5d179e"
+
     onVisibleChanged : {
         if (visible) {
             console.log("NewScreen onVisibleChanged");
@@ -44,140 +46,158 @@ Item {
         }
     }
 
-    function camera(){
-        camera.visible = true
-        agri.visible=false
-        mapping.visible = false
-        vtol.visible=false
-        cameraicon.visible=true
-        agriicon.visible=false
-        mappingicon.visible=false
-        vtolicon.visible=false
-        droneAnim1.visible=false
-    }
+    // function camera(){
+    //     camera.visible = true
+    //     agri.visible=false
+    //     mapping.visible = false
+    //     vtol.visible=false
+    //     cameraicon.visible=true
+    //     agriicon.visible=false
+    //     mappingicon.visible=false
+    //     vtolicon.visible=false
+    //     droneAnim1.visible=false
+    // }
 
-    function agri(){
-        camera.visible=false
-        agri.visible=true
-        mapping.visible=false
-        vtol.visible=false
-        cameraicon.visible=false
-        agriicon.visible=true
-        mappingicon.visible=false
-        vtolicon.visible=false
-        droneAnim1.visible=false
-    }
+    // function agri(){
+    //     camera.visible=false
+    //     agri.visible=true
+    //     mapping.visible=false
+    //     vtol.visible=false
+    //     cameraicon.visible=false
+    //     agriicon.visible=true
+    //     mappingicon.visible=false
+    //     vtolicon.visible=false
+    //     droneAnim1.visible=false
+    // }
 
-    function mapping(){
-        camera.visible=false
-        agri.visible=false
-        mapping.visible=true
-        vtol.visible=false
-        cameraicon.visible=false
-        agriicon.visible=false
-        mappingicon.visible=true
-        vtolicon.visible=false
-        droneAnim1.visible=false
-    }
+    // function mapping(){
+    //     camera.visible=false
+    //     agri.visible=false
+    //     mapping.visible=true
+    //     vtol.visible=false
+    //     cameraicon.visible=false
+    //     agriicon.visible=false
+    //     mappingicon.visible=true
+    //     vtolicon.visible=false
+    //     droneAnim1.visible=false
+    // }
 
-    function vtol(){
-        camera.visible=false
-        agri.visible=false
-        mapping.visible=false
-        vtol.visible=true
-        cameraicon.visible=false
-        agriicon.visible=false
-        mappingicon.visible=false
-        vtolicon.visible=true
-        droneAnim1.visible=false
-    }
+    // function vtol(){
+    //     camera.visible=false
+    //     agri.visible=false
+    //     mapping.visible=false
+    //     vtol.visible=true
+    //     cameraicon.visible=false
+    //     agriicon.visible=false
+    //     mappingicon.visible=false
+    //     vtolicon.visible=true
+    //     droneAnim1.visible=false
+    // }
 
     Rectangle {
         width: Screen.width
         height: Screen.height
-        color: "transparent"  // Dark background
+        color: "white"  // Dark background
 
-        Rectangle {
-            anchors.fill: parent
-            z: 0
-            color: "#1b1c3e"
-        }
+        // Rectangle {
+        //     anchors.fill: parent
+        //     z: 0
+        //     color: "#1b1c3e"
+        // }
 
-        //---- Curved Gradient Background ----
-        Rectangle {
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            width: parent.width * 0.7
-            height: parent.height * 0.9
-            radius: width * 0.5
-            rotation: 25
-            opacity: 0.9
-            anchors.rightMargin: -width * 0.2
-            anchors.bottomMargin: -height * 0.2
-            z: 1
+        // //---- Curved Gradient Background ----
+        // Rectangle {
+        //     anchors.right: parent.right
+        //     anchors.bottom: parent.bottom
+        //     width: parent.width * 0.7
+        //     height: parent.height * 0.9
+        //     radius: width * 0.5
+        //     rotation: 25
+        //     opacity: 0.9
+        //     anchors.rightMargin: -width * 0.2
+        //     anchors.bottomMargin: -height * 0.2
+        //     z: 1
 
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#1b1c3e" }
-                GradientStop { position: 1.0; color: "#7d8df7" }
-            }
-        }
+        //     gradient: Gradient {
+        //         GradientStop { position: 0.0; color: "#1b1c3e" }
+        //         GradientStop { position: 1.0; color: "#7d8df7" }
+        //     }
+        // }
 
 
         // ---- Top Navigation Bar ----
-        RowLayout {
-            spacing: 40
+        Item {
+            width: parent.width
+            height: 50
             anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.topMargin: 30
+            anchors.topMargin: 20
 
-            Item {
-                width: profileLabel.implicitWidth
-                height: profileLabel.implicitHeight
+            // LEFT IMAGE (pinned left)
+            QGCColoredImage {
+                source: "/qmlimages/NewImages/aviatrickslogo.png"
+                width: 200
+                height: 40
+                fillMode: Image.PreserveAspectFit
+                color: "transparent"
 
-                Label {
-                    id: profileLabel
-                    text: "PROFILE"
-                    color: "white"
-                    font.pixelSize: 15
-                    font.bold: true
+                anchors.left: parent.left
+                anchors.leftMargin: 20
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // CENTERED LABELS GROUP
+            Row {
+                spacing: 40
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+
+                Item {
+                    width: profileLabel.implicitWidth
+                    height: profileLabel.implicitHeight
+
+                    Label {
+                        id: profileLabel
+                        text: "PROFILE"
+                        color: "black"
+                        font.pixelSize: 15
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            MapGlobals.currentView_profile = "profile"
+                            mainWindow.openProfileScreen()
+                        }
+                    }
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        //mainWindow.profileScreen1(true)
-                        mainWindow.openProfileScreen();
+                Item {
+                    width: logout.implicitWidth
+                    height: logout.implicitHeight
+
+                    Label {
+                        id: logout
+                        text: "Select Application"
+                        color: "black"
+                        font.pixelSize: 15
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            MapGlobals.currentView_profile = "drone"
+                            mainWindow.openProfileScreen()
+                            //logoutdialog.createObject(mainWindow).open()
+                        }
                     }
                 }
             }
-
-            // Label { text: "ABOUT"; color: "white"; font.pixelSize: 15;font.bold: true }
-            // Label { text: "CONTACT"; color: "white"; font.pixelSize: 15;font.bold: true }
-
-            Item {
-                width: logout.implicitWidth
-                height: logout.implicitHeight
-
-                Label {
-                    id: logout
-                    text: "LOG OUT"
-                    color: "white"
-                    font.pixelSize: 15
-                    font.bold: true
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-
-                        logoutdialog.createObject(mainWindow).open()
-                    }
-                }
-            }
-
         }
+
 
         Row {
             id: mainRow
@@ -194,17 +214,26 @@ Item {
                 spacing: 20
 
                 Label {
-                    text: "TIME TO FLY"
-                    color: "white"
+                    text: "Aviatricks Aerolabs"
+                    color: "Black"
                     font.pointSize:  ScreenTools.largeFontPointSize * 1.2
                     font.bold: true
                 }
+
+                // QGCColoredImage {
+                //     source: "/qmlimages/NewImages/aviatrickslogo.png"
+                //     width: 80
+                //     height: 50
+                //     fillMode: Image.PreserveAspectFit
+                //     color : "transparent"
+                //     //anchors.verticalCenter: parent.verticalCenter
+                // }
 
                 Label {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     text: "Flying a drone is like holding a piece of freedom in your hands. The view from above always tells a story the ground can’t."
-                    color: "lightgray"
+                    color: "gray"
                     font.pointSize:  ScreenTools.mediumFontPointSize
                 }
             }
@@ -217,6 +246,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 clip: true
 
+                //Lottie File for All categoreis diaplayed
                 Item {
                     id: lottieWrapper
                     anchors.centerIn: parent
@@ -236,6 +266,8 @@ Item {
                 }
 
                 // ---- Drone Image Placeholder ----
+
+                //Camera_Drone_Image
                 Image {
                     id:cameraicon
                     source: "/qmlimages/NewImages/cameradrone.svg" // Replace with real image
@@ -246,6 +278,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                 }
 
+                //Mapping_Drone_Image
                 Image {
                     id: mappingicon
                     source: "/qmlimages/NewImages/survey.png" // Replace with real image
@@ -256,6 +289,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                 }
 
+                //VTOL_Drone_Image
                 Image {
                     id: vtolicon
                     source: "/qmlimages/NewImages/vtol.png" // Replace with real image
@@ -266,6 +300,7 @@ Item {
                     visible: droneType ==="VTOL"?true:false
                 }
 
+                //Agri_Drone_Image
                 Image {
                     id:agriicon
                     source: "/qmlimages/NewImages/agri.png" // Replace with real image
@@ -273,7 +308,7 @@ Item {
                     width: parent.width * 0.4
                     height: parent.height * 0.4
                     fillMode: Image.PreserveAspectFit
-                    visible: droneType ==="Agri"?true:false
+                    visible: droneType ==="Agri" ? true : false
                 }
             }
         }
@@ -294,6 +329,8 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottomMargin: 20
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
             spacing: 20
 
             Button {
@@ -315,7 +352,6 @@ Item {
                             font.weight: Font.Medium
                             color: "white"
                             verticalAlignment: Text.AlignVCenter
-
                         }
 
                         QGCColoredImage {
@@ -331,10 +367,10 @@ Item {
 
 
                 background: Rectangle {
-                    color: "#1b1c3e"
-                    radius: 20
-                    border.color: "#005BBB"
-                    border.width: 2
+                    color: app_color
+                    radius: 6
+                    //border.color: "#005BBB"
+                    //border.width: 2
                 }
 
                 onClicked: {
@@ -389,10 +425,10 @@ Item {
                 }
 
                 background: Rectangle {
-                    color: "#1b1c3e"  // Blue color (iOS-style button)
-                    radius: 20  // Curved button
-                    border.color: "#005BBB"  // Border color
-                    border.width: 2
+                    color: app_color
+                    radius: 6
+                    //border.color: "#005BBB"
+                    //border.width: 2
                 }
 
                 onClicked: {
@@ -452,14 +488,13 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
-
                 }
 
                 background: Rectangle {
-                    color: "#1b1c3e" // Blue color (iOS-style button)
-                    radius: 20 // Curved button
-                    border.color: "#005BBB" // Border color
-                    border.width: 2
+                    color: app_color
+                    radius: 6
+                    //border.color: "#005BBB"
+                    //border.width: 2
                 }
 
                 onClicked: {
@@ -522,10 +557,10 @@ Item {
                 }
 
                 background: Rectangle {
-                    color: "#1b1c3e" // Blue color (iOS-style button)
-                    radius: 20 // Curved button
-                    border.color: "#005BBB" // Border color
-                    border.width: 2
+                    color: app_color
+                    radius: 6
+                    //border.color: "#005BBB"
+                    //border.width: 2
                 }
 
                 onClicked: {
@@ -553,99 +588,99 @@ Item {
                 }
             }
 
-            Button {
-                id:vtol
-                text: "VTOL"
-                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-                Layout.preferredWidth: parent.width * 0.13
-                implicitHeight: 30
-                visible: droneType ==="loadpage"?true:droneType ==="VTOL"?true:false
+            // Button {
+            //     id:vtol
+            //     text: "VTOL"
+            //     Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+            //     Layout.preferredWidth: parent.width * 0.13
+            //     implicitHeight: 30
+            //     visible: droneType ==="loadpage"?true:droneType ==="VTOL"?true:false
 
-                contentItem: Item {
-                    anchors.fill: parent
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
+            //     contentItem: Item {
+            //         anchors.fill: parent
+            //         Row {
+            //             anchors.centerIn: parent
+            //             spacing: 6
 
-                        Text {
-                            text: vtol.text
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.weight: Font.Medium
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+            //             Text {
+            //                 text: vtol.text
+            //                 font.pointSize: ScreenTools.defaultFontPointSize
+            //                 font.weight: Font.Medium
+            //                 color: "white"
+            //                 verticalAlignment: Text.AlignVCenter
 
-                        }
+            //             }
 
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/VTOL_application.svg"
-                            width: 15
-                            height: 15
-                            fillMode: Image.PreserveAspectFit
-                            color: "white"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
+            //             QGCColoredImage {
+            //                 source: "/qmlimages/NewImages/VTOL_application.svg"
+            //                 width: 15
+            //                 height: 15
+            //                 fillMode: Image.PreserveAspectFit
+            //                 color: "white"
+            //                 anchors.verticalCenter: parent.verticalCenter
+            //             }
+            //         }
 
-                }
+            //     }
 
-                background: Rectangle {
-                    color: "#1b1c3e" // Blue color (iOS-style button)
-                    radius: 20 // Curved button
-                    border.color: "#005BBB" // Border color
-                    border.width: 2
-                }
+            //     background: Rectangle {
+            //         color: "#1b1c3e" // Blue color (iOS-style button)
+            //         radius: 20 // Curved button
+            //         border.color: "#005BBB" // Border color
+            //         border.width: 2
+            //     }
 
-                onClicked: {
-                    QGroundControl.saveGlobalSetting("loadpage", "VTOL")
-                    mainWindow.showFlyView1()
-                    MapGlobals.comefrom="Start"
-                    console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-                    _appSettings.screen = "Start"
-                    var videoSettings = QGroundControl.settingsManager.videoSettings
-                    if (videoSettings) {
-                        var videoSourceFact = videoSettings.videoSource
-                        if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                            videoSourceFact.value = videoSourceFact.enumValues[0]
-                        }
-                    }
-                    // camera.visible=false
-                    // agri.visible=false
-                    // mapping.visible=false
-                    // vtol.visible=true
-                }
-            }
+            //     onClicked: {
+            //         QGroundControl.saveGlobalSetting("loadpage", "VTOL")
+            //         mainWindow.showFlyView1()
+            //         MapGlobals.comefrom="Start"
+            //         console.log("MapGlobals.comefrom",MapGlobals.comefrom)
+            //         _appSettings.screen = "Start"
+            //         var videoSettings = QGroundControl.settingsManager.videoSettings
+            //         if (videoSettings) {
+            //             var videoSourceFact = videoSettings.videoSource
+            //             if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+            //                 videoSourceFact.value = videoSourceFact.enumValues[0]
+            //             }
+            //         }
+            //         // camera.visible=false
+            //         // agri.visible=false
+            //         // mapping.visible=false
+            //         // vtol.visible=true
+            //     }
+            // }
 
         }
 
-        Component {
-            id: logoutdialog
+        // Component {
+        //     id: logoutdialog
 
-            QGCPopupDialog {
-                id: popup
-                title: qsTr("Logout")
+        //     QGCPopupDialog {
+        //         id: popup
+        //         title: qsTr("Logout")
 
-                buttons: Dialog.Yes | Dialog.No
+        //         buttons: Dialog.Yes | Dialog.No
 
-                onAccepted: {
-                    QGroundControl.saveBoolGlobalSetting("login", false)
-                    QGroundControl.saveGlobalSetting("loadpage", "loadpage")
-                    popup.visible = false
-                    MapGlobals.profile()
-                }
+        //         onAccepted: {
+        //             QGroundControl.saveBoolGlobalSetting("login", false)
+        //             QGroundControl.saveGlobalSetting("loadpage", "loadpage")
+        //             popup.visible = false
+        //             MapGlobals.profile()
+        //         }
 
-                onRejected: {
-                    popup.visible = false
-                }
+        //         onRejected: {
+        //             popup.visible = false
+        //         }
 
-                ColumnLayout {
-                    spacing: ScreenTools.defaultFontPixelWidth
-                    QGCLabel {
-                        text: qsTr("Are you sure you want to logout?")
-                        Layout.fillWidth: true
-                    }
-                }
-            }
-        }
+        //         ColumnLayout {
+        //             spacing: ScreenTools.defaultFontPixelWidth
+        //             QGCLabel {
+        //                 text: qsTr("Are you sure you want to logout?")
+        //                 Layout.fillWidth: true
+        //             }
+        //         }
+        //     }
+        // }
 
         // First Dialog – Type Selection Only
 
@@ -743,13 +778,13 @@ Item {
                 property int selectedType
 
                 Connections {
-                       target: editingConfig
-                       enabled: editingConfig !== null
+                    target: editingConfig
+                    enabled: editingConfig !== null
 
-                       function onShowToast(message) {
-                           mainWindow.showToastMessage(message)
-                       }
-                   }
+                    function onShowToast(message) {
+                        mainWindow.showToastMessage(message)
+                    }
+                }
 
                 onAccepted: {
                     linkSettingsLoader.item.saveSettings()

@@ -33,6 +33,8 @@ QtObject {
     property string kmlPath: ""
     property string waypoint: "waypoint"
 
+    property string currentView_profile: "profile"
+
     property bool share_edit_visibility : false
 
     signal newSessionAdded()

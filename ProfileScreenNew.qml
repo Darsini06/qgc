@@ -21,7 +21,7 @@ import MapGlobals 1.0
 Item {
     id: profilescreen
     anchors.fill: parent
-    property string currentView: "profile" // options: main, accountUpdate, userGuide, record, reports, feedback, settings
+    property string currentView: MapGlobals.currentView_profile//"profile" // options: main, accountUpdate, userGuide, record, reports, feedback, settings
 
     property string userName: QGroundControl.loadGlobalSetting("username", "")
     property string displayName: QGroundControl.loadGlobalSetting("name", "")
@@ -42,6 +42,8 @@ Item {
     property string droneType: "loadpage"
 
     property bool privacyLoading: true
+
+    property color app_color: "#5d179e"
 
 
 
@@ -1749,8 +1751,8 @@ Item {
                         property var buttonModel: [
                             { label: "Camera",  color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
                             { label: "Agri",    color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
-                            { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" },
-                            { label: "VTOL",    color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
+                            { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" }
+                            //{ label: "VTOL",    color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
                         ]
 
                         Component.onCompleted: {
@@ -1814,7 +1816,6 @@ Item {
                                         }
 
                                     }
-
 
 
                                     QGCColoredImage {
