@@ -33,6 +33,8 @@ QtObject {
     property string kmlPath: ""
     property string waypoint: "waypoint"
 
+    property string currentView_profile: "profile"
+
     property bool share_edit_visibility : false
 
     signal newSessionAdded()
@@ -569,14 +571,86 @@ QtObject {
         return true;
     }
 
-    function loginUserFunc(username, password,callback) {
+    // function loginUserFunc(username, password,callback) {
+    //     var db = getDatabase();
+    //     var result = false;
+
+    //     db.transaction(function(tx) {
+    //         var rs = tx.executeSql("SELECT * FROM users WHERE username=? AND password=?", [username, password]);
+    //         console.log("inserted=========",rs)
+    //         if (rs.rows.length > 0) {
+    //             console.log("Login Success");
+    //             result = true;
+    //             //loginLoader.visible = false;
+    //             rootWindow.newscreen();
+    //             rootWindow.showToastMessage("Login Successfully");
+    //             login="login"
+    //             QGroundControl.saveBoolGlobalSetting("login", true)
+
+    //         } else {
+    //             result = false;
+    //             console.log("Invalid Credentials");
+    //             rootWindow.showToastMessage("Incorrect username or password");
+    //         }
+
+    //         if (callback) {
+    //             callback(result);
+    //         }
+
+    //     });
+    // }
+
+
+    function loginUserFunc(userInput, password, callback) {
         var db = getDatabase();
         var result = false;
+        var isEmail = userInput.indexOf("@") !== -1;
 
         db.transaction(function(tx) {
-            var rs = tx.executeSql("SELECT * FROM users WHERE username=? AND password=?", [username, password]);
-            console.log("inserted=========",rs)
-            if (rs.rows.length > 0) {
+
+            var rsUser;
+
+            if (isEmail) {
+                // Check email
+                rsUser = tx.executeSql(
+                            "SELECT * FROM users WHERE email = ?",
+                            [userInput]
+                            );
+
+                if (rsUser.rows.length === 0) {
+                    rootWindow.showToastMessage("Incorrect Email");
+                    callback(false);
+                    return;
+                }
+
+                // Email exists → check password
+                rsUser = tx.executeSql(
+                            "SELECT * FROM users WHERE email = ? AND password = ?",
+                            [userInput, password]
+                            );
+
+            } else {
+                // Check username
+                rsUser = tx.executeSql(
+                            "SELECT * FROM users WHERE username = ?",
+                            [userInput]
+                            );
+
+                if (rsUser.rows.length === 0) {
+                    rootWindow.showToastMessage("Incorrect Username");
+                    callback(false);
+                    return;
+                }
+
+                // Username exists → check password
+                rsUser = tx.executeSql(
+                            "SELECT * FROM users WHERE username = ? AND password = ?",
+                            [userInput, password]
+                            );
+            }
+
+            // Final password validation
+            if (rsUser.rows.length > 0) {
                 console.log("Login Success");
                 result = true;
                 //loginLoader.visible = false;
@@ -585,17 +659,16 @@ QtObject {
                 login="login"
                 QGroundControl.saveBoolGlobalSetting("login", true)
             } else {
+                rootWindow.showToastMessage("Incorrect password");
                 result = false;
-                console.log("Invalid Credentials");
-                rootWindow.showToastMessage("Incorrect username or password");
             }
 
-            if (callback) {
-                callback(result);
-            }
-
+            callback(result);
         });
     }
+
+
+
 
 
     function loadUserData(username, callback) {
