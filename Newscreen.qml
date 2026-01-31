@@ -133,17 +133,17 @@ Item {
             anchors.topMargin: 20
 
             // LEFT IMAGE (pinned left)
-            QGCColoredImage {
-                source: "/qmlimages/NewImages/aviatrickslogo.png"
-                width: 200
-                height: 40
-                fillMode: Image.PreserveAspectFit
-                color: "transparent"
+            // QGCColoredImage {
+            //     source: "/qmlimages/NewImages/aviatrickslogo.svg"
+            //     width: parent.width * 0.3
+            //     height: 30
+            //     fillMode: Image.PreserveAspectFit
+            //     color: "transparent"
 
-                anchors.left: parent.left
-                anchors.leftMargin: 20
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            //     anchors.left: parent.left
+            //     anchors.leftMargin: 20
+            //     anchors.verticalCenter: parent.verticalCenter
+            // }
 
             // CENTERED LABELS GROUP
             Row {
@@ -203,6 +203,7 @@ Item {
             id: mainRow
             z: 5
             anchors.fill: parent
+            anchors.horizontalCenter:  parent.horizontalCenter
             anchors.margins: 40
             spacing: 20
 
@@ -213,21 +214,21 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 20
 
-                Label {
-                    text: "Aviatricks Aerolabs"
-                    color: "Black"
-                    font.pointSize:  ScreenTools.largeFontPointSize * 1.2
-                    font.bold: true
-                }
-
-                // QGCColoredImage {
-                //     source: "/qmlimages/NewImages/aviatrickslogo.png"
-                //     width: 80
-                //     height: 50
-                //     fillMode: Image.PreserveAspectFit
-                //     color : "transparent"
-                //     //anchors.verticalCenter: parent.verticalCenter
+                // Label {
+                //     text: "Aviatricks Aerolabs"
+                //     color: "Black"
+                //     font.pointSize:  ScreenTools.largeFontPointSize * 1.2
+                //     font.bold: true
                 // }
+
+                QGCColoredImage {
+                    source: "/qmlimages/NewImages/aviatrickslogo.svg"
+                    width: parent.width * 0.35
+                    height: 35
+                    fillMode: Image.PreserveAspectFit
+                    color: "transparent"
+                    //anchors.verticalCenter: parent.verticalCenter
+                }
 
                 Label {
                     width: parent.width * 0.9
@@ -260,7 +261,6 @@ Item {
                         source: "qrc:/qmlimages/NewImages/droneManFly.json"
                         autoPlay: true
                         loops: Animation.Infinite
-
                         anchors.centerIn: parent
                     }
                 }

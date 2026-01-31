@@ -6,6 +6,7 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.LocalStorage 2.0
+import QtQuick.Effects
 
 import QtWebView 1.1
 
@@ -44,6 +45,16 @@ Item {
     property bool privacyLoading: true
 
     property color app_color: "#5d179e"
+
+    property real screenWidth: parent.width
+    property real screenHeight: parent.height
+    property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
+    property real baseUnit: 8 * scaleRatio
+
+
+    function dp(value) {
+        return value * baseUnit;
+    }
 
 
 
@@ -273,7 +284,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     RowLayout {
                         anchors.fill: parent
@@ -304,7 +315,7 @@ Item {
 
                         QGCColoredImage {
                             id: homeIcon
-                            source: "/qmlimages/NewImages/profile.png"
+                            source: "/qmlimages/NewImages/user_profile.svg"
                             width: 25
                             height: 25
                             fillMode: Image.PreserveAspectFit
@@ -546,7 +557,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     QGCColoredImage {
                         id: backArrow
@@ -684,7 +695,7 @@ Item {
                                         radius: 8
                                         color: "white"
                                         border.width: namefield.activeFocus ? 2 : 1
-                                        border.color: namefield.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: namefield.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: namefield
@@ -725,7 +736,7 @@ Item {
                                         radius: 8
                                         color: "white"
                                         border.width: _username.activeFocus ? 2 : 1
-                                        border.color: _username.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: _username.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: _username
@@ -765,7 +776,7 @@ Item {
                                         radius: 8
                                         color: "white"
                                         border.width: emailField.activeFocus ? 2 : 1
-                                        border.color: emailField.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: emailField.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: emailField
@@ -802,7 +813,7 @@ Item {
                                         radius: 8
                                         color: "white"
                                         border.width: mobileField.activeFocus ? 2 : 1
-                                        border.color: mobileField.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: mobileField.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: mobileField
@@ -847,8 +858,8 @@ Item {
                                                 height: 15
                                                 radius: 10
                                                 border.width: 2
-                                                border.color: "#1b1c3e"
-                                                color: rpcCompletedStatus === 1 ? "#1b1c3e" : "transparent"
+                                                border.color: app_color//"#1b1c3e"
+                                                color: rpcCompletedStatus === 1 ? app_color : "transparent"
 
                                                 MouseArea {
                                                     anchors.fill: parent
@@ -859,7 +870,7 @@ Item {
                                             Text {
                                                 text: "Yes"
                                                 font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#333333"
+                                                color: "#000000"
                                                 anchors.verticalCenter: parent.verticalCenter
 
                                                 MouseArea {
@@ -879,8 +890,8 @@ Item {
                                                 height: 15
                                                 radius: 10
                                                 border.width: 2
-                                                border.color: "#1b1c3e"
-                                                color: rpcCompletedStatus === 0 ? "#1b1c3e" : "transparent"
+                                                border.color: app_color//"#1b1c3e"
+                                                color: rpcCompletedStatus === 0 ? app_color : "transparent"
 
                                                 MouseArea {
                                                     anchors.fill: parent
@@ -891,7 +902,7 @@ Item {
                                             Text {
                                                 text: "No"
                                                 font.pointSize: ScreenTools.defaultFontPointSize
-                                                color: "#333333"
+                                                color: "#000000"
                                                 anchors.verticalCenter: parent.verticalCenter
 
                                                 MouseArea {
@@ -935,7 +946,7 @@ Item {
 
                                     background: Rectangle {
                                         radius: 5
-                                        color: parent.pressed ? "#218838" : "#28a745"
+                                        color: app_color//parent.pressed ? "#218838" : "#28a745"
                                     }
 
                                     contentItem: Text {
@@ -977,7 +988,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     // Back arrow (left center)
                     QGCColoredImage {
@@ -1099,7 +1110,7 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Screen.height * 0.15
-                        color: "#1b1c3e"
+                        color: app_color//"#1b1c3e"
 
                         RowLayout {
                             anchors.fill: parent
@@ -1211,7 +1222,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     // Back Arrow (Left Center)
                     QGCColoredImage {
@@ -1336,7 +1347,7 @@ Item {
                                         height: 40
                                         radius: 8
                                         border.width: feed_mobile.activeFocus ? 2 : 1
-                                        border.color: feed_mobile.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: feed_mobile.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: feed_mobile
@@ -1361,7 +1372,7 @@ Item {
                                         height: 40
                                         radius: 8
                                         border.width: feed_email.activeFocus ? 2 : 1
-                                        border.color: feed_email.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: feed_email.activeFocus ? app_color : "#dcdde1"
 
                                         TextField {
                                             id: feed_email
@@ -1386,7 +1397,7 @@ Item {
                                         height: 100
                                         radius: 8
                                         border.width: feedbackArea.activeFocus ? 2 : 1
-                                        border.color: feedbackArea.activeFocus ? "#3498db" : "#dcdde1"
+                                        border.color: feedbackArea.activeFocus ? app_color : "#dcdde1"
 
                                         TextArea {
                                             id: feedbackArea
@@ -1403,9 +1414,25 @@ Item {
                                 Button {
                                     text: "Send"
                                     width: parent.width * 0.3
+                                    height: 40
                                     anchors.horizontalCenter: parent.horizontalCenter
 
+                                    background: Rectangle {
+                                        radius: 5
+                                        color: app_color//parent.pressed ? "#218838" : "#28a745"
+                                    }
+
+                                    contentItem: Text {
+                                        text: parent.text
+                                        color: "white"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+
                                     onClicked: {
+
                                         if (feedbackArea.text === "") {
                                             mainWindow.showToastMessage("Enter your valuable feedback");
                                             return;
@@ -1453,7 +1480,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     QGCColoredImage {
                         source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
@@ -1648,7 +1675,7 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: parent.height * 0.15
-                    color: "#1b1c3e"
+                    color: app_color//"#1b1c3e"
 
                     QGCColoredImage {
                         source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
@@ -1688,159 +1715,293 @@ Item {
 
                 /* ================= CONTENT ================= */
                 Item {
+                    id : contentArea
                     anchors.top: header.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    anchors.margins: 10
+                    anchors.margins: 20
 
-                    /* -------- LEFT CARD -------- */
-                    Rectangle {
-                        id: reportLeft
-                        width: parent.width * 0.4
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        color: "white"
+                    /* ---- STATE ---- */
+                    property int selectedIndex: -1
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 10
+                    property var buttonModel: [
+                        { label: "Camera", image: "/qmlimages/NewImages/cameradrone.svg" },
+                        { label: "Agri", image: "/qmlimages/NewImages/agri.png" },
+                        { label: "Mapping",image: "/qmlimages/NewImages/survey.png" }
+                    ]
 
-                            Item {
-                                width: 150; height: 150
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                LottieAnimation {
-                                    anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/droneManFly.json"
-                                    autoPlay: true
-                                    loops: Animation.Infinite
-                                    scale: 0.3
-                                }
-                            }
-
-                            Text {
-                                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                                color: "black"
-                                width: parent.width - 40
+                    Component.onCompleted: {
+                        var saved = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
+                        for (var i = 0; i < buttonModel.length; i++) {
+                            if (buttonModel[i].label === saved) {
+                                selectedIndex = i
+                                break
                             }
                         }
                     }
 
-                    /* -------- RIGHT CARD -------- */
-                    Rectangle {
-                        id: rightCard
-                        anchors.left: reportLeft.right
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.leftMargin: 10
-                        radius: 5
-                        color: "white"
-                        border.color: "#e0e0e0"
-
-                        /* ---- STATE ---- */
-                        property int selectedIndex: -1
-
-                        property var buttonModel: [
-                            { label: "Camera",  color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
-                            { label: "Agri",    color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
-                            { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" }
-                            //{ label: "VTOL",    color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
-                        ]
-
-                        Component.onCompleted: {
-                            var saved = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
-                            for (var i = 0; i < buttonModel.length; i++) {
-                                if (buttonModel[i].label === saved) {
-                                    selectedIndex = i
-                                    break
-                                }
-                            }
-                        }
+                    Column {
+                        id: mainColumn
+                        spacing: 40
+                        width: parent.width * 0.9
+                        anchors.centerIn: parent
 
                         Grid {
-                            anchors.centerIn: parent
-                            columns: 2
+                            id : grid
+                            columns: 3
                             spacing: 20
-                            width: parent.width * 0.9
-                            height: parent.height * 0.9
+                            width: parent.width
+                            anchors.horizontalCenter: parent.horizontalCenter
 
                             Repeater {
-                                model: rightCard.buttonModel
+                                model: contentArea.buttonModel
 
-                                Button {
-                                    width: parent.width * 0.45
-                                    height: parent.height * 0.45
+                                Item {
+                                    width: (grid.width - (grid.spacing * (grid.columns - 1))) / grid.columns
 
-                                    padding: 0
-                                    leftPadding: 0
-                                    rightPadding: 0
-                                    topPadding: 0
-                                    bottomPadding: 0
+                                    height: contentColumn.implicitHeight + 40
 
-                                    background: Rectangle {
-                                        anchors.fill: parent
-                                        radius: 12
-                                        color: modelData.color
-                                        border.width: 2
-                                        border.color: rightCard.selectedIndex === index
-                                                      ? "yellow"
-                                                      : modelData.border
+                                    // ----- SHADOW SOURCE -----
+                                    Rectangle {
+                                        id: shadowSource
+                                        anchors.fill: card
+                                        radius: 8
+                                        color: "white"
+                                        visible: false
                                     }
 
-                                    contentItem: Item {
+                                    // ----- REAL ELEVATION -----
+                                    MultiEffect {
+                                        anchors.fill: shadowSource
+                                        source: shadowSource
+                                        shadowEnabled: true
+
+                                        shadowHorizontalOffset: 0
+                                        shadowVerticalOffset: dp(0.5) //contentArea.selectedIndex === index ? dp(2) : dp(1)
+                                        shadowBlur: 1.5 //contentArea.selectedIndex === index ? 0.8 : 0.5
+                                        shadowColor: "#40000000"
+                                    }
+
+                                    // ----- CARD -----
+                                    Button {
+                                        id: card
                                         anchors.fill: parent
-                                        Column {
-                                            anchors.centerIn: parent
-                                            spacing: 10
+                                        padding: 0
 
-                                            Image {
-                                                source: modelData.image
-                                                width: 48
-                                                height: 48
-                                                fillMode: Image.PreserveAspectFit
-                                            }
+                                        background: Rectangle {
+                                            radius: 8
+                                            color: "white"
+                                            border.width: contentArea.selectedIndex === index
+                                                          ? 2
+                                                          : 1
+                                            border.color: contentArea.selectedIndex === index
+                                                          ? app_color
+                                                          : "#D3D3D3"
+                                        }
 
-                                            Text {
-                                                text: modelData.label
-                                                color: "white"
-                                                font.bold: true
+                                        contentItem: Item   {
+                                            anchors.fill: parent
+
+                                            Column {
+                                                id : contentColumn
+                                                anchors.centerIn: parent
+                                                spacing: 12
+
+                                                Image {
+                                                    source: modelData.image
+                                                    width: 56
+                                                    height: 56
+                                                    fillMode: Image.PreserveAspectFit
+                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                }
+
+                                                Text {
+                                                    text: modelData.label
+                                                    color: "black"
+                                                    font.bold: true
+                                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                                    horizontalAlignment: Text.AlignHCenter
+                                                    width: parent.width
+                                                    wrapMode: Text.WordWrap
+                                                }
                                             }
                                         }
 
+                                        QGCColoredImage {
+                                            visible: contentArea.selectedIndex === index
+                                            source: "qrc:/qmlimages/check.svg"
+                                            width: 20
+                                            height: 20
+                                            anchors.top: parent.top
+                                            anchors.right: parent.right
+                                            anchors.margins: 10
+                                            color: app_color
+                                        }
+
+                                        onClicked: {
+                                            contentArea.selectedIndex = index
+                                        }
                                     }
 
-
-                                    QGCColoredImage {
-                                        visible: rightCard.selectedIndex === index
-                                        source: "qrc:/qmlimages/check.svg"
-                                        width: 18
-                                        height: 18
-                                        anchors.top: parent.top
-                                        anchors.right: parent.right
-                                        anchors.margins: 8
-                                        color: "green"
-                                    }
-
-                                    onClicked: {
-                                        rightCard.selectedIndex = index
-                                        QGroundControl.saveGlobalSetting("loadpage", modelData.label)
-                                        mainWindow.showToastMessage(modelData.label + " Selected")
-                                        currentView = "profile"
-                                    }
                                 }
                             }
+
                         }
 
+                        Button {
+                            text: "Continue"
+                            width: parent.width * 0.5
+                            height: 40
+                            enabled: contentArea.selectedIndex !== -1
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            background: Rectangle {
+                                radius: 5
+                                color: enabled ? app_color : "#D3D3D3"
+                            }
+
+                            contentItem: Text {
+                                text: parent.text
+                                color: "white"
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.bold: true
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+
+                            onClicked: {
+                                console.log("Selected:", contentArea.buttonModel[contentArea.selectedIndex].label)
+                                QGroundControl.saveGlobalSetting("loadpage", contentArea.buttonModel[contentArea.selectedIndex].label)
+                                mainWindow.showToastMessage(contentArea.buttonModel[contentArea.selectedIndex].label + " Selected")
+
+                                mainWindow.openNewScreen();
+                                //currentView = "profile"
+                            }
+                        }
                     }
+
+
                 }
+
+
+                //     Item {
+                //         anchors.top: header.bottom
+                //         anchors.left: parent.left
+                //         anchors.right: parent.right
+                //         anchors.bottom: parent.bottom
+                //         anchors.margins: 10
+
+                //         /* -------- RIGHT CARD -------- */
+                //         Rectangle {
+                //             id: rightCard
+                //             anchors.left: reportLeft.right
+                //             anchors.right: parent.right
+                //             anchors.top: parent.top
+                //             anchors.bottom: parent.bottom
+                //             anchors.leftMargin: 10
+                //             radius: 5
+                //             color: "white"
+                //             border.color: "#e0e0e0"
+
+                //             /* ---- STATE ---- */
+                //             property int selectedIndex: -1
+
+                //             property var buttonModel: [
+                //                 { label: "Camera",  color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/cameradrone.svg" },
+                //                 { label: "Agri",    color: "#1c3f2b", border: "#4CAF50", image: "/qmlimages/NewImages/agri.png" },
+                //                 { label: "Mapping", color: "#1b2a49", border: "#3b6ea5", image: "/qmlimages/NewImages/survey.png" }
+                //                 //{ label: "VTOL",    color: "#2e1437", border: "#9b59b6", image: "/qmlimages/NewImages/vtol.png" }
+                //             ]
+
+                //             Component.onCompleted: {
+                //                 var saved = QGroundControl.loadGlobalSetting("loadpage", "loadpage").trim()
+                //                 for (var i = 0; i < buttonModel.length; i++) {
+                //                     if (buttonModel[i].label === saved) {
+                //                         selectedIndex = i
+                //                         break
+                //                     }
+                //                 }
+                //             }
+
+                //             Grid {
+                //                 anchors.centerIn: parent
+                //                 columns: 2
+                //                 spacing: 20
+                //                 width: parent.width * 0.9
+                //                 height: parent.height * 0.9
+
+                //                 Repeater {
+                //                     model: rightCard.buttonModel
+
+                //                     Button {
+                //                         width: parent.width * 0.45
+                //                         height: parent.height * 0.45
+
+                //                         padding: 0
+                //                         leftPadding: 0
+                //                         rightPadding: 0
+                //                         topPadding: 0
+                //                         bottomPadding: 0
+
+                //                         background: Rectangle {
+                //                             anchors.fill: parent
+                //                             radius: 12
+                //                             color: modelData.color
+                //                             border.width: 2
+                //                             border.color: rightCard.selectedIndex === index
+                //                                           ? "yellow"
+                //                                           : modelData.border
+                //                         }
+
+                //                         contentItem: Item {
+                //                             anchors.fill: parent
+                //                             Column {
+                //                                 anchors.centerIn: parent
+                //                                 spacing: 10
+
+                //                                 Image {
+                //                                     source: modelData.image
+                //                                     width: 48
+                //                                     height: 48
+                //                                     fillMode: Image.PreserveAspectFit
+                //                                 }
+
+                //                                 Text {
+                //                                     text: modelData.label
+                //                                     color: "white"
+                //                                     font.bold: true
+                //                                 }
+                //                             }
+
+                //                         }
+
+
+                //                         QGCColoredImage {
+                //                             visible: rightCard.selectedIndex === index
+                //                             source: "qrc:/qmlimages/check.svg"
+                //                             width: 18
+                //                             height: 18
+                //                             anchors.top: parent.top
+                //                             anchors.right: parent.right
+                //                             anchors.margins: 8
+                //                             color: "green"
+                //                         }
+
+                //                         onClicked: {
+                //                             rightCard.selectedIndex = index
+                //                             QGroundControl.saveGlobalSetting("loadpage", modelData.label)
+                //                             mainWindow.showToastMessage(modelData.label + " Selected")
+                //                             currentView = "profile"
+                //                         }
+                //                     }
+                //                 }
+                //             }
+
+                //         }
+                //     }
+
+
             }
         }
     }
