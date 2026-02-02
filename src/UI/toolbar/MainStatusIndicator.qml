@@ -66,12 +66,15 @@ RowLayout {
                     }
 
                     if (_activeVehicle.flying) {
+                        console.log("flying check")
+                        mainWindow.takeoff()
+                        console.log("flying check1")
                         return mainStatusLabel._flyingText
                     } else if (_activeVehicle.landing) {
-                    mainWindow.land()
+                    //mainWindow.land()
                         return mainStatusLabel._landingText
                     } else {
-                        mainWindow.takeoff()
+                        //mainWindow.takeoff()
                         return mainStatusLabel._armedText
                     }
                 } else {
@@ -82,16 +85,20 @@ RowLayout {
                             } else {
                                 _mainStatusBGColor = "green"//"transparent"//"#A6ADFF"//
                             }
+                            console.log("healthAndArmingCheckReport")
                             return mainStatusLabel._readyToFlyText
                         } else {
+                            console.log("healthAndArmingCheckReport1")
                             _mainStatusBGColor = "red"//"transparent"//"#A6ADFF"//
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
+                            console.log("readyToFlyAvailable readyToFly")
                             _mainStatusBGColor = "green"//"transparent"//"#A6ADFF"//
                             return mainStatusLabel._readyToFlyText
                         } else {
+                            console.log("readyToFlyAvailable  readyToFly1")
                             _mainStatusBGColor ="yellow"// "transparent"//"#A6ADFF"//
                             return mainStatusLabel._notReadyToFlyText
                         }
@@ -327,6 +334,7 @@ RowLayout {
 
             SettingsGroupLayout {
                 Layout.fillWidth: true
+
 
                 GridLayout {
                     columns:            2

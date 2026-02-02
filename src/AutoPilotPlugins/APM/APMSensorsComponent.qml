@@ -23,7 +23,7 @@ import QGroundControl.Controllers
 import QGroundControl.ArduPilot
 import QGroundControl.QGCPositionManager
 import MAVLink
-
+import QtQuick.Effects
 SetupPage {
     id:             sensorsPage
     pageComponent:  sensorsPageComponent
@@ -32,207 +32,260 @@ SetupPage {
     Component {
         id: sensorsPageComponent
 
+
         Item {
             width:  availableWidth
             height: availableHeight
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 20
 
-                // GridView for calibration buttons
-                GridView {
-                    id: gridView
-                    property bool buttonsEnabled: true
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-
-                    boundsBehavior: Flickable.StopAtBounds
-                    flickDeceleration: 2000
-                    snapMode: GridView.NoSnap
-
-                    //Layout.alignment: Qt.AlignHCenter
-                    cellWidth: width / 4
-                    cellHeight: ScreenTools.defaultFontPixelHeight * 15
-
-                    model: ListModel {
-
-                        ListElement {
-                            name: "Accelerometer"
-                            type: "accel"
-                            indicator: true
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Compass"
-                            type: "compass"
-                            indicator: true
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Level Horizon"
-                            type: "level"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Gyro"
-                            type: "gyro"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Pressure"
-                            type: "pressure"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "RC Calibration"
-                            type: "rc"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "Flight Modes"
-                            type: "flightModes"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-
-                        ListElement {
-                            name: "ESC Calibration"
-                            type: "esc"
-                            //globals.activeVehicle ? globals.activeVehicle.supportsMotorInterference : false
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Motors"
-                            type: "motors"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-                        }
-
-                        ListElement {
-                            name: "Tunning"
-                            type: "tuning"
-                            icon: "/qmlimages/NewImages/homeIcon.png"
-                            status: "none"
-
-                        }
-                    }
-
-                    delegate: Item {
-                        width: gridView.cellWidth
-                        height: gridView.cellHeight
-                        // Dynamic visibility for some buttons
-
-
-                        Rectangle {
-                            anchors.fill: parent
-                            anchors.margins: 5
-                            color: {
-                                if (model.status === "success") return "#2ecc71";   // Success: Green
-                                if (model.status === "failure") return "#e74c3c";   // Failure: Red
-
-                                switch (model.type) {
-                                case "accel":        return "#2980b9";  // Blue
-                                case "compass":      return "#8e44ad";  // Purple
-                                case "level":        return "#16a085";  // Teal
-                                case "gyro":         return "#d35400";  // Orange
-                                case "pressure":     return "#f39c12";  // Yellow Orange
-                                case "rc":           return "#2c3e50";  // Navy Blue
-                                case "flightModes":  return "#c0392b";  // Dark Red
-                                case "esc":          return "#27ae60";  // Green
-                                case "motors":       return "#7f8c8d";  // Gray
-                                case "tuning":       return "#9b59b6";  // Light Purple
-                                default:             return qgcPal.button;
-                                }
-                            }
-
-                            radius: 10
-                            border.color: qgcPal.buttonText
-                            border.width: 1
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 5
-                                width: parent.width
-
-                                // Icon above the text
-                                Image {
-                                    source: model.icon
-                                    width: 32
-                                    height: 32
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    fillMode: Image.PreserveAspectFit
-                                }
-
-                                // Label below the icon
-                                QGCLabel {
-                                    text: model.name//model.type === "pressure" ? _calibratePressureText : model.name
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    wrapMode: Text.WordWrap
-                                    font.bold: true
-                                }
-                            }
-
-                            // Indicator for calibration status
-                            Rectangle {
-                                visible: model.indicator
-                                width: ScreenTools.defaultFontPixelHeight * 0.75
-                                height: width
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 5
-                                radius: width * 0.5
-                                // color: {
-                                //     if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
-                                //     if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
-                                //     return "transparent";
-                                // }
-                            }
-
-                            // QGCLabel {
-                            //     anchors.centerIn: parent
-                            //     text: {
-                            //         if (model.type === "pressure") return _calibratePressureText;
-                            //         return model.name;
-                            //     }
-                            //     color: qgcPal.buttonText
-                            // }
-
-                            MouseArea {
-                                id: mouseArea
-                                anchors.fill: parent
-                                enabled: gridView.buttonsEnabled
-                                onClicked: {
-                                    //handleButtonClick(model.type)
-                                     console.log("Next button clicked")
-                                }
-                            }
-                        }
-
-                    }
+            property var calibrationList: [
+                {
+                    text: "Accelerometer",
+                    type: "accel",
+                    indicator: true,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Compass",
+                    type: "compass",
+                    indicator: true,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Level Horizon",
+                    type: "level",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Gyro",
+                    type: "gyro",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Pressure",
+                    type: "pressure",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "RC Calibration",
+                    type: "rc",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Flight Modes",
+                    type: "flightModes",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "ESC Calibration",
+                    type: "esc",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Motors",
+                    type: "motors",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
+                },
+                {
+                    text: "Tuning",
+                    type: "tuning",
+                    indicator: false,
+                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    status: "none",
+                    color: "#ffffff"
                 }
+            ]
+
+            // Calculate card width to show exactly 3 per row with spacing
+            readonly property int cardsPerRow: 4
+            readonly property int horizontalMargin: 50
+            readonly property int columnSpacing: 20
+            readonly property int cardWidth: (width *0.98 - horizontalMargin - (columnSpacing * (cardsPerRow - 1))) / cardsPerRow
+            readonly property int cardHeight: cardWidth // Keep cards square
+
+
+            QGCFlickable {
+                id: mainFlickable
+                anchors.fill: parent
+                contentWidth: width
+                contentHeight: contentheight.implicitHeight
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
+                ColumnLayout {
+                    id:contentheight
+                    width: parent.width
+                    spacing: 20
+
+
+
+                    // GridView for calibration buttons
+                    Grid {
+                        id: gridView
+                        width: parent.width - horizontalMargin
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        columns: cardsPerRow
+                        spacing: columnSpacing
+
+
+                        // Horizontal spacing (between columns)
+                        columnSpacing: 30
+                        // Vertical spacing (between rows)
+                        rowSpacing: 30
+
+                        Repeater {
+                            model: calibrationList
+                            delegate:         Item {
+                                width: cardWidth
+                                height: cardHeight
+                                // Dynamic visibility for some buttons
+
+
+
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: 5
+                                    color: {
+                                        if (modelData.status === "success") return "#2ecc71";   // Success: Green
+                                        if (modelData.status === "failure") return "#e74c3c";   // Failure: Red
+
+                                        switch (model.type) {
+                                        case "accel":        return "white";  // Blue
+                                        case "compass":      return "white";  // Purple
+                                        case "level":        return "white";  // Teal
+                                        case "gyro":         return "white";  // Orange
+                                        case "pressure":     return "white";  // Yellow Orange
+                                        case "rc":           return "white";  // Navy Blue
+                                        case "flightModes":  return "white";  // Dark Red
+                                        case "esc":          return "white";  // Green
+                                        case "motors":       return "white";  // Gray
+                                        case "tuning":       return "white";  // Light Purple
+                                        default:             return "white";
+                                        }
+                                    }
+
+                                    radius: 10
+                                    border.color: qgcPal.buttonText
+                                    border.width: 1
+                                    Rectangle {
+                                                        id: shadowSource
+                                                        anchors.fill: parent
+                                                        radius: 10//dp(4)
+                                                        color: "white"
+                                                        visible: false
+                                                        anchors.margins: 2
+
+                                                    }
+
+                                                    MultiEffect {
+                                                        anchors.fill: shadowSource
+                                                        source: shadowSource
+
+                                                        shadowEnabled: true
+                                                        shadowBlur: 1.0
+                                                        shadowHorizontalOffset: 15
+                                                        shadowVerticalOffset: 15//dp(1)
+                                                        shadowColor: "#5d179e"   // soft black
+                                                    }
+
+
+                                    Column {
+                                        anchors.centerIn: parent
+                                        spacing: 5
+                                        width: parent.width
+
+                                        // Icon above the text
+                                        Image {
+                                            source: modelData.icon
+                                            width: 32
+                                            height: 32
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            fillMode: Image.PreserveAspectFit
+                                        }
+
+                                        // Label below the icon
+                                        QGCLabel {
+                                            text: modelData.text//model.type === "pressure" ? _calibratePressureText : model.name
+                                            color: "black"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            wrapMode: Text.WordWrap
+                                            font.bold: true
+                                        }
+                                    }
+
+                                    // Indicator for calibration status
+                                    Rectangle {
+                                        visible: modelData.indicator
+                                        width: ScreenTools.defaultFontPixelHeight * 0.75
+                                        height: width
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.margins: 5
+                                        radius: width * 0.5
+                                        color: "#5d179e"
+                                        // color: {
+                                        //     if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
+                                        //     if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
+                                        //     return "transparent";
+                                        // }
+                                    }
+
+                                    // QGCLabel {
+                                    //     anchors.centerIn: parent
+                                    //     text: {
+                                    //         if (model.type === "pressure") return _calibratePressureText;
+                                    //         return model.name;
+                                    //     }
+                                    //     color: qgcPal.buttonText
+                                    // }
+
+                                    MouseArea {
+                                        id: mouseArea
+                                        anchors.fill: parent
+                                        enabled: gridView.buttonsEnabled
+                                        onClicked: {
+                                            //handleButtonClick(model.type)
+                                             console.log("Next button clicked")
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+
+                }
+
+
             }
+
+
         }
     }
 

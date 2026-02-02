@@ -29,7 +29,8 @@ RowLayout {
     QGCLabel {
         id:                 label  
         Layout.fillWidth:   true
-        color:"white"
+        color:"#5d179e"
+        font.bold:      true
     }
 
     FactComboBox {

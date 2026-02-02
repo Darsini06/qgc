@@ -122,7 +122,7 @@ T.ComboBox {
 
     background: Rectangle {
         color:          qgcPal.button
-        border.color:   qgcPal.buttonBorder
+        border.color:   "#5d179e"//qgcPal.buttonBorder
         border.width:   _showBorder ? 1 : 0
         radius:         20//ScreenTools.buttonBorderRadius
     }

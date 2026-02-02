@@ -28,7 +28,7 @@ RowLayout {
     QGCLabel {
         Layout.fillWidth:   true
         text:               label
-        color:"white"
+        color:"#5d179e"
     }
 
     FactTextField {

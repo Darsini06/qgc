@@ -186,10 +186,13 @@ Popup {
             rejectButton.text = qsTr("No")
             rejectButton.visible = true
         } else if (buttons & Dialog.NoToAll) {
-            rejectButton.text = qsTr("No to All")
+            rejectButton.text = qsTr("Save As")
             rejectButton.visible = true
         } else if (buttons & Dialog.Abort) {
             rejectButton.text = qsTr("Abort")
+            rejectButton.visible = true
+        } else if (buttons & Dialog.Saveas) {
+            rejectButton.text = qsTr("Save As")
             rejectButton.visible = true
         }
 

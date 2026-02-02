@@ -45,7 +45,7 @@ Item {
 
 
             if(MapGlobals.save==="save1"){
-                customdialog.createObject(mainWindow).open()
+                savefiledialog.createObject(mainWindow).open()
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
                 var strippedFileName1=_appSettings.username
@@ -211,85 +211,47 @@ Item {
         }
     }
 
-    Component{
-        id: customdialog
+    Component {
+        id: savefiledialog
+
+        QGCPopupDialog {
+            id: popup
+            title: qsTr("Save Options")
+            closeOnClickOutside: true
 
 
+            buttons: Dialog.NoToAll | Dialog.Save
 
-    Item {
-        id: saveOptionsDialog
-        parent: Overlay.overlay
-        anchors.centerIn: parent
-        width: 600
-        height: 200
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 20
-            color: "#80ffffff"
-            border.color: "#ccccff"
-            border.width: 2
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 20
-                anchors.margins: 20
-
-                // Centered Title
-                Label {
-                    text: qsTr("Save Options")
-                    font.bold: true
-                    font.pointSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    width: parent.width
+            onAccepted: {
+                var strippedFileName1 = _appSettings.username
+                if (strippedFileName1 == "") {
+                    mobileFileSaveDialog.preventClose = true
+                    return
                 }
+                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
+                popup.visible = false
+            }
 
-                // Buttons Row
-                Row {
-                    spacing: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
+            // onSaveAsNewAccepted: {
+            //     customdialogedit.createObject(mainWindow).open()
+            //     popup.visible = false
+            //     }
 
-                    Button {
-                        text: qsTr("Save with existing name")
-                        height: 34
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
-                            //saveOptionsDialog.close()
-                            saveOptionsDialog.visible=false;
-                            var strippedFileName1 = _appSettings.username
-                            if (strippedFileName1 == "") {
-                                mobileFileSaveDialog.preventClose = true
-                                return
-                            }
-                            _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
-                        }
-                    }
+            onRejected: {
+                customdialogedit.createObject(mainWindow).open()
+                popup.visible = false
+            }
 
-                    Button {
-                        text: qsTr("Save as new file")
-                        height: 34
-                        font.bold: true
-                        background: Rectangle {
-                            radius: 20
-                            color: "#ccccff"
-                        }
-                        onClicked: {
-                            //saveOptionsDialog.close()
-                            saveOptionsDialog.visible=false;
-                            customdialogedit.createObject(mainWindow).open()
-                        }
-                    }
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
+                    Layout.fillWidth: true
                 }
             }
         }
     }
 
-
-    }
 
     Component {
         id: mobileFileSaveDialogComponent
@@ -539,7 +501,7 @@ Item {
             Column {
                 anchors.centerIn: parent
                 spacing: 20
-                width: parent.width * 0.8
+                width: 300//parent.width * 0.8
 
                 // Title
                 Label {
@@ -556,7 +518,7 @@ Item {
                     spacing: 10
                     width: parent.width
                     Label {
-                        text: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):qsTr("Project Name:")
+                        text: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):*/qsTr("Project Name:")
                         Layout.preferredWidth: 100
                         color: "white"
                         font.bold: true
@@ -565,49 +527,49 @@ Item {
                     TextField {
                         id: nameField
                         Layout.fillWidth: true
-                        placeholderText: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):qsTr("Enter your project name")
+                        placeholderText: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):*/qsTr("Enter your project name")
                     }
                 }
 
-                // Phone Number Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                    Label {
-                        text: qsTr("Ph No:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: phoneField
-                        Layout.fillWidth: true
-                        placeholderText: qsTr("Enter 10-digit phone no")
-                        validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                        inputMethodHints: Qt.ImhDigitsOnly
-                    }
-                }
+                // // Phone Number Field
+                // RowLayout {
+                //     spacing: 10
+                //     width: parent.width
+                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                //     Label {
+                //         text: qsTr("Ph No:")
+                //         Layout.preferredWidth: 100
+                //         color: "white"
+                //         font.bold: true
+                //         font.pointSize: 14
+                //     }
+                //     TextField {
+                //         id: phoneField
+                //         Layout.fillWidth: true
+                //         placeholderText: qsTr("Enter 10-digit phone no")
+                //         validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                //         inputMethodHints: Qt.ImhDigitsOnly
+                //     }
+                // }
 
-                // Ground Name Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                    Label {
-                        text: qsTr("Ground Name:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: groundField
-                        Layout.fillWidth: true
-                        placeholderText: qsTr("Enter ground name")
-                    }
-                }
+                // // Ground Name Field
+                // RowLayout {
+                //     spacing: 10
+                //     width: parent.width
+                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                //     Label {
+                //         text: qsTr("Ground Name:")
+                //         Layout.preferredWidth: 100
+                //         color: "white"
+                //         font.bold: true
+                //         font.pointSize: 14
+                //     }
+                //     TextField {
+                //         id: groundField
+                //         Layout.fillWidth: true
+                //         placeholderText: qsTr("Enter ground name")
+                //     }
+                // }
 
                 // Buttons Row
                 Row {
@@ -663,14 +625,20 @@ Item {
 
 
                             if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                if (nameField.text.length < 3 || phoneField.text.length < 3 || groundField.text.length < 3) {
+                                // if (nameField.text.length < 3 || phoneField.text.length < 3 || groundField.text.length < 3) {
+                                //         mobileFileSaveDialog.preventClose = true
+                                //         return
+                                //     }
+
+                                // let concatenatedText = nameField.text.substring(0, 3) +
+                                //                            phoneField.text.substring(0, 3) +
+                                //                            groundField.text.substring(0, 3);
+                                if (nameField.text.length < 3 ) {
                                         mobileFileSaveDialog.preventClose = true
                                         return
                                     }
 
-                                let concatenatedText = nameField.text.substring(0, 3) +
-                                                           phoneField.text.substring(0, 3) +
-                                                           groundField.text.substring(0, 3);
+                                let concatenatedText = nameField.text.substring(0, 10);
 
 
             _appSettings.username = concatenatedText;

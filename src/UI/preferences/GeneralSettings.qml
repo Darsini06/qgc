@@ -38,7 +38,7 @@ SettingsPage {
                 Layout.alignment: Qt.AlignHCenter
                 text: "General Settings"
                 font.pixelSize: 20
-                color: "white"
+                color: "black"
                 font.bold: true
             }
 
@@ -308,7 +308,7 @@ SettingsPage {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Flyview Settings"
                 font.pixelSize: 20
-                color: "white"
+                color: "#3A3A3A"
                 font.bold: true
             }
 
@@ -396,57 +396,57 @@ SettingsPage {
         }
     }
 
-    SettingsGroupLayout {
-        Layout.fillWidth:       true
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 35
-        heading:                qsTr("Custom MAVLink Actions")
-        headingDescription:     qsTr("Custom action JSON files should be created in the '%1' folder.").arg(QGroundControl.settingsManager.appSettings.customActionsSavePath)
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:       true
+    //     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 35
+    //     heading:                qsTr("Custom MAVLink Actions")
+    //     headingDescription:     qsTr("Custom action JSON files should be created in the '%1' folder.").arg(QGroundControl.settingsManager.appSettings.customActionsSavePath)
 
-        LabelledComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Fly View Custom Actions")
-            model:              customActionList()
-            onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.flyViewActionsFile.rawValue = "" : _customMavlinkActionsSettings.flyViewActionsFile.rawValue = comboBox.currentText
+    //     LabelledComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Fly View Custom Actions")
+    //         model:              customActionList()
+    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.flyViewActionsFile.rawValue = "" : _customMavlinkActionsSettings.flyViewActionsFile.rawValue = comboBox.currentText
 
-            Component.onCompleted: {
-                var index = comboBox.find(_customMavlinkActionsSettings.flyViewActionsFile.valueString)
-                comboBox.currentIndex = index == -1 ? 0 : index
-            }
-        }
+    //         Component.onCompleted: {
+    //             var index = comboBox.find(_customMavlinkActionsSettings.flyViewActionsFile.valueString)
+    //             comboBox.currentIndex = index == -1 ? 0 : index
+    //         }
+    //     }
 
-        LabelledComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Joystick Custom Actions")
-            model:              customActionList()
-            onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.joystickActionsFile.rawValue = "" : _customMavlinkActionsSettings.joystickActionsFile.rawValue = comboBox.currentText
+    //     LabelledComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Joystick Custom Actions")
+    //         model:              customActionList()
+    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.joystickActionsFile.rawValue = "" : _customMavlinkActionsSettings.joystickActionsFile.rawValue = comboBox.currentText
 
-            Component.onCompleted: {
-                var index = comboBox.find(_customMavlinkActionsSettings.joystickActionsFile.valueString)
-                comboBox.currentIndex = index == -1 ? 0 : index
-            }
-        }
-    }
+    //         Component.onCompleted: {
+    //             var index = comboBox.find(_customMavlinkActionsSettings.joystickActionsFile.valueString)
+    //             comboBox.currentIndex = index == -1 ? 0 : index
+    //         }
+    //     }
+    // }
 
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Virtual Joystick")
-        visible:            _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Virtual Joystick")
+    //     visible:            _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Enabled")
-            visible:            _virtualJoystick.visible
-            fact:               _virtualJoystick
-        }
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Enabled")
+    //         visible:            _virtualJoystick.visible
+    //         fact:               _virtualJoystick
+    //     }
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Auto-Center Throttle")
-            visible:            _virtualJoystickAutoCenterThrottle.visible
-            enabled:            _virtualJoystick.rawValue
-            fact:               _virtualJoystickAutoCenterThrottle
-        }
-    }
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Auto-Center Throttle")
+    //         visible:            _virtualJoystickAutoCenterThrottle.visible
+    //         enabled:            _virtualJoystick.rawValue
+    //         fact:               _virtualJoystickAutoCenterThrottle
+    //     }
+    // }
 
     SettingsGroupLayout {
         Layout.fillWidth:   true
@@ -573,7 +573,7 @@ SettingsPage {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Planview Settings"
                 font.pixelSize: 20
-                color: "white"
+                color: "#3A3A3A"
                 font.bold: true
             }
     SettingsGroupLayout {
@@ -628,7 +628,7 @@ SettingsPage {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Video Settings"
                 font.pixelSize: 20
-                color: "white"
+                color: "#3A3A3A"
                 font.bold: true
             }
     SettingsGroupLayout {
@@ -751,47 +751,47 @@ SettingsPage {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Telemetry Settings"
                 font.pixelSize: 20
-                color: "white"
+                color: "#3A3A3A"
                 font.bold: true
             }
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Ground Station")
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Ground Station")
 
-        RowLayout {
-            Layout.fillWidth:   true
-            spacing:            ScreenTools.defaultFontPixelWidth * 2
+    //     RowLayout {
+    //         Layout.fillWidth:   true
+    //         spacing:            ScreenTools.defaultFontPixelWidth * 2
 
-            QGCLabel {
-                Layout.fillWidth:   true
-                text:               qsTr("MAVLink System ID:")
-                color: "white"
-            }
+    //         QGCLabel {
+    //             Layout.fillWidth:   true
+    //             text:               qsTr("MAVLink System ID:")
+    //             color: "white"
+    //         }
 
-            QGCTextField {
-                text:               QGroundControl.mavlinkSystemID.toString()
-                numericValuesOnly:  true
-                onEditingFinished: {
-                    console.log("text", text)
-                    QGroundControl.mavlinkSystemID = parseInt(text)
-                }
-            }
-        }
+    //         QGCTextField {
+    //             text:               QGroundControl.mavlinkSystemID.toString()
+    //             numericValuesOnly:  true
+    //             onEditingFinished: {
+    //                 console.log("text", text)
+    //                 QGroundControl.mavlinkSystemID = parseInt(text)
+    //             }
+    //         }
+    //     }
 
-        QGCCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Emit heartbeat")
-            checked:            QGroundControl.multiVehicleManager.gcsHeartBeatEnabled
-            onClicked:          QGroundControl.multiVehicleManager.gcsHeartBeatEnabled = checked
-        }
+    //     QGCCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Emit heartbeat")
+    //         checked:            QGroundControl.multiVehicleManager.gcsHeartBeatEnabled
+    //         onClicked:          QGroundControl.multiVehicleManager.gcsHeartBeatEnabled = checked
+    //     }
 
-        QGCCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Only connect to vehicle with same MAVLink protocol version")
-            checked:            QGroundControl.isVersionCheckEnabled
-            onClicked:          QGroundControl.isVersionCheckEnabled = checked
-        }
-    }
+    //     QGCCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Only connect to vehicle with same MAVLink protocol version")
+    //         checked:            QGroundControl.isVersionCheckEnabled
+    //         onClicked:          QGroundControl.isVersionCheckEnabled = checked
+    //     }
+    // }
 
     SettingsGroupLayout {
         id:                 mavlink2SigningGroup
@@ -992,6 +992,281 @@ SettingsPage {
             labelText:          _activeVehicle ? (_activeVehicle.mavlinkSigning ? "On" : "Off") : _notConnectedStr
         }
     }
+
+
+
+
+    //Drone Settings ------------------------------------------------------------------------------------
+
+    property var _linkManager:          QGroundControl.linkManager
+        property var _autoConnectSettings:  QGroundControl.settingsManager.autoConnectSettings
+
+        SettingsGroupLayout {
+            heading:        qsTr("AutoConnect")
+            visible:        _autoConnectSettings.visible
+
+            Repeater {
+                id: autoConnectRepeater
+
+                model: [
+                    _autoConnectSettings.autoConnectPixhawk,
+                    _autoConnectSettings.autoConnectSiKRadio,
+                    _autoConnectSettings.autoConnectLibrePilot,
+                    _autoConnectSettings.autoConnectUDP,
+                    _autoConnectSettings.autoConnectZeroConf,
+                    _autoConnectSettings.autoConnectRTKGPS,
+                ]
+
+                property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
+
+                FactCheckBoxSlider {
+                    Layout.fillWidth:   true
+                    text:               autoConnectRepeater.names[index]
+                    fact:               modelData
+                    visible:            modelData.visible
+                }
+            }
+        }
+
+        SettingsGroupLayout {
+            heading: qsTr("Links")
+
+            Repeater {
+                model: _linkManager.linkConfigurations
+
+                RowLayout {
+                    Layout.fillWidth:   true
+                    visible:            !object.dynamic
+
+                    QGCLabel {
+                        Layout.fillWidth:   true
+                        text:               object.name
+                        color: "white"
+                    }
+                    QGCColoredImage {
+                        height:                 ScreenTools.minTouchPixels
+                        width:                  height
+                        sourceSize.height:      height
+                        fillMode:               Image.PreserveAspectFit
+                        mipmap:                 true
+                        smooth:                 true
+                        color:                  qgcPalEdit.text
+                        source:                 "/res/pencil.svg"
+                        enabled:                !object.link
+
+                        QGCPalette {
+                            id: qgcPalEdit
+                            colorGroupEnabled: parent.enabled
+                        }
+
+                        QGCMouseArea {
+                            fillItem: parent
+                            onClicked: {
+                                var editingConfig = _linkManager.startConfigurationEditing(object)
+                                linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
+                            }
+                        }
+                    }
+                    QGCColoredImage {
+                        height:                 ScreenTools.minTouchPixels
+                        width:                  height
+                        sourceSize.height:      height
+                        fillMode:               Image.PreserveAspectFit
+                        mipmap:                 true
+                        smooth:                 true
+                        color:                  qgcPalDelete.text
+                        source:                 "/res/TrashDelete.svg"
+
+                        QGCPalette {
+                            id: qgcPalDelete
+                            colorGroupEnabled: parent.enabled
+                        }
+
+                        QGCMouseArea {
+                            fillItem:   parent
+                            onClicked:  mainWindow.showMessageDialog(
+                                            qsTr("Delete Link"),
+                                            qsTr("Are you sure you want to delete '%1'?").arg(object.name),
+                                            Dialog.Ok | Dialog.Cancel,
+                                            function () {
+                                                _linkManager.removeConfiguration(object)
+                                            })
+                        }
+                    }
+                    QGCButton {
+                        text:       object.link ? qsTr("Disconnect") : qsTr("Connect")
+                        onClicked: {
+                            if (object.link) {
+                                object.link.disconnect()
+                                object.linkChanged()
+                            } else {
+                                _linkManager.createConnectedLink(object)
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            LabelledButton {
+                label:      qsTr("Add New Link")
+                buttonText: qsTr("Add")
+
+                onClicked: {
+                    typeSelectionDialogComponent.createObject(mainWindow).open()
+                }
+            }
+        }
+
+        // First Dialog – Type Selection Only
+        Component {
+            id: typeSelectionDialogComponent
+
+            QGCPopupDialog {
+                id: typeDialog
+                title: qsTr("Select Link Type")
+                buttons: false
+                closeOnClickOutside: true
+
+                property int selectedType: -1
+
+                ColumnLayout {
+                    spacing: 15                     // we’ll control spacing ourselves
+                    Layout.fillWidth: true
+
+                    Repeater {
+                        model: _linkManager.linkTypeStrings
+
+                        delegate: RowLayout {
+                            Layout.fillWidth: true        // row spans full width
+                            spacing: 20
+
+                            Rectangle {
+                                width: 25
+                                height: 25
+                                radius: width/2
+                                color: "#7F56D9"
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    font.pixelSize: 14
+                                    color: "white"
+                                    text: index + 1
+                                }
+                            }
+
+                            //Item { Layout.fillWidth: true }
+
+                            // clickable text
+                            Text {
+                                text: modelData
+                                //Layout.alignment: Qt.AlignHCenter
+                                font.pixelSize: 16
+                                color: "black"   // adjust to your theme
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        typeDialog.selectedType = index
+                                        typeDialog.close()
+                                        var editingConfig = _linkManager.createConfiguration(index, "")
+                                        linkConfigDialogComponent.createObject(mainWindow, {
+                                                                                   editingConfig: editingConfig,
+                                                                                   originalConfig: null,
+                                                                                   selectedType: index
+                                                                               }).open()
+                                    }
+                                    // hoverEnabled: true
+                                    // onEntered: parent.color = "blue"   // optional hover effect
+                                    // onExited:  parent.color = "green"
+                                }
+                            }
+
+                             Item { Layout.fillWidth: true }
+
+                            // // full-width divider
+                            // Rectangle {
+                            //     Layout.fillWidth: true
+                            //     height: 1
+                            //     color: "#aaaaaa"  // divider colour
+                            // }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Second Dialog - Configuration (without type dropdown)
+        Component {
+            id: linkConfigDialogComponent
+
+            QGCPopupDialog {
+                title:          selectedType === 3 ? "Bluetooth Devices"
+                                                   : originalConfig ? qsTr("Edit Link")
+                                                   : qsTr("Add New Link")
+                buttons:        Dialog.Save | Dialog.Cancel
+                acceptAllowed:  nameField.text !== ""
+
+                property var originalConfig
+                property var editingConfig
+                property int selectedType
+
+                onAccepted: {
+
+                    linkSettingsLoader.item.saveSettings()
+                    editingConfig.devName = nameField.text
+                    editingConfig.name    = editingConfig.devName
+
+                    if (originalConfig) {
+                        _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+                    } else {
+                        editingConfig.dynamic = false
+                        _linkManager.endCreateConfiguration(editingConfig)
+                        _linkManager.createConnectedLink(editingConfig)
+                    }
+                }
+
+                onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+
+                // ---------- MAIN LAYOUT ----------
+                ColumnLayout {
+                    id: mainColumn
+                    spacing: ScreenTools.defaultFontPixelHeight / 2
+                    Layout.fillWidth: true
+
+
+                    // ---- Name row (not shown for Bluetooth) ----
+                    RowLayout {
+                        Layout.fillWidth: true    // row stretches full width
+                        spacing: ScreenTools.defaultFontPixelWidth
+                        visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+
+                        QGCLabel { text: qsTr("Name") }
+
+                        QGCTextField {
+                            id:               nameField
+                            Layout.fillWidth: true   // text field grows to take remaining width
+                            text:             editingConfig.devName
+                            placeholderText:  qsTr("Enter name")
+                        }
+                    }
+
+                    // ---- Device list / settings loader ----
+                    Loader {
+                        id: linkSettingsLoader
+                        Layout.fillWidth: true        // << ensures it spans the whole dialog
+                        source: subEditConfig.settingsURL
+
+                        property var subEditConfig:         editingConfig
+                        property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
+                        property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
+                        property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
+                        property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+                    }
+                }
+            }
+        }
+
 
     Text {
                 Layout.alignment: Qt.AlignHCenter
