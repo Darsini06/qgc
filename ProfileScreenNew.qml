@@ -259,15 +259,28 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "#00000030"
+        color: "transparent"
         visible: pageLoader.status === Loader.Loading
         z: 99
 
-        BusyIndicator {
+        Item {
+            id: lottieWrapper
             anchors.centerIn: parent
-            running: true
+            width: dp(3)
+            height: dp(3)
+            scale: 0.5
+
+            LottieAnimation {
+                id: droneAnim
+                source: "qrc:/qmlimages/NewImages/loading_lottie.json"
+                anchors.centerIn: parent
+                autoPlay: true
+                loops: Animation.Infinite
+                frameRate: 300   // increase speed
+            }
         }
     }
+
 
 
     //Profile Screen
@@ -632,23 +645,24 @@ Item {
 
                                 LottieAnimation {
                                     id: droneAnim
-                                    anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                                    anchors.fill: parent
+                                    source: "qrc:/qmlimages/NewImages/feedback_sent.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
-                                    scale: 0.3
+
                                     onStatusChanged: console.log("Lottie Status:", status)
                                 }
                             }
 
-                            Text {
-                                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                                wrapMode: Text.WordWrap
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: "black" // Changed from white to black for visibility
-                                horizontalAlignment: Text.AlignHCenter
-                                width: parent.width - 40 // Add some margin
-                            }
+
+                            // Text {
+                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                            //     wrapMode: Text.WordWrap
+                            //     font.pointSize: ScreenTools.defaultFontPointSize
+                            //     color: "black" // Changed from white to black for visibility
+                            //     horizontalAlignment: Text.AlignHCenter
+                            //     width: parent.width - 40 // Add some margin
+                            // }
                         }
                     }
 
@@ -1295,21 +1309,21 @@ Item {
 
                                 LottieAnimation {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                                    source: "qrc:/qmlimages/NewImages/feedback_sent.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
-                                    scale: 0.3
+                                    scale: 0.4
                                 }
                             }
 
-                            Text {
-                                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                color: "black"
-                                width: parent.width - 40
-                            }
+                            // Text {
+                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                            //     wrapMode: Text.WordWrap
+                            //     horizontalAlignment: Text.AlignHCenter
+                            //     font.pointSize: ScreenTools.defaultFontPointSize
+                            //     color: "black"
+                            //     width: parent.width - 40
+                            // }
                         }
                     }
 
@@ -1545,20 +1559,20 @@ Item {
 
                                 LottieAnimation {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                                    source: "qrc:/qmlimages/NewImages/report_lottie.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
-                                    scale: 0.3
+                                    scale: 0.5
                                 }
                             }
 
-                            Text {
-                                text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                                color: "black"
-                                width: parent.width - 40
-                            }
+                            // Text {
+                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                            //     wrapMode: Text.WordWrap
+                            //     horizontalAlignment: Text.AlignHCenter
+                            //     color: "black"
+                            //     width: parent.width - 40
+                            // }
                         }
                     }
 

@@ -18,6 +18,8 @@ import QtQuick.Layouts 1.15
 
 import MapGlobals 1.0
 
+import Qt.labs.lottieqt 1.0
+
 Item {
     id: root
     anchors.fill: parent
@@ -116,25 +118,47 @@ Item {
 
                         Row {
                             anchors.fill: parent
-                            //spacing: dp(2)
+                            spacing: 0
 
-                            // LEFT SIDE IMAGE CONTAINER (margin provider)
+                            // // LEFT SIDE IMAGE CONTAINER (margin provider)
+                            // Item {
+                            //     width: parent.width * 0.45
+                            //     height: parent.height
+
+                            //     Rectangle {
+                            //         anchors.fill: parent
+                            //         anchors.margins: dp(2)
+                            //         radius: dp(4)
+                            //         clip: true
+                            //         //antialiasing: true
+                            //         color: "black"
+
+                            //         Image {
+                            //             anchors.fill: parent
+                            //             source: "/qmlimages/NewImages/nature_background.webp"
+                            //             fillMode: Image.PreserveAspectCrop
+                            //         }
+                            //     }
+                            // }
+
                             Item {
                                 width: parent.width * 0.45
                                 height: parent.height
 
                                 Rectangle {
                                     anchors.fill: parent
-                                    anchors.margins: dp(2)   // ✅ NOW IT WORKS
+                                    anchors.margins: dp(2)
                                     radius: dp(4)
                                     clip: true
-                                    //antialiasing: true
-                                    color: "black"
+                                    color: "transparent"
 
-                                    Image {
-                                        anchors.fill: parent
-                                        source: "/qmlimages/NewImages/nature_background.webp"
-                                        fillMode: Image.PreserveAspectCrop
+                                    LottieAnimation {
+                                        anchors.centerIn: parent   // ✅ allowed (inside Rectangle)
+                                        source: "qrc:/qmlimages/NewImages/login_lottie.json"
+                                        autoPlay: true
+                                        loops: Animation.Infinite
+                                        scale: 0.5
+                                        frameRate: 120
                                     }
                                 }
                             }

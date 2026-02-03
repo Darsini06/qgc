@@ -270,11 +270,11 @@ Item {
                 //Camera_Drone_Image
                 Image {
                     id:cameraicon
-                    source: "/qmlimages/NewImages/cameradrone.svg" // Replace with real image
+                    source: "/qmlimages/NewImages/cameraDrone_png.png"
                     visible: droneType ==="Camera"?true:false
                     anchors.centerIn: parent
-                    width: parent.width * 0.4
-                    height: parent.height * 0.4
+                    width: parent.width * 0.7
+                    height: parent.height * 0.7
                     fillMode: Image.PreserveAspectFit
                 }
 
