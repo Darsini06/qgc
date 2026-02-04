@@ -281,8 +281,6 @@ Item {
         }
     }
 
-
-
     //Profile Screen
     Component {
         id: profilePage
@@ -646,7 +644,7 @@ Item {
                                 LottieAnimation {
                                     id: droneAnim
                                     anchors.fill: parent
-                                    source: "qrc:/qmlimages/NewImages/feedback_sent.json"
+                                    source: "qrc:/qmlimages/NewImages/accountupdate_lottie.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
 
@@ -1309,7 +1307,7 @@ Item {
 
                                 LottieAnimation {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/feedback_sent.json"
+                                    source: "qrc:/qmlimages/NewImages/feedback_1.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
                                     scale: 0.4
@@ -1559,7 +1557,7 @@ Item {
 
                                 LottieAnimation {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/report_lottie.json"
+                                    source: "qrc:/qmlimages/NewImages/report_1.json"
                                     autoPlay: true
                                     loops: Animation.Infinite
                                     scale: 0.5

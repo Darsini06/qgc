@@ -150,17 +150,23 @@
         <file alias="NewImages/feedback_lottie.json">src/NewImages/feedback_lottie.json</file>
         <file alias="NewImages/login_lottie.json">src/NewImages/login_lottie.json</file>
         <file alias="NewImages/point_mark.svg">src/NewImages/point_mark.svg</file>
-        <file alias="NewImages/VTOL_application.svg">src/NewImages/VTOL_application.svg</file>
-        
+        <file alias="NewImages/VTOL_application.svg">src/NewImages/VTOL_application.svg</file> 
         <file alias="NewImages/cameraDrone_png.png">src/NewImages/cameraDrone_png.png</file>
         <file alias="NewImages/loading_lottie.json">src/NewImages/loading_lottie.json</file>
         <file alias="NewImages/feedback_sent.json">src/NewImages/feedback_sent.json</file>
         <file alias="NewImages/profile_lottie.json">src/NewImages/profile_lottie.json</file>
         <file alias="NewImages/accountupdate_lottie.json">src/NewImages/accountupdate_lottie.json</file>
         <file alias="NewImages/cameraDrone_svg.svg">src/NewImages/cameraDrone_svg.svg</file>
+
+        <file alias="NewImages/feedback_2.json">src/NewImages/feedback_2.json</file>
+        <file alias="NewImages/feedback_3.json">src/NewImages/feedback_3.json</file>
+        <file alias="NewImages/feedback_1.json">src/NewImages/feedback_1.json</file>
+        <file alias="NewImages/report_1.json">src/NewImages/report_1.json</file>
+        <file alias="NewImages/clock_time.json">src/NewImages/clock_time.json</file>
+        <file alias="NewImages/loading_color_dots.json">src/NewImages/loading_color_dots.json</file>
+        <file alias="NewImages/loading_hands.json">src/NewImages/loading_hands.json</file>
+       
         
-
-
 
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
