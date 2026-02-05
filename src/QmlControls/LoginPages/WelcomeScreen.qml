@@ -157,8 +157,8 @@ Item {
                                         source: "qrc:/qmlimages/NewImages/login_lottie.json"
                                         autoPlay: true
                                         loops: Animation.Infinite
-                                        scale: 0.5
-                                        frameRate: 120
+                                        scale: 0.6
+                                        frameRate: 30
                                     }
                                 }
                             }
@@ -431,10 +431,10 @@ Item {
                                                                 loginPass.text,
                                                                 function(result) {
                                                                     if (result) {
-                                                                        QGroundControl.saveGlobalSetting(
-                                                                                    "username",
-                                                                                    loginUser.text.trim()
-                                                                                    );
+                                                                        // QGroundControl.saveGlobalSetting(
+                                                                        //             "username",
+                                                                        //             loginUser.text.trim()
+                                                                        //             );
 
                                                                         loginUser.text = "";
                                                                         loginPass.text = "";
@@ -561,22 +561,44 @@ Item {
                             spacing: 0
 
                             // LEFT SIDE IMAGE
+                            // Item {
+                            //     width: parent.width * 0.45
+                            //     height: parent.height
+
+                            //     Rectangle {
+                            //         anchors.fill: parent
+                            //         anchors.margins: dp(2)   // ✅ NOW IT WORKS
+                            //         radius: dp(4)
+                            //         clip: true
+                            //         antialiasing: true
+                            //         color: "black"
+
+                            //         Image {
+                            //             anchors.fill: parent
+                            //             source: "/qmlimages/NewImages/nature_background.webp"
+                            //             fillMode: Image.PreserveAspectCrop
+                            //         }
+                            //     }
+                            // }
+
                             Item {
                                 width: parent.width * 0.45
                                 height: parent.height
 
                                 Rectangle {
                                     anchors.fill: parent
-                                    anchors.margins: dp(2)   // ✅ NOW IT WORKS
+                                    anchors.margins: dp(2)
                                     radius: dp(4)
                                     clip: true
-                                    antialiasing: true
-                                    color: "black"
+                                    color: "transparent"
 
-                                    Image {
-                                        anchors.fill: parent
-                                        source: "/qmlimages/NewImages/nature_background.webp"
-                                        fillMode: Image.PreserveAspectCrop
+                                    LottieAnimation {
+                                        anchors.centerIn: parent   // ✅ allowed (inside Rectangle)
+                                        source: "qrc:/qmlimages/NewImages/login_lottie.json"
+                                        autoPlay: true
+                                        loops: Animation.Infinite
+                                        scale: 0.5
+                                        //frameRate: 120
                                     }
                                 }
                             }
@@ -1224,22 +1246,44 @@ Item {
                             spacing: 0
 
                             // LEFT SIDE IMAGE
+                            // Item {
+                            //     width: parent.width * 0.45
+                            //     height: parent.height
+
+                            //     Rectangle {
+                            //         anchors.fill: parent
+                            //         anchors.margins: dp(2)   // ✅ NOW IT WORKS
+                            //         radius: dp(4)
+                            //         clip: true
+                            //         antialiasing: true
+                            //         color: "black"
+
+                            //         Image {
+                            //             anchors.fill: parent
+                            //             source: "/qmlimages/NewImages/nature_background.webp"
+                            //             fillMode: Image.PreserveAspectCrop
+                            //         }
+                            //     }
+                            // }
+
                             Item {
                                 width: parent.width * 0.45
                                 height: parent.height
 
                                 Rectangle {
                                     anchors.fill: parent
-                                    anchors.margins: dp(2)   // ✅ NOW IT WORKS
+                                    anchors.margins: dp(2)
                                     radius: dp(4)
                                     clip: true
-                                    antialiasing: true
-                                    color: "black"
+                                    color: "transparent"
 
-                                    Image {
-                                        anchors.fill: parent
-                                        source: "/qmlimages/NewImages/nature_background.webp"
-                                        fillMode: Image.PreserveAspectCrop
+                                    LottieAnimation {
+                                        anchors.centerIn: parent   // ✅ allowed (inside Rectangle)
+                                        source: "qrc:/qmlimages/NewImages/login_lottie.json"
+                                        autoPlay: true
+                                        loops: Animation.Infinite
+                                        scale: 0.5
+                                        //frameRate: 120
                                     }
                                 }
                             }

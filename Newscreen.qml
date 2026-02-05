@@ -12,6 +12,9 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import MapGlobals 1.0
 import QtQuick.Layouts 1.15
+
+import QtQuick.Effects
+
 Item {
     id: mainWindow1
     anchors.fill: parent
@@ -26,6 +29,16 @@ Item {
     property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
     property color app_color: "#5d179e"
+
+    property real screenWidth: parent.width
+    property real screenHeight: parent.height
+    property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
+    property real baseUnit: 8 * scaleRatio
+
+
+    function dp(value) {
+        return value * baseUnit;
+    }
 
     onVisibleChanged : {
         if (visible) {
@@ -174,12 +187,12 @@ Item {
                 }
 
                 Item {
-                    width: logout.implicitWidth
-                    height: logout.implicitHeight
+                    width: select_type.implicitWidth
+                    height: select_type.implicitHeight
 
                     Label {
-                        id: logout
-                        text: "Select Application"
+                        id: select_type
+                        text: "SELECT APPLICATION"
                         color: "black"
                         font.pixelSize: 15
                         font.bold: true
@@ -195,6 +208,29 @@ Item {
                         }
                     }
                 }
+
+                Item {
+                    width: logout.implicitWidth
+                    height: logout.implicitHeight
+
+                    Label {
+                        id: logout
+                        text: "LOGOUT"
+                        color: "black"
+                        font.pixelSize: 15
+                        font.bold: true
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+
+                            logoutdialog.createObject(mainWindow).open()
+                        }
+                    }
+                }
+
             }
         }
 
@@ -203,8 +239,8 @@ Item {
             id: mainRow
             z: 5
             anchors.fill: parent
-            anchors.horizontalCenter:  parent.horizontalCenter
-            anchors.margins: 40
+            //anchors.horizontalCenter:  parent.horizontalCenter
+            anchors.margins: 30
             spacing: 20
 
             // LEFT SIDE
@@ -242,75 +278,120 @@ Item {
             // RIGHT SIDE
             Item {
                 id: rightSide
-                width: parent.width * 0.45
-                height: parent.height
-                anchors.verticalCenter: parent.verticalCenter
-                clip: true
+                width: parent.width * 0.4
+                height: parent.height * 0.6
+                //anchors.right: parent.right
+                //anchors.verticalCenter: parent.verticalCenter
+                clip: false  // IMPORTANT: allow shadow outside
 
-                //Lottie File for All categoreis diaplayed
-                Item {
-                    id: lottieWrapper
-                    anchors.centerIn: parent
-                    width: rightSide.width
-                    height: width
-                    scale: 0.3
-                    visible: droneType === "loadpage"
+                // ---- SHADOW SOURCE ----
+                Rectangle {
+                    id: shadowSource
+                    anchors.fill: card
+                    radius: 8
+                    color: "white"
+                    visible: false
+                }
 
-                    LottieAnimation {
-                        id: droneAnim
-                        source: "qrc:/qmlimages/NewImages/droneManFly.json"
-                        autoPlay: true
-                        loops: Animation.Infinite
+                // ---- REAL ELEVATION ----
+                MultiEffect {
+                    anchors.fill: shadowSource
+                    source: shadowSource
+                    shadowEnabled: true
+                    shadowHorizontalOffset: 0
+                    shadowVerticalOffset: dp(1)
+                    shadowBlur: 1.5
+                    shadowColor: "#40000000"
+                }
+
+                // ---- CARD ----
+                Rectangle {
+                    id: card
+                    anchors.fill: parent
+                    radius: 8
+                    color: "white"
+                    border.width: 2
+                    border.color: app_color
+                    clip: true
+
+                    // // ---- CENTERED IMAGE ----
+                    // QGCColoredImage {
+                    //     anchors.centerIn: parent
+                    //     source: "qrc:/qmlimages/NewImages/camera_Application.svg"
+                    //     width: 56
+                    //     height: 56
+                    //     fillMode: Image.PreserveAspectFit
+                    //     color : "black"
+                    // }
+
+                    //Lottie File for All categoreis diaplayed
+                    Item {
+                        id: lottieWrapper
                         anchors.centerIn: parent
+                        width: parent.width * 0.5
+                        height: width
+                        visible: droneType === "loadpage"
+                        z: 30
+
+                        LottieAnimation {
+                            anchors.fill: parent
+                            source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                            autoPlay: true
+                            loops: Animation.Infinite
+                            frameRate: 24   // optional performance boost
+                        }
+                    }
+
+
+                    // ---- Drone Image Placeholder ----
+
+                    //Camera_Drone_Image
+                    Image {
+                        id:cameraicon
+                        source: "/qmlimages/NewImages/cameraDrone_png.png"
+                        visible: droneType ==="Camera"?true:false
+                        anchors.centerIn: parent
+                        width: parent.width * 0.9
+                        height: parent.height * 0.9
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    //Mapping_Drone_Image
+                    Image {
+                        id: mappingicon
+                        source: "/qmlimages/NewImages/survey.png" // Replace with real image
+                        visible: droneType ==="Mapping"?true:false
+                        anchors.centerIn: parent
+                        width: parent.width * 0.5
+                        height: parent.height * 0.5
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    // //VTOL_Drone_Image
+                    // Image {
+                    //     id: vtolicon
+                    //     source: "/qmlimages/NewImages/vtol.png" // Replace with real image
+                    //     anchors.centerIn: parent
+                    //     width: parent.width * 0.4
+                    //     height: parent.height * 0.4
+                    //     fillMode: Image.PreserveAspectFit
+                    //     visible: droneType ==="VTOL"?true:false
+                    // }
+
+                    //Agri_Drone_Image
+                    Image {
+                        id:agriicon
+                        source: "/qmlimages/NewImages/agri.png" // Replace with real image
+                        anchors.centerIn: parent
+                        width: parent.width * 0.7
+                        height: parent.height * 0.7
+                        fillMode: Image.PreserveAspectFit
+                        visible: droneType ==="Agri" ? true : false
                     }
                 }
 
-                // ---- Drone Image Placeholder ----
-
-                //Camera_Drone_Image
-                Image {
-                    id:cameraicon
-                    source: "/qmlimages/NewImages/cameraDrone_png.png"
-                    visible: droneType ==="Camera"?true:false
-                    anchors.centerIn: parent
-                    width: parent.width * 0.7
-                    height: parent.height * 0.7
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                //Mapping_Drone_Image
-                Image {
-                    id: mappingicon
-                    source: "/qmlimages/NewImages/survey.png" // Replace with real image
-                    visible: droneType ==="Mapping"?true:false
-                    anchors.centerIn: parent
-                    width: parent.width * 0.4
-                    height: parent.height * 0.4
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                //VTOL_Drone_Image
-                Image {
-                    id: vtolicon
-                    source: "/qmlimages/NewImages/vtol.png" // Replace with real image
-                    anchors.centerIn: parent
-                    width: parent.width * 0.4
-                    height: parent.height * 0.4
-                    fillMode: Image.PreserveAspectFit
-                    visible: droneType ==="VTOL"?true:false
-                }
-
-                //Agri_Drone_Image
-                Image {
-                    id:agriicon
-                    source: "/qmlimages/NewImages/agri.png" // Replace with real image
-                    anchors.centerIn: parent
-                    width: parent.width * 0.4
-                    height: parent.height * 0.4
-                    fillMode: Image.PreserveAspectFit
-                    visible: droneType ==="Agri" ? true : false
-                }
             }
+
         }
 
     }
@@ -329,8 +410,8 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottomMargin: 20
-            anchors.leftMargin: 20
-            anchors.rightMargin: 20
+            anchors.leftMargin: 30
+            anchors.rightMargin: 30
             spacing: 20
 
             Button {
@@ -341,27 +422,37 @@ Item {
                 implicitHeight: 30
 
                 contentItem: Item {
-                    anchors.fill: parent
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
+                    anchors.centerIn: parent
 
-                        Text {
-                            text: connectbtn.text
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.weight: Font.Medium
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
-                        }
-
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/commlinks.svg"
-                            width: 15
-                            height: 15
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                    Text {
+                        text: connectbtn.text
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        color: "white"
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
+
+                    // Row {
+                    //     anchors.centerIn: parent
+                    //     spacing: 6
+
+                    //     Text {
+                    //         text: connectbtn.text
+                    //         font.pointSize: ScreenTools.defaultFontPointSize
+                    //         font.weight: Font.Medium
+                    //         color: "white"
+                    //         verticalAlignment: Text.AlignVCenter
+                    //     }
+
+                    //     QGCColoredImage {
+                    //         source: "/qmlimages/NewImages/commlinks.svg"
+                    //         width: 15
+                    //         height: 15
+                    //         fillMode: Image.PreserveAspectFit
+                    //         anchors.verticalCenter: parent.verticalCenter
+                    //     }
+                    // }
 
                 }
 
@@ -399,28 +490,39 @@ Item {
                 visible: droneType==="loadpage" ? true : droneType==="Camera" ? true : false
 
                 contentItem: Item {
-                    anchors.fill: parent
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
+                    anchors.centerIn: parent
 
-                        Text {
-                            text: camera.text
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.weight: Font.Medium
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+                    Text {
+                        text: camera.text
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        color: "white"
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
 
-                        }
-
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/camera_Application.svg"
-                            width: 15
-                            height: 15
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
                     }
+
+                    // Row {
+                    //     anchors.centerIn: parent
+                    //     spacing: 6
+
+                    //     Text {
+                    //         text: camera.text
+                    //         font.pointSize: ScreenTools.defaultFontPointSize
+                    //         font.weight: Font.Medium
+                    //         color: "white"
+                    //         verticalAlignment: Text.AlignVCenter
+
+                    //     }
+
+                    //     QGCColoredImage {
+                    //         source: "/qmlimages/NewImages/camera_Application.svg"
+                    //         width: 15
+                    //         height: 15
+                    //         fillMode: Image.PreserveAspectFit
+                    //         anchors.verticalCenter: parent.verticalCenter
+                    //     }
+                    // }
 
                 }
 
@@ -466,28 +568,40 @@ Item {
                 visible: droneType==="loadpage" ? true : droneType==="Agri"? true : false
 
                 contentItem: Item {
-                    anchors.fill: parent
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
+                    anchors.centerIn: parent
 
-                        Text {
-                            text: agri.text
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.weight: Font.Medium
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+                    Text {
+                        text: agri.text
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        color: "white"
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
 
-                        }
-
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/agri_Application.svg"
-                            width: 15
-                            height: 15
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
                     }
+
+                    //      Row {
+                    //          anchors.centerIn: parent
+                    //          spacing: 6
+
+                    //          Text {
+                    //              text: agri.text
+                    //              font.pointSize: ScreenTools.defaultFontPointSize
+                    //              font.weight: Font.Medium
+                    //              color: "white"
+                    //              verticalAlignment: Text.AlignVCenter
+
+                    //          }
+
+                    //          QGCColoredImage {
+                    //              source: "/qmlimages/NewImages/agri_Application.svg"
+                    //              width: 15
+                    //              height: 15
+                    //              fillMode: Image.PreserveAspectFit
+                    //              anchors.verticalCenter: parent.verticalCenter
+                    //          }
+                    //      }
+
                 }
 
                 background: Rectangle {
@@ -531,28 +645,39 @@ Item {
                 visible: droneType==="loadpage"?true:droneType==="Mapping"?true:false
 
                 contentItem: Item {
-                    anchors.fill: parent
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
+                    anchors.centerIn: parent
 
-                        Text {
-                            text: mapping.text
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.weight: Font.Medium
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+                    Text {
+                        text: mapping.text
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        color: "white"
+                        verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
 
-                        }
-
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/mapping_Application.svg"
-                            width: 15
-                            height: 15
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
                     }
+
+                    // Row {
+                    //     anchors.centerIn: parent
+                    //     spacing: 6
+
+                    //     Text {
+                    //         text: mapping.text
+                    //         font.pointSize: ScreenTools.defaultFontPointSize
+                    //         font.weight: Font.Medium
+                    //         color: "white"
+                    //         verticalAlignment: Text.AlignVCenter
+
+                    //     }
+
+                    //     QGCColoredImage {
+                    //         source: "/qmlimages/NewImages/mapping_Application.svg"
+                    //         width: 15
+                    //         height: 15
+                    //         fillMode: Image.PreserveAspectFit
+                    //         anchors.verticalCenter: parent.verticalCenter
+                    //     }
+                    // }
 
                 }
 
@@ -652,35 +777,35 @@ Item {
 
         }
 
-        // Component {
-        //     id: logoutdialog
+        Component {
+            id: logoutdialog
 
-        //     QGCPopupDialog {
-        //         id: popup
-        //         title: qsTr("Logout")
+            QGCPopupDialog {
+                id: popup
+                title: qsTr("Logout")
 
-        //         buttons: Dialog.Yes | Dialog.No
+                buttons: Dialog.Yes | Dialog.No
 
-        //         onAccepted: {
-        //             QGroundControl.saveBoolGlobalSetting("login", false)
-        //             QGroundControl.saveGlobalSetting("loadpage", "loadpage")
-        //             popup.visible = false
-        //             MapGlobals.profile()
-        //         }
+                onAccepted: {
+                    QGroundControl.saveBoolGlobalSetting("login", false)
+                    QGroundControl.saveGlobalSetting("loadpage", "loadpage")
+                    popup.visible = false
+                    MapGlobals.profile()
+                }
 
-        //         onRejected: {
-        //             popup.visible = false
-        //         }
+                onRejected: {
+                    popup.visible = false
+                }
 
-        //         ColumnLayout {
-        //             spacing: ScreenTools.defaultFontPixelWidth
-        //             QGCLabel {
-        //                 text: qsTr("Are you sure you want to logout?")
-        //                 Layout.fillWidth: true
-        //             }
-        //         }
-        //     }
-        // }
+                ColumnLayout {
+                    spacing: ScreenTools.defaultFontPixelWidth
+                    QGCLabel {
+                        text: qsTr("Are you sure you want to logout?")
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+        }
 
         // First Dialog – Type Selection Only
 

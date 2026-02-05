@@ -603,7 +603,7 @@ QtObject {
 
     function loginUserFunc(userInput, password, callback) {
         var db = getDatabase();
-        var result = false;
+
         var isEmail = userInput.indexOf("@") !== -1;
 
         db.transaction(function(tx) {
@@ -650,25 +650,56 @@ QtObject {
             }
 
             // Final password validation
+
             if (rsUser.rows.length > 0) {
                 console.log("Login Success");
-                result = true;
-                //loginLoader.visible = false;
+
+                var user = rsUser.rows.item(0); // ✅ REAL USER FROM DB
+
+                QGroundControl.saveGlobalSetting("username", user.username);
+                QGroundControl.saveGlobalSetting("email", user.email);
+                QGroundControl.saveGlobalSetting("name", user.displayname);
+
+                QGroundControl.saveBoolGlobalSetting("login", true);
+
                 rootWindow.newscreen();
                 rootWindow.showToastMessage("Login Successfully");
+
                 login="login"
-                QGroundControl.saveBoolGlobalSetting("login", true)
-            } else {
+
+
+                callback(true);
+                return;
+            }else {
                 rootWindow.showToastMessage("Incorrect password");
-                result = false;
+                callback(false);
+                return;
             }
 
-            callback(result);
+
         });
     }
 
 
+    // if (rsUser.rows.length > 0) {
+    //     console.log("Login Success");
+    //     result = true;
+    //     //loginLoader.visible = false;
+    //     rootWindow.newscreen();
+    //     rootWindow.showToastMessage("Login Successfully");
+    //     login="login"
+    //     QGroundControl.saveBoolGlobalSetting("login", true)
 
+
+
+
+
+    // } else {
+    //     rootWindow.showToastMessage("Incorrect password");
+    //     result = false;
+    // }
+
+    // callback(result);
 
 
     function loadUserData(username, callback) {

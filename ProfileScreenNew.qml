@@ -272,7 +272,7 @@ Item {
 
             LottieAnimation {
                 id: droneAnim
-                source: "qrc:/qmlimages/NewImages/loading_lottie.json"
+                source: "qrc:/qmlimages/NewImages/loading_hands.json"
                 anchors.centerIn: parent
                 autoPlay: true
                 loops: Animation.Infinite
@@ -324,14 +324,14 @@ Item {
                             Layout.fillWidth: true
                         }
 
-                        QGCColoredImage {
-                            id: homeIcon
-                            source: "/qmlimages/NewImages/user_profile.svg"
-                            width: 25
-                            height: 25
-                            fillMode: Image.PreserveAspectFit
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     id: homeIcon
+                        //     source: "/qmlimages/NewImages/user_profile.svg"
+                        //     width: 25
+                        //     height: 25
+                        //     fillMode: Image.PreserveAspectFit
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Profile"
@@ -374,22 +374,35 @@ Item {
                             // Profile Image
                             Rectangle {
                                 Layout.alignment: Qt.AlignHCenter
-                                width: 80
-                                height: 80
-                                radius: 40
+                                width: 85
+                                height: 85
+                                radius: width / 2
+                                border.color: "#000000"
+                                border.width: 2
                                 color: "transparent"
+                                clip: true
 
-                                QGCColoredImage {
+                                // QGCColoredImage {
+                                //     anchors.centerIn: parent
+                                //     source: "/qmlimages/NewImages/profileImage.png"
+                                //     width: 80
+                                //     height: 80
+                                //     fillMode: Image.PreserveAspectFit
+                                //     //color: "#666666"
+                                //     color: "transparent"
+
+                                // }
+
+                                AnimatedImage {
                                     anchors.centerIn: parent
-                                    source: "/qmlimages/NewImages/profileImage.png"
+                                    source: "qrc:/qmlimages/NewImages/report_gif.gif"
                                     width: 80
                                     height: 80
+                                    cache: true
                                     fillMode: Image.PreserveAspectFit
-                                    //color: "#666666"
-                                    color: "transparent"
-
                                 }
                             }
+
 
                             // Name
                             Text {
@@ -590,16 +603,16 @@ Item {
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 8
+                        spacing: 0
 
-                        QGCColoredImage {
-                            id: accountUpdate
-                            source: "/qmlimages/NewImages/accountUpdate_black.svg"
-                            width: 25
-                            height: 25
-                            fillMode: Image.PreserveAspectFit
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     id: accountUpdate
+                        //     source: "/qmlimages/NewImages/accountUpdate_black.svg"
+                        //     width: 25
+                        //     height: 25
+                        //     fillMode: Image.PreserveAspectFit
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Account Update"
@@ -631,37 +644,26 @@ Item {
                         border.color: "#e0e0e0"
                         border.width: 1
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 10
+                        // Center just the Lottie container
+                        Item {
+                            width: 50
+                            height: 50
+                            anchors.centerIn: parent
 
-                            Item {
-                                width: 150
-                                height: 150
-                                anchors.horizontalCenter: parent.horizontalCenter
+                            LottieAnimation {
+                                id: droneAnim
+                                anchors.centerIn: parent
+                                source: "qrc:/qmlimages/NewImages/accountupdate_lottie.json"
+                                autoPlay: true
+                                loops: Animation.Infinite
 
-                                LottieAnimation {
-                                    id: droneAnim
-                                    anchors.fill: parent
-                                    source: "qrc:/qmlimages/NewImages/accountupdate_lottie.json"
-                                    autoPlay: true
-                                    loops: Animation.Infinite
+                                // Scale down by 50%
+                                scale: 0.5
 
-                                    onStatusChanged: console.log("Lottie Status:", status)
-                                }
+                                onStatusChanged: console.log("Lottie Status:", status)
                             }
-
-
-                            // Text {
-                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                            //     wrapMode: Text.WordWrap
-                            //     font.pointSize: ScreenTools.defaultFontPointSize
-                            //     color: "black" // Changed from white to black for visibility
-                            //     horizontalAlignment: Text.AlignHCenter
-                            //     width: parent.width - 40 // Add some margin
-                            // }
                         }
+
                     }
 
                     // Second Card - Form
@@ -1024,16 +1026,16 @@ Item {
 
                     // Center title + icon
                     Row {
-                        spacing: 8
+                        spacing: 0
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
 
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/privacy_policy_black.svg"
-                            width: 25
-                            height: 25
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     source: "/qmlimages/NewImages/privacy_policy_black.svg"
+                        //     width: 25
+                        //     height: 25
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Privacy Policy"
@@ -1151,14 +1153,14 @@ Item {
                                 Layout.fillWidth: true
                             }
 
-                            QGCColoredImage {
-                                id: termsconditions
-                                source: "/qmlimages/NewImages/terms_condition_black.svg"
-                                width: 25
-                                height: 25
-                                fillMode: Image.PreserveAspectFit
-                                color: "white"
-                            }
+                            // QGCColoredImage {
+                            //     id: termsconditions
+                            //     source: "/qmlimages/NewImages/terms_condition_black.svg"
+                            //     width: 25
+                            //     height: 25
+                            //     fillMode: Image.PreserveAspectFit
+                            //     color: "white"
+                            // }
 
                             Text {
                                 text: "Terms & Conditions"
@@ -1255,16 +1257,16 @@ Item {
 
                     // Center Title
                     Row {
-                        spacing: 8
+                        spacing: 0
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
 
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/feedback.svg"
-                            width: 25
-                            height: 25
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     source: "/qmlimages/NewImages/feedback.svg"
+                        //     width: 25
+                        //     height: 25
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Feedback"
@@ -1295,34 +1297,53 @@ Item {
                         border.color: "#e0e0e0"
                         border.width: 1
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 10
+                        // Column {
+                        //     anchors.centerIn: parent     // ✅ center both horizontally & vertically
+                        //     spacing: 10
 
-                            Item {
-                                width: 150
-                                height: 150
-                                anchors.horizontalCenter: parent.horizontalCenter
+                        //     Item {
+                        //         width: 150
+                        //         height: 150
+                        //         anchors.horizontalCenter: parent.horizontalCenter
 
-                                LottieAnimation {
-                                    anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/feedback_1.json"
-                                    autoPlay: true
-                                    loops: Animation.Infinite
-                                    scale: 0.4
-                                }
+                        //         LottieAnimation {
+                        //             anchors.centerIn: parent
+                        //             source: "qrc:/qmlimages/NewImages/feedback_1.json"
+                        //             autoPlay: true
+                        //             loops: Animation.Infinite
+                        //             scale: 0.25
+                        //         }
+                        //     }
+
+                        //     // Text {
+                        //     //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                        //     //     wrapMode: Text.WordWrap
+                        //     //     horizontalAlignment: Text.AlignHCenter
+                        //     //     font.pointSize: ScreenTools.defaultFontPointSize
+                        //     //     color: "black"
+                        //     //     width: parent.width - 40
+                        //     // }
+                        // }
+
+                        Item {
+                            width: 50
+                            height: 50
+                            anchors.centerIn: parent
+
+                            LottieAnimation {
+                                id: droneAnim
+                                anchors.centerIn: parent
+                                source: "qrc:/qmlimages/NewImages/feedback_1.json"
+                                autoPlay: true
+                                loops: Animation.Infinite
+
+                                // Scale down by 50%
+                                scale: 0.25
+
+                                onStatusChanged: console.log("Lottie Status:", status)
                             }
-
-                            // Text {
-                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                            //     wrapMode: Text.WordWrap
-                            //     horizontalAlignment: Text.AlignHCenter
-                            //     font.pointSize: ScreenTools.defaultFontPointSize
-                            //     color: "black"
-                            //     width: parent.width - 40
-                            // }
                         }
+
                     }
 
                     /* ===== RIGHT CARD ===== */
@@ -1509,14 +1530,14 @@ Item {
                     }
 
                     Row {
-                        spacing: 8
+                        spacing: 0
                         anchors.centerIn: parent
 
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/report.svg"
-                            width: 25; height: 25
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     source: "/qmlimages/NewImages/report.svg"
+                        //     width: 25; height: 25
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Report"
@@ -1546,32 +1567,52 @@ Item {
                         border.color: "#e0e0e0"
                         color: "white"
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 10
+                        // Column {
+                        //     anchors.centerIn: parent
+                        //     spacing: 10
 
-                            Item {
-                                width: 150; height: 150
-                                anchors.horizontalCenter: parent.horizontalCenter
+                        //     Item {
+                        //         width: 150
+                        //         height: 150
+                        //         anchors.horizontalCenter: parent.horizontalCenter
 
-                                LottieAnimation {
-                                    anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/report_1.json"
-                                    autoPlay: true
-                                    loops: Animation.Infinite
-                                    scale: 0.5
-                                }
+                        //         LottieAnimation {
+                        //             anchors.centerIn: parent
+                        //             source: "qrc:/qmlimages/NewImages/report_1.json"
+                        //             autoPlay: true
+                        //             loops: Animation.Infinite
+                        //             scale: 0.1
+                        //         }
+                        //     }
+
+                        //     // Text {
+                        //     //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
+                        //     //     wrapMode: Text.WordWrap
+                        //     //     horizontalAlignment: Text.AlignHCenter
+                        //     //     color: "black"
+                        //     //     width: parent.width - 40
+                        //     // }
+                        // }
+
+                        Item {
+                            width: 50
+                            height: 50
+                            anchors.centerIn: parent
+
+                            LottieAnimation {
+                                id: droneAnim
+                                anchors.centerIn: parent
+                                source: "qrc:/qmlimages/NewImages/report_1.json"
+                                autoPlay: true
+                                loops: Animation.Infinite
+
+                                // Scale down by 50%
+                                scale: 0.1
+
+                                onStatusChanged: console.log("Lottie Status:", status)
                             }
-
-                            // Text {
-                            //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                            //     wrapMode: Text.WordWrap
-                            //     horizontalAlignment: Text.AlignHCenter
-                            //     color: "black"
-                            //     width: parent.width - 40
-                            // }
                         }
+
                     }
 
                     /* ===== RIGHT CARD ===== */
@@ -1598,7 +1639,7 @@ Item {
                                 radius: 6
                                 color: "#f8f9fa"
 
-                                Row {
+                            Row {
                                     anchors.fill: parent
                                     anchors.margins: 20
                                     spacing: 15
@@ -1608,11 +1649,13 @@ Item {
                                         width: parent.width * 0.3
                                         font.bold: true
                                     }
+
                                     Text {
                                         text: "Start Time"
                                         width: parent.width * 0.3
                                         font.bold: true
                                     }
+
                                     Text {
                                         text: "End Time"
                                         width: parent.width * 0.3
@@ -1707,14 +1750,14 @@ Item {
 
                     Row {
                         anchors.centerIn: parent
-                        spacing: 10
+                        spacing: 0
 
-                        QGCColoredImage {
-                            source: "/qmlimages/NewImages/select_drone_type_black.svg"
-                            width: 25
-                            height: 25
-                            color: "white"
-                        }
+                        // QGCColoredImage {
+                        //     source: "/qmlimages/NewImages/select_drone_type_black.svg"
+                        //     width: 25
+                        //     height: 25
+                        //     color: "white"
+                        // }
 
                         Text {
                             text: "Select Application"
@@ -1857,6 +1900,7 @@ Item {
                                     }
 
                                 }
+
                             }
 
                         }
