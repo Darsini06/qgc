@@ -59,84 +59,18 @@ Item {
         }
     }
 
-    // function camera(){
-    //     camera.visible = true
-    //     agri.visible=false
-    //     mapping.visible = false
-    //     vtol.visible=false
-    //     cameraicon.visible=true
-    //     agriicon.visible=false
-    //     mappingicon.visible=false
-    //     vtolicon.visible=false
-    //     droneAnim1.visible=false
-    // }
+    /* ========= BACKGROUND IMAGE ========= */
+    Image {
+        id: bgImage
+        anchors.fill: parent
+        source: "qrc:/qmlimages/NewImages/background_home.png"
+        fillMode: Image.PreserveAspectCrop
+        z: 0
+    }
 
-    // function agri(){
-    //     camera.visible=false
-    //     agri.visible=true
-    //     mapping.visible=false
-    //     vtol.visible=false
-    //     cameraicon.visible=false
-    //     agriicon.visible=true
-    //     mappingicon.visible=false
-    //     vtolicon.visible=false
-    //     droneAnim1.visible=false
-    // }
-
-    // function mapping(){
-    //     camera.visible=false
-    //     agri.visible=false
-    //     mapping.visible=true
-    //     vtol.visible=false
-    //     cameraicon.visible=false
-    //     agriicon.visible=false
-    //     mappingicon.visible=true
-    //     vtolicon.visible=false
-    //     droneAnim1.visible=false
-    // }
-
-    // function vtol(){
-    //     camera.visible=false
-    //     agri.visible=false
-    //     mapping.visible=false
-    //     vtol.visible=true
-    //     cameraicon.visible=false
-    //     agriicon.visible=false
-    //     mappingicon.visible=false
-    //     vtolicon.visible=true
-    //     droneAnim1.visible=false
-    // }
-
-    Rectangle {
-        width: Screen.width
-        height: Screen.height
-        color: "white"  // Dark background
-
-        // Rectangle {
-        //     anchors.fill: parent
-        //     z: 0
-        //     color: "#1b1c3e"
-        // }
-
-        // //---- Curved Gradient Background ----
-        // Rectangle {
-        //     anchors.right: parent.right
-        //     anchors.bottom: parent.bottom
-        //     width: parent.width * 0.7
-        //     height: parent.height * 0.9
-        //     radius: width * 0.5
-        //     rotation: 25
-        //     opacity: 0.9
-        //     anchors.rightMargin: -width * 0.2
-        //     anchors.bottomMargin: -height * 0.2
-        //     z: 1
-
-        //     gradient: Gradient {
-        //         GradientStop { position: 0.0; color: "#1b1c3e" }
-        //         GradientStop { position: 1.0; color: "#7d8df7" }
-        //     }
-        // }
-
+    Item {
+        anchors.fill: parent
+        z: 1
 
         // ---- Top Navigation Bar ----
         Item {
@@ -192,7 +126,7 @@ Item {
 
                     Label {
                         id: select_type
-                        text: "SELECT APPLICATION"
+                        text: "APPLICATION"
                         color: "black"
                         font.pixelSize: 15
                         font.bold: true
@@ -225,7 +159,6 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-
                             logoutdialog.createObject(mainWindow).open()
                         }
                     }
@@ -237,7 +170,7 @@ Item {
 
         Row {
             id: mainRow
-            z: 5
+
             anchors.fill: parent
             //anchors.horizontalCenter:  parent.horizontalCenter
             anchors.margins: 30
@@ -280,9 +213,11 @@ Item {
                 id: rightSide
                 width: parent.width * 0.4
                 height: parent.height * 0.6
-                //anchors.right: parent.right
-                //anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
                 clip: false  // IMPORTANT: allow shadow outside
+
+                onVisibleChanged: console.log("rightSide visible:", visible, "droneType:", droneType)
 
                 // ---- SHADOW SOURCE ----
                 Rectangle {
@@ -310,35 +245,34 @@ Item {
                     anchors.fill: parent
                     radius: 8
                     color: "white"
-                    border.width: 2
+                    border.width: 1
                     border.color: app_color
                     clip: true
-
-                    // // ---- CENTERED IMAGE ----
-                    // QGCColoredImage {
-                    //     anchors.centerIn: parent
-                    //     source: "qrc:/qmlimages/NewImages/camera_Application.svg"
-                    //     width: 56
-                    //     height: 56
-                    //     fillMode: Image.PreserveAspectFit
-                    //     color : "black"
-                    // }
 
                     //Lottie File for All categoreis diaplayed
                     Item {
                         id: lottieWrapper
                         anchors.centerIn: parent
-                        width: parent.width * 0.5
-                        height: width
+                        width: parent.width
+                        height: parent.height
                         visible: droneType === "loadpage"
                         z: 30
 
-                        LottieAnimation {
+                        Rectangle {
                             anchors.fill: parent
-                            source: "qrc:/qmlimages/NewImages/droneManFly.json"
-                            autoPlay: true
-                            loops: Animation.Infinite
-                            frameRate: 24   // optional performance boost
+                            anchors.margins: dp(2)
+                            radius: dp(4)
+                            clip: true
+                            color: "transparent"
+
+                            LottieAnimation {
+                                anchors.centerIn: parent
+                                source: "qrc:/qmlimages/NewImages/droneManFly.json"
+                                autoPlay: true
+                                loops: Animation.Infinite
+                                scale: 0.35
+                                frameRate: 24
+                            }
                         }
                     }
 
@@ -349,22 +283,24 @@ Item {
                     Image {
                         id:cameraicon
                         source: "/qmlimages/NewImages/cameraDrone_png.png"
-                        visible: droneType ==="Camera"?true:false
+                        visible: droneType === "Camera"
                         anchors.centerIn: parent
                         width: parent.width * 0.9
                         height: parent.height * 0.9
                         fillMode: Image.PreserveAspectFit
+                        onStatusChanged: console.log("Camera image status:", status)
                     }
 
                     //Mapping_Drone_Image
                     Image {
                         id: mappingicon
                         source: "/qmlimages/NewImages/survey.png" // Replace with real image
-                        visible: droneType ==="Mapping"?true:false
+                        visible: droneType === "Mapping"
                         anchors.centerIn: parent
                         width: parent.width * 0.5
                         height: parent.height * 0.5
                         fillMode: Image.PreserveAspectFit
+                        onStatusChanged: console.log("Mapping image status:", status)
                     }
 
                     // //VTOL_Drone_Image
@@ -386,24 +322,14 @@ Item {
                         width: parent.width * 0.7
                         height: parent.height * 0.7
                         fillMode: Image.PreserveAspectFit
-                        visible: droneType ==="Agri" ? true : false
+                        visible: droneType ==="Agri"
+                        onStatusChanged: console.log("Agri image status:", status)
                     }
                 }
 
             }
 
         }
-
-    }
-
-    property string planType: "Standard"
-    property var _appSettings: QGroundControl.settingsManager.appSettings
-
-    property var _linkManager: QGroundControl.linkManager
-
-    Rectangle {
-        color: "transparent"
-        anchors.fill: parent
 
         RowLayout {
             anchors.bottom: parent.bottom
@@ -777,194 +703,201 @@ Item {
 
         }
 
-        Component {
-            id: logoutdialog
-
-            QGCPopupDialog {
-                id: popup
-                title: qsTr("Logout")
-
-                buttons: Dialog.Yes | Dialog.No
-
-                onAccepted: {
-                    QGroundControl.saveBoolGlobalSetting("login", false)
-                    QGroundControl.saveGlobalSetting("loadpage", "loadpage")
-                    popup.visible = false
-                    MapGlobals.profile()
-                }
-
-                onRejected: {
-                    popup.visible = false
-                }
-
-                ColumnLayout {
-                    spacing: ScreenTools.defaultFontPixelWidth
-                    QGCLabel {
-                        text: qsTr("Are you sure you want to logout?")
-                        Layout.fillWidth: true
-                    }
-                }
-            }
-        }
-
-        // First Dialog – Type Selection Only
-
-        Component {
-            id: typeSelectionDialogComponent
-
-            QGCPopupDialog {
-                id: typeDialog
-                title: qsTr("Select Link Type")
-                buttons: 0
-                showButtons: false
-                //close icon condition
-                closeOnClickOutside: true
-
-                property int selectedType: -1
-
-                ColumnLayout {
-                    spacing: 15                     // we’ll control spacing ourselves
-                    Layout.fillWidth: true
-
-                    Repeater {
-                        model: _linkManager.linkTypeStrings
-                        delegate: RowLayout {
-                            Layout.fillWidth: true        // row spans full width
-                            spacing: 20
-
-                            Rectangle {
-                                width: 25
-                                height: 25
-                                radius: width/2
-                                color: "#7F56D9"
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    font.pixelSize: 14
-                                    color: "white"
-                                    text: index + 1
-                                }
-                            }
-
-                            //Item { Layout.fillWidth: true }
-
-                            // clickable text
-                            Text {
-                                text: modelData
-                                //Layout.alignment: Qt.AlignHCenter
-                                font.pixelSize: 16
-                                color: "black"   // adjust to your theme
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        typeDialog.selectedType = index
-                                        typeDialog.close()
-                                        var editingConfig = _linkManager.createConfiguration(index, "")
-                                        linkConfigDialogComponent.createObject(mainWindow, {
-                                                                                   editingConfig: editingConfig,
-                                                                                   originalConfig: null,
-                                                                                   selectedType: index
-                                                                               }).open()
-                                    }
-                                    // hoverEnabled: true
-                                    // onEntered: parent.color = "blue"   // optional hover effect
-                                    // onExited:  parent.color = "green"
-                                }
-                            }
-
-                            Item { Layout.fillWidth: true }
-
-                            // // full-width divider
-                            // Rectangle {
-                            //     Layout.fillWidth: true
-                            //     height: 1
-                            //     color: "#aaaaaa"  // divider colour
-                            // }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Second Dialog - Configuration (without type dropdown)
-        Component {
-            id: linkConfigDialogComponent
-
-            QGCPopupDialog {
-                title:          selectedType === 3 ? "Bluetooth Devices"
-                                                   : originalConfig ? qsTr("Edit Link")
-                                                                    : qsTr("Add New Link")
-                buttons:        Dialog.Save | Dialog.Cancel
-                acceptAllowed:  nameField.text !== ""
-
-                property var originalConfig
-                property var editingConfig
-                property int selectedType
-
-                Connections {
-                    target: editingConfig
-                    enabled: editingConfig !== null
-
-                    function onShowToast(message) {
-                        mainWindow.showToastMessage(message)
-                    }
-                }
-
-                onAccepted: {
-                    linkSettingsLoader.item.saveSettings()
-                    editingConfig.devName = nameField.text
-                    editingConfig.name    = editingConfig.devName
-
-                    if (originalConfig) {
-                        _linkManager.endConfigurationEditing(originalConfig, editingConfig)
-                    } else {
-                        editingConfig.dynamic = false
-                        _linkManager.endCreateConfiguration(editingConfig)
-                        _linkManager.createConnectedLink(editingConfig)
-                    }
-                }
-
-                onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
-
-                // ---------- MAIN LAYOUT ----------
-                ColumnLayout {
-                    id: mainColumn
-                    spacing: ScreenTools.defaultFontPixelHeight / 2
-                    Layout.fillWidth: true
-
-
-                    // ---- Name row (not shown for Bluetooth) ----
-                    RowLayout {
-                        Layout.fillWidth: true    // row stretches full width
-                        spacing: ScreenTools.defaultFontPixelWidth
-                        visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
-
-                        QGCLabel { text: qsTr("Name") }
-
-                        QGCTextField {
-                            id:               nameField
-                            Layout.fillWidth: true   // text field grows to take remaining width
-                            text:             editingConfig.devName
-                            placeholderText:  qsTr("Enter name")
-                        }
-                    }
-
-                    // ---- Device list / settings loader ----
-                    Loader {
-                        id: linkSettingsLoader
-                        Layout.fillWidth: true        // << ensures it spans the whole dialog
-                        source: subEditConfig.settingsURL
-
-                        property var subEditConfig:         editingConfig
-                        property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
-                        property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
-                        property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
-                        property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
-                    }
-                }
-            }
-        }
-
     }
+
+    Component {
+        id: logoutdialog
+
+        QGCPopupDialog {
+            id: popup
+            title: qsTr("Logout")
+
+            buttons: Dialog.Yes | Dialog.No
+
+            onAccepted: {
+                QGroundControl.saveBoolGlobalSetting("login", false)
+                QGroundControl.saveGlobalSetting("loadpage", "loadpage")
+                popup.visible = false
+                MapGlobals.profile()
+            }
+
+            onRejected: {
+                popup.visible = false
+            }
+
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Are you sure you want to logout?")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
+
+    // First Dialog – Type Selection Only
+
+    Component {
+        id: typeSelectionDialogComponent
+
+        QGCPopupDialog {
+            id: typeDialog
+            title: qsTr("Select Link Type")
+            buttons: 0
+            showButtons: false
+            //close icon condition
+            closeOnClickOutside: true
+
+            property int selectedType: -1
+
+            ColumnLayout {
+                spacing: 15                     // we’ll control spacing ourselves
+                Layout.fillWidth: true
+
+                Repeater {
+                    model: _linkManager.linkTypeStrings
+                    delegate: RowLayout {
+                        Layout.fillWidth: true        // row spans full width
+                        spacing: 20
+
+                        Rectangle {
+                            width: 25
+                            height: 25
+                            radius: width/2
+                            color: "#7F56D9"
+
+                            Text {
+                                anchors.centerIn: parent
+                                font.pixelSize: 14
+                                color: "white"
+                                text: index + 1
+                            }
+                        }
+
+                        //Item { Layout.fillWidth: true }
+
+                        // clickable text
+                        Text {
+                            text: modelData
+                            //Layout.alignment: Qt.AlignHCenter
+                            font.pixelSize: 16
+                            color: "black"   // adjust to your theme
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    typeDialog.selectedType = index
+                                    typeDialog.close()
+                                    var editingConfig = _linkManager.createConfiguration(index, "")
+                                    linkConfigDialogComponent.createObject(mainWindow, {
+                                                                               editingConfig: editingConfig,
+                                                                               originalConfig: null,
+                                                                               selectedType: index
+                                                                           }).open()
+                                }
+                                // hoverEnabled: true
+                                // onEntered: parent.color = "blue"   // optional hover effect
+                                // onExited:  parent.color = "green"
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        // // full-width divider
+                        // Rectangle {
+                        //     Layout.fillWidth: true
+                        //     height: 1
+                        //     color: "#aaaaaa"  // divider colour
+                        // }
+                    }
+                }
+            }
+        }
+    }
+
+    // Second Dialog - Configuration (without type dropdown)
+    Component {
+        id: linkConfigDialogComponent
+
+        QGCPopupDialog {
+            title:          selectedType === 3 ? "Bluetooth Devices"
+                                               : originalConfig ? qsTr("Edit Link")
+                                                                : qsTr("Add New Link")
+            buttons:        Dialog.Save | Dialog.Cancel
+            acceptAllowed:  nameField.text !== ""
+
+            property var originalConfig
+            property var editingConfig
+            property int selectedType
+
+            Connections {
+                target: editingConfig
+                enabled: editingConfig !== null
+
+                function onShowToast(message) {
+                    mainWindow.showToastMessage(message)
+                }
+            }
+
+            onAccepted: {
+                linkSettingsLoader.item.saveSettings()
+                editingConfig.devName = nameField.text
+                editingConfig.name    = editingConfig.devName
+
+                if (originalConfig) {
+                    _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+                } else {
+                    editingConfig.dynamic = false
+                    _linkManager.endCreateConfiguration(editingConfig)
+                    _linkManager.createConnectedLink(editingConfig)
+                }
+            }
+
+            onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+
+            // ---------- MAIN LAYOUT ----------
+            ColumnLayout {
+                id: mainColumn
+                spacing: ScreenTools.defaultFontPixelHeight / 2
+                Layout.fillWidth: true
+
+
+                // ---- Name row (not shown for Bluetooth) ----
+                RowLayout {
+                    Layout.fillWidth: true    // row stretches full width
+                    spacing: ScreenTools.defaultFontPixelWidth
+                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+
+                    QGCLabel { text: qsTr("Name") }
+
+                    QGCTextField {
+                        id:               nameField
+                        Layout.fillWidth: true   // text field grows to take remaining width
+                        text:             editingConfig.devName
+                        placeholderText:  qsTr("Enter name")
+                    }
+                }
+
+                // ---- Device list / settings loader ----
+                Loader {
+                    id: linkSettingsLoader
+                    Layout.fillWidth: true        // << ensures it spans the whole dialog
+                    source: subEditConfig.settingsURL
+
+                    property var subEditConfig:         editingConfig
+                    property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
+                    property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
+                    property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
+                    property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+                }
+            }
+        }
+    }
+
+    property string planType: "Standard"
+    property var _appSettings: QGroundControl.settingsManager.appSettings
+
+    property var _linkManager: QGroundControl.linkManager
+
+
 }

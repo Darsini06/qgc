@@ -168,6 +168,8 @@
 
         <file alias="NewImages/feedback_gif.gif">src/NewImages/feedback_gif.gif</file>
         <file alias="NewImages/report_gif.gif">src/NewImages/report_gif.gif</file>
+
+        <file alias="NewImages/background_home.png">src/NewImages/background_home.png</file>
        
         
 
