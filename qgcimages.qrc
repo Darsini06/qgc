@@ -157,7 +157,6 @@
         <file alias="NewImages/profile_lottie.json">src/NewImages/profile_lottie.json</file>
         <file alias="NewImages/accountupdate_lottie.json">src/NewImages/accountupdate_lottie.json</file>
         <file alias="NewImages/cameraDrone_svg.svg">src/NewImages/cameraDrone_svg.svg</file>
-
         <file alias="NewImages/feedback_2.json">src/NewImages/feedback_2.json</file>
         <file alias="NewImages/feedback_3.json">src/NewImages/feedback_3.json</file>
         <file alias="NewImages/feedback_1.json">src/NewImages/feedback_1.json</file>
@@ -165,11 +164,29 @@
         <file alias="NewImages/clock_time.json">src/NewImages/clock_time.json</file>
         <file alias="NewImages/loading_color_dots.json">src/NewImages/loading_color_dots.json</file>
         <file alias="NewImages/loading_hands.json">src/NewImages/loading_hands.json</file>
-
         <file alias="NewImages/feedback_gif.gif">src/NewImages/feedback_gif.gif</file>
         <file alias="NewImages/report_gif.gif">src/NewImages/report_gif.gif</file>
-
         <file alias="NewImages/background_home.png">src/NewImages/background_home.png</file>
+        <file alias="NewImages/spray_parameter.svg">src/NewImages/spray_parameter.svg</file>
+        <file alias="NewImages/all_parameter.svg">src/NewImages/all_parameter.svg</file>
+        <file alias="NewImages/Tuning_calibration.svg">src/NewImages/Tuning_calibration.svg</file>
+        <file alias="NewImages/basic_marking.svg">src/NewImages/basic_marking.svg</file>
+        <file alias="NewImages/circle_marking.svg">src/NewImages/circle_marking.svg</file>
+        <file alias="NewImages/obstacles.svg">src/NewImages/obstacles.svg</file>
+        <file alias="NewImages/levelhorizon_calibration.svg">src/NewImages/levelhorizon_calibration.svg</file>
+        <file alias="NewImages/gyro_calibration.svg">src/NewImages/gyro_calibration.svg</file>
+        <file alias="NewImages/upload_file.svg">src/NewImages/upload_file.svg</file>
+        <file alias="NewImages/save_file.svg">src/NewImages/save_file.svg</file>
+        <file alias="NewImages/motor_calibration.svg">src/NewImages/motor_calibration.svg</file>
+        <file alias="NewImages/boundary_marking.svg">src/NewImages/boundary_marking.svg</file>
+        <file alias="NewImages/map_selection.svg">src/NewImages/map_selection.svg</file>
+        <file alias="NewImages/Drone_connected.svg">src/NewImages/Drone_connected.svg</file>
+        <file alias="NewImages/mark_with_gps.svg">src/NewImages/mark_with_gps.svg</file>
+        <file alias="NewImages/pressure_calibration.svg">src/NewImages/pressure_calibration.svg</file>
+        <file alias="NewImages/RC_caliberation.svg">src/NewImages/RC_caliberation.svg</file>
+        <file alias="NewImages/ESC_calibration.svg">src/NewImages/ESC_calibration.svg</file>
+        <file alias="NewImages/Accel_calibration.svg">src/NewImages/Accel_calibration.svg</file>
+        <file alias="NewImages/compass_calibration.svg">src/NewImages/compass_calibration.svg</file>
        
         
 

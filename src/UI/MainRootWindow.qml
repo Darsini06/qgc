@@ -93,6 +93,8 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
+    property color app_color: "#5d179e"
+
 
     function dp(value) {
         return value * baseUnit;
@@ -893,11 +895,11 @@ ApplicationWindow {
             anchors.fill: parent
             spacing: 0
 
-            // Top App Bar
+            /* ================= HEADER ================= */
             Rectangle {
                 Layout.preferredHeight: 44
                 Layout.fillWidth: true
-                color: "#5d179e"
+                color: app_color
 
                 // Back Button (LEFT)
                 QGCColoredImage {
@@ -934,13 +936,11 @@ ApplicationWindow {
 
             Item {
                 Layout.fillWidth: true
-                height: tabBar.height + dp(6)   // room for shadow
+                height: 46 + 4   // Tab height + indicator space
 
-                /* ===== TAB BAR ===== */
+                /* ================= TAB BAR ================= */
                 TabBar {
                     id: tabBar
-                    z: 2
-                    anchors.top: parent.top
                     width: parent.width
                     height: 56
                     currentIndex: 0
@@ -953,41 +953,45 @@ ApplicationWindow {
                         model: tabModel
 
                         TabButton {
+                            id: tabBtn
                             implicitHeight: 56
+                            implicitWidth: Math.max(140, contentRow.implicitWidth + 40)
+
+                            leftPadding: 0
+                            rightPadding: 0
+                            topPadding: 3
+                            bottomPadding: 10
+
                             background: Item {}
 
-                            contentItem: Column {
-                                spacing: 7
-                                anchors.centerIn: parent
+                            contentItem: Item {
+                                anchors.fill: parent
 
-                                QGCColoredImage {
-                                    width: 18
-                                    height: 18
-                                    source: model.image
-                                    color: tabBar.currentIndex === index
-                                           ? "#5d179e"
-                                           : "#000000"
-                                    anchors.horizontalCenter: parent.horizontalCenter
+                                Row {
+                                    id: contentRow
+                                    spacing: 6
+                                    anchors.centerIn: parent
+
+                                    QGCColoredImage {
+                                        width: 18
+                                        height: 18
+                                        source: model.image
+                                        color: tabBar.currentIndex === index
+                                               ? app_color
+                                               : "#9E9E9E"
+                                    }
+
+                                    Text {
+                                        text: model.title
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.bold : tabBar.currentIndex === index
+                                        color: tabBar.currentIndex === index
+                                               ? app_color
+                                               : "#9E9E9E"
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
                                 }
 
-                                Text {
-                                    text: model.title
-                                    font.pixelSize: 11
-                                    color: tabBar.currentIndex === index
-                                           ? "#5d179e"
-                                           : "#000000"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    visible: tabBar.currentIndex !== index
-                                }
-
-                                Rectangle {
-                                    width: 30
-                                    height: 3
-                                    radius: 1
-                                    color: "#5d179e"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    visible: tabBar.currentIndex === index
-                                }
                             }
 
                             onClicked: {
@@ -997,19 +1001,47 @@ ApplicationWindow {
                         }
                     }
                 }
-            }
 
-            /* ---- GRADIENT SHADOW (ELEVATION) ---- */
-            Rectangle {
-                anchors.top: tabBar.bottom
-                width: parent.width
-                height: dp(6)
-                z: 1
-
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#30000000" }
-                    GradientStop { position: 1.0; color: "transparent" }
+                /* ================= BASE LINE (ALL TABS) ================= */
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 1
+                    color: "#D0D0D0"
                 }
+
+                /* ================= ACTIVE INDICATOR ================= */
+                Rectangle {
+                    id: indicator
+                    height: 3
+                    radius: 2
+                    color: app_color
+                    anchors.bottom: parent.bottom
+
+                    property real indicatorRatio : 0.55
+
+                    function updateIndicator() {
+                        if (!tabBar.currentItem) return
+                        width = tabBar.currentItem.width * indicatorRatio
+                        x = tabBar.currentItem.x +
+                            (tabBar.currentItem.width - width) / 2
+                    }
+
+                    Component.onCompleted: updateIndicator()
+
+                    Connections {
+                        target: tabBar
+                        function onWidthChanged() { indicator.updateIndicator() }
+                        function onCurrentIndexChanged() { indicator.updateIndicator() }
+                    }
+
+                    Behavior on x { NumberAnimation { duration: 200 } }
+                    Behavior on width { NumberAnimation { duration: 200 } }
+                }
+
+
+
             }
 
             /* ================= CONTENT ================= */
@@ -1836,7 +1868,7 @@ ApplicationWindow {
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/mapSelection.png"
+                                source: "qrc:/qmlimages/NewImages/basic_marking.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -1869,7 +1901,6 @@ ApplicationWindow {
                     }
                 }
 
-
                 // Drone - Dark Green
                 Button {
                     id:mappingcirclebtn
@@ -1896,7 +1927,7 @@ ApplicationWindow {
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                source: "qrc:/qmlimages/NewImages/circle_marking.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -1928,8 +1959,6 @@ ApplicationWindow {
                     }
                 }
 
-
-
                 // Map Selection - Dark Blue
                 Button {
                     Layout.alignment: Qt.AlignHCenter
@@ -1956,7 +1985,7 @@ ApplicationWindow {
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/mapSelection.png"
+                                source: "/qmlimages/NewImages/map_selection.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -2015,7 +2044,7 @@ ApplicationWindow {
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                source: "qrc:/qmlimages/NewImages/mark_with_gps.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit

@@ -28,6 +28,8 @@ SetupPage {
     id:             sensorsPage
     pageComponent:  sensorsPageComponent
 
+    property color app_color: "#5d179e"
+
 
     Component {
         id: sensorsPageComponent
@@ -42,7 +44,7 @@ SetupPage {
                     text: "Accelerometer",
                     type: "accel",
                     indicator: true,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/Accel_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -50,7 +52,7 @@ SetupPage {
                     text: "Compass",
                     type: "compass",
                     indicator: true,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/compass_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -58,7 +60,7 @@ SetupPage {
                     text: "Level Horizon",
                     type: "level",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/levelhorizon_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -66,7 +68,7 @@ SetupPage {
                     text: "Gyro",
                     type: "gyro",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/gyro_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -74,7 +76,7 @@ SetupPage {
                     text: "Pressure",
                     type: "pressure",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/pressure_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -82,7 +84,7 @@ SetupPage {
                     text: "RC Calibration",
                     type: "rc",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/RC_caliberation.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -90,7 +92,7 @@ SetupPage {
                     text: "Flight Modes",
                     type: "flightModes",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/homeIcon.png",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -98,7 +100,7 @@ SetupPage {
                     text: "ESC Calibration",
                     type: "esc",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/ESC_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -106,7 +108,7 @@ SetupPage {
                     text: "Motors",
                     type: "motors",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/motor_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 },
@@ -114,7 +116,7 @@ SetupPage {
                     text: "Tuning",
                     type: "tuning",
                     indicator: false,
-                    icon: "/qmlimages/NewImages/homeIcon.png",
+                    icon: "qrc:/qmlimages/NewImages/Tuning_calibration.svg",
                     status: "none",
                     color: "#ffffff"
                 }
@@ -141,7 +143,6 @@ SetupPage {
                     spacing: 20
 
 
-
                     // GridView for calibration buttons
                     Grid {
                         id: gridView
@@ -162,8 +163,6 @@ SetupPage {
                                 width: cardWidth
                                 height: cardHeight
                                 // Dynamic visibility for some buttons
-
-
 
 
                                 Rectangle {
@@ -188,41 +187,41 @@ SetupPage {
                                         }
                                     }
 
-                                    radius: 10
-                                    border.color: qgcPal.buttonText
-                                    border.width: 1
+                                    radius: 8
+                                    //border.color: qgcPal.buttonText
+                                    //border.width: 1
                                     Rectangle {
-                                                        id: shadowSource
-                                                        anchors.fill: parent
-                                                        radius: 10//dp(4)
-                                                        color: "white"
-                                                        visible: false
-                                                        anchors.margins: 2
+                                        id: shadowSource
+                                        anchors.fill: parent
+                                        radius: 10//dp(4)
+                                        color: "white"
+                                        visible: false
+                                        anchors.margins: 2
 
-                                                    }
+                                    }
 
-                                                    MultiEffect {
-                                                        anchors.fill: shadowSource
-                                                        source: shadowSource
+                                    MultiEffect {
+                                        anchors.fill: shadowSource
+                                        source: shadowSource
 
-                                                        shadowEnabled: true
-                                                        shadowBlur: 1.0
-                                                        shadowHorizontalOffset: 15
-                                                        shadowVerticalOffset: 15//dp(1)
-                                                        shadowColor: "#5d179e"   // soft black
-                                                    }
+                                        shadowEnabled: true
+                                        shadowBlur: 0.5
+                                        shadowHorizontalOffset: 0
+                                        shadowVerticalOffset: 0//dp(1)
+                                        shadowColor: app_color   // soft black
+                                    }
 
 
                                     Column {
                                         anchors.centerIn: parent
-                                        spacing: 5
+                                        spacing: 10
                                         width: parent.width
 
                                         // Icon above the text
                                         Image {
                                             source: modelData.icon
-                                            width: 32
-                                            height: 32
+                                            width: 40
+                                            height: 40
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             fillMode: Image.PreserveAspectFit
                                         }
@@ -247,7 +246,7 @@ SetupPage {
                                         anchors.right: parent.right
                                         anchors.margins: 5
                                         radius: width * 0.5
-                                        color: "#5d179e"
+                                        color: app_color
                                         // color: {
                                         //     if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
                                         //     if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
@@ -270,7 +269,7 @@ SetupPage {
                                         enabled: gridView.buttonsEnabled
                                         onClicked: {
                                             //handleButtonClick(model.type)
-                                             console.log("Next button clicked")
+                                            console.log("Next button clicked")
                                         }
                                     }
                                 }
@@ -1028,7 +1027,7 @@ SetupPage {
                         text:       qsTr("CompassMot")
                         visible:    globals.activeVehicle ? globals.activeVehicle.supportsMotorInterference : false
                         onClicked:  {
-                             console.log("Click CompassMot button")
+                            console.log("Click CompassMot button")
                             compassMotDialogComponent.createObject(mainWindow).open()
                         }
                     }
@@ -1037,7 +1036,7 @@ SetupPage {
                         width:      _buttonWidth
                         text:       qsTr("Sensor Settings")
                         onClicked:  {
-                             console.log("Click Sensor Settings button")
+                            console.log("Click Sensor Settings button")
                             showOrientationsDialog(_calTypeSet)
                         }
                     }
