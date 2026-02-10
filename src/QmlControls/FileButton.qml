@@ -8,9 +8,9 @@ import QGroundControl.ScreenTools
 Rectangle {
     implicitWidth:  ScreenTools.implicitButtonWidth
     implicitHeight: ScreenTools.implicitButtonHeight
-    color:          highlight ? qgcPal.buttonHighlight : qgcPal.button
+    color:          highlight ? "#1b1c3e"/*qgcPal.buttonHighlight*/ : qgcPal.button
     border.color:   highlight ? qgcPal.buttonHighlightText : qgcPal.buttonText
-
+    radius: 20
     property alias  text:       label.text
     property bool   highlight:  false
 
@@ -42,7 +42,7 @@ Rectangle {
         width:                  _hamburgerSize
         height:                 _hamburgerSize
         sourceSize.height:      _hamburgerSize
-        source:                 "qrc:/qmlimages/Hamburger.svg"
+        source:                 "/res/TrashDelete.svg"
         color:                  highlight ? qgcPal.buttonHighlightText : qgcPal.buttonText
 
         property real _hamburgerSize: parent.height * 0.75
@@ -52,6 +52,10 @@ Rectangle {
         anchors.fill:   parent
         onClicked:      parent.clicked()
     }
+
+
+
+
 
     QGCMouseArea {
         anchors.leftMargin: -_margins * 2

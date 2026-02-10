@@ -1749,7 +1749,7 @@ Item {
             Column {
                 anchors.centerIn: parent
                 spacing: 20
-                width: parent.width * 0.8
+                width: 300//parent.width * 0.8
 
                 // Title
                 Label {
@@ -1766,7 +1766,7 @@ Item {
                     spacing: 10
                     width: parent.width
                     Label {
-                        text: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):qsTr("Project Name:")
+                        text: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):*/qsTr("Project Name:")
                         Layout.preferredWidth: 100
                         color: "white"
                         font.bold: true
@@ -1775,49 +1775,49 @@ Item {
                     TextField {
                         id: nameField
                         Layout.fillWidth: true
-                        placeholderText: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):qsTr("Enter your project name")
+                        placeholderText: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):*/qsTr("Enter your project name")
                     }
                 }
 
-                // Phone Number Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                    Label {
-                        text: qsTr("Ph No:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: phoneField
-                        Layout.fillWidth: true
-                        placeholderText: qsTr("Enter 10-digit phone no")
-                        validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                        inputMethodHints: Qt.ImhDigitsOnly
-                    }
-                }
+                // // Phone Number Field
+                // RowLayout {
+                //     spacing: 10
+                //     width: parent.width
+                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                //     Label {
+                //         text: qsTr("Ph No:")
+                //         Layout.preferredWidth: 100
+                //         color: "white"
+                //         font.bold: true
+                //         font.pointSize: 14
+                //     }
+                //     TextField {
+                //         id: phoneField
+                //         Layout.fillWidth: true
+                //         placeholderText: qsTr("Enter 10-digit phone no")
+                //         validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                //         inputMethodHints: Qt.ImhDigitsOnly
+                //     }
+                // }
 
-                // Ground Name Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                    Label {
-                        text: qsTr("Ground Name:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: groundField
-                        Layout.fillWidth: true
-                        placeholderText: qsTr("Enter ground name")
-                    }
-                }
+                // // Ground Name Field
+                // RowLayout {
+                //     spacing: 10
+                //     width: parent.width
+                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
+                //     Label {
+                //         text: qsTr("Ground Name:")
+                //         Layout.preferredWidth: 100
+                //         color: "white"
+                //         font.bold: true
+                //         font.pointSize: 14
+                //     }
+                //     TextField {
+                //         id: groundField
+                //         Layout.fillWidth: true
+                //         placeholderText: qsTr("Enter ground name")
+                //     }
+                // }
 
                 // Buttons Row
                 Row {
@@ -1879,15 +1879,21 @@ Item {
                         onClicked: {
                             QGroundControl.saveGlobalSetting("load", "load1")
                             if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                if (nameField.text.length < 3 ||
-                                    phoneField.text.length < 3 ||
-                                    groundField.text.length < 3) {
+                                // if (nameField.text.length < 3 ||
+                                //     phoneField.text.length < 3 ||
+                                //     groundField.text.length < 3) {
+                                //     mainWindow.showToastMessage("Please fill all fields")
+                                //     return
+                                // }
+                                // let concatenatedText = nameField.text.substring(0,3) +
+                                //                        phoneField.text.substring(0,3) +
+                                //                        groundField.text.substring(0,3)
+                                if (nameField.text.length < 3 ) {
                                     mainWindow.showToastMessage("Please fill all fields")
                                     return
                                 }
-                                let concatenatedText = nameField.text.substring(0,3) +
-                                                       phoneField.text.substring(0,3) +
-                                                       groundField.text.substring(0,3)
+
+                                let concatenatedText = nameField.text.substring(0,10)
 
                                 _appSettings.username = concatenatedText
                                 _saveCurrentVertices()

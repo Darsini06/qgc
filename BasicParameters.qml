@@ -5,7 +5,7 @@ import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.Palette
 import QGroundControl.ScreenTools
-
+import QtQuick.Effects
 Item {
     id:     root
     anchors.fill: parent
@@ -27,30 +27,30 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
 
     property var agri: [
-        { text: "All", icon: "qrc:/qmlimages/NoGimbal.svg", color: "#2c3e50" },
-        { text: "SPARY", icon: "qrc:/qmlimages/CADDX.svg", color: "#8e44ad" }
+        { text: "All", icon: "/qmlimages/NewImages/homeIcon.png", color: "#2c3e50" },
+        { text: "SPARY", icon: "/qmlimages/NewImages/homeIcon.png", color: "#8e44ad" }
     ]
     property var agrigimbalModels: [
-        { text: "Servo Gimbal", icon: "qrc:/qmlimages/ServoGimbal.svg", color: "#3498db" },
-        { text: "STorM32", icon: "qrc:/qmlimages/STorM32Gimbal.svg", color: "#9b59b6" },
-        { text: "Brushless PWM", icon: "qrc:/qmlimages/BrushlessGimbal.svg", color: "#e74c3c" }
+        { text: "Servo Gimbal", icon: "/qmlimages/NewImages/homeIcon.png", color: "#3498db" },
+        { text: "STorM32", icon: "/qmlimages/NewImages/homeIcon.png", color: "#9b59b6" },
+        { text: "Brushless PWM", icon: "/qmlimages/NewImages/homeIcon.png", color: "#e74c3c" }
     ]
     property var gimbalModels: [
-        { text: "All", icon: "qrc:/qmlimages/NoGimbal.svg", color: "#2c3e50" },
-        { text: "Servo Gimbal", icon: "qrc:/qmlimages/ServoGimbal.svg", color: "#3498db" },
-        { text: "STorM32", icon: "qrc:/qmlimages/STorM32Gimbal.svg", color: "#9b59b6" },
-        { text: "Brushless PWM", icon: "qrc:/qmlimages/BrushlessGimbal.svg", color: "#e74c3c" }
+        { text: "All", icon: "/qmlimages/NewImages/homeIcon.png", color: "#2c3e50" },
+        { text: "Servo Gimbal", icon: "/qmlimages/NewImages/homeIcon.png", color: "#3498db" },
+        { text: "STorM32", icon: "/qmlimages/NewImages/homeIcon.png", color: "#9b59b6" },
+        { text: "Brushless PWM", icon: "/qmlimages/NewImages/homeIcon.png", color: "#e74c3c" }
     ]
 
     property var gimbalModels1: [
-        { text: "CADDX", icon: "qrc:/qmlimages/CADDX.svg", color: "#1abc9c" },
-        { text: "Gremsy", icon: "qrc:/qmlimages/Gremsy.svg", color: "#f39c12" },
-        { text: "Xacti", icon: "qrc:/qmlimages/Xacti.svg", color: "#d35400" }
+        { text: "CADDX", icon: "/qmlimages/NewImages/homeIcon.png", color: "#1abc9c" },
+        { text: "Gremsy", icon: "/qmlimages/NewImages/homeIcon.png", color: "#f39c12" },
+        { text: "Xacti", icon: "/qmlimages/NewImages/homeIcon.png", color: "#d35400" }
     ]
 
     property var gimbalModels2: [
-        { text: "SERVO", icon: "qrc:/qmlimages/CADDX.svg", color: "#27ae60" },
-        { text: "Relay", icon: "qrc:/qmlimages/CADDX.svg", color: "#c0392b" }
+        { text: "SERVO", icon: "/qmlimages/NewImages/homeIcon.png", color: "#27ae60" },
+        { text: "Relay", icon: "/qmlimages/NewImages/homeIcon.png", color: "#c0392b" }
     ]
 
     Rectangle {
@@ -60,51 +60,51 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
         Rectangle {
             anchors.fill: parent
             z: -10
-            color: "#1b1c3e"
+            color: "white"
         }
         // ---- Curved Gradient Background ----
-        Canvas {
-            anchors.fill: parent
-            z: -1
-            opacity: 0.95
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.reset()
+        // Canvas {
+        //     anchors.fill: parent
+        //     z: -1
+        //     opacity: 0.95
+        //     onPaint: {
+        //         var ctx = getContext("2d")
+        //         ctx.reset()
 
-                // 🎨 Create diagonal gradient
-                var gradient = ctx.createLinearGradient(0, 0, width, height)
-                gradient.addColorStop(0, "#14163C")
-                gradient.addColorStop(1, "#6A85FB")
-                ctx.fillStyle = gradient
+        //         // 🎨 Create diagonal gradient
+        //         var gradient = ctx.createLinearGradient(0, 0, width, height)
+        //         gradient.addColorStop(0, "#505050")
+        //         gradient.addColorStop(1, "#505050")
+        //         ctx.fillStyle = gradient
 
-                // 🌀 Create a curved path from top-left to bottom-right
-                ctx.beginPath()
-                ctx.moveTo(0, 0)
-                ctx.quadraticCurveTo(width * 0.4, height * 0.1, width, height * 0.9)
-                ctx.lineTo(width, height)
-                ctx.lineTo(0, height)
-                ctx.closePath()
-                ctx.fill()
-            }
-        }
+        //         // 🌀 Create a curved path from top-left to bottom-right
+        //         ctx.beginPath()
+        //         ctx.moveTo(0, 0)
+        //         ctx.quadraticCurveTo(width * 0.4, height * 0.1, width, height * 0.9)
+        //         ctx.lineTo(width, height)
+        //         ctx.lineTo(0, height)
+        //         ctx.closePath()
+        //         ctx.fill()
+        //     }
+        // }
 
-        Rectangle {
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            width: parent.width * 0.5
-            height: parent.height * 0.9
-            radius: width * 0.5
-            rotation: 30
-            opacity: 0.95
-            anchors.rightMargin: 1//-width * 0.25
-            anchors.bottomMargin: 1//-height * 0.2
-            z: -1
+        // Rectangle {
+        //     anchors.right: parent.right
+        //     anchors.bottom: parent.bottom
+        //     width: parent.width * 0.5
+        //     height: parent.height * 0.9
+        //     radius: width * 0.5
+        //     rotation: 30
+        //     opacity: 0.95
+        //     anchors.rightMargin: 1//-width * 0.25
+        //     anchors.bottomMargin: 1//-height * 0.2
+        //     z: -1
 
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
-                GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
-            }
-        }
+        //     gradient: Gradient {
+        //         GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
+        //         GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
+        //     }
+        // }
 
 
 
@@ -122,13 +122,14 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                 spacing: 20
                 topPadding: 20
                 rightPadding: 100
+
                 // Header
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     text: "Agri Sparying"
-                    color: "white"
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    color: "#5d179e"
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
                     font.bold: true
                     bottomPadding: 15
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
@@ -158,8 +159,8 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select Gimbal Type"
-                    color: "white"
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    color: "#5d179e"
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
                     font.bold: true
                     bottomPadding: 15
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
@@ -189,8 +190,8 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select Gimbal Type"
-                    color: "white"
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    color: "#5d179e"
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
                     font.bold: true
                     bottomPadding: 15
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?false:true
@@ -221,8 +222,8 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select Gimbal with camera"
-                    color: "white"
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    color: "#5d179e"
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
                     font.bold: true
                 }
 
@@ -249,8 +250,8 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select camera"
-                    color: "white"
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    color: "#5d179e"
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
                     font.bold: true
                 }
 
@@ -298,10 +299,31 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             Rectangle {
                 id: card
                 anchors.fill: parent
-                color: modelData.color
+                color: "white"//modelData.color
                 radius: 10
-                border.color: agriall === index ? "limegreen" : "transparent"
-                border.width: agriall === index ? 3 : 0
+                border.color: agriall === index ? "limegreen" : "#5d179e"
+                border.width: agriall === index ? 3 : 2
+
+                Rectangle {
+                                    id: shadowSource
+                                    anchors.fill: parent
+                                    radius: 10//dp(4)
+                                    color: "white"
+                                    visible: false
+                                    anchors.margins: 2
+
+                                }
+
+                                MultiEffect {
+                                    anchors.fill: shadowSource
+                                    source: shadowSource
+
+                                    shadowEnabled: true
+                                    shadowBlur: 1.0
+                                    shadowHorizontalOffset: 15
+                                    shadowVerticalOffset: 15//dp(1)
+                                    shadowColor: "#5d179e"   // soft black
+                                }
 
                 // Selection indicator (top-right corner)
                 Rectangle {
@@ -313,6 +335,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
+
 
                     Image {
                         anchors.centerIn: parent
@@ -346,7 +369,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                     Text {
                         text: modelData.text
-                        color: "white"
+                        color: "grey"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -412,10 +435,31 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             Rectangle {
                 id: card
                 anchors.fill: parent
-                color: modelData.color
+                color: "white"//modelData.color
                 radius: 10
-                border.color: agrigimbal === index ? "limegreen" : "transparent"
-                border.width: agrigimbal === index ? 3 : 0
+                border.color: agrigimbal === index ? "limegreen" : "#5d179e"
+                border.width: agrigimbal === index ? 3 : 2
+
+                Rectangle {
+                                    id: shadowSource
+                                    anchors.fill: parent
+                                    radius: 10//dp(4)
+                                    color: "white"
+                                    visible: false
+                                    anchors.margins: 2
+
+                                }
+
+                                MultiEffect {
+                                    anchors.fill: shadowSource
+                                    source: shadowSource
+
+                                    shadowEnabled: true
+                                    shadowBlur: 1.0
+                                    shadowHorizontalOffset: 15
+                                    shadowVerticalOffset: 15//dp(1)
+                                    shadowColor: "#5d179e"   // soft black
+                                }
 
                 // Selection indicator (top-right corner)
                 Rectangle {
@@ -460,7 +504,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                     Text {
                         text: modelData.text
-                        color: "white"
+                        color: "grey"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -528,10 +572,31 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             Rectangle {
                 id: card
                 anchors.fill: parent
-                color: modelData.color
+                color: "white"//modelData.color
                 radius: 10
                 border.color: cameragimbal === index ? "limegreen" : "transparent"
                 border.width: cameragimbal === index ? 3 : 0
+
+                Rectangle {
+                                    id: shadowSource
+                                    anchors.fill: parent
+                                    radius: 10//dp(4)
+                                    color: "white"
+                                    visible: false
+                                    anchors.margins: 2
+
+                                }
+
+                                MultiEffect {
+                                    anchors.fill: shadowSource
+                                    source: shadowSource
+
+                                    shadowEnabled: true
+                                    shadowBlur: 1.0
+                                    shadowHorizontalOffset: 15
+                                    shadowVerticalOffset: 15//dp(1)
+                                    shadowColor: "#5d179e"   // soft black
+                                }
 
                 // Selection indicator (top-right corner)
                 Rectangle {
@@ -576,7 +641,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                     Text {
                         text: modelData.text
-                        color: "white"
+                        color: "grey"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -641,10 +706,31 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             Rectangle {
                 id: card1
                 anchors.fill: parent
-                color: modelData.color
+                color: "white"//modelData.color
                 radius: 10
-                border.color: cameragimbal1 === index ? "limegreen" : "transparent"
-                border.width: cameragimbal1 === index ? 3 : 0
+                border.color: cameragimbal1 === index ? "limegreen" : "#5d179e"
+                border.width: cameragimbal1 === index ? 3 : 2
+
+                Rectangle {
+                                    id: shadowSource
+                                    anchors.fill: parent
+                                    radius: 10//dp(4)
+                                    color: "white"
+                                    visible: false
+                                    anchors.margins: 2
+
+                                }
+
+                                MultiEffect {
+                                    anchors.fill: shadowSource
+                                    source: shadowSource
+
+                                    shadowEnabled: true
+                                    shadowBlur: 1.0
+                                    shadowHorizontalOffset: 15
+                                    shadowVerticalOffset: 15//dp(1)
+                                    shadowColor: "#5d179e"   // soft black
+                                }
 
                 // Selection indicator (top-right corner)
                 Rectangle {
@@ -679,7 +765,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                     Text {
                         text: modelData.text
-                        color: "white"
+                        color: "grey"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -734,10 +820,31 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
             Rectangle {
                 id: card2
                 anchors.fill: parent
-                color: modelData.color
+                color: "white"//modelData.color
                 radius: 10
-                border.color: cameragimbal2 === index ? "limegreen" : "transparent"
-                border.width: cameragimbal2 === index ? 3 : 0
+                border.color: cameragimbal2 === index ? "limegreen" : "#5d179e"
+                border.width: cameragimbal2 === index ? 3 : 2
+
+                Rectangle {
+                                                    id: shadowSource
+                                                    anchors.fill: parent
+                                                    radius: 10//dp(4)
+                                                    color: "white"
+                                                    visible: false
+                                                    anchors.margins: 2
+
+                                                }
+
+                                                MultiEffect {
+                                                    anchors.fill: shadowSource
+                                                    source: shadowSource
+
+                                                    shadowEnabled: true
+                                                    shadowBlur: 1.0
+                                                    shadowHorizontalOffset: 15
+                                                    shadowVerticalOffset: 15//dp(1)
+                                                    shadowColor: "#5d179e"   // soft black
+                                                }
 
                 // Selection indicator (top-right corner)
                 Rectangle {
@@ -772,7 +879,7 @@ property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
 
                     Text {
                         text: modelData.text
-                        color: "white"
+                        color: "grey"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9

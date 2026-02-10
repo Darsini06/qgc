@@ -158,7 +158,7 @@ Item {
                                         autoPlay: true
                                         loops: Animation.Infinite
                                         scale: 0.6
-                                        frameRate: 30
+                                        frameRate: 24
                                     }
                                 }
                             }

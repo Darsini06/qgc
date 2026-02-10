@@ -276,7 +276,7 @@ Item {
                 anchors.centerIn: parent
                 autoPlay: true
                 loops: Animation.Infinite
-                frameRate: 300   // increase speed
+                //frameRate: 300   // increase speed
             }
         }
     }

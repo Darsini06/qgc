@@ -12,6 +12,7 @@ import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QtQuick.Window
+import QtQuick.Effects
 
 
 import QGroundControl
@@ -87,6 +88,16 @@ ApplicationWindow {
     property string sessionEnd: ""
     property bool sessionSaved: false
 
+    property real screenWidth: parent.width
+    property real screenHeight: parent.height
+    property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
+    property real baseUnit: 8 * scaleRatio
+
+
+    function dp(value) {
+        return value * baseUnit;
+    }
+
 
 
     Connections {
@@ -156,6 +167,7 @@ ApplicationWindow {
             plan="Start"
             console.log("NextScreen loaded with planType: Start")
         }
+        //guidedValueSlider.visible = false
 
     }
 
@@ -244,12 +256,12 @@ ApplicationWindow {
 
     function takeoff(){
         rtlbtn.visible=true
-        takeoffbtn.visible=false
+        takeoffbtn.visible=_guidedController.showTakeoff || !_guidedController.showLand
     }
 
     function land(){
         rtlbtn.visible=false
-        takeoffbtn.visible=true
+        takeoffbtn.visible=_guidedController.showLand && !_guidedController.showTakeoff
     }
 
     function newscreen() {
@@ -851,11 +863,11 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Flight Modes" }
-            ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Settings" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Diamond" }
-            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "Info" }
-            ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
+            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "File Safe" }
+            ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
+            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
+            //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
             // onActiveVehicleChanged: {
@@ -868,9 +880,11 @@ ApplicationWindow {
 
             function updateSettingsTab() {
                 if (activeVehicle) {
+
                     tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+
                 } else {
-                    tabModel.setProperty(1, "file", "APMSensorsComponent.qml");
+                    tabModel.setProperty(2, "file", "APMSensorsComponent.qml");
                 }
             }
         }
@@ -880,42 +894,36 @@ ApplicationWindow {
             spacing: 0
 
             // Top App Bar
-            Rectangle  {
-                Layout.preferredHeight: ScreenTools.toolbarHeight
+            Rectangle {
+                Layout.preferredHeight: 44
                 Layout.fillWidth: true
-                color:  "#1b1c3e"
+                color: "#5d179e"
 
-                Row {
+                // Back Button (LEFT)
+                QGCColoredImage {
+                    id: backArrow
+                    width: 25
+                    height: 25
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left     // Required!
-                    anchors.leftMargin: 20        // Now it will work
-                    spacing: 20
+                    source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                    color: "white"
 
-                    QGCColoredImage {
-                        id: backArrow
-                        width: 30
-                        height: 25
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        color: "white"
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                sideDrawer.close()
-                            }
-                        }
-                    }
-
-                    Text {
-                        text: "Settings"
-                        font.bold: true
-                        font.pixelSize: 20
-                        color: "white"
-                        verticalAlignment: Text.AlignVCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: sideDrawer.close()
                     }
                 }
 
+                // CENTER TITLE (TRUE CENTER)
+                Text {
+                    text: "Settings"
+                    anchors.centerIn: parent
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: "white"
+                }
             }
 
             // Rectangle {
@@ -924,74 +932,100 @@ ApplicationWindow {
             //     color: "transparent"
             // }
 
-            TabBar {
-                id: tabBar
-                Layout.preferredHeight: 20//ScreenTools.toolbarHeight
+            Item {
                 Layout.fillWidth: true
-                currentIndex: 0
+                height: tabBar.height + dp(6)   // room for shadow
 
-                background: Rectangle {
-                    color:  "#1b1c3e"
-                }
+                /* ===== TAB BAR ===== */
+                TabBar {
+                    id: tabBar
+                    z: 2
+                    anchors.top: parent.top
+                    width: parent.width
+                    height: 56
+                    currentIndex: 0
 
-                Repeater {
-                    model: tabModel
-                    TabButton {
-                        Layout.fillWidth: true
-                        height: ScreenTools.toolbarHeight
+                    background: Rectangle {
+                        color: "white"
+                    }
 
-                        background: Rectangle {
-                            color: tabBar.currentIndex === index ? "white" : "grey"
-                            radius: 10
-                        }
+                    Repeater {
+                        model: tabModel
 
-                        contentItem: Column {
-                            spacing: 7
-                            anchors.centerIn: parent
+                        TabButton {
+                            implicitHeight: 56
+                            background: Item {}
 
-                            QGCColoredImage {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: tabBar.currentIndex === index ? 18 : 18
-                                height: tabBar.currentIndex === index ? 18 : 18
-                                source: model.image
-                                //color: tabBar.currentIndex === index ?  "white"//"#1b1c3e" : "white"
-                                color: tabBar.currentIndex === index ? "transparent" : "white"
+                            contentItem: Column {
+                                spacing: 7
+                                anchors.centerIn: parent
+
+                                QGCColoredImage {
+                                    width: 18
+                                    height: 18
+                                    source: model.image
+                                    color: tabBar.currentIndex === index
+                                           ? "#5d179e"
+                                           : "#000000"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                }
+
+                                Text {
+                                    text: model.title
+                                    font.pixelSize: 11
+                                    color: tabBar.currentIndex === index
+                                           ? "#5d179e"
+                                           : "#000000"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    visible: tabBar.currentIndex !== index
+                                }
+
+                                Rectangle {
+                                    width: 30
+                                    height: 3
+                                    radius: 1
+                                    color: "#5d179e"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    visible: tabBar.currentIndex === index
+                                }
                             }
 
-                            // Rectangle {
-                            //     width: 45
-                            //     height: 3
-                            //     color: tabBar.currentIndex === index ? "white" : "black"
-                            //     anchors.horizontalCenter: parent.horizontalCenter
-                            //     visible: tabBar.currentIndex === index
-                            //     radius: 5
-                            // }
-                        }
-
-                        onClicked: {
-                            loaders.source = model.file;
-                            // if (activeVehicle) {
-                            //     loaders.source = model.file;
-                            // } else {
-                            //     showToast("Device not connected");
-                            // }
+                            onClicked: {
+                                tabBar.currentIndex = index
+                                loaders.source = model.file
+                            }
                         }
                     }
                 }
             }
 
+            /* ---- GRADIENT SHADOW (ELEVATION) ---- */
+            Rectangle {
+                anchors.top: tabBar.bottom
+                width: parent.width
+                height: dp(6)
+                z: 1
+
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#30000000" }
+                    GradientStop { position: 1.0; color: "transparent" }
+                }
+            }
+
+            /* ================= CONTENT ================= */
             Rectangle {
                 color: "white"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                radius: 10
+                //radius: 10
 
                 Loader {
                     id: loaders
                     anchors.fill: parent
-                    source: tabModel.get(tabBar.currentIndex).file/*if (activeVehicle) {
-                                            tabModel.get(tabBar.currentIndex).file
-                                        }*/
+                    source: tabModel.get(tabBar.currentIndex).file
+                    // source: tabModel.get(0/*tabBar.currentIndex*/).file/*if (activeVehicle) {
+                    //                         tabModel.get(tabBar.currentIndex).file
+                    //                     }*/
                 }
 
                 Connections {
@@ -1005,6 +1039,7 @@ ApplicationWindow {
                 }
             }
         }
+
     }
 
 
@@ -1149,6 +1184,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    //guidedValueSlider.visible = true
                     myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
@@ -1257,7 +1293,6 @@ ApplicationWindow {
                 }
             }
         }
-
 
         Rectangle {
             id: landbtn
@@ -1409,10 +1444,10 @@ ApplicationWindow {
         y: (parent.height - height) / 2
 
         background: Rectangle {
-            color: "#ccccff"
+            color: "white"//"#ccccff"
             radius: 50
-            border.color: "#6a6af8"
-            border.width: 5
+            border.color: "black"//"#6a6af8"
+            border.width: 2
             clip: true
         }
 
@@ -1448,7 +1483,7 @@ ApplicationWindow {
                 height: 80
                 radius: 40
                 color: "white"
-                border.color: "#6a6af8"
+                border.color: "black"
                 border.width: 2
                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -1470,7 +1505,7 @@ ApplicationWindow {
                         progressState.value = 0
                         progressCircle.requestPaint()
                     }
-                    onEntered: circularButton.color = "#ccccff"
+                    onEntered: circularButton.color = "grey"
                     onExited: circularButton.color = "white"
                 }
 
@@ -1491,7 +1526,7 @@ ApplicationWindow {
                                     false
                                     )
                         ctx.lineWidth = 6
-                        ctx.strokeStyle = "#2323f2"
+                        ctx.strokeStyle = "#141414"
                         ctx.stroke()
                     }
                 }
@@ -1504,9 +1539,9 @@ ApplicationWindow {
                 Rectangle {
                     width: 40
                     height: 40
-                    color: "#ccccff"
+                    color: "white"//"#ccccff"
                     radius: 10
-                    border.color: "#6a6af8"
+                    border.color: "black"//"#6a6af8"
                     border.width: 2
 
                     Text {
@@ -1530,9 +1565,9 @@ ApplicationWindow {
                 Rectangle {
                     width: 40
                     height: 40
-                    color: "#ccccff"
+                    color: "white"//"#ccccff"
                     radius: 10
-                    border.color: "#6a6af8"
+                    border.color: "black"//"#6a6af8"
                     border.width: 2
 
                     Text {
@@ -1617,10 +1652,11 @@ ApplicationWindow {
             } else {
                 activeVehicle.guidedModeLand()
             }
+            rtlbtn.visible=false
+            takeoffbtn.visible=true
 
         }
-        // rtlbtn.visible=false
-        // takeoffbtn.visible=true
+
 
 
         myDialog.close()
@@ -1783,10 +1819,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: mapping
-                        color: "#1b2a49" // Dark Blue
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#3b6ea5"
+                        color: white//"#1b2a49" // Dark Blue
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#3b6ea5"
                         anchors.fill: parent
                     }
 
@@ -1809,7 +1845,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Basic"
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -1833,6 +1869,7 @@ ApplicationWindow {
                     }
                 }
 
+
                 // Drone - Dark Green
                 Button {
                     id:mappingcirclebtn
@@ -1843,10 +1880,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: mappingcircle
-                        color: "#1c3f2b" // Dark Green
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#4CAF50"
+                        color: white//"#1c3f2b" // Dark Green
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#4CAF50"
                     }
 
                     contentItem: Rectangle {
@@ -1868,7 +1905,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Circular"
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -1902,10 +1939,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: bgMap
-                        color: "#1b2a49" // Dark Blue
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#3b6ea5"
+                        color: white//"#1b2a49" // Dark Blue
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#3b6ea5"
                         anchors.fill: parent
                     }
 
@@ -1928,7 +1965,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Map Selection"
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -1962,10 +1999,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: bgDrone
-                        color: "#1c3f2b" // Dark Green
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#4CAF50"
+                        color: white//"#1c3f2b" // Dark Green
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#4CAF50"
                     }
 
                     contentItem: Rectangle {
@@ -1987,7 +2024,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Mark with Drone"
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -2027,10 +2064,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: bgGPS
-                        color: "#1b2a49" // Dark Green
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#3b6ea5"
+                        color: white//"#1b2a49" // Dark Green
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#3b6ea5"
                     }
 
                     contentItem: Rectangle {
@@ -2052,7 +2089,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Mark with GPS"
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -2081,10 +2118,10 @@ ApplicationWindow {
 
                     background: Rectangle {
                         id: bgKml
-                        color: "#2e1437" // Dark Purple
-                        radius: 12
-                        border.width: width * 0.02
-                        border.color: "#9b59b6"
+                        color: white//"#2e1437" // Dark Purple
+                        radius: 34
+                        // border.width: width * 0.02
+                        // border.color: white//"#9b59b6"
                     }
 
                     contentItem: Rectangle {
@@ -2106,7 +2143,7 @@ ApplicationWindow {
 
                             Text {
                                 text: "Load KML/SHP..."
-                                color: "white"
+                                color: "black"
                                 font.pixelSize: 16
                                 font.bold: true
                                 horizontalAlignment: Text.AlignHCenter
@@ -2891,6 +2928,7 @@ ApplicationWindow {
 
     Connections {
         target: activationbar
+
         function onActivationTriggered(value){
             _utmspSendActTrigger= value
         }
