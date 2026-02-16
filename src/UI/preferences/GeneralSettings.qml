@@ -45,7 +45,7 @@ SettingsPage {
 
     SettingsGroupLayout {
         Layout.fillWidth:   true
-        heading:            qsTr("General")
+        heading:            qsTr("")
 
         LabelledFactComboBox {
             label:      qsTr("Language")
@@ -170,14 +170,9 @@ SettingsPage {
                 }
             }
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Units")
-        visible:            QGroundControl.settingsManager.unitsSettings.visible
 
         Repeater {
+            visible:            QGroundControl.settingsManager.unitsSettings.visible
             model: [ QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits, QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits, QGroundControl.settingsManager.unitsSettings.areaUnits, QGroundControl.settingsManager.unitsSettings.speedUnits, QGroundControl.settingsManager.unitsSettings.temperatureUnits ]
 
             LabelledFactComboBox {
@@ -186,17 +181,11 @@ SettingsPage {
                 indexModel:             false
             }
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Brand Image")
-        visible:            _brandImageSettings.visible && !ScreenTools.isMobile
 
         RowLayout {
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth * 2
-            visible:            _userBrandImageIndoor.visible
+            visible:            _userBrandImageIndoor.visible && _brandImageSettings.visible && !ScreenTools.isMobile
 
             ColumnLayout {
                 Layout.fillWidth:   true
@@ -233,7 +222,7 @@ SettingsPage {
         RowLayout {
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth * 2
-            visible:            _userBrandImageOutdoor.visible
+            visible:            _userBrandImageOutdoor.visible &&_brandImageSettings.visible && !ScreenTools.isMobile
 
             ColumnLayout {
 
@@ -269,6 +258,7 @@ SettingsPage {
         }
 
         LabelledButton {
+            visible:            _brandImageSettings.visible && !ScreenTools.isMobile
             label:      qsTr("Reset Images")
             buttonText: qsTr("Reset")
             onClicked:  {
@@ -276,46 +266,6 @@ SettingsPage {
                 _userBrandImageOutdoor.rawValue = ""
             }
         }
-    }
-
-
-    //Flyview Settings ------------------------------------------------------------------------------------
-    //property var    _settingsManager:                   QGroundControl.settingsManager
-    property var    _flyViewSettings:                   _settingsManager.flyViewSettings
-    property var    _customMavlinkActionsSettings:      _settingsManager.customMavlinkActionsSettings
-    property Fact   _virtualJoystick:                   _settingsManager.appSettings.virtualJoystick
-    property Fact   _virtualJoystickAutoCenterThrottle: _settingsManager.appSettings.virtualJoystickAutoCenterThrottle
-    property Fact   _showAdditionalIndicatorsCompass:   _flyViewSettings.showAdditionalIndicatorsCompass
-    property Fact   _lockNoseUpCompass:                 _flyViewSettings.lockNoseUpCompass
-    property Fact   _guidedMinimumAltitude:             _flyViewSettings.guidedMinimumAltitude
-    property Fact   _guidedMaximumAltitude:             _flyViewSettings.guidedMaximumAltitude
-    property Fact   _maxGoToLocationDistance:           _flyViewSettings.maxGoToLocationDistance
-    property var    _viewer3DSettings:                  _settingsManager.viewer3DSettings
-    property Fact   _viewer3DEnabled:                   _viewer3DSettings.enabled
-    property Fact   _viewer3DOsmFilePath:               _viewer3DSettings.osmFilePath
-    property Fact   _viewer3DBuildingLevelHeight:       _viewer3DSettings.buildingLevelHeight
-    property Fact   _viewer3DAltitudeBias:              _viewer3DSettings.altitudeBias
-    QGCFileDialogController { id: fileController }
-
-    function customActionList() {
-        var fileModel = fileController.getFiles(_settingsManager.appSettings.customActionsSavePath, "*.json")
-        fileModel.unshift(qsTr("<None>"))
-        return fileModel
-    }
-
-
-    Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Flyview Settings"
-                font.pixelSize: 20
-                color: "#3A3A3A"
-                font.bold: true
-            }
-
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("General")
 
         FactCheckBoxSlider {
             id:                 useCheckList
@@ -367,12 +317,6 @@ SettingsPage {
             visible:            _updateHomePosition.visible
             property Fact _updateHomePosition: _flyViewSettings.updateHomePosition
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Guided Commands")
-        visible:            _guidedMinimumAltitude.visible || _guidedMaximumAltitude.visible || _maxGoToLocationDistance.visible
 
         LabelledFactTextField {
             Layout.fillWidth:   true
@@ -394,64 +338,6 @@ SettingsPage {
             fact:               _maxGoToLocationDistance
             visible:            fact.visible
         }
-    }
-
-    // SettingsGroupLayout {
-    //     Layout.fillWidth:       true
-    //     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 35
-    //     heading:                qsTr("Custom MAVLink Actions")
-    //     headingDescription:     qsTr("Custom action JSON files should be created in the '%1' folder.").arg(QGroundControl.settingsManager.appSettings.customActionsSavePath)
-
-    //     LabelledComboBox {
-    //         Layout.fillWidth:   true
-    //         label:              qsTr("Fly View Custom Actions")
-    //         model:              customActionList()
-    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.flyViewActionsFile.rawValue = "" : _customMavlinkActionsSettings.flyViewActionsFile.rawValue = comboBox.currentText
-
-    //         Component.onCompleted: {
-    //             var index = comboBox.find(_customMavlinkActionsSettings.flyViewActionsFile.valueString)
-    //             comboBox.currentIndex = index == -1 ? 0 : index
-    //         }
-    //     }
-
-    //     LabelledComboBox {
-    //         Layout.fillWidth:   true
-    //         label:              qsTr("Joystick Custom Actions")
-    //         model:              customActionList()
-    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.joystickActionsFile.rawValue = "" : _customMavlinkActionsSettings.joystickActionsFile.rawValue = comboBox.currentText
-
-    //         Component.onCompleted: {
-    //             var index = comboBox.find(_customMavlinkActionsSettings.joystickActionsFile.valueString)
-    //             comboBox.currentIndex = index == -1 ? 0 : index
-    //         }
-    //     }
-    // }
-
-    // SettingsGroupLayout {
-    //     Layout.fillWidth:   true
-    //     heading:            qsTr("Virtual Joystick")
-    //     visible:            _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
-
-    //     FactCheckBoxSlider {
-    //         Layout.fillWidth:   true
-    //         text:               qsTr("Enabled")
-    //         visible:            _virtualJoystick.visible
-    //         fact:               _virtualJoystick
-    //     }
-
-    //     FactCheckBoxSlider {
-    //         Layout.fillWidth:   true
-    //         text:               qsTr("Auto-Center Throttle")
-    //         visible:            _virtualJoystickAutoCenterThrottle.visible
-    //         enabled:            _virtualJoystick.rawValue
-    //         fact:               _virtualJoystickAutoCenterThrottle
-    //     }
-    // }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Instrument Panel")
-        visible:            _showAdditionalIndicatorsCompass.visible || _lockNoseUpCompass.visible
 
         FactCheckBoxSlider {
             Layout.fillWidth:   true
@@ -466,25 +352,19 @@ SettingsPage {
             visible:            _lockNoseUpCompass.visible
             fact:               _lockNoseUpCompass
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("3D View")
-        visible:            _viewer3DSettings.visible
 
         FactCheckBoxSlider {
             Layout.fillWidth:   true
             text:               qsTr("Enabled")
             fact:               _viewer3DEnabled
-            visible:            _viewer3DEnabled.visible
+            visible:            _viewer3DEnabled.visible  &&  _viewer3DSettings.visible
         }
 
         ColumnLayout{
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth
             enabled:            _viewer3DEnabled.rawValue
-            visible:            _viewer3DOsmFilePath.rawValue
+            visible:            _viewer3DOsmFilePath.rawValue  &&  _viewer3DSettings.visible
 
             RowLayout{
                 Layout.fillWidth:   true
@@ -553,7 +433,7 @@ SettingsPage {
             label:              qsTr("Average Building Level Height")
             fact:               _viewer3DBuildingLevelHeight
             enabled:            _viewer3DEnabled.rawValue
-            visible:            _viewer3DBuildingLevelHeight.visible
+            visible:            _viewer3DBuildingLevelHeight.visible  &&  _viewer3DSettings.visible
         }
 
         LabelledFactTextField {
@@ -561,52 +441,258 @@ SettingsPage {
             label:              qsTr("Vehicles Altitude Bias")
             fact:               _viewer3DAltitudeBias
             enabled:            _viewer3DEnabled.rawValue
-            visible:            _viewer3DAltitudeBias.visible
+            visible:            _viewer3DAltitudeBias.visible  &&  _viewer3DSettings.visible
         }
+
+
     }
 
-    //Planview Settings ------------------------------------------------------------------------------------
-    //property var _settingsManager:  QGroundControl.settingsManager
-    property var _planViewSettings: QGroundControl.settingsManager.planViewSettings
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Units")
+    //     visible:            QGroundControl.settingsManager.unitsSettings.visible
 
-    Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Planview Settings"
-                font.pixelSize: 20
-                color: "#3A3A3A"
-                font.bold: true
-            }
-    SettingsGroupLayout {
-        Layout.fillWidth: true
+    //     Repeater {
+    //         model: [ QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits,
+    //             QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits,
+    //             QGroundControl.settingsManager.unitsSettings.areaUnits,
+    //             QGroundControl.settingsManager.unitsSettings.speedUnits,
+    //             QGroundControl.settingsManager.unitsSettings.temperatureUnits ]
 
-        LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("Default Mission Altitude")
-            fact:               _settingsManager.appSettings.defaultMissionItemAltitude
-            visible:            fact.visible
-        }
+    //         LabelledFactComboBox {
+    //             label:                  modelData.shortDescription
+    //             fact:                   modelData
+    //             indexModel:             false
+    //         }
+    //     }
 
-        LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("VTOL TransitionDistance")
-            fact:               _planViewSettings.vtolTransitionDistance
-            visible:            fact.visible
-        }
+    //     property var masterUnit: QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Use MAV_CMD_CONDITION_GATE for pattern generation")
-            fact:               _planViewSettings.useConditionGate
-            visible:            fact.visible
-        }
+    //     Repeater {
+    //         model: [
+    //             masterUnit,
+    //             QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits,
+    //             QGroundControl.settingsManager.unitsSettings.areaUnits,
+    //             QGroundControl.settingsManager.unitsSettings.speedUnits,
+    //             QGroundControl.settingsManager.unitsSettings.temperatureUnits
+    //         ]
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Missions Do Not Require Takeoff Item")
-            fact:               _planViewSettings.takeoffItemNotRequired
-            visible:            fact.visible
-        }
-    }
+    //         LabelledFactComboBox {
+    //             label: modelData.shortDescription
+    //             fact: modelData
+    //             indexModel: false
+
+    //             onActivated: {
+    //                 // selected value
+    //                 var val = fact.rawValue
+
+    //                 // apply to all units
+    //                 QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits.rawValue = val
+    //                 QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits.rawValue = val
+    //                 QGroundControl.settingsManager.unitsSettings.areaUnits.rawValue = val
+    //                 QGroundControl.settingsManager.unitsSettings.speedUnits.rawValue = val
+    //                 QGroundControl.settingsManager.unitsSettings.temperatureUnits.rawValue = val
+    //             }
+    //         }
+    //     }
+
+    // }
+
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Brand Image")
+    //     visible:            _brandImageSettings.visible && !ScreenTools.isMobile
+
+    //     RowLayout {
+    //         Layout.fillWidth:   true
+    //         spacing:            ScreenTools.defaultFontPixelWidth * 2
+    //         visible:            _userBrandImageIndoor.visible
+
+    //         ColumnLayout {
+    //             Layout.fillWidth:   true
+    //             spacing:            0
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 text:               qsTr("Indoor Image")
+    //             }
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 font.pointSize:     ScreenTools.smallFontPointSize
+    //                 text:               _userBrandImageIndoor.valueString.replace("file:///", "")
+    //                 elide:              Text.ElideMiddle
+    //                 visible:            _userBrandImageIndoor.valueString.length > 0
+    //             }
+    //         }
+
+    //         QGCButton {
+    //             text:       qsTr("Browse")
+    //             onClicked:  userBrandImageIndoorBrowseDialog.openForLoad()
+
+    //             QGCFileDialog {
+    //                 id:                 userBrandImageIndoorBrowseDialog
+    //                 title:              qsTr("Choose custom brand image file")
+    //                 folder:             _userBrandImageIndoor.rawValue.replace("file:///", "")
+    //                 selectFolder:       false
+    //                 onAcceptedForLoad:  (file) => _userBrandImageIndoor.rawValue = "file:///" + file
+    //             }
+    //         }
+    //     }
+
+    //     RowLayout {
+    //         Layout.fillWidth:   true
+    //         spacing:            ScreenTools.defaultFontPixelWidth * 2
+    //         visible:            _userBrandImageOutdoor.visible
+
+    //         ColumnLayout {
+
+    //             Layout.fillWidth:   true
+    //             spacing:            0
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 text:               qsTr("Outdoor Image")
+    //             }
+
+    //             QGCLabel {
+    //                 Layout.fillWidth:   true
+    //                 font.pointSize:     ScreenTools.smallFontPointSize
+    //                 text:               _userBrandImageOutdoor.valueString.replace("file:///", "")
+    //                 elide:              Text.ElideMiddle
+    //                 visible:            _userBrandImageOutdoor.valueString.length > 0
+    //             }
+    //         }
+
+    //         QGCButton {
+    //             text:       qsTr("Browse")
+    //             onClicked:  userBrandImageOutdoorBrowseDialog.openForLoad()
+
+    //             QGCFileDialog {
+    //                 id:                 userBrandImageOutdoorBrowseDialog
+    //                 title:              qsTr("Choose custom brand image file")
+    //                 folder:             _userBrandImageOutdoor.rawValue.replace("file:///", "")
+    //                 selectFolder:       false
+    //                 onAcceptedForLoad:  (file) => _userBrandImageOutdoor.rawValue = "file:///" + file
+    //             }
+    //         }
+    //     }
+
+    //     LabelledButton {
+    //         label:      qsTr("Reset Images")
+    //         buttonText: qsTr("Reset")
+    //         onClicked:  {
+    //             _userBrandImageIndoor.rawValue = ""
+    //             _userBrandImageOutdoor.rawValue = ""
+    //         }
+    //     }
+
+    // }
+
+
+    //Flyview Settings ------------------------------------------------------------------------------------
+    //property var    _settingsManager:                   QGroundControl.settingsManager
+
+
+
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:       true
+    //     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 35
+    //     heading:                qsTr("Custom MAVLink Actions")
+    //     headingDescription:     qsTr("Custom action JSON files should be created in the '%1' folder.").arg(QGroundControl.settingsManager.appSettings.customActionsSavePath)
+
+    //     LabelledComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Fly View Custom Actions")
+    //         model:              customActionList()
+    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.flyViewActionsFile.rawValue = "" : _customMavlinkActionsSettings.flyViewActionsFile.rawValue = comboBox.currentText
+
+    //         Component.onCompleted: {
+    //             var index = comboBox.find(_customMavlinkActionsSettings.flyViewActionsFile.valueString)
+    //             comboBox.currentIndex = index == -1 ? 0 : index
+    //         }
+    //     }
+
+    //     LabelledComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Joystick Custom Actions")
+    //         model:              customActionList()
+    //         onActivated:        (index) => index == 0 ? _customMavlinkActionsSettings.joystickActionsFile.rawValue = "" : _customMavlinkActionsSettings.joystickActionsFile.rawValue = comboBox.currentText
+
+    //         Component.onCompleted: {
+    //             var index = comboBox.find(_customMavlinkActionsSettings.joystickActionsFile.valueString)
+    //             comboBox.currentIndex = index == -1 ? 0 : index
+    //         }
+    //     }
+    // }
+
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Virtual Joystick")
+    //     visible:            _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
+
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Enabled")
+    //         visible:            _virtualJoystick.visible
+    //         fact:               _virtualJoystick
+    //     }
+
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Auto-Center Throttle")
+    //         visible:            _virtualJoystickAutoCenterThrottle.visible
+    //         enabled:            _virtualJoystick.rawValue
+    //         fact:               _virtualJoystickAutoCenterThrottle
+    //     }
+    // }
+
+
+
+
+
+    // //Planview Settings ------------------------------------------------------------------------------------
+    // //property var _settingsManager:  QGroundControl.settingsManager
+    // property var _planViewSettings: QGroundControl.settingsManager.planViewSettings
+
+    // Text {
+    //             Layout.alignment: Qt.AlignHCenter
+    //             text: "Planview Settings"
+    //             font.pixelSize: 20
+    //             color: "#3A3A3A"
+    //             font.bold: true
+    //         }
+    // SettingsGroupLayout {
+    //     Layout.fillWidth: true
+
+    //     LabelledFactTextField {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Default Mission Altitude")
+    //         fact:               _settingsManager.appSettings.defaultMissionItemAltitude
+    //         visible:            fact.visible
+    //     }
+
+    //     LabelledFactTextField {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("VTOL TransitionDistance")
+    //         fact:               _planViewSettings.vtolTransitionDistance
+    //         visible:            fact.visible
+    //     }
+
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Use MAV_CMD_CONDITION_GATE for pattern generation")
+    //         fact:               _planViewSettings.useConditionGate
+    //         visible:            fact.visible
+    //     }
+
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Missions Do Not Require Takeoff Item")
+    //         fact:               _planViewSettings.takeoffItemNotRequired
+    //         visible:            fact.visible
+    //     }
+    // }
 
     //Video Settings ------------------------------------------------------------------------------------
     //property var    _settingsManager:            QGroundControl.settingsManager
@@ -633,7 +719,7 @@ SettingsPage {
             }
     SettingsGroupLayout {
         Layout.fillWidth:   true
-        heading:            qsTr("Video Source")
+        heading:            qsTr("")
         headingDescription: _videoAutoStreamConfig ? qsTr("Mavlink camera stream is automatically configured") : ""
         enabled:            !_videoAutoStreamConfig
 
@@ -644,12 +730,6 @@ SettingsPage {
             fact:               _videoSettings.videoSource
             visible:            fact.visible
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Connection")
-        visible:            !_videoAutoStreamConfig && (_isTCP || _isRTSP | _requiresUDPPort)
 
         LabelledFactTextField {
             Layout.fillWidth:           true
@@ -673,11 +753,6 @@ SettingsPage {
             fact:               _videoSettings.udpPort
             visible:            _requiresUDPPort && _videoSettings.udpPort.visible
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Settings")
 
         LabelledFactTextField {
             Layout.fillWidth:   true
@@ -707,11 +782,6 @@ SettingsPage {
             visible:            fact.visible
             indexModel:         false
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth: true
-        heading:            qsTr("Local Video Storage")
 
         LabelledFactComboBox {
             Layout.fillWidth:   true
@@ -734,7 +804,12 @@ SettingsPage {
             visible:            fact.visible
             enabled:            _videoSettings.enableStorageLimit.rawValue
         }
+
+
     }
+
+
+
 
     //Telemetry Settings ------------------------------------------------------------------------------------
     //property var    _settingsManager:           QGroundControl.settingsManager
@@ -747,13 +822,13 @@ SettingsPage {
     property var     _apmStartMavlinkStreams:   _appSettings.apmStartMavlinkStreams
 
 
-    Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Telemetry Settings"
-                font.pixelSize: 20
-                color: "#3A3A3A"
-                font.bold: true
-            }
+    // Text {
+    //             Layout.alignment: Qt.AlignHCenter
+    //             text: "Telemetry Settings"
+    //             font.pixelSize: 20
+    //             color: "#3A3A3A"
+    //             font.bold: true
+    //         }
     // SettingsGroupLayout {
     //     Layout.fillWidth:   true
     //     heading:            qsTr("Ground Station")
@@ -793,69 +868,69 @@ SettingsPage {
     //     }
     // }
 
-    SettingsGroupLayout {
-        id:                 mavlink2SigningGroup
-        Layout.fillWidth:   true
-        heading:            qsTr("MAVLink 2 Signing")
-        headingDescription: qsTr("Signing keys should only be sent to the vehicle over secure links.")
-        visible:            _mavlink2SigningKey.visible
+    // SettingsGroupLayout {
+    //     id:                 mavlink2SigningGroup
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("MAVLink 2 Signing")
+    //     headingDescription: qsTr("Signing keys should only be sent to the vehicle over secure links.")
+    //     visible:            _mavlink2SigningKey.visible
 
-        property Fact _mavlink2SigningKey: _appSettings.mavlink2SigningKey
+    //     property Fact _mavlink2SigningKey: _appSettings.mavlink2SigningKey
 
-        Connections {
-            target:             mavlink2SigningGroup._mavlink2SigningKey
-            onRawValueChanged:  sendToVehiclePrompt.visible = true
-        }
+    //     Connections {
+    //         target:             mavlink2SigningGroup._mavlink2SigningKey
+    //         onRawValueChanged:  sendToVehiclePrompt.visible = true
+    //     }
 
-        RowLayout {
-            spacing: ScreenTools.defaultFontPixelWidth
+    //     RowLayout {
+    //         spacing: ScreenTools.defaultFontPixelWidth
 
-            LabelledFactTextField {
-                Layout.fillWidth:           true
-                textFieldPreferredWidth:    ScreenTools.defaultFontPixelWidth * 32
-                label:                      qsTr("Key")
-                fact:                       mavlink2SigningGroup._mavlink2SigningKey
-            }
+    //         LabelledFactTextField {
+    //             Layout.fillWidth:           true
+    //             textFieldPreferredWidth:    ScreenTools.defaultFontPixelWidth * 32
+    //             label:                      qsTr("Key")
+    //             fact:                       mavlink2SigningGroup._mavlink2SigningKey
+    //         }
 
-            QGCButton {
-                text:       qsTr("Send to Vehicle")
-                enabled:    _activeVehicle
+    //         QGCButton {
+    //             text:       qsTr("Send to Vehicle")
+    //             enabled:    _activeVehicle
 
-                onClicked: {
-                    sendToVehiclePrompt.visible = false
-                    _activeVehicle.sendSetupSigning()
-                }
-            }
-        }
+    //             onClicked: {
+    //                 sendToVehiclePrompt.visible = false
+    //                 _activeVehicle.sendSetupSigning()
+    //             }
+    //         }
+    //     }
 
-        QGCLabel {
-            id:                 sendToVehiclePrompt
-            Layout.fillWidth:   true
-            text:               qsTr("Signing key has changed. Don't forget to send to Vehicle(s) if needed.")
-            visible:            false
-        }
-    }
+    //     QGCLabel {
+    //         id:                 sendToVehiclePrompt
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Signing key has changed. Don't forget to send to Vehicle(s) if needed.")
+    //         visible:            false
+    //     }
+    // }
 
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("MAVLink Forwarding")
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("MAVLink Forwarding")
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Enable")
-            fact:               _appSettings.forwardMavlink
-            visible:            fact.visible
-        }
+    //     FactCheckBoxSlider {
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Enable")
+    //         fact:               _appSettings.forwardMavlink
+    //         visible:            fact.visible
+    //     }
 
-        LabelledFactTextField {
-            Layout.fillWidth:           true
-            textFieldPreferredWidth:    ScreenTools.defaultFontPixelWidth * 20
-            label:                      qsTr("Host name")
-            fact:                       _appSettings.forwardMavlinkHostName
-            visible:                    fact.visible
-            enabled:                    _appSettings.forwardMavlink.rawValue
-        }
-    }
+    //     LabelledFactTextField {
+    //         Layout.fillWidth:           true
+    //         textFieldPreferredWidth:    ScreenTools.defaultFontPixelWidth * 20
+    //         label:                      qsTr("Host name")
+    //         fact:                       _appSettings.forwardMavlinkHostName
+    //         visible:                    fact.visible
+    //         enabled:                    _appSettings.forwardMavlink.rawValue
+    //     }
+    // }
 
     SettingsGroupLayout {
         Layout.fillWidth:   true
@@ -866,7 +941,7 @@ SettingsPage {
             Layout.fillWidth:   true
             text:               qsTr("Save log after each flight")
             fact:               _telemetrySave
-            visible:            fact.visible
+            visible:            fact.visible  &&  !_disableAllDataPersistence
             property Fact _telemetrySave: _appSettings.telemetrySave
         }
 
@@ -874,7 +949,7 @@ SettingsPage {
             Layout.fillWidth:   true
             text:               qsTr("Save logs even if vehicle was not armed")
             fact:               _telemetrySaveNotArmed
-            visible:            fact.visible
+            visible:            fact.visible   &&  !_disableAllDataPersistence
             enabled:            _appSettings.telemetrySave.rawValue
             property Fact _telemetrySaveNotArmed: _appSettings.telemetrySaveNotArmed
         }
@@ -883,115 +958,115 @@ SettingsPage {
             Layout.fillWidth:   true
             text:               qsTr("Save CSV log of telemetry data")
             fact:               _saveCsvTelemetry
-            visible:            fact.visible
+            visible:            fact.visible   &&  !_disableAllDataPersistence
             property Fact _saveCsvTelemetry: _appSettings.saveCsvTelemetry
         }
     }
 
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Stream Rates (ArduPilot Only)")
-        visible:            _showAPMStreamRates
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Stream Rates (ArduPilot Only)")
+    //     visible:            _showAPMStreamRates
 
-        QGCCheckBoxSlider {
-            id:                 controllerByVehicleCheckBox
-            Layout.fillWidth:   true
-            text:               qsTr("Controlled By vehicle")
-            checked:            !_apmStartMavlinkStreams.rawValue
-            onClicked:          _apmStartMavlinkStreams.rawValue = !checked
-        }
+    //     QGCCheckBoxSlider {
+    //         id:                 controllerByVehicleCheckBox
+    //         Layout.fillWidth:   true
+    //         text:               qsTr("Controlled By vehicle")
+    //         checked:            !_apmStartMavlinkStreams.rawValue
+    //         onClicked:          _apmStartMavlinkStreams.rawValue = !checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Raw Sensors")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateRawSensors
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Raw Sensors")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateRawSensors
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Extended Status")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtendedStatus
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Extended Status")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtendedStatus
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("RC Channels")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateRCChannels
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("RC Channels")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateRCChannels
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Position")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRatePosition
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Position")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRatePosition
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Extra 1")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra1
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Extra 1")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra1
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Extra 2")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra2
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Extra 2")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra2
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Extra 3")
-            fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra3
-            indexModel:         false
-            enabled:            !controllerByVehicleCheckBox.checked
-        }
-    }
+    //     LabelledFactComboBox {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Extra 3")
+    //         fact:               _settingsManager.apmMavlinkStreamRateSettings.streamRateExtra3
+    //         indexModel:         false
+    //         enabled:            !controllerByVehicleCheckBox.checked
+    //     }
+    // }
 
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Link Status (Current Vehicle))")
+    // SettingsGroupLayout {
+    //     Layout.fillWidth:   true
+    //     heading:            qsTr("Link Status (Current Vehicle))")
 
-        LabelledLabel {
-            Layout.fillWidth:   true
-            label:              qsTr("Total messages sent (computed)")
-            labelText:          _activeVehicle ? _activeVehicle.mavlinkSentCount : _notConnectedStr
-        }
+    //     LabelledLabel {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Total messages sent (computed)")
+    //         labelText:          _activeVehicle ? _activeVehicle.mavlinkSentCount : _notConnectedStr
+    //     }
 
-        LabelledLabel {
-            Layout.fillWidth:   true
-            label:              qsTr("Total messages received")
-            labelText:          _activeVehicle ? _activeVehicle.mavlinkReceivedCount : _notConnectedStr
-        }
+    //     LabelledLabel {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Total messages received")
+    //         labelText:          _activeVehicle ? _activeVehicle.mavlinkReceivedCount : _notConnectedStr
+    //     }
 
-        LabelledLabel {
-            Layout.fillWidth:   true
-            label:              qsTr("Total message loss")
-            labelText:          _activeVehicle ? _activeVehicle.mavlinkLossCount : _notConnectedStr
-        }
+    //     LabelledLabel {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Total message loss")
+    //         labelText:          _activeVehicle ? _activeVehicle.mavlinkLossCount : _notConnectedStr
+    //     }
 
-        LabelledLabel {
-            Layout.fillWidth:   true
-            label:              qsTr("Loss rate:")
-            labelText:          _activeVehicle ? _activeVehicle.mavlinkLossPercent.toFixed(0) + '%' : _notConnectedStr
-        }
+    //     LabelledLabel {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Loss rate:")
+    //         labelText:          _activeVehicle ? _activeVehicle.mavlinkLossPercent.toFixed(0) + '%' : _notConnectedStr
+    //     }
 
-        LabelledLabel {
-            Layout.fillWidth:   true
-            label:              qsTr("Signing:")
-            labelText:          _activeVehicle ? (_activeVehicle.mavlinkSigning ? "On" : "Off") : _notConnectedStr
-        }
-    }
+    //     LabelledLabel {
+    //         Layout.fillWidth:   true
+    //         label:              qsTr("Signing:")
+    //         labelText:          _activeVehicle ? (_activeVehicle.mavlinkSigning ? "On" : "Off") : _notConnectedStr
+    //     }
+    // }
 
 
 
@@ -1001,32 +1076,32 @@ SettingsPage {
     property var _linkManager:          QGroundControl.linkManager
         property var _autoConnectSettings:  QGroundControl.settingsManager.autoConnectSettings
 
-        SettingsGroupLayout {
-            heading:        qsTr("AutoConnect")
-            visible:        _autoConnectSettings.visible
+        // SettingsGroupLayout {
+        //     heading:        qsTr("AutoConnect")
+        //     visible:        _autoConnectSettings.visible
 
-            Repeater {
-                id: autoConnectRepeater
+        //     Repeater {
+        //         id: autoConnectRepeater
 
-                model: [
-                    _autoConnectSettings.autoConnectPixhawk,
-                    _autoConnectSettings.autoConnectSiKRadio,
-                    _autoConnectSettings.autoConnectLibrePilot,
-                    _autoConnectSettings.autoConnectUDP,
-                    _autoConnectSettings.autoConnectZeroConf,
-                    _autoConnectSettings.autoConnectRTKGPS,
-                ]
+        //         model: [
+        //             _autoConnectSettings.autoConnectPixhawk,
+        //             _autoConnectSettings.autoConnectSiKRadio,
+        //             _autoConnectSettings.autoConnectLibrePilot,
+        //             _autoConnectSettings.autoConnectUDP,
+        //             _autoConnectSettings.autoConnectZeroConf,
+        //             _autoConnectSettings.autoConnectRTKGPS,
+        //         ]
 
-                property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
+        //         property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
 
-                FactCheckBoxSlider {
-                    Layout.fillWidth:   true
-                    text:               autoConnectRepeater.names[index]
-                    fact:               modelData
-                    visible:            modelData.visible
-                }
-            }
-        }
+        //         FactCheckBoxSlider {
+        //             Layout.fillWidth:   true
+        //             text:               autoConnectRepeater.names[index]
+        //             fact:               modelData
+        //             visible:            modelData.visible
+        //         }
+        //     }
+        // }
 
         SettingsGroupLayout {
             heading: qsTr("Links")
@@ -1041,7 +1116,7 @@ SettingsPage {
                     QGCLabel {
                         Layout.fillWidth:   true
                         text:               object.name
-                        color: "white"
+                        color: "#5d179e"
                     }
                     QGCColoredImage {
                         height:                 ScreenTools.minTouchPixels

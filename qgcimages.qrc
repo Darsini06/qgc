@@ -182,12 +182,26 @@
         <file alias="NewImages/map_selection.svg">src/NewImages/map_selection.svg</file>
         <file alias="NewImages/Drone_connected.svg">src/NewImages/Drone_connected.svg</file>
         <file alias="NewImages/mark_with_gps.svg">src/NewImages/mark_with_gps.svg</file>
+        <file alias="NewImages/mark_with_drone.svg">src/NewImages/mark_with_drone.svg</file>
         <file alias="NewImages/pressure_calibration.svg">src/NewImages/pressure_calibration.svg</file>
-        <file alias="NewImages/RC_caliberation.svg">src/NewImages/RC_caliberation.svg</file>
+        <file alias="NewImages/RC_calibration.svg">src/NewImages/RC_calibration.svg</file>
         <file alias="NewImages/ESC_calibration.svg">src/NewImages/ESC_calibration.svg</file>
         <file alias="NewImages/Accel_calibration.svg">src/NewImages/Accel_calibration.svg</file>
         <file alias="NewImages/compass_calibration.svg">src/NewImages/compass_calibration.svg</file>
-       
+        <file alias="NewImages/background_login.png">src/NewImages/background_login.png</file>
+        <file alias="NewImages/background_login_empty.png">src/NewImages/background_login_empty.png</file>
+        <file alias="NewImages/drone_expert_AiImage.jpg">src/NewImages/drone_expert_AiImage.jpg</file>
+        <file alias="NewImages/inspect_AiImage.jpg">src/NewImages/inspect_AiImage.jpg</file>
+        <file alias="NewImages/collaboration_AiImage.jpg">src/NewImages/collaboration_AiImage.jpg</file>
+        <file alias="NewImages/drone_pilot_AiImage.jpg">src/NewImages/drone_pilot_AiImage.jpg</file>
+        <file alias="NewImages/drone_building_AiImage.jpg">src/NewImages/drone_building_AiImage.jpg</file>
+        <file alias="NewImages/simulation_AiImage.jpg">src/NewImages/simulation_AiImage.jpg</file>
+        <file alias="NewImages/agri_AIImage_transparent.png">src/NewImages/agri_AIImage_transparent.png</file>
+        <file alias="NewImages/mapping_AIImage.png">src/NewImages/mapping_AIImage.png</file>
+        <file alias="NewImages/agri_AIImage.png">src/NewImages/agri_AIImage.png</file>
+        <file alias="NewImages/camera_AIImage.png">src/NewImages/camera_AIImage.png</file>
+        <file alias="NewImages/camera_AIImage_transparent.png">src/NewImages/camera_AIImage_transparent.png</file>
+        
         
 
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>

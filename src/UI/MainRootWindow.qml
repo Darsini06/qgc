@@ -429,7 +429,7 @@ ApplicationWindow {
         showMessageDialog(dialogTitle, dialogText)
     }
 
-    function showToast(text) {
+    function close_dialog_showToast(text) {
         sideDrawer.close()
         toastContainer.showToast(text)
     }
@@ -883,7 +883,7 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(1, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(2, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
                     tabModel.setProperty(2, "file", "APMSensorsComponent.qml");
@@ -1752,10 +1752,11 @@ ApplicationWindow {
 
 
         background: Rectangle {
-            color: "transparent"
-            radius: 10
-            border.color: "white"
-            border.width: 1
+            color: "black"
+            opacity: 0.8
+            //radius: 8
+            //border.color: "white"
+            //border.width: 1
         }
 
         Platform.FileDialog {
@@ -1824,8 +1825,6 @@ ApplicationWindow {
                         mainWindow.showMapping()
                     }
 
-
-
                 }
             }
         }
@@ -1852,9 +1851,9 @@ ApplicationWindow {
                     background: Rectangle {
                         id: mapping
                         color: white//"#1b2a49" // Dark Blue
-                        radius: 34
-                        // border.width: width * 0.02
-                        // border.color: white//"#3b6ea5"
+                        radius: 8
+                        border.width: 2
+                        border.color: app_color
                         anchors.fill: parent
                     }
 
@@ -1864,7 +1863,7 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {
@@ -1912,7 +1911,7 @@ ApplicationWindow {
                     background: Rectangle {
                         id: mappingcircle
                         color: white//"#1c3f2b" // Dark Green
-                        radius: 34
+                        radius: 8
                         // border.width: width * 0.02
                         // border.color: white//"#4CAF50"
                     }
@@ -1923,7 +1922,7 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {
@@ -1969,7 +1968,7 @@ ApplicationWindow {
                     background: Rectangle {
                         id: bgMap
                         color: white//"#1b2a49" // Dark Blue
-                        radius: 34
+                        radius: 8
                         // border.width: width * 0.02
                         // border.color: white//"#3b6ea5"
                         anchors.fill: parent
@@ -1981,7 +1980,7 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {
@@ -2029,7 +2028,7 @@ ApplicationWindow {
                     background: Rectangle {
                         id: bgDrone
                         color: white//"#1c3f2b" // Dark Green
-                        radius: 34
+                        radius: 8
                         // border.width: width * 0.02
                         // border.color: white//"#4CAF50"
                     }
@@ -2040,11 +2039,11 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {
-                                source: "qrc:/qmlimages/NewImages/mark_with_gps.svg"
+                                source: "qrc:/qmlimages/NewImages/mark_with_drone.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -2094,7 +2093,7 @@ ApplicationWindow {
                     background: Rectangle {
                         id: bgGPS
                         color: white//"#1b2a49" // Dark Green
-                        radius: 34
+                        radius: 8
                         // border.width: width * 0.02
                         // border.color: white//"#3b6ea5"
                     }
@@ -2105,11 +2104,11 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {
-                                source: "/qmlimages/NewImages/droneGpsMarking.png"
+                                source: "/qmlimages/NewImages/mark_with_gps.svg"
                                 width: 50
                                 height: 50
                                 fillMode: Image.PreserveAspectFit
@@ -2148,7 +2147,7 @@ ApplicationWindow {
                     background: Rectangle {
                         id: bgKml
                         color: white//"#2e1437" // Dark Purple
-                        radius: 34
+                        radius: 8
                         // border.width: width * 0.02
                         // border.color: white//"#9b59b6"
                     }
@@ -2159,7 +2158,7 @@ ApplicationWindow {
                         anchors.fill: parent
 
                         Column {
-                            spacing: 8
+                            spacing: 10
                             anchors.centerIn: parent
 
                             Image {

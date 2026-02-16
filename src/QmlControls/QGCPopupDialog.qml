@@ -304,19 +304,16 @@ Popup {
                         width: 25
                         height: 25
                         radius: width / 2
-                        color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"  // Darker red on hover
-                        //anchors.right: parent.right
-                        //anchors.top: parent.top
-                        //anchors.margins: 10
+                        color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
                         clip: true
                         visible: closeOnClickOutside
 
                         Text {
-                            text: "×"  // Using multiplication symbol for better looking X
+                            text: "×"
                             color: "white"
                             anchors.centerIn: parent
                             font.bold: true
-                            font.pixelSize: 18
+                            font.pointSize: ScreenTools.largeFontPointSize
                         }
 
                         MouseArea {
@@ -324,11 +321,10 @@ Popup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                close()
-                            }
+                            onClicked: close()
                         }
                     }
+
 
                 }
 

@@ -60,7 +60,7 @@ Item {
                             mainWindow.sideDrawer1("RadioComponent.qml")
                         } else {
                             console.log("device not connected")
-                            mainWindow.showToast("Device not connected")
+                            mainWindow.close_dialog_showToast("Device not connected")
                         }
                     }
 
@@ -93,7 +93,7 @@ Item {
                             mainWindow.sideDrawer1("qrc:/qml/SettingsPanel/ChannelSet.qml")
                         } else {
                             console.log("device not connected")
-                            mainWindow.showToast("Device not connected")
+                            mainWindow.close_dialog_showToast("Device not connected")
                         }
                     }
 

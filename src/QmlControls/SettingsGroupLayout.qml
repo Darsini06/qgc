@@ -6,10 +6,13 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QtQuick.Effects
 ColumnLayout {
-    id:             control    
+    id:             control
     spacing:        _margins / 2
     implicitWidth:  _contentLayout.implicitWidth //+ (_margins * 2)
     implicitHeight: _contentLayout.implicitHeight + (_margins * 2)
+    Layout.leftMargin: 100
+    Layout.rightMargin: 100
+
 
     default property alias contentItem: _contentLayout.data
 
@@ -29,16 +32,16 @@ ColumnLayout {
         spacing:            20
         visible:            heading !== ""
         Layout.topMargin:    20     // 🔼 top padding
-            Layout.bottomMargin: 20     // 🔽 bottom padding
+        Layout.bottomMargin: 20     // 🔽 bottom padding
 
-        QGCLabel { 
+        QGCLabel {
             text:           heading
             font.pointSize: ScreenTools.defaultFontPointSize + 1
             font.bold:      true
             color: "#3A3A3A"
         }
 
-        QGCLabel { 
+        QGCLabel {
             Layout.fillWidth:   true
             text:               headingDescription
             wrapMode:           Text.WordWrap
@@ -92,6 +95,8 @@ ColumnLayout {
         }
 
 
+
+
                         // MultiEffect {
                         //     anchors.fill: shadowSource
                         //     source: shadowSource
@@ -120,7 +125,7 @@ ColumnLayout {
             }
         }
 
- 
+
 
 
 

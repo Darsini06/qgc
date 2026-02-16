@@ -93,102 +93,112 @@ Item {
             // }
 
             // CENTERED LABELS GROUP
-            Row {
-                spacing: 40
+            Rectangle {
+                id: tabBar
+
+                width: contentRow.width + dp(10)
+                height: contentRow.height + dp(5)
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: dp(2)
+                radius: 25
+                color: "transparent"
+                border.width: 1
+                border.color: app_color
+                clip: true
 
-                Item {
-                    width: profileLabel.implicitWidth
-                    height: profileLabel.implicitHeight
+                Row {
+                    id: contentRow
+                    spacing: dp(10)
+                    anchors.centerIn: parent
 
-                    Label {
-                        id: profileLabel
-                        text: "PROFILE"
-                        color: "black"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
+                    Item {
+                        width: profileLabel.implicitWidth
+                        height: profileLabel.implicitHeight
 
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            MapGlobals.currentView_profile = "profile"
-                            mainWindow.openProfileScreen()
+                        Label {
+                            id: profileLabel
+                            text: "PROFILE"
+                            color: "black"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                MapGlobals.currentView_profile = "profile"
+                                mainWindow.openProfileScreen()
+                            }
                         }
                     }
-                }
 
-                Item {
-                    width: select_type.implicitWidth
-                    height: select_type.implicitHeight
+                    Item {
+                        width: select_type.implicitWidth
+                        height: select_type.implicitHeight
 
-                    Label {
-                        id: select_type
-                        text: "APPLICATION"
-                        color: "black"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
+                        Label {
+                            id: select_type
+                            text: "APPLICATION"
+                            color: "black"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            MapGlobals.currentView_profile = "drone"
-                            mainWindow.openProfileScreen()
-                            //logoutdialog.createObject(mainWindow).open()
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                MapGlobals.currentView_profile = "drone"
+                                mainWindow.openProfileScreen()
+                                //logoutdialog.createObject(mainWindow).open()
+                            }
                         }
                     }
-                }
 
-                Item {
-                    width: logout.implicitWidth
-                    height: logout.implicitHeight
+                    Item {
+                        width: logout.implicitWidth
+                        height: logout.implicitHeight
 
-                    Label {
-                        id: logout
-                        text: "LOGOUT"
-                        color: "black"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
+                        Label {
+                            id: logout
+                            text: "LOGOUT"
+                            color: "black"
+                            font.pixelSize: 15
+                            font.bold: true
+                        }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            logoutdialog.createObject(mainWindow).open()
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                logoutdialog.createObject(mainWindow).open()
+                            }
                         }
                     }
+
                 }
 
             }
-        }
 
+
+        }
 
         Row {
             id: mainRow
-
-            anchors.fill: parent
-            //anchors.horizontalCenter:  parent.horizontalCenter
-            anchors.margins: 30
+            width: parent.width - 60  // accounting for margins
+            height: parent.height - 60
+            anchors.centerIn: parent
             spacing: 20
 
             // LEFT SIDE
             Column {
                 id: leftSide
-                width: parent.width * 0.55
+                width: mainRow.width * 0.55
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 20
-
-                // Label {
-                //     text: "Aviatricks Aerolabs"
-                //     color: "Black"
-                //     font.pointSize:  ScreenTools.largeFontPointSize * 1.2
-                //     font.bold: true
-                // }
 
                 QGCColoredImage {
                     source: "/qmlimages/NewImages/aviatrickslogo.svg"
@@ -196,24 +206,22 @@ Item {
                     height: 35
                     fillMode: Image.PreserveAspectFit
                     color: "transparent"
-                    //anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Label {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
-                    text: "Flying a drone is like holding a piece of freedom in your hands. The view from above always tells a story the ground can’t."
+                    text: "Flying a drone is like holding a piece of freedom in your hands. The view from above always tells a story the ground can't."
                     color: "gray"
-                    font.pointSize:  ScreenTools.mediumFontPointSize
+                    font.pointSize: ScreenTools.mediumFontPointSize
                 }
             }
 
             // RIGHT SIDE
             Item {
                 id: rightSide
-                width: parent.width * 0.4
-                height: parent.height * 0.6
-                anchors.right: parent.right
+                width: mainRow.width * 0.4
+                height: mainRow.height * 0.6
                 anchors.verticalCenter: parent.verticalCenter
                 clip: false  // IMPORTANT: allow shadow outside
 
@@ -234,7 +242,7 @@ Item {
                     source: shadowSource
                     shadowEnabled: true
                     shadowHorizontalOffset: 0
-                    shadowVerticalOffset: dp(1)
+                    shadowVerticalOffset: dp(2)
                     shadowBlur: 1.5
                     shadowColor: "#40000000"
                 }
@@ -245,11 +253,34 @@ Item {
                     anchors.fill: parent
                     radius: 8
                     color: "white"
-                    border.width: 1
-                    border.color: app_color
+
+                    // Enable layer to make clip respect the radius
+                    layer.enabled: true
+                    layer.smooth: true
                     clip: true
 
-                    //Lottie File for All categoreis diaplayed
+                    // Background Image (always present)
+                    Image {
+                        id: backgroundImage
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectCrop
+                        smooth: true
+                        mipmap: true
+                        visible: droneType !== "loadpage"
+
+                        source:
+                            droneType === "Camera"  ? "qrc:/qmlimages/NewImages/drone_pilot_AiImage.jpg" :
+                            droneType === "Mapping" ? "qrc:/qmlimages/NewImages/drone_expert_AiImage.jpg" :
+                                                      "qrc:/qmlimages/NewImages/inspect_AiImage.jpg"
+
+                        onStatusChanged: {
+                            console.log("Image status:", status, source)
+                            if (status === Image.Error) console.log("ERROR loading image")
+                            if (status === Image.Ready) console.log("Image loaded OK")
+                        }
+                    }
+
+                    // Lottie overlay
                     Item {
                         id: lottieWrapper
                         anchors.centerIn: parent
@@ -275,60 +306,9 @@ Item {
                             }
                         }
                     }
-
-
-                    // ---- Drone Image Placeholder ----
-
-                    //Camera_Drone_Image
-                    Image {
-                        id:cameraicon
-                        source: "/qmlimages/NewImages/cameraDrone_png.png"
-                        visible: droneType === "Camera"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.9
-                        height: parent.height * 0.9
-                        fillMode: Image.PreserveAspectFit
-                        onStatusChanged: console.log("Camera image status:", status)
-                    }
-
-                    //Mapping_Drone_Image
-                    Image {
-                        id: mappingicon
-                        source: "/qmlimages/NewImages/survey.png" // Replace with real image
-                        visible: droneType === "Mapping"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.5
-                        height: parent.height * 0.5
-                        fillMode: Image.PreserveAspectFit
-                        onStatusChanged: console.log("Mapping image status:", status)
-                    }
-
-                    // //VTOL_Drone_Image
-                    // Image {
-                    //     id: vtolicon
-                    //     source: "/qmlimages/NewImages/vtol.png" // Replace with real image
-                    //     anchors.centerIn: parent
-                    //     width: parent.width * 0.4
-                    //     height: parent.height * 0.4
-                    //     fillMode: Image.PreserveAspectFit
-                    //     visible: droneType ==="VTOL"?true:false
-                    // }
-
-                    //Agri_Drone_Image
-                    Image {
-                        id:agriicon
-                        source: "/qmlimages/NewImages/agri.png" // Replace with real image
-                        anchors.centerIn: parent
-                        width: parent.width * 0.7
-                        height: parent.height * 0.7
-                        fillMode: Image.PreserveAspectFit
-                        visible: droneType ==="Agri"
-                        onStatusChanged: console.log("Agri image status:", status)
-                    }
                 }
 
             }
-
         }
 
         RowLayout {

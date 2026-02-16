@@ -272,7 +272,7 @@ Item {
 
             LottieAnimation {
                 id: droneAnim
-                source: "qrc:/qmlimages/NewImages/loading_hands.json"
+                source: "qrc:/qmlimages/NewImages/loading_color_dots.json"
                 anchors.centerIn: parent
                 autoPlay: true
                 loops: Animation.Infinite
@@ -639,32 +639,20 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
-                        color: "white"
                         radius: 5
-                        border.color: "#e0e0e0"
-                        border.width: 1
+                        // border.color: "#e0e0e0"
+                        // border.width: 1
 
-                        // Center just the Lottie container
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.centerIn: parent
-
-                            LottieAnimation {
-                                id: droneAnim
-                                anchors.centerIn: parent
-                                source: "qrc:/qmlimages/NewImages/accountupdate_lottie.json"
-                                autoPlay: true
-                                loops: Animation.Infinite
-
-                                // Scale down by 50%
-                                scale: 0.5
-
-                                onStatusChanged: console.log("Lottie Status:", status)
-                            }
-                        }
-
+                        Image {
+                              anchors.fill: parent
+                              source: "qrc:/qmlimages/NewImages/nature_background.webp"
+                              fillMode: Image.PreserveAspectCrop
+                              clip: true
+                              smooth: true
+                          }
                     }
+
+
 
                     // Second Card - Form
                     Rectangle {
@@ -1781,9 +1769,9 @@ Item {
                     property int selectedIndex: -1
 
                     property var buttonModel: [
-                        { label: "Camera", image: "/qmlimages/NewImages/cameradrone.svg" },
-                        { label: "Agri", image: "/qmlimages/NewImages/agri.png" },
-                        { label: "Mapping",image: "/qmlimages/NewImages/survey.png" }
+                        { label: "Camera", image: "qrc:/qmlimages/NewImages/drone_pilot_AiImage.jpg" },
+                        { label: "Agri", image: "qrc:/qmlimages/NewImages/drone_expert_AiImage.jpg" },
+                        { label: "Mapping",image: "qrc:/qmlimages/NewImages/inspect_AiImage.jpg" }
                     ]
 
                     Component.onCompleted: {
@@ -1803,7 +1791,7 @@ Item {
                         anchors.centerIn: parent
 
                         Grid {
-                            id : grid
+                            id: grid
                             columns: 3
                             spacing: 20
                             width: parent.width
@@ -1813,11 +1801,13 @@ Item {
                                 model: contentArea.buttonModel
 
                                 Item {
+                                    id: wrapper
+
+                                    // ---- CARD SIZE (CARD CONTROLS SIZE — NOT CONTENT) ----
                                     width: (grid.width - (grid.spacing * (grid.columns - 1))) / grid.columns
+                                    height: width * 0.7        // responsive aspect ratio (IMPORTANT)
 
-                                    height: contentColumn.implicitHeight + 40
-
-                                    // ----- SHADOW SOURCE -----
+                                    // ---------- SHADOW SOURCE ----------
                                     Rectangle {
                                         id: shadowSource
                                         anchors.fill: card
@@ -1826,19 +1816,18 @@ Item {
                                         visible: false
                                     }
 
-                                    // ----- REAL ELEVATION -----
+                                    // ---------- REAL SHADOW ----------
                                     MultiEffect {
                                         anchors.fill: shadowSource
                                         source: shadowSource
                                         shadowEnabled: true
-
                                         shadowHorizontalOffset: 0
-                                        shadowVerticalOffset: dp(0.5) //contentArea.selectedIndex === index ? dp(2) : dp(1)
-                                        shadowBlur: 1.5 //contentArea.selectedIndex === index ? 0.8 : 0.5
+                                        shadowVerticalOffset: dp(1)
+                                        shadowBlur: 1.5
                                         shadowColor: "#40000000"
                                     }
 
-                                    // ----- CARD -----
+                                    // ---------- CARD ----------
                                     Button {
                                         id: card
                                         anchors.fill: parent
@@ -1847,52 +1836,94 @@ Item {
                                         background: Rectangle {
                                             radius: 8
                                             color: "white"
-                                            border.width: contentArea.selectedIndex === index
-                                                          ? 2
-                                                          : 1
+                                            border.width: contentArea.selectedIndex === index ? 2.5 : 1
                                             border.color: contentArea.selectedIndex === index
                                                           ? app_color
                                                           : "#D3D3D3"
+
+                                            // Rectangle {
+                                            //     anchors.fill: parent
+                                            //     radius: parent.radius
+                                            //     color: contentArea.selectedIndex === index
+                                            //            ? Qt.rgba(0,0,0,0.15)
+                                            //            : "transparent"
+                                            // }
                                         }
 
-                                        contentItem: Item   {
+                                        // ===== CONTENT =====
+                                        contentItem: Item {
                                             anchors.fill: parent
+                                            clip: true
 
-                                            Column {
-                                                id : contentColumn
-                                                anchors.centerIn: parent
-                                                spacing: 12
+                                            // IMAGE CONTAINER (controls margin once)
+                                            Item {
+                                                id: imageContainer
+                                                anchors.fill: parent
+                                                anchors.margins: 8
+                                                clip: true
 
+                                                // ---- IMAGE ----
                                                 Image {
+                                                    anchors.fill: parent
                                                     source: modelData.image
-                                                    width: 56
-                                                    height: 56
-                                                    fillMode: Image.PreserveAspectFit
-                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    fillMode: Image.PreserveAspectCrop
                                                 }
 
+                                                // ---- GRADIENT ----
+                                                Rectangle {
+                                                    anchors.left: parent.left
+                                                    anchors.right: parent.right
+                                                    anchors.bottom: parent.bottom
+                                                    height: parent.height * 0.35
+
+                                                    gradient: Gradient {
+                                                        GradientStop { position: 0.0; color: "#00000000" }
+                                                        GradientStop { position: 1.0; color: "#AA000000" }
+                                                    }
+                                                }
+
+                                                // ---- TEXT ----
                                                 Text {
                                                     text: modelData.label
-                                                    color: "black"
+                                                    anchors.left: parent.left
+                                                    anchors.right: parent.right
+                                                    anchors.bottom: parent.bottom
+                                                    anchors.margins: 12
+
+                                                    color: "white"
                                                     font.bold: true
                                                     font.pointSize: ScreenTools.defaultFontPointSize
                                                     horizontalAlignment: Text.AlignHCenter
-                                                    width: parent.width
                                                     wrapMode: Text.WordWrap
                                                 }
                                             }
                                         }
 
-                                        QGCColoredImage {
-                                            visible: contentArea.selectedIndex === index
-                                            source: "qrc:/qmlimages/check.svg"
-                                            width: 20
-                                            height: 20
-                                            anchors.top: parent.top
-                                            anchors.right: parent.right
-                                            anchors.margins: 10
-                                            color: app_color
-                                        }
+                                        // ---- SELECTION CHECK ICON ----
+                                        // Rectangle {
+                                        //     visible: contentArea.selectedIndex === index
+
+                                        //     width: 20
+                                        //     height: 20
+                                        //     //radius: 14
+                                        //     color: "transparent"
+                                        //     //border.color: app_color
+                                        //     //border.width: 2
+
+                                        //     anchors.top: parent.top
+                                        //     anchors.right: parent.right
+                                        //     anchors.margins: 15
+
+                                        //     z: 10   // force above everything
+
+                                        //     QGCColoredImage {
+                                        //         anchors.centerIn: parent
+                                        //         source: "qrc:/qmlimages/check.svg"
+                                        //         width: 20
+                                        //         height: 20
+                                        //         color: app_color
+                                        //     }
+                                        // }
 
                                         onClicked: {
                                             contentArea.selectedIndex = index
@@ -1900,9 +1931,7 @@ Item {
                                     }
 
                                 }
-
                             }
-
                         }
 
                         Button {
