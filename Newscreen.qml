@@ -42,7 +42,7 @@ Item {
 
     onVisibleChanged : {
         if (visible) {
-            console.log("NewScreen onVisibleChanged");
+            console.log("HomeScreen onVisibleChanged");
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
             console.log("droneType",droneType);
         }

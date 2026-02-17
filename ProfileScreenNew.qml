@@ -57,7 +57,6 @@ Item {
     }
 
 
-
     ListModel {
         id: sessionModel
     }
@@ -89,7 +88,7 @@ Item {
             loadSessions();
 
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
-            console.log("ProfileScreenNew droneType",droneType);
+            console.log("ProfileScreen droneType",droneType);
 
             displayName = QGroundControl.loadGlobalSetting("name", "")
             userName = QGroundControl.loadGlobalSetting("username", "")
@@ -257,29 +256,29 @@ Item {
         }
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: "transparent"
-        visible: pageLoader.status === Loader.Loading
-        z: 99
+    // Rectangle {
+    //     anchors.fill: parent
+    //     color: "transparent"
+    //     visible: pageLoader.status === Loader.Loading
+    //     z: 99
 
-        Item {
-            id: lottieWrapper
-            anchors.centerIn: parent
-            width: dp(3)
-            height: dp(3)
-            scale: 0.5
+    //     Item {
+    //         id: lottieWrapper
+    //         anchors.centerIn: parent
+    //         width: dp(3)
+    //         height: dp(3)
+    //         scale: 0.5
 
-            LottieAnimation {
-                id: droneAnim
-                source: "qrc:/qmlimages/NewImages/loading_color_dots.json"
-                anchors.centerIn: parent
-                autoPlay: true
-                loops: Animation.Infinite
-                //frameRate: 300   // increase speed
-            }
-        }
-    }
+    //         LottieAnimation {
+    //             id: droneAnim
+    //             source: "qrc:/qmlimages/NewImages/loading_color_dots.json"
+    //             anchors.centerIn: parent
+    //             autoPlay: true
+    //             loops: Animation.Infinite
+    //             //frameRate: 300   // increase speed
+    //         }
+    //     }
+    // }
 
     //Profile Screen
     Component {
@@ -315,7 +314,7 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     // mainWindow.profileScreen1(false)
-                                    mainWindow.openNewScreen();
+                                    mainWindow.openHomeScreen();
                                 }
                             }
                         }
@@ -1960,7 +1959,7 @@ Item {
                                 QGroundControl.saveGlobalSetting("loadpage", contentArea.buttonModel[contentArea.selectedIndex].label)
                                 mainWindow.showToastMessage(contentArea.buttonModel[contentArea.selectedIndex].label + " Selected")
 
-                                mainWindow.openNewScreen();
+                                mainWindow.openHomeScreen();
                                 //currentView = "profile"
                             }
                         }

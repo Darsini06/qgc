@@ -70,8 +70,8 @@ Rectangle {
             icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
             onClicked:              {
-               // mainWindow.newscreendata()
-                mainWindow.newscreen()
+
+                mainWindow.homescreen()
             }
             icon.color:"white"
         }

@@ -149,8 +149,7 @@ ApplicationWindow {
 
         // Reference Variable for MainRootWindow
         MapGlobals.rootWindow = mainWindow
-        //MapGlobals.loginLoader = login
-        //MapGlobals.newscreen   = newscreen
+
         MapGlobals.modeBtn1    = modebtn1
 
         //Initialize the Database and Create Tables
@@ -266,7 +265,7 @@ ApplicationWindow {
         takeoffbtn.visible=_guidedController.showLand && !_guidedController.showTakeoff
     }
 
-    function newscreen() {
+    function homescreen() {
 
         planbtn.visible =false
         listbtn.visible = false
@@ -278,8 +277,8 @@ ApplicationWindow {
         mainrootIcons.visible = false
         waypointbtn.visible = false
 
-        //newscreen.visible = true
-        mainWindow.openNewScreen()
+        //homescreen.visible = true
+        mainWindow.openHomeScreen()
 
     }
 
@@ -306,7 +305,7 @@ ApplicationWindow {
         modebtn1.visible = false
         mainrootIcons.visible = false
 
-        //newscreen.visible = false
+        //homescreen.visible = false
         mainWindow.closeScreens();
 
         waypointbtn.visible = true
@@ -324,7 +323,7 @@ ApplicationWindow {
         flyView.visible = true
         planView.visible = false
 
-        //newscreen.visible = false
+        //homescreen.visible = false
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
@@ -351,7 +350,7 @@ ApplicationWindow {
         flyView.visible = true
         planView.visible = false
 
-        //newscreen.visible = false
+        //homescreen.visible = false
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
@@ -379,7 +378,7 @@ ApplicationWindow {
         flyView.visible = true
         planView.visible = false
 
-        //newscreen.visible = false
+        //homescreen.visible = false
         mainWindow.closeScreens();
 
         modebtn1.visible = activeVehicle ? true : false
@@ -437,12 +436,6 @@ ApplicationWindow {
     function showToastMessage(text) {
         toastContainer.showToast(text)
     }
-
-    // function profileScreen1(comesFrom) {
-    //     console.log("profileScreen1==========")
-    //     profileScreen.visible = comesFrom
-    //     newscreen.visible = !comesFrom
-    // }
 
     Component {
         id: simpleMessageDialogComponent
@@ -797,12 +790,12 @@ ApplicationWindow {
         pageLoader.source = "qrc:/qml/LoginPages/WelcomeScreen.qml"
     }
 
-    function openNewScreen() {
-        pageLoader.source = "qrc:/qml/Newscreen.qml"
+    function openHomeScreen() {
+        pageLoader.source = "qrc:/qml/LoginPages/HomeScreen.qml"
     }
 
     function openProfileScreen() {
-        pageLoader.source = "qrc:/qml/ProfileScreenNew.qml"
+        pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
     function closeScreens() {

@@ -41,8 +41,7 @@ QtObject {
 
     //MainRootWindow reference variables.
     property var rootWindow
-    //property var loginLoader
-    //property var newscreen
+
     property var modeBtn1
 
     property string login: ""
@@ -582,7 +581,7 @@ QtObject {
     //             console.log("Login Success");
     //             result = true;
     //             //loginLoader.visible = false;
-    //             rootWindow.newscreen();
+    //             rootWindow.homescreen();
     //             rootWindow.showToastMessage("Login Successfully");
     //             login="login"
     //             QGroundControl.saveBoolGlobalSetting("login", true)
@@ -662,7 +661,7 @@ QtObject {
 
                 QGroundControl.saveBoolGlobalSetting("login", true);
 
-                rootWindow.newscreen();
+                rootWindow.homescreen();
                 rootWindow.showToastMessage("Login Successfully");
 
                 login="login"
@@ -685,7 +684,7 @@ QtObject {
     //     console.log("Login Success");
     //     result = true;
     //     //loginLoader.visible = false;
-    //     rootWindow.newscreen();
+    //     rootWindow.homescreen();
     //     rootWindow.showToastMessage("Login Successfully");
     //     login="login"
     //     QGroundControl.saveBoolGlobalSetting("login", true)
@@ -744,14 +743,14 @@ QtObject {
         if(loginpage===true) {
             console.log("profile method MapGLobals inside the IF")
             //loginLoader.visible = false;
-            rootWindow.newscreen();
+            rootWindow.homescreen();
             QGroundControl.saveBoolGlobalSetting("login", true)
             modeBtn1.visible = false
 
         } else {
             console.log("profile method MapGLobals inside the Else")
             //loginLoader.visible = true;
-            //newscreen.visible = false
+            //homescreen.visible = false
             rootWindow.openWelcomeScreen();
 
             console.log("Invalid Credentials");

@@ -64,6 +64,10 @@ qt_add_library(QmlControls STATIC
     ToolStripActionList.h
 
 
+
+
+
+
 )
 
 target_link_libraries(QmlControls
