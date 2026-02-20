@@ -60,6 +60,8 @@ class AirspaceZone : public QObject
     Q_PROPERTY(QString description READ description CONSTANT)
     Q_PROPERTY(bool isActive READ isActive CONSTANT)
     Q_PROPERTY(QGeoCoordinate iconPosition READ iconPosition CONSTANT)
+    Q_PROPERTY(double radius READ radius CONSTANT)
+    Q_PROPERTY(QVariant path READ path CONSTANT)
 
 public:
     explicit AirspaceZone(QObject* parent = nullptr);
@@ -80,6 +82,8 @@ public:
     QString description() const { return _description; }
     bool isActive() const { return _isActive; }
     QGeoCoordinate iconPosition() const { return _iconPosition; }
+    double radius() const { return _radius; }
+    QVariant path() const;
 
     // Setters
     void setName(const QString& name) { _name = name; }
@@ -89,6 +93,7 @@ public:
     void setMaxAltitude(double alt) { _maxAltitude = alt; }
     void setDescription(const QString& desc) { _description = desc; }
     void setIsActive(bool active) { _isActive = active; }
+    void setRadius(double r) { _radius = r; }
     void setProperties(const QJsonObject& props);
 
     // Utility methods
@@ -112,6 +117,7 @@ private:
     QString _description;
     bool _isActive;
     QGeoCoordinate _iconPosition;
+    double _radius = 0.0;
 };
 
 /**

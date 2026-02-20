@@ -1070,7 +1070,7 @@ Item {
                                                                 regConfirm.text = "";
 
                                                                 // Go into the app!
-                                                                MapGlobals.rootWindow.newscreen();
+                                                                MapGlobals.rootWindow.homescreen();
                                                             }
                                                         });
 

@@ -45,8 +45,7 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
-    property string backendUrl: "https://qgc-backend.onrender.com/api"
-    // property string backendUrl: "http://localhost:5000/api"
+    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
 
     function recenterMap() {
@@ -71,36 +70,15 @@ QtObject {
             try {
 
                 // Users table - simplified
-                tx.executeSql("CREATE TABLE IF NOT EXISTS users(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    displayname TEXT NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL,
-                    mobile_number TEXT,
-                    rpc_completed INTEGER DEFAULT 0,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )");
+                tx.executeSql("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, displayname TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, mobile_number TEXT, rpc_completed INTEGER DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
 
                 // Drone sessions table - simplified
-                tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    date TEXT NOT NULL,
-                    start_time TEXT NOT NULL,
-                    end_time TEXT NOT NULL,
-                    duration INTEGER
-                )");
+                tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL, duration INTEGER)");
 
 
                 //feedback table
-                tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (
-                               id INTEGER PRIMARY KEY AUTOINCREMENT,
-                               username TEXT,
-                               mobile_number TEXT,
-                               email TEXT,
-                               comments TEXT
-                           )");
+                tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, mobile_number TEXT, email TEXT, comments TEXT)");
 
                 console.log("Database and tables created successfully");
 
@@ -687,10 +665,10 @@ QtObject {
                         });
 
                     if (rootWindow) {
-                        rootWindow.newscreen();
-                rootWindow.showToastMessage("Login Successfully");
+                        rootWindow.homescreen();
+                        rootWindow.showToastMessage("Login Successfully");
                     } else {
-                        console.error("MapGlobals: rootWindow is null, cannot navigate to newscreen");
+                        console.error("MapGlobals: rootWindow is null, cannot navigate to homescreen");
                     }
                         login = "login";
 

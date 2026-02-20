@@ -235,6 +235,15 @@ bool AirspaceZone::intersectsPath(const QList<QGeoCoordinate>& path) const
     return false;
 }
 
+QVariant AirspaceZone::path() const
+{
+    QVariantList list;
+    for (const QGeoCoordinate& coord : _polygon.perimeter()) {
+        list.append(QVariant::fromValue(coord));
+    }
+    return QVariant::fromValue(list);
+}
+
 //-----------------------------------------------------------------------------
 // AirspaceManager Implementation
 //-----------------------------------------------------------------------------
@@ -320,9 +329,27 @@ void AirspaceManager::fetchAirspaceData(double minLat, double minLon, double max
         qDebug() << "AirspaceManager: Loading from cache (offline mode)";
         QList<AirspaceZone*> cachedZones = _loadFromCache(bbox);
         if (!cachedZones.isEmpty()) {
-            qDeleteAll(_zones);
-            _zones = cachedZones;
-            _updateZonesVariantList();
+            // Merge cached zones
+            int addedCount = 0;
+            for (AirspaceZone* cachedZone : cachedZones) {
+                bool isDuplicate = false;
+                for (AirspaceZone* existingZone : _zones) {
+                    if (existingZone->name() == cachedZone->name() && 
+                        existingZone->zoneType() == cachedZone->zoneType()) {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+                if (isDuplicate) {
+                    delete cachedZone;
+                } else {
+                    _zones.append(cachedZone);
+                    addedCount++;
+                }
+            }
+            if (addedCount > 0) {
+                _updateZonesVariantList();
+            }
             return;
         }
     }
@@ -386,9 +413,25 @@ void AirspaceManager::_handleNetworkReply()
             qDebug() << "AirspaceManager: Falling back to cache";
             QList<AirspaceZone*> cachedZones = _loadFromCache(_currentBbox);
             if (!cachedZones.isEmpty()) {
-                qDeleteAll(_zones);
-                _zones = cachedZones;
-                _updateZonesVariantList();
+                int addedCount = 0;
+                for (AirspaceZone* cachedZone : cachedZones) {
+                    bool isDuplicate = false;
+                    for (AirspaceZone* existingZone : _zones) {
+                        if (existingZone->name() == cachedZone->name()) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    if (isDuplicate) {
+                        delete cachedZone;
+                    } else {
+                        _zones.append(cachedZone);
+                        addedCount++;
+                    }
+                }
+                if (addedCount > 0) {
+                    _updateZonesVariantList();
+                }
             }
         }
     }
@@ -518,10 +561,37 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
         }
     }
 
-    // Replace existing zones
-    qDeleteAll(_zones);
-    _zones = newZones;
-    _updateZonesVariantList();
+    // Merge with existing zones instead of replacing
+    int addedCount = 0;
+    for (AirspaceZone* newZone : newZones) {
+        bool isDuplicate = false;
+        for (AirspaceZone* existingZone : _zones) {
+            // Check for potential duplicate by name and zone type
+            if (existingZone->name() == newZone->name() && 
+                existingZone->zoneType() == newZone->zoneType()) {
+                
+                // Fine-grained check: compare coordinate count and first point
+                if (existingZone->coordinates().size() == newZone->coordinates().size()) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+        }
+
+        if (isDuplicate) {
+            delete newZone;
+        } else {
+            _zones.append(newZone);
+            addedCount++;
+        }
+    }
+
+    if (addedCount > 0) {
+        qInfo() << "AirspaceManager: Added" << addedCount << "new unique zones. Total zones now:" << _zones.size();
+        _updateZonesVariantList();
+    } else {
+        qInfo() << "AirspaceManager: No new unique zones found in this area.";
+    }
 
     // Save to cache
     _saveToCache(_zones);
@@ -572,6 +642,7 @@ AirspaceZone* AirspaceManager::_parseGeoJsonFeature(const QJsonObject& feature)
         double radiusKm = 0;
         if (properties.contains("radius")) {
              radiusKm = properties["radius"].toDouble();
+             zone->setRadius(radiusKm * 1000.0); // Store in meters
         }
         
         if (radiusKm > 0) {

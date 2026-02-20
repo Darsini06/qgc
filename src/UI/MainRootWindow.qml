@@ -160,7 +160,7 @@ ApplicationWindow {
         MapGlobals.profile()
 
         // Print all Session Table Datas. Just For Reference
-        MapGlobals.printSessionTable()
+        // MapGlobals.printSessionTable()
 
         if(_appSettings.screen==="Plan"){
             plan="Plan"

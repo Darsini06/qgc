@@ -30,19 +30,28 @@ Item {
 
     visible: showAirspace && airspaceManager
 
-    // Auto-fetch airspace data when map moves
+    property var _lastFetchCenter: QtPositioning.coordinate(0, 0)
+    property real _lastFetchZoom: 0
+
+    // Auto-fetch airspace data when map moves significantly
     Connections {
         target: map
         
         function onCenterChanged() {
             if (_root.visible && airspaceManager) {
-                _fetchTimer.restart()
+                var distanceMoved = map.center.distanceTo(_lastFetchCenter)
+                // Threshold: 500m or if zoom changed
+                if (distanceMoved > 500) {
+                    _fetchTimer.restart()
+                }
             }
         }
         
         function onZoomLevelChanged() {
             if (_root.visible && airspaceManager) {
-                _fetchTimer.restart()
+                if (Math.abs(map.zoomLevel - _lastFetchZoom) > 0.5) {
+                    _fetchTimer.restart()
+                }
             }
         }
 
@@ -56,11 +65,13 @@ Item {
     // Debounce timer for fetching airspace data
     Timer {
         id: _fetchTimer
-        interval: 1000
+        interval: 1500 // Increased debounce for smoother panning
         repeat: false
         onTriggered: {
             if (map && airspaceManager) {
                 _fetchAirspaceForCurrentView()
+                _lastFetchCenter = map.center
+                _lastFetchZoom = map.zoomLevel
             }
         }
     }
@@ -70,79 +81,61 @@ Item {
         if (!map || !map.mapReady) return
 
         var region = map.visibleRegion
-        if (!region) {
-            console.log("AirspaceMapOverlay: No visibleRegion yet")
-            return
-        }
+        if (!region) return
 
-        // In Qt 6, visibleRegion is a QGeoShape. Try to get a rectangle.
         var bbox = region.boundingGeoRectangle ? region.boundingGeoRectangle() : region
-        
-        if (!bbox || isNaN(bbox.center.latitude) || isNaN(bbox.center.longitude)) {
-            // console.log("AirspaceMapOverlay: BBOX center is NaN - map probably not initialized")
-            return
-        }
+        if (!bbox || isNaN(bbox.center.latitude)) return
 
         var topLeft = bbox.topLeft
         var bottomRight = bbox.bottomRight
 
-        if (!topLeft || !bottomRight || isNaN(topLeft.latitude) || isNaN(bottomRight.latitude)) {
-            console.log("AirspaceMapOverlay: Invalid topLeft/bottomRight coordinates")
-            return
-        }
-
-        // Add buffer to bbox (10% on each side)
+        // Add buffer (expanded to 20% for "static" feel as you pan)
         var latDiff = Math.abs(topLeft.latitude - bottomRight.latitude)
         var lonDiff = Math.abs(bottomRight.longitude - topLeft.longitude)
         
-        if (latDiff === 0 || lonDiff === 0) {
-            // console.log("AirspaceMapOverlay: Zero size bbox - too zoomed in or not ready")
-            return
-        }
+        if (latDiff === 0 || lonDiff === 0) return
 
-        // Buffer added to bbox
-        var latBuffer = latDiff * 0.1
-        var lonBuffer = lonDiff * 0.1
+        var latBuffer = latDiff * 0.2
+        var lonBuffer = lonDiff * 0.2
 
         var minLat = Math.min(topLeft.latitude, bottomRight.latitude) - latBuffer
         var maxLat = Math.max(topLeft.latitude, bottomRight.latitude) + latBuffer
         var minLon = Math.min(topLeft.longitude, bottomRight.longitude) - lonBuffer
         var maxLon = Math.max(topLeft.longitude, bottomRight.longitude) + lonBuffer
 
-        // console.log("AirspaceMapOverlay: Fetching data for BBOX:", minLat.toFixed(4), minLon.toFixed(4), "to", maxLat.toFixed(4), maxLon.toFixed(4))
         airspaceManager.fetchAirspaceData(minLat, minLon, maxLat, maxLon)
     }
 
     // Render airspace zones using MapItemView for correct map coordinate rendering
     MapItemView {
         id:                 mapItemsView
-        parent:             _root.map // ENSURE this is a direct child of the Map for rendering
+        parent:             _root.map 
         model:              airspaceManager ? airspaceManager.zones : []
         visible:            _root.visible
         
         delegate: MapItemGroup {
             id: zoneGroup
-
             property var zone: modelData
 
-            // The Polygon
-            MapPolygon {
-                id: zonePolygon
+            // Circle rendering (Faster for point-based zones)
+            MapCircle {
+                visible: zone.radius > 0
+                center: zone.iconPosition
+                radius: zone.radius
                 color: zone.fillColor
                 opacity: zone.fillOpacity
                 border.color: zone.borderColor
                 border.width: zone.borderWidth
-                path: {
-                    var pathArray = []
-                    var coords = zone.coordinates
-                    for (var i = 0; i < coords.length; i++) {
-                        var coord = coords[i]
-                        if (coord.length >= 2) {
-                            pathArray.push(QtPositioning.coordinate(coord[1], coord[0]))
-                        }
-                    }
-                    return pathArray
-                }
+            }
+
+            // Polygon rendering
+            MapPolygon {
+                visible: zone.radius === 0
+                color: zone.fillColor
+                opacity: zone.fillOpacity
+                border.color: zone.borderColor
+                border.width: zone.borderWidth
+                path: zone.path // Direct C++ property, no JS loop
             }
 
             // Zone label (Hidden by default, shown on click via popup)
