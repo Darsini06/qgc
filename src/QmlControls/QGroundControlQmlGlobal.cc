@@ -21,6 +21,7 @@
 #include "GPSManager.h"
 #endif
 #include "QGCPalette.h"
+#include "AirspaceManager.h"
 #ifdef QT_DEBUG
 #include "MockLink.h"
 #endif
@@ -95,6 +96,7 @@ void QGroundControlQmlGlobal::setToolbox(QGCToolbox* toolbox)
 #ifdef QGC_UTM_ADAPTER
     _utmspManager            = toolbox->utmspManager();
 #endif
+    _airspaceManager         = toolbox->airspaceManager();
 }
 
 void QGroundControlQmlGlobal::saveGlobalSetting (const QString& key, const QString& value)

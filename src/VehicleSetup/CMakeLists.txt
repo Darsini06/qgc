@@ -25,7 +25,11 @@ target_link_libraries(VehicleSetup
         Joystick
 )
 
-target_include_directories(VehicleSetup PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(VehicleSetup PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../FactSystem
+    ${CMAKE_CURRENT_SOURCE_DIR}/../FactSystem/FactControls
+)
 
 if(NOT QGC_NO_SERIAL_LINK)
     target_sources(VehicleSetup

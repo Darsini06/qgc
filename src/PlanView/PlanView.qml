@@ -81,6 +81,13 @@ Item {
     property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+    
+    property var _airspaceValidator: {
+        if (QGroundControl.airspaceManager) {
+            return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)
+        }
+        return null
+    }
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
@@ -346,6 +353,14 @@ Item {
                 console.log("upload_clicked")
                 return
             }
+
+            if (_airspaceValidator) {
+                if (!_airspaceValidator.validateMission(_missionController)) {
+                    _airspaceRestrictionDialog.open()
+                    return
+                }
+            }
+
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
                 sendToVehicle()
@@ -536,8 +551,12 @@ Item {
                                close()
 
 
-                               mainWindow.showPlanView()
+                                mainWindow.showPlanView()
                            }
+    }
+
+    AirspaceRestrictionDialog {
+        id: _airspaceRestrictionDialog
     }
 
     TransectStyleMapVisuals {

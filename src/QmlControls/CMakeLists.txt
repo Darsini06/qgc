@@ -101,9 +101,13 @@ target_link_libraries(QmlControls
         UTMSP
         Vehicle
         VideoManager
+        Airspace
 )
 
-target_include_directories(QmlControls PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(QmlControls PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Airspace
+)
 
 # file(GLOB_RECURSE QML_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*.qml)
 # qt_add_qml_module(QmlControls

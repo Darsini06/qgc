@@ -27,8 +27,10 @@ import QGroundControl.QGCPositionManager
 Map {
     id: _map
 
-    plugin:     Plugin { name: "QGroundControl" }
-    opacity:    0.99 // https://bugreports.qt.io/browse/QTBUG-82185
+    plugin:              Plugin { name: "QGroundControl" }
+    opacity:             0.99 // https://bugreports.qt.io/browse/QTBUG-82185
+    // prefetchingEnabled:  true  // Not supported in Qt 6.6+ Map or causing issues
+    // copyrightsVisible:   false // Not supported in Qt 6.6+ Map or causing issues
 
     bearing: MapGlobals.mapRotation
 
@@ -262,6 +264,12 @@ Map {
     VehicleMapItem {
         id: myVehicleItem
         mapRotation: mapRotation  // <-- pass the rotation value
+    }
+
+    AirspaceMapOverlay {
+        id:                 airspaceOverlay
+        map:                _map
+        airspaceManager:    QGroundControl.airspaceManager
     }
 
 

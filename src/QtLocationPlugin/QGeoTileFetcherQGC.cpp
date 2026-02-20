@@ -108,14 +108,14 @@ QNetworkRequest QGeoTileFetcherQGC::getNetworkRequest(int mapId, int x, int y, i
     if (!token.isEmpty()) {
         request.setRawHeader(QByteArrayLiteral("User-Token"), token);
     }
-    // request.setOriginatingObject(this);
+    request.setAttribute(QNetworkRequest::Http2AllowedAttribute, true);         // Enable HTTP/2 multiplexing
     request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
     request.setAttribute(QNetworkRequest::BackgroundRequestAttribute, true);
     request.setAttribute(QNetworkRequest::CacheSaveControlAttribute, true);
     request.setAttribute(QNetworkRequest::DoNotBufferUploadDataAttribute, false);
     // request.setAttribute(QNetworkRequest::AutoDeleteReplyOnFinishAttribute, true);
     request.setPriority(QNetworkRequest::NormalPriority);
-    request.setTransferTimeout(10000);
+    request.setTransferTimeout(5000);  // 5s per tile: faster failure recovery
 
     return request;
 }

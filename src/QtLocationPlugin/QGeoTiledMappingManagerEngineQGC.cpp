@@ -91,11 +91,11 @@ QGeoTiledMappingManagerEngineQGC::QGeoTiledMappingManagerEngineQGC(const QVarian
             proxy.setType(QNetworkProxy::DefaultProxy);
             m_networkManager->setProxy(proxy);
         #endif
-        m_networkManager->setTransferTimeout(10000);
+        m_networkManager->setTransferTimeout(5000);  // 5s: faster failure recovery
         // m_networkManager->setAutoDeleteReplies(true);
         QNetworkDiskCache *const diskCache = new QNetworkDiskCache(this);
         diskCache->setCacheDirectory(fileTileCache->getCachePath() + "/Downloads");
-        const qint64 maxCacheSize = (50 * pow(1024, 2)); // fileTileCache->getMaxDiskCache()
+        const qint64 maxCacheSize = (200 * pow(1024, 2)); // 200MB HTTP disk cache
         diskCache->setMaximumCacheSize(maxCacheSize);
         m_networkManager->setCache(diskCache);
     }

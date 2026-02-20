@@ -1046,24 +1046,33 @@ Item {
                                     if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
                                     if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
 
-                                    MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result) {
-                                        if (result) {
+                                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result, response) {
+                                                            if (result) {
+                                                                mainWindow.showToastMessage("Account created successfully!");
+                                                                
+                                                                // Use response data if available, otherwise fallback to form fields
+                                                                var user = (response && response.user) ? response.user : {
+                                                                    "username": regUser.text,
+                                                                    "displayname": regDisplay.text,
+                                                                    "email": regEmail.text
+                                                                };
 
-                                            mainWindow.showToastMessage("Account created successfully!");
+                                                                QGroundControl.saveGlobalSetting("username", user.username);
+                                                                QGroundControl.saveGlobalSetting("name", user.displayname);
+                                                                QGroundControl.saveGlobalSetting("email", user.email);
+                                                                QGroundControl.saveBoolGlobalSetting("login", true);
 
-                                            currentView = "signin";
+                                                                // Clear fields
+                                                                regUser.text = "";
+                                                                regDisplay.text = "";
+                                                                regEmail.text = "";
+                                                                regPass.text = "";
+                                                                regConfirm.text = "";
 
-                                            QGroundControl.saveGlobalSetting("username", regUser.text);
-                                            QGroundControl.saveGlobalSetting("name", regDisplay.text);
-                                            QGroundControl.saveGlobalSetting("email", regEmail.text);
-
-                                            regUser.text = "";
-                                            regDisplay.text = "";
-                                            regEmail.text = "";
-                                            regPass.text = "";
-                                            regConfirm.text = "";
-                                        }
-                                    });
+                                                                // Go into the app!
+                                                                MapGlobals.rootWindow.newscreen();
+                                                            }
+                                                        });
 
                                 }
                             }

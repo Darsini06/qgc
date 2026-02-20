@@ -50,7 +50,11 @@ if(QGC_VIEWER3D)
             Qt6::Xml
     )
 
-    target_include_directories(Viewer3D PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    target_include_directories(Viewer3D PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../FactSystem
+        ${CMAKE_CURRENT_SOURCE_DIR}/../MissionManager
+    )
 
     target_compile_definitions(Viewer3D PUBLIC QGC_VIEWER3D)
 

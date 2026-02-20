@@ -32,6 +32,7 @@ class AirLinkManager;
 #ifdef QGC_UTM_ADAPTER
 class UTMSPManager;
 #endif
+class AirspaceManager;
 
 /// This is used to manage all of our top level services/tools
 class QGCToolbox : public QObject {
@@ -60,6 +61,7 @@ public:
 #ifdef QGC_UTM_ADAPTER
     UTMSPManager*                utmspManager             () { return _utmspManager; }
 #endif
+    AirspaceManager*             airspaceManager          () { return _airspaceManager; }
 
 private:
     void setChildToolboxes(void);
@@ -86,6 +88,7 @@ private:
 #ifdef QGC_UTM_ADAPTER
     UTMSPManager*                _utmspManager            = nullptr;
 #endif
+    AirspaceManager*             _airspaceManager         = nullptr;
     friend class QGCApplication;
 };
 

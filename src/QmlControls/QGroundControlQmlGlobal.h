@@ -33,6 +33,7 @@ class SettingsManager;
 class VideoManager;
 class UTMSPManager;
 class AirLinkManager;
+class AirspaceManager;
 
 Q_MOC_INCLUDE("ADSBVehicleManager.h")
 Q_MOC_INCLUDE("FactGroup.h")
@@ -52,6 +53,7 @@ Q_MOC_INCLUDE("UTMSPManager.h")
 #ifndef QGC_AIRLINK_DISABLED
 Q_MOC_INCLUDE("AirLinkManager.h")
 #endif
+Q_MOC_INCLUDE("AirspaceManager.h")
 
 class QGroundControlQmlGlobal : public QGCTool
 {
@@ -131,6 +133,7 @@ public:
 #ifdef QGC_UTM_ADAPTER
     Q_PROPERTY(UTMSPManager*     utmspManager             READ    utmspManager                CONSTANT)
 #endif
+    Q_PROPERTY(AirspaceManager*  airspaceManager          READ    airspaceManager             CONSTANT)
 
     Q_INVOKABLE void    saveGlobalSetting       (const QString& key, const QString& value);
     Q_INVOKABLE QString loadGlobalSetting       (const QString& key, const QString& defaultValue);
@@ -195,6 +198,7 @@ public:
 #ifdef QGC_UTM_ADAPTER
     UTMSPManager*            utmspManager         ()  {return _utmspManager;}
 #endif
+    AirspaceManager*         airspaceManager      ()  {return _airspaceManager;}
 
     qreal zOrderTopMost             () { return 1000; }
     qreal zOrderWidgets             () { return 100; }
@@ -278,6 +282,7 @@ private:
 #ifdef QGC_UTM_ADAPTER
     UTMSPManager*            _utmspManager;
 #endif
+    AirspaceManager*         _airspaceManager        = nullptr;
 
     bool                    _skipSetupPage          = false;
     QStringList             _altitudeModeEnumString;

@@ -25,7 +25,7 @@ import QGroundControl.Vehicle
 
 import MapGlobals 1.0
 
-FlightMap {
+ FlightMap {
     id:                         _root
     allowGCSLocationCenter:     true
     allowVehicleLocationCenter: !_keepVehicleCentered

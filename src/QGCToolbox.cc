@@ -26,6 +26,7 @@
 #ifndef QGC_AIRLINK_DISABLED
 #include "AirLinkManager.h"
 #endif
+#include "AirspaceManager.h"
 
 #if defined(QGC_CUSTOM_BUILD)
 #include CUSTOMHEADER
@@ -62,6 +63,7 @@ QGCToolbox::QGCToolbox(QGCApplication* app)
 #ifdef QGC_UTM_ADAPTER
     _utmspManager            = new UTMSPManager               (app, this);
 #endif
+    _airspaceManager         = new AirspaceManager            (this, app);
 }
 
 void QGCToolbox::setChildToolboxes(void)

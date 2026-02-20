@@ -41,6 +41,8 @@ Item {
     property bool   activationErrorFlag
 
 
+    property alias indicatorVisible: flightStatusIndicator.visible
+
     signal activationTriggered(bool value)
 
     onActivationApprovalChanged: {
@@ -216,6 +218,7 @@ Item {
     }
 
     UTMSPFlightStatusIndicator {
+        id: flightStatusIndicator
     //TODO: add conformance notification
     }
 

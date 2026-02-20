@@ -183,7 +183,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
                         // loginUserFunc(loginUser.text, loginPass.text)
-                        mainWindow.loginUserFunc(loginUser.text, loginPass.text)
+                        MapGlobals.loginUserFunc(loginUser.text, loginPass.text)
                     }
 
                     contentItem: Text {

@@ -1012,6 +1012,15 @@ QGCCacheWorker::_connectDB()
     _db->setDatabaseName(_databasePath);
     _db->setConnectOptions("QSQLITE_ENABLE_SHARED_CACHE");
     _valid = _db->open();
+    if (_valid) {
+        // Performance pragmas: WAL mode for concurrent reads+writes, larger cache
+        QSqlQuery q(*_db);
+        q.exec("PRAGMA journal_mode=WAL");          // Non-blocking concurrent reads
+        q.exec("PRAGMA synchronous=NORMAL");        // Faster writes, safe with WAL
+        q.exec("PRAGMA cache_size=4000");           // ~16MB page cache in SQLite
+        q.exec("PRAGMA temp_store=MEMORY");         // Temp tables in RAM
+        q.exec("PRAGMA mmap_size=268435456");       // 256MB memory-mapped I/O
+    }
     return _valid;
 }
 

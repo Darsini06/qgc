@@ -42,10 +42,10 @@ private:
     static QString _getCachePath(const QVariantMap &parameters);
     static uint32_t _getMemLimit(const QVariantMap &Parameters);
 
-    static uint32_t _getDefaultMaxMemLimit() { return (3 * pow(1024, 2)); }
-    static uint32_t _getDefaultMaxDiskCache() { return 0; } // (50 * pow(1024, 2));
-    static uint32_t _getDefaultExtraTexture() { return (6 * pow(1024, 2)); }
-    static uint32_t _getDefaultMinTexture() { return 0; }
+    static uint32_t _getDefaultMaxMemLimit() { return (64 * pow(1024, 2)); }   // 64MB RAM tile cache
+    static uint32_t _getDefaultMaxDiskCache() { return (200 * pow(1024, 2)); } // 200MB disk fallback
+    static uint32_t _getDefaultExtraTexture() { return (32 * pow(1024, 2)); }  // 32MB GPU texture cache
+    static uint32_t _getDefaultMinTexture() { return (8 * pow(1024, 2)); }     // 8MB min texture budget
 
     static quint32 _getMaxMemCacheSetting();
 

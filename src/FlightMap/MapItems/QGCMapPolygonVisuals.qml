@@ -328,7 +328,7 @@ Item {
 
     Connections {
         target: mapPolygon
-        onTraceModeChanged: {
+        function onTraceModeChanged() {
             if (mapPolygon.traceMode) {
                 _instructionText = _traceText
                 // _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)

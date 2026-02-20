@@ -106,6 +106,8 @@
 #include "FirmwareUpgradeController.h"
 #include "SerialLink.h"
 #endif
+#include "AirspaceManager.h"
+#include "AirspaceRestrictionValidator.h"
 
 #ifdef Q_OS_LINUX
 #ifndef Q_OS_ANDROID
@@ -344,6 +346,10 @@ void QGCApplication::init()
     // #ifdef QGC_VIEWER3D
     Viewer3DManager::registerQmlTypes();
     // #endif
+
+    qmlRegisterUncreatableType<AirspaceManager>         ("QGroundControl", 1, 0, "AirspaceManager",             "Reference only");
+    qmlRegisterUncreatableType<AirspaceZone>            ("QGroundControl", 1, 0, "AirspaceZone",                "Reference only");
+    qmlRegisterType<AirspaceRestrictionValidator>       ("QGroundControl", 1, 0, "AirspaceRestrictionValidator");
 
     qmlRegisterUncreatableType<Autotune>              ("QGroundControl.Vehicle",   1, 0, "Autotune",               "Reference only");
     qmlRegisterUncreatableType<RemoteIDManager>       ("QGroundControl.Vehicle",   1, 0, "RemoteIDManager",        "Reference only");
@@ -856,16 +862,18 @@ bool QGCApplication::event(QEvent *e)
         // On OSX if the user selects Quit from the menu (or Command-Q) the ApplicationWindow does not signal closing. Instead you get a Quit event here only.
         // This in turn causes the standard QGC shutdown sequence to not run. So in this case we close the window ourselves such that the
         // signal is sent and the normal shutdown sequence runs.
-        const bool forceClose = _mainRootWindow->property("_forceClose").toBool();
-        qCDebug(QGCApplicationLog) << "Quit event" << forceClose;
-        // forceClose
-        //  true:   Standard QGC shutdown sequence is complete. Let the app quit normally by falling through to the base class processing.
-        //  false:  QGC shutdown sequence has not been run yet. Don't let this event close the app yet. Close the main window to kick off the normal shutdown.
-        if (!forceClose) {
-            //
-            _mainRootWindow->close();
-            e->ignore();
-            return true;
+        if (_mainRootWindow) {
+            const bool forceClose = _mainRootWindow->property("_forceClose").toBool();
+            qCDebug(QGCApplicationLog) << "Quit event" << forceClose;
+            // forceClose
+            //  true:   Standard QGC shutdown sequence is complete. Let the app quit normally by falling through to the base class processing.
+            //  false:  QGC shutdown sequence has not been run yet. Don't let this event close the app yet. Close the main window to kick off the normal shutdown.
+            if (!forceClose) {
+                //
+                _mainRootWindow->close();
+                e->ignore();
+                return true;
+            }
         }
     }
     return QApplication::event(e);

@@ -24,39 +24,39 @@ if(QGC_UTM_ADAPTER)
     add_definitions(-DQGC_UTM_ADAPTER)
 endif()
 
-add_subdirectory(ADSB)
-add_subdirectory(AirLink)
-add_subdirectory(AnalyzeView)
 add_subdirectory(API)
-add_subdirectory(Audio)
-add_subdirectory(AutoPilotPlugins)
-add_subdirectory(Camera)
 add_subdirectory(Comms)
 add_subdirectory(FactSystem)
 add_subdirectory(FirmwarePlugin)
-# add_subdirectory(FirstRunPromptDialogs)
-# add_subdirectory(FlightDisplay)
-# add_subdirectory(FlightMap)
-add_subdirectory(FollowMe)
-add_subdirectory(Geo)
-add_subdirectory(Gimbal)
-add_subdirectory(GPS)
-add_subdirectory(Joystick)
+add_subdirectory(Audio)
 add_subdirectory(MAVLink)
+add_subdirectory(GPS)
+add_subdirectory(Geo)
+add_subdirectory(Joystick)
+add_subdirectory(ADSB)
+add_subdirectory(AirLink)
+add_subdirectory(AnalyzeView)
+add_subdirectory(AutoPilotPlugins)
+add_subdirectory(Camera)
+add_subdirectory(FollowMe)
+add_subdirectory(Gimbal)
 add_subdirectory(MissionManager)
-# add_subdirectory(PlanView)
 add_subdirectory(PositionManager)
 add_subdirectory(QmlControls)
 add_subdirectory(QtLocationPlugin)
 add_subdirectory(Settings)
 add_subdirectory(Terrain)
-# add_subdirectory(UI)
 add_subdirectory(Utilities)
 add_subdirectory(UTMSP)
 add_subdirectory(Vehicle)
 add_subdirectory(VehicleSetup)
 add_subdirectory(VideoManager)
 add_subdirectory(Viewer3D)
+add_subdirectory(Airspace)
+add_subdirectory(FlightMap)
+add_subdirectory(FlightDisplay)
+add_subdirectory(PlanView)
+add_subdirectory(UI)
 
 #######################################################
 #               Linking Libraries
@@ -71,6 +71,7 @@ target_link_libraries(QGC
         API
         ADSB
         AirLink
+        Airspace
         AnalyzeView
         Audio
         AutoPilotPlugins
@@ -80,21 +81,21 @@ target_link_libraries(QGC
         FactSystem
         FirmwarePlugin
         # FirstRunPromptDialogs
-        # FlightMap
-        # FlightDisplay
+        FlightMap
+        FlightDisplay
         FollowMe
         Gimbal
         GPS
         Joystick
         MAVLink
         MissionManager
-        # PlanView
+        PlanView
         PositionManager
         QGCLocation
         QmlControls
         Settings
         Terrain
-        # UI
+        UI
         Utilities
         UTMSP
         Vehicle
@@ -130,6 +131,7 @@ if(ANDROID)
             Qt6::Core
             Comms
             Joystick
+            qtandroidserialport
     )
 
     target_include_directories(QGC PUBLIC ${CMAKE_SOURCE_DIR}/android/src)

@@ -17,6 +17,8 @@ import QtPositioning
 import QtQuick.Window
 import QtQml.Models
 
+import MapGlobals 1.0
+
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.Controllers

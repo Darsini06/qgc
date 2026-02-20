@@ -28,6 +28,10 @@ bool ShapeFileHelper::_fileIsKML(const QString& file, QString& errorString)
 {
     errorString.clear();
 
+    if (file.isEmpty() || file.startsWith("http://") || file.startsWith("https://")) {
+        return false;
+    }
+
     if (file.endsWith(AppSettings::kmlFileExtension)) {
         return true;
     } else if (file.endsWith(AppSettings::shpFileExtension)) {

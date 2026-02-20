@@ -8,7 +8,7 @@ if(QGC_UTM_ADAPTER)
     message(STATUS "UTMSP is Initialized")
     add_definitions(-DQGC_UTM_ADAPTER)
 
-    if(NOT nlohmann_json_FOUND)
+    if(NOT TARGET nlohmann_json)
         message(STATUS "UTMSP: Fetching nlohmann/json")
         include(FetchContent)
         FetchContent_Declare(json
@@ -17,6 +17,25 @@ if(QGC_UTM_ADAPTER)
             GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(json)
+    endif()
+
+    if(TARGET nlohmann_json)
+        get_target_property(_json_src_dir nlohmann_json SOURCE_DIR)
+        if(_json_src_dir)
+             target_include_directories(UTMSP PUBLIC "$<BUILD_INTERFACE:${_json_src_dir}/single_include>")
+        endif()
+    endif()
+
+    # Fallback: look for nlohmann_json in standard FetchContent locations in _deps to ensure we match the version used by libevents (v3.11.3 usually)
+    # This avoids "different version" conflicts with libevents' internal copy.
+    if(EXISTS "${CMAKE_BINARY_DIR}/_deps/json-src/single_include")
+        target_include_directories(UTMSP PUBLIC "${CMAKE_BINARY_DIR}/_deps/json-src/single_include")
+    elseif(EXISTS "${CMAKE_BINARY_DIR}/_deps/nlohmann_json-src/single_include")
+         target_include_directories(UTMSP PUBLIC "${CMAKE_BINARY_DIR}/_deps/nlohmann_json-src/single_include")
+    elseif(EXISTS "${CMAKE_SOURCE_DIR}/libs/libevents/libevents/libs/cpp/parse/nlohmann_json/single_include")
+         # Last resort: local copy, but this is risky if versions mismatch
+         # message(WARNING "Using local nlohmann_json. This may conflict if libevents uses a different version.")
+         # target_include_directories(UTMSP PUBLIC "${CMAKE_SOURCE_DIR}/libs/libevents/libevents/libs/cpp/parse/nlohmann_json/single_include")
     endif()
 
     find_package(Qt6 REQUIRED COMPONENTS Network Positioning Qml)

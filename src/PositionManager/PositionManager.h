@@ -58,6 +58,7 @@ signals:
     void gcsHeadingChanged(qreal gcsHeading);
     void positionInfoUpdated(QGeoPositionInfo update);
     void gcsPositionHorizontalAccuracyChanged(qreal gcsPositionHorizontalAccuracy);
+    void permissionGranted();
 
 private slots:
     void _positionUpdated(const QGeoPositionInfo &update);

@@ -58,8 +58,11 @@ void QGCPositionManager::_handlePermissionStatus(Qt::PermissionStatus permission
 {
     if (permissionStatus == Qt::PermissionStatus::Granted) {
         _setupPositionSources();
+        emit permissionGranted();
     } else {
         qCWarning(QGCPositionManagerLog) << Q_FUNC_INFO << "Location Permission Denied";
+        // Even if denied, we might want to signal that the flow is over so the app can "proceed"
+        emit permissionGranted();
     }
 }
 
@@ -69,8 +72,10 @@ void QGCPositionManager::_handleBluetoothPermissionStatus(Qt::PermissionStatus s
     if (status == Qt::PermissionStatus::Granted) {
         qDebug() << "Bluetooth Permission Granted";
         // You can start Bluetooth services here if needed
+        emit permissionGranted();
     } else {
         qCWarning(QGCPositionManagerLog) << Q_FUNC_INFO << "Bluetooth Permission Denied";
+        emit permissionGranted();
     }
 }
 

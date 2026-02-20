@@ -9,6 +9,7 @@
 
 #include "UTMSPNetworkRemoteIDManager.h"
 #include "UTMSPLogger.h"
+#include <sstream>
 
 UTMSPNetworkRemoteIDManager::UTMSPNetworkRemoteIDManager(std::shared_ptr<Dispatcher> dispatcher):
     _dispatcher(dispatcher)

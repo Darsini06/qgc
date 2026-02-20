@@ -45,6 +45,8 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
+    property string backendUrl: "https://qgc-backend.onrender.com/api"
+    // property string backendUrl: "http://localhost:5000/api"
 
 
     function recenterMap() {
@@ -111,75 +113,56 @@ QtObject {
     //saveDroneSession
     function saveDroneSession(date, startTime, endTime) {
         console.log("MapGlobals.saveDroneSession()")
-        var db = MapGlobals.getDatabase();
-        db.transaction(function(tx) {
-            try {
-                // Calculate duration in minutes
-                var duration = calculateDuration(startTime, endTime);
+        var duration = calculateDuration(startTime, endTime);
+        var data = {
+            "username": QGroundControl.loadGlobalSetting("username", "Guest"),
+            "date": date,
+            "start_time": startTime,
+            "end_time": endTime,
+            "duration": duration
+        };
 
-                // Insert session with duration
-                var rs = tx.executeSql(
-                            "INSERT INTO drone_sessions(date, start_time, end_time, duration) VALUES(?, ?, ?, ?)",
-                            [date, startTime, endTime, duration]
-                            );
-
-                if (rs.rowsAffected > 0) {
-                    console.log("Session saved - ID:", rs.insertId,
-                                "Date:", date,
-                                "Start:", startTime,
-                                "End:", endTime,
-                                "Duration:", duration, "minutes");
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/sessions");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    console.log("Session saved successfully:", xhr.responseText);
                     sessionSaved = true;
-                    newSessionAdded(); // Emit signal to notify other components
+                    newSessionAdded();
+                } else {
+                    console.error("Error saving session:", xhr.responseText);
                 }
-
-            } catch (error) {
-                console.error("Error saving drone session:", error);
             }
-        });
+        }
+        xhr.send(JSON.stringify(data));
     }
 
     function insertFeedback(username, mobile_number, email, comments, callback) {
         console.log("MapGlobals.insertFeedback()")
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
+        var data = {
+            "username": username,
+            "mobile_number": mobile_number,
+            "email": email,
+            "comments": comments
+        };
 
-                console.log("=== ALL FEEDBACK BEFORE INSERT ===");
-                var beforeInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
-                printFeedbackTable(beforeInsert, "BEFORE INSERT");
-
-                // Insert new feedback
-                var rs = tx.executeSql(
-                            "INSERT INTO feedback (username, mobile_number, email, comments) VALUES (?, ?, ?, ?)",
-                            [username, mobile_number, email, comments]
-                            );
-
-                if (rs.rowsAffected > 0) {
-                    console.log("Feedback inserted successfully");
-
-                    // Print all data AFTER insert
-                    console.log("=== ALL FEEDBACK AFTER INSERT ===");
-                    var afterInsert = tx.executeSql("SELECT * FROM feedback ORDER BY id");
-                    printFeedbackTable(afterInsert, "AFTER INSERT");
-
-                    if (callback) {
-                        callback(true);
-                    }
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/feedback");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    console.log("Feedback submitted successfully");
+                    if (callback) callback(true);
                 } else {
-                    console.log("Feedback insertion failed");
-                    if (callback) {
-                        callback(false);
-                    }
-                }
-
-            } catch (error) {
-                console.error("Error inserting feedback:", error);
-                if (callback) {
-                    callback(false);
+                    console.error("Feedback submission failed:", xhr.responseText);
+                    if (callback) callback(false);
                 }
             }
-        });
+        }
+        xhr.send(JSON.stringify(data));
     }
 
     //calculate the duration from startsession to end session
@@ -241,172 +224,215 @@ QtObject {
     }
 
     function registerUser(username, displayname, email, password, confirmpassword, callback) {
-        console.log("MapGlobals.registerUser()")
-        var db = getDatabase();
-        var result = false;
+        console.log("MapGlobals.registerUser() - Attempting registration for:", username);
+        console.log("Backend URL:", backendUrl + "/register");
 
-        db.transaction(function(tx) {
-            // Print input values
-            console.log("=== USER REGISTRATION ATTEMPT ===");
-            console.log("Username:", username);
-            console.log("Display Name:", displayname);
-            console.log("Email:", email);
-            // Consider not logging passwords in production for security
-            console.log("Password length:", password.length);
-            console.log("Confirm Password length:", confirmpassword.length);
+        var data = {
+            "username": username,
+            "displayname": displayname,
+            "email": email,
+            "password": password
+        };
 
-            // First check if username already exists
-            var usernameCheck = tx.executeSql(
-                        "SELECT id FROM users WHERE username = ?",
-                        [username]
-                        );
+        var xhr = new XMLHttpRequest();
 
-            if (usernameCheck.rows.length > 0) {
-                console.log("Registration failed - username already exists");
-                rootWindow.showToastMessage("Username already exists", true);
-                if (callback) callback(false);
-                return;
+        xhr.onreadystatechange = function() {
+            var statusString = "N/A";
+            try {
+                if (xhr.readyState >= 2) statusString = xhr.status;
+            } catch (e) {
+                // Ignore invalid state errors during intermediate ready states
             }
-
-            // Check if email already exists
-            var emailCheck = tx.executeSql(
-                        "SELECT id FROM users WHERE email = ?",
-                        [email]
-                        );
-
-            if (emailCheck.rows.length > 0) {
-                console.log("Registration failed - email already exists");
-                rootWindow.showToastMessage("Email already registered", true);
-                if (callback) callback(false);
-                return;
-            }
-
-            var rs = tx.executeSql(
-                        "INSERT INTO users(username, displayname, email, password) VALUES(?, ?, ?, ?)",
-                        [username, displayname, email, password]
-                        );
-
-            if (rs.rowsAffected > 0) {
-                console.log("Registration successful!");
-                console.log("Rows affected:", rs.rowsAffected);
-                console.log("Inserted ID:", rs.insertId);
-
-                // Fetch and print the inserted record
-                var selectRs = tx.executeSql(
-                            "SELECT * FROM users WHERE id = ?",
-                            [rs.insertId]
-                            );
-
-                if (selectRs.rows.length > 0) {
-                    var insertedUser = selectRs.rows.item(0);
-                    console.log("Inserted user details:");
-                    console.log("ID:", insertedUser.id);
-                    console.log("Username:", insertedUser.username);
-                    console.log("Display Name:", insertedUser.displayname);
-                    console.log("Email:", insertedUser.email);
-                    console.log("RPC Completed:", insertedUser.rpc_completed);
-                    console.log("Created At:", insertedUser.created_at);
+            
+            console.log("XHR State Change:", xhr.readyState, "Status:", statusString);
+            
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                var currentStatus = 0;
+                try {
+                    currentStatus = xhr.status;
+                } catch (e) {
+                    console.error("Critical error accessing XHR status at DONE state");
                 }
 
-                result = true;
-            } else {
-                console.log("Registration failed - no rows affected");
-                result = false;
+                if (currentStatus === 200 || currentStatus === 201) {
+                    console.log("Registration successful response received");
+                    console.log("Response:", xhr.responseText);
+                    var responseData = null;
+                    try {
+                        responseData = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        console.error("Error parsing registration response:");
+                    }
+                    if (responseData && responseData.user) {
+                        var user = responseData.user;
+                        var db = getDatabase();
+                        db.transaction(function(tx) {
+                            tx.executeSql(
+                                "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
+                                [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
+                            );
+                        });
+                    }
+                    if (callback) callback(true, responseData);
+                } else {
+                    console.error("Registration failed. Status:", currentStatus, "Response:", xhr.responseText);
+                    var message = "Registration Failed";
+                    if (currentStatus === 0) {
+                        message = "Cannot connect to server at " + backendUrl + ". Check your network.";
+                    } else if (xhr.responseText) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            message = response.message || message;
+                        } catch (e) {
+                            console.error("Error parsing error response:", e);
+                            message = "Server error (Invalid JSON response)";
+                        }
+                    }
+                    if (rootWindow) {
+                        rootWindow.showToastMessage(message);
+                    } else {
+                        console.error("rootWindow is NULL, cannot show toast:", message);
+                    }
+                    if (callback) callback(false, null);
+                }
             }
+        }
 
-            console.log("=== REGISTRATION COMPLETED ===");
+        xhr.open("POST", backendUrl + "/register");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.timeout = 60000;
 
-            if (callback) {
-                callback(result);
-            }
-        });
+        xhr.ontimeout = function() {
+            console.error("Registration request timed out for:", backendUrl);
+            if (rootWindow) rootWindow.showToastMessage("Connection timed out. Backend might be spinning up.", true);
+            if (callback) callback(false);
+        };
+
+        xhr.onerror = function() {
+            console.error("Networking error occurred during registration. Possible causes: Firewall, server down, or different WiFi.");
+            if (rootWindow) rootWindow.showToastMessage("Network error. Ensure device can ping " + backendUrl, true);
+            if (callback) callback(false);
+        };
+
+        console.log("Sending data:", JSON.stringify(data));
+        xhr.send(JSON.stringify(data));
     }
 
     //Reset Password
     function resetPassword(username, newPass, callback) {
-        console.log("MapGlobals.resetPassword()")
-        var db = getDatabase();
-        db.transaction(function(tx) {  // 'tx' is the transaction object, not 'db'
-            // Check if username exists
-            var checkRs = tx.executeSql("SELECT * FROM users WHERE username = ?", [username]);
+        console.log("MapGlobals.resetPassword() - Username:", username);
 
-            var result = {success: false, message: ""};
+        var data = {
+            "username": username,
+            "password": newPass
+        };
 
-            if (checkRs.rows.length > 0) {
-                // Update password
-                var updateRs = tx.executeSql("UPDATE users SET password = ? WHERE username = ?", [newPass, username]);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/reset-password");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.timeout = 60000;
 
-                if (updateRs.rowsAffected > 0) {
-                    result.success = true;
-                    result.message = "Password reset successfully!";
+        xhr.ontimeout = function() {
+            console.error("Reset password timed out");
+            if (rootWindow) rootWindow.showToastMessage("Reset password timed out. Backend might be spinning up.", true);
+            if (callback) callback({success: false, message: "Connection timed out"});
+        };
+
+        xhr.onerror = function() {
+            console.error("Network error during reset password");
+            if (rootWindow) rootWindow.showToastMessage("Network error", true);
+            if (callback) callback({success: false, message: "Network error"});
+        };
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Password reset on backend successfully");
+                    
+                    // Now update local DB if user exists
+                    var db = getDatabase();
+                    db.transaction(function(tx) {
+                        var rs = tx.executeSql("UPDATE users SET password = ? WHERE username = ?", [newPass, username]);
+                        if (rs.rowsAffected > 0) {
+                            console.log("Local password updated as well");
+                        }
+                    });
+
+                    if (callback) callback({success: true, message: "Password reset successfully!"});
                 } else {
-                    result.message = "Failed to reset password. Please try again.";
+                    console.error("Failed to reset password on backend:", xhr.responseText);
+                    var message = "Failed to reset password";
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        message = response.message || message;
+                    } catch (e) {}
+                    if (callback) callback({success: false, message: message});
                 }
-            } else {
-                result.message = "Incorrect Username";
             }
-
-            // Call the callback with the result
-            if (callback) {
-                callback(result);
-            }
-        });
+        }
+        xhr.send(JSON.stringify(data));
     }
 
     function updateUser(old_userName, new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, callback) {
-        console.log("MapGlobals.updateUser()")
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            // Print all data BEFORE update
-            console.log("=== ALL USERS BEFORE UPDATE ===");
-            var beforeUpdate = tx.executeSql("SELECT * FROM users");
-            for (var i = 0; i < beforeUpdate.rows.length; i++) {
-                var user = beforeUpdate.rows.item(i);
-                console.log("User", i + 1, "- ID:", user.id,
-                            "Username:", user.username,
-                            "Name:", user.displayname,
-                            "Email:", user.email,
-                            "Mobile:", user.mobile_number || "NULL",
-                            "RPC:", user.rpc_completed);
-            }
+        console.log("MapGlobals.updateUser() - From:", old_userName, "To:", new_username);
 
-            // Perform the update
-            var rs = tx.executeSql(
-                        "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
-                        [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
+        var data = {
+            "old_username": old_userName,
+            "username": new_username,
+            "displayname": newDisplayname,
+            "email": newEmail,
+            "mobile_number": mobile_no,
+            "rpc_completed": _rpcCompleted
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/update-user");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.timeout = 60000;
+
+        xhr.ontimeout = function() {
+            console.error("Update user timed out");
+            if (rootWindow) rootWindow.showToastMessage("Update timed out. Backend might be spinning up.", true);
+            if (callback) callback(false);
+        };
+
+        xhr.onerror = function() {
+            console.error("Network error during update user");
+            if (rootWindow) rootWindow.showToastMessage("Network error during update", true);
+            if (callback) callback(false);
+        };
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Profile updated on backend successfully");
+
+                    // Now update local DB
+                    var db = getDatabase();
+                    db.transaction(function(tx) {
+                        var rs = tx.executeSql(
+                            "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
+                            [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
                         );
+                        if (rs.rowsAffected > 0) {
+                            console.log("Local user database updated successfully");
+                        }
+                    });
 
-            if (rs.rowsAffected > 0) {
-                console.log("User updated successfully");
-                console.log("Rows affected:", rs.rowsAffected);
-
-                // Print all data AFTER update
-                console.log("=== ALL USERS AFTER UPDATE ===");
-                var afterUpdate = tx.executeSql("SELECT * FROM users");
-
-                for (var j = 0; j < afterUpdate.rows.length; j++) {
-                    var updatedUser = afterUpdate.rows.item(j);
-                    console.log("User", j + 1, "- ID:", updatedUser.id,
-                                "Username:", updatedUser.username,
-                                "Name:", updatedUser.displayname,
-                                "Email:", updatedUser.email,
-                                "Mobile:", updatedUser.mobile_number || "NULL",
-                                "RPC:", updatedUser.rpc_completed);
-                }
-
-                if (callback) {
-                    callback(true);
-                }
-
-            } else {
-
-                console.log("User not found or update failed");
-
-                if (callback) {
-                    callback(false);
+                    if (callback) callback(true);
+                } else {
+                    console.error("Failed to update profile on backend. Status:", xhr.status, "Response:", xhr.responseText);
+                    var message = "Failed to update profile on server";
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        message = response.message || message;
+                    } catch (e) {}
+                    if (rootWindow) rootWindow.showToastMessage(message);
+                    if (callback) callback(false);
                 }
             }
-        });
+        }
+        xhr.send(JSON.stringify(data));
     }
 
     function deleteUser(username) {
@@ -601,82 +627,100 @@ QtObject {
 
 
     function loginUserFunc(userInput, password, callback) {
-        var db = getDatabase();
+        console.log("MapGlobals.loginUserFunc() - Authenticating for:", userInput);
+        console.log("Backend URL:", backendUrl + "/login");
 
-        var isEmail = userInput.indexOf("@") !== -1;
+        var data = {
+            "userInput": userInput,
+            "password": password
+        };
 
-        db.transaction(function(tx) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/login");
+        xhr.setRequestHeader("Content-Type", "application/json");
 
-            var rsUser;
+        xhr.timeout = 60000;
 
-            if (isEmail) {
-                // Check email
-                rsUser = tx.executeSql(
-                            "SELECT * FROM users WHERE email = ?",
-                            [userInput]
+        xhr.ontimeout = function() {
+            console.error("Login request timed out");
+            if (rootWindow) rootWindow.showToastMessage("Login timed out. Backend might be spinning up.", true);
+            if (callback) callback(false);
+        };
+
+        xhr.onerror = function() {
+            console.error("Networking error during login");
+            if (rootWindow) rootWindow.showToastMessage("Network error", true);
+            if (callback) callback(false);
+        };
+
+        xhr.onreadystatechange = function() {
+            var statusString = "N/A";
+            try {
+                if (xhr.readyState >= 2) statusString = xhr.status;
+            } catch (e) { }
+            
+            console.log("XHR State Change (Login):", xhr.readyState, "Status:", statusString);
+            
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                var currentStatus = 0;
+                try { currentStatus = xhr.status; } catch (e) { }
+
+                if (currentStatus === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        console.log("Login Success response received");
+
+                        var user = response.user;
+
+                        QGroundControl.saveGlobalSetting("username", user.username);
+                        QGroundControl.saveGlobalSetting("email", user.email);
+                        QGroundControl.saveGlobalSetting("name", user.displayname);
+                        QGroundControl.saveBoolGlobalSetting("login", true);
+
+                        // Sync to local SQLite
+                        var db = getDatabase();
+                        db.transaction(function(tx) {
+                            tx.executeSql(
+                                "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
+                                [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
                             );
+                        });
 
-                if (rsUser.rows.length === 0) {
-                    rootWindow.showToastMessage("Incorrect Email");
-                    callback(false);
-                    return;
-                }
-
-                // Email exists → check password
-                rsUser = tx.executeSql(
-                            "SELECT * FROM users WHERE email = ? AND password = ?",
-                            [userInput, password]
-                            );
-
-            } else {
-                // Check username
-                rsUser = tx.executeSql(
-                            "SELECT * FROM users WHERE username = ?",
-                            [userInput]
-                            );
-
-                if (rsUser.rows.length === 0) {
-                    rootWindow.showToastMessage("Incorrect Username");
-                    callback(false);
-                    return;
-                }
-
-                // Username exists → check password
-                rsUser = tx.executeSql(
-                            "SELECT * FROM users WHERE username = ? AND password = ?",
-                            [userInput, password]
-                            );
-            }
-
-            // Final password validation
-
-            if (rsUser.rows.length > 0) {
-                console.log("Login Success");
-
-                var user = rsUser.rows.item(0); // ✅ REAL USER FROM DB
-
-                QGroundControl.saveGlobalSetting("username", user.username);
-                QGroundControl.saveGlobalSetting("email", user.email);
-                QGroundControl.saveGlobalSetting("name", user.displayname);
-
-                QGroundControl.saveBoolGlobalSetting("login", true);
-
-                rootWindow.homescreen();
+                    if (rootWindow) {
+                        rootWindow.newscreen();
                 rootWindow.showToastMessage("Login Successfully");
+                    } else {
+                        console.error("MapGlobals: rootWindow is null, cannot navigate to newscreen");
+                    }
+                        login = "login";
 
-                login="login"
-
-
-                callback(true);
-                return;
-            }else {
-                rootWindow.showToastMessage("Incorrect password");
-                callback(false);
-                return;
+                        if (callback) callback(true);
+                    } catch (e) {
+                        console.error("Error parsing login response:", e);
+                        if (rootWindow) rootWindow.showToastMessage("Error processing login response");
+                        if (callback) callback(false);
+                    }
+                } else {
+                    console.error("Login Failed. Status:", currentStatus, "Response:", xhr.responseText);
+                    var message = "Incorrect username or password";
+                    if (currentStatus === 0) {
+                        message = "Cannot connect to server at " + backendUrl;
+                    } else if (xhr.responseText) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            message = response.message || message;
+                        } catch (e) {
+                            console.error("Error parsing error response:", e);
+                        }
+                    }
+                    if (rootWindow) rootWindow.showToastMessage(message);
+                    if (callback) callback(false);
+                }
             }
+        }
 
-
-        });
+        console.log("Sending Login Data:", JSON.stringify(data));
+        xhr.send(JSON.stringify(data));
     }
 
 
@@ -752,10 +796,7 @@ QtObject {
             //loginLoader.visible = true;
             //homescreen.visible = false
             rootWindow.openWelcomeScreen();
-
-            console.log("Invalid Credentials");
-            QGroundControl.saveBoolGlobalSetting("login", false)
-            console.log("map globals login else")
+            QGroundControl.saveBoolGlobalSetting("login", false);
         }
     }
 

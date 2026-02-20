@@ -1,0 +1,389 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Indira Gandhi International Airport",
+                "zoneType": "airport",
+                "description": "Delhi Airport - Restricted airspace",
+                "minAltitude": 0,
+                "maxAltitude": 3000,
+                "active": true,
+                "icaoCode": "VIDP"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.08,
+                            28.54
+                        ],
+                        [
+                            77.12,
+                            28.54
+                        ],
+                        [
+                            77.12,
+                            28.58
+                        ],
+                        [
+                            77.08,
+                            28.58
+                        ],
+                        [
+                            77.08,
+                            28.54
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Military Base - Palam",
+                "zoneType": "military",
+                "description": "Indian Air Force Base - No unauthorized flights",
+                "minAltitude": 0,
+                "maxAltitude": 5000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.06,
+                            28.52
+                        ],
+                        [
+                            77.09,
+                            28.52
+                        ],
+                        [
+                            77.09,
+                            28.55
+                        ],
+                        [
+                            77.06,
+                            28.55
+                        ],
+                        [
+                            77.06,
+                            28.52
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Red Fort - Prohibited Zone",
+                "zoneType": "red",
+                "description": "National monument - Absolutely no drone flights permitted",
+                "minAltitude": 0,
+                "maxAltitude": 10000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.238,
+                            28.654
+                        ],
+                        [
+                            77.242,
+                            28.654
+                        ],
+                        [
+                            77.242,
+                            28.658
+                        ],
+                        [
+                            77.238,
+                            28.658
+                        ],
+                        [
+                            77.238,
+                            28.654
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Rashtrapati Bhavan - Prohibited",
+                "zoneType": "red",
+                "description": "Presidential residence - Prohibited airspace",
+                "minAltitude": 0,
+                "maxAltitude": 10000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.192,
+                            28.612
+                        ],
+                        [
+                            77.198,
+                            28.612
+                        ],
+                        [
+                            77.198,
+                            28.618
+                        ],
+                        [
+                            77.192,
+                            28.618
+                        ],
+                        [
+                            77.192,
+                            28.612
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Delhi CTR (Control Zone)",
+                "zoneType": "ctr",
+                "description": "Delhi Control Zone - ATC clearance required",
+                "minAltitude": 0,
+                "maxAltitude": 2000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.0,
+                            28.4
+                        ],
+                        [
+                            77.3,
+                            28.4
+                        ],
+                        [
+                            77.3,
+                            28.7
+                        ],
+                        [
+                            77.0,
+                            28.7
+                        ],
+                        [
+                            77.0,
+                            28.4
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Runway 28 Approach Path",
+                "zoneType": "runway",
+                "description": "Active runway approach - Extreme caution",
+                "minAltitude": 0,
+                "maxAltitude": 1000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.05,
+                            28.555
+                        ],
+                        [
+                            77.08,
+                            28.555
+                        ],
+                        [
+                            77.08,
+                            28.565
+                        ],
+                        [
+                            77.05,
+                            28.565
+                        ],
+                        [
+                            77.05,
+                            28.555
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Republic Day Rehearsal - Temporary",
+                "zoneType": "temporary",
+                "description": "NOTAM: Temporary restriction for Republic Day rehearsal",
+                "minAltitude": 0,
+                "maxAltitude": 3000,
+                "active": true,
+                "validFrom": "2026-01-15T00:00:00Z",
+                "validTo": "2026-01-26T23:59:59Z"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.22,
+                            28.60
+                        ],
+                        [
+                            77.25,
+                            28.60
+                        ],
+                        [
+                            77.25,
+                            28.63
+                        ],
+                        [
+                            77.22,
+                            28.63
+                        ],
+                        [
+                            77.22,
+                            28.60
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Dwarka - Yellow Zone",
+                "zoneType": "yellow",
+                "description": "Restricted area - Proceed with caution",
+                "minAltitude": 0,
+                "maxAltitude": 400,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.02,
+                            28.58
+                        ],
+                        [
+                            77.06,
+                            28.58
+                        ],
+                        [
+                            77.06,
+                            28.62
+                        ],
+                        [
+                            77.02,
+                            28.62
+                        ],
+                        [
+                            77.02,
+                            28.58
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Safdarjung Airport",
+                "zoneType": "airport",
+                "description": "Safdarjung Airport - Restricted airspace",
+                "minAltitude": 0,
+                "maxAltitude": 2000,
+                "active": true,
+                "icaoCode": "VI1X"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.20,
+                            28.58
+                        ],
+                        [
+                            77.22,
+                            28.58
+                        ],
+                        [
+                            77.22,
+                            28.60
+                        ],
+                        [
+                            77.20,
+                            28.60
+                        ],
+                        [
+                            77.20,
+                            28.58
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Hindon Air Force Base",
+                "zoneType": "military",
+                "description": "Military airbase - Restricted zone",
+                "minAltitude": 0,
+                "maxAltitude": 5000,
+                "active": true
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            77.54,
+                            28.70
+                        ],
+                        [
+                            77.58,
+                            28.70
+                        ],
+                        [
+                            77.58,
+                            28.74
+                        ],
+                        [
+                            77.54,
+                            28.74
+                        ],
+                        [
+                            77.54,
+                            28.70
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

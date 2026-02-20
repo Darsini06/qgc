@@ -48,7 +48,7 @@ ApplicationWindow {
     property var    guidedController
     property var    guidedValueSlider
 
-    property var    mapPolygon :                object.surveyAreaPolygon
+    property var    mapPolygon :                null
 
 
     property int    action
@@ -68,6 +68,7 @@ ApplicationWindow {
 
     property bool   _utmspSendActTrigger
     property bool   _utmspStartTelemetry
+    property bool   showUTMIndicator: false
     property var someParameter
     property string planType: "Default"
     property string plan: "Default"
@@ -88,8 +89,8 @@ ApplicationWindow {
     property string sessionEnd: ""
     property bool sessionSaved: false
 
-    property real screenWidth: parent.width
-    property real screenHeight: parent.height
+    property real screenWidth: width
+    property real screenHeight: height
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
@@ -152,13 +153,13 @@ ApplicationWindow {
 
         MapGlobals.modeBtn1    = modebtn1
 
-        //Initialize the Database and Create Tables
+        // Initialize the Database and Create Tables
         MapGlobals.initDB()
 
-        //profilelogin()
+        // Handle initial navigation
         MapGlobals.profile()
 
-        //Print all Session Table Datas.Just For Reference
+        // Print all Session Table Datas. Just For Reference
         MapGlobals.printSessionTable()
 
         if(_appSettings.screen==="Plan"){
@@ -168,8 +169,19 @@ ApplicationWindow {
             plan="Start"
             console.log("NextScreen loaded with planType: Start")
         }
-        //guidedValueSlider.visible = false
+    }
 
+    // Listen for permission granted signal to proceed on mobile devices
+    Connections {
+        target: QGroundControl.qgcPositionManager
+        function onPermissionGranted() {
+            if (MapGlobals.rootWindow) {
+                console.log("Permission granted signal received, re-checking profile flow")
+                MapGlobals.profile()
+            } else {
+                console.log("Permission granted signal received, but MapGlobals.rootWindow not set yet. Skipping.")
+            }
+        }
     }
 
     /* QtObject {
@@ -787,6 +799,8 @@ ApplicationWindow {
 
 
     function openWelcomeScreen() {
+        if (flyView) flyView.visible = false
+        if (planView) planView.visible = false
         pageLoader.source = "qrc:/qml/LoginPages/WelcomeScreen.qml"
     }
 
@@ -859,6 +873,7 @@ ApplicationWindow {
         ListModel {
             id: tabModel
             ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
+            ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
             ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "File Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
             ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
@@ -879,7 +894,7 @@ ApplicationWindow {
                     tabModel.setProperty(2, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
-                    tabModel.setProperty(2, "file", "APMSensorsComponent.qml");
+                    tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
                 }
             }
         }
@@ -1116,8 +1131,30 @@ ApplicationWindow {
         anchors.topMargin: parent.height* 0.15
         anchors.leftMargin: 20
         visible: true
-        spacing: 10  // Adjust this value to control space between icons
+        Rectangle {
+            id:         utmIndicatorBtn
+            Layout.alignment: Qt.AlignLeft
+            width:      parent.width * 0.05
+            height:     width
+            radius:     width / 2
+            color:      "white"
+            visible:    true
+            border.width: width * 0.05
+            border.color: "white"
 
+            QGCColoredImage {
+                source:             "/qmlimages/PaperPlane.svg"
+                width:              parent.width * 0.5
+                height:             width
+                anchors.centerIn:   parent
+                color:              showUTMIndicator ? "green" : "black"
+            }
+
+            MouseArea {
+                anchors.fill:       parent
+                onClicked:          showUTMIndicator = !showUTMIndicator
+            }
+        }
 
         Rectangle {
             id: listbtn
@@ -2960,6 +2997,7 @@ ApplicationWindow {
         activationStartTimestamp:   UTMSPStateStorage.startTimeStamp
         activationApproval:         UTMSPStateStorage.showActivationTab && QGroundControl.utmspManager.utmspVehicle.vehicleActivation
         flightID:                   UTMSPStateStorage.flightID
+        visible:                    showUTMIndicator
         anchors.fill:               parent
     }
 }

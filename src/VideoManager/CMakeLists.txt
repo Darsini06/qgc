@@ -34,4 +34,8 @@ target_link_libraries(VideoManager
         QGC
 )
 
-target_include_directories(VideoManager PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(VideoManager PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../FactSystem
+    ${CMAKE_CURRENT_SOURCE_DIR}/../API
+)
