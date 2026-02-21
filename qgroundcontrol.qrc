@@ -321,12 +321,6 @@
         <file alias="LoginPages/WelcomeScreen.qml">src/QmlControls/LoginPages/WelcomeScreen.qml</file>
         <file alias="LoginPages/HomeScreen.qml">src/QmlControls/LoginPages/HomeScreen.qml</file>
         <file alias="LoginPages/ProfileScreen.qml">src/QmlControls/LoginPages/ProfileScreen.qml</file>
-        <file alias="LoginPages/ReportScreen.qml">src/QmlControls/LoginPages/ReportScreen.qml</file>
-        <file alias="LoginPages/PrivacyPolicy.qml">src/QmlControls/LoginPages/PrivacyPolicy.qml</file>
-        <file alias="LoginPages/SelectApplication.qml">src/QmlControls/LoginPages/SelectApplication.qml</file>
-        <file alias="LoginPages/Feedback.qml">src/QmlControls/LoginPages/Feedback.qml</file>
-        <file alias="LoginPages/Terms_Condition.qml">src/QmlControls/LoginPages/Terms_Condition.qml</file>
-        <file alias="LoginPages/AccountUpdate.qml">src/QmlControls/LoginPages/AccountUpdate.qml</file>
 
         <file alias="Viewer3D/Viewer3D.qml">src/Viewer3D/Viewer3DQml/Viewer3D.qml</file>
         <file alias="Viewer3D/qmldir">src/QmlControls/Viewer3D/qmldir</file>
@@ -368,9 +362,7 @@
         <file alias="Viewer3D/Models3D/Viewer3DVehicleItems.qml">src/Viewer3D/Viewer3DQml/Models3D/Viewer3DVehicleItems.qml</file>
         <file alias="Viewer3D/Viewer3DProgressBar.qml">src/Viewer3D/Viewer3DQml/Viewer3DProgressBar.qml</file>
         <file>MainRootIcons.qml</file>
-        <file>Newscreen.qml</file>
         <file>MapGlobals.qml</file>
-        <file>ProfileScreenNew.qml</file>
         <file>BasicParameters.qml</file>
         <file>BasicParametersList.qml</file>
         <file>Communication.qml</file>
