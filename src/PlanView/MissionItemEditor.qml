@@ -10,7 +10,7 @@ import QGroundControl.Vehicle
 import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.Palette
-import MapGlobals 1.0
+import MapGlobals
 
 /// Mission item edit control
 Rectangle {

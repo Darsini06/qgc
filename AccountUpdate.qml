@@ -10,12 +10,12 @@ import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 import QGroundControl.Palette
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.LocalStorage 2.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.LocalStorage
 
 
-import QtQuick.Layouts 1.15
+import QtQuick.Layouts
 
 Item {
     id: root

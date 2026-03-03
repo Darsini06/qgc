@@ -30,17 +30,30 @@ Item {
 
     visible: showAirspace && airspaceManager
 
-    property var _lastFetchCenter: QtPositioning.coordinate(0, 0)
-    property real _lastFetchZoom: 0
+    property bool _isMapMoving: false
+
+    // Timer to reset moving state
+    Timer {
+        id: _movingStateTimer
+        interval: 100
+        repeat: false
+        onTriggered: _isMapMoving = false
+    }
+
+    function _setMapMoving() {
+        _isMapMoving = true
+        _movingStateTimer.restart()
+    }
 
     // Auto-fetch airspace data when map moves significantly
     Connections {
         target: map
         
         function onCenterChanged() {
+            _setMapMoving()
             if (_root.visible && airspaceManager) {
                 var distanceMoved = map.center.distanceTo(_lastFetchCenter)
-                // Threshold: 500m or if zoom changed
+                // Threshold: 500m
                 if (distanceMoved > 500) {
                     _fetchTimer.restart()
                 }
@@ -48,6 +61,7 @@ Item {
         }
         
         function onZoomLevelChanged() {
+            _setMapMoving()
             if (_root.visible && airspaceManager) {
                 if (Math.abs(map.zoomLevel - _lastFetchZoom) > 0.5) {
                     _fetchTimer.restart()
@@ -60,12 +74,16 @@ Item {
                 _fetchTimer.restart()
             }
         }
+
+        function onRotationChanged() {
+            _setMapMoving()
+        }
     }
 
     // Debounce timer for fetching airspace data
     Timer {
         id: _fetchTimer
-        interval: 1500 // Increased debounce for smoother panning
+        interval: 2000 // Increased further for even better "fast action" performance
         repeat: false
         onTriggered: {
             if (map && airspaceManager) {
@@ -89,14 +107,14 @@ Item {
         var topLeft = bbox.topLeft
         var bottomRight = bbox.bottomRight
 
-        // Add buffer (expanded to 20% for "static" feel as you pan)
+        // Add buffer (expanded to 30% for even more "static" feel as you pan)
         var latDiff = Math.abs(topLeft.latitude - bottomRight.latitude)
         var lonDiff = Math.abs(bottomRight.longitude - topLeft.longitude)
         
         if (latDiff === 0 || lonDiff === 0) return
 
-        var latBuffer = latDiff * 0.2
-        var lonBuffer = lonDiff * 0.2
+        var latBuffer = latDiff * 0.3
+        var lonBuffer = lonDiff * 0.3
 
         var minLat = Math.min(topLeft.latitude, bottomRight.latitude) - latBuffer
         var maxLat = Math.max(topLeft.latitude, bottomRight.latitude) + latBuffer
@@ -117,38 +135,31 @@ Item {
             id: zoneGroup
             property var zone: modelData
 
-            // Circle rendering (Faster for point-based zones)
+            // Circle rendering
             MapCircle {
                 visible: zone.radius > 0
                 center: zone.iconPosition
                 radius: zone.radius
                 color: zone.fillColor
-                opacity: zone.fillOpacity
+                opacity: _isMapMoving ? 0.15 : zone.fillOpacity // Even lighter during move
+                border.width: _isMapMoving ? 0 : zone.borderWidth // Disable borders during move
                 border.color: zone.borderColor
-                border.width: zone.borderWidth
             }
 
             // Polygon rendering
             MapPolygon {
                 visible: zone.radius === 0
                 color: zone.fillColor
-                opacity: zone.fillOpacity
+                opacity: _isMapMoving ? 0.15 : zone.fillOpacity
+                border.width: _isMapMoving ? 0 : zone.borderWidth
                 border.color: zone.borderColor
-                border.width: zone.borderWidth
-                path: zone.path // Direct C++ property, no JS loop
+                path: zone.path 
             }
 
-            // Zone label (Hidden by default, shown on click via popup)
-            // Keeping this for reference but setting visible to false
+            // Airport/Facility icon (Hidden while moving for maximum performance)
             MapQuickItem {
-                visible: false
-                coordinate: zone.iconPosition
-                // ... rest of static label code
-            }
-
-            // Airport/Facility icon (Keep if desired, or hide)
-            MapQuickItem {
-                visible: _root.showIcons && zone.zoneType === "airport"
+                visible: !_isMapMoving && _root.showIcons && 
+                         (zone.zoneType === "airport" || zone.zoneType === "military" || zone.zoneType === "boundary")
                 coordinate: zone.iconPosition
                 anchorPoint.x: airportIcon.width / 2
                 anchorPoint.y: airportIcon.height / 2
@@ -159,6 +170,24 @@ Item {
                     source: "/qmlimages/Airframe/Plane.svg"
                     color: zone.borderColor
                     fillMode: Image.PreserveAspectFit
+                    opacity: 0.8
+                }
+            }
+
+            // Labels (Hidden while moving)
+            MapQuickItem {
+                visible: !_isMapMoving && _root.showLabels && zone.name !== ""
+                coordinate: zone.iconPosition
+                anchorPoint.x: zoneLabel.width / 2
+                anchorPoint.y: zoneLabel.height / 2
+                sourceItem: QGCLabel {
+                    id: zoneLabel
+                    text: zone.name
+                    color: "white"
+                    font.pixelSize: ScreenTools.smallFontPointSize
+                    font.bold: true
+                    style: Text.Outline
+                    styleColor: "black"
                     opacity: 0.8
                 }
             }
@@ -180,9 +209,9 @@ Item {
             var restrictions = _root.airspaceManager.getRestrictionsAtCoordinate(coord.latitude, coord.longitude, 0)
             
             if (restrictions.length > 0) {
-                // Prioritize zones: Red > InnerYellow > OuterYellow > Others
+                // Prioritize zones: Red > Temporary > Boundary > Runway > Yellow > Others
                 var selectedZone = restrictions[0]
-                var priority = { "red": 4, "inneryellow": 3, "outeryellow": 2, "green": 1 }
+                var priority = { "red": 7, "temporary": 6, "boundary": 5, "runway": 4, "inneryellow": 3, "outeryellow": 2, "others": 1, "green": 0 }
                 
                 var currentPri = priority[selectedZone.zoneType] || 0
                 

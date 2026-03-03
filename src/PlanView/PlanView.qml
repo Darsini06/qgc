@@ -26,7 +26,7 @@ import QGroundControl.Controllers
 import QGroundControl.ShapeFileHelper
 import QGroundControl.FlightDisplay
 import QGroundControl.UTMSP
-import MapGlobals 1.0
+import MapGlobals
 
 Item {
     id: _root
@@ -81,7 +81,7 @@ Item {
     property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
-    
+
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
             return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)

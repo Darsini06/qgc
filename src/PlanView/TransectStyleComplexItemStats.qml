@@ -5,7 +5,7 @@ import QGroundControl
 import QGroundControl.ScreenTools
 import QGroundControl.Controls
 
-import MapGlobals 1.0
+import MapGlobals
 
 // Statistics section for TransectStyleComplexItems
 Grid {

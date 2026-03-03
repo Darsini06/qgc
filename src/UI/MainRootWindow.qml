@@ -23,17 +23,17 @@ import QGroundControl.FlightMap
 
 
 import QGroundControl.UTMSP
-import QGroundControl.Palette 1.0
+import QGroundControl.Palette
 
-import MapGlobals 1.0
+import MapGlobals
 
-import QtQuick.LocalStorage 2.0
+import QtQuick.LocalStorage
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import Qt.labs.folderlistmodel 2.1
-import Qt.labs.platform 1.1 as Platform
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Qt.labs.folderlistmodel
+import Qt.labs.platform as Platform
 
 import "qrc:/qml/SettingsPanel"
 

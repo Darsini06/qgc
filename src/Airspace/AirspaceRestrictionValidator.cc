@@ -104,15 +104,17 @@ bool AirspaceRestrictionValidator::validateWaypoint(double latitude, double long
         QVariantMap restriction = restrictionVar.toMap();
         QString zoneType = restriction["type"].toString();
 
-        if (zoneType == "red" || zoneType == "prohibited") {
-            QString message = QString("Waypoint in prohibited zone: %1")
+        if (zoneType == "red" || zoneType == "prohibited" || zoneType == "boundary" || zoneType == "temporary") {
+            QString message = QString("Waypoint in prohibited/restricted zone: %1")
                                   .arg(restriction["name"].toString());
             _setHasRestrictions(true);
             _setRestrictionMessage(message);
             _setBlockMissionUpload(true);
             return false;
-        } else if (zoneType == "yellow" || zoneType == "military" || zoneType == "restricted") {
-            QString message = QString("Waypoint in restricted zone: %1 - Proceed with caution")
+        } else if (zoneType == "yellow" || zoneType == "military" || zoneType == "restricted" || 
+                   zoneType == "inneryellow" || zoneType == "outeryellow" || zoneType == "others" ||
+                   zoneType == "states" || zoneType == "runway") {
+            QString message = QString("Waypoint in advisory/restricted zone: %1 - Proceed with caution")
                                   .arg(restriction["name"].toString());
             _setHasRestrictions(true);
             _setRestrictionMessage(message);

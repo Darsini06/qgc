@@ -1,4 +1,4 @@
-pragma Singleton
+ pragma Singleton
 
 import QtQuick
 import QGroundControl
@@ -6,7 +6,7 @@ import QGroundControl.Controls
 import QtPositioning
 import QGroundControl.QGCPositionManager
 
-import QtQuick.LocalStorage 2.0
+import QtQuick.LocalStorage
 
 
 QtObject {
@@ -45,7 +45,7 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
-    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
+    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use loc      alhost
 
 
     function recenterMap() {

@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick
 import QGroundControl.UTMSP                 1.0
 
 Item {

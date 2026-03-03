@@ -44,15 +44,18 @@ QString AirspaceZone::zoneTypeString() const
     switch (_zoneType) {
         case AirspaceZoneType::RedZone:        return "red";
         case AirspaceZoneType::YellowZone:     return "yellow";
-        case AirspaceZoneType::InnerYellow:     return "inneryellow";
-        case AirspaceZoneType::OuterYellow:     return "outeryellow";
+        case AirspaceZoneType::InnerYellow:    return "inneryellow";
+        case AirspaceZoneType::OuterYellow:    return "outeryellow";
         case AirspaceZoneType::GreenZone:      return "green";
         case AirspaceZoneType::MilitaryZone:   return "military";
         case AirspaceZoneType::Airport:        return "airport";
         case AirspaceZoneType::CTR:            return "ctr";
         case AirspaceZoneType::RunwayApproach: return "runway";
         case AirspaceZoneType::Temporary:      return "temporary";
-        default:                                return "unknown";
+        case AirspaceZoneType::Boundary:       return "boundary";
+        case AirspaceZoneType::Others:         return "others";
+        case AirspaceZoneType::StateBorder:    return "states";
+        default:                               return "unknown";
     }
 }
 
@@ -110,24 +113,30 @@ void AirspaceZone::setProperties(const QJsonObject& props)
     }
 
     if (!typeStr.isEmpty()) {
-        if (typeStr == "red" || typeStr == "prohibited" || typeStr == "boundary") {
+        if (typeStr == "red" || typeStr == "prohibited" || typeStr == "abandoned" || typeStr == "temp-red") {
             setZoneType(AirspaceZoneType::RedZone);
-        } else if (typeStr == "inneryellow") {
+        } else if (typeStr == "boundary") {
+            setZoneType(AirspaceZoneType::Boundary);
+        } else if (typeStr == "inneryellow" || typeStr == "inner-yellow" || typeStr == "inner_yellow") {
             setZoneType(AirspaceZoneType::InnerYellow);
-        } else if (typeStr == "outeryellow") {
+        } else if (typeStr == "outeryellow" || typeStr == "outer-yellow" || typeStr == "outer_yellow") {
             setZoneType(AirspaceZoneType::OuterYellow);
-        } else if (typeStr == "yellow" || typeStr == "restricted" || typeStr == "states") {
+        } else if (typeStr == "yellow" || typeStr == "restricted") {
             setZoneType(AirspaceZoneType::YellowZone);
-        } else if (typeStr == "military") {
+        } else if (typeStr == "military" || typeStr == "naval") {
             setZoneType(AirspaceZoneType::MilitaryZone);
-        } else if (typeStr == "airport") {
+        } else if (typeStr == "airport" || typeStr == "domestic") {
             setZoneType(AirspaceZoneType::Airport);
         } else if (typeStr == "ctr") {
             setZoneType(AirspaceZoneType::CTR);
-        } else if (typeStr == "runway" || typeStr == "approach") {
+        } else if (typeStr == "runway" || typeStr == "approach" || typeStr == "runwayapproach") {
             setZoneType(AirspaceZoneType::RunwayApproach);
-        } else if (typeStr == "temporary" || typeStr == "notam") {
+        } else if (typeStr == "temporary" || typeStr == "notam" || typeStr == "temporary_red_zone") {
             setZoneType(AirspaceZoneType::Temporary);
+        } else if (typeStr == "others" || typeStr == "government" || typeStr == "permanent_red_zone" || typeStr == "option") {
+            setZoneType(AirspaceZoneType::Others);
+        } else if (typeStr == "states" || typeStr == "state_border" || typeStr == "stateborder") {
+            setZoneType(AirspaceZoneType::StateBorder);
         } else {
             setZoneType(AirspaceZoneType::GreenZone);
         }
@@ -140,64 +149,77 @@ void AirspaceZone::_updateStyling()
 {
     switch (_zoneType) {
         case AirspaceZoneType::RedZone:
-            _fillColor = "#ff0505";
-            _borderColor = "#ff0505";
-            _fillOpacity = 0.6;
+            _fillColor = "#db3737";
+            _borderColor = "#db3737";
+            _fillOpacity = 0.55;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::YellowZone:
-            _fillColor = "#d48a00";
-            _borderColor = "#d48a00";
-            _fillOpacity = 0.45;
-            _borderWidth = 2;
-            break;
         case AirspaceZoneType::InnerYellow:
-            _fillColor = "#d48a00";
-            _borderColor = "#d48a00";
+            _fillColor = "#f09433";
+            _borderColor = "#f09433";
             _fillOpacity = 0.45;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::OuterYellow:
-            _fillColor = "#b89b00";
-            _borderColor = "#b89b00";
+            _fillColor = "#e67e22";
+            _borderColor = "#e67e22";
             _fillOpacity = 0.35;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::MilitaryZone:
-            _fillColor = "#8B0000";
-            _borderColor = "#FF0000";
+            _fillColor = "#c0392b";
+            _borderColor = "#c0392b";
             _fillOpacity = 0.6;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::Airport:
-            _fillColor = "#4169E1";
-            _borderColor = "#000080";
-            _fillOpacity = 0.3;
-            _borderWidth = 2;
+            _fillColor = "#27ae60";
+            _borderColor = "#27ae60";
+            _fillOpacity = 0.25;
+            _borderWidth = 1;
             break;
         case AirspaceZoneType::CTR:
-            _fillColor = "#9370DB";
-            _borderColor = "#4B0082";
+            _fillColor = "#8e44ad";
+            _borderColor = "#8e44ad";
             _fillOpacity = 0.25;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::RunwayApproach:
-            _fillColor = "#f76363";
-            _borderColor = "#f76363";
-            _fillOpacity = 0.4;
+            _fillColor = "#e74c3c";
+            _borderColor = "#e74c3c";
+            _fillOpacity = 0.45;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::Temporary:
-            _fillColor = "#ff0707";
-            _borderColor = "#ff0707";
+            _fillColor = "#e67e22";
+            _borderColor = "#e67e22";
             _fillOpacity = 0.6;
             _borderWidth = 3;
             break;
+        case AirspaceZoneType::Boundary:
+            _fillColor = "#d63031";
+            _borderColor = "#d63031";
+            _fillOpacity = 0.75;
+            _borderWidth = 3;
+            break;
+        case AirspaceZoneType::Others:
+            _fillColor = "#7f8c8d";
+            _borderColor = "#7f8c8d";
+            _fillOpacity = 0.2;
+            _borderWidth = 2;
+            break;
+        case AirspaceZoneType::StateBorder:
+            _fillColor = "#95a5a6";
+            _borderColor = "#95a5a6";
+            _fillOpacity = 0.3;
+            _borderWidth = 2;
+            break;
         case AirspaceZoneType::GreenZone:
         default:
-            _fillColor = "#00b900";
-            _borderColor = "#00b900";
-            _fillOpacity = 0.2;
+            _fillColor = "#2ecc71";
+            _borderColor = "#2ecc71";
+            _fillOpacity = 0.25;
             _borderWidth = 1;
             break;
     }
@@ -248,25 +270,18 @@ QVariant AirspaceZone::path() const
 // AirspaceManager Implementation
 //-----------------------------------------------------------------------------
 
-AirspaceManager::AirspaceManager(QGCToolbox* toolbox, QObject* parent)
-    : QObject(parent)
-    , _toolbox(toolbox)
+AirspaceManager::AirspaceManager(QGCApplication* app, QGCToolbox* toolbox)
+    : QGCTool(app, toolbox)
     , _networkManager(new QNetworkAccessManager(this))
     , _isLoading(false)
     , _offlineModeEnabled(false)
-    , _serverUrl("https://airspace-map.onrender.com/api/facilities")
+    , _serverUrl("https://airspace-map-backend-592407489838.asia-south1.run.app/api/facilities")
     , _showAirspace(true)
     , _showLabels(true)
     , _showIcons(true)
     , _autoRefreshTimer(new QTimer(this))
 {
     qDebug() << "AirspaceManager initialized with URL:" << _serverUrl;
-    _initializeDatabase();
-
-    // Setup auto-refresh timer
-    _autoRefreshTimer->setInterval(AUTO_REFRESH_INTERVAL_MS);
-    connect(_autoRefreshTimer, &QTimer::timeout, this, &AirspaceManager::_autoRefreshTimeout);
-    _autoRefreshTimer->start();
 }
 
 AirspaceManager::~AirspaceManager()
@@ -277,6 +292,18 @@ AirspaceManager::~AirspaceManager()
     if (_cacheDatabase.isOpen()) {
         _cacheDatabase.close();
     }
+}
+
+void AirspaceManager::setToolbox(QGCToolbox* toolbox)
+{
+    QGCTool::setToolbox(toolbox);
+
+    _initializeDatabase();
+
+    // Setup auto-refresh timer
+    _autoRefreshTimer->setInterval(AUTO_REFRESH_INTERVAL_MS);
+    connect(_autoRefreshTimer, &QTimer::timeout, this, &AirspaceManager::_autoRefreshTimeout);
+    _autoRefreshTimer->start();
 }
 
 void AirspaceManager::setOfflineModeEnabled(bool enabled)
@@ -764,7 +791,8 @@ QVariantList AirspaceManager::getRestrictionsAtCoordinate(double lat, double lon
         if (zone->containsCoordinate(coord)) {
             QVariantMap restriction;
             restriction["name"] = zone->name();
-            restriction["zoneType"] = zone->zoneTypeString(); // QML expects "zoneType" property name? check popup
+            restriction["type"] = zone->zoneTypeString();     // Required by AirspaceRestrictionValidator
+            restriction["zoneType"] = zone->zoneTypeString(); // Required by QML
             restriction["description"] = zone->description();
             restriction["minAltitude"] = zone->minAltitude();
             restriction["maxAltitude"] = zone->maxAltitude();
