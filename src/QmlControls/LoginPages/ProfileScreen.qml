@@ -181,6 +181,7 @@ Item {
         console.log("Missions Completed:", missionsCompleted);
     }
 
+
     function loadUserDataFromMain() {
 
         MapGlobals.loadUserData(userName, function(userData) {
@@ -228,31 +229,108 @@ Item {
         return formatted;
     }
 
-    Loader {
-        id: pageLoader
-        anchors.fill: parent
-        asynchronous: true
-        active: true
-        visible: true
+    function switchPage(newView) {
+        // start fade OUT
+        fadeOverlay.opacity = 1
 
-        property var pageCache: ({ })
+        // store next page
+        fadeTimer.newView = newView
 
-        sourceComponent: {
-            if (!pageCache[currentView]) {
-                switch (currentView) {
-                case "profile": pageCache[currentView] = profilePage; break
-                case "accountUpdate": pageCache[currentView] = accountUpdatePage; break
-                case "privacy_policy": pageCache[currentView] = privacyPage; break
-                case "terms&conditions": pageCache[currentView] = termsPage; break
-                case "feedback": pageCache[currentView] = feedbackPage; break
-                case "reports": pageCache[currentView] = reportsPage; break
-                case "drone": pageCache[currentView] = dronePage; break
-                default: pageCache[currentView] = profilePage
-                }
-            }
-            return pageCache[currentView]
+        // start timer (wait until fade-out finishes)
+        fadeTimer.start()
+    }
+
+
+    Timer {
+        id: fadeTimer
+        interval: 220        // must match animation duration
+        repeat: false
+
+        property string newView: ""
+
+        onTriggered: {
+            // swap page AFTER fade-out
+            currentView = newView
+
+            // fade IN
+            fadeOverlay.opacity = 0
         }
     }
+
+
+    Item {
+        id: transitionRoot
+        anchors.fill: parent
+
+        Loader {
+            id: pageLoader
+            anchors.fill: parent
+            asynchronous: true
+
+            property var pageCache: ({ })
+
+            sourceComponent: {
+
+                if (!pageCache[currentView]) {
+
+                    switch (currentView) {
+
+                    case "profile":
+                        pageCache[currentView] = profilePage
+                        break
+
+                    case "accountUpdate":
+                        pageCache[currentView] = accountUpdatePage
+                        break
+
+                    case "privacy_policy":
+                        pageCache[currentView] = privacyPage
+                        break
+
+                    case "terms&conditions":
+                        pageCache[currentView] = termsPage
+                        break
+
+                    case "feedback":
+                        pageCache[currentView] = feedbackPage
+                        break
+
+                    case "reports":
+                        pageCache[currentView] = reportsPage
+                        break
+
+                    case "drone":
+                        pageCache[currentView] = dronePage
+                        break
+
+                    default:
+                        pageCache[currentView] = profilePage
+                    }
+                }
+
+                return pageCache[currentView]
+            }
+        }
+
+        Rectangle {
+            id: fadeOverlay
+            anchors.fill: parent
+
+            // softer than pure black (looks professional)
+            color: Qt.rgba(0,0,0,0.18)
+
+            opacity: 0
+            visible: opacity > 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 220
+                    easing.type: Easing.OutCubic
+                }
+            }
+        }
+    }
+
 
     // Rectangle {
     //     anchors.fill: parent
@@ -546,7 +624,9 @@ Item {
                                                     privacyLoading = true
                                                 }
 
-                                                currentView = model.screen // This updates StackLayout.currentIndex
+                                                //currentView = model.screen // This updates StackLayout.currentIndex
+
+                                                switchPage(model.screen)
                                             }
                                         }
                                     }
@@ -641,12 +721,12 @@ Item {
                         // border.width: 1
 
                         Image {
-                              anchors.fill: parent
-                              source: "qrc:/qmlimages/NewImages/nature_background.webp"
-                              fillMode: Image.PreserveAspectCrop
-                              clip: true
-                              smooth: true
-                          }
+                            anchors.fill: parent
+                            source: "qrc:/qmlimages/NewImages/nature_background.webp"
+                            fillMode: Image.PreserveAspectCrop
+                            clip: true
+                            smooth: true
+                        }
                     }
 
 
@@ -969,6 +1049,7 @@ Item {
             }
 
         }
+
     }
 
     // Privacy Policy
@@ -1090,6 +1171,7 @@ Item {
                 }
             }
         }
+
     }
 
     // Terms & Conditions
@@ -1480,6 +1562,7 @@ Item {
                 }
             }
         }
+
     }
 
     // Reports Screen
@@ -1624,7 +1707,7 @@ Item {
                                 radius: 6
                                 color: "#f8f9fa"
 
-                            Row {
+                                Row {
                                     anchors.fill: parent
                                     anchors.margins: 20
                                     spacing: 15
@@ -1695,6 +1778,7 @@ Item {
                 }
             }
         }
+
     }
 
     Component {
@@ -2086,6 +2170,7 @@ Item {
 
             }
         }
+
     }
 
     FileDialog {
