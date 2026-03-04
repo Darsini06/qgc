@@ -48,312 +48,155 @@ Rectangle {
                     spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
                     QGCLabel {
-                        text: "Airspace Settings"
+                        text: "Airspace Information"
                         font.pointSize: ScreenTools.largeFontPointSize
                         font.bold: true
                     }
 
                     QGCLabel {
-                        text: "Configure GeoJSON airspace data service and display options"
+                        text: "View airspace zone legends and manage display preferences"
                         font.pointSize: ScreenTools.smallFontPointSize
                         color: qgcPal.text
                     }
                 }
             }
 
-            // Server Configuration
+            // Zone Type Legend & Selection
             GroupBox {
                 Layout.fillWidth: true
                 Layout.margins: ScreenTools.defaultFontPixelWidth
-                title: "Server Configuration"
+                title: "Airspace Zones & Legend"
 
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: ScreenTools.defaultFontPixelHeight
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: ScreenTools.defaultFontPixelWidth
 
+                    GridLayout {
+                        Layout.fillWidth: true
+                        columns: 4
+                        rowSpacing: ScreenTools.defaultFontPixelHeight * 0.5
+                        columnSpacing: ScreenTools.defaultFontPixelWidth
+
+                        // Red Zone
+                        QGCCheckBox {
+                            id: _hideRed
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideRed", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#FF0000"
+                            opacity: 0.4
+                            border.color: "#8B0000"
+                            border.width: 2
+                        }
                         QGCLabel {
-                            text: "API URL:"
-                            Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 15
-                        }
-
-                        QGCTextField {
-                            id: _serverUrlField
+                            text: "Red Zone"
+                            font.bold: true
                             Layout.fillWidth: true
-                            text: airspaceManager ? airspaceManager.serverUrl : ""
-                            placeholderText: "https://yourserver.com/api/facilities"
+                        }
+                        QGCLabel {
+                            text: "Prohibited - Flight Blocked"
+                            font.pointSize: ScreenTools.smallFontPointSize
                         }
 
-                        QGCButton {
-                            text: "Save"
-                            onClicked: {
-                                if (airspaceManager) {
-                                    airspaceManager.serverUrl = _serverUrlField.text
-                                    _statusLabel.text = "Server URL saved"
-                                    _statusLabel.color = qgcPal.colorGreen
-                                }
-                            }
+                        // Yellow Zone
+                        QGCCheckBox {
+                            id: _hideYellow
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideYellow", !checked) }
                         }
-                    }
-
-                    QGCLabel {
-                        text: "Enter the base URL for your GeoJSON airspace API endpoint"
-                        font.pointSize: ScreenTools.tinyFontPointSize
-                        color: qgcPal.warningText
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                    }
-
-                    QGCCheckBox {
-                        text: "Offline Mode (Use cached data only)"
-                        checked: airspaceManager ? airspaceManager.offlineModeEnabled : false
-                        onClicked: {
-                            if (airspaceManager) {
-                                airspaceManager.offlineModeEnabled = checked
-                            }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#FFFF00"
+                            opacity: 0.3
+                            border.color: "#FFA500"
+                            border.width: 2
                         }
-                    }
-                }
-            }
-
-            // Display Options
-            GroupBox {
-                Layout.fillWidth: true
-                Layout.margins: ScreenTools.defaultFontPixelWidth
-                title: "Display Options"
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: ScreenTools.defaultFontPixelHeight
-
-                    QGCCheckBox {
-                        id: _showAirspaceCheck
-                        text: "Show Airspace Zones"
-                        checked: airspaceManager ? airspaceManager.showAirspace : true
-                        onClicked: {
-                            if (airspaceManager) {
-                                airspaceManager.showAirspace = checked
-                            }
+                        QGCLabel {
+                            text: "Yellow Zone"
+                            font.bold: true
+                            Layout.fillWidth: true
                         }
-                    }
-
-                    QGCCheckBox {
-                        id: _showLabelsCheck
-                        text: "Show Zone Labels"
-                        checked: airspaceManager ? airspaceManager.showLabels : true
-                        enabled: _showAirspaceCheck.checked
-                        onClicked: {
-                            if (airspaceManager) {
-                                airspaceManager.showLabels = checked
-                            }
-                        }
-                    }
-
-                    QGCCheckBox {
-                        id: _showIconsCheck
-                        text: "Show Airport/Facility Icons"
-                        checked: airspaceManager ? airspaceManager.showIcons : true
-                        enabled: _showAirspaceCheck.checked
-                        onClicked: {
-                            if (airspaceManager) {
-                                airspaceManager.showIcons = checked
-                            }
-                        }
-                    }
-
-                    QGCLabel {
-                        text: "Note: Display settings are applied to the map overlay"
-                        font.pointSize: ScreenTools.tinyFontPointSize
-                        color: qgcPal.warningText
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                    }
-                }
-            }
-
-            // Mission Validation
-            GroupBox {
-                Layout.fillWidth: true
-                Layout.margins: ScreenTools.defaultFontPixelWidth
-                title: "Mission Validation"
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: ScreenTools.defaultFontPixelHeight
-
-                    QGCCheckBox {
-                        id: _enableValidationCheck
-                        text: "Enable Airspace Restriction Validation"
-                        checked: true
-                    }
-
-                    QGCCheckBox {
-                        text: "Block mission upload in prohibited zones (Red)"
-                        checked: true
-                        enabled: _enableValidationCheck.checked
-                    }
-
-                    QGCCheckBox {
-                        text: "Warn for restricted zones (Yellow/Military)"
-                        checked: true
-                        enabled: _enableValidationCheck.checked
-                    }
-
-                    QGCLabel {
-                        text: "Mission validation checks waypoints against airspace restrictions before upload"
-                        font.pointSize: ScreenTools.tinyFontPointSize
-                        color: qgcPal.warningText
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                    }
-                }
-            }
-
-            // Cache Management
-            GroupBox {
-                Layout.fillWidth: true
-                Layout.margins: ScreenTools.defaultFontPixelWidth
-                title: "Cache Management"
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: ScreenTools.defaultFontPixelHeight
-
-                    QGCLabel {
-                        text: "Airspace data is cached locally for offline use"
-                        font.pointSize: ScreenTools.smallFontPointSize
-                        Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: ScreenTools.defaultFontPixelWidth
-
-                        QGCButton {
-                            text: "Refresh Data"
-                            onClicked: {
-                                if (airspaceManager) {
-                                    airspaceManager.refreshAirspaceData()
-                                    _statusLabel.text = "Refreshing airspace data..."
-                                    _statusLabel.color = qgcPal.text
-                                }
-                            }
+                        QGCLabel {
+                            text: "Restricted - Warning"
+                            font.pointSize: ScreenTools.smallFontPointSize
                         }
 
-                        QGCButton {
-                            text: "Clear Cache"
-                            onClicked: {
-                                _clearCacheDialog.open()
-                            }
+                        // Military Zone
+                        QGCCheckBox {
+                            id: _hideMilitary
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideMilitary", !checked) }
                         }
-                    }
-                }
-            }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#8B0000"
+                            opacity: 0.5
+                            border.color: "#FF0000"
+                            border.width: 2
+                        }
+                        QGCLabel {
+                            text: "Military"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "Military Restricted - Warning"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
 
-            // Zone Type Legend
-            GroupBox {
-                Layout.fillWidth: true
-                Layout.margins: ScreenTools.defaultFontPixelWidth
-                title: "Zone Type Legend"
+                        // Airport
+                        QGCCheckBox {
+                            id: _hideAirport
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideAirport", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#4169E1"
+                            opacity: 0.3
+                            border.color: "#000080"
+                            border.width: 2
+                        }
+                        QGCLabel {
+                            text: "Airport"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "Airport Area - Warning"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
 
-                GridLayout {
-                    anchors.fill: parent
-                    columns: 3
-                    rowSpacing: ScreenTools.defaultFontPixelHeight * 0.5
-                    columnSpacing: ScreenTools.defaultFontPixelWidth
-
-                    // Red Zone
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelHeight * 2
-                        height: ScreenTools.defaultFontPixelHeight * 2
-                        color: "#FF0000"
-                        opacity: 0.4
-                        border.color: "#8B0000"
-                        border.width: 2
-                    }
-                    QGCLabel {
-                        text: "Red Zone"
-                        font.bold: true
-                    }
-                    QGCLabel {
-                        text: "Prohibited - Flight Blocked"
-                        font.pointSize: ScreenTools.smallFontPointSize
-                    }
-
-                    // Yellow Zone
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelHeight * 2
-                        height: ScreenTools.defaultFontPixelHeight * 2
-                        color: "#FFFF00"
-                        opacity: 0.3
-                        border.color: "#FFA500"
-                        border.width: 2
-                    }
-                    QGCLabel {
-                        text: "Yellow Zone"
-                        font.bold: true
-                    }
-                    QGCLabel {
-                        text: "Restricted - Warning"
-                        font.pointSize: ScreenTools.smallFontPointSize
-                    }
-
-                    // Military Zone
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelHeight * 2
-                        height: ScreenTools.defaultFontPixelHeight * 2
-                        color: "#8B0000"
-                        opacity: 0.5
-                        border.color: "#FF0000"
-                        border.width: 2
-                    }
-                    QGCLabel {
-                        text: "Military"
-                        font.bold: true
-                    }
-                    QGCLabel {
-                        text: "Military Restricted - Warning"
-                        font.pointSize: ScreenTools.smallFontPointSize
-                    }
-
-                    // Airport
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelHeight * 2
-                        height: ScreenTools.defaultFontPixelHeight * 2
-                        color: "#4169E1"
-                        opacity: 0.3
-                        border.color: "#000080"
-                        border.width: 2
-                    }
-                    QGCLabel {
-                        text: "Airport"
-                        font.bold: true
-                    }
-                    QGCLabel {
-                        text: "Airport Area - Warning"
-                        font.pointSize: ScreenTools.smallFontPointSize
-                    }
-
-                    // CTR
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelHeight * 2
-                        height: ScreenTools.defaultFontPixelHeight * 2
-                        color: "#9370DB"
-                        opacity: 0.25
-                        border.color: "#4B0082"
-                        border.width: 2
-                    }
-                    QGCLabel {
-                        text: "CTR"
-                        font.bold: true
-                    }
-                    QGCLabel {
-                        text: "Control Zone - Warning"
-                        font.pointSize: ScreenTools.smallFontPointSize
+                        // CTR
+                        QGCCheckBox {
+                            id: _hideCTR
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideCTR", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#9370DB"
+                            opacity: 0.25
+                            border.color: "#4B0082"
+                            border.width: 2
+                        }
+                        QGCLabel {
+                            text: "CTR"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "Control Zone - Warning"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
                     }
                 }
             }

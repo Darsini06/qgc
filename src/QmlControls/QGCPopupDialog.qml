@@ -260,52 +260,42 @@ Popup {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: titleLable.implicitHeight + 5  // Increased height to accommodate close button
-                color: "#7F56D9"
+                height: Math.max(titleLable.implicitHeight + 20, 45) // Good breathing room
+                color: "#4a2c6d"
                 radius: 12
-                Layout.alignment: Qt.AlignHCenter
 
-                //Bottom rectangle to complete rounded shape
+                //Bottom rectangle to complete half-rounded top bar shape
                 Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    height: 15 // same as radius
-                    color: "#7F56D9"
+                    height: 12 // same as radius
+                    color: "#4a2c6d"
                 }
 
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: _contentMargin
-                    clip: true
+                Item {
+                    anchors.fill: parent
 
                     // Centered title
                     QGCLabel {
                         id: titleLable
                         text: root.title
-                        //anchors.centerIn: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        anchors.centerIn: parent
                         font.pointSize: ScreenTools.defaultFontPointSize
                         font.bold: true
                         color: "white"
-                        padding: 8
-                        // Adjust left margin to account for close button space
-                        //anchors.leftMargin: closeBtn.width + closeBtn.anchors.margins
-                        //anchors.rightMargin: closeBtn.width + closeBtn.anchors.margins
                     }
 
-                    // Close button - placed at top right
+                    // Close button - placed at top right properly
                     Rectangle {
                         id: closeBtn
-                        width: 25
-                        height: 25
-                        radius: width / 2
+                        width: 28
+                        height: 28
+                        radius: 14
                         color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
-                        clip: true
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        anchors.verticalCenter: parent.verticalCenter
                         visible: closeOnClickOutside
 
                         Text {
@@ -314,6 +304,7 @@ Popup {
                             anchors.centerIn: parent
                             font.bold: true
                             font.pointSize: ScreenTools.largeFontPointSize
+                            anchors.verticalCenterOffset: -2
                         }
 
                         MouseArea {
@@ -324,10 +315,7 @@ Popup {
                             onClicked: close()
                         }
                     }
-
-
                 }
-
             }
 
             Rectangle {
@@ -416,7 +404,7 @@ Popup {
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 15
-                        color: "#2196F3"
+                        color: "#4a2c6d"
                     }
                     contentItem: Text {
                         text: acceptButton.text

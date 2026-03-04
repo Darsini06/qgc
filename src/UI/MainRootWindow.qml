@@ -94,7 +94,7 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: "#5d179e"
+    property color app_color: "#4a2c6d"
 
 
     function dp(value) {
@@ -538,7 +538,7 @@ ApplicationWindow {
             Rectangle {
                 width: parent.width
                 height: titleLabel.implicitHeight + 14
-                color: "#7F56D9"
+                color: "#4a2c6d"
                 radius: 14
                 antialiasing: true
                 clip: true
@@ -549,7 +549,7 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     height: 14
-                    color: "#7F56D9"
+                    color: "#4a2c6d"
                     radius: 0
                 }
 
@@ -936,145 +936,105 @@ ApplicationWindow {
                 }
             }
 
-            // Rectangle {
-            //     Layout.preferredHeight: parent.height * 0.10
-            //     Layout.fillWidth: true
-            //     color: "transparent"
-            // }
-
-            Item {
+            // --- MAIN NAVIGATION AREA ---
+            RowLayout {
                 Layout.fillWidth: true
-                height: 46 + 4   // Tab height + indicator space
+                Layout.fillHeight: true
+                spacing: 0
 
-                /* ================= TAB BAR ================= */
-                TabBar {
-                    id: tabBar
-                    width: parent.width
-                    height: 56
-                    currentIndex: 0
-
-                    background: Rectangle {
-                        color: "white"
+                /* ================= SIDEBAR NAVIGATION ================= */
+                Rectangle {
+                    Layout.preferredWidth: ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 20 : ScreenTools.defaultFontPixelWidth * 28
+                    Layout.fillHeight: true
+                    color: "#f8f9fa" // Light aesthetic sidebar
+                    
+                    // Sidebar Right Border
+                    Rectangle {
+                        anchors.right: parent.right
+                        width: 1
+                        height: parent.height
+                        color: "#E0E0E0"
                     }
 
-                    Repeater {
+                    ListView {
+                        id: sidebarList
+                        anchors.fill: parent
                         model: tabModel
+                        currentIndex: tabBarDummy.currentIndex // Sync with dummy for compatibility if needed
+                        clip: true
+                        topMargin: 20
+                        spacing: 2
+                        
+                        // Fake TabBar for index tracking and logic preservation
+                        TabBar { id: tabBarDummy; visible: false; currentIndex: 0 }
 
-                        TabButton {
-                            id: tabBtn
-                            implicitHeight: 56
-                            implicitWidth: Math.max(140, contentRow.implicitWidth + 40)
-
-                            leftPadding: 0
-                            rightPadding: 0
-                            topPadding: 3
-                            bottomPadding: 10
-
-                            background: Item {}
-
-                            contentItem: Item {
+                        delegate: Item {
+                            width: parent.width
+                            height: 60
+                            
+                            Rectangle {
                                 anchors.fill: parent
+                                anchors.margins: 4
+                                radius: 8
+                                color: sidebarList.currentIndex === index ? Qt.rgba(74, 44, 109, 0.1) : "transparent"
+                                
+                                Behavior on color { ColorAnimation { duration: 200 } }
 
-                                Row {
-                                    id: contentRow
-                                    spacing: 6
-                                    anchors.centerIn: parent
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 15
+                                    spacing: 12
 
                                     QGCColoredImage {
-                                        width: 18
-                                        height: 18
+                                        width: 20
+                                        height: 20
                                         source: model.image
-                                        color: tabBar.currentIndex === index
-                                               ? app_color
-                                               : "#9E9E9E"
+                                        color: sidebarList.currentIndex === index ? app_color : "#666666"
                                     }
 
                                     Text {
+                                        Layout.fillWidth: true
                                         text: model.title
                                         font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.bold : tabBar.currentIndex === index
-                                        color: tabBar.currentIndex === index
-                                               ? app_color
-                                               : "#9E9E9E"
-                                        verticalAlignment: Text.AlignVCenter
+                                        font.bold: sidebarList.currentIndex === index
+                                        color: sidebarList.currentIndex === index ? app_color : "#444444"
+                                    }
+                                    
+                                    // Selection Indicator (vertical line)
+                                    Rectangle {
+                                        width: 4
+                                        height: 24
+                                        radius: 2
+                                        color: app_color
+                                        visible: sidebarList.currentIndex === index
                                     }
                                 }
 
-                            }
-
-                            onClicked: {
-                                tabBar.currentIndex = index
-                                loaders.source = model.file
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        sidebarList.currentIndex = index
+                                        tabBarDummy.currentIndex = index
+                                        loaders.source = model.file
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                /* ================= BASE LINE (ALL TABS) ================= */
+                /* ================= SETTINGS CONTENT AREA ================= */
                 Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 1
-                    color: "#D0D0D0"
-                }
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "white"
 
-                /* ================= ACTIVE INDICATOR ================= */
-                Rectangle {
-                    id: indicator
-                    height: 3
-                    radius: 2
-                    color: app_color
-                    anchors.bottom: parent.bottom
-
-                    property real indicatorRatio : 0.55
-
-                    function updateIndicator() {
-                        if (!tabBar.currentItem) return
-                        width = tabBar.currentItem.width * indicatorRatio
-                        x = tabBar.currentItem.x +
-                            (tabBar.currentItem.width - width) / 2
-                    }
-
-                    Component.onCompleted: updateIndicator()
-
-                    Connections {
-                        target: tabBar
-                        function onWidthChanged() { indicator.updateIndicator() }
-                        function onCurrentIndexChanged() { indicator.updateIndicator() }
-                    }
-
-                    Behavior on x { NumberAnimation { duration: 200 } }
-                    Behavior on width { NumberAnimation { duration: 200 } }
-                }
-
-
-
-            }
-
-            /* ================= CONTENT ================= */
-            Rectangle {
-                color: "white"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                //radius: 10
-
-                Loader {
-                    id: loaders
-                    anchors.fill: parent
-                    source: tabModel.get(tabBar.currentIndex).file
-                    // source: tabModel.get(0/*tabBar.currentIndex*/).file/*if (activeVehicle) {
-                    //                         tabModel.get(tabBar.currentIndex).file
-                    //                     }*/
-                }
-
-                Connections {
-                    target: tabBar
-                    onCurrentIndexChanged: {
-                        loaders.source = tabModel.get(tabBar.currentIndex).file
-                        // if (activeVehicle) {
-                        //     loaders.source = tabModel.get(tabBar.currentIndex).file
-                        // }
+                    Loader {
+                        id: loaders
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        source: tabModel.get(sidebarList.currentIndex).file
                     }
                 }
             }

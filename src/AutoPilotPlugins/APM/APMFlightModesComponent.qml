@@ -166,7 +166,7 @@ SetupPage {
                                 model: 6
                                 QGCLabel {
                                     text: qsTr("Flight Mode ") + index
-                                    color: controller.activeFlightMode == index ? "#7F56D9" : qgcPal.text
+                                    color: controller.activeFlightMode == index ? "#4a2c6d" : qgcPal.text
                                     font.bold: controller.activeFlightMode == index ? true : false
                                     property int index: modelData + 1
                                 }
@@ -285,7 +285,7 @@ SetupPage {
                             QGCLabel {
                                 anchors.baseline: optCombo.baseline
                                 text: qsTr("Channel option %1 :").arg(index)
-                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "#7F56D9" : qgcPal.text
+                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "#4a2c6d" : qgcPal.text
                             }
 
                             FactComboBox {

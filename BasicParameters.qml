@@ -25,7 +25,7 @@ Item {
     readonly property int cardWidth: (parent.width *0.98 - horizontalMargin - (columnSpacing * (cardsPerRow - 1))) / cardsPerRow
     readonly property int cardHeight: cardWidth // Keep cards square
 
-    property color app_color: "#5d179e"
+    property color app_color: "#4a2c6d"
 
 
     property var agri: [
@@ -129,11 +129,11 @@ Item {
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Agri Sparying"
+                    text: "Agri Spraying"
                     color: app_color
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
-                    font.bold: true
-                    bottomPadding: 15
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    font.weight: Font.DemiBold
+                    bottomPadding: 20
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                 }
 
@@ -162,9 +162,9 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select Gimbal Type"
                     color: app_color
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
-                    font.bold: true
-                    bottomPadding: 15
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    font.weight: Font.DemiBold
+                    bottomPadding: 20
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
                 }
 
@@ -193,9 +193,9 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: "Select Gimbal Type"
                     color: app_color
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
-                    font.bold: true
-                    bottomPadding: 15
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    font.weight: Font.DemiBold
+                    bottomPadding: 20
                     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?false:true
                 }
 
@@ -223,10 +223,11 @@ Item {
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Select Gimbal with camera"
+                    text: "Select Gimbal with Camera"
                     color: app_color
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
-                    font.bold: true
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    font.weight: Font.DemiBold
+                    bottomPadding: 20
                 }
 
                 // Grid layout for camera gimbals
@@ -251,10 +252,11 @@ Item {
                 Text {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Select camera"
+                    text: "Select Camera"
                     color: app_color
-                    font.pixelSize: ScreenTools.defaultFontPixelSize * 2
-                    font.bold: true
+                    font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
+                    font.weight: Font.DemiBold
+                    bottomPadding: 20
                 }
 
                 // Grid layout for agriall
@@ -303,8 +305,8 @@ Item {
                 anchors.fill: parent
                 color: "white"//modelData.color
                 radius: 10
-                border.color: agriall === index ? "limegreen" : app_color
-                border.width: agriall === index ? 3 : 2
+                border.color: agriall === index ? "#bb86fc" : "#e1bee7"
+                border.width: agriall === index ? 3 : 1
 
                 Rectangle {
                     id: shadowSource
@@ -322,8 +324,8 @@ Item {
 
                     shadowEnabled: true
                     shadowBlur: 1.0
-                    shadowHorizontalOffset: 15
-                    shadowVerticalOffset: 15//dp(1)
+                    shadowHorizontalOffset: 5
+                    shadowVerticalOffset: 5
                     shadowColor: app_color   // soft black
                 }
 
@@ -333,7 +335,7 @@ Item {
                     width: 20
                     height: 20
                     radius: 10
-                    color: "limegreen"
+                    color: "#bb86fc"
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
@@ -441,8 +443,8 @@ Item {
                 anchors.fill: parent
                 color: "white"//modelData.color
                 radius: 10
-                border.color: agrigimbal === index ? "limegreen" : app_color
-                border.width: agrigimbal === index ? 3 : 2
+                border.color: agrigimbal === index ? "#bb86fc" : "#e1bee7"
+                border.width: agrigimbal === index ? 3 : 1
 
                 Rectangle {
                     id: shadowSource
@@ -460,8 +462,8 @@ Item {
 
                     shadowEnabled: true
                     shadowBlur: 1.0
-                    shadowHorizontalOffset: 15
-                    shadowVerticalOffset: 15//dp(1)
+                    shadowHorizontalOffset: 5
+                    shadowVerticalOffset: 5
                     shadowColor: app_color   // soft black
                 }
 
@@ -471,7 +473,7 @@ Item {
                     width: 20
                     height: 20
                     radius: 10
-                    color: "limegreen"
+                    color: "#bb86fc"
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
@@ -577,8 +579,8 @@ Item {
                 anchors.fill: parent
                 color: "white"//modelData.color
                 radius: 10
-                border.color: cameragimbal === index ? "limegreen" : "transparent"
-                border.width: cameragimbal === index ? 3 : 0
+                border.color: cameragimbal === index ? "#bb86fc" : "#e1bee7"
+                border.width: cameragimbal === index ? 3 : 1
 
                 Rectangle {
                     id: shadowSource
@@ -596,8 +598,8 @@ Item {
 
                     shadowEnabled: true
                     shadowBlur: 1.0
-                    shadowHorizontalOffset: 15
-                    shadowVerticalOffset: 15//dp(1)
+                    shadowHorizontalOffset: 5
+                    shadowVerticalOffset: 5
                     shadowColor: app_color   // soft black
                 }
 
@@ -607,7 +609,7 @@ Item {
                     width: 20
                     height: 20
                     radius: 10
-                    color: "limegreen"
+                    color: "#bb86fc"
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
@@ -711,8 +713,8 @@ Item {
                 anchors.fill: parent
                 color: "white"//modelData.color
                 radius: 10
-                border.color: cameragimbal1 === index ? "limegreen" : app_color
-                border.width: cameragimbal1 === index ? 3 : 2
+                border.color: cameragimbal1 === index ? "#bb86fc" : "#e1bee7"
+                border.width: cameragimbal1 === index ? 3 : 1
 
                 Rectangle {
                     id: shadowSource
@@ -730,8 +732,8 @@ Item {
 
                     shadowEnabled: true
                     shadowBlur: 1.0
-                    shadowHorizontalOffset: 15
-                    shadowVerticalOffset: 15//dp(1)
+                    shadowHorizontalOffset: 5
+                    shadowVerticalOffset: 5
                     shadowColor: app_color   // soft black
                 }
 
@@ -741,7 +743,7 @@ Item {
                     width: 20
                     height: 20
                     radius: 10
-                    color: "limegreen"
+                    color: "#bb86fc"
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
@@ -825,8 +827,8 @@ Item {
                 anchors.fill: parent
                 color: "white"//modelData.color
                 radius: 10
-                border.color: cameragimbal2 === index ? "limegreen" : app_color
-                border.width: cameragimbal2 === index ? 3 : 2
+                border.color: cameragimbal2 === index ? "#bb86fc" : "#e1bee7"
+                border.width: cameragimbal2 === index ? 3 : 1
 
                 Rectangle {
                     id: shadowSource
@@ -844,8 +846,8 @@ Item {
 
                     shadowEnabled: true
                     shadowBlur: 1.0
-                    shadowHorizontalOffset: 15
-                    shadowVerticalOffset: 15//dp(1)
+                    shadowHorizontalOffset: 5
+                    shadowVerticalOffset: 5
                     shadowColor: app_color   // soft black
                 }
 
@@ -855,7 +857,7 @@ Item {
                     width: 20
                     height: 20
                     radius: 10
-                    color: "limegreen"
+                    color: "#bb86fc"
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.margins: 5
