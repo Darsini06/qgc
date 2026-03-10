@@ -11,11 +11,14 @@ import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 
-import QtQuick.LocalStorage
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.LocalStorage 2.0
+import QtQuick.Layouts 1.15
 
-import MapGlobals
+import MapGlobals 1.0
 
-import Qt.labs.lottieqt
+import Qt.labs.lottieqt 1.0
 
 
 Item {

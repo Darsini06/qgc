@@ -149,76 +149,76 @@ void AirspaceZone::_updateStyling()
 {
     switch (_zoneType) {
         case AirspaceZoneType::RedZone:
-            _fillColor = "#db3737";
-            _borderColor = "#db3737";
-            _fillOpacity = 0.55;
+            _fillColor = "#ff0505";
+            _borderColor = "#ff0505";
+            _fillOpacity = 0.6;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::YellowZone:
         case AirspaceZoneType::InnerYellow:
-            _fillColor = "#f09433";
-            _borderColor = "#f09433";
+            _fillColor = "#d48a00";
+            _borderColor = "#d48a00";
             _fillOpacity = 0.45;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::OuterYellow:
-            _fillColor = "#e67e22";
-            _borderColor = "#e67e22";
+            _fillColor = "#b89b00";
+            _borderColor = "#b89b00";
             _fillOpacity = 0.35;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::MilitaryZone:
-            _fillColor = "#c0392b";
-            _borderColor = "#c0392b";
+            _fillColor = "#ff0505";   // Military follows red zone color
+            _borderColor = "#ff0505";
             _fillOpacity = 0.6;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::Airport:
-            _fillColor = "#27ae60";
-            _borderColor = "#27ae60";
+            _fillColor = "#008a00";   // Airport base is green
+            _borderColor = "#008a00";
             _fillOpacity = 0.25;
             _borderWidth = 1;
             break;
         case AirspaceZoneType::CTR:
-            _fillColor = "#8e44ad";
-            _borderColor = "#8e44ad";
+            _fillColor = "#9370DB";
+            _borderColor = "#4B0082";
             _fillOpacity = 0.25;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::RunwayApproach:
-            _fillColor = "#e74c3c";
-            _borderColor = "#e74c3c";
-            _fillOpacity = 0.45;
+            _fillColor = "#f76363";
+            _borderColor = "#f76363";
+            _fillOpacity = 0.4;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::Temporary:
-            _fillColor = "#e67e22";
-            _borderColor = "#e67e22";
+            _fillColor = "#ff0707";
+            _borderColor = "#ff0707";
             _fillOpacity = 0.6;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::Boundary:
-            _fillColor = "#d63031";
-            _borderColor = "#d63031";
-            _fillOpacity = 0.75;
+            _fillColor = "#d61e1e";
+            _borderColor = "#d61e1e";
+            _fillOpacity = 0.85;
             _borderWidth = 3;
             break;
         case AirspaceZoneType::Others:
-            _fillColor = "#7f8c8d";
-            _borderColor = "#7f8c8d";
+            _fillColor = "#607d8b";   // Blue-grey consistent with comment
+            _borderColor = "#607d8b";
             _fillOpacity = 0.2;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::StateBorder:
-            _fillColor = "#95a5a6";
-            _borderColor = "#95a5a6";
+            _fillColor = "#e2894d";
+            _borderColor = "#e2894d";
             _fillOpacity = 0.3;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::GreenZone:
         default:
-            _fillColor = "#2ecc71";
-            _borderColor = "#2ecc71";
+            _fillColor = "#008a00";
+            _borderColor = "#008a00";
             _fillOpacity = 0.25;
             _borderWidth = 1;
             break;

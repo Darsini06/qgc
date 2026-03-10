@@ -1,20 +1,23 @@
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.LocalStorage
+import QtQuick.LocalStorage 2.0
 import QtQuick.Effects
 
-import QtWebView
+import QtWebView 1.1
 
-import Qt.labs.lottieqt
+import Qt.labs.lottieqt 1.0
 
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
-import MapGlobals
+import MapGlobals 1.0
 
 Item {
     id: profilescreen
