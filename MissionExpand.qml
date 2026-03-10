@@ -16,11 +16,14 @@ import QGroundControl.Palette
 Rectangle {
     id:             _root
     height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
-    color:          "#1b1c3e"//_currentItem ? qgcPal.missionItemEditor : qgcPal.windowShade
-    radius:         20//_radius
-    opacity:        _currentItem ? 1.0 : 0.7
-    border.width:   _readyForSave ? 2 : 2
-    border.color:   _readyForSave ? "white" : qgcPal.warningText
+    gradient: Gradient {
+        GradientStop { position: 0.0; color: _currentItem ? "#5a3c7d" : "#2d1c42" }
+        GradientStop { position: 1.0; color: _currentItem ? "#4a2c6d" : "#1e1230" }
+    }
+    radius:         12
+    opacity:        _currentItem ? 1.0 : 0.75
+    border.width:   _currentItem ? 1 : 1
+    border.color:   _currentItem ? "#8a6cad" : "#3d2455"
 
     property var    map                 ///< Map control
     property var    masterController

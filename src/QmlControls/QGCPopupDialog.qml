@@ -242,36 +242,28 @@ Popup {
     //     radius:         20//root.padding / 2
     //     border.width:   1
     //     border.color:   _qgcPal.windowShadeLight
-    // }
+    property real popupWidth: 0
 
     Rectangle {
-        width: mainLayout.implicitWidth
-        height: mainLayout.implicitHeight
-        color: "#ffffff"
-        radius: 12
-        //border.width: 1
-        //border.color: "#dddddd"
+        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
+        height: mainLayout.implicitHeight + (buttonRow.visible ? _contentMargin : 0)
+        color: _qgcPal.window
+        radius: 0
+        border.width: 1
+        border.color: _qgcPal.windowShadeLight
         anchors.centerIn: parent
 
         ColumnLayout {
             id: mainLayout
-            anchors.centerIn: parent
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width
             spacing: _contentMargin
 
             Rectangle {
                 Layout.fillWidth: true
                 height: Math.max(titleLable.implicitHeight + 20, 45) // Good breathing room
                 color: "#4a2c6d"
-                radius: 12
-
-                //Bottom rectangle to complete half-rounded top bar shape
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 12 // same as radius
-                    color: "#4a2c6d"
-                }
+                radius: 0
 
                 Item {
                     anchors.fill: parent
@@ -291,7 +283,7 @@ Popup {
                         id: closeBtn
                         width: 28
                         height: 28
-                        radius: 14
+                        radius: 0
                         color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
                         anchors.right: parent.right
                         anchors.rightMargin: 12
@@ -321,13 +313,13 @@ Popup {
             Rectangle {
 
                 Layout.fillWidth:       true
-                Layout.preferredWidth:  Math.min(maxAvailableWidth, totalContentWidth)
+                Layout.preferredWidth:  maxAvailableWidth
                 Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
                 color:                  _qgcPal.window
                 Layout.leftMargin:     10
                 Layout.rightMargin:     10
 
-                property real maxAvailableWidth:    mainWindow.width - _contentMargin * 4
+                property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:
                     mainWindow.height
                     - titleLable.height
@@ -382,7 +374,7 @@ Popup {
                     onClicked: _reject()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 15
+                        radius: 0
                         color: "#E53935"
                     }
                     contentItem: Text {
@@ -403,7 +395,7 @@ Popup {
                     onClicked: _accept()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 15
+                        radius: 0
                         color: "#4a2c6d"
                     }
                     contentItem: Text {

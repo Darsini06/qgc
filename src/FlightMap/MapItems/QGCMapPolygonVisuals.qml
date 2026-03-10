@@ -575,7 +575,7 @@ Item {
                 width: displayText.contentWidth + 12 // Padding
                 radius: height / 2 // Rounded corners
                 color: "#1b1c3e" // light purple background
-                border.color: "#005BBB"
+                border.color: "#4a2c6d"
                 border.width: 1
 
                 Text {
@@ -1496,7 +1496,7 @@ Item {
                     height: parent.height * 0.9
                     radius: 10
                     color: "#ffffffcc" // semi-transparent white
-                    border.color: "#3399ff"
+                    border.color: "#4a2c6d"
                     border.width: 2
 
                     Column {
@@ -1696,240 +1696,216 @@ Item {
         }
     }
 
-    Component{
+    Component {
         id: customdialog
 
         Dialog {
-            id: customDialog
-            modal: true
-            dim: true
+            id:             customDialog
+            modal:          true
+            dim:            true
+            closePolicy:    Popup.NoAutoClose
             anchors.centerIn: parent
-            width: parent.width //* 0.8
-            height: parent.height //* 0.6
-
+            width:          ScreenTools.defaultFontPixelWidth * 38
+            height:         ScreenTools.defaultFontPixelHeight * 11
+            padding:        0
+            
             background: Rectangle {
-                color: "#661B1C3E"
-                radius: 15
-                border.color: "#005BBB"
-                border.width: 2
+                radius: 4
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#5a3c7d" }
+                    GradientStop { position: 1.0; color: "#2d1c42" }
+                }
+                border.color: "#4a2c6d"
+                border.width: 1
             }
 
-            // 🔴 Close Button
-            Rectangle {
-                id: closeBtn
-                width: 30
-                height: 30
-                radius: 15
-                color: "red"
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.margins: 10
+            contentItem: ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
 
-                Text {
-                    text: "X"
-                    anchors.centerIn: parent
-                    color: "white"
-                    font.bold: true
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        customDialog.visible = false
-                        if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                            mainWindow.showFlyView()
-                        } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                            mainWindow.showMapping()
-                        }
-                        MapGlobals.editdialog = "editdialog1"
-                    }
-                }
-            }
-
-            Column {
-                anchors.centerIn: parent
-                spacing: 20
-                width: 300//parent.width * 0.8
-
-                // Title
-                Label {
-                    text: qsTr("Set Ground Name")
-                    font.bold: true
-                    color: "white"
-                    font.pointSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    width: parent.width
-                }
-
-                // Name Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    Label {
-                        text: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):*/qsTr("Project Name:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: nameField
-                        Layout.fillWidth: true
-                        placeholderText: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):*/qsTr("Enter your project name")
+                // Header
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.28
+                    Text {
+                        text:               qsTr("Set Ground Name")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:     14
+                        anchors.centerIn:    parent
                     }
                 }
 
-                // // Phone Number Field
-                // RowLayout {
-                //     spacing: 10
-                //     width: parent.width
-                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                //     Label {
-                //         text: qsTr("Ph No:")
-                //         Layout.preferredWidth: 100
-                //         color: "white"
-                //         font.bold: true
-                //         font.pointSize: 14
-                //     }
-                //     TextField {
-                //         id: phoneField
-                //         Layout.fillWidth: true
-                //         placeholderText: qsTr("Enter 10-digit phone no")
-                //         validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                //         inputMethodHints: Qt.ImhDigitsOnly
-                //     }
-                // }
+                // Separator 1
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:             1
+                    color:              "white"
+                    opacity:            0.15
+                }
 
-                // // Ground Name Field
-                // RowLayout {
-                //     spacing: 10
-                //     width: parent.width
-                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                //     Label {
-                //         text: qsTr("Ground Name:")
-                //         Layout.preferredWidth: 100
-                //         color: "white"
-                //         font.bold: true
-                //         font.pointSize: 14
-                //     }
-                //     TextField {
-                //         id: groundField
-                //         Layout.fillWidth: true
-                //         placeholderText: qsTr("Enter ground name")
-                //     }
-                // }
-
-                // Buttons Row
-                Row {
-                    spacing: 40
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Button {
-                        text: qsTr("Cancel")
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            radius: 20
-                            color: "#1b1c3e"
-                            border.color: "#005BBB"
-                            border.width: 2
+                // Content Area
+                Item {
+                    Layout.fillWidth:   true
+                    Layout.fillHeight:  true
+                    RowLayout {
+                        anchors {
+                            left:           parent.left
+                            right:          parent.right
+                            verticalCenter: parent.verticalCenter
+                            leftMargin:     25
+                            rightMargin:    25
                         }
-                        contentItem: Text {
-                            text: "Cancel"
-                            anchors.fill: parent
-                                    verticalAlignment: Text.AlignVCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                            color: "white"
-                            font.bold: true
-                            font.pointSize: 14
+                        spacing:          15
 
+                        Text {
+                            text:           qsTr("Project Name:")
+                            color:          "white"
+                            font.bold:      true
+                            font.pointSize: 11
                         }
-                        onClicked: {
-                            QGroundControl.saveGlobalSetting("load", "load")
-                            customDialog.visible = false
-                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                mainWindow.showFlyView()
-                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                mainWindow.showMapping()
+
+                        TextField {
+                            id:             nameField
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 34
+                            placeholderText: qsTr("Enter your project name")
+                            placeholderTextColor: "#999999"
+                            font.pointSize: 10
+                            color:          "black"
+                            verticalAlignment: TextInput.AlignVCenter
+                            leftPadding:    10
+                            background: Rectangle {
+                                radius:         2
+                                color:          "white"
                             }
-                            MapGlobals.editdialog = "editdialog1"
                         }
                     }
+                }
 
-                    Button {
-                        text: qsTr("Confirm")
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            radius: 20
-                            color: "#1b1c3e"
-                            border.color: "#005BBB"
-                            border.width: 2
-                        }
-                        contentItem: Text {
-                            text: "Confirm"
-                            anchors.fill: parent
-                                    verticalAlignment: Text.AlignVCenter
+                // Separator 2
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:             1
+                    color:              "white"
+                    opacity:            0.15
+                }
+
+                // Buttons Area
+                Item {
+                    Layout.fillWidth:   true
+                    Layout.preferredHeight: parent.height * 0.32
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 0
+
+                        // Cancel Column
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Button {
+                                id:             cancelBtn
+                                anchors.centerIn: parent
+                                width: 125
+                                height: 36
+                                onClicked: {
+                                    QGroundControl.saveGlobalSetting("load", "load")
+                                    customDialog.close()
+                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                        mainWindow.showFlyView()
+                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                        mainWindow.showMapping()
+                                    }
+                                    MapGlobals.editdialog = "editdialog1"
+                                }
+                                background: Rectangle {
+                                    radius:     height / 2
+                                    color:      "#3a1f57"
+                                    border.color: "#4a2c6d"
+                                    border.width: 1
+                                }
+                                contentItem: Text {
+                                    text:               qsTr("Cancel")
+                                    color:              "white"
+                                    font.bold:          true
+                                    font.pointSize:     12
                                     horizontalAlignment: Text.AlignHCenter
-                            color: "white"
-                            font.bold: true
-                            font.pointSize: 14
+                                    verticalAlignment:   Text.AlignVCenter
+                                }
+                            }
                         }
 
-                        onClicked: {
-                            QGroundControl.saveGlobalSetting("load", "load1")
-                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                // if (nameField.text.length < 3 ||
-                                //     phoneField.text.length < 3 ||
-                                //     groundField.text.length < 3) {
-                                //     mainWindow.showToastMessage("Please fill all fields")
-                                //     return
-                                // }
-                                // let concatenatedText = nameField.text.substring(0,3) +
-                                //                        phoneField.text.substring(0,3) +
-                                //                        groundField.text.substring(0,3)
-                                if (nameField.text.length < 3 ) {
-                                    mainWindow.showToastMessage("Please fill all fields")
-                                    return
+                        // Vertical Separator
+                        Rectangle {
+                            Layout.fillHeight: true
+                            width: 1
+                            color: "white"
+                            opacity: 0.15
+                            Layout.topMargin: 10
+                            Layout.bottomMargin: 10
+                        }
+
+                        // Confirm Column
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Button {
+                                id:             confirmBtn
+                                anchors.centerIn: parent
+                                width: 125
+                                height: 36
+                                onClicked: {
+                                    QGroundControl.saveGlobalSetting("load", "load1")
+                                    if (nameField.text.length < 3) {
+                                        mainWindow.showToastMessage(qsTr("Please enter a valid project name"))
+                                        return
+                                    }
+
+                                    let concatenatedText = nameField.text.substring(0, 10)
+                                    _appSettings.username = concatenatedText
+                                    
+                                    if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
+                                        _saveCurrentVertices()
+                                        _circleMode = false
+                                        mapPolygon.traceMode = true
+                                        if(MapGlobals.mark_with !== "KML_File") {
+                                            mapPolygon.clear()
+                                        }
+                                    } else if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Mapping") {
+                                        mapping = true
+                                        if(QGroundControl.loadGlobalSetting("mapping", "mapping") === "basic") {
+                                            _resetPolygon()
+                                        } else if(QGroundControl.loadGlobalSetting("mapping", "mapping") === "circle") {
+                                            _resetCircle()
+                                        }
+                                    }
+
+                                    customDialog.close()
+                                    MapGlobals.editdialog = "editdialog1"
                                 }
-
-                                let concatenatedText = nameField.text.substring(0,10)
-
-                                _appSettings.username = concatenatedText
-                                _saveCurrentVertices()
-                                _circleMode = false
-                                mapPolygon.traceMode = true
-                                if(MapGlobals.mark_with !== "KML_File" ){
-                                    mapPolygon.clear()
+                                background: Rectangle {
+                                    radius:     height / 2
+                                    gradient: Gradient {
+                                        GradientStop { position: 0.0; color: "#6a4c8d" }
+                                        GradientStop { position: 1.0; color: "#4a2c6d" }
+                                    }
+                                    border.color: "#5a3c7d"
+                                    border.width: 1
                                 }
-                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-
-                                if (nameField.text.length < 3 ) {
-                                    mainWindow.showToastMessage("Please fill all fields")
-                                    return
+                                contentItem: Text {
+                                    text:               qsTr("Confirm")
+                                    color:              "white"
+                                    font.bold:          true
+                                    font.pointSize:     12
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment:   Text.AlignVCenter
                                 }
-
-                                let concatenatedText = nameField.text.substring(0,10)
-
-                                _appSettings.username = concatenatedText
-                                console.log("Username:", concatenatedText)
-                                mapping = true
-                                if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-                                    _resetPolygon()
-                                } else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-                                    _resetCircle()
-                                }
-
                             }
-
-                            customDialog.visible = false
-                            MapGlobals.editdialog = "editdialog1"
                         }
                     }
                 }
             }
         }
-
     }
 
 

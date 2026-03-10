@@ -65,15 +65,20 @@ SettingsPage {
     property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 25
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
 
+    property bool   _isNarrow:                  root.width < ScreenTools.defaultFontPixelWidth * 80
+    property real   _innerMargin:               _isNarrow ? ScreenTools.defaultFontPixelWidth * 2 : ScreenTools.defaultFontPixelWidth * 4
+    property real   _contentWidth:              Math.min(root.width - (_innerMargin * 2), ScreenTools.defaultFontPixelWidth * 120)
+
     // -- Content Layout --
     ColumnLayout {
         id:                 contentLayout
         Layout.fillWidth:   true
+        Layout.preferredWidth: _contentWidth
         Layout.maximumWidth: ScreenTools.defaultFontPixelWidth * 120
         Layout.alignment:   Qt.AlignHCenter
-        Layout.leftMargin:  ScreenTools.defaultFontPixelWidth * 4
-        Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 4
-        spacing:            ScreenTools.defaultFontPixelHeight
+        Layout.leftMargin:  _innerMargin
+        Layout.rightMargin: _innerMargin
+        spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight / 2 : ScreenTools.defaultFontPixelHeight
 
         Text {
             Layout.alignment: Qt.AlignHCenter
@@ -105,9 +110,11 @@ SettingsPage {
         ColumnLayout {
             spacing: 12
             visible: _appSettings.followTarget.visible
+            Layout.fillWidth: true
             QGCLabel { text: qsTr("Stream GCS Position"); color: "black"; font.bold: true }
-            RowLayout {
-                spacing: 25
+            Flow {
+                Layout.fillWidth: true
+                spacing: 20
                 Repeater {
                     model: _appSettings.followTarget.enumStrings
                     RowLayout {
@@ -196,7 +203,7 @@ SettingsPage {
                 spacing: 12
                 Layout.fillWidth: true
                 QGCLabel { text: unitFact.shortDescription; color: "black"; font.bold: true }
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
                     spacing: 20
                     Repeater {
@@ -223,11 +230,11 @@ SettingsPage {
         }
 
         // --- Brand Image Section ---
-        RowLayout {
+        ColumnLayout {
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth * 2
             visible:            _userBrandImageIndoor.visible && _brandImageSettings.visible && !ScreenTools.isMobile
-
+            
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing:          0
@@ -242,6 +249,7 @@ SettingsPage {
             }
 
             QGCButton {
+                Layout.alignment: _isNarrow ? Qt.AlignRight : Qt.AlignRight
                 text:      qsTr("Browse")
                 onClicked: userBrandImageIndoorBrowseDialog.openForLoad()
                 QGCFileDialog {
@@ -254,7 +262,7 @@ SettingsPage {
             }
         }
 
-        RowLayout {
+        ColumnLayout {
             Layout.fillWidth:   true
             spacing:            ScreenTools.defaultFontPixelWidth * 2
             visible:            _userBrandImageOutdoor.visible && _brandImageSettings.visible && !ScreenTools.isMobile
@@ -273,6 +281,7 @@ SettingsPage {
             }
 
             QGCButton {
+                Layout.alignment: _isNarrow ? Qt.AlignRight : Qt.AlignRight
                 text:      qsTr("Browse")
                 onClicked: userBrandImageOutdoorBrowseDialog.openForLoad()
                 QGCFileDialog {
@@ -394,9 +403,9 @@ SettingsPage {
             enabled:          _viewer3DEnabled.rawValue
             visible:          _viewer3DOsmFilePath.rawValue && _viewer3DSettings.visible
 
-            RowLayout {
+            ColumnLayout {
                 Layout.fillWidth: true
-                spacing:          ScreenTools.defaultFontPixelWidth
+                spacing:          ScreenTools.defaultFontPixelHeight / 4
                 QGCLabel { text: qsTr("3D Map File:"); color: "black"; font.bold: true }
                 QGCTextField {
                     id:               osmFileTextField
@@ -406,9 +415,13 @@ SettingsPage {
                 }
             }
 
-            RowLayout {
+            Flow {
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignRight
                 spacing:          ScreenTools.defaultFontPixelWidth
+                
+                Item { Layout.fillWidth: _isNarrow; visible: _isNarrow } // Spacer for layout
+
                 QGCButton {
                     text:      qsTr("Clear")
                     onClicked: {
@@ -516,15 +529,18 @@ SettingsPage {
         LabelledFactTextField {
             Layout.fillWidth: true
             label:            qsTr("UDP Port")
+            fact:             _videoSettings.udpPort
             visible:          _requiresUDPPort && fact.visible
             enabled:          !_videoAutoStreamConfig
         }
 
         ColumnLayout {
-            spacing: 10
+            spacing: 12
+            Layout.fillWidth: true
             visible: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
             QGCLabel { text: qsTr("Aspect Ratio"); color: "black"; font.bold: true }
-            RowLayout {
+            Flow {
+                Layout.fillWidth: true
                 spacing: 20
                 Repeater {
                     model: _videoSettings.aspectRatio.enumStrings
@@ -577,10 +593,12 @@ SettingsPage {
         }
 
         ColumnLayout {
-            spacing: 10
+            spacing: 12
+            Layout.fillWidth: true
             visible: _videoSettings.forceVideoDecoder.visible
             QGCLabel { text: qsTr("Video Decode Priority"); color: "black"; font.bold: true }
-            RowLayout {
+            Flow {
+                Layout.fillWidth: true
                 spacing: 20
                 Repeater {
                     model: _videoSettings.forceVideoDecoder.enumStrings
@@ -604,10 +622,12 @@ SettingsPage {
         }
 
         ColumnLayout {
-            spacing: 10
+            spacing: 12
+            Layout.fillWidth: true
             visible: _videoSettings.recordingFormat.visible
             QGCLabel { text: qsTr("Record File Format"); color: "black"; font.bold: true }
-            RowLayout {
+            Flow {
+                Layout.fillWidth: true
                 spacing: 20
                 Repeater {
                     model: _videoSettings.recordingFormat.enumStrings
@@ -712,67 +732,146 @@ SettingsPage {
 
         Repeater {
             model: _linkManager.linkConfigurations
-            RowLayout {
+            ColumnLayout {
+                id:               linkRow
                 Layout.fillWidth: true
                 visible:          !object.dynamic
+                spacing:          ScreenTools.defaultFontPixelHeight / 4
 
-                QGCLabel {
+                // Background highlight on hover/mobile
+                Rectangle {
                     Layout.fillWidth: true
-                    text:             object.name
-                    color:            "black"
-                }
+                    height:           Math.max(linkMainRow.height + 10, ScreenTools.minTouchPixels)
+                    color:            "#F5F5F5"
+                    radius:           8
+                    visible:          !_isNarrow
 
-                QGCColoredImage {
-                    height:            ScreenTools.minTouchPixels
-                    width:             height
-                    sourceSize.height: height
-                    fillMode:          Image.PreserveAspectFit
-                    mipmap:            true
-                    smooth:            true
-                    color:             qgcPalEdit.text
-                    source:            "/res/pencil.svg"
-                    enabled:           !object.link
+                    RowLayout {
+                        id:               linkMainRow
+                        anchors.fill:     parent
+                        anchors.margins:  10
+                        spacing:          15
 
-                    QGCPalette { id: qgcPalEdit; colorGroupEnabled: parent.enabled }
+                        QGCLabel {
+                            Layout.fillWidth: true
+                            text:             object.name
+                            color:            "black"
+                            font.bold:        true
+                        }
 
-                    QGCMouseArea {
-                        fillItem: parent
-                        onClicked: {
-                            var editingConfig = _linkManager.startConfigurationEditing(object)
-                            linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
+                        RowLayout {
+                            spacing: 15
+                            QGCColoredImage {
+                                height:            24
+                                width:             height
+                                sourceSize.height: height
+                                fillMode:          Image.PreserveAspectFit
+                                color:             qgcPalEdit.text
+                                source:            "/res/pencil.svg"
+                                enabled:           !object.link
+                                QGCPalette { id: qgcPalEdit; colorGroupEnabled: parent.enabled }
+                                QGCMouseArea {
+                                    fillItem: parent
+                                    onClicked: {
+                                        var editingConfig = _linkManager.startConfigurationEditing(object)
+                                        linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
+                                    }
+                                }
+                            }
+
+                            QGCColoredImage {
+                                height:            24
+                                width:             height
+                                sourceSize.height: height
+                                fillMode:          Image.PreserveAspectFit
+                                color:             qgcPalDelete.text
+                                source:            "/res/TrashDelete.svg"
+                                QGCPalette { id: qgcPalDelete; colorGroupEnabled: parent.enabled }
+                                QGCMouseArea {
+                                    fillItem: parent
+                                    onClicked: mainWindow.showMessageDialog(
+                                                   qsTr("Delete Link"),
+                                                   qsTr("Are you sure you want to delete '%1'?").arg(object.name),
+                                                   Dialog.Ok | Dialog.Cancel,
+                                                   function () { _linkManager.removeConfiguration(object) })
+                                }
+                            }
+
+                            QGCButton {
+                                text:      object.link ? qsTr("Disconnect") : qsTr("Connect")
+                                onClicked: {
+                                    if (object.link) {
+                                        object.link.disconnect()
+                                    } else {
+                                        _linkManager.createConnectedLink(object)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
-                QGCColoredImage {
-                    height:            ScreenTools.minTouchPixels
-                    width:             height
-                    sourceSize.height: height
-                    fillMode:          Image.PreserveAspectFit
-                    mipmap:            true
-                    smooth:            true
-                    color:             qgcPalDelete.text
-                    source:            "/res/TrashDelete.svg"
+                // Narrow screen layout
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:           narrowCol.implicitHeight + 20
+                    color:            "#F8F9FB"
+                    radius:           10
+                    border.color:     "#E0E0E0"
+                    border.width:     1
+                    visible:          _isNarrow
 
-                    QGCPalette { id: qgcPalDelete; colorGroupEnabled: parent.enabled }
+                    ColumnLayout {
+                        id:               narrowCol
+                        anchors.fill:     parent
+                        anchors.margins:  12
+                        spacing:          10
 
-                    QGCMouseArea {
-                        fillItem: parent
-                        onClicked: mainWindow.showMessageDialog(
-                                       qsTr("Delete Link"),
-                                       qsTr("Are you sure you want to delete '%1'?").arg(object.name),
-                                       Dialog.Ok | Dialog.Cancel,
-                                       function () { _linkManager.removeConfiguration(object) })
-                    }
-                }
+                        QGCLabel {
+                            Layout.fillWidth: true
+                            text:             object.name
+                            color:            "black"
+                            font.bold:        true
+                            font.pointSize:   ScreenTools.mediumFontPointSize
+                        }
 
-                QGCButton {
-                    text:      object.link ? qsTr("Disconnect") : qsTr("Connect")
-                    onClicked: {
-                        if (object.link) {
-                            object.link.disconnect()
-                        } else {
-                            _linkManager.createConnectedLink(object)
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing:          15
+
+                            QGCButton {
+                                Layout.preferredWidth: ScreenTools.minTouchPixels * 2
+                                text:      qsTr("Edit")
+                                enabled:   !object.link
+                                onClicked: {
+                                    var editingConfig = _linkManager.startConfigurationEditing(object)
+                                    linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
+                                }
+                            }
+
+                            QGCButton {
+                                Layout.preferredWidth: ScreenTools.minTouchPixels * 2
+                                text:      qsTr("Delete")
+                                onClicked: mainWindow.showMessageDialog(
+                                               qsTr("Delete Link"),
+                                               qsTr("Are you sure you want to delete '%1'?").arg(object.name),
+                                               Dialog.Ok | Dialog.Cancel,
+                                               function () { _linkManager.removeConfiguration(object) })
+                            }
+
+                            Item { Layout.fillWidth: true }
+
+                            QGCButton {
+                                primary:   true
+                                text:      object.link ? qsTr("Disconnect") : qsTr("Connect")
+                                onClicked: {
+                                    if (object.link) {
+                                        object.link.disconnect()
+                                    } else {
+                                        _linkManager.createConnectedLink(object)
+                                    }
+                                }
+                            }
                         }
                     }
                 }

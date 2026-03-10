@@ -912,24 +912,25 @@ Item {
             buttons: 0
             showButtons: false
             closeOnClickOutside: true
+            
+            // Set the overall popup UI width tightly
+            popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.85, 340) : 420
 
             property int selectedType: -1
 
             ColumnLayout {
-                spacing: 16
+                spacing: (isSmallScreen || isMobile) ? 8 : 16
                 Layout.fillWidth: true
-                Layout.minimumWidth: 420
-                Layout.margins: 20
 
                 Text {
                     text: qsTr("Choose how you want to connect to your drone from the options below.")
-                    font.pointSize: ScreenTools.defaultFontPointSize * 0.95
+                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.8 : 0.95)
                     color: "black"
                     opacity: 0.7
                     wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
                     Layout.fillWidth: true
-                    Layout.maximumWidth: 400
-                    Layout.bottomMargin: 10
+                    Layout.bottomMargin: (isSmallScreen || isMobile) ? 8 : 16
                 }
 
                 Repeater {
@@ -937,71 +938,71 @@ Item {
                     delegate: Rectangle {
                         id: typeItem
                         property bool isDisabled: index === 4 || index === 5 
+                        visible: !isDisabled
                         Layout.fillWidth: true
-                        height: 70
-                        radius: 12
-                        color: isDisabled ? "#E0E0E0" : (typeMouseArea.containsMouse ? Qt.rgba(249/255, 115/255, 22/255, 0.1) : "#F8F9FA")
-                        border.color: isDisabled ? "#D1D5DB" : (typeMouseArea.containsMouse ? accent_color : "#E5E7EB")
+                        Layout.preferredHeight: visible ? Math.max(((isSmallScreen || isMobile) ? 46 : 64), innerText.implicitHeight + ((isSmallScreen || isMobile) ? 20 : 28)) : 0
+                        radius: 10
+                        color: typeMouseArea.containsMouse ? Qt.rgba(249/255, 115/255, 22/255, 0.1) : "white"
+                        border.color: typeMouseArea.containsMouse ? accent_color : "#E5E7EB"
                         border.width: 1
-                        opacity: isDisabled ? 0.5 : 1.0
-                        Behavior on color { ColorAnimation { duration: 250 } }
-                        Behavior on border.color { ColorAnimation { duration: 250 } }
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.margins: 14
-                            spacing: 20
+                            anchors.margins: (isSmallScreen || isMobile) ? 8 : 12
+                            spacing: (isSmallScreen || isMobile) ? 12 : 16
 
                             // Number / Icon Box
                             Rectangle {
-                                width: 42
-                                height: 42
-                                radius: 10
-                                color: isDisabled ? "#D1D5DB" : (typeMouseArea.containsMouse && !isDisabled ? accent_color : "#E5E7EB")
-                                border.color: typeMouseArea.containsMouse && !isDisabled ? Qt.lighter(accent_color, 1.2) : "transparent"
-                                border.width: 1
-                                Behavior on color { ColorAnimation { duration: 250 } }
+                                width: (isSmallScreen || isMobile) ? 30 : 38
+                                height: (isSmallScreen || isMobile) ? 30 : 38
+                                radius: 8
+                                Layout.alignment: Qt.AlignVCenter
+                                color: typeMouseArea.containsMouse ? accent_color : "#E5E7EB"
+                                Behavior on color { ColorAnimation { duration: 150 } }
 
                                 Text {
                                     anchors.centerIn: parent
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.2
+                                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
                                     font.bold: true
-                                    color: isDisabled ? "gray" : (typeMouseArea.containsMouse && !isDisabled ? "white" : "black")
-                                    opacity: typeMouseArea.containsMouse && !isDisabled ? 1.0 : 0.8
+                                    color: typeMouseArea.containsMouse ? "white" : "black"
+                                    opacity: typeMouseArea.containsMouse ? 1.0 : 0.8
                                     text: (index + 1)
-                                    Behavior on color { ColorAnimation { duration: 250 } }
+                                    Behavior on color { ColorAnimation { duration: 150 } }
                                 }
                             }
 
                             // Connection Type Title
                             Text {
+                                id: innerText
                                 Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignVCenter
                                 text: modelData
-                                font.pointSize: ScreenTools.defaultFontPointSize * 1.3
+                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.95 : 1.2)
                                 font.weight: Font.DemiBold
-                                color: isDisabled ? "gray" : "black"
-                                verticalAlignment: Text.AlignVCenter
-                                Behavior on color { ColorAnimation { duration: 250 } }
+                                color: "black"
+                                wrapMode: Text.WordWrap
+                                Behavior on color { ColorAnimation { duration: 150 } }
                             }
 
                             // Arrow Indicator
                             Text {
+                                Layout.alignment: Qt.AlignVCenter
                                 text: "→"
-                                font.pointSize: ScreenTools.defaultFontPointSize * 1.8
+                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 1.2 : 1.6)
                                 font.bold: true
-                                color: typeMouseArea.containsMouse && !isDisabled ? accent_color : "transparent"
-                                Behavior on color { ColorAnimation { duration: 250 } }
+                                color: typeMouseArea.containsMouse ? accent_color : "transparent"
+                                Behavior on color { ColorAnimation { duration: 150 } }
                             }
                         }
 
                         MouseArea {
                             id: typeMouseArea
                             anchors.fill: parent
-                            hoverEnabled: !isDisabled
-                            enabled: !isDisabled
-                            cursorShape: isDisabled ? Qt.ForbiddenCursor : Qt.PointingHandCursor
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                if (isDisabled) return;
                                 typeDialog.selectedType = index
                                 typeDialog.close()
                                 var editingConfig = _linkManager.createConfiguration(index, "")
@@ -1061,9 +1062,9 @@ Item {
             // ---------- MAIN LAYOUT ----------
             ColumnLayout {
                 id: mainColumn
-                spacing: ScreenTools.defaultFontPixelHeight
+                spacing: isSmallScreen ? ScreenTools.defaultFontPixelHeight * 0.5 : ScreenTools.defaultFontPixelHeight
                 Layout.fillWidth: true
-                Layout.minimumWidth: 400
+                Layout.minimumWidth: isSmallScreen ? mainWindow1.width * 0.9 : 400
 
                 // ---- Name row (not shown for Bluetooth) ----
                 RowLayout {

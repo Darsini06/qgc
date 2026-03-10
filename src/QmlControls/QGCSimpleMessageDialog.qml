@@ -24,10 +24,17 @@ QGCPopupDialog {
     }
 
     ColumnLayout {
+        spacing: 0
+
         QGCLabel {
             id:                     label
-            Layout.preferredWidth:  Math.max(mainWindow.width / (ScreenTools.isMobile ? 2 : 3), headerMinWidth)
+            Layout.fillWidth:       true
+            Layout.leftMargin:      ScreenTools.defaultFontPixelWidth
+            Layout.rightMargin:     ScreenTools.defaultFontPixelWidth
+            Layout.topMargin:       ScreenTools.defaultFontPixelHeight * 0.5
+            Layout.bottomMargin:    ScreenTools.defaultFontPixelHeight * 0.5
             wrapMode:               Text.WordWrap
+            horizontalAlignment:    Text.AlignLeft
         }
     }
 }

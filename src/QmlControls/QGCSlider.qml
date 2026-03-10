@@ -44,9 +44,20 @@ Slider {
         width:          control.horizontal ? control.availableWidth : implicitWidth
         height:         control.horizontal ? implicitHeight : control.availableHeight
         radius:         control._barHeight / 2
-        color:          qgcPal.button
+        color:          "transparent"
         border.width:   1
-        border.color:   qgcPal.buttonText
+        border.color:   "#cbd5e1"
+        
+        // Active filled progress layout
+        Rectangle {
+            anchors.left:   parent.left
+            anchors.top:    parent.top
+            anchors.bottom: parent.bottom
+            width:          control.visualPosition * parent.width
+            radius:         parent.radius
+            color:          "#4a2c6d"
+            visible:        control.horizontal
+        }
     }
 
     // FIXME-QT6: Indicator portion of slider not yet supported
@@ -82,12 +93,12 @@ Slider {
                             control.topPadding + control.visualPosition * (control.availableHeight - height)
         implicitWidth:  _radius * 2
         implicitHeight: _radius * 2
-        color:          qgcPal.button
-        border.color:   qgcPal.buttonText
-        border.width:   1
+        color:          control.pressed ? "#f1f5f9" : "white"
+        border.color:   "#4a2c6d"
+        border.width:   2
         radius:         _radius
 
-        property real _radius: ScreenTools.isMobile ? ScreenTools.minTouchPixels / 2 : ScreenTools.defaultFontPixelHeight / 2
+        property real _radius: ScreenTools.isMobile ? ScreenTools.minTouchPixels / 2 : ScreenTools.defaultFontPixelHeight / 1.5
 
         Label {
             text:               control.value.toFixed( control.to <= 1 ? 1 : 0)
@@ -95,7 +106,8 @@ Slider {
             anchors.centerIn:   parent
             font.family:        ScreenTools.normalFontFamily
             font.pointSize:     ScreenTools.smallFontPointSize
-            color:              qgcPal.buttonText
+            color:              "#4a2c6d"
+            font.bold:          true
         }
     }
 }

@@ -91,7 +91,7 @@ Item {
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
-    property real iconSize: baseSize * 1.2   // icon inside the circle
+    property real iconSize: baseSize * 0.5   // icon inside the circle
 
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
@@ -213,33 +213,28 @@ Item {
         Rectangle {
             id: sharebtn
             Layout.alignment: Qt.AlignRight
-            width: 40
-            height: 40
+            width: baseSize
+            height: baseSize
             radius: width / 2  // Makes it a circle
-            color: "black"     // Black background
+            color: "#4a2c6d"   // Theme color
+            border.color: "#8e6abb"
+            border.width: 1
+            opacity: 0.95
             visible: true
-
 
             QGCColoredImage {
                 source: "qrc:/InstrumentValueIcons/share-alt.svg"
-                width: 24
-                height: 24
+                width: iconSize
+                height: iconSize
                 anchors.centerIn: parent
                 color: "white"
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked:
-                {
+                onClicked: {
                     dialog.open()
                 }
-
-                // onClicked: {
-                //     // mainWindow.showPlanView()
-                //     // //viewer3DWindow.close()
-
-                // }
             }
         }
 
@@ -934,25 +929,42 @@ Item {
                 width: parent.width * 0.4   // 80% of screen width
                 height: parent.height * 0.2 // 50% of screen height
                 background: Rectangle {
-                    color: "white"
-                    radius: 10
-                    border.color: "black"
-                    border.width: 1
+                    color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
+                    radius: 12
+                    border.color: "#4a2c6d"
+                    border.width: 2
                 }
                 Column {
                     anchors.centerIn: parent
-                    spacing: 20
-                    width: parent.width * 0.7
+                    spacing: 25
+                    width: parent.width * 0.8
 
                     Text {
                         text: "Are you sure you want to share the plan?"
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: 14
+                        font.pixelSize: 16
+                        color: "white"
+                        font.bold: true
                     }
 
                     Button {
                         text: qsTr("Share")
                         anchors.horizontalCenter: parent.horizontalCenter
+                        width: 120
+                        height: 40
+                        background: Rectangle {
+                            color: "#4a2c6d"
+                            radius: 20
+                            border.color: "#8e6abb"
+                            border.width: 1
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            font.bold: true
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
                         onClicked: {
                             dialog.close()
                             if (_planMasterController.currentPlanFile !== "") {
@@ -1023,42 +1035,162 @@ Item {
                 anchors.top:        parent.top
                 //-------------------------------------------------------
 
-                // Mission Controls (Expanded)
-                QGCTabBar {
+                // Mission Controls - Professional Purple Theme Slider
+                Rectangle {
                     id:         layerTabBar
                     width:      parent.width
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector  && !_utmspEnabled
-                    Component.onCompleted: currentIndex = 0
+                    height:     42
+                    color:      "#2d1c42"  // Dark purple background
+                    radius:     21
+                    border.color: "#4a2c6d"
+                    border.width: 1
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
-                    QGCTabButton {
-                        text:       qsTr("Mission")
+                    property int currentIndex: 0
+                    property bool fenceVisible: _geoFenceController.supported
+                    property int _visibleTabCount: fenceVisible ? 2 : 1
+
+                    // Active pill highlight
+                    Rectangle {
+                        id: sliderHighlight
+                        width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                        height: layerTabBar.height - 6
+                        y: 3
+                        x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0.0; color: "#6a4c8d" }
+                            GradientStop { position: 1.0; color: "#4a2c6d" }
+                        }
+                        radius: height / 2
+                        border.color: "#8a6cad"
+                        border.width: 1
+                        Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                     }
-                    QGCTabButton {
-                        text:       qsTr("Fence")
-                        enabled:    _geoFenceController.supported
-                        visible: droneType==="Mapping"?true:false
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 3
+                        spacing: 0
+
+                        MouseArea {
+                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                            height: parent.height
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: layerTabBar.currentIndex = 0
+                            Text {
+                                text: qsTr("Mission")
+                                anchors.centerIn: parent
+                                font.pointSize: 11
+                                font.bold: layerTabBar.currentIndex === 0
+                                color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
+                                Behavior on color { ColorAnimation { duration: 200 } }
+                            }
+                        }
+
+                        MouseArea {
+                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                            height: parent.height
+                            visible: layerTabBar.fenceVisible
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: layerTabBar.currentIndex = 1
+                            Text {
+                                text: qsTr("Fence")
+                                anchors.centerIn: parent
+                                font.pointSize: 11
+                                font.bold: layerTabBar.currentIndex === 1
+                                color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
+                                Behavior on color { ColorAnimation { duration: 200 } }
+                            }
+                        }
                     }
-                    // QGCTabButton {
-                    //     text:       qsTr("Rally")
-                    //     enabled:    _rallyPointController.supported
-                    // }
                 }
 
-                QGCTabBar {
+                Rectangle {
                     id:         layerTabBarUTMSP
                     width:      parent.width
+                    height:     40
+                    color:      "#f1f5f9"
+                    radius:     8
+                    border.color: "#e2e8f0"
+                    border.width: 1
                     visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled
-                    QGCTabButton {
-                        text:       qsTr("Mission")
+
+                    property int currentIndex: 0
+                    property bool rallyVisible: _rallyPointController.supported
+                    property int _visibleTabCount: 1 + (rallyVisible ? 1 : 0) + 1
+
+                    Rectangle {
+                        id: sliderHighlightUTMSP
+                        width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+                        height: layerTabBarUTMSP.height - 8
+                        y: 4
+                        x: {
+                            var tabWidth = width;
+                            if (layerTabBarUTMSP.currentIndex === 0) return 4;
+                            if (layerTabBarUTMSP.currentIndex === 1) return 4 + tabWidth;
+                            if (layerTabBarUTMSP.currentIndex === 2) return 4 + tabWidth * (layerTabBarUTMSP.rallyVisible ? 2 : 1);
+                            return 4;
+                        }
+                        color: "white"
+                        radius: 6
+                        border.color: "#d1d5db"
+                        border.width: 1
+                        
+                        Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
                     }
-                    QGCTabButton {
-                        text:       qsTr("Rally")
-                        enabled:    _rallyPointController.supported
-                    }
-                    QGCTabButton {
-                        id: utmspbutton
-                        text:       qsTr("UTM-Adapter")
-                        visible: _utmspEnabled
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        spacing: 0
+                        
+                        MouseArea {
+                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+                            height: parent.height
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: layerTabBarUTMSP.currentIndex = 0
+                            Text {
+                                text: qsTr("Mission")
+                                anchors.centerIn: parent
+                                font.pointSize: 12
+                                font.bold: layerTabBarUTMSP.currentIndex === 0
+                                color: layerTabBarUTMSP.currentIndex === 0 ? "black" : "#64748b"
+                                Behavior on color { ColorAnimation { duration: 200 } }
+                            }
+                        }
+
+                        MouseArea {
+                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+                            height: parent.height
+                            visible: layerTabBarUTMSP.rallyVisible
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: layerTabBarUTMSP.currentIndex = 1
+                            Text {
+                                text: qsTr("Rally")
+                                anchors.centerIn: parent
+                                font.pointSize: 12
+                                font.bold: layerTabBarUTMSP.currentIndex === 1
+                                color: layerTabBarUTMSP.currentIndex === 1 ? "black" : "#64748b"
+                                Behavior on color { ColorAnimation { duration: 200 } }
+                            }
+                        }
+                        
+                        MouseArea {
+                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+                            height: parent.height
+                            visible: _utmspEnabled
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: layerTabBarUTMSP.currentIndex = 2
+                            Text {
+                                text: qsTr("UTM-Adapter")
+                                anchors.centerIn: parent
+                                font.pointSize: 12
+                                font.bold: layerTabBarUTMSP.currentIndex === 2
+                                color: layerTabBarUTMSP.currentIndex === 2 ? "black" : "#64748b"
+                                Behavior on color { ColorAnimation { duration: 200 } }
+                            }
+                        }
                     }
                 }
             }
@@ -1129,17 +1261,6 @@ Item {
                 }
             }
 
-            // GeoFence Editor
-            GeoFenceEditor {
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
-            }
 
             // Rally Point Editor
             RallyPointEditorHeader {
@@ -1196,120 +1317,251 @@ Item {
             text:                       qsTr("Powered by %1").arg(_licenseString)
         }
 
-        Dialog {
+        Popup {
             id: missionItemDialog
+            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+            
+            // Position in the bottom-right corner
+            x: parent.width - width - 20
+            property real targetY: parent.height - height - 20
+            y: targetY
+            
             modal: true
             dim: true
+            parent: Overlay.overlay
+            
             property int currentIndex: -1
             property var currentMissionItem: null
-            parent: Overlay.overlay
-            anchors.centerIn: parent
 
-            Rectangle {
-                id: closeBtn
-                width: 30
-                height: 30
-                radius: width / 2
-                color: "red"
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.margins: 10
-
-                Text {
-                    text: "X"
-                    color: "white"
-                    anchors.centerIn: parent
-                    font.bold: true
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked:{
-                        missionItemDialog.visible = false
-                        mainWindow.showPlanView()
-
-                    }
-                }
+            // Slide animation from bottom
+            enter: Transition {
+                NumberAnimation { property: "y"; from: missionItemDialog.parent.height; to: missionItemDialog.targetY; duration: 350; easing.type: Easing.OutExpo }
             }
-            width: Math.min(Screen.width * 0.9, 600)
-            height: Math.min(editorContent.implicitHeight +25, Screen.height * 0.8)
-
-
-            // Center positioning will happen in Component.onCompleted and onOpened
-            onOpened: {
-                x = (Screen.width - width) / 2
-                y = (Screen.height - height) / 2
+            exit: Transition {
+                NumberAnimation { property: "y"; to: missionItemDialog.parent.height; duration: 250; easing.type: Easing.InCubic }
             }
 
-            contentItem: Rectangle {
-                width: parent.width
-                height: parent.height
-                color: Qt.rgba(0.98, 0.98, 0.98, 1)
-                border.color: "#cccccc"
+            background: Rectangle {
+                color:        "#2d2b3c"   // Dark charcoal — exact match to reference image
+                radius:       15          // Rounded dialog corners (as shown in image)
+                border.color: "#3a3750"
                 border.width: 1
-                radius: 8
+            }
 
-                QGCFlickable {
-                    id: flickableEditor
-                    anchors.fill: parent
-                    contentWidth: width
-                    anchors.margins: 1
-                    contentHeight: editorContent.implicitHeight
-                    clip: true
+            // Header Area
+            Item {
+                id: drawerHeader
+                width: parent.width
+                height: 60
+                anchors.top: parent.top
+                
+                Text {
+                    text: missionItemDialog.currentMissionItem ? missionItemDialog.currentMissionItem.commandName : "Edit Item"
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: "#e8e4f0"   // Light text on dark background
+                    anchors.centerIn: parent
+                }
 
-                    flickableDirection: Flickable.VerticalFlick
+                Rectangle {
+                    id: closeBtn
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: closeBtnArea.pressed ? "#3d3a50" : (closeBtnArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+                    border.color: "#4a4560"
+                    border.width: 1
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins: 15
+                    Behavior on color { ColorAnimation { duration: 100 } }
 
-                    Column {
-                        id: editorContent
-                        width: flickableEditor.width
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/close.svg"
+                        color: closeBtnArea.containsMouse ? "#e0dcf8" : "#9898bb"
+                        width: 14
+                        height: 14
+                        anchors.centerIn: parent
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                    }
 
-                        MissionItemEditor {
-                            id: editor
-                            width: parent.width
-                            map: editorMap
-                            masterController: _planMasterController
-                            missionItem: missionItemDialog.currentMissionItem
-                            readOnly: false
-
-                            onClicked: (sequenceNumber) => {
-                                           _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                                           // Optional
-                                       }
-
-                            onRemove: {
-                                var removeVIIndex = missionItemDialog.currentIndex
-                                _missionController.removeVisualItem(removeVIIndex)
-                                if (removeVIIndex >= _missionController.visualItems.count) {
-                                    removeVIIndex--
-                                }
-
-                                console.log("currentMissionItem.commandName : ",missionItemDialog.currentMissionItem.commandName)
-
-
-                                if(missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
-                                    console.log("clicked rtl")
-
-                                    QGroundControl.saveGlobalSetting("waypoint", "waypoint")
-
-                                    MapGlobals.waypoint="waypoint"
-                                    returnWaypointEnabled=true
-                                    waypointMark=true
-                                }else if(missionItemDialog.currentMissionItem.commandName==="Takeoff"){
-                                    console.log("clicked takeoff")
-                                    QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
-                                    mapclear()
-                                }
-
-
-                                missionItemDialog.close()
-                            }
-
-                            onSelectNextNotReadyItem: {
-                                selectNextNotReady()
-                            }
+                    MouseArea {
+                        id: closeBtnArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            missionItemDialog.close()
+                            mainWindow.showPlanView()
                         }
                     }
                 }
+                
+                // Subtle divider line
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "#3d3a50"
+                    anchors.bottom: parent.bottom
+                }
+            }
+
+            QGCFlickable {
+                id: flickableEditor
+                anchors.top: drawerHeader.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                contentWidth: width
+                anchors.margins: 10
+                contentHeight: editorContent.implicitHeight
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
+
+                Column {
+                    id: editorContent
+                    width: flickableEditor.width
+
+                    MissionItemEditor {
+                        id: editor
+                        width: parent.width
+                        map: editorMap
+                        masterController: _planMasterController
+                        missionItem: missionItemDialog.currentMissionItem
+                        readOnly: false
+
+                        onClicked: (sequenceNumber) => {
+                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                        }
+
+                        onRemove: {
+                            var removeVIIndex = missionItemDialog.currentIndex
+                            _missionController.removeVisualItem(removeVIIndex)
+                            if (removeVIIndex >= _missionController.visualItems.count) {
+                                removeVIIndex--
+                            }
+
+                            if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
+                                QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                                MapGlobals.waypoint="waypoint"
+                                returnWaypointEnabled=true
+                                waypointMark=true
+                            } else if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Takeoff"){
+                                QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
+                                mapclear()
+                            }
+
+                            missionItemDialog.close()
+                        }
+
+                        onSelectNextNotReadyItem: {
+                            selectNextNotReady()
+                        }
+                    }
+                }
+            }
+        }
+
+        Popup {
+            id: geoFenceDrawer
+            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+            
+            // Position in the bottom-right corner
+            x: parent.width - width - 20
+            property real targetY: parent.height - height - 20
+            y: targetY
+            
+            modal: true
+            dim: true
+            parent: Overlay.overlay
+            visible: _editingLayer == _layerGeoFence
+            onClosed: { 
+                if (layerTabBar.currentIndex === 1) {
+                    layerTabBar.currentIndex = 0;
+                }
+            }
+
+            // Slide animation from bottom
+            enter: Transition {
+                NumberAnimation { property: "y"; from: geoFenceDrawer.parent.height; to: geoFenceDrawer.targetY; duration: 350; easing.type: Easing.OutExpo }
+            }
+            exit: Transition {
+                NumberAnimation { property: "y"; to: geoFenceDrawer.parent.height; duration: 250; easing.type: Easing.InCubic }
+            }
+
+            background: Rectangle {
+                color:        "#2d2b3c"
+                radius:       15
+                border.color: "#3a3750"
+                border.width: 1
+            }
+
+            Item {
+                id: geoFenceDrawerHeader
+                width: parent.width
+                height: 60
+                anchors.top: parent.top
+                
+                Text {
+                    text: qsTr("GeoFence Settings")
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: "#e8e4f0"
+                    anchors.centerIn: parent
+                }
+
+                Rectangle {
+                    id: geoFenceCloseBtn
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: closeGeoArea.pressed ? "#3d3a50" : (closeGeoArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+                    border.color: "#4a4560"
+                    border.width: 1
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.rightMargin: 15
+                    Behavior on color { ColorAnimation { duration: 100 } }
+                    
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/close.svg"
+                        color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
+                        width: 14
+                        height: 14
+                        anchors.centerIn: parent
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                    }
+
+                    MouseArea {
+                        id: closeGeoArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            geoFenceDrawer.close()
+                        }
+                    }
+                }
+                
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "#3d3a50"
+                    anchors.bottom: parent.bottom
+                }
+            }
+
+            GeoFenceEditor {
+                id: geoFenceEditor
+                anchors.top: geoFenceDrawerHeader.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 10
+                myGeoFenceController: _geoFenceController
+                flightMap: editorMap
             }
         }
 
@@ -1420,18 +1672,21 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: "#4a2c6d"
+                        border.color: "#8e6abb"
+                        border.width: 1
                         anchors.fill: parent
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/qmlimages/NewImages/fileupload.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent
-                        color: "black"
+                    contentItem: Item {
+                        anchors.fill: parent
+                        QGCColoredImage {
+                            source: "/qmlimages/NewImages/fileupload.svg"
+                            width: iconSize
+                            height: iconSize
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
                     }
 
                     onClicked: {
@@ -1460,18 +1715,21 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: "#4a2c6d"
+                        border.color: "#8e6abb"
+                        border.width: 1
                         anchors.fill: parent
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/res/rtl.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent
-                        color: "black"
+                    contentItem: Item {
+                        anchors.fill: parent
+                        QGCColoredImage {
+                            source: "/res/rtl.svg"
+                            width: iconSize
+                            height: iconSize
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
                     }
 
                     onClicked: {
@@ -1503,9 +1761,9 @@ Item {
                 width: baseSize
                 height: baseSize
                 radius: width / 2
-                color: "white"//"white"//"#1b1c3e"
-                //border.width: width * 0.05
-                //border.color: "white"//"white"//"#005BBB"
+                color: "#4a2c6d"
+                border.width: 1
+                border.color: "#8e6abb"
                 clip: true
 
                 MouseArea {
@@ -1519,15 +1777,15 @@ Item {
                     id: compassArrow
                     source: "/qmlimages/NewImages/cardinal_point.svg"
                     anchors.centerIn: parent
-                    width: iconSize * 0.65
-                    height: iconSize * 0.65
+                    width: iconSize
+                    height: iconSize
                     fillMode: Image.PreserveAspectFit
                     transform: Rotation {
                         origin.x: compassArrow.width / 2
                         origin.y: compassArrow.height / 2
                         angle: -MapGlobals.mapRotation
                     }
-                    color : "transparent"
+                    color : "white"
                 }
             }
 
@@ -1547,14 +1805,14 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: 20
-                    color: "#80ffffff"
-                    border.color: "#ccccff"
+                    radius: 12
+                    color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
+                    border.color: "#4a2c6d"
                     border.width: 2
 
                     Column {
                         anchors.centerIn: parent
-                        spacing: 20
+                        spacing: 25
                         anchors.margins: 20
 
                         // Centered Title
@@ -1562,6 +1820,7 @@ Item {
                             text: qsTr("Are you sure you want to share the plan?")
                             font.bold: true
                             font.pointSize: 16
+                            color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             width: parent.width
                         }
@@ -1573,12 +1832,20 @@ Item {
 
                             Button {
                                 text: " Share"
-                                width: 100
-                                height: 34
-                                font.bold: true
+                                width: 120
+                                height: 40
                                 background: Rectangle {
                                     radius: 20
-                                    color: "#ccccff"
+                                    color: "#4a2c6d"
+                                    border.color: "#8e6abb"
+                                    border.width: 1
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.bold: true
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: {
                                     if (_planMasterController.currentPlanFile !== "") {
@@ -1593,7 +1860,6 @@ Item {
                     }
                 }
             }
-
         }
 
         TerrainStatus {

@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#1b1c3e"//"#A6ADFF"//qgcPal.toolbarBackground
+    color:  "#4a2c6d"//"#A6ADFF"//qgcPal.toolbarBackground
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
@@ -267,6 +267,13 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin:     20
         spacing: 12
+
+        WeatherIndicator {
+            id: weatherIndicator
+            visible: true
+        }
+
+        Rectangle { width: 2; height: 40; color: "transparent" } // Separator
 
         BatteryIndicator {
             id: batteryIndicator
@@ -626,7 +633,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         height:         ScreenTools.toolbarHeight//_root.height * 0.05
         width:          _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
-        color:          "#7d8df7"//qgcPal.colorGreen
+        color:          "#4a2c6d"//qgcPal.colorGreen
         visible:        !largeProgressBar.visible
     }
 
@@ -637,7 +644,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#1b1c3e"//qgcPal.window
+        color:          "#4a2c6d"//qgcPal.window
         radius:         4  // Rounded corners
         visible:        _showLargeProgress
 
@@ -725,10 +732,6 @@ Rectangle {
         //     text: qsTr("Downloading Parameters") + (_activeVehicle ? " (" + Math.round(_activeVehicle.loadProgress * 100) + "%)" : "")
         //     font.pointSize: ScreenTools.largeFontPointSize
         // }
-
-
-
-
 
 
         // // Close hint

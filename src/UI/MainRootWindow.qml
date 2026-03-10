@@ -1084,27 +1084,30 @@ ApplicationWindow {
     }
 
     ColumnLayout {
-        id:columnbtn
-        anchors.top: parent.top
+        id: columnbtn
+        anchors.top: toolbar.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.topMargin: parent.height* 0.15
-        anchors.leftMargin: 20
+        anchors.topMargin: ScreenTools.defaultFontPixelHeight * 0.8
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 2.5
+        spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
+
+        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+        readonly property real _iconSize: _btnSize * 0.55
         Rectangle {
             id:         utmIndicatorBtn
             Layout.alignment: Qt.AlignLeft
-            width:      parent.width * 0.05
+            width:      columnbtn._btnSize
             height:     width
             radius:     width / 2
             color:      "white"
-            visible:    true
+            visible:    false
             border.width: width * 0.05
             border.color: "white"
 
             QGCColoredImage {
                 source:             "/qmlimages/PaperPlane.svg"
-                width:              parent.width * 0.5
+                width:              columnbtn._iconSize
                 height:             width
                 anchors.centerIn:   parent
                 color:              showUTMIndicator ? "green" : "black"
@@ -1119,7 +1122,7 @@ ApplicationWindow {
         Rectangle {
             id: listbtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
             color:  "white"//"#1b1c3e"
@@ -1130,7 +1133,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: flightModeIndicator2
                 source: "/qmlimages/NewImages/savefile.svg" //"/qmlimages/NewImages/log.png"
-                width: parent.width * 0.5   // 60% of button size
+                width:  columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "transparent"
@@ -1185,7 +1188,7 @@ ApplicationWindow {
         Rectangle {
             id: takeoffbtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
             color:  "white"//"#1b1c3e"      // white background
@@ -1196,7 +1199,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: takeofficon
                 source: "/qmlimages/NewImages/takeOff.svg"
-                width: parent.width * 0.6   // 60% of button size
+                width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
@@ -1217,7 +1220,7 @@ ApplicationWindow {
         Rectangle {
             id: waypointbtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
             color:  "white"//"#1b1c3e"      // white background
@@ -1228,7 +1231,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: waypointbtnicon1
                 source: "/qmlimages/MapAddMission.svg"
-                width: parent.width * 0.6   // 60% of button size
+                width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
@@ -1285,7 +1288,7 @@ ApplicationWindow {
         Rectangle {
             id: camerabtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
             color:  "white"//"#1b1c3e"      // white background
@@ -1296,7 +1299,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: camerabtnicon
                 source: "/qmlimages/NewImages/takeOff.svg"
-                width: parent.width * 0.5   // 60% of button size
+                width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
@@ -1319,7 +1322,7 @@ ApplicationWindow {
         Rectangle {
             id: landbtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
             color:  "white"//"#1b1c3e"      // white background
@@ -1330,7 +1333,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: landbtnicon
                 source: "/qmlimages/NewImages/return.svg"
-                width: parent.width * 0.5   // 60% of button size
+                width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
@@ -1351,7 +1354,7 @@ ApplicationWindow {
         Rectangle {
             id: rtlbtn
             Layout.alignment: Qt.AlignLeft
-            width: parent.width * 0.05    // 8% of parent width
+            width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
             color:  "white"//"#1b1c3e"      // white background
@@ -1362,7 +1365,7 @@ ApplicationWindow {
             QGCColoredImage {
                 id: rtlbtnicon
                 source: "/qmlimages/NewImages/landing.png"
-                width: parent.width * 0.5   // 60% of button size
+                width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
@@ -1458,18 +1461,21 @@ ApplicationWindow {
     Dialog {
         id: myDialog
         width: 320
-        height: 300
-        property string imageSource: "/qmlimages/NewImages/takeOff.svg" // Default image
-        property string dialogText: "Default Text" // Default text
+        height: 380
+        property string imageSource: "/qmlimages/NewImages/takeOff.svg"
+        property string dialogText: "Default Text"
 
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
 
         background: Rectangle {
-            color: "white"//"#ccccff"
-            radius: 50
-            border.color: "black"//"#6a6af8"
-            border.width: 2
+            radius: 12
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#5a3c7d" }
+                GradientStop { position: 1.0; color: "#2d1c42" }
+            }
+            border.color: "#4a2c6d"
+            border.width: 1
             clip: true
         }
 
@@ -1484,94 +1490,71 @@ ApplicationWindow {
         }
 
         contentItem: ColumnLayout {
-            width: parent.width
-            height: parent.height
-            spacing: 10
-            anchors.centerIn: parent
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 15
 
+            // Header/Title
             Text {
-
-                text: myDialog.dialogText==="settings"?"Takeoff Altitude: " + takeoffSettings.sliderOutputValue + " m":myDialog.dialogText+"/n add data"
-                font.pixelSize: 16
-                color: "black"
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("TAKEOFF SETTINGS")
+                color: "white"
+                font.pointSize: 14
                 font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: 0.9
             }
 
             Rectangle {
-                id: circularButton
-                width: 80
-                height: 80
-                radius: 40
+                Layout.fillWidth: true
+                height: 1
                 color: "white"
-                border.color: "black"
-                border.width: 2
-                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: 0.1
+            }
 
-                Image {
-                    source: myDialog.imageSource
-                    width: 24
-                    height: 24
-                    anchors.centerIn: parent
+            // Altitude Display Area
+            ColumnLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 5
+                
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: myDialog.dialogText === "settings" ? qsTr("Takeoff Altitude") : qsTr("Confirm Action")
+                    color: "white"
+                    font.pointSize: 10
+                    opacity: 0.7
                 }
 
-                MouseArea {
-                    id: holdArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    onPressed: progressTimer.start()
-                    onReleased: {
-                        progressTimer.stop()
-                        progressState.value = 0
-                        progressCircle.requestPaint()
-                    }
-                    onEntered: circularButton.color = "grey"
-                    onExited: circularButton.color = "white"
-                }
-
-                Canvas {
-                    id: progressCircle
-                    width: parent.width
-                    height: parent.height
-                    anchors.centerIn: parent
-
-                    onPaint: {
-                        var ctx = getContext("2d")
-                        ctx.clearRect(0, 0, width, height)
-                        ctx.beginPath()
-                        ctx.arc(
-                                    width / 2, height / 2,
-                                    35, -Math.PI / 2,
-                                    (2 * Math.PI * progressState.value) - Math.PI / 2,
-                                    false
-                                    )
-                        ctx.lineWidth = 6
-                        ctx.strokeStyle = "#141414"
-                        ctx.stroke()
-                    }
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: takeoffSettings.sliderOutputValue.toFixed(1) + " m"
+                    color: "white"
+                    font.pointSize: 32
+                    font.bold: true
+                    visible: myDialog.dialogText === "settings"
                 }
             }
 
+            // Controls
             RowLayout {
-                spacing: 10
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: myDialog.dialogText==="settings"?true:false
-                Rectangle {
-                    width: 40
-                    height: 40
-                    color: "white"//"#ccccff"
-                    radius: 10
-                    border.color: "black"//"#6a6af8"
-                    border.width: 2
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 25
+                visible: myDialog.dialogText === "settings"
 
+                // Minus Button
+                Rectangle {
+                    width: 48
+                    height: 48
+                    radius: 24
+                    color: "#3a1f57"
+                    border.color: "#4a2c6d"
+                    border.width: 1
+                    
                     Text {
                         text: "-"
-                        font.pixelSize: 24
-                        color: "black"
-                        font.bold: true
+                        color: "white"
+                        font.pointSize: 20
                         anchors.centerIn: parent
+                        anchors.verticalCenterOffset: -2
                     }
 
                     MouseArea {
@@ -1584,20 +1567,21 @@ ApplicationWindow {
                     }
                 }
 
+                // Plus Button
                 Rectangle {
-                    width: 40
-                    height: 40
-                    color: "white"//"#ccccff"
-                    radius: 10
-                    border.color: "black"//"#6a6af8"
-                    border.width: 2
+                    width: 48
+                    height: 48
+                    radius: 24
+                    color: "#3a1f57"
+                    border.color: "#4a2c6d"
+                    border.width: 1
 
                     Text {
                         text: "+"
-                        font.pixelSize: 24
-                        color: "black"
-                        font.bold: true
+                        color: "white"
+                        font.pointSize: 20
                         anchors.centerIn: parent
+                        anchors.verticalCenterOffset: -1
                     }
 
                     MouseArea {
@@ -1609,6 +1593,66 @@ ApplicationWindow {
                         }
                     }
                 }
+            }
+
+            Item { Layout.fillHeight: true }
+
+            // Center Circular Action Button
+            Item {
+                Layout.alignment: Qt.AlignHCenter
+                width: 100
+                height: 100
+
+                Rectangle {
+                    id: circularButton
+                    anchors.fill: parent
+                    radius: 50
+                    color: "#4a2c6d"
+                    border.color: "#6a4c8d"
+                    border.width: 2
+                    
+                    Canvas {
+                        id: progressCircle
+                        anchors.fill: parent
+                        onPaint: {
+                            var ctx = getContext("2d")
+                            ctx.clearRect(0, 0, width, height)
+                            ctx.beginPath()
+                            ctx.arc(width/2, height/2, 45, -Math.PI/2, (2 * Math.PI * progressState.value) - Math.PI/2, false)
+                            ctx.lineWidth = 4
+                            ctx.strokeStyle = "white"
+                            ctx.stroke()
+                        }
+                    }
+
+                    QGCColoredImage {
+                        source: myDialog.imageSource
+                        width: 40
+                        height: 40
+                        anchors.centerIn: parent
+                        fillMode: Image.PreserveAspectFit
+                        color: "white"
+                    }
+
+                    MouseArea {
+                        id: holdArea
+                        anchors.fill: parent
+                        onPressed: progressTimer.start()
+                        onReleased: {
+                            progressTimer.stop()
+                            progressState.value = 0
+                            progressCircle.requestPaint()
+                        }
+                    }
+                }
+            }
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("Press and hold to confirm")
+                color: "white"
+                font.pointSize: 9
+                opacity: 0.6
             }
         }
 
@@ -1696,13 +1740,13 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignRight
             width: 100
             height: 38
-            radius: width / 2  // Makes it a circle
-            color:  "white"//"#1b1c3e"     // white background
+           // radius: width / 2  // Makes it a circle
+            color:  "#4a2c6d"//"#1b1c3e"     // white background
             visible: false
 
             Text {
                 text: " + New Plot "
-                color: "black"
+                color: "white"
                 anchors.centerIn: parent
                 font.bold: true
             }
@@ -1727,27 +1771,34 @@ ApplicationWindow {
 
     }
 
-    Dialog {
+    // ── Full-screen Mission Type Selector ────────────────────────────────────
+    // Single Rectangle covers 100% of the window — no popup, no scroll, no crop.
+    Rectangle {
         id: dialog
-        modal: true
-        dim: true
-        anchors.centerIn: parent
-        width: parent.width //* 0.8 // 80% of screen width
-        height: parent.height // * 0.5 // 50% of screen height
+        anchors.fill: parent
+        visible: false
+        z: 999                 // Ensure it covers toolbar/FlyView completely
+        color: "#0d0d0f"
 
-        property alias mappingbtn: mappingbtn
-        property alias mappingcirclebtn: mappingcirclebtn
-        property alias agribtn: agribtn
-        property alias agrigpsbtn: agrigpsbtn
+        // Smooth fade-in
+        Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }
+        opacity: visible ? 1 : 0
 
-
-        background: Rectangle {
-            color: "black"
-            opacity: 0.8
-            //radius: 8
-            //border.color: "white"
-            //border.width: 1
+        Rectangle {
+            anchors.fill: parent
+            opacity: 0.18
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: app_color }
+                GradientStop { position: 0.5; color: "transparent" }
+                GradientStop { position: 1.0; color: app_color }
+            }
         }
+
+        // Properties exposed for external visibility control (legacy callers)
+        property alias mappingbtn:      mappingbtn
+        property alias mappingcirclebtn: mappingcirclebtn
+        property alias agribtn:         agribtn
+        property alias agrigpsbtn:      agrigpsbtn
 
         Platform.FileDialog {
             id: kmlFileDialog
@@ -1756,542 +1807,392 @@ ApplicationWindow {
             fileMode: Platform.FileDialog.OpenFile
 
             onAccepted: {
-                console.log("Picked file (QUrl):", kmlFileDialog.file)
-
                 if (kmlFileDialog.file && kmlFileDialog.file !== "") {
-                    var fileStr = kmlFileDialog.file.toString()
-                    console.log("Picked file string:", fileStr)
-
-                    // Handle both file:// and content://
+                    var fileStr   = kmlFileDialog.file.toString()
                     var localPath = ""
-                    if (fileStr.startsWith("file://")) {
+                    if (fileStr.startsWith("file://"))
                         localPath = fileStr.replace("file://", "")
-                    } else if (fileStr.startsWith("content://")) {
-                        // On Android you get content:// URIs
-                        localPath = fileStr   // keep as-is for now
-                    }
+                    else if (fileStr.startsWith("content://"))
+                        localPath = fileStr
 
-                    console.log("Final Local Path:", localPath)
-
-                    MapGlobals.kmlPath = localPath
-                    MapGlobals.mark_with = "KML_File"
-                    MapGlobals.edit = "edit"
+                    MapGlobals.kmlPath             = localPath
+                    MapGlobals.mark_with           = "KML_File"
+                    MapGlobals.edit                = "edit"
                     MapGlobals.share_edit_visibility = false
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
-                } else {
-                    console.log("No file selected")
                 }
             }
         }
 
-
-        // Close button in top-right corner
+        // ── Close button ─────────────────────────────────────────────────────
         Rectangle {
             id: closeBtn
-            width: 30
-            height: 30
+            width:  ScreenTools.minTouchPixels
+            height: width
             radius: width / 2
-            color: "red"
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: 10
+            color:  "transparent"
+            border.color: "white"
+            border.width: 1
+            anchors.right:   parent.right
+            anchors.top:     parent.top
+            anchors.margins: ScreenTools.defaultFontPixelWidth * 1.5
+            z: 10
 
             Text {
-                text: "X"
+                text: "\u00d7"
                 color: "white"
+                font.pixelSize: ScreenTools.mediumFontPointSize * 2
                 anchors.centerIn: parent
-                font.bold: true
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked:{
+                hoverEnabled: true
+                cursorShape:  Qt.PointingHandCursor
+                onClicked: {
                     dialog.visible = false
-                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri")
                         mainWindow.showFlyView()
-                    }else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    else if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping")
                         mainWindow.showMapping()
-                    }
-
                 }
+                onEntered: closeBtn.color = "#cc4444"
+                onExited:  closeBtn.color = "transparent"
             }
         }
 
-        Column {
+        // ── Centered content ─────────────────────────────────────────────────
+        ColumnLayout {
+            id: contentCol
             anchors.centerIn: parent
-            spacing: 20
-            width: parent.width * 0.9
-            height: parent.height
+            // Full width on mobile/tablet, capped on ultra-wide desktops for premium feel
+            width:   Math.min(parent.width * 0.94, ScreenTools.defaultFontPixelWidth * 160)
+            spacing: ScreenTools.defaultFontPixelHeight * 2.5
 
+            // Header
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight * 0.6
+                Layout.alignment: Qt.AlignHCenter
+
+                Text {
+                    text: "SELECT MISSION TYPE"
+                    color: "white"
+                    font.pointSize:   ScreenTools.largeFontPointSize * 1.4
+                    font.bold:        true
+                    font.letterSpacing: 2
+                    Layout.alignment: Qt.AlignHCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    Layout.maximumWidth: contentCol.width
+                }
+
+                Rectangle {
+                    width: 80; height: 4
+                    color: app_color; radius: 2
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                Text {
+                    text: "Choose the method to define your mission boundaries and paths"
+                    color: "#888888"
+                    font.pointSize:  ScreenTools.defaultFontPointSize
+                    Layout.alignment: Qt.AlignHCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    Layout.maximumWidth: contentCol.width * 0.75
+                }
+            }
+
+            // ── Card row ─────────────────────────────────────────────────────
+            // All visible cards share the width equally — single horizontal row.
             RowLayout {
-                width: parent.width
-                height: parent.height // Set explicit height for the row layout
-                spacing: 20
+                id: cardsRow
+                Layout.fillWidth: true
+                spacing: ScreenTools.defaultFontPixelWidth * 2
 
-                // Map Selection - Dark Blue
-                Button {
-                    id:mappingbtn
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                // Card 1: Basic Mapping
+                Rectangle {
+                    id: mappingbtn
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma1.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma1.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma1.containsMouse ? 2 : 1
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping"
 
-                    background: Rectangle {
-                        id: mapping
-                        color: white//"#1b2a49" // Dark Blue
-                        radius: 8
-                        border.width: 2
-                        border.color: app_color
-                        anchors.fill: parent
-                    }
-
-                    contentItem: Rectangle {
-                        radius: mapping.radius
-                        color: "transparent"
-                        anchors.fill: parent
-
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma1.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/basic_marking.svg"
-                                width: 50
-                                height: 50
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Basic"
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
+                        Text {
+                            text: "Basic"; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-
-                    onClicked: {
-                        planView.mapclear()
-                        QGroundControl.saveGlobalSetting("mapping", "basic")
-                        MapGlobals.mark_with = "Mark_With_Manual"
-                        MapGlobals.edit = "edit"
-                        MapGlobals.editdialog = "editdialog"
-                        MapGlobals.share_edit_visibility = false
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
-
+                    MouseArea {
+                        id: ma1; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            planView.mapclear()
+                            QGroundControl.saveGlobalSetting("mapping", "basic")
+                            MapGlobals.mark_with = "Mark_With_Manual"
+                            MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
+                            MapGlobals.share_edit_visibility = false
+                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                        }
                     }
                 }
 
-                // Drone - Dark Green
-                Button {
-                    id:mappingcirclebtn
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+                // Card 2: Circular Mapping
+                Rectangle {
+                    id: mappingcirclebtn
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma2.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma2.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma2.containsMouse ? 2 : 1
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping"
 
-                    background: Rectangle {
-                        id: mappingcircle
-                        color: white//"#1c3f2b" // Dark Green
-                        radius: 8
-                        // border.width: width * 0.02
-                        // border.color: white//"#4CAF50"
-                    }
-
-                    contentItem: Rectangle {
-                        radius: mappingcircle.radius
-                        color: "transparent"
-                        anchors.fill: parent
-
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma2.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/circle_marking.svg"
-                                width: 50
-                                height: 50
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Circular"
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
+                        Text {
+                            text: "Circular"; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-
-                    onClicked: {
-                        planView.mapclear()
-                        QGroundControl.saveGlobalSetting("mapping", "circle")
-                        MapGlobals.mark_with = "Mark_With_Manual"
-                        MapGlobals.edit = "edit"
-                        MapGlobals.editdialog = "editdialog"
-                        MapGlobals.share_edit_visibility = false
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
+                    MouseArea {
+                        id: ma2; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            planView.mapclear()
+                            QGroundControl.saveGlobalSetting("mapping", "circle")
+                            MapGlobals.mark_with = "Mark_With_Manual"
+                            MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
+                            MapGlobals.share_edit_visibility = false
+                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                        }
                     }
                 }
 
-                // Map Selection - Dark Blue
-                Button {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
+                // Card 3: Map Selection  (always visible)
+                Rectangle {
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma3.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma3.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma3.containsMouse ? 2 : 1
 
-
-                    background: Rectangle {
-                        id: bgMap
-                        color: white//"#1b2a49" // Dark Blue
-                        radius: 8
-                        // border.width: width * 0.02
-                        // border.color: white//"#3b6ea5"
-                        anchors.fill: parent
-                    }
-
-                    contentItem: Rectangle {
-                        radius: bgMap.radius
-                        color: "transparent"
-                        anchors.fill: parent
-
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma3.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
                                 source: "/qmlimages/NewImages/map_selection.svg"
-                                width: 50
-                                height: 50
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Map Selection"
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
-                    }
-
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("mapping", "agri")
-                        planView.mapclear()
-                        MapGlobals.mark_with = "Mark_With_Manual"
-                        MapGlobals.edit = "edit"
-                        MapGlobals.editdialog = "editdialog"
-                        MapGlobals.share_edit_visibility = false
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
-
-                    }
-                }
-
-                // Drone - Dark Green
-                Button {
-                    id:agribtn
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
-
-                    background: Rectangle {
-                        id: bgDrone
-                        color: white//"#1c3f2b" // Dark Green
-                        radius: 8
-                        // border.width: width * 0.02
-                        // border.color: white//"#4CAF50"
-                    }
-
-                    contentItem: Rectangle {
-                        radius: bgDrone.radius
-                        color: "transparent"
-                        anchors.fill: parent
-
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
-                                source: "qrc:/qmlimages/NewImages/mark_with_drone.svg"
-                                width: 50
-                                height: 50
-                                fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Mark with Drone"
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
+                        Text {
+                            text: "Map Selection"; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
-
-                    onClicked: {
-
-                        if(activeVehicle){
+                    MouseArea {
+                        id: ma3; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
                             QGroundControl.saveGlobalSetting("mapping", "agri")
                             planView.mapclear()
-                            MapGlobals.mark_with = "Mark_With_Drone"
-                            MapGlobals.edit = "edit"
-                            mainWindow.showPlanView()
-                            dialog.visible = false
-                            planView.data1()
-                        }else {
-                            dialog.visible = false
-                            mainWindow.showToastMessage("Drone Not Connected");
+                            MapGlobals.mark_with = "Mark_With_Manual"
+                            MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
+                            MapGlobals.share_edit_visibility = false
+                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
                         }
-
-                        MapGlobals.share_edit_visibility = false
-
                     }
                 }
 
-                // GPS - Dark Green
-                Button {
-                    id:agrigpsbtn
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+                // Card 4: Mark with Drone
+                Rectangle {
+                    id: agribtn
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma4.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma4.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma4.containsMouse ? 2 : 1
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
 
-                    background: Rectangle {
-                        id: bgGPS
-                        color: white//"#1b2a49" // Dark Green
-                        radius: 8
-                        // border.width: width * 0.02
-                        // border.color: white//"#3b6ea5"
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma4.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/mark_with_drone.svg"
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
+                        Text {
+                            text: "Mark with Drone"; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
                     }
+                    MouseArea {
+                        id: ma4; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (activeVehicle) {
+                                QGroundControl.saveGlobalSetting("mapping", "agri")
+                                planView.mapclear()
+                                MapGlobals.mark_with = "Mark_With_Drone"
+                                MapGlobals.edit = "edit"
+                                mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                            } else {
+                                dialog.visible = false
+                                mainWindow.showToastMessage("Drone Not Connected")
+                            }
+                            MapGlobals.share_edit_visibility = false
+                        }
+                    }
+                }
 
-                    contentItem: Rectangle {
-                        radius: bgGPS.radius
-                        color: "transparent"
-                        anchors.fill: parent
+                // Card 5: Mark with GPS
+                Rectangle {
+                    id: agrigpsbtn
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma5.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma5.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma5.containsMouse ? 2 : 1
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
 
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma5.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
                                 source: "/qmlimages/NewImages/mark_with_gps.svg"
-                                width: 50
-                                height: 50
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Mark with GPS"
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
+                        Text {
+                            text: "Mark with GPS"; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("mapping", "agri")
-                        planView.mapclear()
-                        MapGlobals.mark_with = "Mark_With_GPS"
-                        MapGlobals.edit = "edit"
-                        MapGlobals.share_edit_visibility = false
-                        mainWindow.showPlanView()
-                        dialog.visible = false
-                        planView.data1()
+                    MouseArea {
+                        id: ma5; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            QGroundControl.saveGlobalSetting("mapping", "agri")
+                            planView.mapclear()
+                            MapGlobals.mark_with = "Mark_With_GPS"
+                            MapGlobals.edit = "edit"
+                            MapGlobals.share_edit_visibility = false
+                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                        }
                     }
                 }
 
-                Button {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: parent.width * 0.2
-                    Layout.preferredHeight: parent.height * 0.4
+                // Card 6: Load KML/SHP  (always visible)
+                Rectangle {
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width * 1.2
+                    radius: 18
+                    color:         ma6.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  ma6.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  ma6.containsMouse ? 2 : 1
 
-                    background: Rectangle {
-                        id: bgKml
-                        color: white//"#2e1437" // Dark Purple
-                        radius: 8
-                        // border.width: width * 0.02
-                        // border.color: white//"#9b59b6"
-                    }
-
-                    contentItem: Rectangle {
-                        radius: bgKml.radius
-                        color: "transparent"
-                        anchors.fill: parent
-
-                        Column {
-                            spacing: 10
-                            anchors.centerIn: parent
-
-                            Image {
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: ma6.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
                                 source: "/qmlimages/NewImages/kmlFile.svg"
-                                width: 50
-                                height: 50
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: "Load KML/SHP..."
-                                color: "black"
-                                font.pixelSize: 16
-                                font.bold: true
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
                             }
                         }
+                        Text {
+                            text: "Load KML/SHP..."; color: "white"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
                     }
-
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("mapping", "agri")
-                        // MapGlobals.mark_with = "KML_File"
-                        // MapGlobals.edit = "edit"
-                        // mainWindow.showPlanView()
-                        // dialog.visible = false
-                        // planView.data1()
-                        //kmlOrSHPLoadDialog.openForLoad()
-
-                        // open native file dialog directly
-                        kmlFileDialog.open()
-
+                    MouseArea {
+                        id: ma6; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: kmlFileDialog.open()
                     }
                 }
 
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height* 0.4 // Ensure height is taken from parent
-                // //text: "Map Selection"
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeOff.svg"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Map Selection"
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color:  "white"//"#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: {
-                // console.log("Option 1 clicked")
-                // MapGlobals.edit = "edit"
-                // mainWindow.showPlanView()
-                // dialog.visible = false
-                // planView.data1()
-                // }
-                // }
+            } // end RowLayout (cardsRow)
+        } // end ColumnLayout (contentCol)
 
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-                // //text: "Drone GPS"
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeOff.svg"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Drone GPS"
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color:  "white"//"#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: console.log("Option 2 clicked")
-                // }
+    } // end Rectangle (dialog)
 
-                // Button {
-                // //Layout.fillWidth: true
-                // Layout.alignment: Qt.AlignHCenter
-                // Layout.preferredWidth: parent.width* 0.2
-                // Layout.preferredHeight: parent.height * 0.4// Ensure height is taken from parent
-                // //text: "Load KML/SHP..."
-                // contentItem: Column {
-                // width: parent.width
-                // height: parent.height
-                // spacing: 10
-                // anchors.centerIn: parent
-                // Image {
-                // source: "/qmlimages/NewImages/takeOff.svg"
-                // width: 50
-                // height: 50
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // Text {
-                // text: "Load KML/SHP..."
-                // color: "white"
-                // horizontalAlignment: Text.AlignHCenter
-                // font.bold: true
-                // anchors.horizontalCenter: parent.horizontalCenter
-                // }
-                // }
-                // background: Rectangle {
-                // color:  "white"//"#1b1c3e"
-                // radius: 8
-                // }
-                // onClicked: console.log("Option 2 clicked")
-                // }
-
-            }
-        }
-
-    }
 
     function _restorePreviousVertices() {
         mapPolygon.beginReset()
