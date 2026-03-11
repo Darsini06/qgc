@@ -9,7 +9,7 @@ import QGroundControl.Palette
 import MapGlobals 1.0
 
 Item {
-    id: termsRoot
+    id: privacyRoot
     anchors.fill: parent
     property color app_color: "#5d179e"
     property bool loading: true
@@ -26,9 +26,9 @@ Item {
                 source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
                 width: 25; height: 25; color: "white"
                 anchors.left: parent.left; anchors.leftMargin: 20; anchors.verticalCenter: parent.verticalCenter
-                MouseArea { anchors.fill: parent; onClicked: termsRoot.backClicked() }
+                MouseArea { anchors.fill: parent; onClicked: privacyRoot.backClicked() }
             }
-            Text { text: "Terms & Conditions"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: "white"; anchors.centerIn: parent }
+            Text { text: "Privacy Policy"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: "white"; anchors.centerIn: parent }
         }
 
         Item {
@@ -36,14 +36,14 @@ Item {
             WebView {
                 id: webView
                 anchors.fill: parent
-                url: "https://www.nithra.mobi/privacy.php" // Update URL if available
+                url: "https://www.nithra.mobi/privacy.php"
                 onLoadingChanged: function(loadRequest) {
-                    if (loadRequest.status === WebView.LoadStartedStatus) termsRoot.loading = true
-                    else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) termsRoot.loading = false
+                    if (loadRequest.status === WebView.LoadStartedStatus) privacyRoot.loading = true
+                    else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) privacyRoot.loading = false
                 }
             }
             Rectangle {
-                anchors.fill: parent; color: "#00000020"; visible: termsRoot.loading
+                anchors.fill: parent; color: "#00000020"; visible: privacyRoot.loading
                 BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }
             }
         }
