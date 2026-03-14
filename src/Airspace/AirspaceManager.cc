@@ -113,7 +113,7 @@ void AirspaceZone::setProperties(const QJsonObject& props)
     }
 
     if (!typeStr.isEmpty()) {
-        if (typeStr == "red" || typeStr == "prohibited" || typeStr == "abandoned" || typeStr == "temp-red") {
+        if (typeStr == "red" || typeStr == "prohibited" || typeStr == "abandoned" || typeStr == "permanent_red_zone") {
             setZoneType(AirspaceZoneType::RedZone);
         } else if (typeStr == "boundary") {
             setZoneType(AirspaceZoneType::Boundary);
@@ -131,9 +131,9 @@ void AirspaceZone::setProperties(const QJsonObject& props)
             setZoneType(AirspaceZoneType::CTR);
         } else if (typeStr == "runway" || typeStr == "approach" || typeStr == "runwayapproach") {
             setZoneType(AirspaceZoneType::RunwayApproach);
-        } else if (typeStr == "temporary" || typeStr == "notam" || typeStr == "temporary_red_zone") {
+        } else if (typeStr == "temporary" || typeStr == "notam" || typeStr == "temporary_red_zone" || typeStr == "temp-red" || typeStr == "temp_red") {
             setZoneType(AirspaceZoneType::Temporary);
-        } else if (typeStr == "others" || typeStr == "government" || typeStr == "permanent_red_zone" || typeStr == "option") {
+        } else if (typeStr == "others" || typeStr == "government" || typeStr == "option") {
             setZoneType(AirspaceZoneType::Others);
         } else if (typeStr == "states" || typeStr == "state_border" || typeStr == "stateborder") {
             setZoneType(AirspaceZoneType::StateBorder);
@@ -158,13 +158,13 @@ void AirspaceZone::_updateStyling()
         case AirspaceZoneType::InnerYellow:
             _fillColor = "#d48a00";
             _borderColor = "#d48a00";
-            _fillOpacity = 0.45;
+            _fillOpacity = 0.5;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::OuterYellow:
             _fillColor = "#b89b00";
             _borderColor = "#b89b00";
-            _fillOpacity = 0.35;
+            _fillOpacity = 0.4;
             _borderWidth = 2;
             break;
         case AirspaceZoneType::MilitaryZone:
@@ -642,7 +642,19 @@ AirspaceZone* AirspaceManager::_parseGeoJsonFeature(const QJsonObject& feature)
     } else if (feature.contains("geometry") || feature.contains("geojson")) {
         // Raw database object
         geometry = feature.contains("geometry") ? feature["geometry"].toObject() : feature["geojson"].toObject();
-        properties = feature; // Use the whole object as properties
+        
+        // Handle potentially nested properties
+        if (feature.contains("properties") && feature["properties"].isObject()) {
+            properties = feature["properties"].toObject();
+            // Merge root items into properties if not already present
+            for (auto it = feature.begin(); it != feature.end(); ++it) {
+                if (it.key() != "properties" && it.key() != "geometry" && it.key() != "geojson" && !properties.contains(it.key())) {
+                    properties.insert(it.key(), it.value());
+                }
+            }
+        } else {
+            properties = feature;
+        }
     } else {
         return nullptr;
     }

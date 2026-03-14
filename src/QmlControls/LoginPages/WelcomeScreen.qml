@@ -29,7 +29,7 @@ Item {
 
     property string rightSide: "signup"
 
-    property color primaryHover: "#6366f1"
+    property color primaryHover: "#5e3a8a"   // Lighter shade of #4a2c6d
     property color surfaceColor: "#ffffff"
     property color textSecondary: "#64748b"
 
@@ -39,7 +39,7 @@ Item {
 
     property color textPrimary: "#000000"
 
-    property color app_color: "#5d179e"
+    property color app_color: "#4a2c6d"
 
     property real screenWidth: parent.width
     property real screenHeight: parent.height
@@ -47,13 +47,7 @@ Item {
     property real baseUnit: 8 * scaleRatio
 
 
-    property string title_1: "Welcome Back, Pilot"
-    property string title_2: "Start Your Flight Journey"
-    property string title_3: "Secure Your Access"
 
-    property string subtitle_1: "Sign in to access your flight dashboard, missions, and system controls."
-    property string subtitle_2: "Create your account to manage aircraft, track missions, and unlock full platform features."
-    property string subtitle_3: "Reset your password to regain access to your pilot account safely."
 
 
     function dp(value) {
@@ -61,6 +55,7 @@ Item {
     }
 
 
+    /* ========= BACKGROUND IMAGE ========= */
     /* ========= BACKGROUND IMAGE ========= */
     Image {
         id: bgImage
@@ -159,47 +154,20 @@ Item {
             // Background Image
             Image {
                 anchors.fill: parent
-                source: "qrc:/qmlimages/NewImages/background_login.png"
+                source: "qrc:/qmlimages/NewImages/background_login_premium.png"
                 fillMode: Image.PreserveAspectCrop
                 smooth: true
-            }
 
-            Column {
-                anchors.centerIn: parent
-                width: parent.width * 0.75
-                spacing: 16
-
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-
-                    text: currentView === "signin"
-                          ? title_1
-                          : currentView === "signup"
-                            ? title_2
-                            : title_3
-
-                    font.pointSize: ScreenTools.largeFontPointSize
-                    font.bold: true
-                    color: "white"
-                }
-
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-
-                    text: currentView === "signin"
-                          ? subtitle_1
-                          : currentView === "signup"
-                            ? subtitle_2
-                            : subtitle_3
-
-                    font.pointSize: ScreenTools.defaultFontPointSize
-                    color: "#E0E0E0"
+                // Dynamic gradient overlay to make it look futuristic
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: Qt.rgba(74/255, 44/255, 109/255, 0.4) } // Theme Purple
+                        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.6) }
+                    }
                 }
             }
+
         }
 
     }
@@ -239,7 +207,7 @@ Item {
                             text: "Welcome Back"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             font.weight: Font.Bold
-                            color: textPrimary
+                            color: app_color
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.Wrap
@@ -273,8 +241,8 @@ Item {
                                 Text {
                                     text: "Username or Email"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 Text {
@@ -315,8 +283,8 @@ Item {
                                 Text {
                                     text: "Password"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
                                 Text {
                                     text: "*"
@@ -371,7 +339,7 @@ Item {
                                             source: parent.checked
                                                     ? "/qmlimages/NewImages/password_visible.svg"
                                                     : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: "black"
+                                            color: app_color
                                         }
                                     }
                                 }
@@ -572,7 +540,7 @@ Item {
                             text: "Create Account"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             font.weight: Font.Bold
-                            color: textPrimary
+                            color: app_color
                             horizontalAlignment: Text.AlignHCenter
                             width: parent.width
                         }
@@ -626,8 +594,8 @@ Item {
                                     text: "Full Name"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 Text {
@@ -680,8 +648,8 @@ Item {
                                     text: "Username"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 // QGCColoredImage {
@@ -752,8 +720,8 @@ Item {
                                     text: "Email"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 Text {
@@ -818,8 +786,8 @@ Item {
                                     text: "Password"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 Text {
@@ -891,7 +859,7 @@ Item {
                                         source: parent.checked
                                                 ? "/qmlimages/NewImages/password_visible.svg"
                                                 : "/qmlimages/NewImages/password_hidden.svg"
-                                        color: "black"
+                                        color: app_color
                                     }
                                 }
 
@@ -913,8 +881,8 @@ Item {
                                     text: "Confirm Password"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.Medium
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
                                 }
 
                                 Text {
@@ -987,7 +955,7 @@ Item {
                                         source: parent.checked
                                                 ? "/qmlimages/NewImages/password_visible.svg"
                                                 : "/qmlimages/NewImages/password_hidden.svg"
-                                        color: "black"
+                                        color: app_color
                                     }
                                 }
                             }
@@ -1189,7 +1157,7 @@ Item {
                                 //font.pixelSize: dp(6)
                                 font.pointSize: ScreenTools.mediumFontPointSize
                                 font.weight: Font.Bold
-                                color: textPrimary
+                                color: app_color
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
 
@@ -1226,8 +1194,8 @@ Item {
                                         text: "Username"
                                         //font.pixelSize: dp(4)
                                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                        font.weight: Font.Medium
-                                        color: textPrimary
+                                        font.weight: Font.Bold
+                                        color: app_color
                                         //x: parent.width * 0.25
                                     }
 
@@ -1237,7 +1205,7 @@ Item {
                                         width: 12
                                         height: 12
                                         anchors.verticalCenter: parent.verticalCenter
-                                        color: textPrimary
+                                        color: app_color
                                     }
                                 }
 
@@ -1280,8 +1248,8 @@ Item {
                                         text: "New Password"
                                         //font.pixelSize: dp(4)
                                         font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
-                                        font.weight: Font.Medium
-                                        color: textPrimary
+                                        font.weight: Font.Bold
+                                        color: app_color
                                         //x: parent.width * 0.25
                                     }
 
@@ -1291,7 +1259,7 @@ Item {
                                         width: 12
                                         height: 12
                                         anchors.verticalCenter: parent.verticalCenter
-                                        color: textPrimary
+                                        color: app_color
                                     }
                                 }
 
@@ -1347,7 +1315,7 @@ Item {
                                             source: parent.checked
                                                     ? "/qmlimages/NewImages/password_visible.svg"
                                                     : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: "black"
+                                            color: app_color
                                         }
                                     }
                                 }
@@ -1453,7 +1421,7 @@ Item {
                                     source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
                                     width: dp(4)
                                     height: dp(4)
-                                    color: textPrimary
+                                    color: app_color
 
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -1462,7 +1430,8 @@ Item {
                                     text: "Back"
                                     font.pointSize: ScreenTools.defaultFontPointSize
                                     font.underline: true
-                                    color: textPrimary
+                                    font.weight: Font.Bold
+                                    color: app_color
 
                                     anchors.verticalCenter: parent.verticalCenter
                                 }

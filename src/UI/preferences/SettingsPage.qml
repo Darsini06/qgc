@@ -25,6 +25,7 @@ Item {
     id: root
 
     default property alias contentItem: mainLayout.data
+    property color backgroundColor: "white"
     Rectangle {
         anchors.fill: parent
         color: "transparent"
@@ -32,7 +33,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             z: -10
-            color: "white" // #5d179e
+            color: root.backgroundColor
         }
         // ---- Curved Gradient Background ----
         // Canvas {
@@ -73,8 +74,8 @@ Item {
         //         z: -1
 
         //         gradient: Gradient {
-        //             GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
-        //             GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
+        //             GradientStop { position: 0.0; color: "#2e1b45" } // Deep purple
+        //             GradientStop { position: 1.0; color: "#4a2c6d" } // Brand purple
         //         }
         //     }
 

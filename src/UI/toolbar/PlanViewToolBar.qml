@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#1b1c3e"//qgcPal.toolbarBackground
+    color:  "#4a2c6d"//qgcPal.toolbarBackground
 
     property var    planMasterController
 
@@ -194,7 +194,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#1b1c3e"
+        color:          "#4a2c6d"
         width:50
 
 
@@ -209,6 +209,14 @@ Rectangle {
 
     }
 
+    WeatherIndicator {
+        id: weatherIndicator
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: largeProgressBar1.left
+        anchors.rightMargin: ScreenTools.defaultFontPixelWidth * 2
+        visible: true
+    }
+
     // Large mission download progress bar
     Rectangle {
         id:             largeProgressBar
@@ -216,7 +224,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#1b1c3e"//qgcPal.window
+        color:          "#4a2c6d"//qgcPal.window
         visible:        _showLargeProgress
 
         property bool _userHide:                false
@@ -246,7 +254,7 @@ Rectangle {
             height: progressBackground.height
             width: _controllerProgressPct * parent.width
             radius: 6
-            color: "#7d8df7"
+            color: "#4a2c6d"
         }
 
         QGCLabel {

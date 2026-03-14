@@ -166,7 +166,7 @@ SettingsPage {
                             width: 25
                             height: 25
                             radius: width/2
-                            color: "#7F56D9"
+                            color: "#4a2c6d"
 
                             Text {
                                 anchors.centerIn: parent

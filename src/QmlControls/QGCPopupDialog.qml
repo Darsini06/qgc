@@ -242,70 +242,52 @@ Popup {
     //     radius:         20//root.padding / 2
     //     border.width:   1
     //     border.color:   _qgcPal.windowShadeLight
-    // }
+    property real popupWidth: 0
 
     Rectangle {
-        width: mainLayout.implicitWidth
-        height: mainLayout.implicitHeight
-        color: "#ffffff"
-        radius: 12
-        //border.width: 1
-        //border.color: "#dddddd"
+        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
+        height: mainLayout.implicitHeight + (buttonRow.visible ? _contentMargin : 0)
+        color: _qgcPal.window
+        radius: 0
+        border.width: 1
+        border.color: _qgcPal.windowShadeLight
         anchors.centerIn: parent
 
         ColumnLayout {
             id: mainLayout
-            anchors.centerIn: parent
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width
             spacing: _contentMargin
 
             Rectangle {
                 Layout.fillWidth: true
-                height: titleLable.implicitHeight + 5  // Increased height to accommodate close button
-                color: "#7F56D9"
-                radius: 12
-                Layout.alignment: Qt.AlignHCenter
+                height: Math.max(titleLable.implicitHeight + 20, 45) // Good breathing room
+                color: "#4a2c6d"
+                radius: 0
 
-                //Bottom rectangle to complete rounded shape
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 15 // same as radius
-                    color: "#7F56D9"
-                }
-
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: _contentMargin
-                    clip: true
+                Item {
+                    anchors.fill: parent
 
                     // Centered title
                     QGCLabel {
                         id: titleLable
                         text: root.title
-                        //anchors.centerIn: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        anchors.centerIn: parent
                         font.pointSize: ScreenTools.defaultFontPointSize
                         font.bold: true
                         color: "white"
-                        padding: 8
-                        // Adjust left margin to account for close button space
-                        //anchors.leftMargin: closeBtn.width + closeBtn.anchors.margins
-                        //anchors.rightMargin: closeBtn.width + closeBtn.anchors.margins
                     }
 
-                    // Close button - placed at top right
+                    // Close button - placed at top right properly
                     Rectangle {
                         id: closeBtn
-                        width: 25
-                        height: 25
-                        radius: width / 2
+                        width: 28
+                        height: 28
+                        radius: 0
                         color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
-                        clip: true
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        anchors.verticalCenter: parent.verticalCenter
                         visible: closeOnClickOutside
 
                         Text {
@@ -314,6 +296,7 @@ Popup {
                             anchors.centerIn: parent
                             font.bold: true
                             font.pointSize: ScreenTools.largeFontPointSize
+                            anchors.verticalCenterOffset: -2
                         }
 
                         MouseArea {
@@ -324,22 +307,19 @@ Popup {
                             onClicked: close()
                         }
                     }
-
-
                 }
-
             }
 
             Rectangle {
 
                 Layout.fillWidth:       true
-                Layout.preferredWidth:  Math.min(maxAvailableWidth, totalContentWidth)
+                Layout.preferredWidth:  maxAvailableWidth
                 Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
                 color:                  _qgcPal.window
                 Layout.leftMargin:     10
                 Layout.rightMargin:     10
 
-                property real maxAvailableWidth:    mainWindow.width - _contentMargin * 4
+                property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:
                     mainWindow.height
                     - titleLable.height
@@ -394,7 +374,7 @@ Popup {
                     onClicked: _reject()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 15
+                        radius: 0
                         color: "#E53935"
                     }
                     contentItem: Text {
@@ -415,8 +395,8 @@ Popup {
                     onClicked: _accept()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 15
-                        color: "#2196F3"
+                        radius: 0
+                        color: "#4a2c6d"
                     }
                     contentItem: Text {
                         text: acceptButton.text

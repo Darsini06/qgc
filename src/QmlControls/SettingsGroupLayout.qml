@@ -48,7 +48,7 @@ ColumnLayout {
             font.pointSize:     ScreenTools.smallFontPointSize
             visible:            headingDescription !== ""
             font.bold:      true
-            color: "#5d179e"
+            color: "#4a2c6d"
         }
     }
 
@@ -81,7 +81,7 @@ ColumnLayout {
             shadowBlur: 1.0
             shadowHorizontalOffset: 0
             shadowVerticalOffset: -10      // TOP
-            shadowColor: "#5d179e"
+            shadowColor: "#4a2c6d"
         }
         MultiEffect {
             anchors.fill: shadowSource
@@ -91,7 +91,7 @@ ColumnLayout {
             shadowBlur: 1.2
             shadowHorizontalOffset: 0
             shadowVerticalOffset: 15       // BOTTOM
-            shadowColor: "#5d179e"
+            shadowColor: "#4a2c6d"
         }
 
 
@@ -105,7 +105,7 @@ ColumnLayout {
                         //     shadowBlur: 1.0
                         //     shadowHorizontalOffset: 0
                         //     shadowVerticalOffset: 15//dp(1)
-                        //     shadowColor: "#5d179e"   // soft black
+                        //     shadowColor: "#1a237e"   // soft black
                         // }
 
         Repeater {

@@ -19,10 +19,11 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import MapGlobals 1.0
 
-Item {
+Rectangle {
     id: profilescreen
     anchors.fill: parent
-    property string currentView: MapGlobals.currentView_profile//"profile" // options: main, accountUpdate, userGuide, record, reports, feedback, settings
+    color: "#F8F9FB" // Light professional background
+    property string currentView: MapGlobals.currentView_profile
 
     property string userName: QGroundControl.loadGlobalSetting("username", "")
     property string displayName: QGroundControl.loadGlobalSetting("name", "")
@@ -44,7 +45,7 @@ Item {
 
     property bool privacyLoading: true
 
-    property color app_color: "#5d179e"
+    property color app_color: "#4a2c6d"
 
     property real screenWidth: parent.width
     property real screenHeight: parent.height
@@ -56,6 +57,10 @@ Item {
         return value * baseUnit;
     }
 
+    property bool isMobile: ScreenTools.isMobile
+    property bool isTablet: ScreenTools.isMobile && !ScreenTools.isTinyScreen
+    property bool isDesktop: !ScreenTools.isMobile
+    property bool isSmallScreen: ScreenTools.isTinyScreen
 
     ListModel {
         id: sessionModel
@@ -364,282 +369,299 @@ Item {
             anchors.fill: parent
             ColumnLayout {
                 anchors.fill: parent
-                spacing: 10
+                spacing: 0
 
-                // Profile screen header
+                // Profile screen header - Professional Modern Design
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    Layout.preferredHeight: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
                     RowLayout {
                         anchors.fill: parent
                         anchors.leftMargin: 20
                         anchors.rightMargin: 20
-                        spacing: 10
+                        spacing: 15
 
                         QGCColoredImage {
                             source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
                             fillMode: Image.PreserveAspectFit
-                            width: 25
-                            height: 25
+                            Layout.preferredWidth: 26
+                            Layout.preferredHeight: 26
                             color: "white"
 
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    // mainWindow.profileScreen1(false)
-                                    mainWindow.openHomeScreen();
-                                }
+                                onClicked: mainWindow.openHomeScreen();
                             }
                         }
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        // QGCColoredImage {
-                        //     id: homeIcon
-                        //     source: "/qmlimages/NewImages/user_profile.svg"
-                        //     width: 25
-                        //     height: 25
-                        //     fillMode: Image.PreserveAspectFit
-                        //     color: "white"
-                        // }
-
                         Text {
-                            text: "Profile"
-                            //font.pointSize: 18
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            text: qsTr("User Profile")
+                            font.pointSize: ScreenTools.largeFontPointSize
                             color: "white"
                             font.bold: true
+                            Layout.alignment: Qt.AlignVCenter
                         }
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
+                        Item { Layout.fillWidth: true }
+                    }
+                    
+                    // Header bottom shadow
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: 1
+                        color: "#20000000"
                     }
                 }
 
                 // Profile content area
-                RowLayout {
+                // Profile content area
+                ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.leftMargin: 20
-                    Layout.rightMargin: 20
-                    Layout.bottomMargin: 20
-                    spacing: 20
+                    clip: true
+                    contentWidth: availableWidth
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    padding: (isSmallScreen || isMobile) ? 15 : 25
 
-                    // First Card - Profile Info & Stats
-                    Rectangle {
-                        Layout.preferredWidth: parent.width * 0.45
-                        Layout.fillHeight: true
-                        color: "white"
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        border.width: 1
+                    GridLayout {
+                        width: parent.width
+                        columns: (isSmallScreen || isMobile) ? 1 : 2
+                        rowSpacing: (isSmallScreen || isMobile) ? 15 : 25
+                        columnSpacing: 25
 
-                        ColumnLayout {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 10
-                            clip: true
-
-                            // Profile Image
+                        // First Card - Profile Avatar & Stats
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: (isSmallScreen || isMobile) ? -1 : parent.width * 0.38
+                            Layout.alignment: Qt.AlignTop
+                            implicitHeight: profileColumn.implicitHeight + ((isSmallScreen || isMobile) ? 30 : 50)
+                            
                             Rectangle {
-                                Layout.alignment: Qt.AlignHCenter
-                                width: 85
-                                height: 85
-                                radius: width / 2
-                                border.color: "#000000"
-                                border.width: 2
-                                color: "transparent"
-                                clip: true
-
-                                // QGCColoredImage {
-                                //     anchors.centerIn: parent
-                                //     source: "/qmlimages/NewImages/profileImage.png"
-                                //     width: 80
-                                //     height: 80
-                                //     fillMode: Image.PreserveAspectFit
-                                //     //color: "#666666"
-                                //     color: "transparent"
-
-                                // }
-
-                                AnimatedImage {
-                                    anchors.centerIn: parent
-                                    source: "qrc:/qmlimages/NewImages/report_gif.gif"
-                                    width: 80
-                                    height: 80
-                                    cache: true
-                                    fillMode: Image.PreserveAspectFit
-                                }
+                                id: profileCardBg
+                                anchors.fill: parent
+                                color: "white"
+                                radius: 12
+                                border.color: "#E6E9EF"
+                                border.width: 1
+                                visible: false
+                            }
+                            
+                            MultiEffect {
+                                anchors.fill: profileCardBg
+                                source: profileCardBg
+                                shadowEnabled: true
+                                shadowBlur: 1.0
+                                shadowVerticalOffset: 2
+                                shadowColor: "#15000000"
                             }
 
-
-                            // Name
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: displayName || "Anonymous"
-                                font.pointSize: ScreenTools.mediumFontPointSize
-                                font.bold: true
-                                color: "#333333"
-                            }
-
-                            // Email
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: userEmail || "user@example.com"
-                                font.pointSize: ScreenTools.smallFontPointSize
-                                color: "#666666"
-                            }
-
-                            // Stats Section
                             ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 10
-
-                                // Hours Flown
+                                id: profileColumn
+                                anchors.fill: parent
+                                anchors.margins: (isSmallScreen || isMobile) ? 15 : 25
+                                spacing: (isSmallScreen || isMobile) ? 10 : 15
+                                
+                                // Unified Horizontal Profile & Stats Header
                                 RowLayout {
-                                    spacing: 10
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/time.svg"
-                                        width: 20
-                                        height: 20
-                                        color: "#2c3e50"
-                                    }
-                                    Text {
-                                        text: "Total Hours Flown"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        color: "#666666"
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        text: totalDurationFormatted
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
-                                    }
-                                }
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 90
+                                    spacing: 20
 
-                                // Missions Completed
-                                RowLayout {
-                                    spacing: 10
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/checkmark.svg"
-                                        width: 20
-                                        height: 20
-                                        color: "#2c3e50"
-                                    }
-                                    Text {
-                                        text: "Missions Completed"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        color: "#666666"
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        text: missionsCompleted
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        font.bold: true
-                                        color: "#2c3e50"
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Second Card - Menu List
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        color: "white"
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        border.width: 1
-
-                        ColumnLayout
-                        {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            spacing: 0
-                            clip: true
-
-                            ListView {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-
-                                model: ListModel {
-                                    ListElement { icon: "/qmlimages/NewImages/accountUpdate_black.svg"; name: " Account Update "; screen: "accountUpdate" }
-                                    ListElement { icon: "/qmlimages/NewImages/privacy_policy_black.svg"; name: " Privacy Policy "; screen: "privacy_policy" }
-                                    ListElement { icon: "/qmlimages/NewImages/terms_condition_black.svg"; name: "Terms & Conditions"; screen: "terms&conditions" }
-                                    ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Feedback"; screen: "feedback" }
-                                    ListElement { icon: "/qmlimages/NewImages/report.svg"; name: "Reports"; screen: "reports" }
-                                    ListElement { icon: "/qmlimages/NewImages/select_drone_type_black.svg"; name: "Select Application"; screen: "drone" }
-                                    ListElement { icon: "/qmlimages/NewImages/logout.svg"; name: "Logout"; screen: "logout" }
-                                }
-
-
-                                delegate: Rectangle {
-                                    width: ListView.view.width
-                                    height: 50
-                                    color: "transparent"
-
+                                    // 1. Profile Avatar & Info (Left Corner)
                                     RowLayout {
-                                        anchors.fill: parent
-                                        spacing: 15
-
-                                        QGCColoredImage {
-                                            source: model.icon
-                                            width: 20
-                                            height: 20
-                                            color: "transparent"
+                                        Layout.alignment: Qt.AlignVCenter
+                                        spacing: 12
+                                        
+                                        // Avatar
+                                        Rectangle {
+                                            width: (isSmallScreen || isMobile) ? 60 : 70
+                                            height: width
+                                            radius: width / 2
+                                            color: "white"
+                                            border.color: app_color
+                                            border.width: 2
+                                            
+                                            AnimatedImage {
+                                                anchors.centerIn: parent
+                                                source: "qrc:/qmlimages/NewImages/report_gif.gif"
+                                                width: parent.width * 0.85
+                                                height: width
+                                                fillMode: Image.PreserveAspectFit
+                                            }
                                         }
 
-                                        Text {
-                                            text: model.name
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            color: "#333333"
-                                            Layout.fillWidth: true
+                                        // Name column
+                                        ColumnLayout {
+                                            spacing: 2
+                                            Text { text: qsTr("Welcome,"); font.pointSize: ScreenTools.smallFontPointSize * 0.85; color: "#6D7278" }
+                                            Text { text: displayName || "User"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: "#1A1C1E" }
+                                            Text { text: userEmail || ""; font.pointSize: ScreenTools.smallFontPointSize * 0.75; color: app_color; visible: userEmail !== "" }
                                         }
                                     }
 
-                                    Rectangle {
-                                        anchors.bottom: parent.bottom
-                                        width: parent.width
-                                        height: 1
-                                        color: "#eeeeee"
-                                    }
+                                    // Spacing
+                                    Item { Layout.fillWidth: true }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            if (model.screen === "logout") {
-                                                logoutdialog.createObject(mainWindow).open()
-                                            } else {
+                                    // 2. Stats Section (Right Corner)
+                                    RowLayout {
+                                        Layout.alignment: Qt.AlignVCenter
+                                        spacing: 12
 
-                                                if(model.screen === "privacy_policy"){
-                                                    privacyLoading = true
+                                        // Flight Time Card
+                                        Rectangle {
+                                            width: (isSmallScreen || isMobile) ? 140 : 160
+                                            height: 70
+                                            radius: 12
+                                            color: "#F8FAFC"
+                                            border.color: "#E2E8F0"
+                                            
+                                            RowLayout {
+                                                anchors.fill: parent; anchors.margins: 10; spacing: 10
+                                                Rectangle {
+                                                    width: 32; height: 32; radius: 8; color: "#F3E8FF"
+                                                    QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/time.svg"; width: 18; height: 18; color: app_color }
                                                 }
+                                                ColumnLayout {
+                                                    spacing: 0
+                                                    Text { text: qsTr("Flight Time"); font.pointSize: ScreenTools.smallFontPointSize * 0.8; color: "#64748B" }
+                                                    Text { text: totalDurationFormatted; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: "#0F172A" }
+                                                }
+                                            }
+                                        }
 
-                                                //currentView = model.screen // This updates StackLayout.currentIndex
-
-                                                switchPage(model.screen)
+                                        // Missions Card
+                                        Rectangle {
+                                            width: (isSmallScreen || isMobile) ? 140 : 160
+                                            height: 70
+                                            radius: 12
+                                            color: "#F8FAFC"
+                                            border.color: "#E2E8F0"
+                                            
+                                            RowLayout {
+                                                anchors.fill: parent; anchors.margins: 10; spacing: 10
+                                                Rectangle {
+                                                    width: 32; height: 32; radius: 8; color: "#DCFCE7"
+                                                    QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 18; height: 18; color: "#16A34A" }
+                                                }
+                                                ColumnLayout {
+                                                    spacing: 0
+                                                    Text { text: qsTr("Completed"); font.pointSize: ScreenTools.smallFontPointSize * 0.8; color: "#64748B" }
+                                                    Text { text: missionsCompleted; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: "#0F172A" }
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-
                         }
 
+                        // Second Card - Navigation Menu
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignTop
+                            implicitHeight: menuColumn.implicitHeight + 30
+                            
+                            Rectangle {
+                                id: menuCardBg
+                                anchors.fill: parent
+                                color: "white"
+                                radius: 12
+                                border.color: "#E6E9EF"
+                                border.width: 1
+                                visible: false
+                            }
+                            
+                            MultiEffect {
+                                anchors.fill: menuCardBg
+                                source: menuCardBg
+                                shadowEnabled: true
+                                shadowBlur: 1.0
+                                shadowVerticalOffset: 2
+                                shadowColor: "#15000000"
+                            }
+
+                            ColumnLayout {
+                                id: menuColumn
+                                anchors.fill: parent
+                                anchors.margins: 15
+                                spacing: 0
+
+                                Repeater {
+                                    model: ListModel {
+                                        ListElement { icon: "/qmlimages/NewImages/accountUpdate_black.svg"; name: "Account Details"; screen: "accountUpdate" }
+                                        ListElement { icon: "/qmlimages/NewImages/privacy_policy_black.svg"; name: "Privacy Policy"; screen: "privacy_policy" }
+                                        ListElement { icon: "/qmlimages/NewImages/terms_condition_black.svg"; name: "Terms & Conditions"; screen: "terms&conditions" }
+                                        ListElement { icon: "/qmlimages/NewImages/feedback.svg"; name: "Contact & Feedback"; screen: "feedback" }
+                                        ListElement { icon: "/qmlimages/NewImages/report.svg"; name: "Mission History"; screen: "reports" }
+                                        ListElement { icon: "/qmlimages/NewImages/select_drone_type_black.svg"; name: "Change Profile Mode"; screen: "drone" }
+                                        ListElement { icon: "/qmlimages/NewImages/logout.svg"; name: "Sign Out"; screen: "logout" }
+                                    }
+
+                                    delegate: Item {
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 60
+                                        
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: 2
+                                            radius: 8
+                                            color: itemMouseArea.containsMouse ? "#F5F7FA" : "transparent"
+                                            Behavior on color { ColorAnimation { duration: 150 } }
+                                            
+                                            RowLayout {
+                                                anchors.fill: parent
+                                                anchors.margins: 15
+                                                spacing: 15
+
+                                                QGCColoredImage {
+                                                    source: model.icon
+                                                    width: 22; height: 22
+                                                    color: model.screen === "logout" ? "#E74C3C" : "#1A1C1E"
+                                                }
+
+                                                Text {
+                                                    text: model.name
+                                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                                    color: model.screen === "logout" ? "#E74C3C" : "#1A1C1E"
+                                                    font.bold: itemMouseArea.containsMouse
+                                                    Layout.fillWidth: true
+                                                }
+                                                
+                                                QGCColoredImage {
+                                                    source: "qrc:/InstrumentValueIcons/arrow-thin-right.svg"
+                                                    width: 14; height: 14
+                                                    color: "#D1D5DB"
+                                                    visible: model.screen !== "logout"
+                                                }
+                                            }
+
+                                            MouseArea {
+                                                id: itemMouseArea
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    if (model.screen === "logout") {
+                                                        logoutdialog.createObject(mainWindow).open()
+                                                    } else {
+                                                        if(model.screen === "privacy_policy") privacyLoading = true
+                                                        currentView = model.screen
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-
     }
 
     // Account Update Screen
@@ -653,106 +675,94 @@ Item {
                 anchors.fill: parent
                 color: "white"
 
-                // Header
+                // Professional Header with Gradient-like shadow
                 Rectangle {
                     id: header
                     width: parent.width
-                    height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    height: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
-                    QGCColoredImage {
-                        id: backArrow
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 25
-                        height: 25
-                        color: "white"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 20
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: currentView = "profile"
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 20
+                        
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 26; height: 26
+                            color: "white"
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: currentView = "profile"
+                            }
                         }
-                    }
-
-                    Row {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 0
-
-                        // QGCColoredImage {
-                        //     id: accountUpdate
-                        //     source: "/qmlimages/NewImages/accountUpdate_black.svg"
-                        //     width: 25
-                        //     height: 25
-                        //     fillMode: Image.PreserveAspectFit
-                        //     color: "white"
-                        // }
 
                         Text {
-                            text: "Account Update"
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            font.bold: true
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+                            text: qsTr("Account Settings")
+                            font.pointSize: ScreenTools.largeFontPointSize
+                            font.bold: true; color: "white"
                         }
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
                 // Account Update content area
-                Item {
+                ScrollView {
                     anchors.top: header.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    anchors.margins: 10
+                    clip: true
+                    contentWidth: availableWidth
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    padding: (isSmallScreen || isMobile) ? 15 : 25
 
-                    // First Card - Profile Info & Stats
-                    Rectangle {
-                        id: leftCard
-                        width: parent.width * 0.4
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        radius: 5
-                        // border.color: "#e0e0e0"
-                        // border.width: 1
+                    GridLayout {
+                        width: parent.width
+                        columns: (isSmallScreen || isMobile) ? 1 : 2
+                        rowSpacing: (isSmallScreen || isMobile) ? 15 : 25
+                        columnSpacing: 25
 
-                        Image {
-                            anchors.fill: parent
-                            source: "qrc:/qmlimages/NewImages/nature_background.webp"
-                            fillMode: Image.PreserveAspectCrop
+                        // First Card - Profile Banner
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: (isSmallScreen || isMobile) ? -1 : parent.width * 0.4
+                            Layout.preferredHeight: (isSmallScreen || isMobile) ? 140 : 300
+                            radius: 12
                             clip: true
-                            smooth: true
+                            
+                            Image {
+                                anchors.fill: parent
+                                source: "qrc:/qmlimages/NewImages/nature_background.webp"
+                                fillMode: Image.PreserveAspectCrop
+                                smooth: true
+                            }
+                            
+                            // Accent Overlay
+                            Rectangle {
+                                anchors.fill: parent
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: "#40000000" }
+                                    GradientStop { position: 1.0; color: "transparent" }
+                                }
+                            }
                         }
-                    }
 
-
-
-                    // Second Card - Form
-                    Rectangle {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: leftCard.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: 10
-                        color: "white"
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        border.width: 1
-
-                        ScrollView {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            clip: true
-                            //contentWidth: availableWidth
-                            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        // Second Card - Form
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignTop
+                            implicitHeight: formColumn.implicitHeight + 30
+                            color: "white"
+                            radius: 5
+                            border.color: "#e0e0e0"
+                            border.width: 1
 
                             Column {
                                 id: formColumn
-                                width: parent.width
+                                anchors.fill: parent
+                                anchors.margins: 15
                                 spacing: 10
 
                                 // Name Field
@@ -1040,16 +1050,13 @@ Item {
 
                                 Item { height: 10 } // Spacer
                             }
-
-                        }
-                    } //SecondCaed
-
+                        } //SecondCard
+                    } // GridLayout
                 }
-
-            }
 
         }
 
+        }
     }
 
     // Privacy Policy
@@ -1067,49 +1074,34 @@ Item {
                 Rectangle {
                     id: header
                     width: parent.width
-                    height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    height: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
-                    // Back arrow (left center)
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 25
-                        height: 25
-                        color: "white"
-                        anchors.left: parent.left
-                        anchors.leftMargin: 20
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                currentView = "profile"
-                                privacyLoader.active = false
-                                privacyLoading = true
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 20
+                        
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 26; height: 26
+                            color: "white"
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    currentView = "profile"
+                                    privacyLoader.active = false
+                                    privacyLoading = true
+                                }
                             }
                         }
-                    }
-
-                    // Center title + icon
-                    Row {
-                        spacing: 0
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        // QGCColoredImage {
-                        //     source: "/qmlimages/NewImages/privacy_policy_black.svg"
-                        //     width: 25
-                        //     height: 25
-                        //     color: "white"
-                        // }
 
                         Text {
-                            text: "Privacy Policy"
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            font.bold: true
-                            color: "white"
-                            verticalAlignment: Text.AlignVCenter
+                            text: qsTr("Privacy Policy")
+                            font.pointSize: ScreenTools.largeFontPointSize
+                            font.bold: true; color: "white"
                         }
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
@@ -1190,55 +1182,32 @@ Item {
                     // Header
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: Screen.height * 0.15
-                        color: app_color//"#1b1c3e"
+                        Layout.preferredHeight: Math.max(parent.height * 0.12, 70)
+                        color: app_color
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 20
-                            anchors.rightMargin: 20
-                            spacing: 10
+                            anchors.margins: 20
+                            spacing: 20
 
                             QGCColoredImage {
                                 source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                                fillMode: Image.PreserveAspectFit
-                                width: 25
-                                height: 25
+                                width: 26; height: 26
                                 color: "white"
-
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        //termsconditionsLoader.active = false
-                                        currentView = "profile"
-                                    }
+                                    onClicked: currentView = "profile"
                                 }
                             }
 
-                            Item {
-                                Layout.fillWidth: true
-                            }
-
-                            // QGCColoredImage {
-                            //     id: termsconditions
-                            //     source: "/qmlimages/NewImages/terms_condition_black.svg"
-                            //     width: 25
-                            //     height: 25
-                            //     fillMode: Image.PreserveAspectFit
-                            //     color: "white"
-                            // }
-
                             Text {
-                                text: "Terms & Conditions"
-                                font.pointSize: ScreenTools.mediumFontPointSize
+                                text: qsTr("Terms & Conditions")
+                                font.pointSize: ScreenTools.largeFontPointSize
                                 color: "white"
                                 font.bold: true
                             }
-
-                            Item {
-                                Layout.fillWidth: true
-                            }
+                            Item { Layout.fillWidth: true }
                         }
                     }
 
@@ -1302,267 +1271,174 @@ Item {
                 Rectangle {
                     id: header
                     width: parent.width
-                    height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    height: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
-                    // Back Arrow (Left Center)
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 25
-                        height: 25
-                        color: "white"
-                        anchors.left: parent.left
-                        anchors.leftMargin: 20
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: currentView = "profile"
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 20
+                        
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 26; height: 26
+                            color: "white"
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: currentView = "profile"
+                            }
                         }
-                    }
-
-                    // Center Title
-                    Row {
-                        spacing: 0
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        // QGCColoredImage {
-                        //     source: "/qmlimages/NewImages/feedback.svg"
-                        //     width: 25
-                        //     height: 25
-                        //     color: "white"
-                        // }
 
                         Text {
-                            text: "Feedback"
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            font.bold: true
-                            color: "white"
+                            text: qsTr("User Feedback")
+                            font.pointSize: ScreenTools.largeFontPointSize
+                            font.bold: true; color: "white"
                         }
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
                 /* ================= CONTENT ================= */
-                Item {
+                ScrollView {
                     anchors.top: header.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    anchors.margins: 10
+                    clip: true
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
-                    /* ===== LEFT CARD ===== */
-                    Rectangle {
-                        id: leftCard
-                        width: parent.width * 0.4
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        radius: 5
-                        color: "white"
-                        border.color: "#e0e0e0"
-                        border.width: 1
+                    GridLayout {
+                        width: parent.width
+                        columns: (isSmallScreen || isMobile) ? 1 : 2
+                        rowSpacing: 20
+                        columnSpacing: 20
+                        anchors.margins: 15
 
-                        // Column {
-                        //     anchors.centerIn: parent     // ✅ center both horizontally & vertically
-                        //     spacing: 10
+                        // Illustrative Card
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: (isSmallScreen || isMobile) ? 120 : 300
+                            radius: 12
+                            color: "#F8FAFC"
+                            border.color: "#E2E8F0"
+                            border.width: 1
 
-                        //     Item {
-                        //         width: 150
-                        //         height: 150
-                        //         anchors.horizontalCenter: parent.horizontalCenter
-
-                        //         LottieAnimation {
-                        //             anchors.centerIn: parent
-                        //             source: "qrc:/qmlimages/NewImages/feedback_1.json"
-                        //             autoPlay: true
-                        //             loops: Animation.Infinite
-                        //             scale: 0.25
-                        //         }
-                        //     }
-
-                        //     // Text {
-                        //     //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                        //     //     wrapMode: Text.WordWrap
-                        //     //     horizontalAlignment: Text.AlignHCenter
-                        //     //     font.pointSize: ScreenTools.defaultFontPointSize
-                        //     //     color: "black"
-                        //     //     width: parent.width - 40
-                        //     // }
-                        // }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.centerIn: parent
-
-                            LottieAnimation {
-                                id: droneAnim
+                            Item {
+                                width: (isSmallScreen || isMobile) ? 60 : 100
+                                height: (isSmallScreen || isMobile) ? 60 : 100
                                 anchors.centerIn: parent
-                                source: "qrc:/qmlimages/NewImages/feedback_1.json"
-                                autoPlay: true
-                                loops: Animation.Infinite
 
-                                // Scale down by 50%
-                                scale: 0.25
-
-                                onStatusChanged: console.log("Lottie Status:", status)
+                                LottieAnimation {
+                                    anchors.centerIn: parent
+                                    source: "qrc:/qmlimages/NewImages/feedback_1.json"
+                                    autoPlay: true
+                                    loops: Animation.Infinite
+                                    scale: 0.2
+                                }
                             }
                         }
 
-                    }
+                        // Form Card
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignTop
+                            implicitHeight: feedbackColumn.implicitHeight + 40
+                            color: "white"
+                            radius: 12
+                            border.color: "#E2E8F0"
+                            border.width: 1
 
-                    /* ===== RIGHT CARD ===== */
-                    Rectangle {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: leftCard.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: 10
-                        radius: 5
-                        color: "white"
-                        border.color: "#e0e0e0"
-                        border.width: 1
+                            ColumnLayout {
+                                id: feedbackColumn
+                                anchors.fill: parent
+                                anchors.margins: 20
+                                spacing: 15
 
-                        ScrollView {
-                            anchors.fill: parent
-                            anchors.margins: 10
-                            clip: true
-                            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-                            Column {
-                                width: parent.width
-                                spacing: 10
-
-                                /* ===== Mobile ===== */
-                                Column {
+                                ColumnLayout {
+                                    Layout.fillWidth: true
                                     spacing: 5
-                                    width: parent.width
-
-                                    Text { text: "Mobile Number"; font.bold: true }
-
+                                    Text { text: "Contact Information"; font.bold: true; color: "#1E293B" }
+                                    
                                     Rectangle {
-                                        width: parent.width
-                                        height: 40
+                                        Layout.fillWidth: true
+                                        height: 45
                                         radius: 8
-                                        border.width: feed_mobile.activeFocus ? 2 : 1
-                                        border.color: feed_mobile.activeFocus ? app_color : "#dcdde1"
-
+                                        border.color: feed_mobile.activeFocus ? app_color : "#CBD5E1"
+                                        border.width: 1
                                         TextField {
                                             id: feed_mobile
                                             anchors.fill: parent
-                                            anchors.margins: 5
-                                            placeholderText: "Enter mobile number"
+                                            anchors.margins: 8
+                                            placeholderText: "Mobile Number"
                                             inputMethodHints: Qt.ImhDigitsOnly
                                             background: null
                                         }
                                     }
-                                }
-
-                                /* ===== Email ===== */
-                                Column {
-                                    spacing: 5
-                                    width: parent.width
-
-                                    Text { text: "Email"; font.bold: true }
-
+                                    
                                     Rectangle {
-                                        width: parent.width
-                                        height: 40
+                                        Layout.fillWidth: true
+                                        height: 45
                                         radius: 8
-                                        border.width: feed_email.activeFocus ? 2 : 1
-                                        border.color: feed_email.activeFocus ? app_color : "#dcdde1"
-
+                                        border.color: feed_email.activeFocus ? app_color : "#CBD5E1"
+                                        border.width: 1
                                         TextField {
                                             id: feed_email
                                             anchors.fill: parent
-                                            anchors.margins: 5
-                                            placeholderText: "Enter your email"
+                                            anchors.margins: 8
+                                            placeholderText: "Email Address"
                                             inputMethodHints: Qt.ImhEmailCharactersOnly
                                             background: null
                                         }
                                     }
                                 }
 
-                                /* ===== Feedback ===== */
-                                Column {
+                                ColumnLayout {
+                                    Layout.fillWidth: true
                                     spacing: 5
-                                    width: parent.width
-
-                                    Text { text: "Feedback"; font.bold: true }
-
+                                    Text { text: "Details"; font.bold: true; color: "#1E293B" }
                                     Rectangle {
-                                        width: parent.width
-                                        height: 100
+                                        Layout.fillWidth: true
+                                        height: 120
                                         radius: 8
-                                        border.width: feedbackArea.activeFocus ? 2 : 1
-                                        border.color: feedbackArea.activeFocus ? app_color : "#dcdde1"
-
+                                        border.color: feedbackArea.activeFocus ? app_color : "#CBD5E1"
+                                        border.width: 1
                                         TextArea {
                                             id: feedbackArea
                                             anchors.fill: parent
-                                            anchors.margins: 5
-                                            placeholderText: "Enter your feedback here..."
+                                            anchors.margins: 8
+                                            placeholderText: "Tell us how we can improve..."
                                             wrapMode: TextArea.Wrap
                                             background: null
                                         }
                                     }
                                 }
 
-                                /* ===== Button ===== */
                                 Button {
-                                    text: "Send"
-                                    width: parent.width * 0.3
-                                    height: 40
-                                    anchors.horizontalCenter: parent.horizontalCenter
-
-                                    background: Rectangle {
-                                        radius: 5
-                                        color: app_color//parent.pressed ? "#218838" : "#28a745"
-                                    }
-
-                                    contentItem: Text {
-                                        text: parent.text
-                                        color: "white"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.bold: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-
+                                    text: "Submit Feedback"
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 45
                                     onClicked: {
-
                                         if (feedbackArea.text === "") {
-                                            mainWindow.showToastMessage("Enter your valuable feedback");
+                                            mainWindow.showToastMessage("Please enter your feedback");
                                             return;
                                         }
-
-                                        MapGlobals.insertFeedback(
-                                                    userName,
-                                                    feed_mobile.text,
-                                                    feed_email.text,
-                                                    feedbackArea.text,
-                                                    function(ok) {
-                                                        if (ok) {
-                                                            mainWindow.showToastMessage("Feedback sent successfully!");
-                                                            currentView = "profile";
-                                                        } else {
-                                                            mainWindow.showToastMessage("Failed to send feedback");
-                                                        }
-                                                    }
-                                                    );
+                                        MapGlobals.insertFeedback(userName, feed_mobile.text, feed_email.text, feedbackArea.text, function(ok) {
+                                            if (ok) {
+                                                mainWindow.showToastMessage("Thank you for your feedback!");
+                                                currentView = "profile";
+                                            }
+                                        });
                                     }
+                                    background: Rectangle { radius: 8; color: app_color }
+                                    contentItem: Text { text: parent.text; color: "white"; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                                 }
-
-                                Item { height: 10 }
                             }
                         }
                     }
                 }
             }
         }
-
     }
 
     // Reports Screen
@@ -1580,201 +1456,119 @@ Item {
                 Rectangle {
                     id: header
                     width: parent.width
-                    height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    height: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 25; height: 25
-                        color: "white"
-                        anchors.left: parent.left
-                        anchors.leftMargin: 20
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: currentView = "profile"
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 20
+                        
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 26; height: 26
+                            color: "white"
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: currentView = "profile"
+                            }
                         }
-                    }
-
-                    Row {
-                        spacing: 0
-                        anchors.centerIn: parent
-
-                        // QGCColoredImage {
-                        //     source: "/qmlimages/NewImages/report.svg"
-                        //     width: 25; height: 25
-                        //     color: "white"
-                        // }
 
                         Text {
-                            text: "Report"
-                            font.bold: true
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            color: "white"
+                            text: qsTr("Mission Reports")
+                            font.pointSize: ScreenTools.largeFontPointSize
+                            font.bold: true; color: "white"
                         }
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
                 /* ================= CONTENT ================= */
-                Item {
+                ScrollView {
                     anchors.top: header.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
-                    anchors.margins: 10
+                    clip: true
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                    padding: (isSmallScreen || isMobile) ? 10 : 20
 
-                    /* ===== LEFT CARD ===== */
-                    Rectangle {
-                        id: reportLeft
-                        width: parent.width * 0.4
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        color: "white"
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 20
 
-                        // Column {
-                        //     anchors.centerIn: parent
-                        //     spacing: 10
-
-                        //     Item {
-                        //         width: 150
-                        //         height: 150
-                        //         anchors.horizontalCenter: parent.horizontalCenter
-
-                        //         LottieAnimation {
-                        //             anchors.centerIn: parent
-                        //             source: "qrc:/qmlimages/NewImages/report_1.json"
-                        //             autoPlay: true
-                        //             loops: Animation.Infinite
-                        //             scale: 0.1
-                        //         }
-                        //     }
-
-                        //     // Text {
-                        //     //     text: "A drone is an unmanned aerial vehicle (UAV), an aircraft without a pilot on board, that can be controlled remotely or fly autonomously."
-                        //     //     wrapMode: Text.WordWrap
-                        //     //     horizontalAlignment: Text.AlignHCenter
-                        //     //     color: "black"
-                        //     //     width: parent.width - 40
-                        //     // }
-                        // }
-
-                        Item {
-                            width: 50
-                            height: 50
-                            anchors.centerIn: parent
-
+                        // Illustration Header
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: (isSmallScreen || isMobile) ? 120 : 200
+                            radius: 12
+                            color: "#F1F5F9"
                             LottieAnimation {
-                                id: droneAnim
                                 anchors.centerIn: parent
                                 source: "qrc:/qmlimages/NewImages/report_1.json"
                                 autoPlay: true
                                 loops: Animation.Infinite
-
-                                // Scale down by 50%
-                                scale: 0.1
-
-                                onStatusChanged: console.log("Lottie Status:", status)
+                                scale: 0.15
                             }
                         }
 
-                    }
+                        // Data Card
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: reportsContent.implicitHeight + 40
+                            radius: 12
+                            border.color: "#E2E8F0"
+                            color: "white"
 
-                    /* ===== RIGHT CARD ===== */
-                    Rectangle {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: reportLeft.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: 10
-                        radius: 5
-                        border.color: "#e0e0e0"
-                        color: "white"
+                            ColumnLayout {
+                                id: reportsContent
+                                anchors.fill: parent
+                                anchors.margins: 15
+                                spacing: 15
 
-                        /* Wrapper instead of Column */
-                        Item {
-                            anchors.fill: parent
-                            anchors.margins: 8
-
-                            /* ===== TABLE HEADER ===== */
-                            Rectangle {
-                                id: tableHeader
-                                width: parent.width
-                                height: 40
-                                radius: 6
-                                color: "#f8f9fa"
-
-                                Row {
-                                    anchors.fill: parent
-                                    anchors.margins: 20
-                                    spacing: 15
-
-                                    Text {
-                                        text: "Date"
-                                        width: parent.width * 0.3
-                                        font.bold: true
-                                    }
-
-                                    Text {
-                                        text: "Start Time"
-                                        width: parent.width * 0.3
-                                        font.bold: true
-                                    }
-
-                                    Text {
-                                        text: "End Time"
-                                        width: parent.width * 0.3
-                                        font.bold: true
-                                    }
+                                // Table Headers (Simplified for mobile)
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 10
+                                    Text { text: "Date"; font.bold: true; Layout.fillWidth: true; color: "#64748B" }
+                                    Text { text: "Start"; font.bold: true; Layout.preferredWidth: 80; color: "#64748B" }
+                                    Text { text: "End"; font.bold: true; Layout.preferredWidth: 80; color: "#64748B" }
                                 }
-                            }
 
-                            /* ===== LIST AREA ===== */
-                            ScrollView {
-                                anchors.top: tableHeader.bottom
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                anchors.topMargin: 6
-                                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                                // Separator
+                                Rectangle { Layout.fillWidth: true; height: 1; color: "#F1F5F9" }
 
-                                ListView {
-                                    id: listView
-                                    width: parent.width
-                                    model: sessionModel
-                                    spacing: 6
-
-                                    delegate: Rectangle {
-                                        width: listView.width
-                                        height: 40
-                                        radius: 6
-                                        color: index % 2 ? "#f8f9fa" : "#ffffff"
-
-                                        Row {
-                                            anchors.fill: parent
-                                            anchors.margins: 20
-                                            spacing: 15
-
-                                            Text { text: model.date || "NA"; width: parent.width * 0.3 }
-                                            Text { text: model.start_time || "NA"; width: parent.width * 0.3 }
-                                            Text { text: model.end_time || "NA"; width: parent.width * 0.3 }
+                                // List
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 1
+                                    Repeater {
+                                        model: sessionModel
+                                        delegate: Rectangle {
+                                            Layout.fillWidth: true
+                                            height: 50
+                                            color: index % 2 === 0 ? "transparent" : "#F8FAFC"
+                                            RowLayout {
+                                                anchors.fill: parent
+                                                anchors.margins: 5
+                                                spacing: 10
+                                                Text { text: model.date || "NA"; Layout.fillWidth: true; font.pointSize: ScreenTools.defaultFontPointSize }
+                                                Text { text: model.start_time || "NA"; Layout.preferredWidth: 80 }
+                                                Text { text: model.end_time || "NA"; Layout.preferredWidth: 80 }
+                                            }
                                         }
                                     }
-
-                                    /* Empty State */
+                                    
                                     Label {
-                                        anchors.centerIn: parent
-                                        text: "No sessions recorded yet"
-                                        visible: listView.count === 0
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: "No session history found"
+                                        visible: sessionModel.count === 0
+                                        color: "#94A3B8"
                                     }
                                 }
                             }
                         }
                     }
-
                 }
             }
         }
@@ -1798,42 +1592,31 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    height: Math.max(parent.height * 0.12, 70)
+                    color: app_color
 
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 25
-                        height: 25
-                        color: "white"
-                        anchors.left: parent.left
-                        anchors.leftMargin: 20
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: currentView = "profile"
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 20
+                        
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 26; height: 26
+                            color: "white"
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: currentView = "profile"
+                            }
                         }
-                    }
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 0
-
-                        // QGCColoredImage {
-                        //     source: "/qmlimages/NewImages/select_drone_type_black.svg"
-                        //     width: 25
-                        //     height: 25
-                        //     color: "white"
-                        // }
 
                         Text {
-                            text: "Select Application"
-                            font.pointSize: ScreenTools.mediumFontPointSize
-                            font.bold: true
-                            color: "white"
+                            text: qsTr("Select Mission Profile")
+                            font.pointSize: ScreenTools.largeFontPointSize
+                            font.bold: true; color: "white"
                         }
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
@@ -1850,9 +1633,9 @@ Item {
                     property int selectedIndex: -1
 
                     property var buttonModel: [
-                        { label: "Camera", image: "qrc:/qmlimages/NewImages/drone_pilot_AiImage.jpg" },
-                        { label: "Agri", image: "qrc:/qmlimages/NewImages/drone_expert_AiImage.jpg" },
-                        { label: "Mapping",image: "qrc:/qmlimages/NewImages/inspect_AiImage.jpg" }
+                        { label: "Camera", image: "qrc:/qmlimages/NewImages/camerabg.png" },
+                        { label: "Agri", image: "qrc:/qmlimages/NewImages/agribg.png" },
+                        { label: "Mapping",image: "qrc:/qmlimages/NewImages/mapbg.png" }
                     ]
 
                     Component.onCompleted: {
@@ -1874,7 +1657,7 @@ Item {
                         Grid {
                             id: grid
                             columns: 3
-                            spacing: 20
+                            spacing: (isSmallScreen || isMobile) ? 10 : 20
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
 

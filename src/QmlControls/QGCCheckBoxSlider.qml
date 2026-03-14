@@ -32,7 +32,7 @@ AbstractButton   {
             anchors.left:   parent.left
             text:           visible ? control.text : "X"
             visible:        control.text !== ""
-            color:"#5d179e"
+            color:"#4a2c6d"
             font.bold:      true
         }
     
@@ -45,7 +45,7 @@ AbstractButton   {
             radius:                 height / 2
             color:                  control.checked ? qgcPal.primaryButton : qgcPal.button
             border.width:           _showBorder ? 1 : 0
-            border.color:           "#5d179e"//qgcPal.buttonBorder
+            border.color:           "#4a2c6d"//qgcPal.buttonBorder
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter

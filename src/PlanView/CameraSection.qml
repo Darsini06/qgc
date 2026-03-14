@@ -27,7 +27,8 @@ Column {
         anchors.left:   parent.left
         anchors.right:  parent.right
         text:           qsTr("Camera")
-        checked:        false
+        checked:        true
+        color:          "#e8e4f8"
     }
 
     Column {
@@ -42,6 +43,36 @@ Column {
             anchors.right:  parent.right
             fact:           _camera.cameraAction
             indexModel:     false
+            
+            contentItem: Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: ScreenTools.comboBoxPadding
+                text: cameraActionCombo.currentText
+                color: "#ffffff"
+                font.pointSize: ScreenTools.defaultFontPointSize
+                verticalAlignment: Text.AlignVCenter
+            }
+            
+            delegate: ItemDelegate {
+                width: cameraActionCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: "black"
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    color: cameraActionCombo.highlightedIndex === index ? "#cccccc" : "#ffffff"
+                }
+            }
+            
+            background: Rectangle {
+                radius: 10
+                color: "#4a2c6d"
+                border.color: "#3d3a50"
+                border.width: 1
+            }
         }
 
         RowLayout {
@@ -52,11 +83,20 @@ Column {
 
             QGCLabel {
                 text:               qsTr("Time")
+                color:              "#c8c4dc"
                 Layout.fillWidth:   true
             }
             FactTextField {
                 fact:                   _camera.cameraPhotoIntervalTime
                 Layout.preferredWidth:  _fieldWidth
+                Layout.preferredHeight: 32
+                color:                  "#ffffff"
+                background: Rectangle {
+                    radius: 10
+                    color: "#27253b"
+                    border.color: "#3d3a50"
+                    border.width: 1
+                }
             }
         }
 
@@ -68,11 +108,20 @@ Column {
 
             QGCLabel {
                 text:               qsTr("Distance")
+                color:              "#c8c4dc"
                 Layout.fillWidth:   true
             }
             FactTextField {
                 fact:                   _camera.cameraPhotoIntervalDistance
                 Layout.preferredWidth:  _fieldWidth
+                Layout.preferredHeight: 32
+                color:                  "#ffffff"
+                background: Rectangle {
+                    radius: 10
+                    color: "#27253b"
+                    border.color: "#3d3a50"
+                    border.width: 1
+                }
             }
         }
 
@@ -85,44 +134,126 @@ Column {
             QGCCheckBox {
                 id:                 modeCheckBox
                 text:               qsTr("Mode")
+                textColor:          "#c8c4dc"
                 checked:            _camera.specifyCameraMode
                 onClicked:          _camera.specifyCameraMode = checked
             }
             FactComboBox {
+                id:                 cameraModeCombo
                 fact:               _camera.cameraMode
                 indexModel:         false
                 enabled:            modeCheckBox.checked
                 Layout.fillWidth:   true
+                Layout.preferredHeight: 32
+                
+                contentItem: Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: ScreenTools.comboBoxPadding
+                    text: cameraModeCombo.currentText
+                    color: "#ffffff"
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    verticalAlignment: Text.AlignVCenter
+                }
+                
+                delegate: ItemDelegate {
+                    width: cameraModeCombo.width
+                    contentItem: Text {
+                        text: modelData
+                        color: "black"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    background: Rectangle {
+                        color: cameraModeCombo.highlightedIndex === index ? "#cccccc" : "#ffffff"
+                    }
+                }
+
+                background: Rectangle {
+                    radius: 10
+                    color: "#4a2c6d"
+                    border.color: "#3d3a50"
+                    border.width: 1
+                }
             }
         }
 
-        GridLayout {
+        RowLayout {
             anchors.left:   parent.left
             anchors.right:  parent.right
-            columnSpacing:  ScreenTools.defaultFontPixelWidth / 2
-            rowSpacing:     0
-            columns:        3
+            spacing:        ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth : ScreenTools.defaultFontPixelWidth * 2
 
-            QGCLabel { text: qsTr("Gimbal") }
-            QGCLabel { text: qsTr("Pitch") }
-            QGCLabel { text: qsTr("Yaw") }
-
-            QGCCheckBox {
-                id:                 gimbalCheckBox
-                checked:            _camera.specifyGimbal
-                onClicked:          _camera.specifyGimbal = checked
-                Layout.fillWidth:   true
+            // Gimbal Checkbox Column
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight * 0.2
+                Layout.alignment: Qt.AlignVCenter
+                QGCLabel { 
+                    text: qsTr("Gimbal")
+                    color: "#c8c4dc"
+                    font.bold: true
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                QGCCheckBox {
+                    id:                 gimbalCheckBox
+                    checked:            _camera.specifyGimbal
+                    onClicked:          _camera.specifyGimbal = checked
+                    textColor:          "#c8c4dc"
+                    Layout.alignment:   Qt.AlignHCenter
+                }
             }
-            FactTextField {
-                fact:           _camera.gimbalPitch
-                implicitWidth:  ScreenTools.defaultFontPixelWidth * 9
-                enabled:        gimbalCheckBox.checked
+
+            // Pitch Column
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight * 0.2
+                Layout.fillWidth: true
+                QGCLabel { 
+                    text:               qsTr("Pitch")
+                    color:              "#c8c4dc" 
+                    Layout.alignment:   Qt.AlignHCenter
+                }
+                FactTextField {
+                    fact:                   _camera.gimbalPitch
+                    Layout.fillWidth:       true
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * (ScreenTools.isMobile ? 8 : 12)
+                    Layout.preferredHeight: ScreenTools.isMobile ? 28 : 32
+                    enabled:                gimbalCheckBox.checked
+                    horizontalAlignment:    TextInput.AlignHCenter
+                    font.pixelSize:         ScreenTools.defaultFontPixelHeight * 0.85
+                    color:                  "#ffffff"
+                    background: Rectangle {
+                        radius:         10
+                        color:          "#27253b"
+                        border.color:   "#3d3a50"
+                        border.width:   1
+                    }
+                }
             }
 
-            FactTextField {
-                fact:           _camera.gimbalYaw
-                implicitWidth:  ScreenTools.defaultFontPixelWidth * 9
-                enabled:        gimbalCheckBox.checked
+            // Yaw Column
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelHeight * 0.2
+                Layout.fillWidth: true
+                QGCLabel { 
+                    text:               qsTr("Yaw")
+                    color:              "#c8c4dc" 
+                    Layout.alignment:   Qt.AlignHCenter
+                }
+                FactTextField {
+                    fact:                   _camera.gimbalYaw
+                    Layout.fillWidth:       true
+                    Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * (ScreenTools.isMobile ? 8 : 12)
+                    Layout.preferredHeight: ScreenTools.isMobile ? 28 : 32
+                    enabled:                gimbalCheckBox.checked
+                    horizontalAlignment:    TextInput.AlignHCenter
+                    font.pixelSize:         ScreenTools.defaultFontPixelHeight * 0.85
+                    color:                  "#ffffff"
+                    background: Rectangle {
+                        radius:         10
+                        color:          "#27253b"
+                        border.color:   "#3d3a50"
+                        border.width:   1
+                    }
+                }
             }
         }
     }

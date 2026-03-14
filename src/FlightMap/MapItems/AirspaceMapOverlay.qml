@@ -35,7 +35,7 @@ Item {
     // Timer to reset moving state
     Timer {
         id: _movingStateTimer
-        interval: 100
+        interval: 250
         repeat: false
         onTriggered: _isMapMoving = false
     }
@@ -129,7 +129,8 @@ Item {
         id:                 mapItemsView
         parent:             _root.map 
         model:              airspaceManager ? airspaceManager.zones : []
-        visible:            _root.visible
+        // Performance: Hide overlay while panning and only show if zoomed in essentially (zoom > 1)
+        visible:            _root.visible && !_isMapMoving && map.zoomLevel > 1
         
         delegate: MapItemGroup {
             id: zoneGroup
@@ -141,8 +142,8 @@ Item {
                 center: zone.iconPosition
                 radius: zone.radius
                 color: zone.fillColor
-                opacity: _isMapMoving ? 0.15 : zone.fillOpacity // Even lighter during move
-                border.width: _isMapMoving ? 0 : zone.borderWidth // Disable borders during move
+                opacity: zone.fillOpacity
+                border.width: zone.borderWidth
                 border.color: zone.borderColor
             }
 
@@ -150,46 +151,10 @@ Item {
             MapPolygon {
                 visible: zone.radius === 0
                 color: zone.fillColor
-                opacity: _isMapMoving ? 0.15 : zone.fillOpacity
-                border.width: _isMapMoving ? 0 : zone.borderWidth
+                opacity: zone.fillOpacity
+                border.width: zone.borderWidth
                 border.color: zone.borderColor
                 path: zone.path 
-            }
-
-            // Airport/Facility icon (Hidden while moving for maximum performance)
-            MapQuickItem {
-                visible: !_isMapMoving && _root.showIcons && 
-                         (zone.zoneType === "airport" || zone.zoneType === "military" || zone.zoneType === "boundary")
-                coordinate: zone.iconPosition
-                anchorPoint.x: airportIcon.width / 2
-                anchorPoint.y: airportIcon.height / 2
-                sourceItem: QGCColoredImage {
-                    id: airportIcon
-                    width: ScreenTools.defaultFontPixelHeight * 1.5
-                    height: ScreenTools.defaultFontPixelHeight * 1.5
-                    source: "/qmlimages/Airframe/Plane.svg"
-                    color: zone.borderColor
-                    fillMode: Image.PreserveAspectFit
-                    opacity: 0.8
-                }
-            }
-
-            // Labels (Hidden while moving)
-            MapQuickItem {
-                visible: !_isMapMoving && _root.showLabels && zone.name !== ""
-                coordinate: zone.iconPosition
-                anchorPoint.x: zoneLabel.width / 2
-                anchorPoint.y: zoneLabel.height / 2
-                sourceItem: QGCLabel {
-                    id: zoneLabel
-                    text: zone.name
-                    color: "white"
-                    font.pixelSize: ScreenTools.smallFontPointSize
-                    font.bold: true
-                    style: Text.Outline
-                    styleColor: "black"
-                    opacity: 0.8
-                }
             }
         }
     }

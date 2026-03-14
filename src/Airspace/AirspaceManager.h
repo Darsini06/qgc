@@ -22,7 +22,9 @@
 #include <QSqlDatabase>
 #include <QMutex>
 
-class QGCToolbox;
+#include "QGCToolbox.h"
+
+class QGCApplication;
 class AirspaceRestriction;
 class AirspaceZone;
 

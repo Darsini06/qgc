@@ -45,29 +45,99 @@ Item {
 
     property double _thermalHeightFactor: 0.85 //-- TODO
 
-        Image {
+        Rectangle {
             id:             noVideo
             anchors.fill:   parent
-            source:         "/res/NoVideoBackground.jpg"
-            fillMode:       Image.PreserveAspectCrop
+            color:          "#333333"
             visible:        !(QGroundControl.videoManager.decoding)
 
             Rectangle {
-                anchors.centerIn:   parent
-                width:              noVideoLabel.contentWidth + ScreenTools.defaultFontPixelHeight
-                height:             noVideoLabel.contentHeight + ScreenTools.defaultFontPixelHeight
-                radius:             ScreenTools.defaultFontPixelWidth / 2
-                color:              "black"
-                opacity:            0.5
-            }
+                id: containerBox
+                anchors.centerIn: parent
+                width: contentColumn.width + ScreenTools.defaultFontPixelWidth * 12
+                height: contentColumn.height + ScreenTools.defaultFontPixelHeight * 6
+                color: "black"
+                border.color: "#4a2c6d"
+                border.width: 1
+                radius: 8
 
-            QGCLabel {
-                id:                 noVideoLabel
-                text:               QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue ? qsTr("WAITING FOR VIDEO") : qsTr("VIDEO DISABLED")
-                font.bold:          true
-                color:              "white"
-                font.pointSize:     useSmallFont ? ScreenTools.smallFontPointSize : ScreenTools.largeFontPointSize
-                anchors.centerIn:   parent
+                // Tech corners
+                Item {
+                    width: 20; height: 20; anchors.top: parent.top; anchors.left: parent.left
+                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                }
+                Item {
+                    width: 20; height: 20; anchors.top: parent.top; anchors.right: parent.right
+                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                }
+                Item {
+                    width: 20; height: 20; anchors.bottom: parent.bottom; anchors.left: parent.left
+                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                }
+                Item {
+                    width: 20; height: 20; anchors.bottom: parent.bottom; anchors.right: parent.right
+                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                }
+
+                Column {
+                    id: contentColumn
+                    anchors.centerIn: parent
+                    spacing: ScreenTools.defaultFontPixelHeight * 0.8
+                    
+                    Item {
+                        width: ScreenTools.defaultFontPixelHeight * 3
+                        height: ScreenTools.defaultFontPixelHeight * 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue
+
+                        // Static tech circle
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            border.color: "#4a2c6d"
+                            border.width: 1
+                            radius: width / 2
+                            opacity: 0.3
+                        }
+
+                        // Loading Dots
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 4
+                            Repeater {
+                                model: 3
+                                Rectangle {
+                                    width: 6; height: 6; radius: 3; color: "#4a2c6d"
+                                }
+                            }
+                        }
+                    }
+
+                    QGCLabel {
+                        id:                 noVideoLabel
+                        text:               QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue ? qsTr("WAITING FOR VIDEO") : qsTr("VIDEO DISABLED")
+                        font.bold:          true
+                        color:              "#4a2c6d"
+                        font.pointSize:     useSmallFont ? ScreenTools.smallFontPointSize * 1.5 : ScreenTools.largeFontPointSize * 1.2
+                        font.letterSpacing: 2
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    QGCLabel {
+                        text:               qsTr("ESTABLISHING SECURE CONNECTION...")
+                        font.bold:          true
+                        color:              "#4a2c6d"
+                        font.pointSize:     ScreenTools.smallFontPointSize * 0.8
+                        opacity:            0.6
+                        font.letterSpacing: 1
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible:            QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue
+                    }
+                }
             }
         }
 
@@ -109,32 +179,46 @@ Item {
                     }
                 }
                 Rectangle {
-                    color:  Qt.rgba(1,1,1,0.5)
+                    color:  Qt.rgba(0, 0.9, 1, 0.4)
                     height: parent.height
                     width:  1
                     x:      parent.width * 0.33
                     visible: _showGrid && !QGroundControl.videoManager.fullScreen
                 }
                 Rectangle {
-                    color:  Qt.rgba(1,1,1,0.5)
+                    color:  Qt.rgba(0, 0.9, 1, 0.4)
                     height: parent.height
                     width:  1
                     x:      parent.width * 0.66
                     visible: _showGrid && !QGroundControl.videoManager.fullScreen
                 }
                 Rectangle {
-                    color:  Qt.rgba(1,1,1,0.5)
+                    color:  Qt.rgba(0, 0.9, 1, 0.4)
                     width:  parent.width
                     height: 1
                     y:      parent.height * 0.33
                     visible: _showGrid && !QGroundControl.videoManager.fullScreen
                 }
                 Rectangle {
-                    color:  Qt.rgba(1,1,1,0.5)
+                    color:  Qt.rgba(0, 0.9, 1, 0.4)
                     width:  parent.width
                     height: 1
                     y:      parent.height * 0.66
                     visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                }
+                
+                // Advanced Center Reticle
+                Item {
+                    anchors.centerIn: parent
+                    width: ScreenTools.defaultFontPixelHeight * 4
+                    height: ScreenTools.defaultFontPixelHeight * 4
+                    visible: _showGrid && !QGroundControl.videoManager.fullScreen
+                    
+                    Rectangle { anchors.centerIn: parent; width: 4; height: 4; radius: 2; color: Qt.rgba(0, 0.9, 1, 0.7) }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; anchors.left: parent.left; width: 10; height: 1; color: Qt.rgba(0, 0.9, 1, 0.7) }
+                    Rectangle { anchors.verticalCenter: parent.verticalCenter; anchors.right: parent.right; width: 10; height: 1; color: Qt.rgba(0, 0.9, 1, 0.7) }
+                    Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.top: parent.top; width: 1; height: 10; color: Qt.rgba(0, 0.9, 1, 0.7) }
+                    Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; width: 1; height: 10; color: Qt.rgba(0, 0.9, 1, 0.7) }
                 }
             }
         }

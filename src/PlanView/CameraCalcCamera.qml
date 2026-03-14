@@ -37,6 +37,36 @@ ColumnLayout {
             onModelChanged:     selectCurrentBrand()
             onActivated: (index) => { cameraCalc.cameraBrand = currentText }
 
+            contentItem: Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: ScreenTools.comboBoxPadding
+                text: cameraBrandCombo.currentText
+                color: "#ffffff"
+                font.pointSize: ScreenTools.defaultFontPointSize
+                verticalAlignment: Text.AlignVCenter
+            }
+            
+            delegate: ItemDelegate {
+                width: cameraBrandCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: "black"
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    color: cameraBrandCombo.highlightedIndex === index ? "#cccccc" : "#ffffff"
+                }
+            }
+            
+            background: Rectangle {
+                radius: 10
+                color: "#4a2c6d"
+                border.color: "#3d3a50"
+                border.width: 1
+            }
+
             Connections {
                 target:                 cameraCalc
                 onCameraBrandChanged:   cameraBrandCombo.selectCurrentBrand()
@@ -54,6 +84,36 @@ ColumnLayout {
             visible:            !cameraCalc.isManualCamera && !cameraCalc.isCustomCamera
             onModelChanged:     selectCurrentModel()
             onActivated: (index) => { cameraCalc.cameraModel = currentText }
+
+            contentItem: Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: ScreenTools.comboBoxPadding
+                text: cameraModelCombo.currentText
+                color: "#ffffff"
+                font.pointSize: ScreenTools.defaultFontPointSize
+                verticalAlignment: Text.AlignVCenter
+            }
+            
+            delegate: ItemDelegate {
+                width: cameraModelCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: "black"
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    verticalAlignment: Text.AlignVCenter
+                }
+                background: Rectangle {
+                    color: cameraModelCombo.highlightedIndex === index ? "#cccccc" : "#ffffff"
+                }
+            }
+            
+            background: Rectangle {
+                radius: 10
+                color: "#4a2c6d"
+                border.color: "#3d3a50"
+                border.width: 1
+            }
 
             Connections {
                 target:                 cameraCalc
@@ -79,6 +139,7 @@ ColumnLayout {
                 QGCRadioButton {
                     width:          _editFieldWidth
                     text:           "Landscape"
+                    textColor:      "#ffffff"
                     checked:        !!cameraCalc.landscape.value
                     onClicked:      cameraCalc.landscape.value = 1
                 }
@@ -86,6 +147,7 @@ ColumnLayout {
                 QGCRadioButton {
                     id:             cameraOrientationPortrait
                     text:           "Portrait"
+                    textColor:      "#ffffff"
                     checked:        !cameraCalc.landscape.value
                     onClicked:      cameraCalc.landscape.value = 0
                 }
@@ -106,10 +168,12 @@ ColumnLayout {
                     QGCLabel {
                         Layout.preferredWidth:  _root._fieldWidth
                         text:                   qsTr("Width")
+                        color:                  "#ffffff"
                     }
                     QGCLabel {
                         Layout.preferredWidth:  _root._fieldWidth
                         text:                   qsTr("Height")
+                        color:                  "#ffffff"
                     }
                 }
 
@@ -117,14 +181,18 @@ ColumnLayout {
                     Layout.fillWidth:   true
                     spacing:            _margin
 
-                    QGCLabel { text: qsTr("Sensor"); Layout.fillWidth: true }
+                    QGCLabel { text: qsTr("Sensor"); Layout.fillWidth: true; color: "#ffffff" }
                     FactTextField {
                         Layout.preferredWidth:  _root._fieldWidth
                         fact:                   cameraCalc.sensorWidth
+                        color:                  "#ffffff"
+                        background: Rectangle { radius: 10; color: "#27253b"; border.color: "#3d3a50"; border.width: 1 }
                     }
                     FactTextField {
                         Layout.preferredWidth:  _root._fieldWidth
                         fact:                   cameraCalc.sensorHeight
+                        color:                  "#ffffff"
+                        background: Rectangle { radius: 10; color: "#27253b"; border.color: "#3d3a50"; border.width: 1 }
                     }
                 }
 
@@ -132,14 +200,18 @@ ColumnLayout {
                     Layout.fillWidth:   true
                     spacing:            _margin
 
-                    QGCLabel { text: qsTr("Image"); Layout.fillWidth: true }
+                    QGCLabel { text: qsTr("Image"); Layout.fillWidth: true; color: "#ffffff" }
                     FactTextField {
                         Layout.preferredWidth:  _root._fieldWidth
                         fact:                   cameraCalc.imageWidth
+                        color:                  "#ffffff"
+                        background: Rectangle { radius: 10; color: "#27253b"; border.color: "#3d3a50"; border.width: 1 }
                     }
                     FactTextField {
                         Layout.preferredWidth:  _root._fieldWidth
                         fact:                   cameraCalc.imageHeight
+                        color:                  "#ffffff"
+                        background: Rectangle { radius: 10; color: "#27253b"; border.color: "#3d3a50"; border.width: 1 }
                     }
                 }
 
@@ -149,10 +221,13 @@ ColumnLayout {
                     QGCLabel {
                         text:                   qsTr("Focal length")
                         Layout.fillWidth:       true
+                        color:                  "#ffffff"
                     }
                     FactTextField {
                         Layout.preferredWidth:  _root._fieldWidth
                         fact:                   cameraCalc.focalLength
+                        color:                  "#ffffff"
+                        background: Rectangle { radius: 10; color: "#27253b"; border.color: "#3d3a50"; border.width: 1 }
                     }
                 }
             }

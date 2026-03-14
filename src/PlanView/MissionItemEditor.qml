@@ -16,11 +16,11 @@ import MapGlobals
 Rectangle {
     id:             _root
     height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
-    color:          "#1b1c3e"//_currentItem ? qgcPal.missionItemEditor : qgcPal.windowShade
+    implicitHeight: height
+    color:          "transparent"
     radius:         _radius
     opacity:        _currentItem ? 1.0 : 0.7
-    border.width:   _readyForSave ? 0 : 2
-    border.color:   qgcPal.warningText
+    border.width:   0
 
     property var    map                 ///< Map control
     property var    masterController
@@ -34,7 +34,7 @@ Rectangle {
     property var    _masterController:          masterController
     property var    _missionController:         _masterController.missionController
     property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey")
-    property color  _outerTextColor:            "white"//_currentItem ? qgcPal.primaryButtonText : qgcPal.text
+    property color  _outerTextColor:            "#d8d4ec"
     property bool   _noMissionItemsAdded:       ListView.view.model.count === 1
     property real   _sectionSpacer:             ScreenTools.defaultFontPixelWidth / 2  // spacing between section headings
     property bool   _singleComplexItem:         _missionController.complexMissionItemNames.length === 1
@@ -91,7 +91,7 @@ Rectangle {
             height:                 width
             border.width:           1
             border.color:           qgcPal.warningText
-            color:                  "white"
+            color:                  "#2a2838"
             radius:                 width / 2
             visible:                !_readyForSave
 
@@ -114,7 +114,7 @@ Rectangle {
             fillMode:               Image.PreserveAspectFit
             mipmap:                 true
             smooth:                 true
-            color:                  "white"//qgcPal.text
+            color:                  "#9090b0"
             visible:                _currentItem && missionItem.sequenceNumber !== 0
             source:                 "/res/TrashDelete.svg"
 
@@ -147,7 +147,8 @@ Rectangle {
 
                 QGCLabel {
                     text: missionItem.commandName
-                    color: "white"
+                    color: "#d8d4ec"
+                    font.bold: true
                 }
 
                 QGCColoredImage {
@@ -156,7 +157,7 @@ Rectangle {
                     fillMode:           Image.PreserveAspectFit
                     smooth:             true
                     antialiasing:       true
-                    color:              "white"//qgcPal.text
+                    color:              "#9090b0"
                     source:             "/qmlimages/arrow-down.png"
                 }
             }
@@ -251,9 +252,8 @@ Rectangle {
         height:                 _hamburgerSize
         sourceSize.height:      _hamburgerSize
         source:                 "qrc:/qmlimages/Hamburger.svg"
-        //visible: (missionItem.isCurrentItem || missionItem.commandName === "Survey") && missionItem.sequenceNumber !== 0
         visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
-        color:                  "white"//qgcPal.text
+        color:                  "#475569" // Slate grey for hamburger
 
         QGCMouseArea {
             fillItem:   hamburger
