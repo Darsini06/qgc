@@ -331,6 +331,14 @@
         <file alias="LoginPages/WelcomeScreen.qml">src/QmlControls/LoginPages/WelcomeScreen.qml</file>
         <file alias="LoginPages/HomeScreen.qml">src/QmlControls/LoginPages/HomeScreen.qml</file>
         <file alias="LoginPages/ProfileScreen.qml">src/QmlControls/LoginPages/ProfileScreen.qml</file>
+        <file alias="LoginPages/ReportScreen.qml">src/QmlControls/LoginPages/ReportScreen.qml</file>
+        <file alias="LoginPages/PrivacyPolicy.qml">src/QmlControls/LoginPages/PrivacyPolicy.qml</file>
+        <file alias="LoginPages/SelectApplication.qml">src/QmlControls/LoginPages/SelectApplication.qml</file>
+        <file alias="LoginPages/Feedback.qml">src/QmlControls/LoginPages/Feedback.qml</file>
+        <file alias="LoginPages/Terms_Condition.qml">src/QmlControls/LoginPages/Terms_Condition.qml</file>
+        <file alias="LoginPages/AccountUpdate.qml">src/QmlControls/LoginPages/AccountUpdate.qml</file>
+        <file alias="LoginPages/ProfileMain.qml">src/QmlControls/LoginPages/ProfileMain.qml</file>
+        <file alias="LoginPages/PrivacyScreen.qml">src/QmlControls/LoginPages/PrivacyScreen.qml</file>
 
         <file alias="Viewer3D/Viewer3D.qml">src/Viewer3D/Viewer3DQml/Viewer3D.qml</file>
         <file alias="Viewer3D/qmldir">src/QmlControls/Viewer3D/qmldir</file>

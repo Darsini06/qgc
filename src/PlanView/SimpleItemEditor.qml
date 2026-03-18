@@ -13,8 +13,20 @@ import QGroundControl.Palette
 Rectangle {
     width:  availableWidth
     height: editorColumn.height + (_margin * 2)
-    color:  qgcPal.windowShadeDark
+    color:  "#1e1e24" // Matches Mission Start
     radius: _radius
+
+    property real   _panelRadius:   8
+    property real   _fieldRadius:   15
+    property color  _panelColor:    "#282830"
+    property color  _panelBorder:   "#3e3e4a"
+    property color  _fieldColor:    "#32323b"
+    property color  _fieldBorder:   "#3e3e4a"
+    property color  _headingColor:  "#ffffff"
+    property color  _labelColor:    "#ffffff"
+    property color  _valueColor:    "#ffffff"
+    property color  _unitColor:     "#8e8e93"
+    property color  _colorAccent:   "#4a2c6d"
 
     property bool _specifiesAltitude:       missionItem.specifiesAltitude
     property real _margin:                  ScreenTools.defaultFontPixelHeight / 2
@@ -49,6 +61,150 @@ Rectangle {
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
     Component { id: altModeDialogComponent; AltModeDialog { } }
 
+    Component {
+        id: volumeSliderComponent
+
+        RowLayout {
+            width: parent ? parent.width : implicitWidth // Fill parent Loader
+            spacing: ScreenTools.defaultFontPixelWidth * 0.7
+            property var fact: null
+            property color trackFillColor: _colorAccent
+            property bool showMinusButton: true
+            property bool showPlusButton: true
+
+            Rectangle {
+                visible: parent.showMinusButton
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth: Layout.preferredHeight
+                radius: 15
+                color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _fieldColor : _panelColor)
+                border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
+                border.width: 1
+
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "−"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _headingColor
+                }
+
+                MouseArea {
+                    id: minusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
+                            parent.parent.fact.value -= step;
+                        }
+                    }
+                }
+            }
+
+            Slider {
+                id: factSlider
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+
+                from: {
+                    if (!parent.fact) return 0;
+                    if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0;
+                    return parent.fact.min;
+                }
+                to: {
+                    if (!parent.fact) return 100;
+                    if (isNaN(parent.fact.max) || parent.fact.max > 1000) return (from + 200);
+                    return parent.fact.max;
+                }
+                value: parent.fact ? parent.fact.value : 0
+                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 1) : 1
+
+                background: Rectangle {
+                    x: factSlider.leftPadding
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 100
+                    implicitHeight: 6
+                    width: factSlider.availableWidth
+                    height: implicitHeight
+                    radius: 3
+                    color: _fieldColor
+
+                    Rectangle {
+                        width: factSlider.visualPosition * parent.width
+                        height: parent.height
+                        color: parent.parent.parent.trackFillColor
+                        radius: 3
+                    }
+                }
+
+                handle: Rectangle {
+                    x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 18
+                    implicitHeight: 18
+                    radius: 9
+                    color: _valueColor
+                    border.color: _colorAccent
+                    border.width: factSlider.pressed ? 4 : 2
+
+                    Behavior on border.width { NumberAnimation { duration: 150 } }
+                }
+
+                onMoved: {
+                    if (parent.fact) parent.fact.value = value;
+                }
+            }
+
+            Rectangle {
+                visible: parent.showPlusButton
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth: Layout.preferredHeight
+                radius: 15
+                color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _fieldColor : _panelColor)
+                border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
+                border.width: 1
+
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "+"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _headingColor
+                }
+
+                MouseArea {
+                    id: plusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
+                            parent.parent.fact.value += step;
+                        }
+                    }
+                }
+            }
+
+            FactTextField {
+                id: factField
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 8
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.alignment: Qt.AlignVCenter
+                fact: parent.fact
+                showUnits: true
+                color: _valueColor
+                horizontalAlignment: Qt.AlignHCenter
+                background: Rectangle {
+                    color: factField.activeFocus ? _fieldColor : _panelColor
+                    border.color: factField.activeFocus ? _colorAccent : _panelBorder
+                    border.width: factField.activeFocus ? 2 : 1
+                    radius: 15
+                }
+            }
+        }
+    }
+
     Column {
         id:                 editorColumn
         anchors.margins:    _margin
@@ -64,6 +220,7 @@ Rectangle {
             text:           missionItem.rawEdit ?
                                 qsTr("Provides advanced access to all commands/parameters. Be very careful!") :
                                 missionItem.commandDescription
+            color:          _labelColor
         }
 
         ColumnLayout {
@@ -156,6 +313,7 @@ Rectangle {
                             Layout.alignment:   Qt.AlignBaseline
                             text:               qsTr("Altitude")
                             font.pointSize:     ScreenTools.smallFontPointSize
+                            color:              _labelColor
                         }
                         QGCLabel {
                             id:                 altModeLabel
@@ -166,24 +324,31 @@ Rectangle {
                             height:     ScreenTools.defaultFontPixelHeight / 2
                             width:      height
                             source:     "/res/DropArrow.svg"
-                            color:      qgcPal.text
+                            color:      _unitColor
                             visible:    _globalAltModeIsMixed
                         }
                     }
                 }
 
-                FactTextField {
-                    id:                 altField
+                Loader {
                     Layout.fillWidth:   true
-                    fact:               missionItem.altitude
-                    // Component.onCompleted: {
-                    // fact.value = 510.00
-                    // }
+                    sourceComponent:    volumeSliderComponent
+                    property var targetFact: missionItem.altitude
+                    onTargetFactChanged: if (item) item.fact = targetFact
+                    onLoaded: {
+                        if (item) {
+                            item.fact = targetFact
+                            item.trackFillColor = _colorAccent
+                            item.showMinusButton = true
+                            item.showPlusButton = true
+                        }
+                    }
                 }
 
                 QGCLabel {
                     font.pointSize:     ScreenTools.smallFontPointSize
                     text:               qsTr("Actual AMSL alt sent: %1 %2").arg(missionItem.amslAltAboveTerrain.valueString).arg(missionItem.amslAltAboveTerrain.units)
+                    color:              _unitColor
                     visible:            missionItem.altitudeMode === QGroundControl.AltitudeModeCalcAboveTerrain
                 }
             }
@@ -203,6 +368,7 @@ Rectangle {
                         QGCLabel {
                             font.pointSize: ScreenTools.smallFontPointSize
                             text:           object.name
+                            color:          _labelColor
                             visible:        object.name !== ""
                         }
 
@@ -228,7 +394,7 @@ Rectangle {
                 Repeater {
                     model: missionItem.textFieldFacts
 
-                    QGCLabel { text: object.name }
+                    QGCLabel { text: object.name; color: _labelColor }
                 }
 
                 Repeater {
@@ -238,6 +404,7 @@ Rectangle {
                         text:           object.name
                         checked:        !isNaN(object.rawValue)
                         onClicked:      object.rawValue = checked ? 0 : NaN
+                        textColor:      _labelColor
                     }
                 }
 
@@ -247,36 +414,56 @@ Rectangle {
                     checked:    missionItem.speedSection.specifyFlightSpeed
                     onClicked:  missionItem.speedSection.specifyFlightSpeed = checked
                     visible:    missionItem.speedSection.available
+                    textColor:  _labelColor
                 }
 
 
                 Repeater {
                     model: missionItem.textFieldFacts
 
-                    FactTextField {
-                        showUnits:          true
-                        fact:               object
+                    Loader {
                         Layout.fillWidth:   true
+                        sourceComponent:    volumeSliderComponent
+                        property var targetFact: object
                         enabled:            !object.readOnly
+                        onTargetFactChanged: if (item) item.fact = targetFact
+                        onLoaded: {
+                            if (item) {
+                                item.fact = targetFact
+                            }
+                        }
                     }
                 }
 
                 Repeater {
                     model: missionItem.nanFacts
 
-                    FactTextField {
-                        showUnits:          true
-                        fact:               object
+                    Loader {
                         Layout.fillWidth:   true
+                        sourceComponent:    volumeSliderComponent
+                        property var targetFact: object
                         enabled:            !isNaN(object.rawValue)
+                        onTargetFactChanged: if (item) item.fact = targetFact
+                        onLoaded: {
+                            if (item) {
+                                item.fact = targetFact
+                            }
+                        }
                     }
                 }
 
-                FactTextField {
-                    fact:               missionItem.speedSection.flightSpeed
+                Loader {
                     Layout.fillWidth:   true
+                    sourceComponent:    volumeSliderComponent
+                    property var targetFact: missionItem.speedSection.flightSpeed
                     enabled:            flightSpeedCheckbox.checked
                     visible:            missionItem.speedSection.available
+                    onTargetFactChanged: if (item) item.fact = targetFact
+                    onLoaded: {
+                        if (item) {
+                            item.fact = targetFact
+                        }
+                    }
                 }
             }
 
