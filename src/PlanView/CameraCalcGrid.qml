@@ -25,12 +25,172 @@ Column {
     property var    _vehicleCameraList: _vehicle ? _vehicle.staticCameraList : []
     property bool   _cameraComboFilled: false
 
-    readonly property int _gridTypeManual:          0
-    readonly property int _gridTypeCustomCamera:    1
-    readonly property int _gridTypeCamera:          2
+    readonly property int _gridTypeManual:       0
+    readonly property int _gridTypeCustomCamera: 1
+    readonly property int _gridTypeCamera:       2
+
+    // ── Shared theme colors ───────────────────────────────────────────────
+    readonly property color _colorBgSecondary:   "#282830"
+    readonly property color _colorBgTertiary:    "#32323b"
+    readonly property color _colorBorder:        "#3e3e4a"
+    readonly property color _colorAccent:        "#4a2c6d"
+    readonly property color _colorTextPrimary:   "#ffffff"
+    readonly property color _colorTextSecondary: "#8e8e93"
 
     QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
+    // ── Reusable volume-slider component ──────────────────────────────────
+    Component {
+        id: volumeSliderComponent
+
+        RowLayout {
+            spacing: ScreenTools.defaultFontPixelWidth / 1.5
+            property var  fact:    null
+            property bool enabled: true
+
+            // − button
+            Rectangle {
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth:  Layout.preferredHeight
+                radius:       15
+                color:        minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                border.color: minusArea.containsMouse ? _colorAccent : _colorBorder
+                border.width: 1
+                opacity:      parent.enabled ? 1.0 : 0.4
+
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "−"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _colorTextPrimary
+                }
+
+                MouseArea {
+                    id: minusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled:      parent.parent.enabled
+                    onClicked: {
+                        if (parent.parent.parent.fact) {
+                            var step = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 1
+                            parent.parent.parent.fact.value -= step
+                        }
+                    }
+                }
+            }
+
+            // Slider
+            Slider {
+                id: factSlider
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                enabled: parent.enabled
+
+                from: {
+                    if (!parent.fact) return 0
+                    if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0
+                    return parent.fact.min
+                }
+                to: {
+                    if (!parent.fact) return 100
+                    if (isNaN(parent.fact.max) || parent.fact.max > 10000) return (from + 500)
+                    return parent.fact.max
+                }
+                value:    parent.fact ? parent.fact.value : 0
+                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 1) : 1
+
+                background: Rectangle {
+                    x: factSlider.leftPadding
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 100; implicitHeight: 6
+                    width: factSlider.availableWidth; height: implicitHeight
+                    radius: 3
+                    color: _colorBgTertiary
+                    opacity: factSlider.enabled ? 1.0 : 0.4
+
+                    Rectangle {
+                        width:  factSlider.visualPosition * parent.width
+                        height: parent.height
+                        color:  _colorAccent
+                        radius: 3
+                    }
+                }
+
+                handle: Rectangle {
+                    x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 18; implicitHeight: 18
+                    radius: 9
+                    color:  _colorTextPrimary
+                    opacity: factSlider.enabled ? 1.0 : 0.4
+                    border.color: _colorAccent
+                    border.width: factSlider.pressed ? 4 : 2
+
+                    Behavior on border.width { NumberAnimation { duration: 150 } }
+                }
+
+                onMoved: {
+                    if (parent.fact) parent.fact.value = value
+                }
+            }
+
+            // + button
+            Rectangle {
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth:  Layout.preferredHeight
+                radius:       15
+                color:        plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                border.color: plusArea.containsMouse ? _colorAccent : _colorBorder
+                border.width: 1
+                opacity:      parent.enabled ? 1.0 : 0.4
+
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "+"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _colorTextPrimary
+                }
+
+                MouseArea {
+                    id: plusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled:      parent.parent.enabled
+                    onClicked: {
+                        if (parent.parent.parent.fact) {
+                            var step = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 1
+                            parent.parent.parent.fact.value += step
+                        }
+                    }
+                }
+            }
+
+            // Value box (no placeholder text)
+            FactTextField {
+                id: factField
+                Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 7
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.alignment:       Qt.AlignVCenter
+                fact:                   parent.fact
+                showUnits:              true
+                enabled:                parent.enabled
+                color:                  _colorTextPrimary
+                placeholderText:        ""
+                horizontalAlignment:    Qt.AlignHCenter
+                background: Rectangle {
+                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
+                    border.width: factField.activeFocus ? 2 : 1
+                    radius:       15
+                    opacity:      factField.enabled ? 1.0 : 0.4
+                }
+            }
+        }
+    }
+
+    // ── Camera-spec UI (overlap etc.) ─────────────────────────────────────
     Column {
         anchors.left:   parent.left
         anchors.right:  parent.right
@@ -43,12 +203,14 @@ Column {
             spacing:        _margin
             Item { Layout.fillWidth: true }
             QGCLabel {
-                Layout.preferredWidth:  _root._fieldWidth
-                text:                   qsTr("Front Lap")
+                Layout.preferredWidth: _root._fieldWidth
+                text: qsTr("Front Lap")
+                color: _colorTextPrimary
             }
             QGCLabel {
-                Layout.preferredWidth:  _root._fieldWidth
-                text:                   qsTr("Side Lap")
+                Layout.preferredWidth: _root._fieldWidth
+                text: qsTr("Side Lap")
+                color: _colorTextPrimary
             }
         }
 
@@ -56,22 +218,42 @@ Column {
             anchors.left:   parent.left
             anchors.right:  parent.right
             spacing:        _margin
-            QGCLabel { text: qsTr("Overlap"); Layout.fillWidth: true }
-            FactTextField {
-                Layout.preferredWidth:  _root._fieldWidth
-                fact:                   cameraCalc.frontalOverlap
+            QGCLabel {
+                text: qsTr("Overlap")
+                Layout.fillWidth: true
+                color: _colorTextPrimary
             }
             FactTextField {
-                Layout.preferredWidth:  _root._fieldWidth
-                fact:                   cameraCalc.sideOverlap
+                Layout.preferredWidth: _root._fieldWidth
+                fact: cameraCalc.frontalOverlap
+                color: _colorTextPrimary
+                placeholderText: ""
+                background: Rectangle {
+                    color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: parent.activeFocus ? _colorAccent : _colorBorder
+                    border.width: parent.activeFocus ? 2 : 1
+                    radius: 15
+                }
+            }
+            FactTextField {
+                Layout.preferredWidth: _root._fieldWidth
+                fact: cameraCalc.sideOverlap
+                color: _colorTextPrimary
+                placeholderText: ""
+                background: Rectangle {
+                    color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: parent.activeFocus ? _colorAccent : _colorBorder
+                    border.width: parent.activeFocus ? 2 : 1
+                    radius: 15
+                }
             }
         }
 
         QGCLabel {
-            wrapMode:               Text.WordWrap
-            text:                   qsTr("Select one:")
-            Layout.preferredWidth:  parent.width
-            Layout.columnSpan:      2
+            wrapMode:   Text.WordWrap
+            text:       qsTr("Select one:")
+            width:      parent.width
+            color:      _colorTextSecondary
         }
 
         GridLayout {
@@ -82,62 +264,136 @@ Column {
             columns:        2
 
             QGCRadioButton {
-                id:                     fixedDistanceRadio
-                leftPadding:            0
-                text:                   distanceToSurfaceLabel
-                checked:                !!cameraCalc.valueSetIsDistance.value
-                onClicked:              cameraCalc.valueSetIsDistance.value = 1
+                id:          fixedDistanceRadio
+                leftPadding: 0
+                text:        distanceToSurfaceLabel
+                checked:     !!cameraCalc.valueSetIsDistance.value
+                onClicked:   cameraCalc.valueSetIsDistance.value = 1
             }
 
             AltitudeFactTextField {
-                fact:                       cameraCalc.distanceToSurface
-                altitudeMode:               cameraCalc.distanceMode
-                enabled:                    fixedDistanceRadio.checked
-                Layout.fillWidth:           true
+                fact:         cameraCalc.distanceToSurface
+                altitudeMode: cameraCalc.distanceMode
+                enabled:      fixedDistanceRadio.checked
+                Layout.fillWidth: true
+                placeholderText: ""
+                color: _colorTextPrimary
+                background: Rectangle {
+                    color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: parent.activeFocus ? _colorAccent : _colorBorder
+                    border.width: parent.activeFocus ? 2 : 1
+                    radius: 15
+                    opacity: parent.enabled ? 1.0 : 0.4
+                }
             }
 
             QGCRadioButton {
-                id:                     fixedImageDensityRadio
-                leftPadding:            0
-                text:                   qsTr("Grnd Res")
-                checked:                !cameraCalc.valueSetIsDistance.value
-                onClicked:              cameraCalc.valueSetIsDistance.value = 0
+                id:          fixedImageDensityRadio
+                leftPadding: 0
+                text:        qsTr("Grnd Res")
+                checked:     !cameraCalc.valueSetIsDistance.value
+                onClicked:   cameraCalc.valueSetIsDistance.value = 0
             }
 
             FactTextField {
-                fact:                   cameraCalc.imageDensity
-                enabled:                fixedImageDensityRadio.checked
-                Layout.fillWidth:       true
+                fact:             cameraCalc.imageDensity
+                enabled:          fixedImageDensityRadio.checked
+                Layout.fillWidth: true
+                placeholderText:  ""
+                color: _colorTextPrimary
+                background: Rectangle {
+                    color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: parent.activeFocus ? _colorAccent : _colorBorder
+                    border.width: parent.activeFocus ? 2 : 1
+                    radius: 15
+                    opacity: parent.enabled ? 1.0 : 0.4
+                }
             }
         }
-    } // Column - Camera spec based ui
+    } // Column - Camera spec
 
-    // No camera spec ui
-    GridLayout {
+    // ── Manual camera UI — Altitude / Trigger Dist / Spacing ─────────────
+    ColumnLayout {
         anchors.left:   parent.left
         anchors.right:  parent.right
-        columnSpacing:  _margin
-        rowSpacing:     _margin
-        columns:        2
+        spacing:        _margin * 1.5
         visible:        cameraCalc.isManualCamera
 
-        QGCLabel { text: distanceToSurfaceLabel }
-        AltitudeFactTextField {
-            fact:                       cameraCalc.distanceToSurface
-            altitudeMode:               cameraCalc.distanceMode
-            Layout.fillWidth:           true
+        // ── Altitude ──────────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing:          _margin * 0.5
+
+            QGCLabel {
+                text:  distanceToSurfaceLabel
+                color: _colorTextSecondary
+                font.pointSize: ScreenTools.smallFontPointSize
+            }
+
+            Loader {
+                Layout.fillWidth: true
+                sourceComponent:  volumeSliderComponent
+                property var targetFact: cameraCalc.distanceToSurface
+                onTargetFactChanged: if (item) item.fact = targetFact
+                onLoaded:            if (item) item.fact = targetFact
+            }
         }
 
-        QGCLabel { text: frontalDistanceLabel }
-        FactTextField {
-            Layout.fillWidth:   true
-            fact:               cameraCalc.adjustedFootprintFrontal
+        // Divider
+        Rectangle {
+            Layout.fillWidth: true
+            height:      1
+            color:       _colorBorder
+            opacity:     0.5
         }
 
-        QGCLabel { text: sideDistanceLabel }
-        FactTextField {
-            Layout.fillWidth:   true
-            fact:               cameraCalc.adjustedFootprintSide
+        // ── Trigger Distance ──────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing:          _margin * 0.5
+
+            QGCLabel {
+                text:  frontalDistanceLabel
+                color: _colorTextSecondary
+                font.pointSize: ScreenTools.smallFontPointSize
+            }
+
+            Loader {
+                Layout.fillWidth: true
+                sourceComponent:  volumeSliderComponent
+                property var targetFact: cameraCalc.adjustedFootprintFrontal
+                onTargetFactChanged: if (item) item.fact = targetFact
+                onLoaded:            if (item) item.fact = targetFact
+            }
         }
-    } // GridLayout
+
+        // Divider
+        Rectangle {
+            Layout.fillWidth: true
+            height:      1
+            color:       _colorBorder
+            opacity:     0.5
+        }
+
+        // ── Side Spacing ──────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing:          _margin * 0.5
+
+            QGCLabel {
+                text:  sideDistanceLabel
+                color: _colorTextSecondary
+                font.pointSize: ScreenTools.smallFontPointSize
+            }
+
+            Loader {
+                Layout.fillWidth: true
+                sourceComponent:  volumeSliderComponent
+                property var targetFact: cameraCalc.adjustedFootprintSide
+                onTargetFactChanged: if (item) item.fact = targetFact
+                onLoaded:            if (item) item.fact = targetFact
+            }
+        }
+
+    } // ColumnLayout - manual camera
 } // Column

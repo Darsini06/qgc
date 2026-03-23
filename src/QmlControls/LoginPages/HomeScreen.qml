@@ -30,6 +30,10 @@ Item {
     property color secondary_color: "#7c4dff"
     property color accent_color: "#f97316" // The Orange accent
 
+    // Airspace Recommendation Properties
+    property bool isCheckingAirspace: true
+    property bool isClearToFly: true
+
 
 
     property real screenWidth: parent.width
@@ -177,14 +181,15 @@ Item {
 
         // ---- TOP LEFT LOGO ----
         Image {
+            id: mainLogo
             source: "qrc:/qmlimages/NewImages/aviatrickslogo.svg"
             width: Math.min(parent.width * 0.20, dp(140))
             height: dp(5.5)
             fillMode: Image.PreserveAspectFit
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.leftMargin: isSmallScreen ? dp(5) : 30
-            anchors.topMargin: isSmallScreen ? dp(5) : 30
+            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(4) : 40
+            anchors.topMargin: (isSmallScreen || isMobile) ? dp(4) : 40
             z: 5
             opacity: 0
             Behavior on opacity { NumberAnimation { duration: 1000; easing.type: Easing.OutCubic } }
@@ -195,7 +200,8 @@ Item {
             id: topBrandText
             text: "DRONE COMMANDER"
             // Hide on small mobile screens (phones), show on tablets and desktop
-            visible: (droneType === "loadpage" || parent.height > 500) && !isSmallScreen
+            // Only show the main branding tagline on the primary home state to prevent background ghosting in operational modes
+            visible: (droneType === "loadpage") && !isSmallScreen && parent.height > 500
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             // Ensure space is shared between header and content
@@ -392,20 +398,29 @@ Item {
             }
         }
 
+
+
         // ---- HERO SECTION ----
         Column {
             id: heroSection
             // Conditional positioning: Center for the main tagline, Left for operational modes
             anchors.horizontalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? undefined : parent.horizontalCenter
             anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? parent.left : undefined
-            anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? ((isSmallScreen || isMobile) ? dp(5) : dp(15)) : 0
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
+            
+            // Refined vertical positioning to prevent clashing with logo OR bottom buttons
+            anchors.top: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? mainLogo.bottom : undefined
+            anchors.topMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? (isSmallScreen ? dp(4) : dp(8)) : 0
+            anchors.verticalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? undefined : parent.verticalCenter
+            
+            anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(5) : 0
             
             width: {
-                if (isSmallScreen || isMobile) return parent.width * 0.55 // Increased slightly to accommodate larger font
-                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.55, dp(160))
+                if (isSmallScreen || isMobile) return parent.width * 0.75 // Wider on mobile to prevent excessive wrapping
+                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.55, dp(180))
             }
-            spacing: isSmallScreen ? dp(1) : dp(3)
+            // Reduced basic spacing between elements
+            spacing: isSmallScreen ? dp(0.5) : dp(1.5)
             opacity: 1 
             z: 10
 
@@ -433,15 +448,15 @@ Item {
                         if (isTablet)  return baseSize * 3.0 * scaleMultiplier
                         return baseSize * 1.5
                     } else {
-                        if (isDesktop) return baseSize * 1.8 * scaleMultiplier
-                        if (isTablet)  return baseSize * 1.6 * scaleMultiplier
-                        return baseSize * 0.95
+                        if (isDesktop) return baseSize * 1.5 * scaleMultiplier // Slightly reduced to save vertical space
+                        if (isTablet)  return baseSize * 1.4 * scaleMultiplier
+                        return baseSize * 0.85
                     }
                 }
                 font.bold: true
                 font.family: "Outfit"
-                font.letterSpacing: (droneType === "loadpage" && !isSmallScreen) ? 4 : 1.5
-                lineHeight: 0.82
+                font.letterSpacing: (droneType === "loadpage" && !isSmallScreen) ? 4 : 1.2
+                lineHeight: 0.9 // Improved from 0.82 to prevent letter clipping
 
                 // Glow/Shadow for text readability
                 layer.enabled: true
@@ -457,6 +472,7 @@ Item {
             // Expanded Subtitle / Description
             Label {
                 id: heroSubtitle
+                visible: !isSmallScreen // Hide on small screens to give room for the Flight Zone widget
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
@@ -479,7 +495,7 @@ Item {
                 font.italic: droneType === "loadpage"
                 font.bold: false
                 lineHeight: 1.3
-                topPadding: dp(3)
+                topPadding: dp(1) // Reduced top padding to bring description closer to heading
 
                 // Subtitle shadow
                 layer.enabled: true
@@ -488,6 +504,153 @@ Item {
                     shadowColor: Qt.rgba(0,0,0,0.6)
                     shadowBlur: 0.2
                     shadowVerticalOffset: 1
+                }
+            }
+
+            // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
+            Rectangle {
+                id: airspaceWidget
+                visible: droneType !== "loadpage"
+                
+                // Set width carefully to fit into the column
+                width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
+                implicitHeight: widgetContent.height + dp(3.5)
+                radius: 12
+                color: Qt.rgba(15/255, 15/255, 20/255, 0.75) // Dark cinematic glass theme
+                border.color: isCheckingAirspace ? Qt.rgba(250/255, 204/255, 21/255, 0.4) : (isClearToFly ? Qt.rgba(74/255, 222/255, 128/255, 0.4) : Qt.rgba(248/255, 113/255, 113/255, 0.4))
+                border.width: 1
+                z: 90
+                
+                // Add some top margin for clean spacing after title/subtitle
+                Item { height: isSmallScreen ? dp(2) : dp(3); width: 1 }
+                
+                // Slide-in animation for a premium feel
+                opacity: 0
+                transform: Translate { id: widgetSlide; y: -20 }
+                
+                Component.onCompleted: {
+                    widgetEntryAnim.start()
+                }
+                
+                SequentialAnimation {
+                    id: widgetEntryAnim
+                    PauseAnimation { duration: 1500 }
+                    ParallelAnimation {
+                        NumberAnimation { target: airspaceWidget; property: "opacity"; from: 0; to: 1; duration: 800; easing.type: Easing.OutCubic }
+                        NumberAnimation { target: widgetSlide; property: "y"; from: -20; to: 0; duration: 800; easing.type: Easing.OutBack }
+                    }
+                }
+
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: Qt.rgba(0,0,0,0.6)
+                    shadowBlur: 1.0
+                    shadowVerticalOffset: 4
+                    // Professional glass effect blur for modern aesthetic
+                    blurEnabled: true
+                    blur: 0.1
+                    blurMax: 32
+                }
+
+                // Simulate airspace check on load
+                Timer {
+                    id: airspaceTimer
+                    interval: 3500 // Check takes 3.5 seconds
+                    running: true
+                    repeat: false
+                    onTriggered: {
+                        isCheckingAirspace = false;
+                        isClearToFly = true; 
+                    }
+                }
+
+                ColumnLayout {
+                    id: widgetContent
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.topMargin: dp(1.5)
+                    anchors.leftMargin: dp(2)
+                    anchors.rightMargin: dp(2)
+                    anchors.bottomMargin: dp(1.5)
+                    spacing: dp(0.8)
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: dp(1)
+
+                        // Pulse Inner Dot
+                        Rectangle {
+                            width: dp(1)
+                            height: dp(1)
+                            radius: width / 2
+                            color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                            
+                            SequentialAnimation on opacity {
+                                running: isCheckingAirspace
+                                loops: Animation.Infinite
+                                NumberAnimation { from: 0.1; to: 1.0; duration: 500 }
+                                NumberAnimation { from: 1.0; to: 0.1; duration: 500 }
+                            }
+
+                            layer.enabled: !isCheckingAirspace
+                            layer.effect: MultiEffect {
+                                shadowEnabled: true
+                                shadowColor: isClearToFly ? "#4ade80" : "#f87171"
+                                shadowBlur: 0.8
+                            }
+                        }
+
+                        Label {
+                            
+                            Layout.fillWidth: true
+                            text: qsTr("FLIGHT ZONE STATUS")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.pointSize: ScreenTools.smallFontPointSize * 0.85
+                            font.bold: true
+                            font.letterSpacing: 1.5
+                            opacity: 0.8
+                        }
+                    }
+
+                    Label {
+                        Layout.fillWidth: true
+                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") : 
+                             (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
+                        color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 1.05
+                        font.bold: true
+                        
+                        Behavior on color { ColorAnimation { duration: 400 } }
+                    }
+
+                    Label {
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
+                             (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        color: "white"
+                        opacity: 0.6
+                        font.family: "Outfit" 
+                        font.pointSize: ScreenTools.smallFontPointSize * 0.85
+                        lineHeight: 1.2
+                        
+                        Behavior on opacity { NumberAnimation { duration: 400 } }
+                    }
+                }
+
+                // Interactive element to demo toggling
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (!isCheckingAirspace) {
+                            isClearToFly = !isClearToFly;
+                        }
+                    }
                 }
             }
         }

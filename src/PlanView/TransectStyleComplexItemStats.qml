@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import QGroundControl
 import QGroundControl.ScreenTools
@@ -8,25 +9,31 @@ import QGroundControl.Controls
 import MapGlobals 1.0
 
 // Statistics section for TransectStyleComplexItems
-Grid {
+GridLayout {
     // The following properties must be available up the hierarchy chain
     //property var    missionItem       ///< Mission Item for editor
 
     columns:        2
-    columnSpacing:  ScreenTools.defaultFontPixelWidth
+    columnSpacing:  ScreenTools.defaultFontPixelWidth * 1.5
+    rowSpacing:     ScreenTools.defaultFontPixelHeight * 0.5
 
-    QGCLabel { text: qsTr("Survey Area") }
-    QGCLabel { text: QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString }
+    readonly property color _colorTextPrimary:   "#ffffff"
+    readonly property color _colorTextSecondary: "#8e8e93"
+    readonly property color _colorAccent:        "#4a2c6d"
 
-    QGCLabel { text: qsTr("Photo Count") }
-    QGCLabel { text: missionItem.cameraShots }
+    // Label column
+    QGCLabel { text: qsTr("Survey Area");     color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
+    QGCLabel { text: QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString; color: _colorTextPrimary; font.bold: true }
 
-    QGCLabel { text: qsTr("Photo Interval") }
-    QGCLabel { text: missionItem.timeBetweenShots.toFixed(1) + " " + qsTr("secs") }
+    QGCLabel { text: qsTr("Photo Count");     color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
+    QGCLabel { text: missionItem.cameraShots; color: _colorTextPrimary; font.bold: true }
 
-    QGCLabel { text: qsTr("Trigger Distance") }
-    QGCLabel { text: missionItem.cameraCalc.adjustedFootprintFrontal.valueString + " " + missionItem.cameraCalc.adjustedFootprintFrontal.units }
+    QGCLabel { text: qsTr("Photo Interval");  color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
+    QGCLabel { text: missionItem.timeBetweenShots.toFixed(1) + " " + qsTr("secs"); color: _colorTextPrimary; font.bold: true }
 
-    QGCLabel { text: qsTr("Time") }
-    QGCLabel { text: MapGlobals.time }
+    QGCLabel { text: qsTr("Trigger Distance"); color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
+    QGCLabel { text: missionItem.cameraCalc.adjustedFootprintFrontal.valueString + " " + missionItem.cameraCalc.adjustedFootprintFrontal.units; color: _colorTextPrimary; font.bold: true }
+
+    QGCLabel { text: qsTr("Time");            color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
+    QGCLabel { text: MapGlobals.time;         color: _colorTextPrimary; font.bold: true }
 }
