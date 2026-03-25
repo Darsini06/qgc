@@ -267,39 +267,90 @@ Item {
             buttons:    Dialog.NoButton
 
             ColumnLayout {
+                Layout.preferredWidth: dp(60)
+                spacing:    dp(4)
+
                 QGCLabel {
-                    Layout.maximumWidth:    parent.width
+                    Layout.fillWidth:       true
                     wrapMode:               QGCLabel.WordWrap
+                    color:                  "white"
+                    font.family:            "Outfit"
+                    font.pointSize:         ScreenTools.defaultFontPointSize
+                    horizontalAlignment:    Text.AlignHCenter
                     text:                   _planMasterController.managerVehicle.isOfflineEditingVehicle ?
                                                 qsTr("The vehicle associated with the plan in the Plan View is no longer available. What would you like to do with that plan?") :
                                                 qsTr("The plan being worked on in the Plan View is not from the current vehicle. What would you like to do with that plan?")
                 }
 
-                QGCButton {
+                // Action 1: Discard/Load
+                Rectangle {
                     Layout.fillWidth:   true
-                    text:               _planMasterController.dirty ?
+                    height:             dp(8)
+                    radius:             12
+                    color:              discMA.pressed ? "#1a1b2e" : (discMA.containsMouse ? "#2d2e4a" : Qt.rgba(255,255,255,0.05))
+                    border.color:       Qt.rgba(255,255,255,0.15)
+                    border.width:       1
+
+                    Text {
+                        anchors.centerIn: parent
+                        width:          parent.width * 0.9
+                        elide:          Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                        text:           _planMasterController.dirty ?
                                             (_planMasterController.managerVehicle.isOfflineEditingVehicle ?
                                                  qsTr("Discard Unsaved Changes") :
                                                  qsTr("Discard Unsaved Changes, Load New Plan From Vehicle")) :
                                             qsTr("Load New Plan From Vehicle")
-                    onClicked: {
-                        _planMasterController.showPlanFromManagerVehicle()
-                        _promptForPlanUsageShowing = false
-                        close();
+                        color:          "white"
+                        font.bold:      true
+                        font.family:    "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                    }
+
+                    MouseArea {
+                        id: discMA
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            _planMasterController.showPlanFromManagerVehicle()
+                            _promptForPlanUsageShowing = false
+                            close();
+                        }
                     }
                 }
 
-                QGCButton {
+                // Action 2: Keep Current
+                Rectangle {
                     Layout.fillWidth:   true
-                    text:               _planMasterController.managerVehicle.isOfflineEditingVehicle ?
+                    height:             dp(8)
+                    radius:             12
+                    color:              keepMA.pressed ? Qt.darker("#4a2c6d", 1.2) : (keepMA.containsMouse ? Qt.lighter("#4a2c6d", 1.1) : "#4a2c6d")
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        width:          parent.width * 0.9
+                        elide:          Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                        text:           _planMasterController.managerVehicle.isOfflineEditingVehicle ?
                                             qsTr("Keep Current Plan") :
                                             qsTr("Keep Current Plan, Don't Update From Vehicle")
-                    onClicked: {
-                        if (!_planMasterController.managerVehicle.isOfflineEditingVehicle) {
-                            _planMasterController.dirty = true
+                        color:          "white"
+                        font.bold:      true
+                        font.family:    "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                    }
+
+                    MouseArea {
+                        id: keepMA
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            if (!_planMasterController.managerVehicle.isOfflineEditingVehicle) {
+                                _planMasterController.dirty = true
+                            }
+                            _promptForPlanUsageShowing = false
+                            close()
                         }
-                        _promptForPlanUsageShowing = false
-                        close()
                     }
                 }
             }

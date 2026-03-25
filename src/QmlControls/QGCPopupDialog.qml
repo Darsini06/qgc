@@ -69,7 +69,8 @@ Popup {
     signal accepted
     signal rejected
 
-    property var    _qgcPal:            QGroundControl.globalPalette
+    QGCPalette { id: popupPal; colorGroupEnabled: true }
+    property var    _qgcPal:            popupPal
     property real   _frameSize:         ScreenTools.defaultFontPixelWidth
     property real   _contentMargin:     ScreenTools.defaultFontPixelHeight / 4
 
@@ -247,10 +248,10 @@ Popup {
     Rectangle {
         width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
         height: mainLayout.implicitHeight + (buttonRow.visible ? _contentMargin : 0)
-        color: _qgcPal.window
-        radius: 0
+        color: "#1a1b2e" // Deep dark background for Mission Theme
+        radius: 12
         border.width: 1
-        border.color: _qgcPal.windowShadeLight
+        border.color: Qt.rgba(255, 255, 255, 0.1)
         anchors.centerIn: parent
 
         ColumnLayout {
@@ -261,8 +262,8 @@ Popup {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: Math.max(titleLable.implicitHeight + 20, 45) // Good breathing room
-                color: "#4a2c6d"
+                height: Math.max(titleLable.implicitHeight + 20, 50) // More breathing room
+                color: "#4a2c6d" // Vibrant Orange Header as requested
                 radius: 0
 
                 Item {
@@ -284,7 +285,7 @@ Popup {
                         width: 28
                         height: 28
                         radius: 0
-                        color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
+                        color: closeBtnMouseArea.containsMouse ? "#4a2c6d" : "#4a2c6d"
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -315,9 +316,9 @@ Popup {
                 Layout.fillWidth:       true
                 Layout.preferredWidth:  maxAvailableWidth
                 Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
-                color:                  _qgcPal.window
-                Layout.leftMargin:     10
-                Layout.rightMargin:     10
+                color:                  "transparent"
+                Layout.leftMargin:     25 // Increased margins for better alignment
+                Layout.rightMargin:     25
 
                 property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:
@@ -370,19 +371,19 @@ Popup {
 
                 QGCButton {
                     id: rejectButton
-                    visible: root.showButtons && (root.buttons & Dialog.Cancel)
                     onClicked: _reject()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 0
-                        color: "#E53935"
+                        radius: 8
+                        color: rejectButton.pressed ? "#b71c1c" : (rejectButton.hovered ? "#d32f2f" : "#e53935")
                     }
                     contentItem: Text {
                         text: rejectButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 12
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -390,20 +391,20 @@ Popup {
 
                 QGCButton {
                     id: acceptButton
-                    visible: root.showButtons && (root.buttons & Dialog.Ok)
                     primary: true
                     onClicked: _accept()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 0
-                        color: "#4a2c6d"
+                        radius: 8
+                        color: acceptButton.pressed ? "#311b92" : (acceptButton.hovered ? "#5e35b1" : "#4a2c6d")
                     }
                     contentItem: Text {
                         text: acceptButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 12
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }

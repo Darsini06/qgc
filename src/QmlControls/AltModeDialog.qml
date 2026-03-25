@@ -85,17 +85,24 @@ QGCPopupDialog {
                 checked:        modeValue == currentAltMode
 
                 background: Rectangle {
-                    radius: ScreenTools.defaultFontPixelHeight / 2
-                    color:  pressed | hovered | checked ? QGroundControl.globalPalette.buttonHighlight: QGroundControl.globalPalette.button
+                    radius:  ScreenTools.defaultFontPixelHeight / 2
+                    color:   checked ? "#7B2D8B" : (hovered || pressed ? "rgba(123,45,139,0.35)" : "rgba(255,255,255,0.07)")
+                    border.color: checked ? "#9C4DB5" : (hovered ? "rgba(156,77,181,0.6)" : "rgba(255,255,255,0.12)")
+                    border.width: 1
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
 
                 contentItem: Column {
-                    spacing: 0
+                    spacing: 2
+                    leftPadding:  ScreenTools.defaultFontPixelWidth
+                    rightPadding: ScreenTools.defaultFontPixelWidth
 
                     QGCLabel {
-                        id:     modeNameLabel
-                        text:   modeName
-                        color:  pressed | hovered | checked ? QGroundControl.globalPalette.buttonHighlightText: QGroundControl.globalPalette.buttonText
+                        id:                 modeNameLabel
+                        text:               modeName
+                        font.bold:          true
+                        color:              checked ? "#FFFFFF" : "#D0D0D0"
                     }
 
                     QGCLabel {
@@ -103,7 +110,7 @@ QGCPopupDialog {
                         text:               help
                         wrapMode:           Label.WordWrap
                         font.pointSize:     ScreenTools.smallFontPointSize
-                        color:              modeNameLabel.color
+                        color:              checked ? "#E8D5F5" : "#A0A0A0"
                     }
                 }
 

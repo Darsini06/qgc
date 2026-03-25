@@ -2707,7 +2707,7 @@ ApplicationWindow {
         rightInset:     0
         topInset:       0
         bottomInset:    0
-        padding:        _margins * 2
+        padding:        0
         visible:        false
         modal:          true
         focus:          true
@@ -2739,42 +2739,39 @@ ApplicationWindow {
             indicatorDrawerLoader.sourceComponent   = undefined
         }
 
-        background: Item {
+        background: Rectangle {
+            color: "transparent"
+            radius: indicatorDrawer._margins
 
+            // Floating "+" button for indicators without a vehicle
             Rectangle {
-                id:             backgroundRect
-                anchors.fill:   parent
-                color:          "black"//QGroundControl.globalPalette.window
-                radius:         indicatorDrawer._margins
-                opacity:        0.85
-            }
-
-            Rectangle {
-                anchors.horizontalCenter:   backgroundRect.right
-                anchors.verticalCenter:     backgroundRect.top
-                width:                      50//ScreenTools.defaultFontPixelHeight
-                height:                     20//width
-                radius:                     width / 2
-                color:                      QGroundControl.globalPalette.button
-                border.color:               QGroundControl.globalPalette.buttonText
-                visible:                    activeVehicle ? false :indicatorDrawerLoader.item && indicatorDrawerLoader.item.showExpand && !indicatorDrawer._expanded
+                anchors.horizontalCenter:   parent.right
+                anchors.verticalCenter:     parent.top
+                anchors.horizontalCenterOffset: -4
+                anchors.verticalCenterOffset: 4
+                width:                      32
+                height:                     32
+                radius:                     16
+                color:                      "#3B82F6"
+                border.width:               0
+                visible:                    activeVehicle ? false : (indicatorDrawerLoader.item && indicatorDrawerLoader.item.showExpand && !indicatorDrawer._expanded)
 
                 QGCLabel {
                     anchors.centerIn:   parent
-                    text:               "More"
-                    color:              QGroundControl.globalPalette.buttonText
+                    text:               "+"
+                    color:              "white"
+                    font.pixelSize:     22
+                    font.bold:          true
                 }
 
                 QGCMouseArea {
                     fillItem: parent
                     onClicked: {
                         if(!activeVehicle){
-                            //indicatorDrawer._expanded = true
                             mainWindow.showToolSelectDialog1(4)
                             mainWindow.closeIndicatorDrawer()
                         }else{
                             indicatorDrawer._expanded = true
-                            //mainWindow.showToolSelectDialog1(4)
                             mainWindow.closeIndicatorDrawer()
                         }
                     }

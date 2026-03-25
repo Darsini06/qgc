@@ -720,58 +720,127 @@ SettingsPage {
             Layout.bottomMargin: ScreenTools.defaultFontPixelHeight / 2
         }
 
-        Text {
-            Layout.alignment: Qt.AlignLeft
-            text:             qsTr("Communication Links")
-            font.pixelSize:   ScreenTools.isMobile ? 18 : 22
-            color:            "black"
-            font.bold:        true
-            topPadding:       ScreenTools.defaultFontPixelHeight
-            bottomPadding:    ScreenTools.defaultFontPixelHeight / 2
+        RowLayout {
+            Layout.fillWidth: true
+            
+            Text {
+                Layout.fillWidth: true
+                text:             qsTr("Communication Links")
+                font.pixelSize:   ScreenTools.isMobile ? 18 : 22
+                color:            "black"
+                font.bold:        true
+                topPadding:       ScreenTools.defaultFontPixelHeight
+                bottomPadding:    ScreenTools.defaultFontPixelHeight / 2
+            }
+            
+            Rectangle {
+                Layout.alignment: Qt.AlignVCenter
+                width:            130
+                height:           36
+                radius:           18
+                color:            addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
+                border.color:     "#4a2c6d"
+                border.width:     1
+                
+                Text {
+                    anchors.centerIn: parent
+                    text:             qsTr("+ Add New Link")
+                    color:            "#4a2c6d"
+                    font.bold:        true
+                    font.pixelSize:   14
+                }
+                
+                MouseArea {
+                    id:             addMouse
+                    anchors.fill:   parent
+                    hoverEnabled:   true
+                    cursorShape:    Qt.PointingHandCursor
+                    onClicked:      typeSelectionDialogComponent.createObject(mainWindow).open()
+                }
+            }
         }
 
         Repeater {
             model: _linkManager.linkConfigurations
             ColumnLayout {
-                id:               linkRow
                 Layout.fillWidth: true
                 visible:          !object.dynamic
                 spacing:          ScreenTools.defaultFontPixelHeight / 4
 
-                // Background highlight on hover/mobile
                 Rectangle {
                     Layout.fillWidth: true
-                    height:           Math.max(linkMainRow.height + 10, ScreenTools.minTouchPixels)
-                    color:            "#F5F5F5"
-                    radius:           8
-                    visible:          !_isNarrow
+                    implicitHeight:   mainRowWrapper.implicitHeight + 30
+                    color:            object.link ? "#F4FDF8" : "#FFFFFF"
+                    radius:           10
+                    border.color:     object.link ? "#4a2c6d" : "#E2E8F0"
+                    border.width:     object.link ? 2 : 1
 
                     RowLayout {
-                        id:               linkMainRow
-                        anchors.fill:     parent
-                        anchors.margins:  10
-                        spacing:          15
+                        id:               mainRowWrapper
+                        anchors.left:     parent.left
+                        anchors.right:    parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.margins:  20
+                        spacing:          _isNarrow ? 10 : 20
 
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text:             object.name
-                            color:            "black"
-                            font.bold:        true
+                        // Status Dot
+                        Rectangle {
+                            width:  12
+                            height: 12
+                            radius: 6
+                            color:  object.link ? "#4a2c6d" : "#9E9E9E"
+                            Layout.alignment: Qt.AlignVCenter
                         }
 
+                        // Link Details
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+
+                            Text {
+                                Layout.fillWidth: true
+                                text:             object.name
+                                color:            "#2C3E50"
+                                font.bold:        true
+                                font.pixelSize:   18
+                                elide:            Text.ElideRight
+                            }
+
+                            Text {
+                                text:             object.link ? qsTr("Connected") : qsTr("Disconnected")
+                                color:            object.link ? "#4a2c6d" : "#7F8C8D"
+                                font.pixelSize:   13
+                            }
+                        }
+
+                        // Actions
                         RowLayout {
-                            spacing: 15
-                            QGCColoredImage {
-                                height:            24
-                                width:             height
-                                sourceSize.height: height
-                                fillMode:          Image.PreserveAspectFit
-                                color:             qgcPalEdit.text
-                                source:            "/res/pencil.svg"
-                                enabled:           !object.link
-                                QGCPalette { id: qgcPalEdit; colorGroupEnabled: parent.enabled }
-                                QGCMouseArea {
-                                    fillItem: parent
+                            spacing: _isNarrow ? 8 : 15
+                            Layout.alignment: Qt.AlignVCenter
+
+                            // Edit Action
+                            Rectangle {
+                                width:  36
+                                height: 36
+                                radius: 8
+                                color:  editArea.containsMouse ? "#EBF5FB" : "transparent"
+                                visible: !object.link
+                                border.color: editArea.containsMouse ? "#4a2c6d" : "transparent"
+                                
+                                QGCColoredImage {
+                                    anchors.centerIn: parent
+                                    height:           18
+                                    width:            18
+                                    sourceSize.height: 18
+                                    fillMode:         Image.PreserveAspectFit
+                                    color:            "#4a2c6d"
+                                    source:           "/res/pencil.svg"
+                                }
+                                MouseArea {
+                                    id: editArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         var editingConfig = _linkManager.startConfigurationEditing(object)
                                         linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
@@ -779,16 +848,28 @@ SettingsPage {
                                 }
                             }
 
-                            QGCColoredImage {
-                                height:            24
-                                width:             height
-                                sourceSize.height: height
-                                fillMode:          Image.PreserveAspectFit
-                                color:             qgcPalDelete.text
-                                source:            "/res/TrashDelete.svg"
-                                QGCPalette { id: qgcPalDelete; colorGroupEnabled: parent.enabled }
-                                QGCMouseArea {
-                                    fillItem: parent
+                            // Delete Action
+                            Rectangle {
+                                width:  36
+                                height: 36
+                                radius: 8
+                                color:  deleteArea.containsMouse ? "#FDEDEC" : "transparent"
+                                border.color: deleteArea.containsMouse ? "#E74C3C" : "transparent"
+                                
+                                QGCColoredImage {
+                                    anchors.centerIn: parent
+                                    height:           18
+                                    width:            18
+                                    sourceSize.height: 18
+                                    fillMode:         Image.PreserveAspectFit
+                                    color:            "#E74C3C"
+                                    source:           "/res/TrashDelete.svg"
+                                }
+                                MouseArea {
+                                    id: deleteArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: mainWindow.showMessageDialog(
                                                    qsTr("Delete Link"),
                                                    qsTr("Are you sure you want to delete '%1'?").arg(object.name),
@@ -797,78 +878,34 @@ SettingsPage {
                                 }
                             }
 
-                            QGCButton {
-                                text:      object.link ? qsTr("Disconnect") : qsTr("Connect")
-                                onClicked: {
-                                    if (object.link) {
-                                        object.link.disconnect()
-                                    } else {
-                                        _linkManager.createConnectedLink(object)
-                                    }
+                            // Connect/Disconnect Action
+                            Rectangle {
+                                width:            100
+                                height:           36
+                                radius:           18
+                                color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#5B2C6F" : "#4A2C6D")
+                                border.color:     object.link ? "#E74C3C" : "transparent"
+                                border.width:     1
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text:             object.link ? qsTr("Disconnect") : qsTr("Connect")
+                                    color:            object.link ? "#C0392B" : "white"
+                                    font.bold:        true
+                                    font.pixelSize:   14
                                 }
-                            }
-                        }
-                    }
-                }
-
-                // Narrow screen layout
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           narrowCol.implicitHeight + 20
-                    color:            "#F8F9FB"
-                    radius:           10
-                    border.color:     "#E0E0E0"
-                    border.width:     1
-                    visible:          _isNarrow
-
-                    ColumnLayout {
-                        id:               narrowCol
-                        anchors.fill:     parent
-                        anchors.margins:  12
-                        spacing:          10
-
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text:             object.name
-                            color:            "black"
-                            font.bold:        true
-                            font.pointSize:   ScreenTools.mediumFontPointSize
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing:          15
-
-                            QGCButton {
-                                Layout.preferredWidth: ScreenTools.minTouchPixels * 2
-                                text:      qsTr("Edit")
-                                enabled:   !object.link
-                                onClicked: {
-                                    var editingConfig = _linkManager.startConfigurationEditing(object)
-                                    linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
-                                }
-                            }
-
-                            QGCButton {
-                                Layout.preferredWidth: ScreenTools.minTouchPixels * 2
-                                text:      qsTr("Delete")
-                                onClicked: mainWindow.showMessageDialog(
-                                               qsTr("Delete Link"),
-                                               qsTr("Are you sure you want to delete '%1'?").arg(object.name),
-                                               Dialog.Ok | Dialog.Cancel,
-                                               function () { _linkManager.removeConfiguration(object) })
-                            }
-
-                            Item { Layout.fillWidth: true }
-
-                            QGCButton {
-                                primary:   true
-                                text:      object.link ? qsTr("Disconnect") : qsTr("Connect")
-                                onClicked: {
-                                    if (object.link) {
-                                        object.link.disconnect()
-                                    } else {
-                                        _linkManager.createConnectedLink(object)
+                                
+                                MouseArea {
+                                    id:             connectMouse
+                                    anchors.fill:   parent
+                                    hoverEnabled:   true
+                                    cursorShape:    Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (object.link) {
+                                            object.link.disconnect()
+                                        } else {
+                                            _linkManager.createConnectedLink(object)
+                                        }
                                     }
                                 }
                             }
@@ -877,13 +914,6 @@ SettingsPage {
                 }
             }
         }
-
-        LabelledButton {
-            label:      qsTr("Add New Link")
-            buttonText: qsTr("Add")
-            onClicked:  typeSelectionDialogComponent.createObject(mainWindow).open()
-        }
-
         // Bottom Spacer
         Item {
             Layout.preferredHeight: 20
@@ -895,50 +925,69 @@ SettingsPage {
         id: typeSelectionDialogComponent
         QGCPopupDialog {
             id:                  typeDialog
-            title:               qsTr("Select Link Type")
+            title:               qsTr("Select Communication Link Type")
             buttons:             false
             closeOnClickOutside: true
             property int selectedType: -1
 
             ColumnLayout {
-                spacing:          15
+                spacing:          10
                 Layout.fillWidth: true
+                
                 Repeater {
                     model: _linkManager.linkTypeStrings
-                    delegate: RowLayout {
+                    delegate: Rectangle {
                         Layout.fillWidth: true
-                        spacing:          20
-                        Rectangle {
-                            width:  25
-                            height: 25
-                            radius: width/2
-                            color:  "#4a2c6d"
-                            Text {
-                                anchors.centerIn: parent
-                                font.pixelSize:   14
-                                color:            "white"
-                                text:             index + 1
-                            }
-                        }
-                        Text {
-                            text:           modelData
-                            font.pixelSize: 16
-                            color:          "black"
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    typeDialog.selectedType = index
-                                    typeDialog.close()
-                                    var editingConfig = _linkManager.createConfiguration(index, "")
-                                    linkConfigDialogComponent.createObject(mainWindow, {
-                                        editingConfig:  editingConfig,
-                                        originalConfig: null,
-                                        selectedType:   index
-                                    }).open()
+                        height:           50
+                        radius:           8
+                        color:            linkTypeMouse.containsMouse ? "#F3F4F6" : "transparent"
+                        border.color:     linkTypeMouse.containsMouse ? "#D1D5DB" : "#E5E7EB"
+                        border.width:     1
+                        
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 15
+                            
+                            Rectangle {
+                                width:  30
+                                height: 30
+                                radius: 8
+                                color:  "#4a2c6d" 
+                                Text {
+                                    anchors.centerIn: parent
+                                    font.pixelSize:   14
+                                    font.bold:        true
+                                    color:            "white"
+                                    text:             index + 1
                                 }
                             }
+                            
+                            Text {
+                                text:           modelData
+                                font.pixelSize: 16
+                                font.weight:    500
+                                color:          "#1F2937"
+                                Layout.fillWidth: true
+                            }
                         }
-                        Item { Layout.fillWidth: true }
+                        
+                        MouseArea {
+                            id: linkTypeMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                typeDialog.selectedType = index
+                                typeDialog.close()
+                                var editingConfig = _linkManager.createConfiguration(index, "")
+                                linkConfigDialogComponent.createObject(mainWindow, {
+                                    editingConfig:  editingConfig,
+                                    originalConfig: null,
+                                    selectedType:   index
+                                }).open()
+                            }
+                        }
                     }
                 }
             }
@@ -948,7 +997,7 @@ SettingsPage {
     Component {
         id: linkConfigDialogComponent
         QGCPopupDialog {
-            title:         selectedType === 3 ? qsTr("Bluetooth Devices") : (originalConfig ? qsTr("Edit Link") : qsTr("Add New Link"))
+            title:         selectedType === 3 ? qsTr("Bluetooth Devices") : (originalConfig ? qsTr("Edit Link Configuration") : qsTr("Add New Link"))
             buttons:       Dialog.Save | Dialog.Cancel
             acceptAllowed: nameField.text !== ""
 
@@ -971,20 +1020,31 @@ SettingsPage {
             onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
 
             ColumnLayout {
-                spacing:          ScreenTools.defaultFontPixelHeight / 2
+                spacing:          20
                 Layout.fillWidth: true
 
-                RowLayout {
+                ColumnLayout {
                     Layout.fillWidth: true
-                    spacing:          ScreenTools.defaultFontPixelWidth
+                    spacing:          8
                     visible:          _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
-                    QGCLabel { text: qsTr("Name") }
+                    
+                    QGCLabel { 
+                        text: qsTr("Link Name")
+                        color: "#4A5568"
+                        font.bold: true
+                    }
                     QGCTextField {
                         id:               nameField
                         Layout.fillWidth: true
                         text:             editingConfig.devName
-                        placeholderText:  qsTr("Enter name")
+                        placeholderText:  qsTr("Enter a descriptive name")
                     }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: "#E2E8F0"
                 }
 
                 Loader {

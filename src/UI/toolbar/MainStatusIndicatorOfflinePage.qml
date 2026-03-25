@@ -51,16 +51,63 @@ ToolIndicatorPage {
             Repeater {
                 model: linkConfigs
 
-                delegate: QGCButton {
-                    Layout.fillWidth:   true
-                    text:               object.name + (object.link ? " (" + qsTr("Connected") + ")" : "")
-                    visible:            !object.dynamic
-                    enabled:            !object.link
-                    autoExclusive:      true
+                delegate: Rectangle {
+                    Layout.fillWidth: true
+                    height: 55
+                    color: object.link ? "#10B981" : (mouseArea.containsMouse ? "#334155" : "transparent")
+                    border.width: 0
+                    radius: 8
+                    visible: !object.dynamic
 
-                    onClicked: {
-                        QGroundControl.linkManager.createConnectedLink(object)
-                        mainWindow.closeIndicatorDrawer()
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 15
+                        anchors.rightMargin: 15
+                        spacing: 10
+                        
+                        QGCLabel {
+                            Layout.fillWidth: true
+                            text: object.name
+                            color: "white" // Always sharp white
+                            font.bold: true
+                            font.pixelSize: ScreenTools.defaultFontPointSize * 1.1
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
+                        }
+                        
+                        Row {
+                            spacing: 6
+                            visible: object.link
+                            Layout.alignment: Qt.AlignVCenter
+                            
+                            Rectangle {
+                                width: 8
+                                height: 8
+                                radius: 4
+                                color: "white"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            
+                            QGCLabel {
+                                text: qsTr("Connected")
+                                color: "white"
+                                font.pointSize: ScreenTools.smallFontPointSize
+                                font.bold: true
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: object.link ? Qt.ArrowCursor : Qt.PointingHandCursor
+                        enabled: !object.link
+                        onClicked: {
+                            QGroundControl.linkManager.createConnectedLink(object)
+                            mainWindow.closeIndicatorDrawer()
+                        }
                     }
                 }
             }

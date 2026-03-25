@@ -155,57 +155,95 @@ Item {
             Column {
                 id:         fileOpenColumn
                 width:      40 * ScreenTools.defaultFontPixelWidth
-                spacing:    ScreenTools.defaultFontPixelHeight / 2
+                spacing:    20
 
-                QGCLabel { text: qsTr("Path: %1").arg(_mobileShortPath) }
+                QGCLabel { 
+                    text:   qsTr("Path: %1").arg(_mobileShortPath) 
+                    color:  "white"
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold: true
+                }
 
-                Repeater {
-                    id:     fileRepeater
-                    model:  controller.getFiles(folder, _rgExtensions)
+                Rectangle {
+                    width:          parent.width
+                    height:         Math.max(50, fileListColumn.height)
+                    color:          "transparent"
+                    border.color:   Qt.rgba(255, 255, 255, 0.15)
+                    border.width:   1
+                    radius:         8
+                    clip:           true
+                    
+                    Column {
+                        id:             fileListColumn
+                        width:          parent.width
+                        spacing:        0
 
-                    FileButton {
-                        id:             fileButton
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        text:           modelData
+                        Repeater {
+                            id:     fileRepeater
+                            model:  controller.getFiles(folder, _rgExtensions)
 
-                        onClicked: {
-                            var strippedFileName = modelData.split(".")[0]
-                            _appSettings.username=strippedFileName;
-                            console.log("strippedFileName",strippedFileName)
+                            Item {
+                                width: parent.width
+                                height: fileButton.height
 
+                                FileButton {
+                                    id:             fileButton
+                                    anchors.fill:   parent
+                                    text:           modelData
+                                    border.width:   0
+                                    radius:         0
 
-                            mobileFileOpenDialog.close()
-                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
-                        }
+                                    onClicked: {
+                                        var strippedFileName = modelData.split(".")[0]
+                                        _appSettings.username=strippedFileName;
+                                        console.log("strippedFileName",strippedFileName)
 
-                        onHamburgerClicked: {
-                            highlight = true
-                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                            hamburgerMenu.popup()
-                        }
+                                        mobileFileOpenDialog.close()
+                                        _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
+                                    }
 
-                        QGCMenu {
-                            id: hamburgerMenu
+                                    onHamburgerClicked: {
+                                        highlight = true
+                                        hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
+                                        hamburgerMenu.popup()
+                                    }
 
-                            property string fileToDelete
+                                    QGCMenu {
+                                        id: hamburgerMenu
 
-                            onAboutToHide: fileButton.highlight = false
+                                        property string fileToDelete
 
-                            QGCMenuItem {
-                                text:           qsTr("Delete")
-                                onTriggered: {
-                                    controller.deleteFile(hamburgerMenu.fileToDelete)
-                                    fileRepeater.model = controller.getFiles(folder, _rgExtensions)
+                                        onAboutToHide: fileButton.highlight = false
+
+                                        QGCMenuItem {
+                                            text:           qsTr("Delete")
+                                            onTriggered: {
+                                                controller.deleteFile(hamburgerMenu.fileToDelete)
+                                                fileRepeater.model = controller.getFiles(folder, _rgExtensions)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: Qt.rgba(255, 255, 255, 0.1)
+                                    anchors.bottom: parent.bottom
+                                    visible: index < fileRepeater.count - 1
                                 }
                             }
                         }
                     }
-                }
 
-                QGCLabel {
-                    text:       qsTr("No files")
-                    visible:    fileRepeater.model.length === 0
+                    Text {
+                        anchors.centerIn: parent
+                        text:       qsTr("No files")
+                        color:      "white"
+                        font.pixelSize: 14
+                        font.bold: true
+                        visible:    fileRepeater.model.length === 0
+                    }
                 }
             }
         }
@@ -245,8 +283,12 @@ Item {
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
                 QGCLabel {
-                    text: qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
-                    Layout.fillWidth: true
+                    text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
+                    Layout.fillWidth:   true
+                    color:              "white"
+                    font.family:        "Outfit"
+                    font.pointSize:     ScreenTools.defaultFontPointSize
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }
@@ -314,39 +356,69 @@ Item {
                     text:           qsTr("Save to existing file:")
                 }
 
-                Repeater {
-                    id:     fileRepeater
-                    model:  controller.getFiles(folder, [ _rgExtensions ])
+                Rectangle {
+                    width:          parent.width
+                    height:         Math.max(50, fileSaveList.height)
+                    color:          "transparent"
+                    border.color:   Qt.rgba(255, 255, 255, 0.15)
+                    border.width:   1
+                    radius:         8
+                    clip:           true
 
-                    FileButton {
-                        id:             fileButton
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        text:           modelData
+                    Column {
+                        id: fileSaveList
+                        width: parent.width
+                        spacing: 0
 
-                        onClicked: {
-                            mobileFileSaveDialog.close()
-                            _root.acceptedForSave(controller.fullyQualifiedFilename(folder, modelData))
-                        }
+                        Repeater {
+                            id:     fileRepeater
+                            model:  controller.getFiles(folder, [ _rgExtensions ])
 
-                        onHamburgerClicked: {
-                            highlight = true
-                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                            hamburgerMenu.popup()
-                        }
+                            Item {
+                                width: parent.width
+                                height: fileButton.height
 
-                        QGCMenu {
-                            id: hamburgerMenu
+                                FileButton {
+                                    id:             fileButton
+                                    anchors.fill:   parent
+                                    text:           modelData
+                                    border.width:   0
+                                    radius:         0
 
-                            property string fileToDelete
+                                    onClicked: {
+                                        mobileFileSaveDialog.close()
+                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, modelData))
+                                    }
 
-                            onAboutToHide: fileButton.highlight = false
+                                    onHamburgerClicked: {
+                                        highlight = true
+                                        hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
+                                        hamburgerMenu.popup()
+                                    }
 
-                            QGCMenuItem {
-                                text:           qsTr("Delete")
-                                onTriggered: {
-                                    controller.deleteFile(hamburgerMenu.fileToDelete)
-                                    fileRepeater.model = controller.getFiles(folder, [ _rgExtensions ])
+                                    QGCMenu {
+                                        id: hamburgerMenu
+
+                                        property string fileToDelete
+
+                                        onAboutToHide: fileButton.highlight = false
+
+                                        QGCMenuItem {
+                                            text:           qsTr("Delete")
+                                            onTriggered: {
+                                                controller.deleteFile(hamburgerMenu.fileToDelete)
+                                                fileRepeater.model = controller.getFiles(folder, [ _rgExtensions ])
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: Qt.rgba(255, 255, 255, 0.1)
+                                    anchors.bottom: parent.bottom
+                                    visible: index < fileRepeater.count - 1
                                 }
                             }
                         }

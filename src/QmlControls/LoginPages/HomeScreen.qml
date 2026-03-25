@@ -1088,8 +1088,8 @@ Item {
                 Text {
                     text: qsTr("Choose how you want to connect to your drone from the options below.")
                     font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.8 : 0.95)
-                    color: "black"
-                    opacity: 0.7
+                    color: "white"
+                    opacity: 0.8
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     Layout.fillWidth: true
@@ -1104,9 +1104,9 @@ Item {
                         visible: !isDisabled
                         Layout.fillWidth: true
                         Layout.preferredHeight: visible ? Math.max(((isSmallScreen || isMobile) ? 46 : 64), innerText.implicitHeight + ((isSmallScreen || isMobile) ? 20 : 28)) : 0
-                        radius: 10
-                        color: typeMouseArea.containsMouse ? Qt.rgba(249/255, 115/255, 22/255, 0.1) : "white"
-                        border.color: typeMouseArea.containsMouse ? accent_color : "#E5E7EB"
+                        radius: 8
+                        color: typeMouseArea.containsMouse ? Qt.rgba(255, 255, 255, 0.05) : "transparent"
+                        border.color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
                         border.width: 1
                         Behavior on color { ColorAnimation { duration: 150 } }
                         Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -1122,17 +1122,17 @@ Item {
                                 height: (isSmallScreen || isMobile) ? 30 : 38
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? accent_color : "#E5E7EB"
-                                Behavior on color { ColorAnimation { duration: 150 } }
+                                color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.08)
+                                border.color: Qt.rgba(255,255,255,0.1)
+                                border.width: 1
 
                                 Text {
                                     anchors.centerIn: parent
                                     font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
                                     font.bold: true
-                                    color: typeMouseArea.containsMouse ? "white" : "black"
+                                    color: "white"
                                     opacity: typeMouseArea.containsMouse ? 1.0 : 0.8
                                     text: (index + 1)
-                                    Behavior on color { ColorAnimation { duration: 150 } }
                                 }
                             }
 
@@ -1144,9 +1144,8 @@ Item {
                                 text: modelData
                                 font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.95 : 1.2)
                                 font.weight: Font.DemiBold
-                                color: "black"
+                                color: "white"
                                 wrapMode: Text.WordWrap
-                                Behavior on color { ColorAnimation { duration: 150 } }
                             }
 
                             // Arrow Indicator
@@ -1155,8 +1154,7 @@ Item {
                                 text: "→"
                                 font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 1.2 : 1.6)
                                 font.bold: true
-                                color: typeMouseArea.containsMouse ? accent_color : "transparent"
-                                Behavior on color { ColorAnimation { duration: 150 } }
+                                color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255,255,255,0.3)
                             }
                         }
 

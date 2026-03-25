@@ -9,206 +9,354 @@ import QGroundControl.Palette
 import MapGlobals 1.0
 
 Item {
-    id: selectAppRoot
+    id: root
     anchors.fill: parent
-    property color app_color: "#4a2c6d"
-    property color accent_color: "#4a2c6d"
-    
+
+    // ── Palette ─────────────────────────────────────────────────
+    readonly property color brandDark:    "#1A1335"
+    readonly property color brandPrimary: "#4A2C6D"
+    readonly property color brandAccent:  "#7B4FA6"
+    readonly property color pageBg:       "#EDEEF4"
+
+    // ── Adaptive sizing helpers ──────────────────────────────────
+    // Everything is derived from the actual pixel dimensions of this item
+    readonly property real hPad:      Math.max(16, root.width  * 0.03)
+    readonly property real vPad:      Math.max(12, root.height * 0.03)
+    readonly property real cardGap:   Math.max(10, root.width  * 0.015)
+    readonly property real cardH:     bodyArea.height * 0.62          // cards occupy 62 % of body
+    readonly property real thumbW:    cardH * 0.58                    // square-ish left thumbnail
+    readonly property real labelH:    Math.max(44, cardH * 0.22)      // bottom label strip
+    readonly property real btnH:      Math.max(40, root.height* 0.065)
+    readonly property real btnW:      Math.max(160, root.width * 0.22)
+    readonly property real r:         12                              // universal corner radius
+
     signal backClicked()
     signal appSelected()
 
-    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 60
+    property int selectedIndex: -1
 
+    readonly property var appModel: [
+        { label: "Camera",  desc: "Aerial photography & video",    image: "qrc:/qmlimages/NewImages/camerabg.png" },
+        { label: "Agri",    desc: "Precision agriculture & spray", image: "qrc:/qmlimages/NewImages/agribg.png"   },
+        { label: "Mapping", desc: "3-D mapping & surveying",       image: "qrc:/qmlimages/NewImages/mapbg.png"    }
+    ]
+
+    Component.onCompleted: {
+        var saved = QGroundControl.loadGlobalSetting("loadpage", "Camera").trim()
+        for (var i = 0; i < appModel.length; i++) {
+            if (appModel[i].label === saved) { selectedIndex = i; break }
+        }
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  BACKGROUND
+    // ════════════════════════════════════════════════════════════
     Rectangle {
         anchors.fill: parent
-        color: "#F8F9FD"
+        color: pageBg
+    }
 
-        /* ================= PREMIUM HEADER ================= */
+    // ════════════════════════════════════════════════════════════
+    //  HEADER
+    // ════════════════════════════════════════════════════════════
+    Rectangle {
+        id: header
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: Math.max(56, root.height * 0.11)
+        z: 10
+
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0.0; color: brandDark    }
+            GradientStop { position: 1.0; color: brandPrimary }
+        }
+
+        // Glowing accent underline
         Rectangle {
-            id: header
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: Math.max(70, parent.height * 0.1)
-            color: app_color
-            z: 10
-
-            Rectangle {
-                anchors.fill: parent
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0.0; color: Qt.darker(app_color, 1.1) }
-                    GradientStop { position: 1.0; color: app_color }
-                }
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 20
-                anchors.rightMargin: 20
-                spacing: 15
-
-                Rectangle {
-                    width: 36; height: 36; radius: 18
-                    color: backMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(255, 255, 255, 0.1)
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                        width: 20; height: 20; color: "white"
-                        anchors.centerIn: parent
-                    }
-                    MouseArea {
-                        id: backMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: selectAppRoot.backClicked()
-                    }
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    text: "Select Mission Profile"
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.bold: true; color: "white"
-                    font.family: "Outfit"
-                }
+            anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+            height: 2
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 0.5; color: brandAccent   }
+                GradientStop { position: 1.0; color: "transparent" }
             }
         }
 
-        /* ================= CENTERED ADAPTABLE CONTENT ================= */
-        Item {
-            anchors.top: header.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+        RowLayout {
+            anchors { fill: parent; leftMargin: hPad; rightMargin: hPad }
+            spacing: hPad * 0.6
 
-            ColumnLayout {
-                id: contentColumn
-                width: Math.min(isSmallScreen ? parent.width - 40 : 900, parent.width - 40)
-                anchors.centerIn: parent
-                spacing: 40
+            // Back button
+            Rectangle {
+                width: header.height * 0.56
+                height: width
+                radius: 8
+                color: backMa.containsMouse ? Qt.rgba(1,1,1,0.20) : Qt.rgba(1,1,1,0.09)
+                Behavior on color { ColorAnimation { duration: 140 } }
 
-                property int selectedIndex: -1
-                property var buttonModel: [
-                    { label: "Camera", image: "qrc:/qmlimages/NewImages/camerabg.png" },
-                    { label: "Agri", image: "qrc:/qmlimages/NewImages/agribg.png" },
-                    { label: "Mapping", image: "qrc:/qmlimages/NewImages/mapbg.png" }
-                ]
-
-                Component.onCompleted: {
-                    var saved = QGroundControl.loadGlobalSetting("loadpage", "Camera").trim()
-                    for (var i = 0; i < buttonModel.length; i++) {
-                        if (buttonModel[i].label === saved) {
-                            selectedIndex = i
-                            break
-                        }
-                    }
+                QGCColoredImage {
+                    source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                    width: parent.width * 0.55
+                    height: width
+                    color: "white"
+                    anchors.centerIn: parent
                 }
+                MouseArea {
+                    id: backMa; anchors.fill: parent
+                    hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: root.backClicked()
+                }
+            }
 
-                // Grid Layout
-                GridLayout {
-                    id: cardsGrid
-                    Layout.fillWidth: true
-                    columns: isSmallScreen ? 1 : 3
-                    columnSpacing: 25
-                    rowSpacing: 25
+            // Title + subtitle
+            Column {
+                Layout.fillWidth: true
+                spacing: 2
+                Text {
+                    text: "Mission Profile"
+                    font {
+                        family: "Outfit"
+                        pointSize: ScreenTools.mediumFontPointSize
+                        bold: true
+                    }
+                    color: "white"
+                }
+                Text {
+                    text: "Select an application mode to continue"
+                    font { family: "Outfit"; pointSize: ScreenTools.smallFontPointSize }
+                    color: Qt.rgba(1,1,1,0.55)
+                }
+            }
+        }
+    }
 
-                    Repeater {
-                        model: contentColumn.buttonModel
-                        
+    // ════════════════════════════════════════════════════════════
+    //  BODY  — fills everything below the header
+    // ════════════════════════════════════════════════════════════
+    Item {
+        id: bodyArea
+        anchors {
+            top: header.bottom
+            left: parent.left; right: parent.right; bottom: parent.bottom
+        }
+
+        // ── centred column ────────────────────────────────────────
+        Column {
+            anchors.centerIn: parent
+            width: bodyArea.width - hPad * 2
+            spacing: vPad
+
+            // section label
+            Text {
+                text: "Choose Application"
+                font { family: "Outfit"; pointSize: ScreenTools.defaultFontPointSize; bold: true }
+                color: brandPrimary
+            }
+
+            // ── HORIZONTAL CARDS ───────────────────────────────────
+            Row {
+                id: cardRow
+                width: parent.width
+                height: root.cardH
+                spacing: root.cardGap
+
+                Repeater {
+                    model: root.appModel
+
+                    // ── Single card (vertical layout: image top, label bottom) ──
+                    Rectangle {
+                        id: card
+                        width: (cardRow.width - cardRow.spacing * (root.appModel.length - 1))
+                               / root.appModel.length
+                        height: cardRow.height
+                        radius: root.r
+                        clip: true
+
+                        readonly property bool isSelected: root.selectedIndex === index
+
+                        color: "white"
+                        border.color: isSelected ? brandAccent : "#DDE1EA"
+                        border.width: isSelected ? 3 : 1
+
+                        Behavior on border.color { ColorAnimation { duration: 180 } }
+                        Behavior on border.width  { NumberAnimation  { duration: 180 } }
+
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            shadowEnabled: true
+                            shadowColor: isSelected
+                                         ? Qt.rgba(74,44,109,0.28)
+                                         : Qt.rgba(0,0,0,0.08)
+                            shadowBlur: 0.85
+                            shadowVerticalOffset: isSelected ? 8 : 3
+                        }
+
+                        // ── Image fills top portion ───────────────
                         Rectangle {
-                            id: cardContainer
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: isSmallScreen ? 120 : 260
-                            radius: 16
-                            color: "white"
-                            border.color: contentColumn.selectedIndex === index ? accent_color : "#E2E8F0"
-                            border.width: contentColumn.selectedIndex === index ? 3 : 1
+                            id: imgBox
+                            anchors { top: parent.top; left: parent.left; right: parent.right }
+                            height: card.height - labelStrip.height
                             clip: true
+                            color: brandDark
+                            // top-left / top-right rounded, bottom flat
+                            radius: root.r
 
-                            layer.enabled: true
-                            layer.effect: MultiEffect {
-                                shadowEnabled: true
-                                shadowColor: contentColumn.selectedIndex === index ? Qt.rgba(74, 44, 109, 0.2) : Qt.rgba(0,0,0,0.05)
-                                shadowBlur: 0.8
-                                shadowVerticalOffset: 4
+                            // flatten bottom corners
+                            Rectangle {
+                                anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                                height: root.r
+                                color: parent.color
                             }
 
-                            ColumnLayout {
+                            Image {
                                 anchors.fill: parent
-                                spacing: 0
+                                source: modelData.image
+                                fillMode: Image.PreserveAspectCrop
+                                opacity: 0.9
+                            }
 
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    Image { 
-                                        anchors.fill: parent
-                                        source: modelData.image
-                                        fillMode: Image.PreserveAspectCrop
-                                    }
-                                    
-                                    // Selection Indicator (Checkmark Badge)
-                                    Rectangle {
-                                        width: 28; height: 28; radius: 14
-                                        color: accent_color
-                                        anchors.top: parent.top; anchors.right: parent.right
-                                        anchors.margins: 10
-                                        visible: contentColumn.selectedIndex === index
-                                        z: 10
-                                        QGCColoredImage {
-                                            source: "qrc:/InstrumentValueIcons/checkmark.svg"
-                                            width: 14; height: 14; color: "white"
-                                            anchors.centerIn: parent
-                                        }
-                                    }
-                                }
+                            // ── Check badge (top-right) ───────────
+                            Rectangle {
+                                visible: isSelected
+                                width: Math.max(22, card.width * 0.12)
+                                height: width; radius: 6
+                                color: brandAccent
+                                anchors { top: parent.top; right: parent.right; margins: 10 }
+                                z: 5
 
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: 60
+                                QGCColoredImage {
+                                    source: "qrc:/InstrumentValueIcons/checkmark.svg"
+                                    width: parent.width * 0.55
+                                    height: width
                                     color: "white"
-                                    Text {
-                                        text: modelData.label
-                                        anchors.centerIn: parent
-                                        font.pointSize: ScreenTools.mediumFontPointSize
-                                        font.bold: true
-                                        color: contentColumn.selectedIndex === index ? accent_color : "#333333"
-                                    }
+                                    anchors.centerIn: parent
                                 }
                             }
+                        }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: contentColumn.selectedIndex = index
+                        // ── Label strip at bottom ──────────────────
+                        Rectangle {
+                            id: labelStrip
+                            anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+                            height: root.labelH
+                            radius: root.r
+                            color: isSelected ? Qt.rgba(74,44,109,0.07) : "white"
+                            Behavior on color { ColorAnimation { duration: 180 } }
+
+                            // flatten top corners
+                            Rectangle {
+                                anchors { top: parent.top; left: parent.left; right: parent.right }
+                                height: root.r
+                                color: parent.color
                             }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                font {
+                                    family: "Outfit"
+                                    pointSize: ScreenTools.defaultFontPointSize
+                                    bold: true
+                                }
+                                color: isSelected ? brandPrimary : "#1E1E2E"
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.selectedIndex = index
                         }
                     }
                 }
+            }
 
-                // Action Button
-                Button {
-                    id: activateBtn
-                    text: "CONFIRM"
-                    Layout.preferredWidth: isSmallScreen ? parent.width : 300
-                    Layout.preferredHeight: 50
-                    Layout.alignment: Qt.AlignHCenter
-                    enabled: contentColumn.selectedIndex !== -1
-                    
-                    background: Rectangle { 
-                        radius: 25
-                        color: parent.enabled ? (parent.pressed ? Qt.darker(accent_color, 1.1) : accent_color) : "#D1D5DB"
+            // ── Divider ──────────────────────────────────────────
+            Rectangle {
+                width: parent.width; height: 1; color: "#D8DCE6"
+            }
+
+            // ── Bottom bar: hint + confirm ───────────────────────
+            RowLayout {
+                width: parent.width
+                spacing: 12
+
+                // Selection hint
+                Row {
+                    Layout.fillWidth: true
+                    spacing: 6
+
+                    Rectangle {
+                        width: 8; height: 8; radius: 4
+                        anchors.verticalCenter: hintText.verticalCenter
+                        color: root.selectedIndex === -1 ? "#C8CDD8" : brandAccent
+                        Behavior on color { ColorAnimation { duration: 160 } }
                     }
-                    
-                    contentItem: Text { 
-                        text: activateBtn.text; color: "white"; font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
-                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter 
+                    Text {
+                        id: hintText
+                        text: root.selectedIndex === -1
+                              ? "No profile selected"
+                              : "Selected:  " + root.appModel[root.selectedIndex].label
+                        font { family: "Outfit"; pointSize: ScreenTools.defaultFontPointSize }
+                        color: root.selectedIndex === -1 ? "#AAB0BE" : brandPrimary
+                        Behavior on color { ColorAnimation { duration: 160 } }
+                    }
+                }
+
+                // Confirm button
+                Rectangle {
+                    Layout.preferredWidth:  root.btnW
+                    Layout.preferredHeight: root.btnH
+                    radius: 10
+                    color: {
+                        if (root.selectedIndex === -1) return "#C8CDD8"
+                        if (cMa.pressed)               return Qt.darker(brandPrimary, 1.18)
+                        if (cMa.containsMouse)         return brandAccent
+                        return brandPrimary
+                    }
+                    Behavior on color { ColorAnimation { duration: 160 } }
+
+                    // Arrow icon + text
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            text: root.selectedIndex === -1 ? "Select a Profile" : "Confirm Selection"
+                            font {
+                                family: "Outfit"
+                                pointSize: ScreenTools.defaultFontPointSize
+                                bold: true
+                            }
+                            color: "white"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        QGCColoredImage {
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-right.svg"
+                            width: ScreenTools.defaultFontPixelHeight
+                            height: width
+                            color: "white"
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: root.selectedIndex !== -1
+                        }
                     }
 
-                    onClicked: {
-                        QGroundControl.saveGlobalSetting("loadpage", contentColumn.buttonModel[contentColumn.selectedIndex].label)
-                        if (MapGlobals.rootWindow) MapGlobals.rootWindow.showToastMessage(contentColumn.buttonModel[contentColumn.selectedIndex].label + " Mode Selected")
-                        selectAppRoot.appSelected()
+                    MouseArea {
+                        id: cMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        enabled: root.selectedIndex !== -1
+                        onClicked: {
+                            var sel = root.appModel[root.selectedIndex]
+                            QGroundControl.saveGlobalSetting("loadpage", sel.label)
+                            if (MapGlobals.rootWindow)
+                                MapGlobals.rootWindow.showToastMessage(sel.label + " Mode Selected")
+                            root.appSelected()
+                        }
                     }
                 }
             }
