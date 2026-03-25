@@ -333,11 +333,15 @@ Popup {
                 QGCFlickable {
                     anchors.margins:    _contentMargin
                     anchors.fill:       parent
-                    contentWidth:       dialogContentParent.childrenRect.width
+                    contentWidth:       width
                     contentHeight:      dialogContentParent.childrenRect.height
+                    flickableDirection: Flickable.VerticalFlick
+                    interactive:        contentHeight > height
+                    clip:               true
 
                     Item {
                         id:     dialogContentParent
+                        width:  parent.width
                         focus:  true
 
                         Keys.onPressed: (event) => {

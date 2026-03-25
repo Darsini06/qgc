@@ -124,7 +124,6 @@ QGCPopupDialog {
                         implicitHeight: contentHeight
                         model:          coordinateSystemCombo.delegateModel
                         currentIndex:   coordinateSystemCombo.highlightedIndex
-                        ScrollIndicator.vertical: ScrollIndicator { }
                     }
 
                     background: Rectangle {
@@ -203,7 +202,7 @@ QGCPopupDialog {
             }
         }
 
-        // UTM Section (Also converted to sketch-style row if needed)
+        // UTM Section
         GridLayout {
             Layout.fillWidth:   true
             columns:            2
@@ -213,15 +212,163 @@ QGCPopupDialog {
 
             ColumnLayout {
                 spacing: dp(1)
-                Label { text: qsTr("ZONE"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true }
+                Label { text: qsTr("Zone"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.zone
                     Layout.fillWidth: true
                     textColor: "white"
-                    background: Rectangle { implicitHeight: dp(6.5); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: borderColor; border.width: 1 }
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: "Outfit"
+                    background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
                 }
             }
-            // ... truncated for brevity, would follow the same pattern
+            ColumnLayout {
+                spacing: dp(1)
+                Label { text: qsTr("Hemisphere"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                FactComboBox {
+                    id:                 hemisphereCombo
+                    fact:               controller.hemisphere
+                    Layout.fillWidth:   true
+                    indexModel:         false
+                    font.family:        "Outfit"
+                    font.bold:          true
+
+                    contentItem: Text {
+                        leftPadding:    12
+                        text:           hemisphereCombo.currentText
+                        color:          "white"
+                        verticalAlignment: Text.AlignVCenter
+                        font.family:    "Outfit"
+                        font.bold:      true
+                    }
+                    
+                    background: Rectangle {
+                        implicitHeight: dp(6)
+                        color:          Qt.rgba(255, 255, 255, 0.08)
+                        radius:         8
+                        border.color:   hemisphereCombo.activeFocus ? secondary_color : borderColor
+                        border.width:   1
+                    }
+
+                    delegate: ItemDelegate {
+                        width:  hemisphereCombo.width
+                        height: dp(6)
+                        contentItem: Text {
+                            text:                   modelData
+                            color:                  "white"
+                            font.family:            "Outfit"
+                            verticalAlignment:      Text.AlignVCenter
+                            leftPadding:            12
+                        }
+                        background: Rectangle {
+                            color:  hemisphereCombo.currentIndex === index ? secondary_color : (hovered ? Qt.rgba(255,255,255,0.05) : "transparent")
+                            radius: 8
+                        }
+                    }
+
+                    popup: Popup {
+                        y:              hemisphereCombo.height + 4
+                        width:          hemisphereCombo.width
+                        implicitHeight: contentItem.implicitHeight
+                        padding:        4
+                        contentItem: ListView {
+                            clip:           true
+                            implicitHeight: contentHeight
+                            model:          hemisphereCombo.delegateModel
+                        }
+                        background: Rectangle {
+                            color:          "#1a1b2e"
+                            border.color:   borderColor
+                            border.width:   1
+                            radius:         12
+                        }
+                    }
+                }
+            }
+            ColumnLayout {
+                spacing: dp(1)
+                Label { text: qsTr("Easting"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                FactTextField {
+                    fact: controller.easting
+                    Layout.fillWidth: true
+                    textColor: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: "Outfit"
+                    background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
+                }
+            }
+            ColumnLayout {
+                spacing: dp(1)
+                Label { text: qsTr("Northing"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                FactTextField {
+                    fact: controller.northing
+                    Layout.fillWidth: true
+                    textColor: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    font.family: "Outfit"
+                    background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
+                }
+            }
+        }
+
+        // MGRS Section
+        ColumnLayout {
+            Layout.fillWidth:   true
+            spacing:            dp(1)
+            visible:            _showMGRS
+
+            Label { text: qsTr("MGRS"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+            FactTextField {
+                fact: controller.mgrs
+                Layout.fillWidth: true
+                textColor: "white"
+                horizontalAlignment: Text.AlignHCenter
+                font.family: "Outfit"
+                background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
+            }
+        }
+
+        // Vehicle Position Section
+        ColumnLayout {
+            Layout.fillWidth:   true
+            spacing:            dp(2)
+            visible:            _showVehicle
+
+            QGCLabel {
+                Layout.fillWidth:   true
+                text:               qsTr("Set the position to the current location of the active vehicle.")
+                color:              "white"
+                wrapMode:           Text.WordWrap
+                font.family:        "Outfit"
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: dp(12)
+                color: Qt.rgba(255, 255, 255, 0.05)
+                radius: 12
+                border.color: borderColor
+                border.width: 1
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: dp(1)
+                    QGCLabel { 
+                        text: qsTr("Vehicle Coordinate:") 
+                        color: secondary_color
+                        font.bold: true
+                        font.family: "Outfit"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                    QGCLabel { 
+                        text: globals.activeVehicle ? globals.activeVehicle.coordinate.toString() : qsTr("No active vehicle")
+                        color: "white"
+                        font.family: "Outfit"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
         }
 
         // Action Buttons Row - Perfectly Symmetric Horizontal 50/50 Split
