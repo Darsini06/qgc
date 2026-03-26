@@ -202,21 +202,23 @@ Item {
 
 
 
+    // Left Top Back Arrow Navigation explicitly removed as requested by user
+
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottomMargin: 20
         anchors.rightMargin: 20
-        spacing: 20  // Adjust this value to control space between icons
+        spacing: 20
 
         Rectangle {
             id: sharebtn
             Layout.alignment: Qt.AlignRight
             width: baseSize
             height: baseSize
-            radius: width / 2  // Makes it a circle
-            color: "#4a2c6d"   // Theme color
+            radius: width / 2
+            color: "#4a2c6d"
             border.color: "#8e6abb"
             border.width: 1
             opacity: 0.95
@@ -600,6 +602,7 @@ Item {
                                 mainWindow.showPlanView()
                            }
     }
+
 
     AirspaceRestrictionDialog {
         id: _airspaceRestrictionDialog
@@ -1064,7 +1067,7 @@ Item {
             anchors.bottom:     parent.bottom
             anchors.right:      parent.right
             anchors.rightMargin: _toolsMargin
-            //visible: false
+            visible:            _editingLayer != _layerMission
         }
         //-------------------------------------------------------
         // Right Panel Controls
@@ -1072,7 +1075,7 @@ Item {
         Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
-            //visible: false
+            visible:                _editingLayer != _layerMission
 
             DeadMouseArea {
                 anchors.fill:   parent
@@ -1086,164 +1089,7 @@ Item {
                 anchors.top:        parent.top
                 //-------------------------------------------------------
 
-                // Mission Controls - Professional Purple Theme Slider
-                Rectangle {
-                    id:         layerTabBar
-                    width:      parent.width
-                    height:     42
-                    color:      "#2d1c42"  // Dark purple background
-                    radius:     21
-                    border.color: "#4a2c6d"
-                    border.width: 1
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
-
-                    property int currentIndex: 0
-                    property bool fenceVisible: _geoFenceController.supported
-                    property int _visibleTabCount: fenceVisible ? 2 : 1
-
-                    // Active pill highlight
-                    Rectangle {
-                        id: sliderHighlight
-                        width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                        height: layerTabBar.height - 6
-                        y: 3
-                        x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: "#6a4c8d" }
-                            GradientStop { position: 1.0; color: "#4a2c6d" }
-                        }
-                        radius: height / 2
-                        border.color: "#8a6cad"
-                        border.width: 1
-                        Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-                    }
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 3
-                        spacing: 0
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBar.currentIndex = 0
-                            Text {
-                                text: qsTr("Mission")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 0
-                                color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            visible: layerTabBar.fenceVisible
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBar.currentIndex = 1
-                            Text {
-                                text: qsTr("Fence")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 1
-                                color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id:         layerTabBarUTMSP
-                    width:      parent.width
-                    height:     40
-                    color:      "#f1f5f9"
-                    radius:     8
-                    border.color: "#e2e8f0"
-                    border.width: 1
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled
-
-                    property int currentIndex: 0
-                    property bool rallyVisible: _rallyPointController.supported
-                    property int _visibleTabCount: 1 + (rallyVisible ? 1 : 0) + 1
-
-                    Rectangle {
-                        id: sliderHighlightUTMSP
-                        width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                        height: layerTabBarUTMSP.height - 8
-                        y: 4
-                        x: {
-                            var tabWidth = width;
-                            if (layerTabBarUTMSP.currentIndex === 0) return 4;
-                            if (layerTabBarUTMSP.currentIndex === 1) return 4 + tabWidth;
-                            if (layerTabBarUTMSP.currentIndex === 2) return 4 + tabWidth * (layerTabBarUTMSP.rallyVisible ? 2 : 1);
-                            return 4;
-                        }
-                        color: "white"
-                        radius: 6
-                        border.color: "#d1d5db"
-                        border.width: 1
-                        
-                        Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
-                    }
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        spacing: 0
-                        
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 0
-                            Text {
-                                text: qsTr("Mission")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 0
-                                color: layerTabBarUTMSP.currentIndex === 0 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            visible: layerTabBarUTMSP.rallyVisible
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 1
-                            Text {
-                                text: qsTr("Rally")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 1
-                                color: layerTabBarUTMSP.currentIndex === 1 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-                        
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            visible: _utmspEnabled
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 2
-                            Text {
-                                text: qsTr("UTM-Adapter")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 2
-                                color: layerTabBarUTMSP.currentIndex === 2 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-                    }
-                }
+                // Layer tabs moved to bottomCenterContainer
             }
             //-------------------------------------------------------
             // Mission Item Editor
@@ -1255,7 +1101,7 @@ Item {
                 anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.25
-                visible:                _editingLayer == _layerMission && !planControlColapsed
+                visible:                false // Hidden per user request; bottom popup used instead
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -2294,6 +2140,209 @@ Item {
             _planMasterController.removeAllFromVehicle();
             _missionController.setCurrentPlanViewSeqNum(0, true);
             if(_utmspEnabled){_resetRegisterFlightPlan = true}
+        }
+    }
+
+    // --- Slide-up Mission Actions Popup ---
+    Popup {
+        id: missionActionsPopup
+        width: ScreenTools.defaultFontPixelWidth * 45
+        height: 60
+        
+        x: (parent.width - width) / 2
+        property real targetY: parent.height - height - 80 // Anchor exactly above the bottom tab bar
+        y: targetY
+        
+        modal: false    // So user can still click map while open
+        dim: false
+
+        enter: Transition {
+            NumberAnimation { property: "y"; from: missionActionsPopup.parent.height; to: missionActionsPopup.targetY; duration: 250; easing.type: Easing.OutQuart }
+        }
+        exit: Transition {
+            NumberAnimation { property: "y"; to: missionActionsPopup.parent.height; duration: 250; easing.type: Easing.OutQuart }
+        }
+
+        background: Rectangle {
+            color: "transparent"
+        }
+
+        contentItem: RowLayout {
+            spacing: 12
+            
+            Repeater {
+                model: [
+                    { "text": qsTr("Mission Start"), "action": "start" },
+                    { "text": qsTr("Survey"), "action": "survey" },
+                    { "text": qsTr("Return To Launch"), "action": "rtl" }
+                ]
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 12
+                    color: "#4a2c6d"
+                    border.color: "#8a6cad"
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: modelData.text
+                        color: "white"
+                        font.pointSize: 10
+                        font.bold: true
+                        font.family: "Outfit"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            missionActionsPopup.close()
+
+                            var items = _missionController.visualItems
+                            var targetIndex = -1
+                            var targetItem  = null
+
+                            if (modelData.action === "start") {
+                                // Always open item 0 (Mission Start / planned home)
+                                targetIndex = 0
+                                targetItem  = items.get(0)
+                                if (targetItem)
+                                    _missionController.setCurrentPlanViewSeqNum(targetItem.sequenceNumber, false)
+
+                            } else if (modelData.action === "survey") {
+                                // Find first existing Survey; insert new one only if absent
+                                for (var i = 0; i < items.count; i++) {
+                                    var it = items.get(i)
+                                    if (it && it.commandName === "Survey") {
+                                        targetIndex = i
+                                        targetItem  = it
+                                        _missionController.setCurrentPlanViewSeqNum(it.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertComplexItemAfterCurrent("Survey")
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem  = items.get(targetIndex)
+                                }
+
+                            } else if (modelData.action === "rtl") {
+                                // Find first existing Return-To-Launch; insert new one only if absent
+                                for (var j = 0; j < items.count; j++) {
+                                    var rtlIt = items.get(j)
+                                    if (rtlIt && rtlIt.commandName === "Return To Launch") {
+                                        targetIndex = j
+                                        targetItem  = rtlIt
+                                        _missionController.setCurrentPlanViewSeqNum(rtlIt.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertLandItemAfterCurrent()
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem  = items.get(targetIndex)
+                                }
+                            }
+
+                            if (targetItem) {
+                                missionItemDialog.currentMissionItem = targetItem
+                                missionItemDialog.currentIndex       = targetIndex
+                                missionItemDialog.open()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Central Mission Control Container - Tabs & Actions
+    Column {
+        id: bottomCenterContainer
+        anchors.bottom:             parent.bottom
+        anchors.horizontalCenter:   parent.horizontalCenter
+        anchors.bottomMargin:       ScreenTools.defaultFontPixelHeight * 2.0
+        spacing:                    10
+        width:                      ScreenTools.defaultFontPixelWidth * 45
+        z:                          QGroundControl.zOrderWidgets + 100
+        visible:                    _editingLayer == _layerMission || _editingLayer == _layerGeoFence
+
+        // --- Row 3: Tab Selector ---
+        Rectangle {
+            id:         layerTabBar
+            width:      parent.width
+            height:     42
+            color:      "#2d1c42"
+            radius:     height / 2
+            border.color: "#4a2c6d"
+            border.width: 1
+            visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
+
+            property int currentIndex: 0
+            property bool fenceVisible: _geoFenceController.supported
+            property int _visibleTabCount: fenceVisible ? 2 : 1
+
+            Rectangle {
+                id: sliderHighlight
+                width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                height: layerTabBar.height - 6
+                y: 3
+                x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
+                color: "#4a2c6d"
+                radius: height / 2
+                border.color: "#8a6cad"
+                border.width: 1
+                Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.margins: 3
+                spacing: 0
+
+                MouseArea {
+                    width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                    height: parent.height
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (layerTabBar.currentIndex === 0) {
+                            if (missionActionsPopup.opened) missionActionsPopup.close()
+                            else missionActionsPopup.open()
+                        } else {
+                            layerTabBar.currentIndex = 0
+                            missionActionsPopup.open()
+                        }
+                    }
+                    Text {
+                        text: qsTr("Mission")
+                        anchors.centerIn: parent
+                        font.pointSize: 11
+                        font.bold: layerTabBar.currentIndex === 0
+                        color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
+                    }
+                }
+
+                MouseArea {
+                    width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+                    height: parent.height
+                    visible: layerTabBar.fenceVisible
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        layerTabBar.currentIndex = 1
+                        missionActionsPopup.close()
+                        if (!geoFenceDrawer.opened) geoFenceDrawer.open()
+                    }
+                    Text {
+                        text: qsTr("Fence")
+                        anchors.centerIn: parent
+                        font.pointSize: 11
+                        font.bold: layerTabBar.currentIndex === 1
+                        color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
+                    }
+                }
+            }
         }
     }
 }

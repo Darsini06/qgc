@@ -47,9 +47,9 @@ Rectangle {
     property var    _fileExtension:                 QGroundControl.settingsManager.appSettings.missionFileExtension
     property var    _appSettings:                   QGroundControl.settingsManager.appSettings
     property bool   _waypointsOnlyMode:             QGroundControl.corePlugin.options.missionWaypointsOnly
-    property bool   _showCameraSection:             (_waypointsOnlyMode || QGroundControl.corePlugin.showAdvancedUI) && !_controllerVehicle.apmFirmware
+    property bool   _showCameraSection:             true // Always show per user request: "should not miss any content"
     property bool   _simpleMissionStart:            QGroundControl.corePlugin.options.showSimpleMissionStart
-    property bool   _showFlightSpeed:               !_controllerVehicle.vtol && !_simpleMissionStart && !_controllerVehicle.apmFirmware
+    property bool   _showFlightSpeed:               true // Always show
     property bool   _allowFWVehicleTypeSelection:   _noMissionItemsAdded && !globals.activeVehicle
 
     readonly property string _firmwareLabel:    qsTr("Firmware")
@@ -303,7 +303,7 @@ Rectangle {
                             if (item) {
                                 item.fact = targetFact
                                 item.trackFillColor = _colorAccent
-                                item.showMinusButton = false
+                                item.showMinusButton = true
                                 item.showPlusButton = true
                             }
                         }
@@ -345,6 +345,8 @@ Rectangle {
                         if (item) {
                             item.fact = targetFact
                             item.trackFillColor = "#ffffff"
+                            item.showMinusButton = true
+                            item.showPlusButton = true
                         }
                     }
                 }

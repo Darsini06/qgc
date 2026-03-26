@@ -17,127 +17,265 @@ import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
+ColumnLayout  {
 
-SettingsPage {
-    property var _linkManager:          QGroundControl.linkManager
-    property var _autoConnectSettings:  QGroundControl.settingsManager.autoConnectSettings
+    Layout.fillWidth: true
+    spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
-    SettingsGroupLayout {
-        heading:        qsTr("AutoConnect")
-        visible:        _autoConnectSettings.visible
+    property var _linkManager: QGroundControl.linkManager
+    property color app_color: "#4a2c6d"
+    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
-        Repeater {
-            id: autoConnectRepeater
 
-            model: [
-                _autoConnectSettings.autoConnectPixhawk,
-                _autoConnectSettings.autoConnectSiKRadio,
-                _autoConnectSettings.autoConnectLibrePilot,
-                _autoConnectSettings.autoConnectUDP,
-                _autoConnectSettings.autoConnectZeroConf,
-                _autoConnectSettings.autoConnectRTKGPS,
-            ]
+    // Success path
+    Connections {
+        target: QGroundControl.multiVehicleManager
 
-            property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
+        function onActiveVehicleChanged(vehicle) {
+            if (vehicle) {
+                mainWindow.showToastMessage("Drone Connected")
+            } else {
+                mainWindow.showToastMessage("Drone DisConnected")
+            }
+            mainWindow.connecting_drone = false
+            mainWindow.close_dialog_showToast("")
+        }
+    }
 
-            FactCheckBoxSlider {
-                Layout.fillWidth:   true
-                text:               autoConnectRepeater.names[index]
-                fact:               modelData
-                visible:            modelData.visible
+    // Failure path
+    Connections {
+        target: QGroundControl.linkManager
+
+        function onCommunicationError(linkName, errorMessage) {
+            console.log("LinkSettings: connect failed for", linkName)
+            mainWindow.connecting_drone = false     // stop loading screen
+            mainWindow.close_dialog_showToast("")   // close any open dialogs
+            mainWindow.showToastMessage("Connection failed: " + errorMessage)
+        }
+    }
+
+    // --- Links Section ---
+    Rectangle {
+        Layout.fillWidth: true
+        height: 1
+        color: "#E0E0E0"
+        Layout.topMargin: ScreenTools.defaultFontPixelHeight * 0.5
+        Layout.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.5
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            text:             qsTr("Communication Links")
+            font.pixelSize:   ScreenTools.mediumFontPointSize
+            color:            "black"
+            font.bold:        true
+            //topPadding:       ScreenTools.defaultFontPixelHeight
+            bottomPadding:   ScreenTools.defaultFontPixelHeight * 0.3
+        }
+
+        Rectangle {
+            Layout.alignment: Qt.AlignVCenter
+            width:            130
+            height:           36
+            radius:           18
+            color:            addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
+            border.color:     "#4a2c6d"
+            border.width:     1
+
+            Text {
+                anchors.centerIn: parent
+                text:             qsTr("+ Add New Link")
+                color:            "#4a2c6d"
+                font.bold:        true
+                font.pixelSize:   14
+            }
+
+            MouseArea {
+                id:             addMouse
+                anchors.fill:   parent
+                hoverEnabled:   true
+                cursorShape:    Qt.PointingHandCursor
+                onClicked:      typeSelectionDialogComponent.createObject(mainWindow).open()
             }
         }
     }
 
-    SettingsGroupLayout {
-        heading: qsTr("Links")
+    Repeater {
+        model: _linkManager.linkConfigurations
 
-        Repeater {
-            model: _linkManager.linkConfigurations
-            
-            RowLayout {
-                Layout.fillWidth:   true
-                visible:            !object.dynamic
+        ColumnLayout {
+            id:               linkRow
+            Layout.fillWidth: true
+            visible:          !object.dynamic
+            spacing:          ScreenTools.defaultFontPixelHeight / 4
 
-                QGCLabel {
-                    Layout.fillWidth:   true
-                    text:               object.name
-                    color: "white"
-                }
-                QGCColoredImage {
-                    height:                 ScreenTools.minTouchPixels
-                    width:                  height
-                    sourceSize.height:      height
-                    fillMode:               Image.PreserveAspectFit
-                    mipmap:                 true
-                    smooth:                 true
-                    color:                  qgcPalEdit.text
-                    source:                 "/res/pencil.svg"
-                    enabled:                !object.link
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight:   mainRowWrapper.implicitHeight + 30
+                color:            object.link ? "#F4FDF8" : "#FFFFFF"
+                radius:           10
+                border.color:     object.link ? "#4a2c6d" : "#E2E8F0"
+                border.width:     object.link ? 2 : 1
 
-                    QGCPalette {
-                        id: qgcPalEdit
-                        colorGroupEnabled: parent.enabled
+                RowLayout {
+                    id:               mainRowWrapper
+                    anchors.left:     parent.left
+                    anchors.right:    parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins:  20
+                    spacing:          _isNarrow ? 10 : 20
+
+                    // Status Dot
+                    Rectangle {
+                        width:  12
+                        height: 12
+                        radius: 6
+                        color:  object.link ? "#4a2c6d" : "#9E9E9E"
+                        Layout.alignment: Qt.AlignVCenter
                     }
 
-                    QGCMouseArea {
-                        fillItem: parent
-                        onClicked: {
-                            var editingConfig = _linkManager.startConfigurationEditing(object)
-                            linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
+                    // Link Details
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
+
+                        Text {
+                            Layout.fillWidth: true
+                            text:             object.name
+                            color:            "#2C3E50"
+                            font.bold:        true
+                            //font.pixelSize:   18
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            elide:            Text.ElideRight
+                        }
+
+                        Text {
+                            text:             object.link ? qsTr("Connected") : qsTr("Disconnected")
+                            color:            object.link ? "#4a2c6d" : "#7F8C8D"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
+                    }
+
+                    // Actions
+                    RowLayout {
+                        spacing: _isNarrow ? 8 : 15
+                        Layout.alignment: Qt.AlignVCenter
+
+                        // Delete Action
+                        Rectangle {
+                            width:  36
+                            height: 36
+                            radius: 8
+                            color:  deleteArea.containsMouse ? "#FDEDEC" : "transparent"
+                            border.color: deleteArea.containsMouse ? "#E74C3C" : "transparent"
+
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                height:           18
+                                width:            18
+                                sourceSize.height: 18
+                                fillMode:         Image.PreserveAspectFit
+                                color:            "#E74C3C"
+                                source:           "/res/TrashDelete.svg"
+                            }
+
+                            MouseArea {
+                                id: deleteArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    var cfg = object
+                                    if (!cfg) return
+                                    mainWindow.showMessageDialog(
+                                                qsTr("Delete Link"),
+                                                qsTr("Are you sure you want to delete '%1'?").arg(cfg.name),
+                                                Dialog.Ok | Dialog.Cancel,
+                                                function() { _linkManager.removeConfiguration(cfg) }
+                                                )
+                                }
+                            }
+                        }
+
+                        // Connect/Disconnect Action
+                        Rectangle {
+                            width:            100
+                            height:           36
+                            radius:           18
+                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#5B2C6F" : "#4A2C6D")
+                            border.color:     object.link ? "#E74C3C" : "transparent"
+                            border.width:     1
+
+                            Connections {
+                                target: object
+                                function onLinkChanged() {
+                                    console.log("object.linkChanged fired, link is now:", object.link)
+                                }
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text:             object.link ? qsTr("Disconnect") : qsTr("Connect")
+                                color:            object.link ? "#C0392B" : "white"
+                                font.bold:        true
+                                font.pixelSize:   14
+                            }
+
+                            MouseArea {
+                                id:             connectMouse
+                                anchors.fill:   parent
+                                hoverEnabled:   true
+                                cursorShape:    Qt.PointingHandCursor
+                                onClicked: {
+                                    if (!object) {
+                                        console.warn("LinkSettings: config object is null")
+                                        return
+                                    }
+
+                                    if (object.link) {
+                                        console.log("Click DisConnect Button")
+                                        _linkManager.disconnectLink(object)
+                                    } else {
+                                        // Check Bluetooth availability before connecting
+                                        // object is a LinkConfiguration — if it's Bluetooth type,
+                                        // it has isBluetoothAvailable()
+                                        console.log("click Connect Button",object.linkType)
+
+                                        if (object.linkType === 0) {  // 0 = TypeBluetooth
+                                            if (!object.isBluetoothAvailable()) {
+                                                console.log("Please turn ON Bluetooth")
+                                                mainWindow.showToastMessage("Please turn ON Bluetooth");
+                                                return
+                                            }
+                                        }
+
+                                        if (activeVehicle) {
+                                            mainWindow.showToastMessage(
+                                                        qsTr("Please disconnect the active vehicle before connecting a new one"))
+                                            return
+                                        }
+
+                                        _linkManager.createConnectedLink(object)
+                                        mainWindow.connecting_drone = true
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                QGCColoredImage {
-                    height:                 ScreenTools.minTouchPixels
-                    width:                  height
-                    sourceSize.height:      height
-                    fillMode:               Image.PreserveAspectFit
-                    mipmap:                 true
-                    smooth:                 true
-                    color:                  qgcPalDelete.text
-                    source:                 "/res/TrashDelete.svg"
-
-                    QGCPalette {
-                        id: qgcPalDelete
-                        colorGroupEnabled: parent.enabled
-                    }
-
-                    QGCMouseArea {
-                        fillItem:   parent
-                        onClicked:  mainWindow.showMessageDialog(
-                                        qsTr("Delete Link"),
-                                        qsTr("Are you sure you want to delete '%1'?").arg(object.name),
-                                        Dialog.Ok | Dialog.Cancel,
-                                        function () {
-                                            _linkManager.removeConfiguration(object)
-                                        })
-                    }
-                }
-                QGCButton {
-                    text:       object.link ? qsTr("Disconnect") : qsTr("Connect")
-                    onClicked: {
-                        if (object.link) {
-                            object.link.disconnect()
-                            object.linkChanged()
-                        } else {
-                            _linkManager.createConnectedLink(object)
-
-                        }
-                    }
-                }
-            }
-        }
-
-        LabelledButton {
-            label:      qsTr("Add New Link")
-            buttonText: qsTr("Add")
-
-            onClicked: {
-                typeSelectionDialogComponent.createObject(mainWindow).open()
             }
         }
     }
+
+    // Bottom Spacer
+    Item {
+        Layout.preferredHeight: 20
+    }
+
 
     // First Dialog – Type Selection Only
     Component {
@@ -159,14 +297,16 @@ SettingsPage {
                     model: _linkManager.linkTypeStrings
 
                     delegate: RowLayout {
-                        Layout.fillWidth: true        // row spans full width
+                        visible: modelData !== "Mock Link" &&
+                                 modelData !== "Log Replay"
+                        Layout.fillWidth: true
                         spacing: 20
 
                         Rectangle {
                             width: 25
                             height: 25
                             radius: width/2
-                            color: "#4a2c6d"
+                            color: app_color
 
                             Text {
                                 anchors.centerIn: parent
@@ -188,18 +328,18 @@ SettingsPage {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
+
                                     typeDialog.selectedType = index
                                     typeDialog.close()
+
                                     var editingConfig = _linkManager.createConfiguration(index, "")
+
                                     linkConfigDialogComponent.createObject(mainWindow, {
                                                                                editingConfig: editingConfig,
                                                                                originalConfig: null,
                                                                                selectedType: index
                                                                            }).open()
                                 }
-                                // hoverEnabled: true
-                                // onEntered: parent.color = "blue"   // optional hover effect
-                                // onExited:  parent.color = "green"
                             }
                         }
 
@@ -222,9 +362,10 @@ SettingsPage {
         id: linkConfigDialogComponent
 
         QGCPopupDialog {
-            title:          selectedType === 3 ? "Bluetooth Devices"
-                                               : originalConfig ? qsTr("Edit Link")
-                                               : qsTr("Add New Link")
+            id : linkConfigDialog
+            title: selectedType === 3 ? "Bluetooth Devices"
+                                      : originalConfig ? qsTr("Edit Link")
+                                                       : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
             acceptAllowed:  nameField.text !== ""
 
@@ -232,22 +373,53 @@ SettingsPage {
             property var editingConfig
             property int selectedType
 
+            property bool _connectionInitiated: false
+
+            Connections {
+                target: linkConfigDialog.editingConfig
+                enabled: linkConfigDialog.editingConfig !== null
+
+                function onShowToast(message) {
+                    mainWindow.showToastMessage(message)
+                }
+            }
+
             onAccepted: {
+
+                if ( _connectionInitiated ) {
+                    console.log("linkConfigDialog: ignoring duplicate accept")
+                    return
+                }
 
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.devName = nameField.text
                 editingConfig.name    = editingConfig.devName
 
                 if (originalConfig) {
+
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+
                 } else {
                     editingConfig.dynamic = false
                     _linkManager.endCreateConfiguration(editingConfig)
+
+                    if (activeVehicle) {
+                        mainWindow.showToastMessage(
+                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
+                        return
+                    }
+
+                    _connectionInitiated = true         // mark as initiated
+                    mainWindow.connecting_drone = true  // only set true once
                     _linkManager.createConnectedLink(editingConfig)
+                    console.log("click save button editingConfig : ")
                 }
             }
 
-            onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+            onRejected: {
+                _connectionInitiated = false  // reset on cancel
+                _linkManager.cancelConfigurationEditing(editingConfig)
+            }
 
             // ---------- MAIN LAYOUT ----------
             ColumnLayout {
@@ -267,7 +439,7 @@ SettingsPage {
                     QGCTextField {
                         id:               nameField
                         Layout.fillWidth: true   // text field grows to take remaining width
-                        text:             editingConfig.devName
+                        text:             linkConfigDialog.editingConfig.devName
                         placeholderText:  qsTr("Enter name")
                     }
                 }
@@ -278,7 +450,7 @@ SettingsPage {
                     Layout.fillWidth: true        // << ensures it spans the whole dialog
                     source: subEditConfig.settingsURL
 
-                    property var subEditConfig:         editingConfig
+                    property var subEditConfig:         linkConfigDialog.editingConfig
                     property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
                     property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
                     property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
@@ -289,7 +461,6 @@ SettingsPage {
     }
 
 }
-
 
 // LabelledButton {
 //     label:      qsTr("Add New Link")
