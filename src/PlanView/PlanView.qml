@@ -207,14 +207,13 @@ Item {
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
         anchors.bottomMargin: 20
-        anchors.rightMargin: 20
+        anchors.leftMargin: 20
         spacing: 20
 
         Rectangle {
             id: sharebtn
-            Layout.alignment: Qt.AlignRight
+            Layout.alignment: Qt.AlignLeft
             width: baseSize
             height: baseSize
             radius: width / 2
@@ -240,6 +239,37 @@ Item {
             }
         }
 
+        // Save button
+        Rectangle {
+            Layout.alignment: Qt.AlignLeft
+            width:  baseSize
+            height: baseSize
+            radius: width / 2
+            color:  "#4a2c6d"
+            border.color: "#8e6abb"
+            border.width: 1
+            opacity: 0.95
+            visible: true
+
+            QGCColoredImage {
+                source: "/qmlimages/MapCenter.svg"
+                width:  iconSize
+                height: iconSize
+                anchors.centerIn: parent
+                color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if (_planMasterController.currentPlanFile !== "") {
+                        _planMasterController.saveToCurrent()
+                    } else {
+                        _planMasterController.saveToSelectedFile1()
+                    }
+                }
+            }
+        }
     }
 
     MapFitFunctions {
@@ -2263,7 +2293,7 @@ Item {
         id: bottomCenterContainer
         anchors.bottom:             parent.bottom
         anchors.horizontalCenter:   parent.horizontalCenter
-        anchors.bottomMargin:       ScreenTools.defaultFontPixelHeight * 2.0
+        anchors.bottomMargin:       10
         spacing:                    10
         width:                      ScreenTools.defaultFontPixelWidth * 45
         z:                          QGroundControl.zOrderWidgets + 100
@@ -2275,7 +2305,7 @@ Item {
             width:      parent.width
             height:     42
             color:      "#2d1c42"
-            radius:     height / 2
+            radius:     10
             border.color: "#4a2c6d"
             border.width: 1
             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
@@ -2291,7 +2321,7 @@ Item {
                 y: 3
                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
                 color: "#4a2c6d"
-                radius: height / 2
+                radius: 10
                 border.color: "#8a6cad"
                 border.width: 1
                 Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
