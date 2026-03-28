@@ -136,6 +136,7 @@ Row {
 
     // ========== MAP SWITCH ==========
     Rectangle {
+        id: mapSwitchButton
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
@@ -147,19 +148,12 @@ Row {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-
                 iconsContainer.visible = false;
-
-                if (!_mapProviderFact || !_mapTypeFact) {
-                    console.error("Map provider or map type fact is not defined.");
-                    return;
+                if (mapTypePopup.opened) {
+                    mapTypePopup.close();
+                } else {
+                    mapTypePopup.open();
                 }
-                var mapTypes = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue);
-                if (mapTypes.length === 0) return;
-                var currentIndex = mapTypes.indexOf(_mapTypeFact.rawValue);
-                if (currentIndex === -1) currentIndex = 0;
-                var nextIndex = (currentIndex + 1) % mapTypes.length;
-                _mapTypeFact.rawValue = mapTypes[nextIndex];
             }
         }
 
@@ -169,6 +163,131 @@ Row {
             width: iconSize * 0.5
             height: iconSize * 0.5
             color : "black"
+        }
+
+        // Dropdown Popup for Map Types
+        Popup {
+            id: mapTypePopup
+            y: parent.height + 10
+            x: - (width - parent.width)
+            width: ScreenTools.defaultFontPixelWidth * 25
+            height: Math.min(400, (mapTypeListView.count * 45) + 50)
+            padding: 0
+            margins: 0
+            
+            background: Rectangle {
+                color: "white"
+                radius: 12
+                border.color: "#E0E0E0"
+                border.width: 1
+                
+                // Add a subtle shadow-like effect
+                layer.enabled: true
+                layer.effect: Qt.createQmlObject("import QtQuick; import QtQuick.Effects; MultiEffect { shadowEnabled: true; shadowBlur: 0.5; shadowColor: \"#20000000\"; shadowVerticalOffset: 4 }", mapTypePopup)
+            }
+            
+            contentItem: ColumnLayout {
+                spacing: 0
+                anchors.fill: parent
+                
+                // Header
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 45
+                    color: "#F8F9FA"
+                    radius: 12
+                    
+                    // Flatten bottom corners of header
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: 6
+                        color: "#F8F9FA"
+                    }
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: qsTr("Map Layers")
+                        font.pixelSize: ScreenTools.defaultFontPointSize
+                        font.bold: true
+                        color: "#333333"
+                    }
+                    
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        width: parent.width
+                        height: 1
+                        color: "#EEEEEE"
+                    }
+                }
+                
+                // Map Type List
+                ListView {
+                    id: mapTypeListView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    model: _mapProviderFact ? _mapEngineManager.mapTypeList(_mapProviderFact.rawValue) : []
+                    
+                    delegate: Item {
+                        width: mapTypeListView.width
+                        height: 45
+                        
+                        Rectangle {
+                            anchors.fill: parent
+                            color: mouseArea.containsMouse ? "#F0F2F5" : "transparent"
+                            
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 15
+                                anchors.rightMargin: 15
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 14
+                                    height: 14
+                                    radius: 7
+                                    border.color: _mapTypeFact.rawValue === modelData ? "#5d179e" : "#B0B0B0"
+                                    border.width: _mapTypeFact.rawValue === modelData ? 4 : 1
+                                    color: "white"
+                                }
+                                
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData
+                                    font.pixelSize: ScreenTools.defaultFontPointSize
+                                    color: _mapTypeFact.rawValue === modelData ? "#5d179e" : "#444444"
+                                    font.bold: _mapTypeFact.rawValue === modelData
+                                    elide: Text.ElideRight
+                                }
+                                
+                                QGCColoredImage {
+                                    source: "/InstrumentValueIcons/checkmark.svg"
+                                    width: 14
+                                    height: 14
+                                    color: "#5d179e"
+                                    visible: _mapTypeFact.rawValue === modelData
+                                }
+                            }
+                            
+                            MouseArea {
+                                id: mouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: {
+                                    _mapTypeFact.rawValue = modelData
+                                    mapTypePopup.close()
+                                }
+                            }
+                        }
+                    }
+                    
+                    ScrollBar.vertical: ScrollBar {
+                        width: 8
+                        policy: ScrollBar.AsNeeded
+                    }
+                }
+            }
         }
     }
 

@@ -1738,17 +1738,18 @@ ApplicationWindow {
         Rectangle {
             id: planbtn
             Layout.alignment: Qt.AlignRight
-            width: 100
-            height: 38
-           // radius: width / 2  // Makes it a circle
-            color:  "#4a2c6d"//"#1b1c3e"     // white background
-            visible: false
+            width: 48
+            height: 48
+            radius: width / 2
+            color:  "#4a2c6d"
+            visible: plan === "Plan" 
 
             Text {
-                text: " + New Plot "
+                text: "+"
                 color: "white"
                 anchors.centerIn: parent
                 font.bold: true
+                font.pointSize: 24
             }
 
             MouseArea {

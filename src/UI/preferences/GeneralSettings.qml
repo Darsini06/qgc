@@ -93,11 +93,26 @@ SettingsPage {
         }
 
         //Language
-        LabelledFactComboBox {
-            label:      qsTr("Language")
-            fact:       _appSettings.qLocaleLanguage
-            indexModel: false
-            visible:    _appSettings.qLocaleLanguage.visible
+        // LabelledFactComboBox {
+        //     label:      qsTr("Language")
+        //     fact:       _appSettings.qLocaleLanguage
+        //     indexModel: false
+        //     visible:    _appSettings.qLocaleLanguage.visible
+        // }
+
+        RowLayout {
+            spacing: 20
+            visible: _appSettings.qLocaleLanguage.visible
+            QGCLabel {
+                text: qsTr("Language")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 20
+            }
+            QGCLabel {
+                text: "English"
+                color: "gray"
+            }
         }
 
         // LabelledFactComboBox {
