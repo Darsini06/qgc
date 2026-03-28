@@ -53,44 +53,48 @@ Item {
 
             Rectangle {
                 id: containerBox
-                anchors.centerIn: parent
-                width: contentColumn.width + ScreenTools.defaultFontPixelWidth * 12
-                height: contentColumn.height + ScreenTools.defaultFontPixelHeight * 6
+                anchors.fill: parent
                 color: "black"
-                border.color: "#4a2c6d"
-                border.width: 1
-                radius: 8
+                
+                // Responsive multipliers
+                readonly property real scaleFact: Math.min(width / 800, height / 450)
+                readonly property real adaptiveScale: Math.max(0.4, scaleFact) // Ensure it doesn't get TOO small
 
-                // Tech corners
+                // Tech corners - now responsive
                 Item {
-                    width: 20; height: 20; anchors.top: parent.top; anchors.left: parent.left
-                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    anchors.top: parent.top; anchors.left: parent.left; anchors.margins: parent.width * 0.05
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
-                    width: 20; height: 20; anchors.top: parent.top; anchors.right: parent.right
-                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    anchors.top: parent.top; anchors.right: parent.right; anchors.margins: parent.width * 0.05
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#4a2c6d"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
                 }
                 Item {
-                    width: 20; height: 20; anchors.bottom: parent.bottom; anchors.left: parent.left
-                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.margins: parent.width * 0.05
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
-                    width: 20; height: 20; anchors.bottom: parent.bottom; anchors.right: parent.right
-                    Rectangle { width: parent.width; height: 3; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: 3; height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: parent.width * 0.05
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#4a2c6d"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
                 }
 
                 Column {
                     id: contentColumn
                     anchors.centerIn: parent
-                    spacing: ScreenTools.defaultFontPixelHeight * 0.8
+                    spacing: Math.max(10, parent.height * 0.08)
+                    width: parent.width * 0.9
                     
                     Item {
-                        width: ScreenTools.defaultFontPixelHeight * 3
-                        height: ScreenTools.defaultFontPixelHeight * 3
+                        width: Math.min(60, parent.height * 0.25)
+                        height: width
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue
 
@@ -99,19 +103,27 @@ Item {
                             anchors.fill: parent
                             color: "transparent"
                             border.color: "#4a2c6d"
-                            border.width: 1
+                            border.width: Math.max(1, 2 * adaptiveScale)
                             radius: width / 2
-                            opacity: 0.3
+                            opacity: 0.4
                         }
 
-                        // Loading Dots
+                        // Loading Dots (Responsive)
                         Row {
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Math.max(4, parent.width * 0.01)
                             Repeater {
                                 model: 3
                                 Rectangle {
-                                    width: 6; height: 6; radius: 3; color: "#4a2c6d"
+                                    width: Math.max(3, parent.parent.width * 0.12)
+                                    height: width; radius: width / 2; color: "#4a2c6d"
+                                    
+                                    SequentialAnimation on opacity {
+                                        loops: Animation.Infinite
+                                        PauseAnimation { duration: index * 200 }
+                                        NumberAnimation { from: 0.2; to: 1.0; duration: 600 }
+                                        NumberAnimation { from: 1.0; to: 0.2; duration: 600 }
+                                    }
                                 }
                             }
                         }
@@ -119,23 +131,27 @@ Item {
 
                     QGCLabel {
                         id:                 noVideoLabel
+                        width:              parent.width
                         text:               QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue ? qsTr("WAITING FOR VIDEO") : qsTr("VIDEO DISABLED")
                         font.bold:          true
                         color:              "#4a2c6d"
-                        font.pointSize:     useSmallFont ? ScreenTools.smallFontPointSize * 1.5 : ScreenTools.largeFontPointSize * 1.2
-                        font.letterSpacing: 2
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pointSize:     ScreenTools.defaultFontPointSize * (parent.parent.width < 400 ? 0.8 : 1.5)
+                        font.letterSpacing: parent.parent.width < 400 ? 1 : 4
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode:           Text.WordWrap
                     }
 
                     QGCLabel {
+                        width:              parent.width
                         text:               qsTr("ESTABLISHING SECURE CONNECTION...")
                         font.bold:          true
                         color:              "#4a2c6d"
-                        font.pointSize:     ScreenTools.smallFontPointSize * 0.8
-                        opacity:            0.6
-                        font.letterSpacing: 1
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        visible:            QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue
+                        font.pointSize:     ScreenTools.smallFontPointSize * (parent.parent.width < 400 ? 0.6 : 0.9)
+                        opacity:            0.7
+                        font.letterSpacing: parent.parent.width < 400 ? 0 : 2
+                        horizontalAlignment: Text.AlignHCenter
+                        visible:            QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue && parent.parent.height > 100
+                        wrapMode:           Text.WordWrap
                     }
                 }
             }

@@ -122,6 +122,10 @@
         <file alias="NewImages/total_hours.svg">src/NewImages/total_hours.svg</file>
         <file alias="NewImages/terms_condition_black.svg">src/NewImages/terms_condition_black.svg</file>
         <file alias="NewImages/select_drone_type_black.svg">src/NewImages/select_drone_type_black.svg</file>
+        <file alias="NewImages/map_default.jpeg">src/NewImages/map_default.jpeg</file>
+        <file alias="NewImages/map_satellite.jpeg">src/NewImages/map_satellite.jpeg</file>
+        <file alias="NewImages/map_terrain.jpeg">src/NewImages/map_terrain.jpeg</file>
+        <file alias="NewImages/map_hybrid.jpeg">src/NewImages/map_hybrid.jpeg</file>
         <file alias="NewImages/cardinal_point.svg">src/NewImages/cardinal_point.svg</file>
         <file alias="NewImages/report_color.svg">src/NewImages/report_color.svg</file>
         <file alias="NewImages/report.svg">src/NewImages/report.svg</file>

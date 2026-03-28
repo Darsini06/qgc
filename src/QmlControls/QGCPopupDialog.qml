@@ -101,7 +101,13 @@ Popup {
     Component.onCompleted: {
         // The last child item will be the true dialog content.
         // Re-Parent it to the right place in the ui hierarchy.
-        contentChildren[contentChildren.length - 1].parent = dialogContentParent
+        var content = contentChildren[contentChildren.length - 1];
+        content.parent = dialogContentParent;
+
+        // Automatically ensure dialog content fills the available width to enable child text wrapping.
+        if (content.width <= 0) {
+            content.width = Qt.binding(function() { return dialogContentParent.width });
+        }
     }
 
     onAboutToShow: setupDialogButtons(buttons)
@@ -247,7 +253,7 @@ Popup {
 
     Rectangle {
         width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
-        height: mainLayout.implicitHeight + (buttonRow.visible ? _contentMargin : 0)
+        height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
         color: "#1a1b2e" // Deep dark background for Mission Theme
         radius: 12
         border.width: 1
@@ -256,8 +262,7 @@ Popup {
 
         ColumnLayout {
             id: mainLayout
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
+            anchors.fill: parent
             spacing: _contentMargin
 
             Rectangle {
@@ -271,12 +276,15 @@ Popup {
 
                     // Centered title
                     QGCLabel {
-                        id: titleLable
-                        text: root.title
-                        anchors.centerIn: parent
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.bold: true
-                        color: "white"
+                        id:                     titleLable
+                        text:                   root.title
+                        width:                  parent.width - 80 // Constrain width for wrapping
+                        wrapMode:               Text.WordWrap
+                        horizontalAlignment:    Text.AlignHCenter
+                        anchors.centerIn:       parent
+                        font.pointSize:         ScreenTools.defaultFontPointSize
+                        font.bold:              true
+                        color:                  "white"
                     }
 
                     // Close button - placed at top right properly
@@ -312,13 +320,12 @@ Popup {
             }
 
             Rectangle {
-
                 Layout.fillWidth:       true
-                Layout.preferredWidth:  maxAvailableWidth
-                Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
+                Layout.fillHeight:      true
+                implicitHeight:         totalContentHeight
                 color:                  "transparent"
-                Layout.leftMargin:     25 // Increased margins for better alignment
-                Layout.rightMargin:     25
+                Layout.leftMargin:      25
+                Layout.rightMargin:     35 // Balanced margin for scrollbar
 
                 property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:
@@ -338,6 +345,18 @@ Popup {
                     flickableDirection: Flickable.VerticalFlick
                     interactive:        contentHeight > height
                     clip:               true
+
+                    // Add a subtle scroll indicator
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        visible: parent.interactive
+                        background: Item { }
+                        contentItem: Rectangle {
+                            implicitWidth: 4
+                            radius: 2
+                            color: Qt.rgba(255, 255, 255, 0.2)
+                        }
+                    }
 
                     Item {
                         id:     dialogContentParent

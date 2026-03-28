@@ -165,126 +165,164 @@ Row {
             color : "black"
         }
 
-        // Dropdown Popup for Map Types
+        // Dropdown Popup for Map Types - BALANCED VERY SMALL VERSION
         Popup {
             id: mapTypePopup
-            y: parent.height + 10
-            x: - (width - parent.width)
-            width: ScreenTools.defaultFontPixelWidth * 25
-            height: Math.min(400, (mapTypeListView.count * 45) + 50)
+            y: parent.height + 8
+            x: - (width - parent.width) // Right aligned with button
+            width: ScreenTools.defaultFontPixelWidth * 22
+            height: contentLayout.implicitHeight + 16
             padding: 0
             margins: 0
             
             background: Rectangle {
-                color: "white"
+                color: "#2C2C2C" // Deep Dark Grey
                 radius: 12
-                border.color: "#E0E0E0"
+                border.color: "#3D3D3D"
                 border.width: 1
-                
-                // Add a subtle shadow-like effect
+
+                // Subtle compact shadow
                 layer.enabled: true
-                layer.effect: Qt.createQmlObject("import QtQuick; import QtQuick.Effects; MultiEffect { shadowEnabled: true; shadowBlur: 0.5; shadowColor: \"#20000000\"; shadowVerticalOffset: 4 }", mapTypePopup)
+                layer.effect: Qt.createQmlObject("import QtQuick; import QtQuick.Effects; MultiEffect { shadowEnabled: true; shadowBlur: 0.8; shadowColor: \"#A0000000\"; shadowVerticalOffset: 3 }", mapTypePopup)
             }
             
             contentItem: ColumnLayout {
-                spacing: 0
+                id: contentLayout
+                spacing: 8
                 anchors.fill: parent
+                anchors.topMargin: 10
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                anchors.bottomMargin: 20 // Adjusted for label containment
                 
-                // Header
-                Rectangle {
+                // Miniature Header with 'X'
+                RowLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 45
-                    color: "#F8F9FA"
-                    radius: 12
-                    
-                    // Flatten bottom corners of header
-                    Rectangle {
-                        anchors.bottom: parent.bottom
-                        width: parent.width
-                        height: 6
-                        color: "#F8F9FA"
-                    }
+                    Layout.preferredHeight: 18
                     
                     Text {
-                        anchors.centerIn: parent
-                        text: qsTr("Map Layers")
-                        font.pixelSize: ScreenTools.defaultFontPointSize
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Map type")
+                        font.pixelSize: ScreenTools.defaultFontPointSize * 0.8
                         font.bold: true
-                        color: "#333333"
+                        color: "#FFFFFF"
                     }
                     
                     Rectangle {
-                        anchors.bottom: parent.bottom
-                        width: parent.width
-                        height: 1
-                        color: "#EEEEEE"
+                        width: 18
+                        height: 18
+                        radius: 9
+                        color: xMouseArea.containsMouse ? "#444444" : "transparent"
+                        Layout.alignment: Qt.AlignVCenter
+                        
+                        Item {
+                            anchors.centerIn: parent
+                            width: 8
+                            height: 8
+                            
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: 1.2
+                                radius: 1
+                                color: "#FFFFFF"
+                                rotation: 45
+                                antialiasing: true
+                            }
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: 1.2
+                                radius: 1
+                                color: "#FFFFFF"
+                                rotation: -45
+                                antialiasing: true
+                            }
+                        }
+                        
+                        MouseArea {
+                            id: xMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: mapTypePopup.close()
+                        }
                     }
                 }
                 
-                // Map Type List
-                ListView {
-                    id: mapTypeListView
+                // Grid with Light Gaps
+                Row {
+                    id: mapTypeGrid
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    model: _mapProviderFact ? _mapEngineManager.mapTypeList(_mapProviderFact.rawValue) : []
-                    
-                    delegate: Item {
-                        width: mapTypeListView.width
-                        height: 45
+                    spacing: 6 // Light gap between columns
+
+                    readonly property string _rootPath: "qrc:/qmlimages/NewImages/"
+                    readonly property string _selectionColor: "#AC82FF" 
+
+                    component MapIconColumn: Column {
+                        property string label: ""
+                        property string typeNameSuffix: ""
+                        property string iconSource: ""
+                        spacing: 6 // Light gap between image and text
+                        width: (parent.width - 18) / 4
                         
                         Rectangle {
-                            anchors.fill: parent
-                            color: mouseArea.containsMouse ? "#F0F2F5" : "transparent"
+                            width: parent.width
+                            height: width
+                            radius: 8
+                            color: "#3D3D3D"
+                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#444444"
+                            border.width: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? 2 : 1
+                            clip: true
                             
-                            RowLayout {
+                            Image {
                                 anchors.fill: parent
-                                anchors.leftMargin: 15
-                                anchors.rightMargin: 15
-                                spacing: 12
-                                
-                                Rectangle {
-                                    width: 14
-                                    height: 14
-                                    radius: 7
-                                    border.color: _mapTypeFact.rawValue === modelData ? "#5d179e" : "#B0B0B0"
-                                    border.width: _mapTypeFact.rawValue === modelData ? 4 : 1
-                                    color: "white"
-                                }
-                                
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: modelData
-                                    font.pixelSize: ScreenTools.defaultFontPointSize
-                                    color: _mapTypeFact.rawValue === modelData ? "#5d179e" : "#444444"
-                                    font.bold: _mapTypeFact.rawValue === modelData
-                                    elide: Text.ElideRight
-                                }
-                                
-                                QGCColoredImage {
-                                    source: "/InstrumentValueIcons/checkmark.svg"
-                                    width: 14
-                                    height: 14
-                                    color: "#5d179e"
-                                    visible: _mapTypeFact.rawValue === modelData
-                                }
+                                source: mapTypeGrid._rootPath + iconSource
+                                fillMode: Image.AlwaysCrop
                             }
                             
                             MouseArea {
-                                id: mouseArea
                                 anchors.fill: parent
-                                hoverEnabled: true
                                 onClicked: {
-                                    _mapTypeFact.rawValue = modelData
-                                    mapTypePopup.close()
+                                    var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
+                                    var found = types.find(t => t.toLowerCase().includes(typeNameSuffix.toLowerCase()))
+                                    if (found) {
+                                        _mapTypeFact.rawValue = found
+                                    }
                                 }
                             }
                         }
+                        
+                        Text {
+                            width: parent.width
+                            text: label
+                            horizontalAlignment: Text.AlignHCenter
+                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#999999"
+                            font.pixelSize: ScreenTools.defaultFontPointSize * 0.65
+                            font.bold: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase())
+                            elide: Text.ElideRight
+                        }
                     }
-                    
-                    ScrollBar.vertical: ScrollBar {
-                        width: 8
-                        policy: ScrollBar.AsNeeded
+
+                    MapIconColumn { 
+                        label: qsTr("Default")
+                        typeNameSuffix: "street" 
+                        iconSource: "map_default.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Satellite")
+                        typeNameSuffix: "satellite" 
+                        iconSource: "map_satellite.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Terrain")
+                        typeNameSuffix: "terrain" 
+                        iconSource: "map_terrain.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Hybrid")
+                        typeNameSuffix: "hybrid" 
+                        iconSource: "map_hybrid.jpeg"
                     }
                 }
             }

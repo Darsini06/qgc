@@ -24,7 +24,8 @@ QGCPopupDialog {
     }
 
     ColumnLayout {
-        spacing: 0
+        width:      parent.width
+        spacing:    0
 
         QGCLabel {
             id:                     label

@@ -49,6 +49,7 @@ QGCPopupDialog {
 
     ColumnLayout {
         id:         mainColumn
+        width:      parent.width
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
         spacing:    _margin * 2
@@ -68,7 +69,7 @@ QGCPopupDialog {
 
             QGCComboBox {
                 id:                 coordinateSystemCombo
-                Layout.preferredWidth: dp(40)
+                Layout.preferredWidth: dp(32)
                 model:              showSetPositionFromVehicle && globals.activeVehicle ? 
                                         [ qsTr("Geographic"), qsTr("Universal Transverse Mercator"), qsTr("Military Grid Reference"), qsTr("Vehicle Position") ] :
                                         [ qsTr("Geographic"), qsTr("Universal Transverse Mercator"), qsTr("Military Grid Reference") ]
@@ -215,7 +216,8 @@ QGCPopupDialog {
                 Label { text: qsTr("Zone"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.zone
-                    Layout.fillWidth: true
+                    Layout.maximumWidth:  dp(16)
+                    Layout.fillWidth:     true
                     textColor: "white"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
@@ -228,6 +230,7 @@ QGCPopupDialog {
                 FactComboBox {
                     id:                 hemisphereCombo
                     fact:               controller.hemisphere
+                    Layout.maximumWidth: dp(16)
                     Layout.fillWidth:   true
                     indexModel:         false
                     font.family:        "Outfit"
@@ -290,6 +293,7 @@ QGCPopupDialog {
                 Label { text: qsTr("Easting"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.easting
+                    Layout.maximumWidth: dp(18)
                     Layout.fillWidth: true
                     textColor: "white"
                     horizontalAlignment: Text.AlignHCenter
@@ -302,6 +306,7 @@ QGCPopupDialog {
                 Label { text: qsTr("Northing"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.northing
+                    Layout.maximumWidth: dp(18)
                     Layout.fillWidth: true
                     textColor: "white"
                     horizontalAlignment: Text.AlignHCenter
