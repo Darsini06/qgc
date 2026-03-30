@@ -1868,19 +1868,19 @@ ApplicationWindow {
         ColumnLayout {
             id: contentCol
             anchors.centerIn: parent
-            // Full width on mobile/tablet, capped on ultra-wide desktops for premium feel
-            width:   Math.min(parent.width * 0.94, ScreenTools.defaultFontPixelWidth * 160)
-            spacing: ScreenTools.defaultFontPixelHeight * 2.5
+            // Small centered group
+            width:   Math.min(parent.width * 0.85, ScreenTools.defaultFontPixelWidth * 85)
+            spacing: ScreenTools.defaultFontPixelHeight * 1.8
 
             // Header
             ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelHeight * 0.6
+                spacing: ScreenTools.defaultFontPixelHeight * 0.4
                 Layout.alignment: Qt.AlignHCenter
 
                 Text {
                     text: "SELECT MISSION TYPE"
                     color: "white"
-                    font.pointSize:   ScreenTools.largeFontPointSize * 1.4
+                    font.pointSize:   ScreenTools.largeFontPointSize * 1.2
                     font.bold:        true
                     font.letterSpacing: 2
                     Layout.alignment: Qt.AlignHCenter
@@ -1890,19 +1890,9 @@ ApplicationWindow {
                 }
 
                 Rectangle {
-                    width: 80; height: 4
+                    width: 60; height: 3
                     color: app_color; radius: 2
                     Layout.alignment: Qt.AlignHCenter
-                }
-
-                Text {
-                    text: "Choose the method to define your mission boundaries and paths"
-                    color: "#888888"
-                    font.pointSize:  ScreenTools.defaultFontPointSize
-                    Layout.alignment: Qt.AlignHCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    Layout.maximumWidth: contentCol.width * 0.75
                 }
             }
 
@@ -1917,7 +1907,7 @@ ApplicationWindow {
                 Rectangle {
                     id: mappingbtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma1.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma1.containsMouse ? app_color : "#2e2e2e"
@@ -1927,21 +1917,21 @@ ApplicationWindow {
                     Column {
                         anchors.centerIn: parent
                         spacing: parent.height * 0.08
-                        width: parent.width * 0.75
+                        width: parent.width * 0.85
                         Rectangle {
                             width: parent.width * 0.55; height: width; radius: width / 2
                             color: ma1.containsMouse ? app_color : "#252525"
                             anchors.horizontalCenter: parent.horizontalCenter
                             QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/basic_marking.svg"
-                                width: parent.width * 0.6; height: width
+                                width: parent.width * 0.55; height: width
                                 color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
                             }
                         }
                         Text {
                             text: "Basic"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -1964,7 +1954,7 @@ ApplicationWindow {
                 Rectangle {
                     id: mappingcirclebtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma2.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma2.containsMouse ? app_color : "#2e2e2e"
@@ -1988,7 +1978,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Circular"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2010,7 +2000,7 @@ ApplicationWindow {
                 // Card 3: Map Selection  (always visible)
                 Rectangle {
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma3.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma3.containsMouse ? app_color : "#2e2e2e"
@@ -2033,7 +2023,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Map Selection"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2056,7 +2046,7 @@ ApplicationWindow {
                 Rectangle {
                     id: agribtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma4.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma4.containsMouse ? app_color : "#2e2e2e"
@@ -2080,7 +2070,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Mark with Drone"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2108,7 +2098,7 @@ ApplicationWindow {
                 Rectangle {
                     id: agrigpsbtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma5.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma5.containsMouse ? app_color : "#2e2e2e"
@@ -2132,7 +2122,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Mark with GPS"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2154,7 +2144,7 @@ ApplicationWindow {
                 // Card 6: Load KML/SHP  (always visible)
                 Rectangle {
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma6.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma6.containsMouse ? app_color : "#2e2e2e"
@@ -2177,7 +2167,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Load KML/SHP..."; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }

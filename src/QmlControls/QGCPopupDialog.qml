@@ -252,7 +252,7 @@ Popup {
     property real popupWidth: 0
 
     Rectangle {
-        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
+        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 50)
         height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
         color: "#1a1b2e" // Deep dark background for Mission Theme
         radius: 12
@@ -324,8 +324,8 @@ Popup {
                 Layout.fillHeight:      true
                 implicitHeight:         totalContentHeight
                 color:                  "transparent"
-                Layout.leftMargin:      25
-                Layout.rightMargin:     35 // Balanced margin for scrollbar
+                Layout.leftMargin:      20
+                Layout.rightMargin:     25 // Balanced margin for scrollbar
 
                 property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:

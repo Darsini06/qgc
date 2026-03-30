@@ -7,11 +7,11 @@ import QGroundControl.ScreenTools
 /// File Button controls used by QGCFileDialog control
 Rectangle {
     implicitWidth:  ScreenTools.implicitButtonWidth
-    implicitHeight: 45 // Fixed row height for a clean table look
+    implicitHeight: 40 // Tighter row height
     
     color:          mouseArea.containsMouse ? Qt.rgba(255, 255, 255, 0.05) : "transparent"
     border.color:   Qt.rgba(255, 255, 255, 0.1)
-    border.width:   1
+    border.width:   0
     radius:         4
     
     property alias  text:       label.text
@@ -41,7 +41,7 @@ Rectangle {
 
     QGCColoredImage {
         id:                     hamburger
-        anchors.rightMargin:    12
+        anchors.rightMargin:    20
         anchors.right:          parent.right
         anchors.verticalCenter: parent.verticalCenter
         width:                  _hamburgerSize

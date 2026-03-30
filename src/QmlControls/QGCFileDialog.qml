@@ -154,7 +154,7 @@ Item {
 
             Column {
                 id:         fileOpenColumn
-                width:      40 * ScreenTools.defaultFontPixelWidth
+                width:      parent.width
                 spacing:    20
 
                 QGCLabel { 
@@ -323,7 +323,7 @@ Item {
 
             Column {
                 id:         fileSaveColumn
-                width:      40 * ScreenTools.defaultFontPixelWidth
+                width:      parent.width
                 spacing:    ScreenTools.defaultFontPixelHeight / 2
 
                 RowLayout {
@@ -473,7 +473,7 @@ Item {
 
                     Column {
                         id:         fileSaveColumn
-                        width:      40 * ScreenTools.defaultFontPixelWidth
+                        width:      parent.width
                         spacing:    ScreenTools.defaultFontPixelHeight / 2
 
                         RowLayout {

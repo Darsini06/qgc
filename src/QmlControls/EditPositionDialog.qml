@@ -23,10 +23,61 @@ import QGroundControl.Controllers
 QGCPopupDialog {
     id:         root
     title:      qsTr("Edit Vertex Position")
-    buttons:    0 // We will provide custom buttons for special alignment
-
+    buttons:    Dialog.Ok | Dialog.Cancel
     property alias coordinate:                  controller.coordinate
     property bool  showSetPositionFromVehicle:  true
+
+
+    acceptButtonAlias.text:     qsTr("update position")
+    rejectButtonAlias.text:     qsTr("close")
+    acceptButtonAlias.enabled:  !globals.validationError
+
+    acceptButtonAlias.background: Rectangle {
+        implicitWidth:  dp(28)
+        implicitHeight: dp(7)
+        radius:         8
+        color:          acceptButtonAlias.pressed ? Qt.darker("#4a2c6d", 1.2) : (acceptButtonAlias.hovered ? Qt.lighter("#4a2c6d", 1.1) : "#4a2c6d")
+        opacity:        acceptButtonAlias.enabled ? 1.0 : 0.5
+    }
+
+    acceptButtonAlias.contentItem: Text {
+        text:               acceptButtonAlias.text
+        color:              "white"
+        font.bold:          true
+        font.pointSize:     ScreenTools.defaultFontPointSize
+        font.family:        "Outfit"
+        textFormat:         Text.PlainText
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment:   Text.AlignVCenter
+    }
+
+    rejectButtonAlias.background: Rectangle {
+        implicitWidth:  dp(22)
+        implicitHeight: dp(7)
+        radius:         8
+        color:          rejectButtonAlias.pressed ? "#1a1b2e" : (rejectButtonAlias.hovered ? "#2d2e4a" : "transparent")
+        border.color:   Qt.rgba(255, 255, 255, 0.15)
+        border.width:   1
+    }
+
+    rejectButtonAlias.contentItem: Text {
+        text:               rejectButtonAlias.text
+        color:              "white"
+        font.bold:          true
+        font.pointSize:     ScreenTools.defaultFontPointSize
+        font.family:        "Outfit"
+        textFormat:         Text.PlainText
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment:   Text.AlignVCenter
+    }
+
+    onAccepted: {
+        if (_showGeographic)      controller.setFromGeo()
+        else if (_showUTM)        controller.setFromUTM()
+        else if (_showMGRS)       controller.setFromMGRS()
+        else if (_showVehicle)    controller.setFromVehicle()
+    }
+
 
     // Mission Theme Palette
     property color app_color:       "#4a2c6d"
@@ -371,76 +422,6 @@ QGCPopupDialog {
                         color: "white"
                         font.family: "Outfit"
                         anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
-        }
-
-        // Action Buttons Row - Perfectly Symmetric Horizontal 50/50 Split
-        // Action Buttons - Centered Bottom Group
-        Row {
-            Layout.alignment:   Qt.AlignHCenter
-            Layout.topMargin:   _margin * 2
-            spacing:            dp(2)
-
-            // Close Button
-            Rectangle {
-                width:  dp(22)
-                height: dp(7)
-                radius: 8
-                color:  closeMA.pressed ? "#1a1b2e" : (closeMA.containsMouse ? "#2d2e4a" : "transparent")
-                border.color: Qt.rgba(255, 255, 255, 0.15)
-                border.width: 1
-
-                Text {
-                    anchors.centerIn: parent
-                    text:  qsTr("close")
-                    color: "white"
-                    font.bold: true
-                    font.pointSize: ScreenTools.defaultFontPointSize
-                    font.family: "Outfit"
-                    textFormat: Text.PlainText
-                }
-
-                MouseArea {
-                    id: closeMA
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.close()
-                }
-            }
-
-            // Update Position Button
-            Rectangle {
-                width:  dp(28)
-                height: dp(7)
-                radius: 8
-                color:  updateMA.pressed ? Qt.darker("#4a2c6d", 1.2) : (updateMA.containsMouse ? Qt.lighter("#4a2c6d", 1.1) : "#4a2c6d")
-                opacity: globals.validationError ? 0.5 : 1.0
-
-                Text {
-                    anchors.centerIn: parent
-                    text:  qsTr("update position")
-                    color: "white"
-                    font.bold: true
-                    font.pointSize: ScreenTools.defaultFontPointSize
-                    font.family: "Outfit"
-                    textFormat: Text.PlainText
-                }
-
-                MouseArea {
-                    id: updateMA
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: !globals.validationError
-                    onClicked: {
-                        if (_showGeographic)      controller.setFromGeo()
-                        else if (_showUTM)        controller.setFromUTM()
-                        else if (_showMGRS)       controller.setFromMGRS()
-                        else if (_showVehicle)    controller.setFromVehicle()
-                        root.close()
                     }
                 }
             }
