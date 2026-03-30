@@ -1077,23 +1077,26 @@ Item {
             closeOnClickOutside: true
             
             // Set the overall popup UI width tightly
-            popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.85, 340) : 420
-
+            // Set a properly balanced dialog width to prevent text truncation
+            popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
+            
             property int selectedType: -1
 
             ColumnLayout {
-                spacing: (isSmallScreen || isMobile) ? 8 : 16
+                spacing: 12
+                width: parent.width - 24
+                anchors.horizontalCenter: parent.horizontalCenter
                 Layout.fillWidth: true
 
                 Text {
                     text: qsTr("Choose how you want to connect to your drone from the options below.")
-                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.8 : 0.95)
-                    color: "white"
-                    opacity: 0.8
+                    font.family: "Outfit"
+                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
+                    color: "#DDDDDD"
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     Layout.fillWidth: true
-                    Layout.bottomMargin: (isSmallScreen || isMobile) ? 8 : 16
+                    Layout.bottomMargin: 16
                 }
 
                 Repeater {
@@ -1103,58 +1106,61 @@ Item {
                         property bool isDisabled: index === 4 || index === 5 
                         visible: !isDisabled
                         Layout.fillWidth: true
-                        Layout.preferredHeight: visible ? Math.max(((isSmallScreen || isMobile) ? 46 : 64), innerText.implicitHeight + ((isSmallScreen || isMobile) ? 20 : 28)) : 0
+                        Layout.preferredHeight: visible ? 56 : 0
                         radius: 8
-                        color: typeMouseArea.containsMouse ? Qt.rgba(255, 255, 255, 0.05) : "transparent"
-                        border.color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
+                        color: typeMouseArea.containsMouse ? "#2A2A2A" : "#1A1A1A"
+                        border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#333333"
                         border.width: 1
+
                         Behavior on color { ColorAnimation { duration: 150 } }
                         Behavior on border.color { ColorAnimation { duration: 150 } }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.margins: (isSmallScreen || isMobile) ? 8 : 12
-                            spacing: (isSmallScreen || isMobile) ? 12 : 16
+                            anchors.leftMargin: 16
+                            anchors.rightMargin: 16
+                            spacing: 16
 
-                            // Number / Icon Box
+                            // Number Icon Box
                             Rectangle {
-                                width: (isSmallScreen || isMobile) ? 30 : 38
-                                height: (isSmallScreen || isMobile) ? 30 : 38
+                                width: 34
+                                height: 34
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.08)
-                                border.color: Qt.rgba(255,255,255,0.1)
+                                color: typeMouseArea.containsMouse ? "#4a2c6d" : "#2D2D2D"
+                                border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#444444"
                                 border.width: 1
 
                                 Text {
                                     anchors.centerIn: parent
-                                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
+                                    font.family: "Outfit"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
                                     font.bold: true
                                     color: "white"
-                                    opacity: typeMouseArea.containsMouse ? 1.0 : 0.8
                                     text: (index + 1)
                                 }
                             }
 
                             // Connection Type Title
                             Text {
-                                id: innerText
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
                                 text: modelData
-                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.95 : 1.2)
-                                font.weight: Font.DemiBold
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                font.bold: true
                                 color: "white"
-                                wrapMode: Text.WordWrap
+                                elide: Text.ElideRight
                             }
 
                             // Arrow Indicator
                             Text {
                                 Layout.alignment: Qt.AlignVCenter
                                 text: "→"
-                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 1.2 : 1.6)
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.4
                                 font.bold: true
-                                color: typeMouseArea.containsMouse ? accent_color : Qt.rgba(255,255,255,0.3)
+                                color: typeMouseArea.containsMouse ? "white" : "#666666"
                             }
                         }
 
@@ -1185,7 +1191,7 @@ Item {
         id: linkConfigDialogComponent
 
         QGCPopupDialog {
-            title:          selectedType === 3 ? "Bluetooth Devices"
+            title:          selectedType === 0 ? "Bluetooth Devices"
                                                : originalConfig ? qsTr("Edit Link")
                                                                 : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
@@ -1237,7 +1243,7 @@ Item {
                         text: qsTr("Connection Name") 
                         font.bold: true
                         font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "black" // Enforce black color
+                        color: "#DDDDDD" // Unified dark theme text
                     }
 
                     TextField {
@@ -1247,14 +1253,14 @@ Item {
                         placeholderText:  qsTr("e.g. My Custom Drone Connection")
                         
                         font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "black"
+                        color: "white"
                         leftPadding: 16
                         rightPadding: 16
                         
                         background: Rectangle {
                             radius: 8
-                            color: nameField.activeFocus ? "white" : "#F9FAFB"
-                            border.color: nameField.activeFocus ? accent_color : "#D1D5DB"
+                            color: "#1A1A1A"
+                            border.color: nameField.activeFocus ? "#4a2c6d" : "#333333"
                             border.width: nameField.activeFocus ? 2 : 1
                             implicitHeight: 44
                             Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -1266,7 +1272,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: "#E5E7EB"
+                    color: "#333333"
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
                 }
 

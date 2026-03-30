@@ -81,7 +81,7 @@ QGCPopupDialog {
 
     // Mission Theme Palette
     property color app_color:       "#4a2c6d"
-    property color secondary_color: "#7c4dff"
+    property color secondary_color: "#4a2c6d"
     property color accent_color:    "#4a2c6d"
     property color cardBgColor:     Qt.rgba(20/255, 20/255, 30/255, 0.85)
     property color borderColor:     Qt.rgba(255, 255, 255, 0.15)

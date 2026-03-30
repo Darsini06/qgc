@@ -39,74 +39,174 @@ ToolIndicatorPage {
     }
 
     contentComponent: Component {
-        SettingsGroupLayout { 
-            heading: qsTr("Select Link to Connect")
+        ColumnLayout {
+            spacing: 8
+            Layout.preferredWidth: 280
+            
+            // -- PROFESSIONAL ELITE HEADER --
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                
+                QGCLabel {
+                    anchors.centerIn:       parent
+                    text:                   qsTr("Select Link to Connect")
+                    font.bold:              true
+                    font.pointSize:         11
+                    color:                  "#FFFFFF"
+                    font.family:            "Outfit"
+                }
 
-            QGCLabel {
-                text:       qsTr("No Links Configured")
-                visible:    noLinks
-                color : "white"
-            }
-        
-            Repeater {
-                model: linkConfigs
+                // Separator Line
+                Rectangle {
+                    anchors.bottom:         parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width:                  parent.width * 0.95
+                    height:                 1
+                    color:                  "#33FFFFFF"
+                    opacity:                0.2
+                }
 
-                delegate: Rectangle {
-                    Layout.fillWidth: true
-                    height: 55
-                    color: object.link ? "#10B981" : (mouseArea.containsMouse ? "#334155" : "transparent")
-                    border.width: 0
-                    radius: 8
-                    visible: !object.dynamic
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 15
-                        anchors.rightMargin: 15
-                        spacing: 10
-                        
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text: object.name
-                            color: "white" // Always sharp white
-                            font.bold: true
-                            font.pixelSize: ScreenTools.defaultFontPointSize * 1.1
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
-                        }
-                        
-                        Row {
-                            spacing: 6
-                            visible: object.link
-                            Layout.alignment: Qt.AlignVCenter
-                            
-                            Rectangle {
-                                width: 8
-                                height: 8
-                                radius: 4
-                                color: "white"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            
-                            QGCLabel {
-                                text: qsTr("Connected")
-                                color: "white"
-                                font.pointSize: ScreenTools.smallFontPointSize
-                                font.bold: true
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                // Refined "+" Button
+                Rectangle {
+                    anchors.right:          parent.right
+                    anchors.rightMargin:    5
+                    anchors.verticalCenter: parent.verticalCenter
+                    width:                  28
+                    height:                 28
+                    radius:                 width / 2
+                    
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: ma.containsMouse ? "#444444" : "#333333" }
+                        GradientStop { position: 1.0; color: ma.containsMouse ? "#333333" : "#222222" }
+                    }
+                    
+                    border.color:           ma.containsMouse ? "#FFFFFF" : "#444444"
+                    border.width:           1
+                    
+                    QGCLabel {
+                        anchors.centerIn:   parent
+                        text:               "+"
+                        font.bold:          true
+                        font.pointSize:     14
+                        color:              "white"
+                        anchors.verticalCenterOffset: -1 // Visual alignment
+                    }
+                    
+                    MouseArea {
+                        id:                 ma
+                        anchors.fill:       parent
+                        hoverEnabled:       true
+                        onClicked: {
+                            mainWindow.showToolSelectDialog1(4)
+                            mainWindow.closeIndicatorDrawer()
                         }
                     }
+                }
+            }
 
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: object.link ? Qt.ArrowCursor : Qt.PointingHandCursor
-                        enabled: !object.link
-                        onClicked: {
-                            QGroundControl.linkManager.createConnectedLink(object)
-                            mainWindow.closeIndicatorDrawer()
+            // -- PROFESSIONAL TABLE ROWS --
+            Column {
+                Layout.fillWidth: true
+                spacing: 4
+                
+                QGCLabel {
+                    text:       qsTr("No Links Configured")
+                    visible:    noLinks
+                    color:      "#999999"
+                    font.family: "Outfit"
+                    width:      parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            
+                Repeater {
+                    model: linkConfigs
+
+                    delegate: Rectangle {
+                        width:  280
+                        height: 42
+                        radius: 6
+                        border.width:   1
+                        border.color:   object.link ? "#6a4c8d" : (mouseArea.containsMouse ? "#444444" : "#2D2D2D")
+                        
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0.0; color: object.link ? "#4a2c6d" : (mouseArea.containsMouse ? "#333333" : "#1A1A1A") }
+                            GradientStop { position: 1.0; color: object.link ? "#301d4a" : (mouseArea.containsMouse ? "#222222" : "#161616") }
+                        }
+                        
+                        visible: !object.dynamic
+
+                        // Left Indicator Bar
+                        Rectangle {
+                            anchors.left:   parent.left
+                            anchors.top:    parent.top
+                            anchors.bottom: parent.bottom
+                            width:          4
+                            radius:         2
+                            color:          object.link ? "#FFFFFF" : "transparent"
+                            anchors.margins: 4
+                        }
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 16
+                            anchors.rightMargin: 16
+                            spacing: 12
+                            
+                            QGCLabel {
+                                Layout.fillWidth: true
+                                text:           object.name
+                                color:          "white"
+                                font.bold:      true
+                                font.pointSize: 10
+                                font.family:    "Outfit"
+                                elide:          Text.ElideRight
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            
+                            // Connected Status with White Glow
+                            Row {
+                                spacing: 8
+                                visible: object.link
+                                Layout.alignment: Qt.AlignVCenter
+                                
+                                Rectangle {
+                                    width: 8
+                                    height: 8
+                                    radius: 4
+                                    color: "white" 
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    // Subtle Glow
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        width: 14; height: 14; radius: 7
+                                        color: "white"; opacity: 0.2
+                                    }
+                                }
+                                
+                                QGCLabel {
+                                    text:           qsTr("Connected")
+                                    color:          "white"
+                                    font.pointSize: 9
+                                    font.bold:      true
+                                    font.family:    "Outfit"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: object.link ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            enabled: !object.link
+                            onClicked: {
+                                QGroundControl.linkManager.createConnectedLink(object)
+                                mainWindow.closeIndicatorDrawer()
+                            }
                         }
                     }
                 }
@@ -116,44 +216,39 @@ ToolIndicatorPage {
 
     expandedComponent: Component {
         ColumnLayout {
-            spacing: ScreenTools.defaultFontPixelHeight / 2
+            spacing: 15
+            Layout.preferredWidth: 280
 
-            SettingsGroupLayout {
-                LabelledButton {
-                    label:      qsTr("Communication Links")
-                    buttonText: qsTr("Configure")
-
-                    onClicked: {
-                        //mainWindow.showSettingsTool(qsTr("Comm Links"))
-                        mainWindow.showToolSelectDialog1(4)
-                        mainWindow.closeIndicatorDrawer()
+            // Configuration Options (Dark Section)
+            Rectangle {
+                Layout.fillWidth: true
+                height:         120
+                color:          "#161616"
+                radius:         10
+                border.color:   "#2D2D2D"
+                
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 15
+                    spacing: 10
+                    
+                    QGCLabel {
+                        text: qsTr("Auto-Connect Configuration")
+                        color: "white"
+                        font.bold: true
+                        font.family: "Outfit"
                     }
-                }
-            }
 
-            SettingsGroupLayout {
-                heading:        qsTr("AutoConnect")
-                visible:        autoConnectSettings.visible
-
-                Repeater {
-                    id: autoConnectRepeater
-
-                    model: [
-                        autoConnectSettings.autoConnectPixhawk,
-                        autoConnectSettings.autoConnectSiKRadio,
-                        autoConnectSettings.autoConnectLibrePilot,
-                        autoConnectSettings.autoConnectUDP,
-                        autoConnectSettings.autoConnectZeroConf,
-                        autoConnectSettings.autoConnectRTKGPS,
-                    ]
-
-                    property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
-
-                    FactCheckBoxSlider {
-                        Layout.fillWidth:   true
-                        text:               autoConnectRepeater.names[index]
-                        fact:               modelData
-                        visible:            modelData.visible
+                    RowLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("Pixhawk USB"); color: "#999999"; Layout.fillWidth: true }
+                        FactCheckBoxSlider { fact: autoConnectSettings.autoConnectPixhawk }
+                    }
+                    
+                    RowLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("UDP Network"); color: "#999999"; Layout.fillWidth: true }
+                        FactCheckBoxSlider { fact: autoConnectSettings.autoConnectUDP }
                     }
                 }
             }

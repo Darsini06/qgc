@@ -91,7 +91,7 @@ public:
     void        copyFrom        (const LinkConfiguration* source) override;
     void        loadSettings    (QSettings& settings, const QString& root) override;
     void        saveSettings    (QSettings& settings, const QString& root) override;
-    QString     settingsURL     (void) override                                         { return "BluetoothSettings.qml"; }
+    QString     settingsURL     (void) override                                         { return "qrc:/qml/BluetoothSettings.qml"; }
     QString     settingsTitle   (void) override;
 
 public slots:

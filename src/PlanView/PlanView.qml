@@ -738,7 +738,19 @@ Item {
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
-                    onClicked:   (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false) }
+                    onClicked:   (sequenceNumber) => { 
+                        _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+                        for (var i = 0; i < _missionController.visualItems.count; i++) {
+                            var item = _missionController.visualItems.get(i)
+                            if (item.sequenceNumber === sequenceNumber) {
+                                missionItemDialog.currentMissionItem = item
+                                missionItemDialog.currentIndex = i
+                                missionItemDialog.open()
+                                missionItemDialog.visible = true
+                                break
+                            }
+                        }
+                    }
                 }
             }
 
@@ -2201,11 +2213,15 @@ Item {
             spacing: 12
             
             Repeater {
-                model: [
-                    { "text": qsTr("Mission Start"), "action": "start" },
-                    { "text": qsTr("Survey"), "action": "survey" },
-                    { "text": qsTr("Return To Launch"), "action": "rtl" }
-                ]
+                model: {
+                    var actions = [ { "text": qsTr("Mission Start"), "action": "start" } ]
+                    if (droneType !== "Agri") {
+                        actions.push({ "text": qsTr("Takeoff"), "action": "takeoff" })
+                    }
+                    actions.push({ "text": qsTr("Survey"), "action": "survey" })
+                    actions.push({ "text": qsTr("Return To Launch"), "action": "rtl" })
+                    return actions
+                }
 
                 Rectangle {
                     Layout.fillWidth: true
@@ -2256,6 +2272,22 @@ Item {
                                     insertComplexItemAfterCurrent("Survey")
                                     targetIndex = _missionController.currentPlanViewVIIndex
                                     targetItem  = items.get(targetIndex)
+                                }
+
+                            } else if (modelData.action === "takeoff") {
+                                for (var k = 0; k < items.count; k++) {
+                                    var tkfIt = items.get(k)
+                                    if (tkfIt && tkfIt.commandName === "Takeoff") {
+                                        targetIndex = k
+                                        targetItem = tkfIt
+                                        _missionController.setCurrentPlanViewSeqNum(tkfIt.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertTakeItemAfterCurrent()
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem = items.get(targetIndex)
                                 }
 
                             } else if (modelData.action === "rtl") {

@@ -47,7 +47,7 @@ public:
     void        copyFrom            (const LinkConfiguration* source) override;
     void        loadSettings        (QSettings& settings, const QString& root) override;
     void        saveSettings        (QSettings& settings, const QString& root) override;
-    QString     settingsURL         (void) override                                         { return "TcpSettings.qml"; }
+    QString     settingsURL         (void) override                                         { return "qrc:/qml/TcpSettings.qml"; }
     QString     settingsTitle       (void) override                                         { return tr("TCP Link Settings"); }
 
 signals:

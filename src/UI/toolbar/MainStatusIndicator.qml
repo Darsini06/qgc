@@ -173,68 +173,137 @@ RowLayout {
     Component {
         id: mainStatusContentComponent
 
-        Column {
-            id:         mainLayout
-            spacing:    _spacing
+        Item {
+            implicitWidth:  mainLayout.width + 40
+            implicitHeight: mainLayout.height + 40
 
-            QGCButton {
-                // FIXME: forceArm is not possible anymore if _healthAndArmingChecksSupported == true
-                enabled:    _armed || !_healthAndArmingChecksSupported || _activeVehicle.healthAndArmingCheckReport.canArm
-                text:       _armed ?  qsTr("Disarm") : (forceArm ? qsTr("Force Arm") : qsTr("Arm"))
+            Column {
+                id:         mainLayout
+                anchors.centerIn: parent
+                width:      230
+                spacing:    16
 
-                property bool forceArm: false
+                // Dynamic Arm/Disarm Button
+                Rectangle {
+                    width:  parent.width
+                    height: 48    // Slightly taller for a great feel
+                    radius: 12
+                    color: enabledBtn ? (armActionMouse.pressed ? (isArmed ? "#8c1f36" : "#3a1c5d") : (armActionMouse.hovered ? (isArmed ? "#e33959" : "#5a3c7d") : (isArmed ? "#c92a47" : "#4a2c6d"))) : "#333333"
+                    border.color: enabledBtn ? (isArmed ? "#ff5e7b" : "#6a4c8d") : "#555555"
+                    border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                onPressAndHold: forceArm = true
+                    property bool forceArm: false
+                    property bool enabledBtn: _armed || !_healthAndArmingChecksSupported || (_activeVehicle && _activeVehicle.healthAndArmingCheckReport.canArm)
+                    property bool isArmed: _armed
 
-                onClicked: {
-                    if (_armed) {
-                        mainWindow.disarmVehicleRequest()
-                    } else {
-                        if (forceArm) {
-                            mainWindow.forceArmVehicleRequest()
-                        } else {
-                            mainWindow.armVehicleRequest()
+                    Text {
+                        anchors.centerIn: parent
+                        text: parent.isArmed ? qsTr("Disarm") : (parent.forceArm ? qsTr("Force Arm") : qsTr("Arm"))
+                        color: parent.enabledBtn ? "white" : "#888888"
+                        font.bold: true
+                        font.pixelSize: 15
+                        font.family: "Outfit"
+                        font.letterSpacing: 1.0
+                    }
+
+                    MouseArea {
+                        id: armActionMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: parent.enabledBtn ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        enabled: parent.enabledBtn
+
+                        onPressAndHold: parent.forceArm = true
+
+                        onClicked: {
+                            if (_armed) {
+                                mainWindow.disarmVehicleRequest()
+                            } else {
+                                if (parent.forceArm) {
+                                    mainWindow.forceArmVehicleRequest()
+                                } else {
+                                    mainWindow.armVehicleRequest()
+                                }
+                            }
+                            parent.forceArm = false
+                            mainWindow.closeIndicatorDrawer()
                         }
                     }
-                    forceArm = false
-                    mainWindow.closeIndicatorDrawer()
-                }
-            }
-
-            QGCLabel {
-                anchors.horizontalCenter:   parent.horizontalCenter
-                text:                       qsTr("Sensor Status")
-                visible:                    !_healthAndArmingChecksSupported
-                color: "white"
-            }
-
-            GridLayout {
-                rowSpacing:     _spacing
-                columnSpacing:  _spacing
-                rows:           _activeVehicle.sysStatusSensorInfo.sensorNames.length
-                flow:           GridLayout.TopToBottom
-                visible:        !_healthAndArmingChecksSupported
-
-                Repeater {
-                    model: _activeVehicle.sysStatusSensorInfo.sensorNames
-                    QGCLabel { text: modelData
-                        color: "white"
-                    }
                 }
 
-                Repeater {
-                    model: _activeVehicle.sysStatusSensorInfo.sensorStatus
-                    QGCLabel { text: modelData
+                Rectangle {
+                    width: parent.width
+                    height: 1
                     color: "white"
+                    opacity: 0.1
+                    visible: !_healthAndArmingChecksSupported
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("SENSOR STATUS")
+                    visible: !_healthAndArmingChecksSupported
+                    color: "white"
+                    font.pointSize: 10
+                    font.bold: true
+                    font.letterSpacing: 1.5
+                    opacity: 0.9
+                }
+
+                GridLayout {
+                    width: parent.width
+                    rowSpacing:     14
+                    columnSpacing:  ScreenTools.defaultFontPixelWidth * 2
+                    columns: 2
+                    visible:        !_healthAndArmingChecksSupported
+
+                    Repeater {
+                        model: _activeVehicle ? _activeVehicle.sysStatusSensorInfo.sensorNames : 0
+                        QGCLabel { 
+                            text: modelData
+                            color: "white"
+                            opacity: 0.7
+                            font.pointSize: 10
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    Repeater {
+                        model: _activeVehicle ? _activeVehicle.sysStatusSensorInfo.sensorStatus : 0
+                        QGCLabel { 
+                            text: modelData
+                            color: {
+                                var status = String(modelData).toLowerCase()
+                                if (status.includes("normal") || status.includes("ok")) return "#2ECC71"
+                                if (status.includes("disabled")) return "#95A5A6"
+                                return "#E74C3C" 
+                            }
+                            font.pointSize: 10
+                            font.bold: true
+                            Layout.alignment: Qt.AlignRight
+                        }
                     }
                 }
-            }
 
-            QGCLabel {
-                text:       qsTr("Overall Status")
-                visible:    _healthAndArmingChecksSupported && _activeVehicle.healthAndArmingCheckReport.problemsForCurrentMode.count > 0
-                color: "white"
-            }
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "white"
+                    opacity: 0.1
+                    visible: _healthAndArmingChecksSupported && _activeVehicle && _activeVehicle.healthAndArmingCheckReport.problemsForCurrentMode.count > 0
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("OVERALL STATUS")
+                    visible: _healthAndArmingChecksSupported && _activeVehicle && _activeVehicle.healthAndArmingCheckReport.problemsForCurrentMode.count > 0
+                    color: "white"
+                    font.pointSize: 10
+                    font.bold: true
+                    font.letterSpacing: 1.5
+                    opacity: 0.9
+                }
             // List health and arming checks
             Repeater {
                 visible:    _healthAndArmingChecksSupported
@@ -317,6 +386,7 @@ RowLayout {
                 }
             }
         }
+    }
     }
 
     Component {

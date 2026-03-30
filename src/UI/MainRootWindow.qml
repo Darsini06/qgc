@@ -1453,6 +1453,8 @@ ApplicationWindow {
                 QGCLabel {
                     text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
                     Layout.fillWidth: true
+                    color: "white"
+                    wrapMode: Text.WordWrap
                 }
             }
         }
@@ -2731,43 +2733,10 @@ ApplicationWindow {
         }
 
         background: Rectangle {
-            color: "transparent"
-            radius: indicatorDrawer._margins
-
-            // Floating "+" button for indicators without a vehicle
-            Rectangle {
-                anchors.horizontalCenter:   parent.right
-                anchors.verticalCenter:     parent.top
-                anchors.horizontalCenterOffset: -4
-                anchors.verticalCenterOffset: 4
-                width:                      32
-                height:                     32
-                radius:                     16
-                color:                      "#3B82F6"
-                border.width:               0
-                visible:                    activeVehicle ? false : (indicatorDrawerLoader.item && indicatorDrawerLoader.item.showExpand && !indicatorDrawer._expanded)
-
-                QGCLabel {
-                    anchors.centerIn:   parent
-                    text:               "+"
-                    color:              "white"
-                    font.pixelSize:     22
-                    font.bold:          true
-                }
-
-                QGCMouseArea {
-                    fillItem: parent
-                    onClicked: {
-                        if(!activeVehicle){
-                            mainWindow.showToolSelectDialog1(4)
-                            mainWindow.closeIndicatorDrawer()
-                        }else{
-                            indicatorDrawer._expanded = true
-                            mainWindow.closeIndicatorDrawer()
-                        }
-                    }
-                }
-            }
+            color: "#252525" // Dark Grey Background
+            radius: 12
+            border.color: "#333333"
+            border.width: 1
         }
 
         contentItem: QGCFlickable {
