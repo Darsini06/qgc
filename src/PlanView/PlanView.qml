@@ -217,7 +217,7 @@ Item {
             width: baseSize
             height: baseSize
             radius: width / 2
-            color: "#301934"
+            color: Qt.rgba(0, 0, 0, 0.75)
             border.color: "#8e6abb"
             border.width: 1
             opacity: 0.95
@@ -245,8 +245,8 @@ Item {
             width:  baseSize
             height: baseSize
             radius: width / 2
-            color:  "#301934"
-            border.color: "#8e6abb"
+            color:  Qt.rgba(0, 0, 0, 0.75)
+            border.color: "white"
             border.width: 1
             opacity: 0.95
             visible: true
@@ -333,7 +333,7 @@ Item {
                                                  qsTr("Discard Unsaved Changes") :
                                                  qsTr("Discard Unsaved Changes, Load New Plan From Vehicle")) :
                                             qsTr("Load New Plan From Vehicle")
-                        color:          "black"
+                        color:          Qt.rgba(0, 0, 0, 0.75)
                         font.bold:      true
                         font.family:    "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize
@@ -646,14 +646,14 @@ Item {
     PlanViewToolBar {
         id:                     planToolBar
         planMasterController:   _planMasterController
-        //plantypes:planType
+        z:                      100  // Ensure it overlays the map
     }
 
     Item {
         id:             panel
         anchors.left:   parent.left
         anchors.right:  parent.right
-        anchors.top:    planToolBar.bottom
+        anchors.top:    parent.top
         anchors.bottom: parent.bottom
 
         FlightMap {
@@ -1613,8 +1613,8 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#301934"
-                        border.color: "#8e6abb"
+                        color: Qt.rgba(0, 0, 0, 0.75)
+                        border.color: "white"
                         border.width: 1
                         anchors.fill: parent
                     }
@@ -1656,8 +1656,8 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#301934"
-                        border.color: "#8e6abb"
+                        color: Qt.rgba(0, 0, 0, 0.75)
+                        border.color: "white"
                         border.width: 1
                         anchors.fill: parent
                     }
@@ -1702,9 +1702,9 @@ Item {
                 width: baseSize
                 height: baseSize
                 radius: width / 2
-                color: "#301934"
+                color: Qt.rgba(0, 0, 0, 0.75)
                 border.width: 1
-                border.color: "#8e6abb"
+                border.color: "white"
                 clip: true
 
                 MouseArea {
@@ -2229,8 +2229,8 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 12
-                    color: "#301934"
-                    border.color: "#8a6cad"
+                    color: Qt.rgba(0, 0, 0, 0.75)
+                    border.color: "white"
                     border.width: 1
 
                     Text {
@@ -2338,10 +2338,10 @@ Item {
             id:         layerTabBar
             width:      parent.width
             height:     42
-            color:      "#301934"
+            color:      Qt.rgba(0, 0, 0, 0.75)
             radius:     10
-            border.color: "#301934"
-            border.width: 1
+            border.color: "transparent"
+            border.width: 0
             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
             property int currentIndex: 0
@@ -2354,9 +2354,9 @@ Item {
                 height: layerTabBar.height - 6
                 y: 3
                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                color: "#301934"
+                color: Qt.rgba(0, 0, 0, 0.40)
                 radius: 10
-                border.color: "#8a6cad"
+                border.color: "white"
                 border.width: 1
                 Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
             }

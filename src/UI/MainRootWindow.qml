@@ -1125,10 +1125,10 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  "white"//"#301934"
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible: false
-            border.width: width * 0.05    // 10% of button width
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: flightModeIndicator2
@@ -1137,7 +1137,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "transparent"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1191,10 +1191,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#301934"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: takeofficon
@@ -1203,7 +1203,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1223,10 +1223,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#301934"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: waypointbtnicon1
@@ -1235,7 +1235,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1291,10 +1291,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#301934"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: camerabtnicon
@@ -1303,7 +1303,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1325,10 +1325,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#301934"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: landbtnicon
@@ -1337,7 +1337,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1357,10 +1357,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#301934"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: rtlbtnicon
@@ -1369,7 +1369,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
 
@@ -1392,11 +1392,11 @@ ApplicationWindow {
             width: flightmode1.implicitWidth + 30   // 10px padding left/right
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
-            color:  "white"//"#301934"
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
             visible: activeVehicle
 
-            border.width: 2
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             FlightModeIndicator {
                 id: flightmode1
@@ -1737,7 +1737,7 @@ ApplicationWindow {
             width: 48
             height: 48
             radius: width / 2
-            color:  "#301934"
+            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black toolbars button
             visible: plan === "Plan" 
 
             Text {

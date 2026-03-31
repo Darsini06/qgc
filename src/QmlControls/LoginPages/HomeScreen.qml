@@ -669,96 +669,64 @@ Item {
             // Helpful for debugging or ensuring minimum space
             Layout.fillWidth: true
 
-            // Cinematic Swipe to Connect Button
+            // Click to Connect
             Item {
-                id: connectSwipe
+                id: connectClick
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                 Layout.fillWidth: true
                 Layout.maximumWidth: dp(30)
                 Layout.minimumWidth: dp(18)
                 Layout.preferredHeight: dp(7)
 
-                // Track
                 Rectangle {
                     anchors.fill: parent
                     radius: height / 2
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: Qt.rgba(255, 255, 255, 0.15)
+                    color: connectMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
+                    border.color: connectMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                    // Directional Arrows
-                    Row {
-                        anchors.centerIn: parent
-                        anchors.horizontalCenterOffset: dp(4)
-                        spacing: dp(2)
-                        opacity: 0.3
-                        Repeater {
-                            model: 3
-                            Label { text: ">"; color: "white"; font.bold: true; font.pointSize: 10 }
-                        }
-                    }
-
-                    // Glow background for the track
-                    Rectangle {
+                    RowLayout {
                         anchors.fill: parent
-                        radius: parent.radius
-                        color: "transparent"
-                        opacity: 0.1
-                        border.color: accent_color
-                        border.width: 2
-                        visible: swipeMouse.pressed
-                    }
-                }
+                        anchors.margins: dp(0.8)
+                        spacing: dp(1.5)
 
-                // Drag Handle
-                Rectangle {
-                    id: swipeHandle
-                    width: parent.height - dp(2)
-                    height: width
-                    radius: width / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(1)
-                    color: accent_color
+                        Rectangle {
+                            Layout.preferredWidth: parent.height - dp(1)
+                            Layout.preferredHeight: Layout.preferredWidth
+                            radius: width / 2
+                            color: accent_color
+                            
+                            Image {
+                                source: "qrc:/qmlimages/NewImages/commlinks.svg"
+                                width: parent.width * 0.5
+                                height: width
+                                anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
 
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: accent_color
-                        shadowBlur: 0.8
-                    }
-
-                    Image {
-                        source: "qrc:/qmlimages/NewImages/commlinks.svg"
-                        width: parent.width * 0.5
-                        height: width
-                        anchors.centerIn: parent
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    Behavior on x {
-                        enabled: !swipeMouse.pressed
-                        NumberAnimation { duration: 300; easing.type: Easing.OutBack }
+                        Label {
+                            Layout.fillWidth: true
+                            text: qsTr("CONNECT")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                        }
                     }
                 }
 
                 MouseArea {
-                    id: swipeMouse
+                    id: connectMouse
                     anchors.fill: parent
-                    drag.target: swipeHandle
-                    drag.axis: Drag.XAxis
-                    drag.minimumX: dp(1)
-                    drag.maximumX: parent.width - swipeHandle.width - dp(1)
-
-                    onReleased: {
-                        if (swipeHandle.x >= drag.maximumX - dp(2)) {
-                            var editingConfig = _linkManager.createConfiguration(
-                                ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
-                            );
-                            typeSelectionDialogComponent.createObject(mainWindow1, { editingConfig: editingConfig, originalConfig: null }).open();
-                            swipeHandle.x = drag.minimumX
-                        } else {
-                            swipeHandle.x = drag.minimumX
-                        }
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        var editingConfig = _linkManager.createConfiguration(
+                            ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
+                        );
+                        typeSelectionDialogComponent.createObject(mainWindow1, { editingConfig: editingConfig, originalConfig: null }).open();
                     }
                 }
             }
@@ -768,7 +736,7 @@ Item {
             // Swipe to Camera
             Item {
                 id: cameraSwipe
-                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
                 Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
                 Layout.minimumWidth: dp(14)
@@ -857,7 +825,7 @@ Item {
             // Swipe to Agri
             Item {
                 id: agriSwipe
-                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
                 Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
                 Layout.minimumWidth: isSmallScreen ? dp(14) : dp(18)
@@ -946,7 +914,7 @@ Item {
             // Swipe to Mapping
             Item {
                 id: mappingSwipe
-                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
                 Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
                 Layout.minimumWidth: dp(14)

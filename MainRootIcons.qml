@@ -72,7 +72,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"white"//"#301934"
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black circle
         //border.width: width * 0.05
         //border.color: "white"//"white"//"#005BBB"
         clip: true
@@ -113,9 +113,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#301934"    // Dark blue background
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        border.width: 0
+        border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
@@ -130,7 +130,7 @@ Row {
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color : "transparent"
+            color : "white"
         }
     }
 
@@ -140,9 +140,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#301934"    // Dark blue background
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        border.width: 0
+        border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
@@ -162,7 +162,7 @@ Row {
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color : "black"
+            color : "white"
         }
 
         // Dropdown Popup for Map Types - BALANCED VERY SMALL VERSION
@@ -336,9 +336,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"#301934"
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        border.width: 0
+        border.color: "transparent"
 
         MouseArea {
             anchors.fill: parent
@@ -354,7 +354,7 @@ Row {
             width: iconSize * 0.5
             height: iconSize * 0.5
             //color: "transparent"
-            color : "black"
+            color : "white"
         }
 
         Rectangle {
@@ -362,9 +362,9 @@ Row {
             width: baseSize * 2
             height: baseSize * 1
             radius: width * 0.1
-            color: "white"//"#301934"
-            border.color: "white"//"#005BBB"
-            border.width: width * 0.02
+            color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            border.color: "transparent"
+            border.width: 0
             visible: false
             z: 1000
 
@@ -391,7 +391,7 @@ Row {
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     //color: "white"
-                    color : "black"
+                    color : "white"
 
                     MouseArea {
                         anchors.fill: parent
@@ -422,7 +422,7 @@ Row {
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     //color: "white"
-                    color : "black"
+                    color : "white"
 
                     MouseArea {
                         anchors.fill: parent

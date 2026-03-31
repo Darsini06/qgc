@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#301934"//qgcPal.toolbarBackground
+    color:  Qt.rgba(0, 0, 0, 0.75)  // Primary transparent background
 
     property var    planMasterController
 
@@ -194,7 +194,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#301934"
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
         width:50
 
 
@@ -224,7 +224,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#301934"//qgcPal.window
+        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black//qgcPal.window
         visible:        _showLargeProgress
 
         property bool _userHide:                false
