@@ -74,8 +74,8 @@ Item {
         //         z: -1
 
         //         gradient: Gradient {
-        //             GradientStop { position: 0.0; color: "#2e1b45" } // Deep purple
-        //             GradientStop { position: 1.0; color: "#4a2c6d" } // Brand purple
+        //             GradientStop { position: 0.0; color: "#301934" } // Deep purple
+        //             GradientStop { position: 1.0; color: "#301934" } // Brand purple
         //         }
         //     }
 

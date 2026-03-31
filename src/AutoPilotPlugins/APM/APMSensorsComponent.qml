@@ -29,7 +29,7 @@ SetupPage {
     id:             sensorsPage
     pageComponent:  sensorsPageComponent
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
 
 
     property real screenWidth: parent.width

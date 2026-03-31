@@ -87,7 +87,9 @@ RowLayout {
             implicitHeight: Math.min(ScreenTools.screenHeight * 0.8, contentColumn.implicitHeight + headerArea.height + ScreenTools.defaultFontPixelHeight * 2)
             radius:         15
             clip:           true
-            color:          "#4a2c6d" // Solid professional theme color
+            color:          "#FFFFFF"
+            border.color:   "#301934"
+            border.width:   1
 
             ColumnLayout {
                 anchors.fill: parent
@@ -108,7 +110,7 @@ RowLayout {
                         QGCLabel {
                             Layout.fillWidth: true
                             text:             activeVehicle ? activeVehicle.flightMode : qsTr("Stabilize")
-                            color:            "white"
+                            color:            "#000000"
                             font.pointSize:   ScreenTools.mediumFontPointSize
                             font.bold:        true
                         }
@@ -122,7 +124,7 @@ RowLayout {
 
                             QGCLabel {
                                 text:             "X" // Use standard character to ensure display
-                                color:            "white"
+                                color:            "#000000"
                                 anchors.centerIn: parent
                                 font.pixelSize:   parent.height * 0.5
                                 font.bold:        true
@@ -140,8 +142,8 @@ RowLayout {
                 Rectangle {
                     Layout.fillWidth: true
                     height:           1
-                    color:            "white"
-                    opacity:          0.2
+                    color:            "#DDE1EA"
+                    opacity:          1.0
                 }
 
                 // Scrollable content
@@ -199,7 +201,8 @@ RowLayout {
                                     id:                 modeButton
                                     Layout.fillWidth:   true
                                     height:             ScreenTools.defaultFontPixelHeight * 3
-                                    color:              modeMouseArea.pressed ? Qt.darker("#ffffff", 1.2) : (_activeVehicle.flightMode === modelData ? "white" : "transparent")
+                                    color:              modeMouseArea.pressed ? "#F1F5F9" : (_activeVehicle.flightMode === modelData ? "#301934" : "transparent")
+                                    radius:             8
                                     
                                     RowLayout {
                                         anchors.fill:    parent
@@ -209,7 +212,7 @@ RowLayout {
                                         QGCLabel {
                                             Layout.fillWidth: true
                                             text:             modelData
-                                            color:            (_activeVehicle.flightMode === modelData) ? "black" : "white"
+                                            color:            (_activeVehicle.flightMode === modelData) ? "white" : "black"
                                             font.pointSize:   ScreenTools.defaultFontPointSize
                                             font.bold:        _activeVehicle.flightMode === modelData
                                         }
@@ -249,8 +252,8 @@ RowLayout {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     height:           1
-                                    color:            "white"
-                                    opacity:          0.1
+                                    color:            "#DDE1EA"
+                                    opacity:          1.0
                                     visible:          index < modeRepeater.count - 1
                                 }
                             }

@@ -159,7 +159,7 @@ Item {
 
                 QGCLabel { 
                     text:   qsTr("Path: %1").arg(_mobileShortPath) 
-                    color:  "white"
+                    color:  "black"
                     font.pointSize: ScreenTools.smallFontPointSize
                     font.bold: true
                 }
@@ -239,7 +239,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text:       qsTr("No files")
-                        color:      "white"
+                        color:      "black"
                         font.pixelSize: 14
                         font.bold: true
                         visible:    fileRepeater.model.length === 0
@@ -285,7 +285,7 @@ Item {
                 QGCLabel {
                     text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
                     Layout.fillWidth:   true
-                    color:              "white"
+                    color:              "black"
                     font.family:        "Outfit"
                     font.pointSize:     ScreenTools.defaultFontPointSize
                     horizontalAlignment: Text.AlignHCenter
@@ -540,13 +540,9 @@ Item {
             padding:        0
             
             background: Rectangle {
-                radius: 12
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#5a3c7d" }
-                    GradientStop { position: 1.0; color: "#2d1c42" }
-                }
-                border.color: "#4a2c6d"
-                border.width: 1
+                radius: 15
+                color: "white"
+                border.width: 0
                 clip: true
             }
 
@@ -555,9 +551,21 @@ Item {
                 spacing: 0
 
                 // Header
-                Item {
+                Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
+                    color: "#301934"
+                    radius: 15
+                    // Top rounded corners only
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.radius
+                        color: parent.color
+                        visible: parent.radius > 0
+                    }
+
                     Text {
                         text:               qsTr("Set Ground Name")
                         font.bold:          true
@@ -572,7 +580,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     height:             1
-                    color:              "white"
+                    color:              "black"
                     opacity:            0.15
                 }
 
@@ -592,7 +600,7 @@ Item {
 
                         Text {
                             text:           qsTr("Project Name:")
-                            color:          "white"
+                            color:          "black"
                             font.bold:      true
                             font.pointSize: 11
                             font.family:    "Outfit"
@@ -601,16 +609,18 @@ Item {
                         TextField {
                             id:             nameField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 34
+                            Layout.preferredHeight: 40
                             placeholderText: qsTr("Enter your project name")
-                            placeholderTextColor: "#999999"
-                            font.pointSize: 10
+                            placeholderTextColor: "#888888"
+                            font.pointSize: 11
                             color:          "black"
                             verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    10
+                            leftPadding:    15
                             background: Rectangle {
-                                radius:         2
-                                color:          "white"
+                                radius:         10
+                                color:          "#FFFFFF"
+                                border.color:   nameField.activeFocus ? "#301934" : "#DDE1EA"
+                                border.width:   nameField.activeFocus ? 2 : 1
                             }
                         }
                     }
@@ -620,7 +630,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     height:             1
-                    color:              "white"
+                    color:              "black"
                     opacity:            0.15
                 }
 
@@ -645,10 +655,9 @@ Item {
                                     customDialog.visible = false
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
-                                    color:      "#3a1f57"
-                                    border.color: "#4a2c6d"
-                                    border.width: 1
+                                    radius:     12
+                                    color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
+                                    border.width: 0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
@@ -666,7 +675,7 @@ Item {
                         Rectangle {
                             Layout.fillHeight: true
                             width: 1
-                            color: "white"
+                            color: "black"
                             opacity: 0.15
                             Layout.topMargin: 10
                             Layout.bottomMargin: 10
@@ -702,10 +711,13 @@ Item {
                                     customDialog.visible = false
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
-                                    color:      "#4a2c6d"
-                                    border.color: "#5a3c7d"
-                                    border.width: 1
+                                    radius:     12
+                                    gradient: Gradient {
+                                        GradientStop { position: 0.0; color: "#301934" }
+                                        GradientStop { position: 1.0; color: "#301934" }
+                                    }
+                                    border.width: 0
+                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Confirm")

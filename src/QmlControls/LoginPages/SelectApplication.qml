@@ -14,7 +14,7 @@ Item {
 
     // ── Palette ─────────────────────────────────────────────────
     readonly property color brandDark:    "#1A1335"
-    readonly property color brandPrimary: "#4A2C6D"
+    readonly property color brandPrimary: "#301934"
     readonly property color brandAccent:  "#7B4FA6"
     readonly property color pageBg:       "#EDEEF4"
 

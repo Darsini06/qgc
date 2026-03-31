@@ -94,7 +94,7 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
 
 
     function dp(value) {
@@ -538,7 +538,7 @@ ApplicationWindow {
             Rectangle {
                 width: parent.width
                 height: titleLabel.implicitHeight + 14
-                color: "#4a2c6d"
+                color: "#301934"
                 radius: 14
                 antialiasing: true
                 clip: true
@@ -549,7 +549,7 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     height: 14
-                    color: "#4a2c6d"
+                    color: "#301934"
                     radius: 0
                 }
 
@@ -1125,7 +1125,7 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  "white"//"#1b1c3e"
+            color:  "white"//"#301934"
             visible: false
             border.width: width * 0.05    // 10% of button width
             border.color:  "white"//"#005BBB"
@@ -1161,7 +1161,7 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2            // Circle
-        //     color:  "white"//"#1b1c3e"
+        //     color:  "white"//"#301934"
         //     visible: true
         //     border.width: width * 0.05    // 10% of button width
         //     border.color:  "white"//"#005BBB"
@@ -1191,7 +1191,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  "white"//"#301934"      // white background
             visible:  false
             border.width: width * 0.05
             border.color:  "white"//"#005BBB"
@@ -1223,7 +1223,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  "white"//"#301934"      // white background
             visible:  false
             border.width: width * 0.05
             border.color:  "white"//"#005BBB"
@@ -1259,7 +1259,7 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2   // Makes it a circle
-        //     color:  "white"//"#1b1c3e"      // white background
+        //     color:  "white"//"#301934"      // white background
         //     visible:  false
         //     border.width: width * 0.05
         //     border.color:  "white"//"#005BBB"
@@ -1291,7 +1291,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  "white"//"#301934"      // white background
             visible:  false
             border.width: width * 0.05
             border.color:  "white"//"#005BBB"
@@ -1325,7 +1325,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  "white"//"#301934"      // white background
             visible:  false
             border.width: width * 0.05
             border.color:  "white"//"#005BBB"
@@ -1357,7 +1357,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  "white"//"#301934"      // white background
             visible:  false
             border.width: width * 0.05
             border.color:  "white"//"#005BBB"
@@ -1392,7 +1392,7 @@ ApplicationWindow {
             width: flightmode1.implicitWidth + 30   // 10px padding left/right
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
-            color:  "white"//"#1b1c3e"
+            color:  "white"//"#301934"
             visible: activeVehicle
 
             border.width: 2
@@ -1453,7 +1453,7 @@ ApplicationWindow {
                 QGCLabel {
                     text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
                     Layout.fillWidth: true
-                    color: "white"
+                    color: "black"
                     wrapMode: Text.WordWrap
                 }
             }
@@ -1462,23 +1462,21 @@ ApplicationWindow {
 
     Dialog {
         id: myDialog
-        width: 320
-        height: 380
+        width: 260
+        height: 350
         property string imageSource: "/qmlimages/NewImages/takeOff.svg"
         property string dialogText: "Default Text"
 
         x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
+        y: toolbar.y + toolbar.height + 20
+        modal: false
+        dim: false
+        closePolicy: Popup.CloseOnPressOutside
 
         background: Rectangle {
-            radius: 12
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#5a3c7d" }
-                GradientStop { position: 1.0; color: "#2d1c42" }
-            }
-            border.color: "#4a2c6d"
-            border.width: 1
-            clip: true
+            radius: 15
+            color: "white"
+            border.width: 0
         }
 
         QtObject {
@@ -1500,37 +1498,37 @@ ApplicationWindow {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: qsTr("TAKEOFF SETTINGS")
-                color: "white"
-                font.pointSize: 14
+                color: "black"
+                font.pointSize: 11
                 font.bold: true
-                opacity: 0.9
+                opacity: 0.8
+                Layout.topMargin: 10
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "white"
-                opacity: 0.1
+                color: "#3d3a50"
+                opacity: 0.5
             }
 
             // Altitude Display Area
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 5
+                spacing: 2
                 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: myDialog.dialogText === "settings" ? qsTr("Takeoff Altitude") : qsTr("Confirm Action")
-                    color: "white"
-                    font.pointSize: 10
-                    opacity: 0.7
+                    color: "#9898bb"
+                    font.pointSize: 9
                 }
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: takeoffSettings.sliderOutputValue.toFixed(1) + " m"
-                    color: "white"
-                    font.pointSize: 32
+                    color: "black"
+                    font.pointSize: 28
                     font.bold: true
                     visible: myDialog.dialogText === "settings"
                 }
@@ -1539,17 +1537,16 @@ ApplicationWindow {
             // Controls
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 25
+                spacing: 20
                 visible: myDialog.dialogText === "settings"
 
                 // Minus Button
-                Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#3a1f57"
-                    border.color: "#4a2c6d"
-                    border.width: 1
+                    Rectangle {
+                        width: 48
+                        height: 48
+                        radius: 24
+                        color: "#2a2b3e"
+                        border.width: 0
                     
                     Text {
                         text: "-"
@@ -1570,13 +1567,12 @@ ApplicationWindow {
                 }
 
                 // Plus Button
-                Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#3a1f57"
-                    border.color: "#4a2c6d"
-                    border.width: 1
+                    Rectangle {
+                        width: 48
+                        height: 48
+                        radius: 24
+                        color: "#2a2b3e"
+                        border.width: 0
 
                     Text {
                         text: "+"
@@ -1602,16 +1598,15 @@ ApplicationWindow {
             // Center Circular Action Button
             Item {
                 Layout.alignment: Qt.AlignHCenter
-                width: 100
-                height: 100
+                width: 90
+                height: 90
 
                 Rectangle {
                     id: circularButton
                     anchors.fill: parent
                     radius: 50
-                    color: "#4a2c6d"
-                    border.color: "#6a4c8d"
-                    border.width: 2
+                    color: "#301934"
+                    border.width: 0
                     
                     Canvas {
                         id: progressCircle
@@ -1648,13 +1643,12 @@ ApplicationWindow {
                     }
                 }
             }
-
+            // Instruction text
             Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("Press and hold to confirm")
-                color: "white"
-                font.pointSize: 9
-                opacity: 0.6
+                Layout.alignment:       Qt.AlignHCenter
+                text:                   qsTr("Press and hold to confirm")
+                color:                  "#9898bb"
+                font.pointSize:         9
             }
         }
 
@@ -1743,7 +1737,7 @@ ApplicationWindow {
             width: 48
             height: 48
             radius: width / 2
-            color:  "#4a2c6d"
+            color:  "#301934"
             visible: plan === "Plan" 
 
             Text {

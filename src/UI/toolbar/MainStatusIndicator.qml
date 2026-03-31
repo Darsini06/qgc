@@ -188,8 +188,8 @@ RowLayout {
                     width:  parent.width
                     height: 48    // Slightly taller for a great feel
                     radius: 12
-                    color: enabledBtn ? (armActionMouse.pressed ? (isArmed ? "#8c1f36" : "#3a1c5d") : (armActionMouse.hovered ? (isArmed ? "#e33959" : "#5a3c7d") : (isArmed ? "#c92a47" : "#4a2c6d"))) : "#333333"
-                    border.color: enabledBtn ? (isArmed ? "#ff5e7b" : "#6a4c8d") : "#555555"
+                    color: enabledBtn ? (armActionMouse.pressed ? (isArmed ? "#8c1f36" : "#301934") : (armActionMouse.hovered ? (isArmed ? "#e33959" : "#301934") : (isArmed ? "#c92a47" : "#301934"))) : "#333333"
+                    border.color: enabledBtn ? (isArmed ? "#ff5e7b" : "#301934") : "#555555"
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 150 } }
 

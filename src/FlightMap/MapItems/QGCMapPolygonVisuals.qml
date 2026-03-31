@@ -574,8 +574,8 @@ Item {
                 height: displayText.contentHeight + 6 // Padding
                 width: displayText.contentWidth + 12 // Padding
                 radius: height / 2 // Rounded corners
-                color: "#1b1c3e" // light purple background
-                border.color: "#4a2c6d"
+                color: "#301934" // light purple background
+                border.color: "#301934"
                 border.width: 1
 
                 Text {
@@ -1087,7 +1087,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
+                        color: "white"//"#301934"
                         //border.color: "#005BBB"
                         //border.width: 2
                         anchors.fill: parent
@@ -1177,7 +1177,7 @@ Item {
 
                 //     background: Rectangle {
                 //         radius: width / 2
-                //         color: "#1b1c3e"
+                //         color: "#301934"
                 //         border.color: "#005BBB"
                 //         border.width: 2
                 //         anchors.fill: parent
@@ -1207,7 +1207,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
+                        color: "white"//"#301934"
                         //border.color: "#005BBB"
                         //border.width: 2
                         anchors.fill: parent
@@ -1243,7 +1243,7 @@ Item {
 
                 //     background: Rectangle {
                 //         radius: width / 2
-                //         color: "#1b1c3e"
+                //         color: "#301934"
                 //         border.color: "#005BBB"
                 //         border.width: 2
                 //         anchors.fill: parent
@@ -1281,7 +1281,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
+                        color: "white"//"#301934"
                         //border.color: "#005BBB"
                         //border.width: 2
                         anchors.fill: parent
@@ -1372,7 +1372,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
+                        color: "white"//"#301934"
                         //border.color: "#005BBB"
                         //border.width: 2
                         anchors.fill: parent
@@ -1496,7 +1496,7 @@ Item {
                     height: parent.height * 0.9
                     radius: 10
                     color: "#ffffffcc" // semi-transparent white
-                    border.color: "#4a2c6d"
+                    border.color: "#301934"
                     border.width: 2
 
                     Column {
@@ -1504,25 +1504,46 @@ Item {
                         anchors.margins: 20
                         spacing: 15
 
-                        // Title
-                        Label {
-                            text: qsTr("Set Ground Name")
-                            font.bold: true
-                            font.pointSize: 14
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            width: parent.width
+                        // Header
+                        Rectangle {
+                            width: parent.width + 40
+                            height: 50
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: "#301934"
+                            radius: 10
+                            // Rounded top only
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                height: 10
+                                width: parent.width
+                                color: parent.color
+                            }
+
+                            Label {
+                                text: qsTr("Set Ground Name")
+                                font.bold: true
+                                color: "white"
+                                font.pointSize: 14
+                                anchors.centerIn: parent
+                                font.family: "Outfit"
+                            }
                         }
 
                         // Name Field
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Name :"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Name :"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField
                                 Layout.fillWidth: true
+                                color: "black"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1530,13 +1551,19 @@ Item {
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField1
                                 Layout.fillWidth: true
+                                color: "black"
                                 validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
                                 inputMethodHints: Qt.ImhDigitsOnly
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField1.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1544,11 +1571,17 @@ Item {
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField2
                                 Layout.fillWidth: true
+                                color: "black"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField2.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1558,21 +1591,37 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             Button {
-                                text: "Cancel"
+                                id: cancelBtnMobile
+                                text: qsTr("Cancel")
                                 width: 100
                                 background: Rectangle {
-                                    radius: 10
-                                    color: "#ccccff"
+                                    radius: 12
+                                    color: cancelBtnMobile.pressed ? "#C0392B" : (cancelBtnMobile.hovered ? "#E74C3C" : "#E74C3C")
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "white"
+                                    font.bold: true
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: mobileFileSaveDialog.onRejected()
                             }
 
                             Button {
-                                text: "Confirm"
+                                id: confirmBtnMobile
+                                text: qsTr("Confirm")
                                 width: 100
                                 background: Rectangle {
-                                    radius: 10
-                                    color: "#ccccff"
+                                    radius: 12
+                                    color: confirmBtnMobile.pressed ? "#1a0d1c" : (confirmBtnMobile.hovered ? "#4a2650" : "#301934")
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "white"
+                                    font.bold: true
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: mobileFileSaveDialog.accepted()
                             }
@@ -1710,13 +1759,9 @@ Item {
             padding:        0
             
             background: Rectangle {
-                radius: 4
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#5a3c7d" }
-                    GradientStop { position: 1.0; color: "#2d1c42" }
-                }
-                border.color: "#4a2c6d"
-                border.width: 1
+                radius: 15
+                color: "white"
+                border.width: 0
             }
 
             contentItem: ColumnLayout {
@@ -1724,15 +1769,27 @@ Item {
                 spacing: 0
 
                 // Header
-                Item {
+                Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
+                    color: "#301934"
+                    radius: 15
+                    // Top rounded corners only
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.radius
+                        color: parent.color
+                    }
+
                     Text {
                         text:               qsTr("Set Ground Name")
                         font.bold:          true
                         color:              "white"
                         font.pointSize:     14
                         anchors.centerIn:    parent
+                        font.family:        "Outfit"
                     }
                 }
 
@@ -1760,7 +1817,7 @@ Item {
 
                         Text {
                             text:           qsTr("Project Name:")
-                            color:          "white"
+                            color:          "black"
                             font.bold:      true
                             font.pointSize: 11
                         }
@@ -1768,16 +1825,18 @@ Item {
                         TextField {
                             id:             nameField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 34
+                            Layout.preferredHeight: 40
                             placeholderText: qsTr("Enter your project name")
-                            placeholderTextColor: "#999999"
-                            font.pointSize: 10
+                            placeholderTextColor: "#888888"
+                            font.pointSize: 11
                             color:          "black"
                             verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    10
+                            leftPadding:    15
                             background: Rectangle {
-                                radius:         2
-                                color:          "white"
+                                radius:         10
+                                color:          "#FFFFFF"
+                                border.color:   nameField.activeFocus ? "#301934" : "#DDE1EA"
+                                border.width:   nameField.activeFocus ? 2 : 1
                             }
                         }
                     }
@@ -1819,16 +1878,16 @@ Item {
                                     MapGlobals.editdialog = "editdialog1"
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
-                                    color:      "#3a1f57"
-                                    border.color: "#4a2c6d"
-                                    border.width: 1
+                                    radius:     12
+                                    color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
+                                    border.width: 0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
                                     color:              "white"
                                     font.bold:          true
                                     font.pointSize:     12
+                                    font.family:        "Outfit"
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment:   Text.AlignVCenter
                                 }
@@ -1884,13 +1943,13 @@ Item {
                                     MapGlobals.editdialog = "editdialog1"
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
+                                    radius:     12
                                     gradient: Gradient {
-                                        GradientStop { position: 0.0; color: "#6a4c8d" }
-                                        GradientStop { position: 1.0; color: "#4a2c6d" }
+                                        GradientStop { position: 0.0; color: "#301934" }
+                                        GradientStop { position: 1.0; color: "#301934" }
                                     }
-                                    border.color: "#5a3c7d"
-                                    border.width: 1
+                                    border.width: 0
+                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Confirm")

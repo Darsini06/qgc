@@ -14,8 +14,8 @@ Item {
     anchors.fill: parent
 
     // --- Design Tokens (Consistent with ProfileMain.qml) ---
-    property color app_color:       "#4a2c6d" 
-    property color accent_color:    "#4a2c6d" 
+    property color app_color:       "#301934" 
+    property color accent_color:    "#301934" 
     property color surface_color:   "#ffffff"
     property color bg_color:        "#f8f9fa"
     property color text_primary:    "#1e293b"

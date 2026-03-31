@@ -43,7 +43,7 @@ TabButton {
         radius: 20//backRadius
         border.width: _showHighlight ? 1 : 0
         border.color: qgcPal.buttonBorder
-        color: "#1b1c3e"//_showHighlight ? qgcPal.buttonHighlight : qgcPal.button
+        color: "#301934"//_showHighlight ? qgcPal.buttonHighlight : qgcPal.button
     }
 
     contentItem: Item {

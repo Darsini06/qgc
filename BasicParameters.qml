@@ -25,7 +25,7 @@ Item {
     readonly property int cardWidth: (parent.width *0.98 - horizontalMargin - (columnSpacing * (cardsPerRow - 1))) / cardsPerRow
     readonly property int cardHeight: cardWidth // Keep cards square
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
 
 
     property var agri: [
@@ -510,7 +510,7 @@ Item {
 
                     Text {
                         text: modelData.text
-                        color: "grey"
+                        color: "#000000"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -646,7 +646,7 @@ Item {
 
                     Text {
                         text: modelData.text
-                        color: "grey"
+                        color: "#000000"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9
@@ -770,7 +770,7 @@ Item {
 
                     Text {
                         text: modelData.text
-                        color: "grey"
+                        color: "#000000"
                         font.bold: true
                         font.pixelSize: ScreenTools.smallFontPixelSize
                         width: parent.width * 0.9

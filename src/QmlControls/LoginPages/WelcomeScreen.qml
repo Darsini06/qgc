@@ -29,7 +29,7 @@ Item {
 
     property string rightSide: "signup"
 
-    property color primaryHover: "#5e3a8a"   // Lighter shade of #4a2c6d
+    property color primaryHover: "#5e3a8a"   // Lighter shade of #301934
     property color surfaceColor: "#ffffff"
     property color textSecondary: "#64748b"
 
@@ -39,7 +39,7 @@ Item {
 
     property color textPrimary: "#000000"
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
 
     property real screenWidth: parent.width
     property real screenHeight: parent.height
@@ -162,7 +162,7 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(74/255, 44/255, 109/255, 0.4) } // Theme Purple
+                        GradientStop { position: 0.0; color: Qt.rgba(48/255, 25/255, 52/255, 0.4) } // Theme Purple
                         GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.6) }
                     }
                 }

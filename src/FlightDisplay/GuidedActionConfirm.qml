@@ -22,10 +22,10 @@ Rectangle {
     width:      ScreenTools.defaultFontPixelWidth * 35
     height:     mainLayout.height + (_margins * 2)
     radius:     20//ScreenTools.defaultFontPixelWidth / 2
-    color:      "#1b1c3e"//qgcPal.window
+    color:      "white"
     visible:    _utmspEnabled === true ? utmspSliderTrigger: false
     border.width: 2//width * 0.05
-    border.color: "#005BBB"
+    border.color: "#301934"
 
     property var    guidedController
     property var    guidedValueSlider
@@ -125,7 +125,7 @@ Rectangle {
             wrapMode:               Text.WordWrap
             font.pointSize:         ScreenTools.defaultFontPointSize
             font.bold:              true
-            color:"white"
+            color:"black"
         }
 
         QGCCheckBox {
@@ -149,7 +149,7 @@ Rectangle {
                             height: 100
                             radius: 50
                             color: "white"
-                            border.color: "#6a6af8"
+                            border.color: "#301934"
                             border.width: 2
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.verticalCenter
@@ -162,6 +162,7 @@ Rectangle {
                                     wrapMode:               Text.WordWrap
                                     font.pointSize:         ScreenTools.defaultFontPointSize
                                     font.bold:              true
+                                    color: "black"
                                     text:       qsTr("Press here")
                                 }
 
@@ -192,7 +193,7 @@ Rectangle {
                                     ctx.beginPath()
                                     ctx.arc(width / 2, height / 2, 35, -Math.PI / 2, (2 * Math.PI * progressState.value) - Math.PI / 2, false)
                                     ctx.lineWidth = 6
-                                    ctx.strokeStyle = "#2323f2"
+                                    ctx.strokeStyle = "#301934"
                                     ctx.stroke()
                                 }
                             }
@@ -273,14 +274,14 @@ Rectangle {
                 height: slider.height * 0.75
                 width:  height
                 radius: height / 2
-                color:  qgcPal.primaryButton
+                color:  "#301934"
 
                 QGCColoredImage {
                     anchors.margins:    parent.height / 4
                     anchors.fill:       parent
                     source:             "/res/XDelete.svg"
                     fillMode:           Image.PreserveAspectFit
-                    color:              qgcPal.text
+                    color:              "white"
                 }
 
                 QGCMouseArea {

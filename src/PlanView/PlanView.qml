@@ -217,7 +217,7 @@ Item {
             width: baseSize
             height: baseSize
             radius: width / 2
-            color: "#4a2c6d"
+            color: "#301934"
             border.color: "#8e6abb"
             border.width: 1
             opacity: 0.95
@@ -245,7 +245,7 @@ Item {
             width:  baseSize
             height: baseSize
             radius: width / 2
-            color:  "#4a2c6d"
+            color:  "#301934"
             border.color: "#8e6abb"
             border.width: 1
             opacity: 0.95
@@ -305,7 +305,7 @@ Item {
                 QGCLabel {
                     Layout.fillWidth:       true
                     wrapMode:               QGCLabel.WordWrap
-                    color:                  "white"
+                    color:                  "black"
                     font.family:            "Outfit"
                     font.pointSize:         ScreenTools.defaultFontPointSize
                     horizontalAlignment:    Text.AlignHCenter
@@ -319,7 +319,7 @@ Item {
                     Layout.fillWidth:   true
                     height:             dp(8)
                     radius:             12
-                    color:              discMA.pressed ? "#1a1b2e" : (discMA.containsMouse ? "#2d2e4a" : Qt.rgba(255,255,255,0.05))
+                    color:              discMA.pressed ? "white" : (discMA.containsMouse ? "#2d2e4a" : Qt.rgba(255,255,255,0.05))
                     border.color:       Qt.rgba(255,255,255,0.15)
                     border.width:       1
 
@@ -333,7 +333,7 @@ Item {
                                                  qsTr("Discard Unsaved Changes") :
                                                  qsTr("Discard Unsaved Changes, Load New Plan From Vehicle")) :
                                             qsTr("Load New Plan From Vehicle")
-                        color:          "white"
+                        color:          "black"
                         font.bold:      true
                         font.family:    "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize
@@ -356,7 +356,7 @@ Item {
                     Layout.fillWidth:   true
                     height:             dp(8)
                     radius:             12
-                    color:              keepMA.pressed ? Qt.darker("#4a2c6d", 1.2) : (keepMA.containsMouse ? Qt.lighter("#4a2c6d", 1.1) : "#4a2c6d")
+                    color:              keepMA.pressed ? Qt.darker("#301934", 1.2) : (keepMA.containsMouse ? Qt.lighter("#301934", 1.1) : "#301934")
                     
                     Text {
                         anchors.centerIn: parent
@@ -1027,7 +1027,7 @@ Item {
                 background: Rectangle {
                     color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
                     radius: 12
-                    border.color: "#4a2c6d"
+                    border.color: "#301934"
                     border.width: 2
                 }
                 Column {
@@ -1049,7 +1049,7 @@ Item {
                         width: 120
                         height: 40
                         background: Rectangle {
-                            color: "#4a2c6d"
+                            color: "#301934"
                             radius: 20
                             border.color: "#8e6abb"
                             border.width: 1
@@ -1266,8 +1266,9 @@ Item {
             property real targetY: parent.height - height - 20
             y: targetY
             
-            modal: true
-            dim: true
+            modal: false
+            dim: false
+            closePolicy: Popup.NoAutoClose
             parent: Overlay.overlay
             
             property int currentIndex: -1
@@ -1412,8 +1413,9 @@ Item {
             property real targetY: parent.height - height - 20
             y: targetY
             
-            modal: true
-            dim: true
+            modal: false
+            dim: false
+            closePolicy: Popup.NoAutoClose
             parent: Overlay.overlay
             visible: _editingLayer == _layerGeoFence
             onClosed: { 
@@ -1522,7 +1524,7 @@ Item {
 
         //         background: Rectangle {
         //             radius: width / 2
-        //             color: "#1b1c3e"
+        //             color: "#301934"
         //             border.color: "#005BBB"
         //             border.width: 2
         //             anchors.fill: parent
@@ -1563,7 +1565,7 @@ Item {
 
         //         background: Rectangle {
         //             radius: width / 2
-        //             color: "#1b1c3e"
+        //             color: "#301934"
         //             border.color: "#005BBB"
         //             border.width: 2
         //             anchors.fill: parent
@@ -1611,7 +1613,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#4a2c6d"
+                        color: "#301934"
                         border.color: "#8e6abb"
                         border.width: 1
                         anchors.fill: parent
@@ -1654,7 +1656,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "#4a2c6d"
+                        color: "#301934"
                         border.color: "#8e6abb"
                         border.width: 1
                         anchors.fill: parent
@@ -1700,7 +1702,7 @@ Item {
                 width: baseSize
                 height: baseSize
                 radius: width / 2
-                color: "#4a2c6d"
+                color: "#301934"
                 border.width: 1
                 border.color: "#8e6abb"
                 clip: true
@@ -1746,7 +1748,7 @@ Item {
                     anchors.fill: parent
                     radius: 12
                     color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
-                    border.color: "#4a2c6d"
+                    border.color: "#301934"
                     border.width: 2
 
                     Column {
@@ -1775,7 +1777,7 @@ Item {
                                 height: 40
                                 background: Rectangle {
                                     radius: 20
-                                    color: "#4a2c6d"
+                                    color: "#301934"
                                     border.color: "#8e6abb"
                                     border.width: 1
                                 }
@@ -2227,7 +2229,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 12
-                    color: "#4a2c6d"
+                    color: "#301934"
                     border.color: "#8a6cad"
                     border.width: 1
 
@@ -2336,9 +2338,9 @@ Item {
             id:         layerTabBar
             width:      parent.width
             height:     42
-            color:      "#2d1c42"
+            color:      "#301934"
             radius:     10
-            border.color: "#4a2c6d"
+            border.color: "#301934"
             border.width: 1
             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
@@ -2352,7 +2354,7 @@ Item {
                 height: layerTabBar.height - 6
                 y: 3
                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                color: "#4a2c6d"
+                color: "#301934"
                 radius: 10
                 border.color: "#8a6cad"
                 border.width: 1

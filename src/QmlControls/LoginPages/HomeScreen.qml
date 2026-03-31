@@ -26,7 +26,7 @@ Item {
     property var    _pipOrWindowItem
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
     property color secondary_color: "#7c4dff"
     property color accent_color: "#f97316" // The Orange accent
 
@@ -1092,7 +1092,7 @@ Item {
                     text: qsTr("Choose how you want to connect to your drone from the options below.")
                     font.family: "Outfit"
                     font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
-                    color: "#DDDDDD"
+                    color: "black"
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     Layout.fillWidth: true
@@ -1108,8 +1108,8 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: visible ? 56 : 0
                         radius: 8
-                        color: typeMouseArea.containsMouse ? "#2A2A2A" : "#1A1A1A"
-                        border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#333333"
+                        color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
+                        border.color: typeMouseArea.containsMouse ? "#301934" : "#E2E8F0"
                         border.width: 1
 
                         Behavior on color { ColorAnimation { duration: 150 } }
@@ -1127,8 +1127,8 @@ Item {
                                 height: 34
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? "#4a2c6d" : "#2D2D2D"
-                                border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#444444"
+                                color: typeMouseArea.containsMouse ? "#301934" : "#F1F5F9"
+                                border.color: typeMouseArea.containsMouse ? "#301934" : "#DDE1EA"
                                 border.width: 1
 
                                 Text {
@@ -1136,7 +1136,7 @@ Item {
                                     font.family: "Outfit"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 1.1
                                     font.bold: true
-                                    color: "white"
+                                    color: typeMouseArea.containsMouse ? "white" : "black"
                                     text: (index + 1)
                                 }
                             }
@@ -1149,7 +1149,7 @@ Item {
                                 font.family: "Outfit"
                                 font.pointSize: ScreenTools.defaultFontPointSize * 1.1
                                 font.bold: true
-                                color: "white"
+                                color: "black"
                                 elide: Text.ElideRight
                             }
 
@@ -1243,7 +1243,7 @@ Item {
                         text: qsTr("Connection Name") 
                         font.bold: true
                         font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "#DDDDDD" // Unified dark theme text
+                        color: "black"
                     }
 
                     TextField {
@@ -1253,14 +1253,14 @@ Item {
                         placeholderText:  qsTr("e.g. My Custom Drone Connection")
                         
                         font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "white"
+                        color: "black"
                         leftPadding: 16
                         rightPadding: 16
                         
                         background: Rectangle {
                             radius: 8
-                            color: "#1A1A1A"
-                            border.color: nameField.activeFocus ? "#4a2c6d" : "#333333"
+                            color: "#FFFFFF"
+                            border.color: nameField.activeFocus ? "#301934" : "#DDE1EA"
                             border.width: nameField.activeFocus ? 2 : 1
                             implicitHeight: 44
                             Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -1272,7 +1272,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     height: 1
-                    color: "#333333"
+                    color: "#E0E0E0"
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
                 }
 

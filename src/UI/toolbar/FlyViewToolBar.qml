@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#4a2c6d"//"#A6ADFF"//qgcPal.toolbarBackground
+    color:  "#301934"//"#A6ADFF"//qgcPal.toolbarBackground
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
@@ -633,7 +633,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         height:         ScreenTools.toolbarHeight//_root.height * 0.05
         width:          _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
-        color:          "#4a2c6d"//qgcPal.colorGreen
+        color:          "#301934"//qgcPal.colorGreen
         visible:        !largeProgressBar.visible
     }
 
@@ -641,7 +641,7 @@ Rectangle {
     Rectangle {
         id:             largeProgressBar
         anchors.fill:   parent
-        color:          "#0F0F12" // Deep dark professional background
+        color:          "#FFFFFF" // High-contrast White Background
         visible:        _showLargeProgress
         z:              100
 
@@ -657,7 +657,7 @@ Rectangle {
             gradient: Gradient {
                 orientation: Gradient.Horizontal
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.5; color: "#4a2c6d" }
+                GradientStop { position: 0.5; color: "#301934" }
                 GradientStop { position: 1.0; color: "transparent" }
             }
         }
@@ -669,7 +669,7 @@ Rectangle {
             // Status Text
             Text {
                 text: qsTr("SYNCHRONIZING SYSTEM PARAMETERS")
-                color: "white"
+                color: "#000000"
                 font.pointSize: ScreenTools.smallFontPointSize
                 font.bold: true
                 font.letterSpacing: 2
@@ -679,7 +679,7 @@ Rectangle {
             // Percentage
             Text {
                 text: Math.round(largeProgressBar.progress * 100) + "%"
-                color: "#4a2c6d"
+                color: "#301934"
                 font.pointSize: ScreenTools.smallFontPointSize
                 font.bold: true
                 Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 5
@@ -692,7 +692,7 @@ Rectangle {
             anchors.left:   parent.left
             height:         3
             width:          parent.width * largeProgressBar.progress
-            color:          "#4a2c6d"
+            color:          "#301934"
             
             // Add a glowing effect to the tip
             Rectangle {
@@ -703,7 +703,7 @@ Rectangle {
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
                     GradientStop { position: 0.0; color: "transparent" }
-                    GradientStop { position: 1.0; color: "#ffffff" }
+                    GradientStop { position: 1.0; color: "#FFFFFF" }
                 }
             }
 
@@ -721,7 +721,7 @@ Rectangle {
             gradient: Gradient {
                 orientation: Gradient.Horizontal
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.5; color: "#4a2c6d" }
+                GradientStop { position: 0.5; color: "#301934" }
                 GradientStop { position: 1.0; color: "transparent" }
             }
 

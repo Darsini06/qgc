@@ -36,7 +36,7 @@ QGCPopupDialog {
         implicitWidth:  dp(28)
         implicitHeight: dp(7)
         radius:         8
-        color:          acceptButtonAlias.pressed ? Qt.darker("#4a2c6d", 1.2) : (acceptButtonAlias.hovered ? Qt.lighter("#4a2c6d", 1.1) : "#4a2c6d")
+        color:          acceptButtonAlias.pressed ? Qt.darker("#301934", 1.2) : (acceptButtonAlias.hovered ? Qt.lighter("#301934", 1.1) : "#301934")
         opacity:        acceptButtonAlias.enabled ? 1.0 : 0.5
     }
 
@@ -55,14 +55,14 @@ QGCPopupDialog {
         implicitWidth:  dp(22)
         implicitHeight: dp(7)
         radius:         8
-        color:          rejectButtonAlias.pressed ? "#1a1b2e" : (rejectButtonAlias.hovered ? "#2d2e4a" : "transparent")
-        border.color:   Qt.rgba(255, 255, 255, 0.15)
+        color:          rejectButtonAlias.pressed ? "white" : (rejectButtonAlias.hovered ? "#f5f5f5" : "transparent")
+        border.color:   Qt.rgba(0, 0, 0, 0.15)
         border.width:   1
     }
 
     rejectButtonAlias.contentItem: Text {
         text:               rejectButtonAlias.text
-        color:              "white"
+        color:              "black"
         font.bold:          true
         font.pointSize:     ScreenTools.defaultFontPointSize
         font.family:        "Outfit"
@@ -80,9 +80,9 @@ QGCPopupDialog {
 
 
     // Mission Theme Palette
-    property color app_color:       "#4a2c6d"
-    property color secondary_color: "#4a2c6d"
-    property color accent_color:    "#4a2c6d"
+    property color app_color:       "#301934"
+    property color secondary_color: "#301934"
+    property color accent_color:    "#301934"
     property color cardBgColor:     Qt.rgba(20/255, 20/255, 30/255, 0.85)
     property color borderColor:     Qt.rgba(255, 255, 255, 0.15)
 
@@ -112,7 +112,7 @@ QGCPopupDialog {
 
             Label {
                 text:               qsTr("Coordinate system")
-                color:              "white"
+                color:              "black"
                 font.pointSize:     ScreenTools.smallFontPointSize
                 font.bold:          true
                 Layout.alignment:   Qt.AlignLeft
@@ -131,7 +131,7 @@ QGCPopupDialog {
                 contentItem: Text {
                     leftPadding:    12
                     text:           parent.currentText
-                    color:          "white"
+                    color:          "black"
                     verticalAlignment: Text.AlignVCenter
                     font.family:    "Outfit"
                     font.bold:      true
@@ -152,7 +152,7 @@ QGCPopupDialog {
                     
                     contentItem: Text {
                         text:                   modelData
-                        color:                  "white"
+                        color:                  coordinateSystemCombo.currentIndex === index ? "white" : "black"
                         font.family:            "Outfit"
                         font.pointSize:         ScreenTools.defaultFontPointSize
                         verticalAlignment:      Text.AlignVCenter
@@ -179,7 +179,7 @@ QGCPopupDialog {
                     }
 
                     background: Rectangle {
-                        color:          "#1a1b2e" // Deep dark charcoal
+                        color:          "white" // Deep dark charcoal
                         border.color:   borderColor
                         border.width:   1
                         radius:         12
@@ -207,14 +207,14 @@ QGCPopupDialog {
                 spacing: dp(1)
                 Label {
                     text: qsTr("latitude")
-                    color: "white"
+                    color: "black"
                     font.pointSize: ScreenTools.smallFontPointSize * 0.9
                     font.bold: true
                 }
                 FactTextField {
                     fact: controller.latitude
                     Layout.fillWidth: true
-                    textColor: "white"
+                    textColor: "black"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
                     background: Rectangle {
@@ -233,14 +233,14 @@ QGCPopupDialog {
                 spacing: dp(1)
                 Label {
                     text: qsTr("longitude")
-                    color: "white"
+                    color: "black"
                     font.pointSize: ScreenTools.smallFontPointSize * 0.9
                     font.bold: true
                 }
                 FactTextField {
                     fact: controller.longitude
                     Layout.fillWidth: true
-                    textColor: "white"
+                    textColor: "black"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
                     background: Rectangle {
@@ -264,12 +264,12 @@ QGCPopupDialog {
 
             ColumnLayout {
                 spacing: dp(1)
-                Label { text: qsTr("Zone"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                Label { text: qsTr("Zone"); color: "black"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.zone
                     Layout.maximumWidth:  dp(16)
                     Layout.fillWidth:     true
-                    textColor: "white"
+                    textColor: "black"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
                     background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
@@ -277,7 +277,7 @@ QGCPopupDialog {
             }
             ColumnLayout {
                 spacing: dp(1)
-                Label { text: qsTr("Hemisphere"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                Label { text: qsTr("Hemisphere"); color: "black"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactComboBox {
                     id:                 hemisphereCombo
                     fact:               controller.hemisphere
@@ -290,7 +290,7 @@ QGCPopupDialog {
                     contentItem: Text {
                         leftPadding:    12
                         text:           hemisphereCombo.currentText
-                        color:          "white"
+                        color:          "black"
                         verticalAlignment: Text.AlignVCenter
                         font.family:    "Outfit"
                         font.bold:      true
@@ -309,7 +309,7 @@ QGCPopupDialog {
                         height: dp(6)
                         contentItem: Text {
                             text:                   modelData
-                            color:                  "white"
+                            color:                  hemisphereCombo.currentIndex === index ? "white" : "black"
                             font.family:            "Outfit"
                             verticalAlignment:      Text.AlignVCenter
                             leftPadding:            12
@@ -331,7 +331,7 @@ QGCPopupDialog {
                             model:          hemisphereCombo.delegateModel
                         }
                         background: Rectangle {
-                            color:          "#1a1b2e"
+                            color:          "white"
                             border.color:   borderColor
                             border.width:   1
                             radius:         12
@@ -341,12 +341,12 @@ QGCPopupDialog {
             }
             ColumnLayout {
                 spacing: dp(1)
-                Label { text: qsTr("Easting"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                Label { text: qsTr("Easting"); color: "black"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.easting
                     Layout.maximumWidth: dp(18)
                     Layout.fillWidth: true
-                    textColor: "white"
+                    textColor: "black"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
                     background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
@@ -354,12 +354,12 @@ QGCPopupDialog {
             }
             ColumnLayout {
                 spacing: dp(1)
-                Label { text: qsTr("Northing"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+                Label { text: qsTr("Northing"); color: "black"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
                 FactTextField {
                     fact: controller.northing
                     Layout.maximumWidth: dp(18)
                     Layout.fillWidth: true
-                    textColor: "white"
+                    textColor: "black"
                     horizontalAlignment: Text.AlignHCenter
                     font.family: "Outfit"
                     background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
@@ -373,11 +373,11 @@ QGCPopupDialog {
             spacing:            dp(1)
             visible:            _showMGRS
 
-            Label { text: qsTr("MGRS"); color: "white"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
+            Label { text: qsTr("MGRS"); color: "black"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; font.family: "Outfit" }
             FactTextField {
                 fact: controller.mgrs
                 Layout.fillWidth: true
-                textColor: "white"
+                textColor: "black"
                 horizontalAlignment: Text.AlignHCenter
                 font.family: "Outfit"
                 background: Rectangle { implicitHeight: dp(6); color: Qt.rgba(255,255,255,0.08); radius: 8; border.color: parent.activeFocus ? secondary_color : borderColor; border.width: 1 }
@@ -393,7 +393,7 @@ QGCPopupDialog {
             QGCLabel {
                 Layout.fillWidth:   true
                 text:               qsTr("Set the position to the current location of the active vehicle.")
-                color:              "white"
+                color:              "black"
                 wrapMode:           Text.WordWrap
                 font.family:        "Outfit"
                 horizontalAlignment: Text.AlignHCenter
@@ -419,7 +419,7 @@ QGCPopupDialog {
                     }
                     QGCLabel { 
                         text: globals.activeVehicle ? globals.activeVehicle.coordinate.toString() : qsTr("No active vehicle")
-                        color: "white"
+                        color: "black"
                         font.family: "Outfit"
                         anchors.horizontalCenter: parent.horizontalCenter
                     }

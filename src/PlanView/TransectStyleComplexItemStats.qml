@@ -19,7 +19,7 @@ GridLayout {
 
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"
-    readonly property color _colorAccent:        "#4a2c6d"
+    readonly property color _colorAccent:        "#301934"
 
     // Label column
     QGCLabel { text: qsTr("Survey Area");     color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }

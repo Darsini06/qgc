@@ -9,10 +9,10 @@ Rectangle {
     implicitWidth:  ScreenTools.implicitButtonWidth
     implicitHeight: 40 // Tighter row height
     
-    color:          mouseArea.containsMouse ? Qt.rgba(255, 255, 255, 0.05) : "transparent"
-    border.color:   Qt.rgba(255, 255, 255, 0.1)
-    border.width:   0
-    radius:         4
+    color:          mouseArea.containsMouse ? "#F1F5F9" : "transparent"
+    border.color:   "#DDE1EA"
+    border.width:   highlight ? 2 : 0
+    radius:         8
     
     property alias  text:       label.text
     property bool   highlight:  false
@@ -33,7 +33,7 @@ Rectangle {
         anchors.bottom:         parent.bottom
         verticalAlignment:      Text.AlignVCenter
         horizontalAlignment:    Text.AlignLeft  // Table-like left alignment
-        color:                  "white"
+        color:                  "black"
         font.pixelSize:         16
         font.bold:              true
         elide:                  Text.ElideRight

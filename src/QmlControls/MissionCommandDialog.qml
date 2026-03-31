@@ -34,6 +34,7 @@ QGCPopupDialog {
 
             QGCLabel {
                 text: qsTr("Category:")
+                color: "#FFFFFF"
             }
 
             QGCComboBox {
@@ -62,10 +63,10 @@ QGCPopupDialog {
             delegate: Rectangle {
                 width:  parent.width
                 height: commandColumn.height + ScreenTools.defaultFontPixelHeight
-                color:  QGroundControl.globalPalette.button
+                color:  "#1A1A1A"
 
                 property var    mavCmdInfo: modelData
-                property color  textColor:  QGroundControl.globalPalette.buttonText
+                property color  textColor:  "#FFFFFF"
 
                 Column {
                     id:                 commandColumn

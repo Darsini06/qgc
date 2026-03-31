@@ -72,7 +72,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"white"//"#1b1c3e"
+        color: "white"//"white"//"#301934"
         //border.width: width * 0.05
         //border.color: "white"//"white"//"#005BBB"
         clip: true
@@ -113,7 +113,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#1b1c3e"    // Dark blue background
+        color: "white"//"#301934"    // Dark blue background
         border.width: width * 0.05
         border.color: "white"//"#005BBB"
         clip: true          // This ensures content stays within the circular bounds
@@ -140,7 +140,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#1b1c3e"    // Dark blue background
+        color: "white"//"#301934"    // Dark blue background
         border.width: width * 0.05
         border.color: "white"//"#005BBB"
         clip: true          // This ensures content stays within the circular bounds
@@ -176,9 +176,9 @@ Row {
             margins: 0
             
             background: Rectangle {
-                color: "#2C2C2C" // Deep Dark Grey
+                color: "#FFFFFF" // Pure White
                 radius: 12
-                border.color: "#3D3D3D"
+                border.color: "#301934"
                 border.width: 1
 
                 // Subtle compact shadow
@@ -206,7 +206,7 @@ Row {
                         text: qsTr("Map type")
                         font.pixelSize: ScreenTools.defaultFontPointSize * 0.8
                         font.bold: true
-                        color: "#FFFFFF"
+                        color: "#000000"
                     }
                     
                     Rectangle {
@@ -226,7 +226,7 @@ Row {
                                 width: parent.width
                                 height: 1.2
                                 radius: 1
-                                color: "#FFFFFF"
+                                color: "#000000"
                                 rotation: 45
                                 antialiasing: true
                             }
@@ -235,7 +235,7 @@ Row {
                                 width: parent.width
                                 height: 1.2
                                 radius: 1
-                                color: "#FFFFFF"
+                                color: "#000000"
                                 rotation: -45
                                 antialiasing: true
                             }
@@ -270,8 +270,8 @@ Row {
                             width: parent.width
                             height: width
                             radius: 8
-                            color: "#3D3D3D"
-                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#444444"
+                            color: "#F8F9FA"
+                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#DDE1EA"
                             border.width: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? 2 : 1
                             clip: true
                             
@@ -297,7 +297,7 @@ Row {
                             width: parent.width
                             text: label
                             horizontalAlignment: Text.AlignHCenter
-                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#999999"
+                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#1E1E2E"
                             font.pixelSize: ScreenTools.defaultFontPointSize * 0.65
                             font.bold: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase())
                             elide: Text.ElideRight
@@ -336,7 +336,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"#1b1c3e"
+        color: "white"//"#301934"
         border.width: width * 0.05
         border.color: "white"//"#005BBB"
 
@@ -362,7 +362,7 @@ Row {
             width: baseSize * 2
             height: baseSize * 1
             radius: width * 0.1
-            color: "white"//"#1b1c3e"
+            color: "white"//"#301934"
             border.color: "white"//"#005BBB"
             border.width: width * 0.02
             visible: false

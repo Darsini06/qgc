@@ -257,7 +257,7 @@ Item {
 
     //     background: Rectangle {
     //         radius: width / 2
-    //         color: "#1b1c3e"
+    //         color: "#301934"
     //         border.color: "#005BBB"
     //         border.width: 2
     //     }
@@ -277,6 +277,15 @@ Item {
     // }
 
 
+    Component {
+        id: editPositionDialog
+
+        EditPositionDialog {
+            coordinate:             _missionItem.isSurveyItem ? _missionItem.centerCoordinate : _missionItem.coordinate
+            onCoordinateChanged:    _missionItem.isSurveyItem ? _missionItem.centerCoordinate = coordinate : _missionItem.coordinate = coordinate
+        }
+    }
+
     Item {
         anchors.top: parent.top
         anchors.left: parent.left
@@ -292,7 +301,7 @@ Item {
 
             background: Rectangle {
                 radius: width / 2
-                color: "white"//"#1b1c3e"
+                color: "white"//"#301934"
                 //border.color: "#005BBB"
                 //border.width: 2
             }
@@ -310,8 +319,9 @@ Item {
             }
 
             onClicked: {
-                console.log("Edit clicked")
-                if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+                console.log("Edit clicked - Opening EditPositionDialog")
+                _missionItem.masterController.missionController.setCurrentPlanViewSeqNum(_missionItem.sequenceNumber, false)
+                editPositionDialog.createObject(mainWindow).open()
             }
         }
     }

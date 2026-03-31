@@ -18,7 +18,7 @@ MenuItem {
         font.family:        "Outfit"
         font.pointSize:     11
         font.bold:          true
-        color:              menuItem.highlighted ? "white" : "#D0D0D0"
+        color:              menuItem.highlighted ? "white" : "black"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment:   Text.AlignVCenter
         elide:              Text.ElideRight
@@ -27,7 +27,7 @@ MenuItem {
     background: Rectangle {
         implicitWidth:  ScreenTools.defaultFontPixelWidth * 12
         implicitHeight: 40
-        color:          menuItem.highlighted ? "#4A2C6D" : "transparent"
+        color:          menuItem.highlighted ? "#301934" : "transparent"
         radius:         6
     }
 }

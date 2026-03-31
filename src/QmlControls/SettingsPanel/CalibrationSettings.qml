@@ -566,7 +566,7 @@ SetupPage {
                                 return mouseArea.containsPress ? qgcPal.buttonHighlight : qgcPal.button;
                             }
                             radius: 8
-                            border.color: qgcPal.buttonText
+                            border.color: "black"
                             border.width: 1
 
                             Column {
@@ -813,7 +813,7 @@ SetupPage {
                             horizontalAlignment: Text.AlignHCenter
                             width: parent.width
                             font.pointSize: ScreenTools.defaultFontPointSize
-                            color: "black"
+                            color:              "black"
                             visible : !controller.showOrientationCalArea
                         }
 
@@ -857,6 +857,7 @@ SetupPage {
                                             wrapMode: Text.WordWrap
                                             font.pointSize: ScreenTools.defaultFontPointSize
                                             text: controller.orientationCalAreaHelpText || qsTr("Rotate the vehicle to the shown positions")
+                                            color:              "black"
                                         }
 
                                         QGCButton {
@@ -1102,7 +1103,7 @@ SetupPage {
                             horizontalAlignment: Text.AlignHCenter
                             width: parent.width
                             font.pointSize: ScreenTools.defaultFontPointSize
-                            color: "black"
+                            color:              "black"
                         }
 
                         // Image
@@ -1111,7 +1112,7 @@ SetupPage {
                             width: parent.width * 0.25
                             height: width
                             anchors.horizontalCenter: parent.horizontalCenter
-                            color: "black"
+                            color:              "#301934"
                         }
                     }
                 }
@@ -1228,6 +1229,7 @@ SetupPage {
                                             qsTr("- Yellow indicates a questionable compass or calibration.\n") +
                                             qsTr("- Red indicates a compass which should not be used.\n\n") +
                                             qsTr("YOU MUST REBOOT YOUR VEHICLE AFTER EACH CALIBRATION.")
+                            color:          "black"
                         }
 
                         QGCButton {
@@ -1257,6 +1259,7 @@ SetupPage {
                             anchors.right:  parent.right
                             wrapMode:       Text.WordWrap
                             text:           qsTr("YOU MUST REBOOT YOUR VEHICLE AFTER EACH CALIBRATION.")
+                            color:          "black"
                         }
 
                         QGCButton {
@@ -1281,9 +1284,11 @@ SetupPage {
 
                     QGCLabel {
                         text: compassLabel(index)
+                        color: "black"
                     }
                     APMSensorIdDecoder {
                         fact: sensorParams.rgCompassId[index]
+                        color: "black"
                     }
 
                     Column {
@@ -1424,6 +1429,7 @@ SetupPage {
                             width:      parent.width
                             wrapMode:   Text.WordWrap
                             text:       calType === _calTypeAccel ? simpleAccelText : _orientationDialogHelp
+                            color:      "black"
                         }
 
                         QGCColoredImage {
@@ -1439,7 +1445,7 @@ SetupPage {
 
                             visible: calType !== _calTypeAccel
 
-                            QGCLabel { text: qsTr("Autopilot Rotation:") }
+                            QGCLabel { text: qsTr("Autopilot Rotation:"); color: "black" }
 
                             FactComboBox {
                                 width:      rotationColumnWidth
@@ -1456,6 +1462,7 @@ SetupPage {
                                 width:      parent.width
                                 wrapMode:   Text.WordWrap
                                 text: qsTr("Simple accelerometer calibration is less precise but allows calibrating without rotating the vehicle. Check this if you have a large/heavy vehicle.")
+                                color:      "white"
                             }
 
                             QGCCheckBox {
@@ -1475,6 +1482,7 @@ SetupPage {
                             width:      parent.width
                             visible:    globals.activeVehicle.sub && _orientationsDialogShowCompass
                             text:       qsTr("Magnetic Declination")
+                            color:      "white"
                         }
 
                         Column {
@@ -1514,6 +1522,7 @@ SetupPage {
                                         qsTr("suitable for vehicles where the field is close to spherical. It is ") +
                                         qsTr("useful for large vehicles where moving the vehicle to calibrate it ") +
                                         qsTr("is difficult. Point the vehicle North before using it.")
+                            color:      "white"
                         }
 
                         Column {
@@ -1535,6 +1544,7 @@ SetupPage {
                                 visible:    northCalibrationCheckBox.checked && !globals.activeVehicle.coordinate.isValid
                                 wrapMode:   Text.WordWrap
                                 text:       qsTr("Vehicle has no Valid positon, please provide it")
+                                color:      "white"
                             }
 
                             QGCCheckBox {
@@ -1555,22 +1565,35 @@ SetupPage {
                                 visible:    useMapPositionCheckbox.checked
                                 wrapMode:   Text.WordWrap
                                 text:       qsTr(`Lat: ${_mapPosition.latitude.toFixed(4)} Lon: ${_mapPosition.longitude.toFixed(4)}`)
+                                color:      "white"
                             }
 
                             FactTextField {
                                 id:         northCalLat
                                 visible:    !useGcsPositionCheckbox.checked && !useMapPositionCheckbox.checked && northCalibrationCheckBox.checked
                                 text:       "0.00"
-                                textColor:  isNaN(parseFloat(text)) ? qgcPal.warningText: qgcPal.textFieldText
+                                color:      "white"
                                 enabled:    !useGcsPositionCheckbox.checked
+                                background: Rectangle {
+                                    color:  "#1A1A1A"
+                                    radius: 8
+                                    border.color: "#301934"
+                                    border.width: 1
+                                }
                             }
 
                             FactTextField {
                                 id:         northCalLon
                                 visible:    !useGcsPositionCheckbox.checked && !useMapPositionCheckbox.checked && northCalibrationCheckBox.checked
                                 text:       "0.00"
-                                textColor:  isNaN(parseFloat(text)) ? qgcPal.warningText: qgcPal.textFieldText
+                                color:      "white"
                                 enabled:    !useGcsPositionCheckbox.checked
+                                background: Rectangle {
+                                    color:  "#1A1A1A"
+                                    radius: 8
+                                    border.color: "#301934"
+                                    border.width: 1
+                                }
                             }
 
                         }

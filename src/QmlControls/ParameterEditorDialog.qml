@@ -174,6 +174,7 @@ QGCPopupDialog {
             wrapMode:           Text.WordWrap
             visible:            !longDescriptionLabel.visible
             text:               fact.shortDescription
+            color:              "black"
         }
 
         QGCLabel {
@@ -182,6 +183,7 @@ QGCPopupDialog {
             wrapMode:           Text.WordWrap
             visible:            fact.longDescription != ""
             text:               fact.longDescription
+            color:              "black"
         }
 
         Row {
@@ -191,32 +193,38 @@ QGCPopupDialog {
                 id:         minValueDisplay
                 text:       qsTr("Min: ") + fact.minString
                 visible:    !fact.minIsDefaultForType
+                color:      "black"
             }
 
             QGCLabel {
                 text:       qsTr("Max: ") + fact.maxString
                 visible:    !fact.maxIsDefaultForType
+                color:      "black"
             }
 
             QGCLabel {
                 text:       qsTr("Default: ") + fact.defaultValueString
                 visible:    _allowDefaultReset
+                color:      "black"
             }
         }
 
         QGCLabel {
             text:       qsTr("Parameter name: ") + fact.name
             visible:    fact.componentId > 0 // > 0 means it's a parameter fact
+            color:      "black"
         }
 
         QGCLabel {
             visible:    fact.vehicleRebootRequired
             text:       qsTr("Vehicle reboot required after change")
+            color:      "black"
         }
 
         QGCLabel {
             visible:    fact.qgcRebootRequired
             text:       qsTr("Application restart required after change")
+            color:      "black"
         }
 
         QGCLabel {
@@ -225,6 +233,7 @@ QGCPopupDialog {
             text:       qsTr("Warning: Modifying values while vehicle is in flight can lead to vehicle instability and possible vehicle loss. ") +
                         qsTr("Make sure you know what you are doing and double-check your values before Save!")
             visible:    fact.componentId != -1
+            color:      "black"
         }
 
         QGCCheckBox {

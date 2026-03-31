@@ -17,8 +17,8 @@ Rectangle {
     id:             _root
     height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
     gradient: Gradient {
-        GradientStop { position: 0.0; color: _currentItem ? "#5a3c7d" : "#2d1c42" }
-        GradientStop { position: 1.0; color: _currentItem ? "#4a2c6d" : "#1e1230" }
+        GradientStop { position: 0.0; color: _currentItem ? "#301934" : "#301934" }
+        GradientStop { position: 1.0; color: _currentItem ? "#301934" : "#1e1230" }
     }
     radius:         12
     opacity:        _currentItem ? 1.0 : 0.75

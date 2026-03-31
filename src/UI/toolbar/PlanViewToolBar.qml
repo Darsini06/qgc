@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#4a2c6d"//qgcPal.toolbarBackground
+    color:  "#301934"//qgcPal.toolbarBackground
 
     property var    planMasterController
 
@@ -194,7 +194,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#4a2c6d"
+        color:          "#301934"
         width:50
 
 
@@ -224,7 +224,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color:          "#4a2c6d"//qgcPal.window
+        color:          "#301934"//qgcPal.window
         visible:        _showLargeProgress
 
         property bool _userHide:                false
@@ -254,7 +254,7 @@ Rectangle {
             height: progressBackground.height
             width: _controllerProgressPct * parent.width
             radius: 6
-            color: "#4a2c6d"
+            color: "#301934"
         }
 
         QGCLabel {

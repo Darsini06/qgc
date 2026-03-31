@@ -31,7 +31,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#4a2c6d"
+    property color  _colorAccent:   "#301934"
 
     property var    _masterControler:               masterController
     property var    _missionController:             _masterControler.missionController

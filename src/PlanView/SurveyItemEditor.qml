@@ -26,7 +26,7 @@ TransectStyleComplexItemEditor {
     readonly property color _colorBgSecondary:   "#282830"
     readonly property color _colorBgTertiary:    "#32323b"
     readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#4a2c6d"
+    readonly property color _colorAccent:        "#301934"
     readonly property color _colorAccentLight:   "#6d3da0"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"

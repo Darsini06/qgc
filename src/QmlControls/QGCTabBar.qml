@@ -8,7 +8,7 @@ import QGroundControl.ScreenTools
 
 TabBar {
     background: Rectangle {
-        color: "#1b1c3e"//qgcPal.window
+        color: "#301934"//qgcPal.window
         radius: 20
     }
 }

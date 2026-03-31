@@ -22,7 +22,7 @@ Rectangle {
         height: tabBar.height - 8
         y: 4
         x: 4 + (tabBar.currentIndex * width)
-        color: "#4a2c6d"
+        color: "#301934"
         radius: 7
         border.color: "#6d3da0"
         border.width: 1

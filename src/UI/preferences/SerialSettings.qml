@@ -28,16 +28,16 @@ ColumnLayout {
         rowSpacing:     _rowSpacing
         columnSpacing:  _colSpacing
 
-        QGCLabel { text: qsTr("Serial Port"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Serial Port"); color: "black" }
         QGCComboBox {
             id:                     commPortCombo
             Layout.preferredWidth:  _secondColumnWidth
             enabled:                QGroundControl.linkManager.serialPorts.length > 0
 
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: commPortCombo.activeFocus || commPortCombo.pressed ? "#4a2c6d" : "#333333"
+                border.color: commPortCombo.activeFocus || commPortCombo.pressed ? "#301934" : "#DDE1EA"
                 border.width: commPortCombo.activeFocus || commPortCombo.pressed ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -45,7 +45,7 @@ ColumnLayout {
             contentItem: Text {
                 text: commPortCombo.currentText
                 font: commPortCombo.font
-                color: "white"
+                color: "black"
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 16
             }
@@ -57,7 +57,7 @@ ColumnLayout {
                 height:                 ScreenTools.defaultFontPixelWidth
                 width:                  height
                 source:                 "/qmlimages/arrow-down.png"
-                color:                  "white"
+                color:                  "black"
             }
 
             popup: Popup {
@@ -72,10 +72,10 @@ ColumnLayout {
                     currentIndex: commPortCombo.highlightedIndex
                 }
                 background: Rectangle {
-                    color: "#2A2A2A"
-                    border.color: "#444444"
+                    color: "#FFFFFF"
+                    border.color: "#301934"
                     border.width: 1
-                    radius: 4
+                    radius: 8
                 }
             }
 
@@ -83,13 +83,13 @@ ColumnLayout {
                 width: commPortCombo.width
                 contentItem: Text {
                     text: modelData
-                    color: "white"
+                    color: (parent.highlighted || (index === commPortCombo.currentIndex)) ? "white" : "black"
                     font: commPortCombo.font
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 12
                 }
                 background: Rectangle {
-                    color: parent.highlighted ? "#4a2c6d" : "#2A2A2A"
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
                 }
             }
 
@@ -129,16 +129,16 @@ ColumnLayout {
             }
         }
 
-        QGCLabel { text: qsTr("Baud Rate"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Baud Rate"); color: "black" }
         QGCComboBox {
             id:                     baudCombo
             Layout.preferredWidth:  _secondColumnWidth
             model:                  QGroundControl.linkManager.serialBaudRates
 
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: baudCombo.activeFocus || baudCombo.pressed ? "#4a2c6d" : "#333333"
+                border.color: baudCombo.activeFocus || baudCombo.pressed ? "#301934" : "#DDE1EA"
                 border.width: baudCombo.activeFocus || baudCombo.pressed ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -146,7 +146,7 @@ ColumnLayout {
             contentItem: Text {
                 text: baudCombo.currentText
                 font: baudCombo.font
-                color: "white"
+                color: "black"
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 16
             }
@@ -158,7 +158,7 @@ ColumnLayout {
                 height:                 ScreenTools.defaultFontPixelWidth
                 width:                  height
                 source:                 "/qmlimages/arrow-down.png"
-                color:                  "white"
+                color:                  "black"
             }
 
             popup: Popup {
@@ -173,10 +173,10 @@ ColumnLayout {
                     currentIndex: baudCombo.highlightedIndex
                 }
                 background: Rectangle {
-                    color: "#2A2A2A"
-                    border.color: "#444444"
+                    color: "#FFFFFF"
+                    border.color: "#301934"
                     border.width: 1
-                    radius: 4
+                    radius: 8
                 }
             }
 
@@ -184,13 +184,13 @@ ColumnLayout {
                 width: baudCombo.width
                 contentItem: Text {
                     text: modelData
-                    color: "white"
+                    color: (parent.highlighted || (index === baudCombo.currentIndex)) ? "white" : "black"
                     font: baudCombo.font
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 12
                 }
                 background: Rectangle {
-                    color: parent.highlighted ? "#4a2c6d" : "#2A2A2A"
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
                 }
             }
 
@@ -218,7 +218,7 @@ ColumnLayout {
     QGCCheckBox {
         id:         advancedSettings
         text:       qsTr("Advanced Settings")
-        textColor:  "white"
+        textColor:  "black"
         checked:    false
     }
 
@@ -231,12 +231,12 @@ ColumnLayout {
         QGCCheckBox {
             Layout.columnSpan:  2
             text:               qsTr("Enable Flow Control")
-            textColor:          "white"
+            textColor:          "black"
             checked:            subEditConfig.flowControl !== 0
             onCheckedChanged:   subEditConfig.flowControl = checked ? 1 : 0
         }
 
-        QGCLabel { text: qsTr("Parity"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Parity"); color: "black" }
 
         QGCComboBox {
             id:                     parityCombo
@@ -244,9 +244,9 @@ ColumnLayout {
             model:                  [qsTr("None"), qsTr("Even"), qsTr("Odd")]
 
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: parityCombo.activeFocus ? "#4a2c6d" : "#333333"
+                border.color: parityCombo.activeFocus ? "#301934" : "#DDE1EA"
                 border.width: parityCombo.activeFocus ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -254,7 +254,7 @@ ColumnLayout {
             contentItem: Text {
                 text: parityCombo.currentText
                 font: parityCombo.font
-                color: "white"
+                color: "black"
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 16
             }
@@ -266,7 +266,7 @@ ColumnLayout {
                 height:                 ScreenTools.defaultFontPixelWidth
                 width:                  height
                 source:                 "/qmlimages/arrow-down.png"
-                color:                  "white"
+                color:                  "black"
             }
 
             popup: Popup {
@@ -281,10 +281,10 @@ ColumnLayout {
                     currentIndex: parityCombo.highlightedIndex
                 }
                 background: Rectangle {
-                    color: "#2A2A2A"
-                    border.color: "#444444"
+                    color: "#FFFFFF"
+                    border.color: "#301934"
                     border.width: 1
-                    radius: 4
+                    radius: 8
                 }
             }
 
@@ -292,13 +292,13 @@ ColumnLayout {
                 width: parityCombo.width
                 contentItem: Text {
                     text: modelData
-                    color: "white"
+                    color: (parent.highlighted || (index === parityCombo.currentIndex)) ? "white" : "black"
                     font: parityCombo.font
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 12
                 }
                 background: Rectangle {
-                    color: parent.highlighted ? "#4a2c6d" : "#2A2A2A"
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
                 }
             }
 
@@ -335,7 +335,7 @@ ColumnLayout {
             }
         }
 
-        QGCLabel { text: qsTr("Data Bits"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Data Bits"); color: "black" }
 
         QGCComboBox {
             id:                     dataBitsCombo
@@ -343,9 +343,9 @@ ColumnLayout {
             model:                  [ "5", "6", "7", "8" ]
 
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: dataBitsCombo.activeFocus ? "#4a2c6d" : "#333333"
+                border.color: dataBitsCombo.activeFocus ? "#301934" : "#DDE1EA"
                 border.width: dataBitsCombo.activeFocus ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -353,7 +353,7 @@ ColumnLayout {
             contentItem: Text {
                 text: dataBitsCombo.currentText
                 font: dataBitsCombo.font
-                color: "white"
+                color: "black"
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 16
             }
@@ -365,7 +365,7 @@ ColumnLayout {
                 height:                 ScreenTools.defaultFontPixelWidth
                 width:                  height
                 source:                 "/qmlimages/arrow-down.png"
-                color:                  "white"
+                color:                  "black"
             }
 
             popup: Popup {
@@ -380,10 +380,10 @@ ColumnLayout {
                     currentIndex: dataBitsCombo.highlightedIndex
                 }
                 background: Rectangle {
-                    color: "#2A2A2A"
-                    border.color: "#444444"
+                    color: "#FFFFFF"
+                    border.color: "#301934"
                     border.width: 1
-                    radius: 4
+                    radius: 8
                 }
             }
 
@@ -391,20 +391,20 @@ ColumnLayout {
                 width: dataBitsCombo.width
                 contentItem: Text {
                     text: modelData
-                    color: "white"
+                    color: (parent.highlighted || (index === dataBitsCombo.currentIndex)) ? "white" : "black"
                     font: dataBitsCombo.font
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 12
                 }
                 background: Rectangle {
-                    color: parent.highlighted ? "#4a2c6d" : "#2A2A2A"
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
                 }
             }
             currentIndex:           Math.max(Math.min(subEditConfig.dataBits - 5, 3), 0)
             onActivated: (index) => { subEditConfig.dataBits = index + 5 }
         }
 
-        QGCLabel { text: qsTr("Stop Bits"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Stop Bits"); color: "black" }
 
         QGCComboBox {
             id:                     stopBitsCombo
@@ -412,9 +412,9 @@ ColumnLayout {
             model:                  [ "1", "2" ]
 
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: stopBitsCombo.activeFocus ? "#4a2c6d" : "#333333"
+                border.color: stopBitsCombo.activeFocus ? "#301934" : "#DDE1EA"
                 border.width: stopBitsCombo.activeFocus ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -422,7 +422,7 @@ ColumnLayout {
             contentItem: Text {
                 text: stopBitsCombo.currentText
                 font: stopBitsCombo.font
-                color: "white"
+                color: "black"
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 16
             }
@@ -434,7 +434,7 @@ ColumnLayout {
                 height:                 ScreenTools.defaultFontPixelWidth
                 width:                  height
                 source:                 "/qmlimages/arrow-down.png"
-                color:                  "white"
+                color:                  "black"
             }
 
             popup: Popup {
@@ -449,10 +449,10 @@ ColumnLayout {
                     currentIndex: stopBitsCombo.highlightedIndex
                 }
                 background: Rectangle {
-                    color: "#2A2A2A"
-                    border.color: "#444444"
+                    color: "#FFFFFF"
+                    border.color: "#301934"
                     border.width: 1
-                    radius: 4
+                    radius: 8
                 }
             }
 
@@ -460,13 +460,13 @@ ColumnLayout {
                 width: stopBitsCombo.width
                 contentItem: Text {
                     text: modelData
-                    color: "white"
+                    color: (parent.highlighted || (index === stopBitsCombo.currentIndex)) ? "white" : "black"
                     font: stopBitsCombo.font
                     verticalAlignment: Text.AlignVCenter
                     leftPadding: 12
                 }
                 background: Rectangle {
-                    color: parent.highlighted ? "#4a2c6d" : "#2A2A2A"
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
                 }
             }
             currentIndex:           Math.max(Math.min(subEditConfig.stopBits - 1, 1), 0)

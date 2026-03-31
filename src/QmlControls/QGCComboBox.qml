@@ -88,13 +88,16 @@ T.ComboBox {
         contentItem: Text {
             text:                   _text
             font:                   control.font
-            color:                  control.currentIndex === index ? qgcPal.buttonHighlightText : qgcPal.buttonText
+            color:                  control.currentIndex === index ? "white" : (highlighted ? "white" : "black")
             verticalAlignment:      Text.AlignVCenter
+            horizontalAlignment:    Text.AlignHCenter
         }
 
         background: Rectangle {
-            color:                  control.currentIndex === index ? "#1b1c3e" : qgcPal.button
-            radius: 20
+            color:                  control.currentIndex === index ? "#301934" : (highlighted ? "#301934" : "white")
+            radius: 8
+            border.color:           control.currentIndex === index ? "#301934" : "#E2E8F0"
+            border.width:           1
         }
 
         highlighted:                control.highlightedIndex === index
@@ -107,24 +110,24 @@ T.ComboBox {
         height:                 ScreenTools.defaultFontPixelWidth
         width:                  height
         source:                 "/qmlimages/arrow-down.png"
-        color:                  qgcPal.buttonText
+        color:                  "black"
     }
 
     // The label of the button
     contentItem: QGCLabel {
         id:                         text
         anchors.verticalCenter:     parent.verticalCenter
-        anchors.horizontalCenter:   centeredLabel ? parent.horizontalCenter : undefined
+        horizontalAlignment:        Text.AlignHCenter
         text:                       control.alternateText === "" ? control.currentText : control.alternateText
         font:                       control.font
-        color:                      qgcPal.buttonText
+        color:                      "black"
     }
 
     background: Rectangle {
-        color:          qgcPal.button
-        border.color:   "#1a237e"//qgcPal.buttonBorder
-        border.width:   _showBorder ? 1 : 0
-        radius:         20//ScreenTools.buttonBorderRadius
+        color:          "white"
+        border.color:   "#301934"
+        border.width:   1
+        radius:         8
     }
 
     popup: T.Popup {
@@ -142,21 +145,14 @@ T.ComboBox {
             currentIndex:           control.highlightedIndex
             highlightMoveDuration:  0
 
-            Rectangle {
-                z:              10
-                width:          parent.width
-                height:         parent.height
-                color:          "transparent"
-                border.color:   qgcPal.text
-                radius: 20
-            }
-
             T.ScrollIndicator.vertical: ScrollIndicator { }
         }
 
         background: Rectangle {
-            color: qgcPal.window
-            radius: 20
+            color: "white"
+            radius: 8
+            border.color: "#301934"
+            border.width: 1
         }
     }
 }

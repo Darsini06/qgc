@@ -23,7 +23,7 @@ ColumnLayout  {
     spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
     property var _linkManager: QGroundControl.linkManager
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
 
@@ -83,13 +83,13 @@ ColumnLayout  {
             height:           36
             radius:           18
             color:            addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
-            border.color:     "#4a2c6d"
+            border.color:     "#301934"
             border.width:     1
 
             Text {
                 anchors.centerIn: parent
                 text:             qsTr("+ Add New Link")
-                color:            "#4a2c6d"
+                color:            "#301934"
                 font.bold:        true
                 font.pixelSize:   14
             }
@@ -118,7 +118,7 @@ ColumnLayout  {
                 implicitHeight:   mainRowWrapper.implicitHeight + 30
                 color:            object.link ? "#F4FDF8" : "#FFFFFF"
                 radius:           10
-                border.color:     object.link ? "#4a2c6d" : "#E2E8F0"
+                border.color:     object.link ? "#301934" : "#E2E8F0"
                 border.width:     object.link ? 2 : 1
 
                 RowLayout {
@@ -134,7 +134,7 @@ ColumnLayout  {
                         width:  12
                         height: 12
                         radius: 6
-                        color:  object.link ? "#4a2c6d" : "#9E9E9E"
+                        color:  object.link ? "#301934" : "#9E9E9E"
                         Layout.alignment: Qt.AlignVCenter
                     }
 
@@ -155,7 +155,7 @@ ColumnLayout  {
 
                         Text {
                             text:             object.link ? qsTr("Connected") : qsTr("Disconnected")
-                            color:            object.link ? "#4a2c6d" : "#7F8C8D"
+                            color:            object.link ? "#301934" : "#7F8C8D"
                             font.pointSize: ScreenTools.smallFontPointSize
                         }
                     }
@@ -206,7 +206,7 @@ ColumnLayout  {
                             width:            100
                             height:           36
                             radius:           18
-                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#5B2C6F" : "#4A2C6D")
+                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#301934" : "#301934")
                             border.color:     object.link ? "#E74C3C" : "transparent"
                             border.width:     1
 
@@ -305,8 +305,8 @@ ColumnLayout  {
                         Layout.fillWidth: true
                         Layout.preferredHeight: visible ? (ScreenTools.isMobile ? 46 : 56) : 0
                         radius: 8
-                        color: typeMouseArea.containsMouse ? "#2A2A2A" : "#1A1A1A"
-                        border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#333333"
+                        color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
+                        border.color: typeMouseArea.containsMouse ? "#301934" : "#E2E8F0"
                         border.width: 1
 
                         Behavior on color { ColorAnimation { duration: 150 } }
@@ -324,8 +324,8 @@ ColumnLayout  {
                                 height: width
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? "#4a2c6d" : "#2D2D2D"
-                                border.color: typeMouseArea.containsMouse ? "#6a4c8d" : "#444444"
+                                color: typeMouseArea.containsMouse ? "#301934" : "#F1F5F9"
+                                border.color: typeMouseArea.containsMouse ? "#301934" : "#DDE1EA"
                                 border.width: 1
 
                                 Text {
@@ -333,7 +333,7 @@ ColumnLayout  {
                                     font.family: "Outfit"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 1.1
                                     font.bold: true
-                                    color: "white"
+                                    color: typeMouseArea.containsMouse ? "white" : "black"
                                     text: (index + 1)
                                 }
                             }
@@ -346,7 +346,7 @@ ColumnLayout  {
                                 font.family: "Outfit"
                                 font.pointSize: ScreenTools.defaultFontPointSize * 1.1
                                 font.bold: true
-                                color: "white"
+                                color: "black"
                                 elide: Text.ElideRight
                             }
 
@@ -463,7 +463,7 @@ ColumnLayout  {
 
                     QGCLabel { 
                         text: qsTr("Name")
-                        color: "#DDDDDD"
+                        color: "black"
                         Layout.preferredWidth: linkSettingsLoader._firstColumnWidth
                     }
 
@@ -472,13 +472,13 @@ ColumnLayout  {
                         Layout.preferredWidth: linkSettingsLoader._secondColumnWidth
                         text:             linkConfigDialog.editingConfig.devName
                         placeholderText:  qsTr("Enter name")
-                        textColor:        "white"
+                        textColor:        "black"
                         leftPadding:      16
                         rightPadding:     16
                         background: Rectangle {
-                            color: "#1A1A1A"
+                            color: "#FFFFFF"
                             radius: 8
-                            border.color: nameField.activeFocus ? "#4a2c6d" : "#333333"
+                            border.color: nameField.activeFocus ? "#301934" : "#DDE1EA"
                             border.width: nameField.activeFocus ? 2 : 1
                             implicitHeight: 44
                             Behavior on border.color { ColorAnimation { duration: 200 } }

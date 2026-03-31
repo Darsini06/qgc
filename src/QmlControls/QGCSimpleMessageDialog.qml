@@ -36,7 +36,7 @@ QGCPopupDialog {
             Layout.bottomMargin:    ScreenTools.defaultFontPixelHeight * 0.5
             wrapMode:               Text.WordWrap
             horizontalAlignment:    Text.AlignLeft
-            color:                  "white"
+            color:                  "black"
         }
     }
 }

@@ -35,7 +35,7 @@ ColumnLayout {
             anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Refresh")
-            color: !subEditConfig.scanning ? "#E0E0E0" : "gray"
+            color: !subEditConfig.scanning ? "black" : "gray"
             font.pixelSize: 13
             font.bold: true
             font.family: "Outfit"
@@ -72,7 +72,7 @@ ColumnLayout {
 
             Text {
                 text: qsTr("Scanning for devices...")
-                color: "white"
+                color: "black"
                 font.pixelSize: 13
                 font.family: "Outfit"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -83,7 +83,7 @@ ColumnLayout {
         Text {
             anchors.centerIn: parent
             text: qsTr("No Bluetooth devices found\nClick 'Refresh' to scan again")
-            color: "#AAAAAA"
+            color: "#666666"
             font.pixelSize: 13
             font.family: "Outfit"
             horizontalAlignment: Text.AlignHCenter
@@ -114,7 +114,7 @@ ColumnLayout {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: isSelected ? "#4a2c6d" : (mouseArea.containsMouse ? "#2D2D2D" : "transparent")
+                        color: isSelected ? "#301934" : (mouseArea.containsMouse ? "#F1F5F9" : "transparent")
                         
                         // Bottom Separator Line
                         Rectangle {
@@ -122,7 +122,7 @@ ColumnLayout {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: 1
-                            color: "#333333"
+                            color: "#DDE1EA"
                         }
 
                         // Selection Bar Indicator
@@ -131,7 +131,7 @@ ColumnLayout {
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             width: 3
-                            color: isSelected ? "white" : "transparent"
+                            color: isSelected ? "#FFFFFF" : "transparent"
                         }
 
                         RowLayout {
@@ -143,7 +143,7 @@ ColumnLayout {
                             Text {
                                 text: modelData
                                 Layout.fillWidth: true
-                                color: "white"
+                                color: isSelected ? "white" : "black"
                                 font.pixelSize: 14
                                 font.bold: true
                                 font.family: "Outfit"
@@ -156,7 +156,7 @@ ColumnLayout {
                                 width: 8
                                 height: 8
                                 radius: 4
-                                color: "white"
+                                color: "#FFFFFF"
                                 visible: isSelected
                                 Layout.alignment: Qt.AlignVCenter
                                 

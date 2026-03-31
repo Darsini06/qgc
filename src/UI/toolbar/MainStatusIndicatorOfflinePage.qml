@@ -53,7 +53,7 @@ ToolIndicatorPage {
                     text:                   qsTr("Select Link to Connect")
                     font.bold:              true
                     font.pointSize:         11
-                    color:                  "#FFFFFF"
+                    color:                  "#000000"
                     font.family:            "Outfit"
                 }
 
@@ -63,8 +63,8 @@ ToolIndicatorPage {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width:                  parent.width * 0.95
                     height:                 1
-                    color:                  "#33FFFFFF"
-                    opacity:                0.2
+                    color:                  "#DDE1EA"
+                    opacity:                1.0
                 }
 
                 // Refined "+" Button
@@ -77,11 +77,11 @@ ToolIndicatorPage {
                     radius:                 width / 2
                     
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: ma.containsMouse ? "#444444" : "#333333" }
-                        GradientStop { position: 1.0; color: ma.containsMouse ? "#333333" : "#222222" }
+                        GradientStop { position: 0.0; color: ma.containsMouse ? "#FFFFFF" : "#F8F9FA" }
+                        GradientStop { position: 1.0; color: ma.containsMouse ? "#F1F5F9" : "#E2E8F0" }
                     }
                     
-                    border.color:           ma.containsMouse ? "#FFFFFF" : "#444444"
+                    border.color:           ma.containsMouse ? "#301934" : "#DDE1EA"
                     border.width:           1
                     
                     QGCLabel {
@@ -89,7 +89,7 @@ ToolIndicatorPage {
                         text:               "+"
                         font.bold:          true
                         font.pointSize:     14
-                        color:              "white"
+                        color:              ma.containsMouse ? "#301934" : "black"
                         anchors.verticalCenterOffset: -1 // Visual alignment
                     }
                     
@@ -127,12 +127,12 @@ ToolIndicatorPage {
                         height: 42
                         radius: 6
                         border.width:   1
-                        border.color:   object.link ? "#6a4c8d" : (mouseArea.containsMouse ? "#444444" : "#2D2D2D")
+                        border.color:   object.link ? "#301934" : (mouseArea.containsMouse ? "#301934" : "#E2E8F0")
                         
                         gradient: Gradient {
                             orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: object.link ? "#4a2c6d" : (mouseArea.containsMouse ? "#333333" : "#1A1A1A") }
-                            GradientStop { position: 1.0; color: object.link ? "#301d4a" : (mouseArea.containsMouse ? "#222222" : "#161616") }
+                            GradientStop { position: 0.0; color: object.link ? "#301934" : (mouseArea.containsMouse ? "#F1F5F9" : "#FFFFFF") }
+                            GradientStop { position: 1.0; color: object.link ? "#301d4a" : (mouseArea.containsMouse ? "#E2E8F0" : "#F8F9FA") }
                         }
                         
                         visible: !object.dynamic
@@ -157,7 +157,7 @@ ToolIndicatorPage {
                             QGCLabel {
                                 Layout.fillWidth: true
                                 text:           object.name
-                                color:          "white"
+                                color:          object.link ? "white" : "black"
                                 font.bold:      true
                                 font.pointSize: 10
                                 font.family:    "Outfit"
@@ -223,9 +223,9 @@ ToolIndicatorPage {
             Rectangle {
                 Layout.fillWidth: true
                 height:         120
-                color:          "#161616"
+                color:          "#F8F9FA"
                 radius:         10
-                border.color:   "#2D2D2D"
+                border.color:   "#DDE1EA"
                 
                 ColumnLayout {
                     anchors.fill: parent
@@ -234,20 +234,20 @@ ToolIndicatorPage {
                     
                     QGCLabel {
                         text: qsTr("Auto-Connect Configuration")
-                        color: "white"
+                        color: "black"
                         font.bold: true
                         font.family: "Outfit"
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Pixhawk USB"); color: "#999999"; Layout.fillWidth: true }
+                        QGCLabel { text: qsTr("Pixhawk USB"); color: "#1E1E2E"; Layout.fillWidth: true }
                         FactCheckBoxSlider { fact: autoConnectSettings.autoConnectPixhawk }
                     }
                     
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("UDP Network"); color: "#999999"; Layout.fillWidth: true }
+                        QGCLabel { text: qsTr("UDP Network"); color: "#1E1E2E"; Layout.fillWidth: true }
                         FactCheckBoxSlider { fact: autoConnectSettings.autoConnectUDP }
                     }
                 }

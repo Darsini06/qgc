@@ -48,7 +48,7 @@ ColumnLayout {
             font.pointSize:     ScreenTools.smallFontPointSize
             visible:            headingDescription !== ""
             font.bold:      true
-            color: "#4a2c6d"
+            color: "#301934"
         }
     }
 
@@ -81,7 +81,7 @@ ColumnLayout {
             shadowBlur: 1.0
             shadowHorizontalOffset: 0
             shadowVerticalOffset: -10      // TOP
-            shadowColor: "#4a2c6d"
+            shadowColor: "#301934"
         }
         MultiEffect {
             anchors.fill: shadowSource
@@ -91,7 +91,7 @@ ColumnLayout {
             shadowBlur: 1.2
             shadowHorizontalOffset: 0
             shadowVerticalOffset: 15       // BOTTOM
-            shadowColor: "#4a2c6d"
+            shadowColor: "#301934"
         }
 
 

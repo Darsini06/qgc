@@ -294,7 +294,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     RowLayout {
                         anchors.fill: parent
@@ -580,7 +580,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     QGCColoredImage {
                         id: backArrow
@@ -859,7 +859,7 @@ Item {
                                                 height: 15
                                                 radius: 10
                                                 border.width: 2
-                                                border.color: app_color//"#1b1c3e"
+                                                border.color: app_color//"#301934"
                                                 color: rpcCompletedStatus === 1 ? app_color : "transparent"
 
                                                 MouseArea {
@@ -891,7 +891,7 @@ Item {
                                                 height: 15
                                                 radius: 10
                                                 border.width: 2
-                                                border.color: app_color//"#1b1c3e"
+                                                border.color: app_color//"#301934"
                                                 color: rpcCompletedStatus === 0 ? app_color : "transparent"
 
                                                 MouseArea {
@@ -989,7 +989,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     // Back arrow (left center)
                     QGCColoredImage {
@@ -1111,7 +1111,7 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: Screen.height * 0.15
-                        color: app_color//"#1b1c3e"
+                        color: app_color//"#301934"
 
                         RowLayout {
                             anchors.fill: parent
@@ -1223,7 +1223,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     // Back Arrow (Left Center)
                     QGCColoredImage {
@@ -1500,7 +1500,7 @@ Item {
                     id: header
                     width: parent.width
                     height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     QGCColoredImage {
                         source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
@@ -1717,7 +1717,7 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: parent.height * 0.15
-                    color: app_color//"#1b1c3e"
+                    color: app_color//"#301934"
 
                     QGCColoredImage {
                         source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"

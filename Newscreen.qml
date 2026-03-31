@@ -655,7 +655,7 @@ Item {
             //     }
 
             //     background: Rectangle {
-            //         color: "#1b1c3e" // Blue color (iOS-style button)
+            //         color: "#301934" // Blue color (iOS-style button)
             //         radius: 20 // Curved button
             //         border.color: "#005BBB" // Border color
             //         border.width: 2

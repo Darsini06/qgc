@@ -35,7 +35,7 @@ ColumnLayout {
     RowLayout {
         spacing: _colSpacing
 
-        QGCLabel { text: qsTr("Port"); color: "#DDDDDD" }
+        QGCLabel { text: qsTr("Port"); color: "black" }
         QGCTextField {
             id:                     portField
             text:                   subEditConfig.localPort.toString()
@@ -43,13 +43,13 @@ ColumnLayout {
             Layout.preferredWidth:  _secondColumnWidth
             inputMethodHints:       Qt.ImhFormattedNumbersOnly
             onTextChanged:          subEditConfig.localPort = parseInt(portField.text)
-            textColor:              "white"
+            textColor:              "black"
             leftPadding:            16
             rightPadding:           16
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: portField.activeFocus ? "#4a2c6d" : "#333333"
+                border.color: portField.activeFocus ? "#301934" : "#DDE1EA"
                 border.width: portField.activeFocus ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -57,7 +57,7 @@ ColumnLayout {
         }
     }
 
-    QGCLabel { text: qsTr("Server Addresses (optional)"); color: "#DDDDDD" }
+    QGCLabel { text: qsTr("Server Addresses (optional)"); color: "black" }
 
     Repeater {
         model: subEditConfig.hostList
@@ -68,7 +68,7 @@ ColumnLayout {
             QGCLabel {
                 Layout.preferredWidth:  _secondColumnWidth
                 text:                   modelData
-                color:                  "white"
+                color:                  "black"
             }
 
             QGCButton {
@@ -102,13 +102,13 @@ ColumnLayout {
             id:                     hostField
             Layout.preferredWidth:  _secondColumnWidth
             placeholderText:        qsTr("Example: 127.0.0.1:14550")
-            textColor:              "white"
+            textColor:              "black"
             leftPadding:            16
             rightPadding:           16
             background: Rectangle {
-                color: "#1A1A1A"
+                color: "#FFFFFF"
                 radius: 8
-                border.color: hostField.activeFocus ? "#4a2c6d" : "#333333"
+                border.color: hostField.activeFocus ? "#301934" : "#DDE1EA"
                 border.width: hostField.activeFocus ? 2 : 1
                 implicitHeight: 44
                 Behavior on border.color { ColorAnimation { duration: 200 } }
@@ -135,7 +135,7 @@ ColumnLayout {
                 implicitHeight: 44
                 implicitWidth: 120
                 radius: 8
-                color: addServerBtn.enabled ? (addServerBtn.pressed ? "#3a1c5d" : (addServerBtn.hovered ? "#5a3c7d" : "#4a2c6d")) : "#333333"
+                color: addServerBtn.enabled ? (addServerBtn.pressed ? "#301934" : (addServerBtn.hovered ? "#301934" : "#301934")) : "#333333"
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
         }
