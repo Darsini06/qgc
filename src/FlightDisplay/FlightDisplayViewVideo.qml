@@ -64,26 +64,26 @@ Item {
                 Item {
                     width: 30 * adaptiveScale; height: 30 * adaptiveScale
                     anchors.top: parent.top; anchors.left: parent.left; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#301934"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#301934"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
                     width: 30 * adaptiveScale; height: 30 * adaptiveScale
                     anchors.top: parent.top; anchors.right: parent.right; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#301934"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#301934"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
                 }
                 Item {
                     width: 30 * adaptiveScale; height: 30 * adaptiveScale
                     anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#301934"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#301934"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
                     width: 30 * adaptiveScale; height: 30 * adaptiveScale
                     anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "#301934"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "#301934"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
                 }
 
                 Column {
@@ -102,7 +102,7 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             color: "transparent"
-                            border.color: "#301934"
+                            border.color: "white"
                             border.width: Math.max(1, 2 * adaptiveScale)
                             radius: width / 2
                             opacity: 0.4
@@ -116,7 +116,7 @@ Item {
                                 model: 3
                                 Rectangle {
                                     width: Math.max(3, parent.parent.width * 0.12)
-                                    height: width; radius: width / 2; color: "#301934"
+                                    height: width; radius: width / 2; color: "white"
                                     
                                     SequentialAnimation on opacity {
                                         loops: Animation.Infinite
@@ -134,7 +134,7 @@ Item {
                         width:              parent.width
                         text:               QGroundControl.settingsManager.videoSettings.streamEnabled.rawValue ? qsTr("WAITING FOR VIDEO") : qsTr("VIDEO DISABLED")
                         font.bold:          true
-                        color:              "#301934"
+                        color:              "white"
                         font.pointSize:     ScreenTools.defaultFontPointSize * (parent.parent.width < 400 ? 0.8 : 1.5)
                         font.letterSpacing: parent.parent.width < 400 ? 1 : 4
                         horizontalAlignment: Text.AlignHCenter
@@ -145,7 +145,7 @@ Item {
                         width:              parent.width
                         text:               qsTr("ESTABLISHING SECURE CONNECTION...")
                         font.bold:          true
-                        color:              "#301934"
+                        color:              "white"
                         font.pointSize:     ScreenTools.smallFontPointSize * (parent.parent.width < 400 ? 0.6 : 0.9)
                         opacity:            0.7
                         font.letterSpacing: parent.parent.width < 400 ? 0 : 2

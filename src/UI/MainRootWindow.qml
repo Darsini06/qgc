@@ -94,7 +94,7 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: "#301934"
+    property color app_color: "#262626"
 
 
     function dp(value) {
@@ -874,7 +874,7 @@ ApplicationWindow {
             id: tabModel
             ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
             ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "File Safe" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
             ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
@@ -891,7 +891,7 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(2, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(3, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
                     tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
@@ -976,7 +976,7 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
-                                color: sidebarList.currentIndex === index ? Qt.rgba(74, 44, 109, 0.1) : "transparent"
+                                color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
                                 
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
@@ -1125,7 +1125,7 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible: false
             border.width: 0
             border.color:  "transparent"
@@ -1191,7 +1191,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1223,7 +1223,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1291,7 +1291,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1325,7 +1325,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1357,7 +1357,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1392,7 +1392,7 @@ ApplicationWindow {
             width: flightmode1.implicitWidth + 30   // 10px padding left/right
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible: activeVehicle
 
             border.width: 0
@@ -1737,7 +1737,7 @@ ApplicationWindow {
             width: 48
             height: 48
             radius: width / 2
-            color:  Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black toolbars button
+            color:  Qt.rgba(0, 0, 0, 0.40)      // More transparent black toolbars button
             visible: plan === "Plan" 
 
             Text {

@@ -1077,7 +1077,7 @@ Item {
                         Layout.preferredHeight: visible ? 56 : 0
                         radius: 8
                         color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
-                        border.color: typeMouseArea.containsMouse ? "#301934" : "#E2E8F0"
+                        border.color: typeMouseArea.containsMouse ? "#262626" : "#E2E8F0"
                         border.width: 1
 
                         Behavior on color { ColorAnimation { duration: 150 } }
@@ -1095,8 +1095,8 @@ Item {
                                 height: 34
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? "#301934" : "#F1F5F9"
-                                border.color: typeMouseArea.containsMouse ? "#301934" : "#DDE1EA"
+                                color: typeMouseArea.containsMouse ? "#262626" : "#F1F5F9"
+                                border.color: typeMouseArea.containsMouse ? "#262626" : "#DDE1EA"
                                 border.width: 1
 
                                 Text {
@@ -1228,7 +1228,7 @@ Item {
                         background: Rectangle {
                             radius: 8
                             color: "#FFFFFF"
-                            border.color: nameField.activeFocus ? "#301934" : "#DDE1EA"
+                            border.color: nameField.activeFocus ? "#262626" : "#DDE1EA"
                             border.width: nameField.activeFocus ? 2 : 1
                             implicitHeight: 44
                             Behavior on border.color { ColorAnimation { duration: 200 } }

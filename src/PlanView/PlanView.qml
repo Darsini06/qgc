@@ -81,6 +81,8 @@ Item {
     property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
+
+    property real compassBottomY: compassNorth.y + compassNorth.height + 10
     
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
@@ -217,9 +219,9 @@ Item {
             width: baseSize
             height: baseSize
             radius: width / 2
-            color: Qt.rgba(0, 0, 0, 0.75)
-            border.color: "#8e6abb"
-            border.width: 1
+            color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
+            border.color: "transparent"
+            border.width: 0
             opacity: 0.95
             visible: true
 
@@ -245,9 +247,9 @@ Item {
             width:  baseSize
             height: baseSize
             radius: width / 2
-            color:  Qt.rgba(0, 0, 0, 0.75)
-            border.color: "white"
-            border.width: 1
+            color:  Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
+            border.color: "transparent"
+            border.width: 0
             opacity: 0.95
             visible: true
 
@@ -333,7 +335,7 @@ Item {
                                                  qsTr("Discard Unsaved Changes") :
                                                  qsTr("Discard Unsaved Changes, Load New Plan From Vehicle")) :
                                             qsTr("Load New Plan From Vehicle")
-                        color:          Qt.rgba(0, 0, 0, 0.75)
+                        color:          "black"
                         font.bold:      true
                         font.family:    "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize
@@ -596,8 +598,11 @@ Item {
         }
     }
 
-    QGCMapPolygonVisuals{
-        id:filename
+    QGCMapPolygonVisuals {
+        id:                     filename
+        cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
+        cardinalLeftScreenX:    15
+        mapRotation:            MapGlobals.mapRotation
     }
 
     QGCFileDialog {
@@ -643,11 +648,6 @@ Item {
 
     }
 
-    PlanViewToolBar {
-        id:                     planToolBar
-        planMasterController:   _planMasterController
-        z:                      100  // Ensure it overlays the map
-    }
 
     Item {
         id:             panel
@@ -1027,7 +1027,7 @@ Item {
                 background: Rectangle {
                     color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
                     radius: 12
-                    border.color: "#301934"
+                    border.color: "white"  // Light border for dark background
                     border.width: 2
                 }
                 Column {
@@ -1049,10 +1049,10 @@ Item {
                         width: 120
                         height: 40
                         background: Rectangle {
-                            color: "#301934"
+                            color: Qt.rgba(0, 0, 0, 0.60)  // Darker for button action
                             radius: 20
-                            border.color: "#8e6abb"
-                            border.width: 1
+                            border.color: "transparent"
+                            border.width: 0
                         }
                         contentItem: Text {
                             text: parent.text
@@ -1613,9 +1613,9 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: Qt.rgba(0, 0, 0, 0.75)
-                        border.color: "white"
-                        border.width: 1
+                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
+                        border.color: "transparent"
+                        border.width: 0
                         anchors.fill: parent
                     }
 
@@ -1656,9 +1656,9 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: Qt.rgba(0, 0, 0, 0.75)
-                        border.color: "white"
-                        border.width: 1
+                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
+                        border.color: "transparent"
+                        border.width: 0
                         anchors.fill: parent
                     }
 
@@ -1688,49 +1688,6 @@ Item {
             }
         }
 
-
-
-        Item {
-
-            id: compassNorth
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin:  10
-            anchors.leftMargin: 8
-
-            Rectangle {
-                width: baseSize
-                height: baseSize
-                radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.75)
-                border.width: 1
-                border.color: "white"
-                clip: true
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        MapGlobals.mapRotation = 0
-                    }
-                }
-
-                QGCColoredImage {
-                    id: compassArrow
-                    source: "/qmlimages/NewImages/cardinal_point.svg"
-                    anchors.centerIn: parent
-                    width: iconSize
-                    height: iconSize
-                    fillMode: Image.PreserveAspectFit
-                    transform: Rotation {
-                        origin.x: compassArrow.width / 2
-                        origin.y: compassArrow.height / 2
-                        angle: -MapGlobals.mapRotation
-                    }
-                    color : "white"
-                }
-            }
-
-        }
 
 
 
@@ -1777,9 +1734,9 @@ Item {
                                 height: 40
                                 background: Rectangle {
                                     radius: 20
-                                    color: "#301934"
-                                    border.color: "#8e6abb"
-                                    border.width: 1
+                                    color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black dialog button
+                                    border.color: "transparent"
+                                    border.width: 0
                                 }
                                 contentItem: Text {
                                     text: parent.text
@@ -2229,9 +2186,9 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: 12
-                    color: Qt.rgba(0, 0, 0, 0.75)
-                    border.color: "white"
-                    border.width: 1
+                    color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black popup item
+                    border.color: "transparent"
+                    border.width: 0
 
                     Text {
                         anchors.centerIn: parent
@@ -2338,7 +2295,7 @@ Item {
             id:         layerTabBar
             width:      parent.width
             height:     42
-            color:      Qt.rgba(0, 0, 0, 0.75)
+            color:      Qt.rgba(0, 0, 0, 0.40)  // Transparent black tab bar
             radius:     10
             border.color: "transparent"
             border.width: 0
@@ -2354,10 +2311,10 @@ Item {
                 height: layerTabBar.height - 6
                 y: 3
                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                color: Qt.rgba(0, 0, 0, 0.40)
+                color: Qt.rgba(0, 0, 0, 0.40)  // Selected tab indicator transparency
                 radius: 10
-                border.color: "white"
-                border.width: 1
+                border.color: "transparent"
+                border.width: 0
                 Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
             }
 
@@ -2408,5 +2365,11 @@ Item {
                 }
             }
         }
+    }
+    PlanViewToolBar {
+        id:                     planToolBar
+        planMasterController:   _planMasterController
+        z:                      100
+        //plantypes:planType
     }
 }

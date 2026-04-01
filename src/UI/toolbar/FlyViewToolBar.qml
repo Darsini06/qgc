@@ -23,11 +23,11 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  Qt.rgba(0, 0, 0, 0.75)  // Primary transparent background
+    color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black toolbar
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
-    property color  _mainStatusBGColor: Qt.rgba(0, 0, 0, 0.75)  // Matching transparency level
+    property color  _mainStatusBGColor: qgcPal.toolBarColor
 
     function dropMessageIndicatorTool() {
         toolIndicators.dropMessageIndicatorTool();

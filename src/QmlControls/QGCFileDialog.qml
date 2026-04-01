@@ -540,7 +540,7 @@ Item {
             padding:        0
             
             background: Rectangle {
-                radius: 15
+                radius: 20
                 color: "white"
                 border.width: 0
                 clip: true
@@ -554,8 +554,8 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
-                    color: "#301934"
-                    radius: 15
+                    color: "#262626"
+                    radius: 20
                     // Top rounded corners only
                     Rectangle {
                         anchors.bottom: parent.bottom
@@ -619,7 +619,7 @@ Item {
                             background: Rectangle {
                                 radius:         10
                                 color:          "#FFFFFF"
-                                border.color:   nameField.activeFocus ? "#301934" : "#DDE1EA"
+                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
                                 border.width:   nameField.activeFocus ? 2 : 1
                             }
                         }
@@ -713,8 +713,8 @@ Item {
                                 background: Rectangle {
                                     radius:     12
                                     gradient: Gradient {
-                                        GradientStop { position: 0.0; color: "#301934" }
-                                        GradientStop { position: 1.0; color: "#301934" }
+                                        GradientStop { position: 0.0; color: "#262626" }
+                                        GradientStop { position: 1.0; color: "#262626" }
                                     }
                                     border.width: 0
                                     opacity: confirmBtn.pressed ? 0.8 : 1.0

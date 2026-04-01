@@ -255,7 +255,7 @@ Popup {
         width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 50)
         height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
         color: "white" // Deep dark background for Mission Theme
-        radius: 12
+        radius: 20
         border.width: 1
         border.color: Qt.rgba(0, 0, 0, 0.1)
         anchors.centerIn: parent
@@ -268,8 +268,17 @@ Popup {
             Rectangle {
                 Layout.fillWidth: true
                 height: Math.max(titleLable.implicitHeight + 20, 50) // More breathing room
-                color: "#301934" // Vibrant Orange Header as requested
-                radius: 0
+                color: "#262626" // Faded charcoal black as requested
+                radius: 20
+
+                // Mask bottom rounded corners
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 20
+                    color: parent.color
+                }
 
                 Item {
                     anchors.fill: parent
@@ -293,7 +302,7 @@ Popup {
                         width: 28
                         height: 28
                         radius: 0
-                        color: closeBtnMouseArea.containsMouse ? "#301934" : "#301934"
+                        color: closeBtnMouseArea.containsMouse ? "#262626" : "#262626"
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -419,7 +428,7 @@ Popup {
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 8
-                        color: acceptButton.pressed ? "#2d0e3aff" : (acceptButton.hovered ? "#5e35b1" : "#301934")
+                        color: acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
                     }
                     contentItem: Text {
                         text: acceptButton.text

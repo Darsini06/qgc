@@ -287,44 +287,44 @@ Item {
     }
 
     Item {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.leftMargin: 50
-        anchors.topMargin: 10
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.leftMargin: 60
+            anchors.topMargin: 10
 
-        Button {
-            id: editBtn
-            padding: 0
-            visible: MapGlobals.share_edit_visibility
-            implicitWidth: baseSize
-            implicitHeight: baseSize
+            Button {
+                id: editBtn
+                padding: 0
+                visible: MapGlobals.share_edit_visibility
+                implicitWidth: baseSize
+                implicitHeight: baseSize
 
-            background: Rectangle {
-                radius: width / 2
-                color: "white"//"#301934"
-                //border.color: "#005BBB"
-                //border.width: 2
-            }
+                background: Rectangle {
+                    radius: width / 2
+                    color: "white"//"#1b1c3e"
+                    //border.color: "#005BBB"
+                    //border.width: 2
+                }
 
-            contentItem: Item {
-                anchors.fill: parent
+                contentItem: Item {
+                    anchors.fill: parent
 
-                QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                    width: iconSize * 0.5
-                    height: iconSize * 0.5
-                    anchors.centerIn: parent
-                    color: "black"
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                        width: iconSize * 0.5
+                        height: iconSize * 0.5
+                        anchors.centerIn: parent
+                        color: "black"
+                    }
+                }
+
+                onClicked: {
+                    console.log("Edit clicked")
+                    if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                    MapGlobals.share_edit_visibility = false
                 }
             }
-
-            onClicked: {
-                console.log("Edit clicked - Opening EditPositionDialog")
-                _missionItem.masterController.missionController.setCurrentPlanViewSeqNum(_missionItem.sequenceNumber, false)
-                editPositionDialog.createObject(mainWindow).open()
-            }
         }
-    }
-
 }
 

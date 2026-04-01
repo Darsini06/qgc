@@ -16,16 +16,7 @@ import MapGlobals 1.0
 
 Row {
     id: icons_row
-
-    anchors {
-        top: parent.top
-        right: parent.right
-        topMargin: parent.height * 0.05   // adjust vertical position
-        rightMargin: Screen.width * 0.01  // slight right padding
-    }
-
-
-    spacing: parent.width * 0.01    // spacing based on screen width
+    spacing: 12  // standard spacing between icons
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
@@ -72,7 +63,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black circle
+        color: "transparent"  // Fully transparent circle background
         //border.width: width * 0.05
         //border.color: "white"//"white"//"#005BBB"
         clip: true
@@ -113,7 +104,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
         border.width: 0
         border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
@@ -140,7 +131,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
         border.width: 0
         border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
@@ -176,9 +167,9 @@ Row {
             margins: 0
             
             background: Rectangle {
-                color: "#FFFFFF" // Pure White
+                color: Qt.rgba(0, 0, 0, 0.4) // Reduced opacity black transparent
                 radius: 12
-                border.color: "#301934"
+                border.color: Qt.rgba(255, 255, 255, 0.1)
                 border.width: 1
 
                 // Subtle compact shadow
@@ -206,7 +197,7 @@ Row {
                         text: qsTr("Map type")
                         font.pixelSize: ScreenTools.defaultFontPointSize * 0.8
                         font.bold: true
-                        color: "#000000"
+                        color: "white"
                     }
                     
                     Rectangle {
@@ -226,7 +217,7 @@ Row {
                                 width: parent.width
                                 height: 1.2
                                 radius: 1
-                                color: "#000000"
+                                color: "white"
                                 rotation: 45
                                 antialiasing: true
                             }
@@ -235,7 +226,7 @@ Row {
                                 width: parent.width
                                 height: 1.2
                                 radius: 1
-                                color: "#000000"
+                                color: "white"
                                 rotation: -45
                                 antialiasing: true
                             }
@@ -270,8 +261,8 @@ Row {
                             width: parent.width
                             height: width
                             radius: 8
-                            color: "#F8F9FA"
-                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#DDE1EA"
+                            color: "transparent"
+                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : Qt.rgba(255, 255, 255, 0.2)
                             border.width: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? 2 : 1
                             clip: true
                             
@@ -297,7 +288,7 @@ Row {
                             width: parent.width
                             text: label
                             horizontalAlignment: Text.AlignHCenter
-                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "#1E1E2E"
+                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "white"
                             font.pixelSize: ScreenTools.defaultFontPointSize * 0.65
                             font.bold: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase())
                             elide: Text.ElideRight
@@ -336,7 +327,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
         border.width: 0
         border.color: "transparent"
 
@@ -362,7 +353,7 @@ Row {
             width: baseSize * 2
             height: baseSize * 1
             radius: width * 0.1
-            color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+            color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             border.color: "transparent"
             border.width: 0
             visible: false

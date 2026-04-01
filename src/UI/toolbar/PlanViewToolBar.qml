@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  Qt.rgba(0, 0, 0, 0.75)  // Primary transparent background
+    color:  Qt.rgba(0, 0, 0, 0.40)  // Transparent black background
 
     property var    planMasterController
 
@@ -50,7 +50,7 @@ Rectangle {
         anchors.bottom:         parent.bottom
         spacing:                ScreenTools.defaultFontPixelWidth / 2
 
-        QGCToolBarButton {
+        /*QGCToolBarButton {
             id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
             icon.source:            "qrc:/InstrumentValueIcons/home.svg"
@@ -93,7 +93,7 @@ Rectangle {
                                         }
                 }
             }
-        }
+        }*/
 
     }
 
@@ -194,7 +194,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black
+        color:          Qt.rgba(0, 0, 0, 0.40)
         width:50
 
 
@@ -224,7 +224,7 @@ Rectangle {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         parent.height
-        color: Qt.rgba(0, 0, 0, 0.75)  // Darker transparent black//qgcPal.window
+        color:          Qt.rgba(0, 0, 0, 0.40)//qgcPal.window
         visible:        _showLargeProgress
 
         property bool _userHide:                false
@@ -254,7 +254,7 @@ Rectangle {
             height: progressBackground.height
             width: _controllerProgressPct * parent.width
             radius: 6
-            color: "#301934"
+            color: Qt.rgba(0, 0, 0, 0.40)
         }
 
         QGCLabel {
