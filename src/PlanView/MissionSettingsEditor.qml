@@ -17,7 +17,7 @@ Rectangle {
     width:              availableWidth
     height:             valuesColumn.implicitHeight + (_margin * 2)
     implicitHeight:     height
-    color:              "#1e1e24"
+    color:              "transparent"
     visible:            missionItem.isCurrentItem
     radius:             _radius
 
@@ -31,7 +31,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#301934"
+    property color  _colorAccent:   "#471880"
 
     property var    _masterControler:               masterController
     property var    _missionController:             _masterControler.missionController

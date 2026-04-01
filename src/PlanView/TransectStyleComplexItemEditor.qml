@@ -18,7 +18,7 @@ Rectangle {
     id:         _root
     height:     childrenRect.y + childrenRect.height + _margin
     width:      availableWidth
-    color:      "#1e1e24"
+    color:      "transparent"
     radius:     _radius
 
     property bool   transectAreaDefinitionComplete: true
@@ -38,11 +38,11 @@ Rectangle {
     property bool   _presetsAvailable:          _missionItem.presetNames.length !== 0
 
     // --- Theme Colors (matching GeoFence / MissionStart) ---
-    readonly property color _colorBgPrimary:     "#1e1e24"
+    readonly property color _colorBgPrimary:     "transparent"
     readonly property color _colorBgSecondary:   "#282830"
     readonly property color _colorBgTertiary:    "#32323b"
     readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#301934"
+    readonly property color _colorAccent:        "#471880"
     readonly property color _colorAccentLight:   "#6d3da0"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"

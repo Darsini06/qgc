@@ -13,7 +13,7 @@ import QGroundControl.Palette
 Rectangle {
     width:  availableWidth
     height: editorColumn.height + (_margin * 2)
-    color:  "#1e1e24" // Matches Mission Start
+    color:  "transparent"
     radius: _radius
 
     property real   _panelRadius:   8
@@ -26,7 +26,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#301934"
+    property color  _colorAccent:   "#471880"
 
     property bool _specifiesAltitude:       missionItem.specifiesAltitude
     property real _margin:                  ScreenTools.defaultFontPixelHeight / 2

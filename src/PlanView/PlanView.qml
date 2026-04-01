@@ -358,7 +358,7 @@ Item {
                     Layout.fillWidth:   true
                     height:             dp(8)
                     radius:             12
-                    color:              keepMA.pressed ? Qt.darker("#301934", 1.2) : (keepMA.containsMouse ? Qt.lighter("#301934", 1.1) : "#301934")
+                    color:              keepMA.pressed ? Qt.darker("#471880", 1.2) : (keepMA.containsMouse ? Qt.lighter("#471880", 1.1) : "#471880")
                     
                     Text {
                         anchors.centerIn: parent
@@ -1025,7 +1025,7 @@ Item {
                 width: parent.width * 0.4   // 80% of screen width
                 height: parent.height * 0.2 // 50% of screen height
                 background: Rectangle {
-                    color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
+                    color: "#BF000000" // Dark Transparent Black 75% alpha
                     radius: 12
                     border.color: "white"  // Light border for dark background
                     border.width: 2
@@ -1283,7 +1283,7 @@ Item {
             }
 
             background: Rectangle {
-                color:        "#2d2b3c"   // Dark charcoal — exact match to reference image
+                color:        "#BF000000" // Dark Transparent Black 75% alpha
                 radius:       15          // Rounded dialog corners (as shown in image)
                 border.color: "#3a3750"
                 border.width: 1
@@ -1433,7 +1433,7 @@ Item {
             }
 
             background: Rectangle {
-                color:        "#2d2b3c"
+                color:        "#BF000000" // Dark Transparent Black 75% alpha
                 radius:       15
                 border.color: "#3a3750"
                 border.width: 1
@@ -1524,7 +1524,7 @@ Item {
 
         //         background: Rectangle {
         //             radius: width / 2
-        //             color: "#301934"
+        //             color: "#471880"
         //             border.color: "#005BBB"
         //             border.width: 2
         //             anchors.fill: parent
@@ -1565,7 +1565,7 @@ Item {
 
         //         background: Rectangle {
         //             radius: width / 2
-        //             color: "#301934"
+        //             color: "#471880"
         //             border.color: "#005BBB"
         //             border.width: 2
         //             anchors.fill: parent
@@ -1704,8 +1704,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: Qt.rgba(0.05, 0.05, 0.08, 0.95)
-                    border.color: "#301934"
+                    color: "#BF000000" // Dark Transparent Black 75% alpha
+                    border.color: "#471880"
                     border.width: 2
 
                     Column {
