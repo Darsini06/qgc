@@ -69,6 +69,9 @@ public:
     Q_INVOKABLE void shutdown();
     Q_INVOKABLE LogReplayLink *startLogReplay(const QString &logFile);
 
+    //For disconnect written by Dharun
+    Q_INVOKABLE void disconnectLink(LinkConfiguration* config);
+
     QList<SharedLinkInterfacePtr> links() { return _rgLinks; }
     QStringList linkTypeStrings() const;
     bool mavlinkSupportForwardingEnabled() const { return _mavlinkSupportForwardingEnabled; }
@@ -124,6 +127,8 @@ public:
 signals:
     void mavlinkSupportForwardingEnabledChanged();
     void isBluetoothAvailableChanged();
+
+    void communicationError(const QString& title, const QString& error); // add this
 
 private slots:
     void _linkDisconnected();
