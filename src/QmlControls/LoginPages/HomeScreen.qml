@@ -793,7 +793,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START CAMERA")
+                            text: qsTr("CAMERA")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
@@ -865,7 +865,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START MISSION")
+                            text: qsTr("SPRAYING")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
@@ -937,7 +937,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START MAPPING")
+                            text: qsTr("MAPPING")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
