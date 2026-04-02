@@ -104,7 +104,7 @@ bool AirspaceRestrictionValidator::validateWaypoint(double latitude, double long
         QVariantMap restriction = restrictionVar.toMap();
         QString zoneType = restriction["type"].toString();
 
-        if (zoneType == "red" || zoneType == "prohibited" || zoneType == "boundary" || zoneType == "temporary") {
+        if (zoneType == "red" || zoneType == "prohibited" || zoneType == "boundary" || zoneType == "temporary" || zoneType == "helipad") {
             QString message = QString("Waypoint in prohibited/restricted zone: %1")
                                   .arg(restriction["name"].toString());
             _setHasRestrictions(true);

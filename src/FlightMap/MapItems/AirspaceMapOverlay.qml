@@ -159,10 +159,10 @@ Item {
         }
     }
 
-    // Timer to hide popup after 2 seconds
+    // Timer to hide popup after 5 seconds
     Timer {
         id: _popupHideTimer
-        interval: 2000
+        interval: 5000
         repeat: false
         onTriggered: _zoneInfoPopup.hide()
     }
@@ -189,7 +189,7 @@ Item {
                     }
                 }
                 
-                _zoneInfoPopup.show(selectedZone)
+                _zoneInfoPopup.show(selectedZone, position)
                 _popupHideTimer.restart()
             }
         }
@@ -198,20 +198,22 @@ Item {
     // Zone information popup (UI Overlay - Screen Coordinates)
     Rectangle {
         id: _zoneInfoPopup
-        anchors.centerIn: parent
-        width: Math.max(_zoneInfoColumn.width + ScreenTools.defaultFontPixelWidth * 4, ScreenTools.defaultFontPixelWidth * 25)
-        height: _zoneInfoColumn.height + ScreenTools.defaultFontPixelHeight * 1.5
-        radius: ScreenTools.defaultFontPixelHeight * 0.5
-        color: Qt.rgba(0, 0, 0, 0.85)
-        border.color: currentZone ? currentZone.borderColor : "white"
-        border.width: 2
+        width: Math.max(_zoneInfoColumn.width + ScreenTools.defaultFontPixelWidth * 4, ScreenTools.defaultFontPixelWidth * 20)
+        height: _zoneInfoColumn.height + ScreenTools.defaultFontPixelHeight * 2
+        radius: 4
+        color: "white"
+        border.color: "#A020F0"
+        border.width: 3
         visible: false
-        z: 9999 // Ensure it's on top of everything
+        z: 9999 
 
         property var currentZone: null
 
-        function show(zone) {
+        function show(zone, pos) {
             currentZone = zone
+            // Position near the click location
+            x = Math.max(0, Math.min(_root.width - width, pos.x - width / 2))
+            y = Math.max(0, Math.min(_root.height - height, pos.y - height - 20))
             visible = true
         }
 
@@ -227,10 +229,18 @@ Item {
             width: parent.width - ScreenTools.defaultFontPixelWidth * 2
 
             QGCLabel {
-                text: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.name : ""
-                color: "white"
+                text: {
+                    if (!_zoneInfoPopup.currentZone) return ""
+                    // If it's a "red" zone and name is generic, use "Red Zone"
+                    var name = _zoneInfoPopup.currentZone.name
+                    if (name.toLowerCase().indexOf("red") === -1 && _zoneInfoPopup.currentZone.zoneType === "red") {
+                        return name + " (Red Zone)"
+                    }
+                    return name
+                }
+                color: "#FF4500" // Bright orange-red like screenshot
                 font.bold: true
-                font.pixelSize: ScreenTools.mediumFontPointSize
+                font.pixelSize: ScreenTools.largeFontPointSize
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WordWrap
                 width: parent.width
@@ -238,17 +248,9 @@ Item {
             }
 
             QGCLabel {
-                text: _zoneInfoPopup.currentZone ? 
-                      "(" + _zoneInfoPopup.currentZone.zoneType.toUpperCase() + ")" : ""
-                color: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.borderColor : "yellow"
-                font.pixelSize: ScreenTools.smallFontPointSize
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            QGCLabel {
-                visible: _zoneInfoPopup.currentZone && _zoneInfoPopup.currentZone.description !== ""
+                visible: _zoneInfoPopup.currentZone && _zoneInfoPopup.currentZone.description !== "" && _zoneInfoPopup.currentZone.description !== _zoneInfoPopup.currentZone.name
                 text: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.description : ""
-                color: "white"
+                color: "#333333" // Dark grey for description
                 font.pixelSize: ScreenTools.smallFontPointSize
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WordWrap

@@ -221,6 +221,78 @@ Rectangle {
                             text: "Control Zone - Warning"
                             font.pointSize: ScreenTools.smallFontPointSize
                         }
+
+                        // Boundary
+                        QGCCheckBox {
+                            id: _hideBoundary
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideBoundary", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#d61e1e"
+                            opacity: 0.85
+                            border.color: "#d61e1e"
+                            border.width: 2
+                        }
+                        QGCLabel {
+                            text: "Boundary"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "International Boundary - Restricted"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
+
+                        // Helipad
+                        QGCCheckBox {
+                            id: _hideHelipad
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideHelipad", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#cc0000"
+                            opacity: 0.6
+                            border.color: "#cc0000"
+                            border.width: 2
+                        }
+                        QGCLabel {
+                            text: "Helipad"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "Helipad Area - No Fly Zone"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
+
+                        // States
+                        QGCCheckBox {
+                            id: _hideStates
+                            checked: true
+                            onClicked: { QGroundControl.saveGlobalSetting("Airspace.HideStates", !checked) }
+                        }
+                        Rectangle {
+                            width: ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            color: "#008a00"
+                            opacity: 0.3
+                            border.color: "#000000"
+                            border.width: 1
+                        }
+                        QGCLabel {
+                            text: "States"
+                            font.bold: true
+                            Layout.fillWidth: true
+                        }
+                        QGCLabel {
+                            text: "State Boundary Restriction"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                        }
                     }
                 }
             }

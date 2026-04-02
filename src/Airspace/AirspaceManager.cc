@@ -55,6 +55,7 @@ QString AirspaceZone::zoneTypeString() const
         case AirspaceZoneType::Boundary:       return "boundary";
         case AirspaceZoneType::Others:         return "others";
         case AirspaceZoneType::StateBorder:    return "states";
+        case AirspaceZoneType::Helipad:        return "helipad";
         default:                               return "unknown";
     }
 }
@@ -137,6 +138,8 @@ void AirspaceZone::setProperties(const QJsonObject& props)
             setZoneType(AirspaceZoneType::Others);
         } else if (typeStr == "states" || typeStr == "state_border" || typeStr == "stateborder") {
             setZoneType(AirspaceZoneType::StateBorder);
+        } else if (typeStr == "helipad") {
+            setZoneType(AirspaceZoneType::Helipad);
         } else {
             setZoneType(AirspaceZoneType::GreenZone);
         }
@@ -210,10 +213,16 @@ void AirspaceZone::_updateStyling()
             _borderWidth = 2;
             break;
         case AirspaceZoneType::StateBorder:
-            _fillColor = "#e2894d";
-            _borderColor = "#e2894d";
+            _fillColor = "#008a00";   // Aligned with web-app green restriction
+            _borderColor = "#008a00";
             _fillOpacity = 0.3;
             _borderWidth = 2;
+            break;
+        case AirspaceZoneType::Helipad:
+            _fillColor = "#cc0000";   // Strong red for helipads
+            _borderColor = "#cc0000";
+            _fillOpacity = 0.6;
+            _borderWidth = 3;
             break;
         case AirspaceZoneType::GreenZone:
         default:
@@ -772,18 +781,23 @@ bool AirspaceManager::checkMissionRestrictions(const QVariantList& waypoints, QS
                 }
             }
 
-            if (altitudeViolation || zone->zoneType() == AirspaceZoneType::RedZone) {
-                if (zone->zoneType() == AirspaceZoneType::RedZone) {
-                    errorMessage = QString("Mission blocked: Path intersects prohibited zone '%1'")
+            AirspaceZoneType zType = zone->zoneType();
+            bool isBlocking = (zType == AirspaceZoneType::RedZone || 
+                               zType == AirspaceZoneType::Boundary || 
+                               zType == AirspaceZoneType::Temporary || 
+                               zType == AirspaceZoneType::Helipad);
+
+            if (altitudeViolation || isBlocking) {
+                if (isBlocking) {
+                    errorMessage = QString("Mission blocked: Path intersects prohibited/restricted zone '%1'")
                                        .arg(zone->name());
                     emit missionRestrictionDetected(zone->name(), zone->zoneTypeString(), errorMessage);
                     return false; // Block mission
-                } else if (zone->zoneType() == AirspaceZoneType::YellowZone ||
-                           zone->zoneType() == AirspaceZoneType::MilitaryZone) {
-                    errorMessage = QString("Warning: Path intersects restricted zone '%1'. Proceed with caution.")
+                } else {
+                    // Advisory zones
+                    errorMessage = QString("Warning: Path intersects restricted/advisory zone '%1'. Proceed with caution.")
                                        .arg(zone->name());
                     emit missionRestrictionDetected(zone->name(), zone->zoneTypeString(), errorMessage);
-                    // Don't block, just warn
                 }
             }
         }
@@ -795,17 +809,26 @@ bool AirspaceManager::checkMissionRestrictions(const QVariantList& waypoints, QS
 QVariantList AirspaceManager::getRestrictionsAtCoordinate(double lat, double lon, double altitude)
 {
     QVariantList restrictions;
-    QGeoCoordinate coord(lat, lon);
-    Q_UNUSED(altitude); // Check all altitudes for map clicks
+    QGeoCoordinate coord(lat, lon, altitude);
 
     for (AirspaceZone* zone : _zones) {
-        // Simple bounding box check first for optimization? containsCoordinate does polygon check.
         if (zone->containsCoordinate(coord)) {
             QVariantMap restriction;
             restriction["name"] = zone->name();
-            restriction["type"] = zone->zoneTypeString();     // Required by AirspaceRestrictionValidator
-            restriction["zoneType"] = zone->zoneTypeString(); // Required by QML
             restriction["description"] = zone->description();
+            
+            AirspaceZoneType zType = zone->zoneType();
+            if (zType == AirspaceZoneType::RedZone || zType == AirspaceZoneType::Boundary || 
+                zType == AirspaceZoneType::Temporary || zType == AirspaceZoneType::Helipad) {
+                restriction["type"] = "red";
+            } else if (zType == AirspaceZoneType::InnerYellow || zType == AirspaceZoneType::OuterYellow ||
+                       zType == AirspaceZoneType::YellowZone || zType == AirspaceZoneType::MilitaryZone) {
+                restriction["type"] = "yellow";
+            } else {
+                restriction["type"] = "none";
+            }
+
+            restriction["zoneType"] = zone->zoneTypeString(); // Required by QML
             restriction["minAltitude"] = zone->minAltitude();
             restriction["maxAltitude"] = zone->maxAltitude();
             restriction["borderColor"] = zone->borderColor(); // Added
@@ -815,6 +838,22 @@ QVariantList AirspaceManager::getRestrictionsAtCoordinate(double lat, double lon
     }
 
     return restrictions;
+}
+
+bool AirspaceManager::isCoordinateInRedZone(const QGeoCoordinate& coord)
+{
+    for (AirspaceZone* zone : _zones) {
+        if (zone->isActive() && zone->containsCoordinate(coord)) {
+            AirspaceZoneType zType = zone->zoneType();
+            if (zType == AirspaceZoneType::RedZone || 
+                zType == AirspaceZoneType::Boundary || 
+                zType == AirspaceZoneType::Temporary || 
+                zType == AirspaceZoneType::Helipad) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void AirspaceManager::clearCache()

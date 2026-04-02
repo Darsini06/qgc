@@ -15,7 +15,7 @@ A **professional-grade airspace restriction system** for QGroundControl that int
 - ✅ Auto-refresh every 5 minutes
 - ✅ Thread-safe with QMutex
 - ✅ Network error handling
-- ✅ Supports all zone types (red, yellow, military, airport, CTR, runway, temporary)
+- ✅ Supports all zone types (red, yellow, military, airport, CTR, runway, temporary, boundary, states, helipad)
 
 **AirspaceZone** (in AirspaceManager.h/cc)
 - ✅ Represents individual airspace zones

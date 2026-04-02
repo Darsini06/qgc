@@ -201,7 +201,59 @@ QtObject {
         });
     }
 
-    function registerUser(username, displayname, email, password, confirmpassword, callback) {
+    function sendOTP(email, callback) {
+        console.log("MapGlobals.sendOTP() - Requesting OTP for:", email);
+        var data = { "email": email };
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/send-otp");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (rootWindow) rootWindow.showToastMessage(response.message || "OTP sent successfully");
+                    if (callback) callback(true);
+                } else {
+                    var errorMsg = "Failed to send OTP";
+                    try {
+                        var errorResp = JSON.parse(xhr.responseText);
+                        errorMsg = errorResp.message || errorMsg;
+                    } catch (e) {}
+                    if (rootWindow) rootWindow.showToastMessage(errorMsg);
+                    if (callback) callback(false);
+                }
+            }
+        }
+        xhr.send(JSON.stringify(data));
+    }
+
+    function verifyOTP(email, otp, callback) {
+        console.log("MapGlobals.verifyOTP() - Verifying OTP for:", email);
+        var data = { "email": email, "otp": otp };
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/verify-otp");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    // if (rootWindow) rootWindow.showToastMessage(response.message || "OTP verified successfully");
+                    if (callback) callback(true);
+                } else {
+                    var errorMsg = "Verification failed";
+                    try {
+                        var errorResp = JSON.parse(xhr.responseText);
+                        errorMsg = errorResp.message || errorMsg;
+                    } catch (e) {}
+                    if (rootWindow) rootWindow.showToastMessage(errorMsg);
+                    if (callback) callback(false);
+                }
+            }
+        }
+        xhr.send(JSON.stringify(data));
+    }
+
+    function registerUser(username, displayname, email, password, confirmpassword, otp, callback) {
         console.log("MapGlobals.registerUser() - Attempting registration for:", username);
         console.log("Backend URL:", backendUrl + "/register");
 
@@ -209,7 +261,8 @@ QtObject {
             "username": username,
             "displayname": displayname,
             "email": email,
-            "password": password
+            "password": password,
+            "otp": otp
         };
 
         var xhr = new XMLHttpRequest();

@@ -44,7 +44,8 @@ enum class AirspaceZoneType {
     Temporary,      // Temporary restriction (NOTAM)
     Boundary,       // International Boundary
     Others,         // Other restricted areas
-    StateBorder     // State boundaries
+    StateBorder,    // State boundaries
+    Helipad         // Helipad restricted area
 };
 
 /**
@@ -166,6 +167,7 @@ public:
     Q_INVOKABLE void refreshAirspaceData();
     Q_INVOKABLE bool checkMissionRestrictions(const QVariantList& waypoints, QString& errorMessage);
     Q_INVOKABLE QVariantList getRestrictionsAtCoordinate(double lat, double lon, double altitude);
+    Q_INVOKABLE bool isCoordinateInRedZone(const QGeoCoordinate& coord);
     Q_INVOKABLE void clearCache();
 
     // From QGCTool
