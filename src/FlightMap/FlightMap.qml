@@ -245,18 +245,47 @@ Map {
         visible:        gcsPosition.isValid
         coordinate:     gcsPosition
 
-        sourceItem: Image {
-            id:             mapItemImage
-            source:         isNaN(gcsHeading) ? "/res/QGCLogoFull" : "/res/QGCLogoFull"//"/res/QGCLogoArrow"
-            mipmap:         true
-            antialiasing:   true
-            fillMode:       Image.PreserveAspectFit
-            height:         ScreenTools.defaultFontPixelHeight * (isNaN(gcsHeading) ? 1.75 : 2.5 )
-            sourceSize.height: height
-            transform: Rotation {
-                origin.x:       mapItemImage.width  / 2
-                origin.y:       mapItemImage.height / 2
-                angle:          isNaN(gcsHeading) ? 0 : gcsHeading
+        sourceItem: Item {
+            property real size: ScreenTools.defaultFontPixelHeight * (isNaN(gcsHeading) ? 1.75 : 2.5)
+            width: size
+            height: size
+
+            Timer {
+                interval: 500
+                running: true
+                repeat: true
+                onTriggered: {
+                    var page = QGroundControl.loadGlobalSetting("loadpage", "loadpage")
+                    if (page === "Agri") mapItemImage.color = "green"
+                    else if (page === "Camera") mapItemImage.color = "black"
+                    else mapItemImage.color = "red"
+                }
+            }
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: parent.width * 0.95
+                height: width
+                radius: width / 2
+                color: "white"
+                border.color: "#DDDDDD"
+                border.width: 1
+            }
+
+            QGCColoredImage {
+                id:             mapItemImage
+                anchors.fill:   parent
+                source:         isNaN(gcsHeading) ? "/res/QGCLogoFull" : "/res/QGCLogoFull"
+                mipmap:         true
+                antialiasing:   true
+                fillMode:       Image.PreserveAspectFit
+                sourceSize.height: height
+                color: "red" // fallback initial color, will be updated by timer
+                transform: Rotation {
+                    origin.x:       mapItemImage.width  / 2
+                    origin.y:       mapItemImage.height / 2
+                    angle:          isNaN(gcsHeading) ? 0 : gcsHeading
+                }
             }
         }
     }

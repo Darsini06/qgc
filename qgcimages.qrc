@@ -97,7 +97,7 @@
         <file alias="NewImages/communication.png">src/NewImages/communication.png</file>
         <file alias="NewImages/agri.png">src/NewImages/agri.png</file>
         <file alias="NewImages/cameradrone.svg">src/NewImages/cameradrone.svg</file>
-        <file alias="NewImages/aviatrickslogo.svg">src/NewImages/aviatrickslogo.svg</file>
+        <file alias="NewImages/dronecommanderlogo.svg">src/NewImages/dronecommanderlogo.svg</file>
         <file alias="NewImages/gps.png">src/NewImages/gps.png</file>
         <file alias="NewImages/landing.png">src/NewImages/landing.png</file>
         <file alias="NewImages/location.png">src/NewImages/location.png</file>

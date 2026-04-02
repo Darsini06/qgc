@@ -180,6 +180,7 @@ Item {
         font.family:    normalFontFamily
         property real   fontWidth:    contentWidth
         property real   fontHeight:   contentHeight
+
         Component.onCompleted: {
             //-- First, compute platform, default size
             if(ScreenToolsController.isMobile) {
