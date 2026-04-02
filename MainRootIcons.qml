@@ -16,16 +16,7 @@ import MapGlobals
 
 Row {
     id: icons_row
-
-    anchors {
-        top: parent.top
-        right: parent.right
-        topMargin: parent.height * 0.05   // adjust vertical position
-        rightMargin: Screen.width * 0.01  // slight right padding
-    }
-
-
-    spacing: parent.width * 0.01    // spacing based on screen width
+    spacing: 12  // standard spacing between icons
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
@@ -72,7 +63,7 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"white"//"#1b1c3e"
+        color: "transparent"  // Fully transparent circle background
         //border.width: width * 0.05
         //border.color: "white"//"white"//"#005BBB"
         clip: true
@@ -113,9 +104,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#1b1c3e"    // Dark blue background
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+        border.width: 0
+        border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
@@ -130,36 +121,30 @@ Row {
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color : "transparent"
+            color : "white"
         }
     }
 
     // ========== MAP SWITCH ==========
     Rectangle {
+        id: mapSwitchButton
         width: baseSize
         height: baseSize
         radius: width / 2   // Makes it a circle
-        color: "white"//"#1b1c3e"    // Dark blue background
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+        border.width: 0
+        border.color: "transparent"
         clip: true          // This ensures content stays within the circular bounds
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-
                 iconsContainer.visible = false;
-
-                if (!_mapProviderFact || !_mapTypeFact) {
-                    console.error("Map provider or map type fact is not defined.");
-                    return;
+                if (mapTypePopup.opened) {
+                    mapTypePopup.close();
+                } else {
+                    mapTypePopup.open();
                 }
-                var mapTypes = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue);
-                if (mapTypes.length === 0) return;
-                var currentIndex = mapTypes.indexOf(_mapTypeFact.rawValue);
-                if (currentIndex === -1) currentIndex = 0;
-                var nextIndex = (currentIndex + 1) % mapTypes.length;
-                _mapTypeFact.rawValue = mapTypes[nextIndex];
             }
         }
 
@@ -168,7 +153,170 @@ Row {
             anchors.centerIn: parent
             width: iconSize * 0.5
             height: iconSize * 0.5
-            color : "black"
+            color : "white"
+        }
+
+        // Dropdown Popup for Map Types - BALANCED VERY SMALL VERSION
+        Popup {
+            id: mapTypePopup
+            y: parent.height + 8
+            x: - (width - parent.width) // Right aligned with button
+            width: ScreenTools.defaultFontPixelWidth * 22
+            height: contentLayout.implicitHeight + 16
+            padding: 0
+            margins: 0
+            
+            background: Rectangle {
+                color: Qt.rgba(0, 0, 0, 0.4) // Reduced opacity black transparent
+                radius: 12
+                border.color: Qt.rgba(255, 255, 255, 0.1)
+                border.width: 1
+
+                // Subtle compact shadow
+                layer.enabled: true
+                layer.effect: Qt.createQmlObject("import QtQuick; import QtQuick.Effects; MultiEffect { shadowEnabled: true; shadowBlur: 0.8; shadowColor: \"#A0000000\"; shadowVerticalOffset: 3 }", mapTypePopup)
+            }
+            
+            contentItem: ColumnLayout {
+                id: contentLayout
+                spacing: 8
+                anchors.fill: parent
+                anchors.topMargin: 10
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                anchors.bottomMargin: 20 // Adjusted for label containment
+                
+                // Miniature Header with 'X'
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 18
+                    
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Map type")
+                        font.pixelSize: ScreenTools.defaultFontPointSize * 0.8
+                        font.bold: true
+                        color: "white"
+                    }
+                    
+                    Rectangle {
+                        width: 18
+                        height: 18
+                        radius: 9
+                        color: xMouseArea.containsMouse ? "#444444" : "transparent"
+                        Layout.alignment: Qt.AlignVCenter
+                        
+                        Item {
+                            anchors.centerIn: parent
+                            width: 8
+                            height: 8
+                            
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: 1.2
+                                radius: 1
+                                color: "white"
+                                rotation: 45
+                                antialiasing: true
+                            }
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: 1.2
+                                radius: 1
+                                color: "white"
+                                rotation: -45
+                                antialiasing: true
+                            }
+                        }
+                        
+                        MouseArea {
+                            id: xMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: mapTypePopup.close()
+                        }
+                    }
+                }
+                
+                // Grid with Light Gaps
+                Row {
+                    id: mapTypeGrid
+                    Layout.fillWidth: true
+                    spacing: 6 // Light gap between columns
+
+                    readonly property string _rootPath: "qrc:/qmlimages/NewImages/"
+                    readonly property string _selectionColor: "#AC82FF" 
+
+                    component MapIconColumn: Column {
+                        property string label: ""
+                        property string typeNameSuffix: ""
+                        property string iconSource: ""
+                        spacing: 6 // Light gap between image and text
+                        width: (parent.width - 18) / 4
+                        
+                        Rectangle {
+                            width: parent.width
+                            height: width
+                            radius: 8
+                            color: "transparent"
+                            border.color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : Qt.rgba(255, 255, 255, 0.2)
+                            border.width: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? 2 : 1
+                            clip: true
+                            
+                            Image {
+                                anchors.fill: parent
+                                source: mapTypeGrid._rootPath + iconSource
+                                fillMode: Image.AlwaysCrop
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
+                                    var found = types.find(t => t.toLowerCase().includes(typeNameSuffix.toLowerCase()))
+                                    if (found) {
+                                        _mapTypeFact.rawValue = found
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Text {
+                            width: parent.width
+                            text: label
+                            horizontalAlignment: Text.AlignHCenter
+                            color: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase()) ? mapTypeGrid._selectionColor : "white"
+                            font.pixelSize: ScreenTools.defaultFontPointSize * 0.65
+                            font.bold: _mapTypeFact.rawValue.toLowerCase().includes(typeNameSuffix.toLowerCase())
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    MapIconColumn { 
+                        label: qsTr("Default")
+                        typeNameSuffix: "street" 
+                        iconSource: "map_default.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Satellite")
+                        typeNameSuffix: "satellite" 
+                        iconSource: "map_satellite.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Terrain")
+                        typeNameSuffix: "terrain" 
+                        iconSource: "map_terrain.jpeg"
+                    }
+                    MapIconColumn { 
+                        label: qsTr("Hybrid")
+                        typeNameSuffix: "hybrid" 
+                        iconSource: "map_hybrid.jpeg"
+                    }
+                }
+            }
         }
     }
 
@@ -179,9 +327,9 @@ Row {
         width: baseSize
         height: baseSize
         radius: width / 2
-        color: "white"//"#1b1c3e"
-        border.width: width * 0.05
-        border.color: "white"//"#005BBB"
+        color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+        border.width: 0
+        border.color: "transparent"
 
         MouseArea {
             anchors.fill: parent
@@ -197,7 +345,7 @@ Row {
             width: iconSize * 0.5
             height: iconSize * 0.5
             //color: "transparent"
-            color : "black"
+            color : "white"
         }
 
         Rectangle {
@@ -205,9 +353,9 @@ Row {
             width: baseSize * 2
             height: baseSize * 1
             radius: width * 0.1
-            color: "white"//"#1b1c3e"
-            border.color: "white"//"#005BBB"
-            border.width: width * 0.02
+            color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            border.color: "transparent"
+            border.width: 0
             visible: false
             z: 1000
 
@@ -234,7 +382,7 @@ Row {
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     //color: "white"
-                    color : "black"
+                    color : "white"
 
                     MouseArea {
                         anchors.fill: parent
@@ -265,7 +413,7 @@ Row {
                     height: iconSize * 0.5
                     fillMode: Image.PreserveAspectFit
                     //color: "white"
-                    color : "black"
+                    color : "white"
 
                     MouseArea {
                         anchors.fill: parent

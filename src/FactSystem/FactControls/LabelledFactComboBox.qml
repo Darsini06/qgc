@@ -29,7 +29,7 @@ RowLayout {
     QGCLabel {
         id:                 label  
         Layout.fillWidth:   true
-        color:"#4a2c6d"
+        color:"#301934"
         font.bold:      true
     }
 

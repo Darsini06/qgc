@@ -14,7 +14,7 @@ Item {
     anchors.fill: parent
 
     property string userName: QGroundControl.loadGlobalSetting("username", "")
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
     property color accent_color: "#7c4dff"
     property color sidebar_color: "#2d1b4d"
     property color bg_color: "#FFFFFF"
@@ -112,15 +112,17 @@ Item {
                         }
                     }
 
+                    // Static Icon instead of Animation to improve scroll performance
                     Item {
-                        Layout.preferredHeight: 100
+                        Layout.preferredHeight: 120
                         Layout.fillWidth: true
-                        LottieAnimation {
+                        QGCColoredImage {
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                            source: "qrc:/qmlimages/NewImages/feedback_1.json"
-                            autoPlay: true; loops: Animation.Infinite
-                            width: 120; height: 120
+                            source: "qrc:/qmlimages/NewImages/feedback_color.svg"
+                            width: 100; height: 100
+                            color: "white"
+                            opacity: 0.15
                         }
                     }
 

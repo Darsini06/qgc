@@ -9,7 +9,7 @@ CheckBox {
     spacing:        _noText ? 0 : ScreenTools.defaultFontPixelWidth
     focusPolicy:    Qt.ClickFocus
 
-    property color  textColor:          "white"//_qgcPal.text
+    property color  textColor:          "black"//_qgcPal.text
     property bool   textBold:           false
     property real   textFontPointSize:  ScreenTools.defaultFontPointSize
 
@@ -40,15 +40,15 @@ CheckBox {
         implicitHeight: implicitWidth
         x:              control.leftPadding
         y:              parent.height / 2 - height / 2
-        color:          control.enabled ? "#27253b" : "#1d1b28"
-        border.color:   control.checked ? "#b27aff" : "#3d3a50"
+        color:          control.enabled ? (control.checked ? "#301934" : "#FFFFFF") : "#F1F5F9"
+        border.color:   control.checked ? "#301934" : "#DDE1EA"
         border.width:   1
         radius:         4
         opacity:        control.checkedState === Qt.PartiallyChecked ? 0.5 : 1
 
         QGCColoredImage {
             source:             "/qmlimages/checkbox-check.svg"
-            color:              "#b27aff"
+            color:              "#FFFFFF"
             mipmap:             true
             fillMode:           Image.PreserveAspectFit
             width:              parent.implicitWidth * 0.75

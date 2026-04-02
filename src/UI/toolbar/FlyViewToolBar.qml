@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  "#4a2c6d"//"#A6ADFF"//qgcPal.toolbarBackground
+    color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black toolbar
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
@@ -633,123 +633,111 @@ Rectangle {
         anchors.bottom: parent.bottom
         height:         ScreenTools.toolbarHeight//_root.height * 0.05
         width:          _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
-        color:          "#4a2c6d"//qgcPal.colorGreen
+        color:          "#301934"//qgcPal.colorGreen
         visible:        !largeProgressBar.visible
     }
 
-    // Modern parameter download progress bar
+    // Professional high-tech parameter download progress bar
     Rectangle {
         id:             largeProgressBar
-        anchors.bottom: parent.bottom
-        anchors.left:   parent.left
-        anchors.right:  parent.right
-        height:         parent.height
-        color:          "#4a2c6d"//qgcPal.window
-        radius:         4  // Rounded corners
+        anchors.fill:   parent
+        color:          "#FFFFFF" // High-contrast White Background
         visible:        _showLargeProgress
+        z:              100
 
         property bool _initialDownloadComplete: _activeVehicle ? _activeVehicle.initialConnectComplete : true
         property bool _userHide:                false
         property bool _showLargeProgress:       !_initialDownloadComplete && !_userHide
+        property real progress:                  _activeVehicle ? _activeVehicle.loadProgress : 0
 
-        // Smooth progress bar with moving icon at center
-        Item {
-            id: progressBarContainer
+        // Subtle gradient background glow
+        Rectangle {
             anchors.fill: parent
-            anchors.margins: 6
-            visible: _showLargeProgress
+            opacity: 0.15
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 0.5; color: "#301934" }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+        }
 
-            property real progress: _activeVehicle ? _activeVehicle.loadProgress : 0
+        RowLayout {
+            anchors.centerIn: parent
+            spacing: ScreenTools.defaultFontPixelWidth * 2
 
-            // Background bar
+            // Status Text
+            Text {
+                text: qsTr("SYNCHRONIZING SYSTEM PARAMETERS")
+                color: "#000000"
+                font.pointSize: ScreenTools.smallFontPointSize
+                font.bold: true
+                font.letterSpacing: 2
+                opacity: 0.8
+            }
+
+            // Percentage
+            Text {
+                text: Math.round(largeProgressBar.progress * 100) + "%"
+                color: "#301934"
+                font.pointSize: ScreenTools.smallFontPointSize
+                font.bold: true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 5
+            }
+        }
+
+        // The sleek progress line at the bottom
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left:   parent.left
+            height:         3
+            width:          parent.width * largeProgressBar.progress
+            color:          "#301934"
+            
+            // Add a glowing effect to the tip
             Rectangle {
-                id: progressBackground
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
                 anchors.right: parent.right
-                height: 30
-                radius: 6
-                color: Qt.lighter(qgcPal.window, 1.1)
-                border.color: "#cccccc"
-            }
-
-            // Foreground bar (progress fill)
-            Rectangle {
-                id: progressFill
-                anchors.verticalCenter: progressBackground.verticalCenter
-                anchors.left: progressBackground.left
-                height: progressBackground.height
-                width: progressBackground.width * progressBarContainer.progress
-                radius: 6
-                color: "#7d8df7"
-            }
-
-            Image {
-                id: progressIcon
-                source: "/qmlimages/NewImages/agri.png"
-                sourceSize.width: 50
-                sourceSize.height: 50
-                opacity: 0.9
-
-                // Horizontal movement
-                x: progressBackground.x + (progressBackground.width * progressBarContainer.progress) - width / 2
-
-                // Vertical bounce
-                y: progressBackground.y - 20 + bounceOffset
-
-                //  Tilt the icon by 45 degrees
-                rotation: 45
-                transformOrigin: Item.Center  // Rotate around center
-
-                // Bouncing animation using bounceOffset
-                property real bounceOffset: 0
-
-                SequentialAnimation on bounceOffset {
-                    running: _showLargeProgress && !_initialDownloadComplete
-                    loops: Animation.Infinite
-                    NumberAnimation {
-                        from: 0
-                        to: 15
-                        duration: 500
-                        easing.type: Easing.OutQuad
-                    }
-                    NumberAnimation {
-                        from: 15
-                        to: 0
-                        duration: 500
-                        easing.type: Easing.InQuad
-                    }
+                width:  40
+                height: parent.height
+                visible: largeProgressBar.progress > 0 && largeProgressBar.progress < 1
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0.0; color: "transparent" }
+                    GradientStop { position: 1.0; color: "#FFFFFF" }
                 }
             }
 
+            Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutQuad } }
         }
 
-        // Loading text
-        // QGCLabel {
-        //     anchors.top: parent.top
-        //     anchors.horizontalCenter: parent.horizontalCenter
-        //     anchors.topMargin: ScreenTools.defaultFontPixelHeight
-        //     text: qsTr("Downloading Parameters") + (_activeVehicle ? " (" + Math.round(_activeVehicle.loadProgress * 100) + "%)" : "")
-        //     font.pointSize: ScreenTools.largeFontPointSize
-        // }
+        // Subtle scanning pulse animation
+        Rectangle {
+            id: scanPulse
+            height: 1
+            width: 100
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 1
+            opacity: 0.5
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 0.5; color: "#301934" }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
 
+            NumberAnimation on x {
+                from: -100
+                to: largeProgressBar.width
+                duration: 2000
+                running: largeProgressBar.visible
+                loops: Animation.Infinite
+            }
+        }
 
-        // // Close hint
-        // QGCLabel {
-        //     anchors.margins:    _margin
-        //     anchors.right:      parent.right
-        //     anchors.bottom:     parent.bottom
-        //     text:               qsTr("Click to hide")
-        //     font.pointSize:     ScreenTools.smallFontPointSize
-        //     opacity:            0.7
-
-        //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
-        // }
-
-        // MouseArea {
-        //     anchors.fill:   parent
-        //     onClicked:      largeProgressBar._userHide = true
-        // }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: largeProgressBar._userHide = true
+        }
     }
 
 

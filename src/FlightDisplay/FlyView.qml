@@ -97,6 +97,7 @@ Item {
     FlyViewToolBar {
         id:         toolbar
         visible:    !QGroundControl.videoManager.fullScreen
+        z:          100    // Overlay on top of map
     }
 
 
@@ -105,7 +106,7 @@ Item {
 
     Item {
         id:                 mapHolder
-        anchors.top:        toolbar.bottom
+        anchors.top:        parent.top        // Extend map behind toolbar for transparency
         anchors.bottom:     parent.bottom
         anchors.left:       parent.left
         anchors.right:      parent.right

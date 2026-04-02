@@ -58,10 +58,10 @@ SetupPage {
                 id: tabFlightMode
                 width: parent.width / 2 - (_margins / 2)
                 height: ScreenTools.defaultFontPixelHeight * 1.5
-                color: selectedTab === "flightMode" ? "#cccccc" : "#ffffff"
-                radius: 6
-                border.width: 1
-                border.color: "#999999"
+                color: selectedTab === "flightMode" ? "#301934" : "#ffffff"
+                radius:         10
+                border.width:   2
+                border.color:   selectedTab === "flightMode" ? "#301934" : "#DDE1EA"
 
                 MouseArea {
                     anchors.fill: parent
@@ -72,6 +72,7 @@ SetupPage {
                     anchors.centerIn: parent
                     text: qsTr("Flight Mode Settings")
                     font.bold: true
+                    color: selectedTab === "flightMode" ? "white" : "black"
                 }
             }
 
@@ -79,10 +80,10 @@ SetupPage {
                 id: tabSwitchOptions
                 width: parent.width / 2 - (_margins / 2)
                 height: ScreenTools.defaultFontPixelHeight * 1.5
-                color: selectedTab === "switchOptions" ? "#cccccc" : "#ffffff"
-                radius: 6
-                border.width: 1
-                border.color: "#999999"
+                color: selectedTab === "switchOptions" ? "#301934" : "#ffffff"
+                radius:         10
+                border.width:   2
+                border.color:   selectedTab === "switchOptions" ? "#301934" : "#DDE1EA"
                 MouseArea {
                     anchors.fill: parent
                     onClicked: selectedTab = "switchOptions"
@@ -91,6 +92,7 @@ SetupPage {
                     anchors.centerIn: parent
                     text: qsTr("Switch Options")
                     font.bold: true
+                    color: selectedTab === "switchOptions" ? "white" : "black"
                 }
             }
         }
@@ -140,6 +142,7 @@ SetupPage {
                             QGCLabel {
                                 anchors.baseline: modeChannelCombo.baseline
                                 text: qsTr("Flight mode channel:")
+                                color: "black"
                             }
 
                             QGCComboBox {
@@ -166,7 +169,7 @@ SetupPage {
                                 model: 6
                                 QGCLabel {
                                     text: qsTr("Flight Mode ") + index
-                                    color: controller.activeFlightMode == index ? "#4a2c6d" : qgcPal.text
+                                    color: controller.activeFlightMode == index ? "#301934" : "black"
                                     font.bold: controller.activeFlightMode == index ? true : false
                                     property int index: modelData + 1
                                 }
@@ -223,7 +226,10 @@ SetupPage {
 
                             Repeater {
                                 model: 6
-                                QGCLabel { text: _pwmStrings[modelData] }
+                                QGCLabel {
+                                    text: _pwmStrings[modelData]
+                                    color: "black"
+                                }
                             }
                         }
 
@@ -285,7 +291,7 @@ SetupPage {
                             QGCLabel {
                                 anchors.baseline: optCombo.baseline
                                 text: qsTr("Channel option %1 :").arg(index)
-                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "#4a2c6d" : qgcPal.text
+                                color: controller.channelOptionEnabled[modelData + (_ch7OptAvailable ? 1 : 0)] ? "#301934" : "black"
                             }
 
                             FactComboBox {

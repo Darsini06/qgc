@@ -28,13 +28,14 @@ ColumnLayout {
         Layout.fillWidth:       true
         font.pointSize:         ScreenTools.smallFontPointSize
         wrapMode:               Text.WordWrap
+        color:                  "#888888" // Softer for notes
         text:                   qsTr("Note: For best perfomance, please disable AutoConnect to UDP devices on the General page.")
     }
 
     RowLayout {
         spacing: _colSpacing
 
-        QGCLabel { text: qsTr("Port") }
+        QGCLabel { text: qsTr("Port"); color: "black" }
         QGCTextField {
             id:                     portField
             text:                   subEditConfig.localPort.toString()
@@ -42,10 +43,21 @@ ColumnLayout {
             Layout.preferredWidth:  _secondColumnWidth
             inputMethodHints:       Qt.ImhFormattedNumbersOnly
             onTextChanged:          subEditConfig.localPort = parseInt(portField.text)
+            textColor:              "black"
+            leftPadding:            16
+            rightPadding:           16
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: portField.activeFocus ? "#301934" : "#DDE1EA"
+                border.width: portField.activeFocus ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
         }
     }
 
-    QGCLabel { text: qsTr("Server Addresses (optional)") }
+    QGCLabel { text: qsTr("Server Addresses (optional)"); color: "black" }
 
     Repeater {
         model: subEditConfig.hostList
@@ -56,11 +68,29 @@ ColumnLayout {
             QGCLabel {
                 Layout.preferredWidth:  _secondColumnWidth
                 text:                   modelData
+                color:                  "black"
             }
 
             QGCButton {
+                id:         removeBtn
                 text:       qsTr("Remove")
                 onClicked:  subEditConfig.removeHost(modelData)
+                contentItem: Text {
+                    text: removeBtn.text
+                    color: "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 13
+                    font.bold: true
+                    font.family: "Outfit"
+                }
+                background: Rectangle {
+                    implicitHeight: 36
+                    implicitWidth: 80
+                    radius: 8
+                    color: removeBtn.pressed ? "#c81e1e" : (removeBtn.hovered ? "#ef4444" : "#333333")
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                }
             }
         }
     }
@@ -72,13 +102,41 @@ ColumnLayout {
             id:                     hostField
             Layout.preferredWidth:  _secondColumnWidth
             placeholderText:        qsTr("Example: 127.0.0.1:14550")
+            textColor:              "black"
+            leftPadding:            16
+            rightPadding:           16
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: hostField.activeFocus ? "#301934" : "#DDE1EA"
+                border.width: hostField.activeFocus ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
         }
         QGCButton {
+            id:         addServerBtn
             text:       qsTr("Add Server")
             enabled:    hostField.text !== ""
             onClicked: {
                 subEditConfig.addHost(hostField.text)
                 hostField.text = ""
+            }
+            contentItem: Text {
+                text: addServerBtn.text
+                color: addServerBtn.enabled ? "white" : "#888888"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 14
+                font.bold: true
+                font.family: "Outfit"
+            }
+            background: Rectangle {
+                implicitHeight: 44
+                implicitWidth: 120
+                radius: 8
+                color: addServerBtn.enabled ? (addServerBtn.pressed ? "#301934" : (addServerBtn.hovered ? "#301934" : "#301934")) : "#333333"
+                Behavior on color { ColorAnimation { duration: 150 } }
             }
         }
     }

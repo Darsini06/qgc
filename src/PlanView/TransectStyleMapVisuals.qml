@@ -257,7 +257,7 @@ Item {
 
     //     background: Rectangle {
     //         radius: width / 2
-    //         color: "#1b1c3e"
+    //         color: "#301934"
     //         border.color: "#005BBB"
     //         border.width: 2
     //     }
@@ -277,44 +277,54 @@ Item {
     // }
 
 
-    Item {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.leftMargin: 50
-        anchors.topMargin: 10
+    Component {
+        id: editPositionDialog
 
-        Button {
-            id: editBtn
-            padding: 0
-            visible: MapGlobals.share_edit_visibility
-            implicitWidth: baseSize
-            implicitHeight: baseSize
-
-            background: Rectangle {
-                radius: width / 2
-                color: "white"//"#1b1c3e"
-                //border.color: "#005BBB"
-                //border.width: 2
-            }
-
-            contentItem: Item {
-                anchors.fill: parent
-
-                QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                    width: iconSize * 0.5
-                    height: iconSize * 0.5
-                    anchors.centerIn: parent
-                    color: "black"
-                }
-            }
-
-            onClicked: {
-                console.log("Edit clicked")
-                if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
-            }
+        EditPositionDialog {
+            coordinate:             _missionItem.isSurveyItem ? _missionItem.centerCoordinate : _missionItem.coordinate
+            onCoordinateChanged:    _missionItem.isSurveyItem ? _missionItem.centerCoordinate = coordinate : _missionItem.coordinate = coordinate
         }
     }
 
+    Item {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.leftMargin: 60
+            anchors.topMargin: 10
+
+            Button {
+                id: editBtn
+                padding: 0
+                visible: MapGlobals.share_edit_visibility
+                implicitWidth: baseSize
+                implicitHeight: baseSize
+
+                background: Rectangle {
+                    radius: width / 2
+                    color: "white"//"#1b1c3e"
+                    //border.color: "#005BBB"
+                    //border.width: 2
+                }
+
+                contentItem: Item {
+                    anchors.fill: parent
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                        width: iconSize * 0.5
+                        height: iconSize * 0.5
+                        anchors.centerIn: parent
+                        color: "black"
+                    }
+                }
+
+                onClicked: {
+                    console.log("Edit clicked")
+                    if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                    MapGlobals.share_edit_visibility = false
+                }
+            }
+        }
 }
 

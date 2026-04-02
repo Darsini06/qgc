@@ -50,8 +50,6 @@
         <file alias="Analyze.svg">src/UI/toolbar/Images/Analyze.svg</file>
         <file alias="APM/BrandImage">src/FirmwarePlugin/APM/APMBrandImage.png</file>
         <file alias="APM/BrandImageSub">src/FirmwarePlugin/APM/APMBrandImageSub.png</file>
-
-
         <file alias="NewImages/SearchIcon.png">src/NewImages/searchIcon.png</file>
         <file alias="NewImages/CompassArrow.png">src/NewImages/compass_arrow.png</file>
         <file alias="NewImages/map_eraser.svg">src/NewImages/map_eraser.svg</file>
@@ -103,8 +101,8 @@
         <file alias="NewImages/gps.png">src/NewImages/gps.png</file>
         <file alias="NewImages/landing.png">src/NewImages/landing.png</file>
         <file alias="NewImages/location.png">src/NewImages/location.png</file>
-        <file alias="NewImages/logout.svg">src/NewImages/logout.svg</file>     
-        <file alias="NewImages/logout_color.svg">src/NewImages/logout_color.svg</file>     
+        <file alias="NewImages/logout.svg">src/NewImages/logout.svg</file>
+        <file alias="NewImages/logout_color.svg">src/NewImages/logout_color.svg</file>
         <file alias="NewImages/notification.png">src/NewImages/notification.png</file>
         <file alias="NewImages/obstacle.png">src/NewImages/obstacle.png</file>
         <file alias="NewImages/privacy_policy.png">src/NewImages/privacy_policy.png</file>
@@ -122,6 +120,10 @@
         <file alias="NewImages/total_hours.svg">src/NewImages/total_hours.svg</file>
         <file alias="NewImages/terms_condition_black.svg">src/NewImages/terms_condition_black.svg</file>
         <file alias="NewImages/select_drone_type_black.svg">src/NewImages/select_drone_type_black.svg</file>
+        <file alias="NewImages/map_default.jpeg">src/NewImages/map_default.jpeg</file>
+        <file alias="NewImages/map_satellite.jpeg">src/NewImages/map_satellite.jpeg</file>
+        <file alias="NewImages/map_terrain.jpeg">src/NewImages/map_terrain.jpeg</file>
+        <file alias="NewImages/map_hybrid.jpeg">src/NewImages/map_hybrid.jpeg</file>
         <file alias="NewImages/cardinal_point.svg">src/NewImages/cardinal_point.svg</file>
         <file alias="NewImages/report_color.svg">src/NewImages/report_color.svg</file>
         <file alias="NewImages/report.svg">src/NewImages/report.svg</file>
@@ -150,7 +152,7 @@
         <file alias="NewImages/feedback_lottie.json">src/NewImages/feedback_lottie.json</file>
         <file alias="NewImages/login_lottie.json">src/NewImages/login_lottie.json</file>
         <file alias="NewImages/point_mark.svg">src/NewImages/point_mark.svg</file>
-        <file alias="NewImages/VTOL_application.svg">src/NewImages/VTOL_application.svg</file> 
+        <file alias="NewImages/VTOL_application.svg">src/NewImages/VTOL_application.svg</file>
         <file alias="NewImages/cameraDrone_png.png">src/NewImages/cameraDrone_png.png</file>
         <file alias="NewImages/loading_lottie.json">src/NewImages/loading_lottie.json</file>
         <file alias="NewImages/feedback_sent.json">src/NewImages/feedback_sent.json</file>
@@ -205,10 +207,9 @@
         <file alias="NewImages/camera_AIImage_transparent.png">src/NewImages/camera_AIImage_transparent.png</file>
         <file alias="NewImages/agriculture.jpg">src/NewImages/agriculture.jpg</file>
         <file alias="NewImages/agri_bg_image5.png">src/NewImages/agri_bg_image5.png</file>
-         <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
-         <file alias="NewImages/camerabg.png">src/NewImages/camerabg.png</file>
-         <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>
-
+        <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
+        <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>
+        <file alias="NewImages/camerabg.png">src/NewImages/camerabg.png</file>
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
         <file alias="arrow-down.png">src/QmlControls/arrow-down.png</file>

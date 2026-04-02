@@ -44,59 +44,17 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "transparent"
+        color: "#FFFFFF"
 
+        // Vertical divider for sidebar
         Rectangle {
-            anchors.fill: parent
-            z: -10
-            color: "#1b1c3e"
+            id: sidebarSeparator
+            width: 1
+            height: parent.height
+            color: "#E1E1E1"
+            x: ScreenTools.defaultFontPixelWidth * 16.5
+            z: 5
         }
-        // ---- Curved Gradient Background ----
-        Canvas {
-            anchors.fill: parent
-            z: -1
-            opacity: 0.95
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.reset()
-
-                // 🎨 Create diagonal gradient
-                var gradient = ctx.createLinearGradient(0, 0, width, height)
-                gradient.addColorStop(0, "#14163C")
-                gradient.addColorStop(1, "#6A85FB")
-                ctx.fillStyle = gradient
-
-                // 🌀 Create a curved path from top-left to bottom-right
-                ctx.beginPath()
-                ctx.moveTo(0, 0)
-                ctx.quadraticCurveTo(width * 0.4, height * 0.1, width, height * 0.9)
-                ctx.lineTo(width, height)
-                ctx.lineTo(0, height)
-                ctx.closePath()
-                ctx.fill()
-            }
-        }
-
-        Rectangle {
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            width: parent.width * 0.5
-            height: parent.height * 0.9
-            radius: width * 0.5
-            rotation: 30
-            opacity: 0.95
-            anchors.rightMargin: 1//-width * 0.25
-            anchors.bottomMargin: 1//-height * 0.2
-            z: -1
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#14163C" } // Deep indigo
-                GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
-            }
-        }
-
-
-
     }
 
 
@@ -127,29 +85,31 @@ Item {
         QGCLabel {
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Search:")
-            color:"white"
-            font.pixelSize: 20       // ✅ Bigger text
-                    font.bold: true
-                    verticalAlignment: Text.AlignVCenter
+            color: "#1A1A1A"
+            font.pixelSize: 20
+            font.bold: true
+            verticalAlignment: Text.AlignVCenter
         }
 
         QGCTextField {
                     id:                 searchText
-                    height: 25               // ✅ Increase height of the input box
-                    width:150
-                            font.pixelSize: 18       // ✅ Bigger input text
-                            padding: 10              // ✅ Add some inner spacing
-                            background: Rectangle {  // ✅ Modern styled background
-                                color: "white"   // Slightly transparent white background
-                                radius: 6
-                                border.color: "#ffffff55"
-                                border.width: 1
-                            }
-                    placeholderText:    qsTr("          ")//qsTr("    Search here    ")
+                    height: 44
+                    width:250
+                    font.pixelSize: 18
+                    padding: 10
+                    color: "#1A1A1A"
+                    background: Rectangle {
+                        color: "#F5F5F5"
+                        radius: 15
+                        border.color: "#DFE6E9"
+                        border.width: 1
+                    }
+                    placeholderText:    qsTr("Search...")
                     Layout.fillWidth:   true
                     text:               controller.searchText
                     onDisplayTextChanged: controller.searchText = displayText
                     anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignHCenter
                     Component.onCompleted: if(QGroundControl.loadGlobalSetting("tab","tab")==="None"){
                                                controller.searchText = ""
                                            }else if(QGroundControl.loadGlobalSetting("tab","tab")==="Spray"){
@@ -334,7 +294,7 @@ Item {
             /// Group buttons
             QGCFlickable {
                 id :                groupScroll
-                width:              ScreenTools.defaultFontPixelWidth * 15
+                width:              ScreenTools.defaultFontPixelWidth * 16.5
                 anchors.top:        header.bottom
                 anchors.bottom:     parent.bottom
                 clip:               true
@@ -342,6 +302,13 @@ Item {
                 contentHeight:      groupedViewCategoryColumn.height
                 flickableDirection: Flickable.VerticalFlick
                 visible:            !_searchFilter
+
+                // Sidebar background
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#F8F9FA"
+                    z: -1
+                }
 
                 ColumnLayout {
                     id:             groupedViewCategoryColumn
@@ -381,6 +348,21 @@ Item {
                                     checked:        object == controller.currentGroup
                                     autoExclusive:  true
 
+                                    background: Rectangle {
+                                        color: parent.checked ? "#301934" : "transparent"
+                                        radius: 20
+                                        border.color: parent.checked ? "#301934" : "#DFE6E9"
+                                        border.width: 1
+                                    }
+
+                                    contentItem: QGCLabel {
+                                        text:               parent.text
+                                        horizontalAlignment:Text.AlignHCenter
+                                        verticalAlignment:  Text.AlignVCenter
+                                        color:              parent.checked ? "#FFFFFF" : "#1A1A1A"
+                                        font.bold:          parent.checked
+                                    }
+
                                     onClicked: {
                                         if (!checked) _rowWidth = 10
                                         checked = true
@@ -400,17 +382,26 @@ Item {
                 anchors.right: parent.right
                 anchors.top: header.bottom
                 anchors.bottom: parent.bottom
-                orientation: ListView.Vertical
                 model: controller.parameters
                 cacheBuffer: height > 0 ? height * 2 : 0
                 clip: true
+
+                ScrollBar.vertical: ScrollBar {
+                    width: 8
+                    policy: ScrollBar.AsNeeded
+                    background: Rectangle { color: "transparent" }
+                    contentItem: Rectangle {
+                        color: "#BDC3C7"
+                        radius: 4
+                    }
+                }
 
                 // Track currently edited index
                 property int editedIndex: -1
 
                 delegate: Rectangle {
                     id: delegateRoot
-                    height: 50//_rowHeight
+                    height: 70
                     width: _rowWidth
                     color: "transparent"
 
@@ -427,13 +418,13 @@ Item {
                             width: ScreenTools.defaultFontPixelWidth * 15
                             text: itemFact.name
                             clip: true
-                            color: "white"
+                            color: "#1A1A1A"
                         }
 
                         // Dynamic input display: TextField or ComboBox
                         Item {
-                            width: ScreenTools.defaultFontPixelWidth * 15
-                            height: valueLoader.item ? valueLoader.item.implicitHeight : 40
+                            width: ScreenTools.defaultFontPixelWidth * 25
+                            height: 48
 
                             Loader {
                                 id: valueLoader
@@ -449,7 +440,17 @@ Item {
                                     text: itemFact.valueString
                                     readOnly: delegateRoot.isBeingEdited ? false : true
                                     width: parent.width
-                                    color: delegateRoot.isBeingEdited ? "black" : "gray"
+                                    height: parent.height
+                                    color: "#1A1A1A"
+                                    font.pixelSize: 16
+                                    horizontalAlignment: Text.AlignHCenter
+                                    
+                                    background: Rectangle {
+                                        color: delegateRoot.isBeingEdited ? "#F0E6FA" : "#FFFFFF"
+                                        radius: 15
+                                        border.color: delegateRoot.isBeingEdited ? "#301934" : "#DFE6E9"
+                                        border.width: 1
+                                    }
 
                                     // Handle focus changes
                                     onActiveFocusChanged: {
@@ -487,6 +488,7 @@ Item {
                                 QGCComboBox {
                                     id: comboBox
                                     width: parent.width
+                                    height: parent.height
                                     model: itemFact.enumStrings
                                     currentIndex: itemFact.enumIndex
                                     enabled: delegateRoot.isBeingEdited
@@ -498,16 +500,6 @@ Item {
                                         }
                                         editorListView.editedIndex = -1
                                     }
-
-                                    // Click to edit
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            if (!delegateRoot.isBeingEdited) {
-                                                editorListView.editedIndex = index
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -517,7 +509,7 @@ Item {
                             width: ScreenTools.defaultFontPixelWidth * 15
                             wrapMode: Text.NoWrap
                             elide: Text.ElideRight
-                            color: "white"
+                            color: "#636E72"
                         }
 
                         Component.onCompleted: {
@@ -530,8 +522,8 @@ Item {
                     Rectangle {
                         width: _rowWidth
                         height: 1
-                        color: qgcPal.text
-                        opacity: 0.15
+                        color: "#E1E1E1"
+                        opacity: 1
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                     }
@@ -549,10 +541,19 @@ Item {
                                         valueLoader.item.forceActiveFocus()
                                         valueLoader.item.selectAll()
                                     } else {
-                                        valueLoader.item.popup.visible = true
+                                        // Use open()/close() for professional handling
+                                        if (valueLoader.item.popup.visible) {
+                                            valueLoader.item.popup.close()
+                                            editorListView.editedIndex = -1
+                                        } else {
+                                            valueLoader.item.popup.open()
+                                        }
                                     }
                                 }
                             } else {
+                                if (valueLoader.item && itemFact.enumStrings.length !== 0 && valueLoader.item.popup.visible) {
+                                    valueLoader.item.popup.close()
+                                }
                                 editorListView.editedIndex = -1
                             }
                         }

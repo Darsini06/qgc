@@ -72,7 +72,7 @@ public:
     void        copyFrom             (const LinkConfiguration* source) override;
     void        loadSettings         (QSettings& settings, const QString& root) override;
     void        saveSettings         (QSettings& settings, const QString& root) override;
-    QString     settingsURL          (void) override                                        { return "UdpSettings.qml"; }
+    QString     settingsURL          (void) override                                        { return "qrc:/qml/UdpSettings.qml"; }
     QString     settingsTitle        (void) override                                        { return tr("UDP Link Settings"); }
 
 signals:

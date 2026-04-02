@@ -69,7 +69,8 @@ Popup {
     signal accepted
     signal rejected
 
-    property var    _qgcPal:            QGroundControl.globalPalette
+    QGCPalette { id: popupPal; colorGroupEnabled: true }
+    property var    _qgcPal:            popupPal
     property real   _frameSize:         ScreenTools.defaultFontPixelWidth
     property real   _contentMargin:     ScreenTools.defaultFontPixelHeight / 4
 
@@ -100,7 +101,13 @@ Popup {
     Component.onCompleted: {
         // The last child item will be the true dialog content.
         // Re-Parent it to the right place in the ui hierarchy.
-        contentChildren[contentChildren.length - 1].parent = dialogContentParent
+        var content = contentChildren[contentChildren.length - 1];
+        content.parent = dialogContentParent;
+
+        // Automatically ensure dialog content fills the available width to enable child text wrapping.
+        if (content.width <= 0) {
+            content.width = Qt.binding(function() { return dialogContentParent.width });
+        }
     }
 
     onAboutToShow: setupDialogButtons(buttons)
@@ -245,37 +252,48 @@ Popup {
     property real popupWidth: 0
 
     Rectangle {
-        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 45)
-        height: mainLayout.implicitHeight + (buttonRow.visible ? _contentMargin : 0)
-        color: _qgcPal.window
-        radius: 0
+        width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 50)
+        height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
+        color: "white" // Deep dark background for Mission Theme
+        radius: 20
         border.width: 1
-        border.color: _qgcPal.windowShadeLight
+        border.color: Qt.rgba(0, 0, 0, 0.1)
         anchors.centerIn: parent
 
         ColumnLayout {
             id: mainLayout
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
+            anchors.fill: parent
             spacing: _contentMargin
 
             Rectangle {
                 Layout.fillWidth: true
-                height: Math.max(titleLable.implicitHeight + 20, 45) // Good breathing room
-                color: "#4a2c6d"
-                radius: 0
+                height: Math.max(titleLable.implicitHeight + 20, 50) // More breathing room
+                color: "#262626" // Faded charcoal black as requested
+                radius: 20
+
+                // Mask bottom rounded corners
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 20
+                    color: parent.color
+                }
 
                 Item {
                     anchors.fill: parent
 
                     // Centered title
                     QGCLabel {
-                        id: titleLable
-                        text: root.title
-                        anchors.centerIn: parent
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.bold: true
-                        color: "white"
+                        id:                     titleLable
+                        text:                   root.title
+                        width:                  parent.width - 80 // Constrain width for wrapping
+                        wrapMode:               Text.WordWrap
+                        horizontalAlignment:    Text.AlignHCenter
+                        anchors.centerIn:       parent
+                        font.pointSize:         ScreenTools.defaultFontPointSize
+                        font.bold:              true
+                        color:                  "white"
                     }
 
                     // Close button - placed at top right properly
@@ -284,7 +302,7 @@ Popup {
                         width: 28
                         height: 28
                         radius: 0
-                        color: closeBtnMouseArea.containsMouse ? "#d32f2f" : "#f44336"
+                        color: closeBtnMouseArea.containsMouse ? "#262626" : "#262626"
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -311,13 +329,12 @@ Popup {
             }
 
             Rectangle {
-
                 Layout.fillWidth:       true
-                Layout.preferredWidth:  maxAvailableWidth
-                Layout.preferredHeight: Math.min(maxAvailableHeight, totalContentHeight)
-                color:                  _qgcPal.window
-                Layout.leftMargin:     10
-                Layout.rightMargin:     10
+                Layout.fillHeight:      true
+                implicitHeight:         totalContentHeight
+                color:                  "transparent"
+                Layout.leftMargin:      20
+                Layout.rightMargin:     25 // Balanced margin for scrollbar
 
                 property real maxAvailableWidth:    mainLayout.width - (Layout.leftMargin + Layout.rightMargin)
                 property real maxAvailableHeight:
@@ -332,11 +349,27 @@ Popup {
                 QGCFlickable {
                     anchors.margins:    _contentMargin
                     anchors.fill:       parent
-                    contentWidth:       dialogContentParent.childrenRect.width
+                    contentWidth:       width
                     contentHeight:      dialogContentParent.childrenRect.height
+                    flickableDirection: Flickable.VerticalFlick
+                    interactive:        contentHeight > height
+                    clip:               true
+
+                    // Add a subtle scroll indicator
+                    ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        visible: parent.interactive
+                        background: Item { }
+                        contentItem: Rectangle {
+                            implicitWidth: 4
+                            radius: 2
+                            color: Qt.rgba(0, 0, 0, 0.2)
+                        }
+                    }
 
                     Item {
                         id:     dialogContentParent
+                        width:  parent.width
                         focus:  true
 
                         Keys.onPressed: (event) => {
@@ -370,19 +403,19 @@ Popup {
 
                 QGCButton {
                     id: rejectButton
-                    visible: root.showButtons && (root.buttons & Dialog.Cancel)
                     onClicked: _reject()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 0
-                        color: "#E53935"
+                        radius: 8
+                        color: rejectButton.pressed ? "#b71c1c" : (rejectButton.hovered ? "#d32f2f" : "#e53935")
                     }
                     contentItem: Text {
                         text: rejectButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 12
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -390,20 +423,20 @@ Popup {
 
                 QGCButton {
                     id: acceptButton
-                    visible: root.showButtons && (root.buttons & Dialog.Ok)
                     primary: true
                     onClicked: _accept()
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
-                        radius: 0
-                        color: "#4a2c6d"
+                        radius: 8
+                        color: acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
                     }
                     contentItem: Text {
                         text: acceptButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
-                        font.pointSize: 12
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }

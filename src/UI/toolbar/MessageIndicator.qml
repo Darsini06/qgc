@@ -48,7 +48,7 @@ Item {
                 return qgcPal.colorRed;
             // Cannot be so make make it obnoxious to show error
             console.warn("MessageIndicator.qml:getMessageColor Invalid vehicle message type", _activeVehicle.messageTypeNone)
-            return "purple";
+            return "#301934";
         }
         //-- It can only get here when closing (vehicle gone while window active)
         return qgcPal.colorGrey

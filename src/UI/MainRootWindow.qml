@@ -94,7 +94,7 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#262626"
 
 
     function dp(value) {
@@ -538,7 +538,7 @@ ApplicationWindow {
             Rectangle {
                 width: parent.width
                 height: titleLabel.implicitHeight + 14
-                color: "#4a2c6d"
+                color: "#301934"
                 radius: 14
                 antialiasing: true
                 clip: true
@@ -549,7 +549,7 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     height: 14
-                    color: "#4a2c6d"
+                    color: "#301934"
                     radius: 0
                 }
 
@@ -874,7 +874,7 @@ ApplicationWindow {
             id: tabModel
             ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
             ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "File Safe" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
             ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
@@ -891,7 +891,7 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(2, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(3, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
                     tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
@@ -976,7 +976,7 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
-                                color: sidebarList.currentIndex === index ? Qt.rgba(74, 44, 109, 0.1) : "transparent"
+                                color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
                                 
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
@@ -1125,10 +1125,10 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  "white"//"#1b1c3e"
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible: false
-            border.width: width * 0.05    // 10% of button width
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: flightModeIndicator2
@@ -1137,7 +1137,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "transparent"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1161,7 +1161,7 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2            // Circle
-        //     color:  "white"//"#1b1c3e"
+        //     color:  "white"//"#301934"
         //     visible: true
         //     border.width: width * 0.05    // 10% of button width
         //     border.color:  "white"//"#005BBB"
@@ -1191,10 +1191,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: takeofficon
@@ -1203,7 +1203,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1223,10 +1223,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: waypointbtnicon1
@@ -1235,7 +1235,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1259,7 +1259,7 @@ ApplicationWindow {
         //     width: parent.width * 0.05    // 8% of parent width
         //     height: width                 // Keep it square
         //     radius: width / 2   // Makes it a circle
-        //     color:  "white"//"#1b1c3e"      // white background
+        //     color:  "white"//"#301934"      // white background
         //     visible:  false
         //     border.width: width * 0.05
         //     border.color:  "white"//"#005BBB"
@@ -1291,10 +1291,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: camerabtnicon
@@ -1303,7 +1303,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1325,10 +1325,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: landbtnicon
@@ -1337,7 +1337,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
             MouseArea {
@@ -1357,10 +1357,10 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  "white"//"#1b1c3e"      // white background
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
-            border.width: width * 0.05
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             QGCColoredImage {
                 id: rtlbtnicon
@@ -1369,7 +1369,7 @@ ApplicationWindow {
                 height: width
                 anchors.centerIn: parent
                 //color: "white"
-                color : "black"
+                color : "white"
             }
 
 
@@ -1392,11 +1392,11 @@ ApplicationWindow {
             width: flightmode1.implicitWidth + 30   // 10px padding left/right
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
-            color:  "white"//"#1b1c3e"
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible: activeVehicle
 
-            border.width: 2
-            border.color:  "white"//"#005BBB"
+            border.width: 0
+            border.color:  "transparent"
 
             FlightModeIndicator {
                 id: flightmode1
@@ -1453,6 +1453,8 @@ ApplicationWindow {
                 QGCLabel {
                     text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
                     Layout.fillWidth: true
+                    color: "black"
+                    wrapMode: Text.WordWrap
                 }
             }
         }
@@ -1460,23 +1462,21 @@ ApplicationWindow {
 
     Dialog {
         id: myDialog
-        width: 320
-        height: 380
+        width: 260
+        height: 350
         property string imageSource: "/qmlimages/NewImages/takeOff.svg"
         property string dialogText: "Default Text"
 
         x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
+        y: toolbar.y + toolbar.height + 20
+        modal: false
+        dim: false
+        closePolicy: Popup.CloseOnPressOutside
 
         background: Rectangle {
-            radius: 12
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#5a3c7d" }
-                GradientStop { position: 1.0; color: "#2d1c42" }
-            }
-            border.color: "#4a2c6d"
-            border.width: 1
-            clip: true
+            radius: 15
+            color: "white"
+            border.width: 0
         }
 
         QtObject {
@@ -1498,37 +1498,37 @@ ApplicationWindow {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: qsTr("TAKEOFF SETTINGS")
-                color: "white"
-                font.pointSize: 14
+                color: "black"
+                font.pointSize: 11
                 font.bold: true
-                opacity: 0.9
+                opacity: 0.8
+                Layout.topMargin: 10
             }
 
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
-                color: "white"
-                opacity: 0.1
+                color: "#3d3a50"
+                opacity: 0.5
             }
 
             // Altitude Display Area
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 5
+                spacing: 2
                 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: myDialog.dialogText === "settings" ? qsTr("Takeoff Altitude") : qsTr("Confirm Action")
-                    color: "white"
-                    font.pointSize: 10
-                    opacity: 0.7
+                    color: "#9898bb"
+                    font.pointSize: 9
                 }
 
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: takeoffSettings.sliderOutputValue.toFixed(1) + " m"
-                    color: "white"
-                    font.pointSize: 32
+                    color: "black"
+                    font.pointSize: 28
                     font.bold: true
                     visible: myDialog.dialogText === "settings"
                 }
@@ -1537,17 +1537,16 @@ ApplicationWindow {
             // Controls
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 25
+                spacing: 20
                 visible: myDialog.dialogText === "settings"
 
                 // Minus Button
-                Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#3a1f57"
-                    border.color: "#4a2c6d"
-                    border.width: 1
+                    Rectangle {
+                        width: 48
+                        height: 48
+                        radius: 24
+                        color: "#2a2b3e"
+                        border.width: 0
                     
                     Text {
                         text: "-"
@@ -1568,13 +1567,12 @@ ApplicationWindow {
                 }
 
                 // Plus Button
-                Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#3a1f57"
-                    border.color: "#4a2c6d"
-                    border.width: 1
+                    Rectangle {
+                        width: 48
+                        height: 48
+                        radius: 24
+                        color: "#2a2b3e"
+                        border.width: 0
 
                     Text {
                         text: "+"
@@ -1600,16 +1598,15 @@ ApplicationWindow {
             // Center Circular Action Button
             Item {
                 Layout.alignment: Qt.AlignHCenter
-                width: 100
-                height: 100
+                width: 90
+                height: 90
 
                 Rectangle {
                     id: circularButton
                     anchors.fill: parent
                     radius: 50
-                    color: "#4a2c6d"
-                    border.color: "#6a4c8d"
-                    border.width: 2
+                    color: "#301934"
+                    border.width: 0
                     
                     Canvas {
                         id: progressCircle
@@ -1646,13 +1643,12 @@ ApplicationWindow {
                     }
                 }
             }
-
+            // Instruction text
             Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("Press and hold to confirm")
-                color: "white"
-                font.pointSize: 9
-                opacity: 0.6
+                Layout.alignment:       Qt.AlignHCenter
+                text:                   qsTr("Press and hold to confirm")
+                color:                  "#9898bb"
+                font.pointSize:         9
             }
         }
 
@@ -1738,17 +1734,18 @@ ApplicationWindow {
         Rectangle {
             id: planbtn
             Layout.alignment: Qt.AlignRight
-            width: 100
-            height: 38
-           // radius: width / 2  // Makes it a circle
-            color:  "#4a2c6d"//"#1b1c3e"     // white background
-            visible: false
+            width: 48
+            height: 48
+            radius: width / 2
+            color:  Qt.rgba(0, 0, 0, 0.40)      // More transparent black toolbars button
+            visible: plan === "Plan" 
 
             Text {
-                text: " + New Plot "
+                text: "+"
                 color: "white"
                 anchors.centerIn: parent
                 font.bold: true
+                font.pointSize: 24
             }
 
             MouseArea {
@@ -1867,19 +1864,19 @@ ApplicationWindow {
         ColumnLayout {
             id: contentCol
             anchors.centerIn: parent
-            // Full width on mobile/tablet, capped on ultra-wide desktops for premium feel
-            width:   Math.min(parent.width * 0.94, ScreenTools.defaultFontPixelWidth * 160)
-            spacing: ScreenTools.defaultFontPixelHeight * 2.5
+            // Small centered group
+            width:   Math.min(parent.width * 0.85, ScreenTools.defaultFontPixelWidth * 85)
+            spacing: ScreenTools.defaultFontPixelHeight * 1.8
 
             // Header
             ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelHeight * 0.6
+                spacing: ScreenTools.defaultFontPixelHeight * 0.4
                 Layout.alignment: Qt.AlignHCenter
 
                 Text {
                     text: "SELECT MISSION TYPE"
                     color: "white"
-                    font.pointSize:   ScreenTools.largeFontPointSize * 1.4
+                    font.pointSize:   ScreenTools.largeFontPointSize * 1.2
                     font.bold:        true
                     font.letterSpacing: 2
                     Layout.alignment: Qt.AlignHCenter
@@ -1889,19 +1886,9 @@ ApplicationWindow {
                 }
 
                 Rectangle {
-                    width: 80; height: 4
+                    width: 60; height: 3
                     color: app_color; radius: 2
                     Layout.alignment: Qt.AlignHCenter
-                }
-
-                Text {
-                    text: "Choose the method to define your mission boundaries and paths"
-                    color: "#888888"
-                    font.pointSize:  ScreenTools.defaultFontPointSize
-                    Layout.alignment: Qt.AlignHCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    Layout.maximumWidth: contentCol.width * 0.75
                 }
             }
 
@@ -1916,7 +1903,7 @@ ApplicationWindow {
                 Rectangle {
                     id: mappingbtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma1.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma1.containsMouse ? app_color : "#2e2e2e"
@@ -1926,21 +1913,21 @@ ApplicationWindow {
                     Column {
                         anchors.centerIn: parent
                         spacing: parent.height * 0.08
-                        width: parent.width * 0.75
+                        width: parent.width * 0.85
                         Rectangle {
                             width: parent.width * 0.55; height: width; radius: width / 2
                             color: ma1.containsMouse ? app_color : "#252525"
                             anchors.horizontalCenter: parent.horizontalCenter
                             QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/basic_marking.svg"
-                                width: parent.width * 0.6; height: width
+                                width: parent.width * 0.55; height: width
                                 color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit
                             }
                         }
                         Text {
                             text: "Basic"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -1963,7 +1950,7 @@ ApplicationWindow {
                 Rectangle {
                     id: mappingcirclebtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma2.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma2.containsMouse ? app_color : "#2e2e2e"
@@ -1987,7 +1974,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Circular"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2009,7 +1996,7 @@ ApplicationWindow {
                 // Card 3: Map Selection  (always visible)
                 Rectangle {
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma3.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma3.containsMouse ? app_color : "#2e2e2e"
@@ -2032,7 +2019,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Map Selection"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2055,7 +2042,7 @@ ApplicationWindow {
                 Rectangle {
                     id: agribtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma4.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma4.containsMouse ? app_color : "#2e2e2e"
@@ -2079,7 +2066,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Mark with Drone"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2107,7 +2094,7 @@ ApplicationWindow {
                 Rectangle {
                     id: agrigpsbtn
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma5.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma5.containsMouse ? app_color : "#2e2e2e"
@@ -2131,7 +2118,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Mark with GPS"; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2153,7 +2140,7 @@ ApplicationWindow {
                 // Card 6: Load KML/SHP  (always visible)
                 Rectangle {
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: width * 1.2
+                    Layout.preferredHeight: width
                     radius: 18
                     color:         ma6.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma6.containsMouse ? app_color : "#2e2e2e"
@@ -2176,7 +2163,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Load KML/SHP..."; color: "white"
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2707,7 +2694,7 @@ ApplicationWindow {
         rightInset:     0
         topInset:       0
         bottomInset:    0
-        padding:        _margins * 2
+        padding:        0
         visible:        false
         modal:          true
         focus:          true
@@ -2739,47 +2726,11 @@ ApplicationWindow {
             indicatorDrawerLoader.sourceComponent   = undefined
         }
 
-        background: Item {
-
-            Rectangle {
-                id:             backgroundRect
-                anchors.fill:   parent
-                color:          "black"//QGroundControl.globalPalette.window
-                radius:         indicatorDrawer._margins
-                opacity:        0.85
-            }
-
-            Rectangle {
-                anchors.horizontalCenter:   backgroundRect.right
-                anchors.verticalCenter:     backgroundRect.top
-                width:                      50//ScreenTools.defaultFontPixelHeight
-                height:                     20//width
-                radius:                     width / 2
-                color:                      QGroundControl.globalPalette.button
-                border.color:               QGroundControl.globalPalette.buttonText
-                visible:                    activeVehicle ? false :indicatorDrawerLoader.item && indicatorDrawerLoader.item.showExpand && !indicatorDrawer._expanded
-
-                QGCLabel {
-                    anchors.centerIn:   parent
-                    text:               "More"
-                    color:              QGroundControl.globalPalette.buttonText
-                }
-
-                QGCMouseArea {
-                    fillItem: parent
-                    onClicked: {
-                        if(!activeVehicle){
-                            //indicatorDrawer._expanded = true
-                            mainWindow.showToolSelectDialog1(4)
-                            mainWindow.closeIndicatorDrawer()
-                        }else{
-                            indicatorDrawer._expanded = true
-                            //mainWindow.showToolSelectDialog1(4)
-                            mainWindow.closeIndicatorDrawer()
-                        }
-                    }
-                }
-            }
+        background: Rectangle {
+            color: "#252525" // Dark Grey Background
+            radius: 12
+            border.color: "#333333"
+            border.width: 1
         }
 
         contentItem: QGCFlickable {

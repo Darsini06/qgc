@@ -17,7 +17,7 @@ Rectangle {
     width:              availableWidth
     height:             valuesColumn.implicitHeight + (_margin * 2)
     implicitHeight:     height
-    color:              "#1e1e24"
+    color:              "transparent"
     visible:            missionItem.isCurrentItem
     radius:             _radius
 
@@ -31,7 +31,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#4a2c6d"
+    property color  _colorAccent:   "#471880"
 
     property var    _masterControler:               masterController
     property var    _missionController:             _masterControler.missionController
@@ -47,9 +47,9 @@ Rectangle {
     property var    _fileExtension:                 QGroundControl.settingsManager.appSettings.missionFileExtension
     property var    _appSettings:                   QGroundControl.settingsManager.appSettings
     property bool   _waypointsOnlyMode:             QGroundControl.corePlugin.options.missionWaypointsOnly
-    property bool   _showCameraSection:             (_waypointsOnlyMode || QGroundControl.corePlugin.showAdvancedUI) && !_controllerVehicle.apmFirmware
+    property bool   _showCameraSection:             true // Always show per user request: "should not miss any content"
     property bool   _simpleMissionStart:            QGroundControl.corePlugin.options.showSimpleMissionStart
-    property bool   _showFlightSpeed:               !_controllerVehicle.vtol && !_simpleMissionStart && !_controllerVehicle.apmFirmware
+    property bool   _showFlightSpeed:               true // Always show
     property bool   _allowFWVehicleTypeSelection:   _noMissionItemsAdded && !globals.activeVehicle
 
     readonly property string _firmwareLabel:    qsTr("Firmware")
@@ -303,7 +303,7 @@ Rectangle {
                             if (item) {
                                 item.fact = targetFact
                                 item.trackFillColor = _colorAccent
-                                item.showMinusButton = false
+                                item.showMinusButton = true
                                 item.showPlusButton = true
                             }
                         }
@@ -345,6 +345,8 @@ Rectangle {
                         if (item) {
                             item.fact = targetFact
                             item.trackFillColor = "#ffffff"
+                            item.showMinusButton = true
+                            item.showPlusButton = true
                         }
                     }
                 }

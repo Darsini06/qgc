@@ -79,6 +79,10 @@ Item {
     property real buttonSize: Math.max(45, Math.min(baseSize, 64))
     property real iconSize: buttonSize * 0.2
 
+    property real cardinalLeftScreenX:   0
+    property real cardinalBottomScreenY: 0
+    property real mapRotation:           0
+
     onVisibleChanged : {
         if (visible) {
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
@@ -574,9 +578,9 @@ Item {
                 height: displayText.contentHeight + 6 // Padding
                 width: displayText.contentWidth + 12 // Padding
                 radius: height / 2 // Rounded corners
-                color: "#1b1c3e" // light purple background
-                border.color: "#4a2c6d"
-                border.width: 1
+                color: Qt.rgba(0, 0, 0, 0.40) // transparent black background
+                border.color: "transparent"
+                border.width: 0
 
                 Text {
                     id: displayText
@@ -976,12 +980,9 @@ Item {
         id: toolbarComponent
 
         Item {
-            id: toolbarRoot
-            // Position and size this container to match the available viewport area
-            x: mapControl.centerViewport.x
-            y: mapControl.centerViewport.y
-            width: mapControl.centerViewport.width
-            height: mapControl.centerViewport.height
+            // This item is parented to mapControl, so x/y are in mapControl coordinates
+            width: mapControl.width
+            height: mapControl.height
 
             Component.onCompleted: {
                 if (MapGlobals.mark_with === "KML_File" && MapGlobals.kmlPath !== "") {
@@ -991,105 +992,122 @@ Item {
                 }
             }
 
-            PlanEditToolbar {
-                id: toolbar
-                anchors.horizontalCenter: mapControl.left
-                anchors.horizontalCenterOffset: mapControl.centerViewport.left + (mapControl.centerViewport.width / 2)
-                y:                              mapControl.centerViewport.top
-                availableWidth:                 mapControl.centerViewport.width
+            // Viewport-based toolbar (hidden)
+            Item {
+                id: toolbarRoot
+                x: mapControl.centerViewport.x
+                y: mapControl.centerViewport.y
+                width: mapControl.centerViewport.width
+                height: mapControl.centerViewport.height
 
-                visible:            false//mapPolygon.traceMode  // added
+                PlanEditToolbar {
+                    id: toolbar
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    y: 0
+                    availableWidth: parent.width
+                    visible: false
+                }
 
-                // QGCButton {
-                //     _horizontalPadding: 0
-                //     text:               qsTr("Basic")
-                //     visible:            !mapPolygon.traceMode
-                //     onClicked:          _resetPolygon()
-                // }
-
-                // QGCButton {
-                //     _horizontalPadding: 0
-                //     text:               qsTr("Circular")
-                //     visible:            !mapPolygon.traceMode
-                //     onClicked:          _resetCircle()
-                // }
-
-                // QGCButton {
-                //     _horizontalPadding: 0
-                //     text:               mapPolygon.traceMode ? qsTr("Done Tracing") : qsTr("Trace")
-                //     onClicked: {
-                //         if (mapPolygon.traceMode) {
-                //             if (mapPolygon.count < 3) {
-                //                 _restorePreviousVertices()
-                //             }else{
-                //                 _planMasterController.saveToSelectedFile()
-                //                 //mapPolygon.traceMode = false
-                //                 mainWindow.planmap()
-                //             }
-
-
-                //             console.log("mapPolygon.traceMode if part")
-
-                //         } else {
-
-                //             customdialog.createObject(mainWindow).open()
-                //             // _saveCurrentVertices()
-                //             // _circleMode = false
-                //             // mapPolygon.traceMode = true
-                //             // mapPolygon.clear();
-                //             // console.log("mapPolygon.traceMode else part")
-                //         }
-
-                //     }
-                // }
-
-                // QGCButton {
-                //     _horizontalPadding: 0
-                //     text:               qsTr("Load KML/SHP...")
-                //     onClicked:          kmlOrSHPLoadDialog.openForLoad()
-                //     visible:            !mapPolygon.traceMode
-                // }
+                Image {
+                    id: controlImage
+                    source: "/qmlimages/NewImages/location.png"
+                    anchors.centerIn: parent
+                    width: 32
+                    height: 32
+                    visible: mapPolygon.traceMode && MapGlobals.mark_with === "Mark_With_Manual" || mapping
+                }
             }
 
-            Image {
-                id: controlImage
-                source: "/qmlimages/NewImages/location.png"
-                anchors.centerIn: parent  // Centers both horizontally and vertically
-                width: 32
-                height: 32
-                visible: (mapPolygon.traceMode || mapping) && MapGlobals.mark_with === "Mark_With_Manual"
-
-
-                // MouseArea {
-                //     anchors.fill: parent
-                //     onClicked: {
-                //         console.log("SVG image clicked")
-                //         // Add your click action here
-                //     }
-                // }
-            }
-
-
-            // Top-right buttons (Boundary + Obstacle)
+            // Buttons positioned directly below the compass icon
+            // cardinalLeftScreenX and cardinalBottomScreenY are in mapControl (panel) space
             Column {
-                //anchors.top: parent.top
-                anchors.right: parent.right
-                spacing: 0
+                x: cardinalLeftScreenX
+                y: cardinalBottomScreenY
+                z: 1000
+                spacing: 8
                 visible: mapPolygon.traceMode
 
-                Button  {
+                Rectangle {
+                    width:  buttonSize
+                    height: buttonSize
+                    radius: width / 2
+                    color:  Qt.rgba(0, 0, 0, 0.40)
+                    anchors.margins: 3
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/home.svg"
+                        anchors.centerIn: parent
+                        width: parent.width * 0.6
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        color : "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            QGroundControl.saveGlobalSetting("waypointvisible", "")
+                            QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                                mainWindow.cameraView()
+                                mainWindow.closefile()
+                            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                mainWindow.showMapping()
+                                mainWindow.closefile()
+                            }
+                            else{
+                                if (planType === "Plan") {
+                                    mainWindow.showFlyView()
+                                    mainWindow.closefile()
+                                } else {
+                                    mainWindow.showFlyView1()
+                                    mainWindow.closefile()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width:  buttonSize
+                    height: buttonSize
+                    radius: width / 2
+                    color:  Qt.rgba(0, 0, 0, 0.40)
+                    anchors.margins: 3
+
+                    QGCColoredImage {
+                        id: compassArrow
+                        source: "qrc:/qmlimages/NewImages/cardinal_point.svg"
+                        anchors.centerIn: parent
+                        width: parent.width * 0.7
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        transform: Rotation {
+                            origin.x: compassArrow.width / 2
+                            origin.y: compassArrow.height / 2
+                            angle: -mapRotation
+                        }
+                        color : "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: MapGlobals.mapRotation = 0
+                    }
+                }
+
+
+
+                Button {
                     id: boundryMarkingBtn
                     text: ""
                     width: buttonSize
                     height: buttonSize
-
                     padding: 10
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
@@ -1098,8 +1116,8 @@ Item {
                         source: "/qmlimages/NewImages/boundaryMarkingIcon.svg"
                         width: iconSize
                         height: iconSize
-                        anchors.centerIn: parent // Center the icon within the container
-                        color: "black"
+                        anchors.centerIn: parent
+                        color: "white"
                     }
 
                     onClicked: {
@@ -1165,111 +1183,120 @@ Item {
                         }
 
                     }
+
                 }
-
-                // Button {
-                //     id: obstacleBtn
-                //     text: ""
-                //     width: 46
-                //     height: 46
-
-                //     padding: 15
-
-                //     background: Rectangle {
-                //         radius: width / 2
-                //         color: "#1b1c3e"
-                //         border.color: "#005BBB"
-                //         border.width: 2
-                //         anchors.fill: parent
-                //         anchors.margins: 3
-                //     }
-
-                //     contentItem: QGCColoredImage {
-                //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                //         width: 16
-                //         height: 16
-                //         anchors.centerIn: parent // Center the icon within the container
-                //         color: "white"
-                //     }
-
-                //     onClicked: {
-                //         // Handle Obstacle click
-                //     }
-                // }
 
                 Button {
                     id: saveBtn
                     text: ""
                     width: buttonSize
                     height: buttonSize
-
                     padding: 12
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
                     contentItem: QGCColoredImage {
-                        //source: "qrc:/InstrumentValueIcons/save-disk.svg"
                         source: "/qmlimages/NewImages/savefile.svg"
                         width: iconSize
                         height: iconSize
-                        anchors.centerIn: parent // Center the icon within the container
-                        color: "black"
+                        anchors.centerIn: parent
+                        color: "white"
                     }
 
                     onClicked: {
                         if (mapPolygon.count < 3) {
                             _restorePreviousVertices()
-                        }else {
+                        } else {
                             _planMasterController.saveToSelectedFile()
                             mainWindow.planmap()
                         }
                     }
                 }
-
-                // Button {
-                //     id: cancelBtn
-                //     text: ""
-                //     width: 46
-                //     height: 46
-
-                //     padding: 13
-
-                //     background: Rectangle {
-                //         radius: width / 2
-                //         color: "#1b1c3e"
-                //         border.color: "#005BBB"
-                //         border.width: 2
-                //         anchors.fill: parent
-                //         anchors.margins: 5
-                //     }
-
-                //     contentItem: QGCColoredImage {
-                //         source: "qrc:/InstrumentValueIcons/cloud-upload.svg"
-                //         width: 16
-                //         height: 16
-                //         anchors.centerIn: parent // Center the icon within the container
-                //         color: "white"
-                //     }
-                //     onClicked: {
-                //         mainWindow.showFlyView()
-                //         MapGlobals.editdialog = "editdialog1"
-                //     }
-                // }
             }
 
             //only for Mapping
             Column {
-                //anchors.top: parent.top
-                anchors.right: parent.right
-                spacing: 0
+                x: cardinalLeftScreenX
+                y: cardinalBottomScreenY
+                z: 1000
+                spacing: 8
                 visible: mapping
+
+                Rectangle {
+                    width:  buttonSize
+                    height: buttonSize
+                    radius: width / 2
+                    color:  Qt.rgba(0, 0, 0, 0.40)
+                    anchors.margins: 3
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/home.svg"
+                        anchors.centerIn: parent
+                        width: parent.width * 0.6
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        color : "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            QGroundControl.saveGlobalSetting("waypointvisible", "")
+                            QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
+                                mainWindow.cameraView()
+                                mainWindow.closefile()
+                            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                mainWindow.showMapping()
+                                mainWindow.closefile()
+                            }
+                            else{
+                                if (planType === "Plan") {
+                                    mainWindow.showFlyView()
+                                    mainWindow.closefile()
+                                } else {
+                                    mainWindow.showFlyView1()
+                                    mainWindow.closefile()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width:  buttonSize
+                    height: buttonSize
+                    radius: width / 2
+                    color:  Qt.rgba(0, 0, 0, 0.40)
+                    anchors.margins: 3
+
+                    QGCColoredImage {
+                        id: compassArrow1
+                        source: "qrc:/qmlimages/NewImages/cardinal_point.svg"
+                        anchors.centerIn: parent
+                        width: parent.width * 0.7
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                        transform: Rotation {
+                            origin.x: compassArrow1.width / 2
+                            origin.y: compassArrow1.height / 2
+                            angle: -mapRotation
+                        }
+                        color : "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: MapGlobals.mapRotation = 0
+                    }
+                }
+
+
 
                 Button {
                     id: boundryMarkingBtn1
@@ -1281,9 +1308,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
@@ -1293,7 +1318,7 @@ Item {
                         width: iconSize
                         height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "black"
+                        color: "white"
                     }
 
                     onClicked: {
@@ -1372,9 +1397,7 @@ Item {
 
                     background: Rectangle {
                         radius: width / 2
-                        color: "white"//"#1b1c3e"
-                        //border.color: "#005BBB"
-                        //border.width: 2
+                        color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
@@ -1384,7 +1407,7 @@ Item {
                         width: iconSize
                         height: iconSize
                         anchors.centerIn: parent // Center the icon within the container
-                        color: "black"
+                        color: "white"
                     }
                     onClicked: {
                         console.log("Mapping clicked")
@@ -1402,10 +1425,205 @@ Item {
 
             }
 
+
+            // Click-outside-to-dismiss overlay — sibling of vertexMenu, fills the whole mapControl area
+            MouseArea {
+                anchors.fill: parent
+                z:            vertexMenu.z - 1
+                visible:      vertexMenu.visible
+                onClicked:    vertexMenu.closeMenu()
+            }
+
+            Rectangle {
+                id: vertexMenu
+                visible: false
+                x: 30
+                y: 60
+                z: 1000
+                radius: 8
+                color: "white"
+                border.color: "#000000"
+                border.width: 1
+                opacity: 0
+
+                width:  menuColumn.implicitWidth  + 28
+                height: menuColumn.implicitHeight + 8
+
+                layer.enabled: true
+                layer.effect: null
+
+                property int _editingVertexIndex: -1
+                property bool _showRemove: false
+
+                function popupVertex(curIndex) {
+                    vertexMenu._editingVertexIndex = curIndex
+                    vertexMenu._showRemove = (mapPolygon.count > 3 && curIndex >= 0)
+                    openAnimation.start()
+                }
+
+                function popupCenter() {
+                    vertexMenu._editingVertexIndex = -1
+                    vertexMenu._showRemove = false
+                    openAnimation.start()
+                }
+
+                function closeMenu() {
+                    closeAnimation.start()
+                }
+
+                // Slide-in from left animation
+                NumberAnimation {
+                    id: openAnimation
+                    target: vertexMenu
+                    property: "x"
+                    from: -vertexMenu.width
+                    to: 30
+                    duration: 280
+                    easing.type: Easing.OutCubic
+                    onStarted: {
+                        vertexMenu.visible = true
+                        vertexMenu.opacity = 1
+                    }
+                }
+
+                // Slide-out to right animation
+                NumberAnimation {
+                    id: closeAnimation
+                    target: vertexMenu
+                    property: "x"
+                    from: 30
+                    to: vertexMenu.width + 20
+                    duration: 220
+                    easing.type: Easing.InCubic
+                    onFinished: {
+                        vertexMenu.visible = false
+                        vertexMenu.x = 30
+                    }
+                }
+
+                Column {
+                    id: menuColumn
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                        margins: 2
+                    }
+                    spacing: 0
+
+                    // Remove vertex
+                    Rectangle {
+                        visible:        vertexMenu._showRemove
+                        implicitWidth:  removeRow.implicitWidth  + 28
+                        implicitHeight: removeRow.implicitHeight + 20
+                        color:          "transparent"
+                        radius:         8
+
+                        Behavior on color {
+                            ColorAnimation { duration: 120 }
+                        }
+
+                        Row {
+                            id: removeRow
+                            anchors.centerIn: parent
+                            spacing: 10
+
+                            QGCColoredImage {
+                                width:              ScreenTools.defaultFontPixelHeight
+                                height:             ScreenTools.defaultFontPixelHeight
+                                anchors.verticalCenter: parent.verticalCenter
+                                sourceSize.height:  height
+                                source:             "/res/TrashDelete.svg"
+                                fillMode:           Image.PreserveAspectFit
+                                mipmap:             true
+                                smooth:             true
+                                color:              qgcPal.text
+                            }
+
+                            Text {
+                                text:               qsTr("Remove vertex...")
+                                color:              "#000000"
+                                font.pointSize:     ScreenTools.defaultFontPointSize
+                                font.weight:        Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: removeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                if (vertexMenu._editingVertexIndex >= 0) {
+                                    mapPolygon.removeVertex(vertexMenu._editingVertexIndex)
+                                }
+                                vertexMenu.closeMenu()
+                            }
+                        }
+                    }
+
+                    // Divider
+                    Rectangle {
+                        visible: vertexMenu._showRemove
+                        width:  menuColumn.implicitWidth
+                        height: 1
+                        color: "#DDDDDD"
+                    }
+
+                    // "Edit position..." item
+                    Rectangle {
+                        id: editBtn
+                        visible: !_circleMode && vertexMenu._editingVertexIndex >= 0
+                        implicitWidth:  editRow.implicitWidth  + 28
+                        implicitHeight: editRow.implicitHeight + 20
+                        color:  "transparent"
+                        radius: 8
+
+                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                        Row {
+                            id: editRow
+                            anchors.centerIn: parent
+                            spacing: 10
+
+
+
+                            QGCColoredImage {
+                                width:              ScreenTools.defaultFontPixelHeight * 0.9
+                                height:             ScreenTools.defaultFontPixelHeight * 0.9
+                                anchors.verticalCenter: parent.verticalCenter
+                                sourceSize.height:  height
+                                source:             "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                                fillMode:           Image.PreserveAspectFit
+                                mipmap:             true
+                                smooth:             true
+                                color:              qgcPal.text
+                            }
+
+                            Text {
+                                text: qsTr("Edit position...")
+                                color: "#000000"
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            id: editMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                vertexMenu.closeMenu()
+                                editVertexPositionDialog.createObject(mainWindow).open()
+                            }
+                        }
+                    }
+                }
+            } // vertexMenu
         }
 
     }
-
 
     // Function to move the selected marker by dx/dy meters
     function moveSelectedMarker(dxMeters, dyMeters) {
@@ -1496,7 +1714,7 @@ Item {
                     height: parent.height * 0.9
                     radius: 10
                     color: "#ffffffcc" // semi-transparent white
-                    border.color: "#4a2c6d"
+                    border.color: "#301934"
                     border.width: 2
 
                     Column {
@@ -1504,25 +1722,46 @@ Item {
                         anchors.margins: 20
                         spacing: 15
 
-                        // Title
-                        Label {
-                            text: qsTr("Set Ground Name")
-                            font.bold: true
-                            font.pointSize: 14
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            width: parent.width
+                        // Header
+                        Rectangle {
+                            width: parent.width + 40
+                            height: 50
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: "#301934"
+                            radius: 10
+                            // Rounded top only
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                height: 10
+                                width: parent.width
+                                color: parent.color
+                            }
+
+                            Label {
+                                text: qsTr("Set Ground Name")
+                                font.bold: true
+                                color: "white"
+                                font.pointSize: 14
+                                anchors.centerIn: parent
+                                font.family: "Outfit"
+                            }
                         }
 
                         // Name Field
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Name :"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Name :"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField
                                 Layout.fillWidth: true
+                                color: "black"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1530,13 +1769,19 @@ Item {
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Ph No:"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField1
                                 Layout.fillWidth: true
+                                color: "black"
                                 validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
                                 inputMethodHints: Qt.ImhDigitsOnly
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField1.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1544,11 +1789,17 @@ Item {
                         RowLayout {
                             Layout.fillWidth: true
                             spacing: 10
-
-                            Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80 }
+                            Label { text: qsTr("Ground Name:"); Layout.preferredWidth: 80; color: "black"; font.bold: true }
                             TextField {
                                 id: filenameTextField2
                                 Layout.fillWidth: true
+                                color: "black"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: "white"
+                                    border.color: filenameTextField2.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.width: 1
+                                }
                             }
                         }
 
@@ -1558,21 +1809,37 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             Button {
-                                text: "Cancel"
+                                id: cancelBtnMobile
+                                text: qsTr("Cancel")
                                 width: 100
                                 background: Rectangle {
-                                    radius: 10
-                                    color: "#ccccff"
+                                    radius: 12
+                                    color: cancelBtnMobile.pressed ? "#C0392B" : (cancelBtnMobile.hovered ? "#E74C3C" : "#E74C3C")
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "white"
+                                    font.bold: true
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: mobileFileSaveDialog.onRejected()
                             }
 
                             Button {
-                                text: "Confirm"
+                                id: confirmBtnMobile
+                                text: qsTr("Confirm")
                                 width: 100
                                 background: Rectangle {
-                                    radius: 10
-                                    color: "#ccccff"
+                                    radius: 12
+                                    color: confirmBtnMobile.pressed ? "#1a0d1c" : (confirmBtnMobile.hovered ? "#4a2650" : "#301934")
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "white"
+                                    font.bold: true
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: mobileFileSaveDialog.accepted()
                             }
@@ -1710,13 +1977,9 @@ Item {
             padding:        0
             
             background: Rectangle {
-                radius: 4
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#5a3c7d" }
-                    GradientStop { position: 1.0; color: "#2d1c42" }
-                }
-                border.color: "#4a2c6d"
-                border.width: 1
+                radius: 20
+                color: "white"
+                border.width: 0
             }
 
             contentItem: ColumnLayout {
@@ -1724,15 +1987,27 @@ Item {
                 spacing: 0
 
                 // Header
-                Item {
+                Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
+                    color: "#262626"
+                    radius: 20
+                    // Top rounded corners only
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.radius
+                        color: parent.color
+                    }
+
                     Text {
                         text:               qsTr("Set Ground Name")
                         font.bold:          true
                         color:              "white"
                         font.pointSize:     14
                         anchors.centerIn:    parent
+                        font.family:        "Outfit"
                     }
                 }
 
@@ -1760,7 +2035,7 @@ Item {
 
                         Text {
                             text:           qsTr("Project Name:")
-                            color:          "white"
+                            color:          "black"
                             font.bold:      true
                             font.pointSize: 11
                         }
@@ -1768,16 +2043,18 @@ Item {
                         TextField {
                             id:             nameField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 34
+                            Layout.preferredHeight: 40
                             placeholderText: qsTr("Enter your project name")
-                            placeholderTextColor: "#999999"
-                            font.pointSize: 10
+                            placeholderTextColor: "#888888"
+                            font.pointSize: 11
                             color:          "black"
                             verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    10
+                            leftPadding:    15
                             background: Rectangle {
-                                radius:         2
-                                color:          "white"
+                                radius:         10
+                                color:          "#FFFFFF"
+                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
+                                border.width:   nameField.activeFocus ? 2 : 1
                             }
                         }
                     }
@@ -1819,16 +2096,16 @@ Item {
                                     MapGlobals.editdialog = "editdialog1"
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
-                                    color:      "#3a1f57"
-                                    border.color: "#4a2c6d"
-                                    border.width: 1
+                                    radius:     12
+                                    color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
+                                    border.width: 0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
                                     color:              "white"
                                     font.bold:          true
                                     font.pointSize:     12
+                                    font.family:        "Outfit"
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment:   Text.AlignVCenter
                                 }
@@ -1884,13 +2161,13 @@ Item {
                                     MapGlobals.editdialog = "editdialog1"
                                 }
                                 background: Rectangle {
-                                    radius:     height / 2
+                                    radius:     12
                                     gradient: Gradient {
-                                        GradientStop { position: 0.0; color: "#6a4c8d" }
-                                        GradientStop { position: 1.0; color: "#4a2c6d" }
+                                        GradientStop { position: 0.0; color: "#262626" }
+                                        GradientStop { position: 1.0; color: "#262626" }
                                     }
-                                    border.color: "#5a3c7d"
-                                    border.width: 1
+                                    border.width: 0
+                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Confirm")

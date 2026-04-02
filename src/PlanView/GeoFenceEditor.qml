@@ -22,12 +22,12 @@ QGCFlickable {
     readonly property real  _radius:            8
 
     // UI Colors - Modern Glassmorphic Dark Theme
-    readonly property color _colorBgPrimary:    "#1e1e24" 
+    readonly property color _colorBgPrimary:    "transparent"
     readonly property color _colorBgSecondary:  "#282830"
     readonly property color _colorBgTertiary:   "#32323b"
     readonly property color _colorBorder:       "#3e3e4a"
-    readonly property color _colorAccent:       "#4a2c6d" // Sleek iOS-like blue
-    readonly property color _colorAccentDark:   "#3d235cff"
+    readonly property color _colorAccent:       "#471880" // Modern Deep PurpleAccent
+    readonly property color _colorAccentDark:   "#471880ff"
     readonly property color _colorTextPrimary:  "#ffffff"
     readonly property color _colorTextSecondary:"#8e8e93"
     readonly property color _colorDanger:       "#FF453A"

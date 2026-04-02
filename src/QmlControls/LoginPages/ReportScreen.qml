@@ -13,7 +13,7 @@ Item {
     id: reportsRoot
     anchors.fill: parent
 
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
     property color sidebar_color: "#1e1431"
     property color bg_color: "#F9FAFB"
     property color border_color: "#E5E7EB"

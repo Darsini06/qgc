@@ -28,11 +28,70 @@ ColumnLayout {
         rowSpacing:     _rowSpacing
         columnSpacing:  _colSpacing
 
-        QGCLabel { text: qsTr("Serial Port") }
+        QGCLabel { text: qsTr("Serial Port"); color: "black" }
         QGCComboBox {
             id:                     commPortCombo
             Layout.preferredWidth:  _secondColumnWidth
             enabled:                QGroundControl.linkManager.serialPorts.length > 0
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: commPortCombo.activeFocus || commPortCombo.pressed ? "#301934" : "#DDE1EA"
+                border.width: commPortCombo.activeFocus || commPortCombo.pressed ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
+            contentItem: Text {
+                text: commPortCombo.currentText
+                font: commPortCombo.font
+                color: "black"
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 16
+            }
+
+            indicator: QGCColoredImage {
+                anchors.rightMargin:    ScreenTools.comboBoxPadding
+                anchors.right:          parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height:                 ScreenTools.defaultFontPixelWidth
+                width:                  height
+                source:                 "/qmlimages/arrow-down.png"
+                color:                  "black"
+            }
+
+            popup: Popup {
+                y: commPortCombo.height - 1
+                width: commPortCombo.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: commPortCombo.delegateModel
+                    currentIndex: commPortCombo.highlightedIndex
+                }
+                background: Rectangle {
+                    color: "#FFFFFF"
+                    border.color: "#301934"
+                    border.width: 1
+                    radius: 8
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: commPortCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: (parent.highlighted || (index === commPortCombo.currentIndex)) ? "white" : "black"
+                    font: commPortCombo.font
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 12
+                }
+                background: Rectangle {
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
+                }
+            }
 
             onActivated: (index) => {
                 if (index != -1) {
@@ -70,11 +129,70 @@ ColumnLayout {
             }
         }
 
-        QGCLabel { text: qsTr("Baud Rate") }
+        QGCLabel { text: qsTr("Baud Rate"); color: "black" }
         QGCComboBox {
             id:                     baudCombo
             Layout.preferredWidth:  _secondColumnWidth
             model:                  QGroundControl.linkManager.serialBaudRates
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: baudCombo.activeFocus || baudCombo.pressed ? "#301934" : "#DDE1EA"
+                border.width: baudCombo.activeFocus || baudCombo.pressed ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
+            contentItem: Text {
+                text: baudCombo.currentText
+                font: baudCombo.font
+                color: "black"
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 16
+            }
+
+            indicator: QGCColoredImage {
+                anchors.rightMargin:    ScreenTools.comboBoxPadding
+                anchors.right:          parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height:                 ScreenTools.defaultFontPixelWidth
+                width:                  height
+                source:                 "/qmlimages/arrow-down.png"
+                color:                  "black"
+            }
+
+            popup: Popup {
+                y: baudCombo.height - 1
+                width: baudCombo.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: baudCombo.delegateModel
+                    currentIndex: baudCombo.highlightedIndex
+                }
+                background: Rectangle {
+                    color: "#FFFFFF"
+                    border.color: "#301934"
+                    border.width: 1
+                    radius: 8
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: baudCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: (parent.highlighted || (index === baudCombo.currentIndex)) ? "white" : "black"
+                    font: baudCombo.font
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 12
+                }
+                background: Rectangle {
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
+                }
+            }
 
             onActivated: (index) => {
                 if (index != -1) {
@@ -100,6 +218,7 @@ ColumnLayout {
     QGCCheckBox {
         id:         advancedSettings
         text:       qsTr("Advanced Settings")
+        textColor:  "black"
         checked:    false
     }
 
@@ -112,15 +231,76 @@ ColumnLayout {
         QGCCheckBox {
             Layout.columnSpan:  2
             text:               qsTr("Enable Flow Control")
+            textColor:          "black"
             checked:            subEditConfig.flowControl !== 0
             onCheckedChanged:   subEditConfig.flowControl = checked ? 1 : 0
         }
 
-        QGCLabel { text: qsTr("Parity") }
+        QGCLabel { text: qsTr("Parity"); color: "black" }
 
         QGCComboBox {
+            id:                     parityCombo
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [qsTr("None"), qsTr("Even"), qsTr("Odd")]
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: parityCombo.activeFocus ? "#301934" : "#DDE1EA"
+                border.width: parityCombo.activeFocus ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
+            contentItem: Text {
+                text: parityCombo.currentText
+                font: parityCombo.font
+                color: "black"
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 16
+            }
+
+            indicator: QGCColoredImage {
+                anchors.rightMargin:    ScreenTools.comboBoxPadding
+                anchors.right:          parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height:                 ScreenTools.defaultFontPixelWidth
+                width:                  height
+                source:                 "/qmlimages/arrow-down.png"
+                color:                  "black"
+            }
+
+            popup: Popup {
+                y: parityCombo.height - 1
+                width: parityCombo.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: parityCombo.delegateModel
+                    currentIndex: parityCombo.highlightedIndex
+                }
+                background: Rectangle {
+                    color: "#FFFFFF"
+                    border.color: "#301934"
+                    border.width: 1
+                    radius: 8
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: parityCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: (parent.highlighted || (index === parityCombo.currentIndex)) ? "white" : "black"
+                    font: parityCombo.font
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 12
+                }
+                background: Rectangle {
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
+                }
+            }
 
             onActivated: (index) => {
                 // Hard coded values from qserialport.h
@@ -155,20 +335,140 @@ ColumnLayout {
             }
         }
 
-        QGCLabel { text: qsTr("Data Bits") }
+        QGCLabel { text: qsTr("Data Bits"); color: "black" }
 
         QGCComboBox {
+            id:                     dataBitsCombo
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [ "5", "6", "7", "8" ]
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: dataBitsCombo.activeFocus ? "#301934" : "#DDE1EA"
+                border.width: dataBitsCombo.activeFocus ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
+            contentItem: Text {
+                text: dataBitsCombo.currentText
+                font: dataBitsCombo.font
+                color: "black"
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 16
+            }
+
+            indicator: QGCColoredImage {
+                anchors.rightMargin:    ScreenTools.comboBoxPadding
+                anchors.right:          parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height:                 ScreenTools.defaultFontPixelWidth
+                width:                  height
+                source:                 "/qmlimages/arrow-down.png"
+                color:                  "black"
+            }
+
+            popup: Popup {
+                y: dataBitsCombo.height - 1
+                width: dataBitsCombo.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: dataBitsCombo.delegateModel
+                    currentIndex: dataBitsCombo.highlightedIndex
+                }
+                background: Rectangle {
+                    color: "#FFFFFF"
+                    border.color: "#301934"
+                    border.width: 1
+                    radius: 8
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: dataBitsCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: (parent.highlighted || (index === dataBitsCombo.currentIndex)) ? "white" : "black"
+                    font: dataBitsCombo.font
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 12
+                }
+                background: Rectangle {
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
+                }
+            }
             currentIndex:           Math.max(Math.min(subEditConfig.dataBits - 5, 3), 0)
             onActivated: (index) => { subEditConfig.dataBits = index + 5 }
         }
 
-        QGCLabel { text: qsTr("Stop Bits") }
+        QGCLabel { text: qsTr("Stop Bits"); color: "black" }
 
         QGCComboBox {
+            id:                     stopBitsCombo
             Layout.preferredWidth:  _secondColumnWidth
             model:                  [ "1", "2" ]
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: stopBitsCombo.activeFocus ? "#301934" : "#DDE1EA"
+                border.width: stopBitsCombo.activeFocus ? 2 : 1
+                implicitHeight: 44
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+            }
+            contentItem: Text {
+                text: stopBitsCombo.currentText
+                font: stopBitsCombo.font
+                color: "black"
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 16
+            }
+
+            indicator: QGCColoredImage {
+                anchors.rightMargin:    ScreenTools.comboBoxPadding
+                anchors.right:          parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height:                 ScreenTools.defaultFontPixelWidth
+                width:                  height
+                source:                 "/qmlimages/arrow-down.png"
+                color:                  "black"
+            }
+
+            popup: Popup {
+                y: stopBitsCombo.height - 1
+                width: stopBitsCombo.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: stopBitsCombo.delegateModel
+                    currentIndex: stopBitsCombo.highlightedIndex
+                }
+                background: Rectangle {
+                    color: "#FFFFFF"
+                    border.color: "#301934"
+                    border.width: 1
+                    radius: 8
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: stopBitsCombo.width
+                contentItem: Text {
+                    text: modelData
+                    color: (parent.highlighted || (index === stopBitsCombo.currentIndex)) ? "white" : "black"
+                    font: stopBitsCombo.font
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 12
+                }
+                background: Rectangle {
+                    color: parent.highlighted ? "#301934" : "#FFFFFF"
+                }
+            }
             currentIndex:           Math.max(Math.min(subEditConfig.stopBits - 1, 1), 0)
             onActivated: (index) => { subEditConfig.stopBits = index + 1 }
         }

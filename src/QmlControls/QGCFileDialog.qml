@@ -154,58 +154,96 @@ Item {
 
             Column {
                 id:         fileOpenColumn
-                width:      40 * ScreenTools.defaultFontPixelWidth
-                spacing:    ScreenTools.defaultFontPixelHeight / 2
+                width:      parent.width
+                spacing:    20
 
-                QGCLabel { text: qsTr("Path: %1").arg(_mobileShortPath) }
+                QGCLabel { 
+                    text:   qsTr("Path: %1").arg(_mobileShortPath) 
+                    color:  "black"
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold: true
+                }
 
-                Repeater {
-                    id:     fileRepeater
-                    model:  controller.getFiles(folder, _rgExtensions)
+                Rectangle {
+                    width:          parent.width
+                    height:         Math.max(50, fileListColumn.height)
+                    color:          "transparent"
+                    border.color:   Qt.rgba(255, 255, 255, 0.15)
+                    border.width:   1
+                    radius:         8
+                    clip:           true
+                    
+                    Column {
+                        id:             fileListColumn
+                        width:          parent.width
+                        spacing:        0
 
-                    FileButton {
-                        id:             fileButton
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        text:           modelData
+                        Repeater {
+                            id:     fileRepeater
+                            model:  controller.getFiles(folder, _rgExtensions)
 
-                        onClicked: {
-                            var strippedFileName = modelData.split(".")[0]
-                            _appSettings.username=strippedFileName;
-                            console.log("strippedFileName",strippedFileName)
+                            Item {
+                                width: parent.width
+                                height: fileButton.height
 
+                                FileButton {
+                                    id:             fileButton
+                                    anchors.fill:   parent
+                                    text:           modelData
+                                    border.width:   0
+                                    radius:         0
 
-                            mobileFileOpenDialog.close()
-                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
-                        }
+                                    onClicked: {
+                                        var strippedFileName = modelData.split(".")[0]
+                                        _appSettings.username=strippedFileName;
+                                        console.log("strippedFileName",strippedFileName)
 
-                        onHamburgerClicked: {
-                            highlight = true
-                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                            hamburgerMenu.popup()
-                        }
+                                        mobileFileOpenDialog.close()
+                                        _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
+                                    }
 
-                        QGCMenu {
-                            id: hamburgerMenu
+                                    onHamburgerClicked: {
+                                        highlight = true
+                                        hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
+                                        hamburgerMenu.popup()
+                                    }
 
-                            property string fileToDelete
+                                    QGCMenu {
+                                        id: hamburgerMenu
 
-                            onAboutToHide: fileButton.highlight = false
+                                        property string fileToDelete
 
-                            QGCMenuItem {
-                                text:           qsTr("Delete")
-                                onTriggered: {
-                                    controller.deleteFile(hamburgerMenu.fileToDelete)
-                                    fileRepeater.model = controller.getFiles(folder, _rgExtensions)
+                                        onAboutToHide: fileButton.highlight = false
+
+                                        QGCMenuItem {
+                                            text:           qsTr("Delete")
+                                            onTriggered: {
+                                                controller.deleteFile(hamburgerMenu.fileToDelete)
+                                                fileRepeater.model = controller.getFiles(folder, _rgExtensions)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: Qt.rgba(255, 255, 255, 0.1)
+                                    anchors.bottom: parent.bottom
+                                    visible: index < fileRepeater.count - 1
                                 }
                             }
                         }
                     }
-                }
 
-                QGCLabel {
-                    text:       qsTr("No files")
-                    visible:    fileRepeater.model.length === 0
+                    Text {
+                        anchors.centerIn: parent
+                        text:       qsTr("No files")
+                        color:      "black"
+                        font.pixelSize: 14
+                        font.bold: true
+                        visible:    fileRepeater.model.length === 0
+                    }
                 }
             }
         }
@@ -245,8 +283,12 @@ Item {
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
                 QGCLabel {
-                    text: qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
-                    Layout.fillWidth: true
+                    text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
+                    Layout.fillWidth:   true
+                    color:              "black"
+                    font.family:        "Outfit"
+                    font.pointSize:     ScreenTools.defaultFontPointSize
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }
@@ -281,7 +323,7 @@ Item {
 
             Column {
                 id:         fileSaveColumn
-                width:      40 * ScreenTools.defaultFontPixelWidth
+                width:      parent.width
                 spacing:    ScreenTools.defaultFontPixelHeight / 2
 
                 RowLayout {
@@ -314,39 +356,69 @@ Item {
                     text:           qsTr("Save to existing file:")
                 }
 
-                Repeater {
-                    id:     fileRepeater
-                    model:  controller.getFiles(folder, [ _rgExtensions ])
+                Rectangle {
+                    width:          parent.width
+                    height:         Math.max(50, fileSaveList.height)
+                    color:          "transparent"
+                    border.color:   Qt.rgba(255, 255, 255, 0.15)
+                    border.width:   1
+                    radius:         8
+                    clip:           true
 
-                    FileButton {
-                        id:             fileButton
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        text:           modelData
+                    Column {
+                        id: fileSaveList
+                        width: parent.width
+                        spacing: 0
 
-                        onClicked: {
-                            mobileFileSaveDialog.close()
-                            _root.acceptedForSave(controller.fullyQualifiedFilename(folder, modelData))
-                        }
+                        Repeater {
+                            id:     fileRepeater
+                            model:  controller.getFiles(folder, [ _rgExtensions ])
 
-                        onHamburgerClicked: {
-                            highlight = true
-                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                            hamburgerMenu.popup()
-                        }
+                            Item {
+                                width: parent.width
+                                height: fileButton.height
 
-                        QGCMenu {
-                            id: hamburgerMenu
+                                FileButton {
+                                    id:             fileButton
+                                    anchors.fill:   parent
+                                    text:           modelData
+                                    border.width:   0
+                                    radius:         0
 
-                            property string fileToDelete
+                                    onClicked: {
+                                        mobileFileSaveDialog.close()
+                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, modelData))
+                                    }
 
-                            onAboutToHide: fileButton.highlight = false
+                                    onHamburgerClicked: {
+                                        highlight = true
+                                        hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
+                                        hamburgerMenu.popup()
+                                    }
 
-                            QGCMenuItem {
-                                text:           qsTr("Delete")
-                                onTriggered: {
-                                    controller.deleteFile(hamburgerMenu.fileToDelete)
-                                    fileRepeater.model = controller.getFiles(folder, [ _rgExtensions ])
+                                    QGCMenu {
+                                        id: hamburgerMenu
+
+                                        property string fileToDelete
+
+                                        onAboutToHide: fileButton.highlight = false
+
+                                        QGCMenuItem {
+                                            text:           qsTr("Delete")
+                                            onTriggered: {
+                                                controller.deleteFile(hamburgerMenu.fileToDelete)
+                                                fileRepeater.model = controller.getFiles(folder, [ _rgExtensions ])
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: Qt.rgba(255, 255, 255, 0.1)
+                                    anchors.bottom: parent.bottom
+                                    visible: index < fileRepeater.count - 1
                                 }
                             }
                         }
@@ -401,7 +473,7 @@ Item {
 
                     Column {
                         id:         fileSaveColumn
-                        width:      40 * ScreenTools.defaultFontPixelWidth
+                        width:      parent.width
                         spacing:    ScreenTools.defaultFontPixelHeight / 2
 
                         RowLayout {
@@ -454,226 +526,214 @@ Item {
 
 
 
-    Component{
+    Component {
         id: customdialogedit
 
         Dialog {
-            id: customDialog
-            modal: true
-            dim: true
+            id:             customDialog
+            modal:          true
+            dim:            true
+            closePolicy:    Popup.NoAutoClose
             anchors.centerIn: parent
-            width: parent.width //* 0.8
-            height: parent.height //* 0.6
-
+            width:          ScreenTools.defaultFontPixelWidth * 38
+            height:         ScreenTools.defaultFontPixelHeight * 11
+            padding:        0
+            
             background: Rectangle {
-                color: "#661B1C3E"
-                radius: 15
-                border.color: "#005BBB"
-                border.width: 2
+                radius: 20
+                color: "white"
+                border.width: 0
+                clip: true
             }
 
-            // 🔴 Close Button
-            Rectangle {
-                id: closeBtn
-                width: 30
-                height: 30
-                radius: 15
-                color: "red"
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.margins: 10
+            contentItem: ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
 
-                Text {
-                    text: "X"
-                    anchors.centerIn: parent
-                    color: "white"
-                    font.bold: true
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        customDialog.visible = false
+                // Header
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.28
+                    color: "#262626"
+                    radius: 20
+                    // Top rounded corners only
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: parent.radius
+                        color: parent.color
+                        visible: parent.radius > 0
                     }
-                }
-            }
 
-            Column {
-                anchors.centerIn: parent
-                spacing: 20
-                width: 300//parent.width * 0.8
-
-                // Title
-                Label {
-                    text: qsTr("Set Ground Name")
-                    font.bold: true
-                    color: "white"
-                    font.pointSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    width: parent.width
-                }
-
-                // Name Field
-                RowLayout {
-                    spacing: 10
-                    width: parent.width
-                    Label {
-                        text: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Name:"):*/qsTr("Project Name:")
-                        Layout.preferredWidth: 100
-                        color: "white"
-                        font.bold: true
-                        font.pointSize: 14
-                    }
-                    TextField {
-                        id: nameField
-                        Layout.fillWidth: true
-                        placeholderText: /*QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?qsTr("Enter your name"):*/qsTr("Enter your project name")
+                    Text {
+                        text:               qsTr("Set Ground Name")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:     14
+                        anchors.centerIn:    parent
+                        font.family:        "Outfit"
                     }
                 }
 
-                // // Phone Number Field
-                // RowLayout {
-                //     spacing: 10
-                //     width: parent.width
-                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                //     Label {
-                //         text: qsTr("Ph No:")
-                //         Layout.preferredWidth: 100
-                //         color: "white"
-                //         font.bold: true
-                //         font.pointSize: 14
-                //     }
-                //     TextField {
-                //         id: phoneField
-                //         Layout.fillWidth: true
-                //         placeholderText: qsTr("Enter 10-digit phone no")
-                //         validator: RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                //         inputMethodHints: Qt.ImhDigitsOnly
-                //     }
-                // }
+                // Separator 1
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:             1
+                    color:              "black"
+                    opacity:            0.15
+                }
 
-                // // Ground Name Field
-                // RowLayout {
-                //     spacing: 10
-                //     width: parent.width
-                //     visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"
-                //     Label {
-                //         text: qsTr("Ground Name:")
-                //         Layout.preferredWidth: 100
-                //         color: "white"
-                //         font.bold: true
-                //         font.pointSize: 14
-                //     }
-                //     TextField {
-                //         id: groundField
-                //         Layout.fillWidth: true
-                //         placeholderText: qsTr("Enter ground name")
-                //     }
-                // }
-
-                // Buttons Row
-                Row {
-                    spacing: 40
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Button {
-                        text: qsTr("Cancel")
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            radius: 20
-                            color: "#1b1c3e"
-                            border.color: "#005BBB"
-                            border.width: 2
+                // Content Area
+                Item {
+                    Layout.fillWidth:   true
+                    Layout.fillHeight:  true
+                    RowLayout {
+                        anchors {
+                            left:           parent.left
+                            right:          parent.right
+                            verticalCenter: parent.verticalCenter
+                            leftMargin:     25
+                            rightMargin:    25
                         }
-                        contentItem: Text {
-                            text: "Cancel"
-                            anchors.fill: parent
-                                    verticalAlignment: Text.AlignVCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                            color: "white"
-                            font.bold: true
-                            font.pointSize: 14
+                        spacing:          15
 
-                        }
-                        onClicked: {
-                            customDialog.visible = false
-                        }
-                    }
-
-                    Button {
-                        text: qsTr("Confirm")
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            radius: 20
-                            color: "#1b1c3e"
-                            border.color: "#005BBB"
-                            border.width: 2
-                        }
-                        contentItem: Text {
-                            text: "Confirm"
-                            anchors.fill: parent
-                                    verticalAlignment: Text.AlignVCenter
-                                    horizontalAlignment: Text.AlignHCenter
-                            color: "white"
-                            font.bold: true
-                            font.pointSize: 14
+                        Text {
+                            text:           qsTr("Project Name:")
+                            color:          "black"
+                            font.bold:      true
+                            font.pointSize: 11
+                            font.family:    "Outfit"
                         }
 
-                        onClicked: {
-
-
-                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                // if (nameField.text.length < 3 || phoneField.text.length < 3 || groundField.text.length < 3) {
-                                //         mobileFileSaveDialog.preventClose = true
-                                //         return
-                                //     }
-
-                                // let concatenatedText = nameField.text.substring(0, 3) +
-                                //                            phoneField.text.substring(0, 3) +
-                                //                            groundField.text.substring(0, 3);
-                                if (nameField.text.length < 3 ) {
-                                        mobileFileSaveDialog.preventClose = true
-                                        return
-                                    }
-
-                                let concatenatedText = nameField.text.substring(0, 10);
-
-
-            _appSettings.username = concatenatedText;
-                                   console.log(concatenatedText);
-
-
-
-                               _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
-                            } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-
-                                if (nameField.text.length < 3 ) {
-                                        mobileFileSaveDialog.preventClose = true
-                                        return
-                                    }
-
-                                let concatenatedText = nameField.text.substring(0, 10);
-
-
-            _appSettings.username = concatenatedText;
-                                   console.log(concatenatedText);
-
-
-
-                               _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
-
-
+                        TextField {
+                            id:             nameField
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 40
+                            placeholderText: qsTr("Enter your project name")
+                            placeholderTextColor: "#888888"
+                            font.pointSize: 11
+                            color:          "black"
+                            verticalAlignment: TextInput.AlignVCenter
+                            leftPadding:    15
+                            background: Rectangle {
+                                radius:         10
+                                color:          "#FFFFFF"
+                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
+                                border.width:   nameField.activeFocus ? 2 : 1
                             }
+                        }
+                    }
+                }
 
-                            customDialog.visible = false
+                // Separator 2
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:             1
+                    color:              "black"
+                    opacity:            0.15
+                }
+
+                // Buttons Area
+                Item {
+                    Layout.fillWidth:   true
+                    Layout.preferredHeight: parent.height * 0.32
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 0
+
+                        // Cancel Column
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Button {
+                                id:             cancelBtn
+                                anchors.centerIn: parent
+                                width: 125
+                                height: 36
+                                onClicked: {
+                                    customDialog.visible = false
+                                }
+                                background: Rectangle {
+                                    radius:     12
+                                    color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
+                                    border.width: 0
+                                }
+                                contentItem: Text {
+                                    text:               qsTr("Cancel")
+                                    color:              "white"
+                                    font.bold:          true
+                                    font.pointSize:     12
+                                    font.family:        "Outfit"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment:   Text.AlignVCenter
+                                }
+                            }
+                        }
+
+                        // Vertical Separator
+                        Rectangle {
+                            Layout.fillHeight: true
+                            width: 1
+                            color: "black"
+                            opacity: 0.15
+                            Layout.topMargin: 10
+                            Layout.bottomMargin: 10
+                        }
+
+                        // Confirm Column
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Button {
+                                id:             confirmBtn
+                                anchors.centerIn: parent
+                                width: 125
+                                height: 36
+                                onClicked: {
+                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                                        if (nameField.text.length < 3 ) {
+                                                mobileFileSaveDialog.preventClose = true
+                                                return
+                                            }
+                                        let concatenatedText = nameField.text.substring(0, 10);
+                                        _appSettings.username = concatenatedText;
+                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                        if (nameField.text.length < 3 ) {
+                                                mobileFileSaveDialog.preventClose = true
+                                                return
+                                            }
+                                        let concatenatedText = nameField.text.substring(0, 10);
+                                        _appSettings.username = concatenatedText;
+                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+                                    }
+                                    customDialog.visible = false
+                                }
+                                background: Rectangle {
+                                    radius:     12
+                                    gradient: Gradient {
+                                        GradientStop { position: 0.0; color: "#262626" }
+                                        GradientStop { position: 1.0; color: "#262626" }
+                                    }
+                                    border.width: 0
+                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
+                                }
+                                contentItem: Text {
+                                    text:               qsTr("Confirm")
+                                    color:              "white"
+                                    font.bold:          true
+                                    font.pointSize:     12
+                                    font.family:        "Outfit"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment:   Text.AlignVCenter
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
     }
 
 }

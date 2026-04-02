@@ -69,7 +69,7 @@ Column {
             
             background: Rectangle {
                 radius: 10
-                color: "#4a2c6d"
+                color: "#301934"
                 border.color: "#3d3a50"
                 border.width: 1
             }
@@ -129,7 +129,7 @@ Column {
             anchors.left:   parent.left
             anchors.right:  parent.right
             spacing:        ScreenTools.defaultFontPixelWidth
-            visible:        _camera.cameraModeSupported
+            visible:        true // Always show Mode row
 
             QGCCheckBox {
                 id:                 modeCheckBox
@@ -171,7 +171,7 @@ Column {
 
                 background: Rectangle {
                     radius: 10
-                    color: "#4a2c6d"
+                    color: "#301934"
                     border.color: "#3d3a50"
                     border.width: 1
                 }

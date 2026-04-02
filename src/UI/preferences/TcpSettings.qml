@@ -26,18 +26,40 @@ GridLayout {
         subEditConfig.port = parseInt(portField.text)
     }
 
-    QGCLabel { text: qsTr("Server Address") }
+    QGCLabel { text: qsTr("Server Address"); color: "black" }
     QGCTextField {
         id:                     hostField
         Layout.preferredWidth:  _secondColumnWidth
         text:                   subEditConfig.host
+        textColor:              "black"
+        leftPadding:            16
+        rightPadding:           16
+        background: Rectangle {
+            color: "#FFFFFF"
+            radius: 8
+            border.color: hostField.activeFocus ? "#301934" : "#DDE1EA"
+            border.width: hostField.activeFocus ? 2 : 1
+            implicitHeight: 44
+            Behavior on border.color { ColorAnimation { duration: 200 } }
+        }
     }
 
-    QGCLabel { text: qsTr("Port") }
+    QGCLabel { text: qsTr("Port"); color: "black" }
     QGCTextField {
         id:                     portField
         Layout.preferredWidth:  _secondColumnWidth
         text:                   subEditConfig.port.toString()
         inputMethodHints:       Qt.ImhFormattedNumbersOnly
+        textColor:              "black"
+        leftPadding:            16
+        rightPadding:           16
+        background: Rectangle {
+            color: "#FFFFFF"
+            radius: 8
+            border.color: portField.activeFocus ? "#301934" : "#DDE1EA"
+            border.width: portField.activeFocus ? 2 : 1
+            implicitHeight: 44
+            Behavior on border.color { ColorAnimation { duration: 200 } }
+        }
     }
 }

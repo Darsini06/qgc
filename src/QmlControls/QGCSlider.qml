@@ -55,7 +55,7 @@ Slider {
             anchors.bottom: parent.bottom
             width:          control.visualPosition * parent.width
             radius:         parent.radius
-            color:          "#4a2c6d"
+            color:          "#301934"
             visible:        control.horizontal
         }
     }
@@ -94,7 +94,7 @@ Slider {
         implicitWidth:  _radius * 2
         implicitHeight: _radius * 2
         color:          control.pressed ? "#f1f5f9" : "white"
-        border.color:   "#4a2c6d"
+        border.color:   "#301934"
         border.width:   2
         radius:         _radius
 
@@ -106,7 +106,7 @@ Slider {
             anchors.centerIn:   parent
             font.family:        ScreenTools.normalFontFamily
             font.pointSize:     ScreenTools.smallFontPointSize
-            color:              "#4a2c6d"
+            color:              "#301934"
             font.bold:          true
         }
     }

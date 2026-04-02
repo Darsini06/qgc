@@ -75,7 +75,7 @@ public:
     void        loadSettings    (QSettings& settings, const QString& root) override;
     void        saveSettings    (QSettings& settings, const QString& root) override;
     void        updateSettings  ();
-    QString     settingsURL     () override { return "SerialSettings.qml"; }
+    QString     settingsURL     () override { return "qrc:/qml/SerialSettings.qml"; }
     QString     settingsTitle   () override { return tr("Serial Link Settings"); }
 
 signals:
