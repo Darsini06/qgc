@@ -180,6 +180,7 @@ Item {
         z: 1
 
         // ---- TOP LEFT LOGO ----
+/*
         Image {
             id: mainLogo
             source: "qrc:/qmlimages/NewImages/aviatrickslogo.svg"
@@ -195,6 +196,7 @@ Item {
             Behavior on opacity { NumberAnimation { duration: 1000; easing.type: Easing.OutCubic } }
             Component.onCompleted: opacity = 1
         }
+*/
 
         Label {
             id: topBrandText
@@ -408,11 +410,8 @@ Item {
             anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? parent.left : undefined
             anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
             
-            // Refined vertical positioning to prevent clashing with logo OR bottom buttons
-            anchors.top: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? mainLogo.bottom : undefined
-            anchors.topMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? (isSmallScreen ? dp(4) : dp(8)) : 0
-            anchors.verticalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? undefined : parent.verticalCenter
-            
+            // Vertically centered alignment
+            anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(5) : 0
             
             width: {
@@ -508,6 +507,7 @@ Item {
             }
 
             // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
+/*
             Rectangle {
                 id: airspaceWidget
                 visible: droneType !== "loadpage"
@@ -653,6 +653,7 @@ Item {
                     }
                 }
             }
+*/
         }
 
         // ---- BOTTOM BUTTONS BAR ----

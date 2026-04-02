@@ -50,26 +50,13 @@ Rectangle {
         anchors.bottom:         parent.bottom
         spacing:                ScreenTools.defaultFontPixelWidth / 2
 
-        /*QGCToolBarButton {
+        QGCToolBarButton {
             id:                     currentButton1
             Layout.preferredHeight: viewButtonRow.height
             icon.source:            "qrc:/InstrumentValueIcons/home.svg"
             logo:                   true
             onClicked:
             {
-                // if(MapGlobals.editdialog==="editdialog1"){
-                //     if (planType === "Plan") {
-                //         mainWindow.showFlyView()
-                //         mainWindow.closefile()
-                //     } else {
-                //         mainWindow.showFlyView1()
-                //         mainWindow.closefile()
-                //     }
-                // }else{
-                //     mainWindow.cameraView()
-
-                // }
-
                 //waypoint visible logic
                 QGroundControl.saveGlobalSetting("waypointvisible", "")
 
@@ -85,15 +72,15 @@ Rectangle {
                 }
                 else{
                     if (planType === "Plan") {
-                                            mainWindow.showFlyView()
-                                            mainWindow.closefile()
-                                        } else {
-                                            mainWindow.showFlyView1()
-                                            mainWindow.closefile()
-                                        }
+                        mainWindow.showFlyView()
+                        mainWindow.closefile()
+                    } else {
+                        mainWindow.showFlyView1()
+                        mainWindow.closefile()
+                    }
                 }
             }
-        }*/
+        }
 
     }
 
