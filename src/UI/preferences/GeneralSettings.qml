@@ -34,7 +34,7 @@ SettingsPage {
     property bool   _isTCP:                     _isStreamSource && (_videoSource === _videoSettings.tcpVideoSource)
     property bool   _isMPEGTS:                  _isStreamSource && (_videoSource === _videoSettings.mpegtsVideoSource)
     property bool   _videoAutoStreamConfig:     _videoManager.autoStreamConfigured
-    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 25
+    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 45
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
 
     //Telemetry Settings ------------------------------------------------------------------------------------
@@ -50,8 +50,8 @@ SettingsPage {
     property var _autoConnectSettings:  QGroundControl.settingsManager.autoConnectSettings
 
     property bool   _isNarrow:                  root.width < ScreenTools.defaultFontPixelWidth * 80
-    property real   _innerMargin:               _isNarrow ? ScreenTools.defaultFontPixelWidth * 2 : ScreenTools.defaultFontPixelWidth * 4
-    property real   _contentWidth:              Math.min(root.width - (_innerMargin * 2), ScreenTools.defaultFontPixelWidth * 120)
+    property real   _innerMargin:               ScreenTools.defaultFontPixelWidth * 2
+    property real   _contentWidth:              Math.min(root.width - (_innerMargin * 3), ScreenTools.defaultFontPixelWidth * 100)
 
 
 
@@ -67,22 +67,19 @@ SettingsPage {
     ColumnLayout {
         id:                 contentLayout
         Layout.fillWidth:   true
-        Layout.preferredWidth: _contentWidth
-        Layout.maximumWidth: ScreenTools.defaultFontPixelWidth * 120
-        Layout.alignment:   Qt.AlignHCenter
-        Layout.leftMargin:  _innerMargin
-        Layout.rightMargin: _innerMargin
+        Layout.alignment:   Qt.AlignLeft
+        Layout.leftMargin:  ScreenTools.defaultFontPixelWidth * 2
+        Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 15 // Absolute maximum margin to force visibility
+        Layout.maximumWidth: root.width > 200 ? root.width - 250 : 800 // Account for sidebar and scrollbar
         spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight / 2 : ScreenTools.defaultFontPixelHeight
 
         Text {
-            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             text:             qsTr("General Settings")
             font.pointSize:   ScreenTools.mediumFontPointSize
             color:            "black"
             font.bold:        true
-            horizontalAlignment: Text.AlignHCenter
-            //bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.2
+            horizontalAlignment: Text.AlignLeft
         }
 
         Rectangle {
@@ -90,6 +87,7 @@ SettingsPage {
             height: 1
             color: "#E0E0E0"
             Layout.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.3
+            visible:          _videoSettings.videoSource.visible
         }
 
         //Language
@@ -141,9 +139,11 @@ SettingsPage {
                 font.bold: true
             }
 
-            Flow {
+            GridLayout {
                 Layout.fillWidth: true
-                spacing: 20
+                columns:          3
+                columnSpacing:    20
+                rowSpacing:       10
 
                 Repeater {
                     model: _appSettings.followTarget.enumStrings
@@ -152,33 +152,32 @@ SettingsPage {
                         spacing: 12
 
                         Rectangle {
-                            width: 26
-                            height: 26
+                            width:        26
+                            height:       26
                             border.color: _appSettings.followTarget.rawValue === _appSettings.followTarget.enumValues[index] ? "black" : "#CCC"
                             border.width: 2
-                            radius: 4
-                            color: "white"
+                            radius:       4
+                            color:        "white"
 
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: 18
-                                height: 18
-                                source: "/qmlimages/checkbox-check.svg"
-                                color: "black"
-                                visible: _appSettings.followTarget.rawValue === _appSettings.followTarget.enumValues[index]
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          _appSettings.followTarget.rawValue === _appSettings.followTarget.enumValues[index]
                             }
-
                         }
 
                         QGCLabel {
-                            text: modelData
+                            text:  modelData
                             color: "black"
                             font.pointSize: ScreenTools.defaultFontPointSize
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: _appSettings.followTarget.rawValue = _appSettings.followTarget.enumValues[index]
+                            onClicked:    _appSettings.followTarget.rawValue = _appSettings.followTarget.enumValues[index]
                         }
                     }
                 }
@@ -313,9 +312,11 @@ SettingsPage {
                     font.bold: true
                 }
 
-                Flow {
+                GridLayout {
                     Layout.fillWidth: true
-                    spacing: 20
+                    columns:          3
+                    columnSpacing:    20
+                    rowSpacing:       10
 
                     Repeater {
                         model: unitFact.enumStrings
@@ -324,32 +325,32 @@ SettingsPage {
                             spacing: 12
 
                             Rectangle {
-                                width: 26
-                                height: 26
+                                width:        26
+                                height:       26
                                 border.color: unitFact.value === unitFact.enumValues[index] ? "black" : "#CCC"
                                 border.width: 2
-                                radius: 4
-                                color: "white"
+                                radius:       4
+                                color:        "white"
 
                                 QGCColoredImage {
                                     anchors.centerIn: parent
-                                    width: 18
-                                    height: 18
-                                    source: "/qmlimages/checkbox-check.svg"
-                                    color: "black"
-                                    visible: unitFact.value === unitFact.enumValues[index]
+                                    width:            18
+                                    height:           18
+                                    source:           "/qmlimages/checkbox-check.svg"
+                                    color:            "black"
+                                    visible:          unitFact.value === unitFact.enumValues[index]
                                 }
                             }
 
                             QGCLabel {
-                                text: modelData
+                                text:  modelData
                                 color: "black"
                                 font.pointSize: ScreenTools.smallFontPointSize
                             }
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: unitFact.value = unitFact.enumValues[index]
+                                onClicked:    unitFact.value = unitFact.enumValues[index]
                             }
                         }
                     }
@@ -459,15 +460,13 @@ SettingsPage {
         }
 
         Text {
-            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             text:             qsTr("Video Settings")
             font.pointSize:   ScreenTools.mediumFontPointSize
             color:            "black"
             font.bold:        true
-            //topPadding:       ScreenTools.defaultFontPixelHeight
-            horizontalAlignment: Text.AlignHCenter
-            //bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.3
+            horizontalAlignment: Text.AlignLeft
+            visible:          _videoSettings.videoSource.visible
         }
 
         ColumnLayout {
@@ -481,77 +480,163 @@ SettingsPage {
                 font.bold: true
             }
 
-            Flow {
+            GridLayout {
                 Layout.fillWidth: true
-                spacing: 15
+                columns:          3
+                columnSpacing:    20
+                rowSpacing:       10
+                visible:          _videoSettings.videoSource.visible
 
                 Repeater {
-
                     model: _videoSettings.videoSource.enumStrings
 
                     RowLayout {
                         spacing: 12
 
                         Rectangle {
-                            width: 26
-                            height: 26
+                            width:        26
+                            height:       26
                             border.color: _videoSettings.videoSource.rawValue === _videoSettings.videoSource.enumValues[index] ? "black" : "#CCC"
                             border.width: 2
-                            radius: 4
-                            color: "white"
+                            radius:       4
+                            color:        "white"
 
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: 18
-                                height: 18
-                                source: "/qmlimages/checkbox-check.svg"
-                                color: "black"
-                                visible: _videoSettings.videoSource.rawValue === _videoSettings.videoSource.enumValues[index]
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          _videoSettings.videoSource.rawValue === _videoSettings.videoSource.enumValues[index]
                             }
                         }
 
                         QGCLabel {
-                            text: modelData
+                            text:  modelData
                             color: "black"
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: _videoSettings.videoSource.rawValue = _videoSettings.videoSource.enumValues[index]
+                            onClicked:    _videoSettings.videoSource.rawValue = _videoSettings.videoSource.enumValues[index]
                         }
                     }
                 }
             }
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:           true
-            textFieldPreferredWidth:    _urlFieldWidth
-            label:                      qsTr("RTSP URL")
-            fact:                       _videoSettings.rtspUrl
-            visible:                    _isRTSP && _videoSettings.rtspUrl.visible
-        }
-
-        LabelledFactTextField {
-            Layout.fillWidth:           true
-            label:                      qsTr("TCP URL")
-            textFieldPreferredWidth:    _urlFieldWidth
-            fact:                       _videoSettings.tcpUrl
-            visible:                    _isTCP && _videoSettings.tcpUrl.visible
-        }
-
-        LabelledFactTextField {
+        GridLayout {
+            columns:            2
+            columnSpacing:      25
+            rowSpacing:         12
             Layout.fillWidth:   true
-            label:              qsTr("UDP Port")
-            fact:               _videoSettings.udpPort
-            visible:            _requiresUDPPort && _videoSettings.udpPort.visible
-        }
+            visible:            _isStreamSource && _videoSettings.videoSource.visible
 
-        LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("Aspect Ratio")
-            fact:               _videoSettings.aspectRatio
-            visible:            !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+            // RTSP URL
+            QGCLabel {
+                text:           qsTr("RTSP URL")
+                color:          "#1a237e"
+                font.bold:      true
+                visible:        _isRTSP && _videoSettings.rtspUrl.visible
+            }
+
+            Rectangle {
+                Layout.fillWidth:       true
+                Layout.preferredHeight: 40
+                Layout.maximumWidth:    _urlFieldWidth
+                color:                  "white"
+                border.color:           "#301934"
+                border.width:           1
+                radius:                 6
+                visible:                _isRTSP && _videoSettings.rtspUrl.visible
+
+                FactTextField {
+                    anchors.fill:       parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    fact:               _videoSettings.rtspUrl
+                    background:         null
+                }
+            }
+
+            // TCP URL
+            QGCLabel {
+                text:           qsTr("TCP URL")
+                color:          "#1a237e"
+                font.bold:      true
+                visible:        _isTCP && _videoSettings.tcpUrl.visible
+            }
+
+            Rectangle {
+                Layout.fillWidth:       true
+                Layout.preferredHeight: 40
+                Layout.maximumWidth:    _urlFieldWidth
+                color:                  "white"
+                border.color:           "#301934"
+                border.width:           1
+                radius:                 6
+                visible:                _isTCP && _videoSettings.tcpUrl.visible
+
+                FactTextField {
+                    anchors.fill:       parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    fact:               _videoSettings.tcpUrl
+                    background:         null
+                }
+            }
+
+            // UDP Port
+            QGCLabel {
+                text:           qsTr("UDP Port")
+                color:          "#1a237e"
+                font.bold:      true
+                visible:        _requiresUDPPort && _videoSettings.udpPort.visible
+            }
+
+            Rectangle {
+                Layout.preferredWidth:  120
+                Layout.preferredHeight: 40
+                color:                  "white"
+                border.color:           "#301934"
+                border.width:           1
+                radius:                 6
+                visible:                _requiresUDPPort && _videoSettings.udpPort.visible
+
+                FactTextField {
+                    anchors.fill:       parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    fact:               _videoSettings.udpPort
+                    background:         null
+                }
+            }
+
+            // Aspect Ratio
+            QGCLabel {
+                text:           qsTr("Aspect Ratio")
+                color:          "#1a237e"
+                font.bold:      true
+                visible:        !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+            }
+
+            Rectangle {
+                Layout.preferredWidth:  120
+                Layout.preferredHeight: 40
+                color:                  "white"
+                border.color:           "#301934"
+                border.width:           1
+                radius:                 6
+                visible:                !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+
+                FactTextField {
+                    anchors.fill:       parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    fact:               _videoSettings.aspectRatio
+                    background:         null
+                }
+            }
         }
 
         // FactCheckBoxSlider {
@@ -629,15 +714,12 @@ SettingsPage {
         }
 
         Text {
-            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             text:             qsTr("Logging")
             font.pixelSize:   ScreenTools.isMobile ? 18 : 22
             color:            "black"
             font.bold:        true
-            //topPadding:       ScreenTools.defaultFontPixelHeight
-            //bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.3
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
             visible:          !_disableAllDataPersistence
         }
 

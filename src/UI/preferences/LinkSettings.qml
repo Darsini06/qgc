@@ -64,16 +64,17 @@ ColumnLayout  {
     }
 
     RowLayout {
-        Layout.fillWidth: true
+        Layout.fillWidth:   true
+        Layout.rightMargin: 40
+        spacing:            ScreenTools.defaultFontPixelWidth * 1.5
 
         Text {
-            Layout.alignment: Qt.AlignHCenter
             Layout.fillWidth: true
             text:             qsTr("Communication Links")
             font.pixelSize:   ScreenTools.mediumFontPointSize
             color:            "black"
             font.bold:        true
-            //topPadding:       ScreenTools.defaultFontPixelHeight
+            horizontalAlignment: Text.AlignLeft
             bottomPadding:   ScreenTools.defaultFontPixelHeight * 0.3
         }
 

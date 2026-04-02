@@ -81,9 +81,20 @@ Item {
         anchors.fill: parent
         z: 0
 
+        // Grey Gradient background specifically for the startup/loadpage state
+        Rectangle {
+            anchors.fill: parent
+            visible: (droneType === "loadpage")
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#E0E0E0" } // Light grey top
+                GradientStop { position: 1.0; color: "#EDEEF4" } // Standard background grey bottom
+            }
+        }
+
         Image {
             id: bgImage
             anchors.fill: parent
+            visible: (droneType !== "loadpage")
             source: {
                 if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
                 if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
@@ -107,6 +118,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: 0.6
+            visible: (droneType !== "loadpage")
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }
                 GradientStop { position: 0.5; color: "transparent" }
@@ -117,6 +129,7 @@ Item {
         // Darkening overlay for cinematic look and text readability - with vignette
         Rectangle {
             anchors.fill: parent
+            visible: (droneType !== "loadpage")
             gradient: Gradient {
                 id: vignetteGradient
                 GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.2) }
@@ -173,6 +186,25 @@ Item {
             cache: true
             mipmap: true
         }
+
+        // Startup/Loadpage Specific Drone (Right Side Corner)
+        Image {
+            id: loadpageDrone
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(5) : dp(5)
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.40
+            height: width
+            source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
+            fillMode: Image.PreserveAspectFit
+            visible: (droneType === "loadpage")
+            opacity: 0.85
+            asynchronous: true
+            cache: true
+            mipmap: true
+            
+            // Note: Shake/Floating animation removed per user request
+        }
     }
 
     Item {
@@ -212,7 +244,7 @@ Item {
                     return dp(16) // Moved down for more style
                 }
             }
-            color: "#FFFFFF"
+            color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
             font.family: "Outfit"
             font.bold: true
             font.letterSpacing: isTablet || isDesktop ? 8 : 4
@@ -268,8 +300,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: profileMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
+                    color: (droneType === "loadpage") ? (profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: profileMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -285,7 +317,7 @@ Item {
                     }
                     Label {
                         text: qsTr("PROFILE")
-                        color: "white"
+                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -310,8 +342,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: appMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
+                    color: (droneType === "loadpage") ? (appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: appMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -327,7 +359,7 @@ Item {
                     }
                     Label {
                         text: qsTr("APPLICATION")
-                        color: "white"
+                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -352,8 +384,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : Qt.rgba(255, 255, 255, 0.1)
+                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -369,7 +401,7 @@ Item {
                     }
                     Label {
                         text: qsTr("LOGOUT")
-                        color: logoutMouse.containsMouse ? "#FF6B6B" : "white"
+                        color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? "#262626" : "#FFFFFF")
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -423,7 +455,7 @@ Item {
                     if (droneType === "Agri")    return "AGRICULTURAL PRECISION"
                     return ""
                 }
-                color: "#FFFFFF"
+                color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                 // Massive size for Drone Commander, slightly larger for others
                 font.pointSize: {
                     var baseSize = ScreenTools.largeFontPointSize
@@ -448,7 +480,7 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.8)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.2) : Qt.rgba(0,0,0,0.8)
                     shadowBlur: 0.3
                     shadowHorizontalOffset: 2
                     shadowVerticalOffset: 2
@@ -468,7 +500,7 @@ Item {
                     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
                     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
                 }
-                color: Qt.rgba(255, 255, 255, 0.9)
+                color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
                     var baseSize = ScreenTools.defaultFontPointSize
                     var scaleMultiplier = dynamicScaleFactor
@@ -487,17 +519,16 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.6)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.1) : Qt.rgba(0,0,0,0.6)
                     shadowBlur: 0.2
                     shadowVerticalOffset: 1
                 }
             }
 
             // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
-/*
             Rectangle {
                 id: airspaceWidget
-                visible: droneType !== "loadpage"
+                visible: true // Always show or adapt as needed
                 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
@@ -640,7 +671,6 @@ Item {
                     }
                 }
             }
-*/
         }
 
         // ---- BOTTOM BUTTONS BAR ----
