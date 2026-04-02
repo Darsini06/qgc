@@ -180,21 +180,21 @@ Item {
         z: 1
 
         // ---- TOP LEFT LOGO ----
-        Image {
-            id: mainLogo
-            source: "qrc:/qmlimages/NewImages/aviatrickslogo.svg"
-            width: Math.min(parent.width * 0.20, dp(140))
-            height: dp(5.5)
-            fillMode: Image.PreserveAspectFit
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(4) : 40
-            anchors.topMargin: (isSmallScreen || isMobile) ? dp(4) : 40
-            z: 5
-            opacity: 0
-            Behavior on opacity { NumberAnimation { duration: 1000; easing.type: Easing.OutCubic } }
-            Component.onCompleted: opacity = 1
-        }
+        // Image {
+        //     id: mainLogo
+        //     source: "qrc:/qmlimages/NewImages/aviatrickslogo.svg"
+        //     width: Math.min(parent.width * 0.20, dp(140))
+        //     height: dp(5.5)
+        //     fillMode: Image.PreserveAspectFit
+        //     anchors.left: parent.left
+        //     anchors.top: parent.top
+        //     anchors.leftMargin: (isSmallScreen || isMobile) ? dp(4) : 40
+        //     anchors.topMargin: (isSmallScreen || isMobile) ? dp(4) : 40
+        //     z: 5
+        //     opacity: 0
+        //     Behavior on opacity { NumberAnimation { duration: 1000; easing.type: Easing.OutCubic } }
+        //     Component.onCompleted: opacity = 1
+        // }
 
         Label {
             id: topBrandText
