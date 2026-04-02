@@ -16,8 +16,8 @@ Item {
     property string userEmail: ""
     property string totalDurationFormatted: "0h 0m"
     property int missionsCompleted: 0
-    property color app_color: "#301934" 
-    property color accent_color: "#7c4dff" 
+    property color app_color: "#262626" 
+    property color accent_color: "#262626" 
     property color surface_color: "#ffffff"
     property color bg_color: "#f8f9fa"
 

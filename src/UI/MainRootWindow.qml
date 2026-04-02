@@ -1088,7 +1088,7 @@ ApplicationWindow {
         anchors.top: toolbar.bottom
         anchors.left: parent.left
         anchors.topMargin: ScreenTools.defaultFontPixelHeight * 0.8
-        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 2.5
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
 

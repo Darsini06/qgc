@@ -26,8 +26,8 @@ Item {
     property var    _pipOrWindowItem
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
-    property color app_color: "#301934"
-    property color secondary_color: "#7c4dff"
+    property color app_color: "#262626"
+    property color secondary_color: "#262626"
     property color accent_color: "#f97316" // The Orange accent
 
     // Airspace Recommendation Properties
@@ -180,23 +180,21 @@ Item {
         z: 1
 
         // ---- TOP LEFT LOGO ----
-/*
         Image {
             id: mainLogo
-            source: "qrc:/qmlimages/NewImages/aviatrickslogo.svg"
-            width: Math.min(parent.width * 0.20, dp(140))
-            height: dp(5.5)
+            source: "qrc:/qmlimages/NewImages/dronecommanderlogo.svg"
+            width: ScreenTools.defaultFontPixelWidth * (isMobile ? 10 : 14)
+            height: width * (100 / 220)
             fillMode: Image.PreserveAspectFit
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(4) : 40
-            anchors.topMargin: (isSmallScreen || isMobile) ? dp(4) : 40
-            z: 5
+            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(2) : dp(5)
+            anchors.topMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            z: 50
             opacity: 0
-            Behavior on opacity { NumberAnimation { duration: 1000; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.OutCubic } }
             Component.onCompleted: opacity = 1
         }
-*/
 
         Label {
             id: topBrandText
@@ -241,16 +239,6 @@ Item {
             Behavior on font.pointSize { NumberAnimation { duration: 600 } }
             Behavior on font.letterSpacing { NumberAnimation { duration: 600 } }
 
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Qt.rgba(0,0,0,0.8)
-                shadowBlur: 0.4
-                shadowVerticalOffset: 2
-                blurEnabled: true
-                blur: 0.1
-                blurMax: 32
-            }
 
             Component.onCompleted: {
                 topTextEntry.start()
@@ -266,10 +254,9 @@ Item {
         // ---- TOP RIGHT NAVIGATION ----
         Row {
             id: topMenu
-            anchors.top: parent.top
+            anchors.verticalCenter: mainLogo.verticalCenter
             anchors.right: parent.right
-            anchors.topMargin: isSmallScreen ? dp(4) : 40
-            anchors.rightMargin: isSmallScreen ? dp(4) : 40
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(2) : dp(5)
             spacing: isSmallScreen ? dp(2) : dp(4)
             z: 100
 
@@ -681,7 +668,7 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: height / 2
+                    radius: 20
                     color: connectMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: connectMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
@@ -734,269 +721,218 @@ Item {
 
             Item { Layout.fillWidth: true }
 
-            // Swipe to Camera
+            // Click to Camera
             Item {
-                id: cameraSwipe
+                id: cameraClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
-                Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
-                Layout.minimumWidth: dp(14)
-                Layout.preferredHeight: isSmallScreen ? dp(6) : dp(7)
+                Layout.maximumWidth: dp(30)
+                Layout.minimumWidth: dp(18)
+                Layout.preferredHeight: dp(7)
                 visible: droneType === "loadpage" || droneType === "Camera"
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: height / 2
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: Qt.rgba(255, 255, 255, 0.15)
+                    radius: 20
+                    color: cameraMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
+                    border.color: cameraMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                    Row {
-                        anchors.centerIn: parent
-                        anchors.horizontalCenterOffset: dp(4)
-                        spacing: dp(2)
-                        opacity: 0.3
-                        Repeater {
-                            model: 3
-                            Label { text: ">"; color: "white"; font.bold: true; font.pointSize: 10 }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: dp(0.8)
+                        spacing: dp(1.5)
+
+                        Rectangle {
+                            Layout.preferredWidth: parent.height - dp(1)
+                            Layout.preferredHeight: Layout.preferredWidth
+                            radius: width / 2
+                            color: "#1a1a1a" // Deep background for icon
+                            
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/camera_Application.svg"
+                                width: parent.width * 0.5
+                                height: width
+                                color: "white"
+                                anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
                         }
-                    }
-                }
 
-                Rectangle {
-                    id: cameraHandle
-                    width: parent.height - dp(2)
-                    height: width
-                    radius: width / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(1)
-                    color: app_color
-
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: app_color
-                        shadowBlur: 0.8
-                    }
-
-                    Image {
-                        source: "qrc:/qmlimages/NewImages/camera_Application.svg"
-                        width: parent.width * 0.5
-                        height: width
-                        anchors.centerIn: parent
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    Behavior on x {
-                        enabled: !cameraMouse.pressed
-                        NumberAnimation { duration: 300; easing.type: Easing.OutBack }
+                        Label {
+                            Layout.fillWidth: true
+                            text: qsTr("START CAMERA")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                        }
                     }
                 }
 
                 MouseArea {
                     id: cameraMouse
                     anchors.fill: parent
-                    drag.target: cameraHandle
-                    drag.axis: Drag.XAxis
-                    drag.minimumX: dp(1)
-                    drag.maximumX: parent.width - cameraHandle.width - dp(1)
-
-                    onReleased: {
-                        if (cameraHandle.x >= drag.maximumX - dp(2)) {
-                            QGroundControl.saveGlobalSetting("loadpage", "Camera")
-                            MapGlobals.comefrom = "Camera"
-                            mainWindow.cameraView()
-                            QGroundControl.saveGlobalSetting("waypoint","waypoint")
-                            var videoSettings = QGroundControl.settingsManager.videoSettings
-                            if (videoSettings) {
-                                var videoSourceFact = videoSettings.videoSource
-                                if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                    videoSourceFact.value = videoSourceFact.enumValues[0]
-                                }
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("loadpage", "Camera")
+                        MapGlobals.comefrom = "Camera"
+                        mainWindow.cameraView()
+                        QGroundControl.saveGlobalSetting("waypoint","waypoint")
+                        var videoSettings = QGroundControl.settingsManager.videoSettings
+                        if (videoSettings) {
+                            var videoSourceFact = videoSettings.videoSource
+                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                                videoSourceFact.value = videoSourceFact.enumValues[0]
                             }
-                            swapCamera();
-                            cameraHandle.x = drag.minimumX
-                        } else {
-                            cameraHandle.x = drag.minimumX
                         }
+                        swapCamera();
                     }
                 }
             }
 
-            // Swipe to Agri
+            // Click to Agri
             Item {
-                id: agriSwipe
+                id: agriClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
-                Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
-                Layout.minimumWidth: isSmallScreen ? dp(14) : dp(18)
-                Layout.preferredHeight: isSmallScreen ? dp(6) : dp(7)
+                Layout.maximumWidth: dp(30)
+                Layout.minimumWidth: dp(18)
+                Layout.preferredHeight: dp(7)
                 visible: droneType === "loadpage" || droneType === "Agri"
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: height / 2
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: Qt.rgba(255, 255, 255, 0.15)
+                    radius: 20
+                    color: agriMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
+                    border.color: agriMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                    Row {
-                        anchors.centerIn: parent
-                        anchors.horizontalCenterOffset: dp(4)
-                        spacing: dp(2)
-                        opacity: 0.3
-                        Repeater {
-                            model: 3
-                            Label { text: ">"; color: "white"; font.bold: true; font.pointSize: 10 }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: dp(0.8)
+                        spacing: dp(1.5)
+
+                        Rectangle {
+                            Layout.preferredWidth: parent.height - dp(1)
+                            Layout.preferredHeight: Layout.preferredWidth
+                            radius: width / 2
+                            color: "#1a2a1a" // Subtle dark green tint for agri background
+                            
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/agri_Application.svg"
+                                width: parent.width * 0.5
+                                height: width
+                                color: "#45d058" // Professional vibrant green
+                                anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
                         }
-                    }
-                }
 
-                Rectangle {
-                    id: agriHandle
-                    width: parent.height - dp(2)
-                    height: width
-                    radius: width / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(1)
-                    color: app_color
-
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: app_color
-                        shadowBlur: 0.8
-                    }
-
-                    Image {
-                        source: "qrc:/qmlimages/NewImages/agri_Application.svg"
-                        width: parent.width * 0.5
-                        height: width
-                        anchors.centerIn: parent
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    Behavior on x {
-                        enabled: !agriMouse.pressed
-                        NumberAnimation { duration: 300; easing.type: Easing.OutBack }
+                        Label {
+                            Layout.fillWidth: true
+                            text: qsTr("START MISSION")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                        }
                     }
                 }
 
                 MouseArea {
                     id: agriMouse
                     anchors.fill: parent
-                    drag.target: agriHandle
-                    drag.axis: Drag.XAxis
-                    drag.minimumX: dp(1)
-                    drag.maximumX: parent.width - agriHandle.width - dp(1)
-
-                    onReleased: {
-                        if (agriHandle.x >= drag.maximumX - dp(2)) {
-                            QGroundControl.saveGlobalSetting("loadpage", "Agri")
-                            mainWindow.showFlyView()
-                            MapGlobals.comefrom = "Plan"
-                            _appSettings.screen = "Plan"
-                            var videoSettings = QGroundControl.settingsManager.videoSettings
-                            if (videoSettings) {
-                                var videoSourceFact = videoSettings.videoSource
-                                if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                    videoSourceFact.value = videoSourceFact.enumValues[0]
-                                }
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("loadpage", "Agri")
+                        mainWindow.showFlyView()
+                        MapGlobals.comefrom = "Plan"
+                        _appSettings.screen = "Plan"
+                        var videoSettings = QGroundControl.settingsManager.videoSettings
+                        if (videoSettings) {
+                            var videoSourceFact = videoSettings.videoSource
+                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                                videoSourceFact.value = videoSourceFact.enumValues[0]
                             }
-                            swapCamera();
-                            agriHandle.x = drag.minimumX
-                        } else {
-                            agriHandle.x = drag.minimumX
                         }
+                        swapCamera();
                     }
                 }
             }
 
-            // Swipe to Mapping
+            // Click to Mapping
             Item {
-                id: mappingSwipe
+                id: mappingClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
                 Layout.fillWidth: true
-                Layout.maximumWidth: isSmallScreen ? dp(22) : dp(30)
-                Layout.minimumWidth: dp(14)
-                Layout.preferredHeight: isSmallScreen ? dp(6) : dp(7)
+                Layout.maximumWidth: dp(30)
+                Layout.minimumWidth: dp(18)
+                Layout.preferredHeight: dp(7)
                 visible: droneType === "loadpage" || droneType === "Mapping"
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: height / 2
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: Qt.rgba(255, 255, 255, 0.15)
+                    radius: 20
+                    color: mappingMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
+                    border.color: mappingMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                    Row {
-                        anchors.centerIn: parent
-                        anchors.horizontalCenterOffset: dp(4)
-                        spacing: dp(2)
-                        opacity: 0.3
-                        Repeater {
-                            model: 3
-                            Label { text: ">"; color: "white"; font.bold: true; font.pointSize: 10 }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: dp(0.8)
+                        spacing: dp(1.5)
+
+                        Rectangle {
+                            Layout.preferredWidth: parent.height - dp(1)
+                            Layout.preferredHeight: Layout.preferredWidth
+                            radius: width / 2
+                            color: "#1a1a2a" // Subtle dark blue tint for mapping background
+                            
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/mapping_Application.svg"
+                                width: parent.width * 0.5
+                                height: width
+                                color: "#3b82f6" // Professional vibrant blue
+                                anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
                         }
-                    }
-                }
 
-                Rectangle {
-                    id: mappingHandle
-                    width: parent.height - dp(2)
-                    height: width
-                    radius: width / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(1)
-                    color: app_color
-
-                    layer.enabled: true
-                    layer.effect: MultiEffect {
-                        shadowEnabled: true
-                        shadowColor: app_color
-                        shadowBlur: 0.8
-                    }
-
-                    Image {
-                        source: "qrc:/qmlimages/NewImages/mapping_Application.svg"
-                        width: parent.width * 0.5
-                        height: width
-                        anchors.centerIn: parent
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    Behavior on x {
-                        enabled: !mappingMouse.pressed
-                        NumberAnimation { duration: 300; easing.type: Easing.OutBack }
+                        Label {
+                            Layout.fillWidth: true
+                            text: qsTr("START MAPPING")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                        }
                     }
                 }
 
                 MouseArea {
                     id: mappingMouse
                     anchors.fill: parent
-                    drag.target: mappingHandle
-                    drag.axis: Drag.XAxis
-                    drag.minimumX: dp(1)
-                    drag.maximumX: parent.width - mappingHandle.width - dp(1)
-
-                    onReleased: {
-                        if (mappingHandle.x >= drag.maximumX - dp(2)) {
-                            QGroundControl.saveGlobalSetting("loadpage", "Mapping")
-                            mainWindow.showMapping()
-                            MapGlobals.comefrom = "Start"
-                            _appSettings.screen = "Start"
-                            var videoSettings = QGroundControl.settingsManager.videoSettings
-                            if (videoSettings) {
-                                var videoSourceFact = videoSettings.videoSource
-                                if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                    videoSourceFact.value = videoSourceFact.enumValues[0]
-                                }
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        QGroundControl.saveGlobalSetting("loadpage", "Mapping")
+                        mainWindow.showMapping()
+                        MapGlobals.comefrom = "Start"
+                        _appSettings.screen = "Start"
+                        var videoSettings = QGroundControl.settingsManager.videoSettings
+                        if (videoSettings) {
+                            var videoSourceFact = videoSettings.videoSource
+                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                                videoSourceFact.value = videoSourceFact.enumValues[0]
                             }
-                            swapCamera();
-                            mappingHandle.x = drag.minimumX
-                        } else {
-                            mappingHandle.x = drag.minimumX
                         }
+                        swapCamera();
                     }
                 }
             }

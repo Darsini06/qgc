@@ -14,8 +14,8 @@ Item {
     anchors.fill: parent
 
     // --- Design Tokens (Consistent with ProfileMain.qml) ---
-    property color app_color:       "#301934" 
-    property color accent_color:    "#301934" 
+    property color app_color:       "#262626" 
+    property color accent_color:    "#262626" 
     property color surface_color:   "#ffffff"
     property color bg_color:        "#f8f9fa"
     property color text_primary:    "#1e293b"
@@ -333,11 +333,11 @@ Item {
                                 radius: 12
                                 gradient: Gradient {
                                     orientation: Gradient.Horizontal
-                                    GradientStop { position: 0.0; color: updateBtn.pressed ? app_color : accent_color }
-                                    GradientStop { position: 1.0; color: updateBtn.pressed ? accent_color : "#9c27b0" }
+                                    GradientStop { position: 0.0; color: updateBtn.pressed ? Qt.darker(app_color, 1.2) : app_color }
+                                    GradientStop { position: 1.0; color: updateBtn.pressed ? Qt.darker(app_color, 1.2) : app_color }
                                 }
                                 layer.enabled: true
-                                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: Qt.rgba(124/255, 77/255, 255/255, 0.4); shadowBlur: 0.6; shadowVerticalOffset: 4 }
+                                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: Qt.rgba(0, 0, 0, 0.4); shadowBlur: 0.6; shadowVerticalOffset: 4 }
                             }
                             contentItem: Text { text: qsTr("SAVE CHANGES"); color: "white"; font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; font.letterSpacing: 1 }
                             onClicked: {

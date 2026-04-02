@@ -13,9 +13,9 @@ Item {
     anchors.fill: parent
 
     // ── Palette ─────────────────────────────────────────────────
-    readonly property color brandDark:    "#1A1335"
-    readonly property color brandPrimary: "#301934"
-    readonly property color brandAccent:  "#7B4FA6"
+    readonly property color brandDark:    "#1A1A1A"
+    readonly property color brandPrimary: "#262626"
+    readonly property color brandAccent:  "#262626"
     readonly property color pageBg:       "#EDEEF4"
 
     // ── Adaptive sizing helpers ──────────────────────────────────
@@ -64,12 +64,7 @@ Item {
         anchors { top: parent.top; left: parent.left; right: parent.right }
         height: Math.max(56, root.height * 0.11)
         z: 10
-
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop { position: 0.0; color: brandDark    }
-            GradientStop { position: 1.0; color: brandPrimary }
-        }
+        color: "#262626" // Faded black
 
         // Glowing accent underline
         Rectangle {
@@ -83,51 +78,41 @@ Item {
             }
         }
 
-        RowLayout {
-            anchors { fill: parent; leftMargin: hPad; rightMargin: hPad }
-            spacing: hPad * 0.6
+        // Back button (small square)
+        Rectangle {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: hPad
+            width: header.height * 0.45
+            height: width
+            radius: 8
+            color: backMa.containsMouse ? Qt.rgba(1,1,1,0.20) : Qt.rgba(1,1,1,0.09)
+            Behavior on color { ColorAnimation { duration: 140 } }
 
-            // Back button
-            Rectangle {
-                width: header.height * 0.56
+            QGCColoredImage {
+                source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                width: parent.width * 0.55
                 height: width
-                radius: 8
-                color: backMa.containsMouse ? Qt.rgba(1,1,1,0.20) : Qt.rgba(1,1,1,0.09)
-                Behavior on color { ColorAnimation { duration: 140 } }
-
-                QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                    width: parent.width * 0.55
-                    height: width
-                    color: "white"
-                    anchors.centerIn: parent
-                }
-                MouseArea {
-                    id: backMa; anchors.fill: parent
-                    hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                    onClicked: root.backClicked()
-                }
+                color: "white"
+                anchors.centerIn: parent
             }
-
-            // Title + subtitle
-            Column {
-                Layout.fillWidth: true
-                spacing: 2
-                Text {
-                    text: "Mission Profile"
-                    font {
-                        family: "Outfit"
-                        pointSize: ScreenTools.mediumFontPointSize
-                        bold: true
-                    }
-                    color: "white"
-                }
-                Text {
-                    text: "Select an application mode to continue"
-                    font { family: "Outfit"; pointSize: ScreenTools.smallFontPointSize }
-                    color: Qt.rgba(1,1,1,0.55)
-                }
+            MouseArea {
+                id: backMa; anchors.fill: parent
+                hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                onClicked: root.backClicked()
             }
+        }
+
+        // Title perfectly centered
+        Text {
+            anchors.centerIn: parent
+            text: "Mission Profile"
+            font {
+                family: "Outfit"
+                pointSize: ScreenTools.mediumFontPointSize * 1.1
+                bold: true
+            }
+            color: "white"
         }
     }
 
@@ -146,13 +131,6 @@ Item {
             anchors.centerIn: parent
             width: bodyArea.width - hPad * 2
             spacing: vPad
-
-            // section label
-            Text {
-                text: "Choose Application"
-                font { family: "Outfit"; pointSize: ScreenTools.defaultFontPointSize; bold: true }
-                color: brandPrimary
-            }
 
             // ── HORIZONTAL CARDS ───────────────────────────────────
             Row {
@@ -186,7 +164,7 @@ Item {
                         layer.effect: MultiEffect {
                             shadowEnabled: true
                             shadowColor: isSelected
-                                         ? Qt.rgba(74,44,109,0.28)
+                                         ? Qt.rgba(44,44,44,0.25)
                                          : Qt.rgba(0,0,0,0.08)
                             shadowBlur: 0.85
                             shadowVerticalOffset: isSelected ? 8 : 3
@@ -241,7 +219,7 @@ Item {
                             anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                             height: root.labelH
                             radius: root.r
-                            color: isSelected ? Qt.rgba(74,44,109,0.07) : "white"
+                            color: isSelected ? Qt.rgba(44,44,44,0.05) : "white"
                             Behavior on color { ColorAnimation { duration: 180 } }
 
                             // flatten top corners

@@ -13,8 +13,8 @@ Item {
     id: reportsRoot
     anchors.fill: parent
 
-    property color app_color: "#301934"
-    property color sidebar_color: "#1e1431"
+    property color app_color: "#262626"
+    property color sidebar_color: "#262626"
     property color bg_color: "#F9FAFB"
     property color border_color: "#E5E7EB"
     property color text_primary: "#111827"
@@ -70,7 +70,7 @@ Item {
                     anchors.fill: parent
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: sidebar_color }
-                        GradientStop { position: 1.0; color: "#2d1b4d" }
+                        GradientStop { position: 1.0; color: "#262626" }
                     }
                 }
 
@@ -192,7 +192,7 @@ Item {
                                             RowLayout {
                                                 Layout.preferredWidth: parent.width * 0.45; spacing: 14
                                                 Rectangle {
-                                                    width: 40; height: 40; radius: 10; color: Qt.rgba(74, 44, 109, 0.07)
+                                                    width: 40; height: 40; radius: 10; color: Qt.rgba(0, 0, 0, 0.07)
                                                     QGCColoredImage { source: "qrc:/InstrumentValueIcons/calendar.svg"; width: 18; height: 18; color: app_color; anchors.centerIn: parent }
                                                 }
                                                 Text { text: model.date; font.family: "Outfit"; font.bold: true; color: text_primary; font.pointSize: 13 }
@@ -223,9 +223,6 @@ Item {
         }
     }
 }
-
-
-
 
 
 
