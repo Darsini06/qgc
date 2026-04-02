@@ -100,10 +100,6 @@ Item {
         z:          100    // Overlay on top of map
     }
 
-
-
-
-
     Item {
         id:                 mapHolder
         anchors.top:        parent.top        // Extend map behind toolbar for transparency

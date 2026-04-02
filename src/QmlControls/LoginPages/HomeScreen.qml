@@ -212,6 +212,7 @@ Item {
         z: 1
 
         // ---- TOP LEFT LOGO ----
+
         Image {
             id: mainLogo
             source: "qrc:/qmlimages/NewImages/dronecommanderlogo.svg"

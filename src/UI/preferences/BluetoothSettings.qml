@@ -17,8 +17,6 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 
 ColumnLayout {
-    Layout.fillWidth: true
-    Layout.fillHeight: true
     spacing: _rowSpacing
 
     function saveSettings() { }
@@ -26,37 +24,58 @@ ColumnLayout {
     Component.onCompleted: subEditConfig.startScan()
 
     // Header section
-    Item {
+    RowLayout {
+
         Layout.fillWidth: true
-        Layout.preferredHeight: 30
 
-        Text {
-            anchors.right: parent.right
-            anchors.rightMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            text: qsTr("Refresh")
-            color: !subEditConfig.scanning ? "black" : "gray"
-            font.pixelSize: 13
-            font.bold: true
-            font.family: "Outfit"
-            font.underline: refreshMouseArea.containsMouse && !subEditConfig.scanning
+        Item { Layout.fillWidth: true } // spacer
 
-            MouseArea {
-                id: refreshMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                enabled: !subEditConfig.scanning
-                onClicked: subEditConfig.startScan()
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        // Right-aligned controls
+        RowLayout {
+            spacing: 10
+            Layout.alignment: Qt.AlignRight
+
+            Text {
+                text: qsTr("Refresh")
+                color: !subEditConfig.scanning ? "blue" : "gray"
+                font.pixelSize: 12
+                font.underline: refreshMouseArea.containsMouse && !subEditConfig.scanning
+
+                MouseArea {
+                    id: refreshMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: !subEditConfig.scanning
+                    onClicked: subEditConfig.startScan()
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
+            }
+
+            Text {
+                text: qsTr("Stop")
+                color: subEditConfig.scanning ? "red" : "gray"
+                font.pixelSize: 12
+                font.underline: stopMouseArea.containsMouse && subEditConfig.scanning
+
+                MouseArea {
+                    id: stopMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: subEditConfig.scanning
+                    onClicked: subEditConfig.stopScan()
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
             }
         }
     }
 
     // Content area
     Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.minimumHeight: 180
+        Layout.alignment: Qt.AlignHCenter
+
+        property int minWidth: 220
+        Layout.preferredWidth: minWidth  // Use fixed minWidth instead of dynamic calculation
+        Layout.preferredHeight: 150
         clip: true
 
         // Loading state
@@ -72,9 +91,8 @@ ColumnLayout {
 
             Text {
                 text: qsTr("Scanning for devices...")
-                color: "black"
-                font.pixelSize: 13
-                font.family: "Outfit"
+                color: "gray"
+                font.pixelSize: 12
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -83,9 +101,8 @@ ColumnLayout {
         Text {
             anchors.centerIn: parent
             text: qsTr("No Bluetooth devices found\nClick 'Refresh' to scan again")
-            color: "#666666"
-            font.pixelSize: 13
-            font.family: "Outfit"
+            color: "gray"
+            font.pixelSize: 12
             horizontalAlignment: Text.AlignHCenter
             visible: !subEditConfig.scanning && subEditConfig.nameList.length === 0
         }
@@ -101,71 +118,49 @@ ColumnLayout {
 
             ListView {
                 id: deviceList
-                spacing: 0
+                spacing: 8
                 width: parent.width
                 implicitHeight: contentHeight
+
                 model: subEditConfig.nameList
 
                 delegate: Item {
                     width: deviceList.width
-                    height: 44
+                    height: 40  // Fixed height for buttons
 
                     property bool isSelected: subEditConfig.devName === modelData
 
                     Rectangle {
-                        anchors.fill: parent
-                        color: isSelected ? "#301934" : (mouseArea.containsMouse ? "#F1F5F9" : "transparent")
-                        
-                        // Bottom Separator Line
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            height: 1
-                            color: "#DDE1EA"
-                        }
-
-                        // Selection Bar Indicator
-                        Rectangle {
-                            anchors.left: parent.left
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            width: 3
-                            color: isSelected ? "#FFFFFF" : "transparent"
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 12
-                            anchors.rightMargin: 12
-                            spacing: 12
-
-                            Text {
-                                text: modelData
-                                Layout.fillWidth: true
-                                color: isSelected ? "white" : "black"
-                                font.pixelSize: 14
-                                font.bold: true
-                                font.family: "Outfit"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
+                        // Visual representation of button
+                        anchors.centerIn: parent
+                        width: Math.min(deviceList.width - 40, textItem.implicitWidth + 20)
+                        height: 40
+                        radius: 15
+                        color: {
+                            if (isSelected) {
+                                return "#2196F3"  // Blue background for selected item
+                            } else if (mouseArea.containsPress) {
+                                return "#d0d0d0"  // Pressed state
+                            } else if (mouseArea.containsMouse) {
+                                return "#e8e8e8"  // Hover state
+                            } else {
+                                return "#f0f0f0"  // Default state
                             }
+                        }
+                        border.color: isSelected ? "#1976D2" : "#a0a0a0"
+                        border.width: isSelected ? 2 : 1
 
-                            // Selected indicator blip
-                            Rectangle {
-                                width: 8
-                                height: 8
-                                radius: 4
-                                color: "#FFFFFF"
-                                visible: isSelected
-                                Layout.alignment: Qt.AlignVCenter
-                                
-                                Rectangle {
-                                    anchors.centerIn: parent
-                                    width: 14; height: 14; radius: 7
-                                    color: "white"; opacity: 0.2
-                                }
-                            }
+                        Text {
+                            id: textItem
+                            anchors.centerIn: parent
+                            text: modelData
+                            font.pixelSize: 14
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.Wrap
+                            elide: Text.ElideRight
+                            width: parent.width - 10
+                            color: isSelected ? "white" : "black"  // White text for selected item
                         }
 
                         MouseArea {

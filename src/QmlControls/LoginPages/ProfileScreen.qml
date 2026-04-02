@@ -75,14 +75,15 @@ Item {
         source: {
             var pathPrefix = "qrc:/qml/LoginPages/"
             switch (currentView) {
-                case "profile":         return pathPrefix + "ProfileMain.qml"
-                case "accountUpdate":   return pathPrefix + "AccountUpdate.qml"
-                case "feedback":        return pathPrefix + "Feedback.qml"
-                case "reports":         return pathPrefix + "ReportScreen.qml"
-                case "drone":           return pathPrefix + "SelectApplication.qml"
-                case "privacy_policy":  return pathPrefix + "PrivacyScreen.qml"
-                case "terms&conditions": return pathPrefix + "Terms_Condition.qml"
-                default:                return pathPrefix + "ProfileMain.qml"
+            case "profile":         return pathPrefix + "ProfileMain.qml"
+            case "accountUpdate":   return pathPrefix + "AccountUpdate.qml"
+            case "feedback":        return pathPrefix + "Feedback.qml"
+            case "reports":         return pathPrefix + "ReportScreen.qml"
+            case "logfiles":         return pathPrefix + "LogFiles.qml"
+            case "drone":           return pathPrefix + "SelectApplication.qml"
+            case "privacy_policy":  return pathPrefix + "PrivacyScreen.qml"
+            case "terms&conditions": return pathPrefix + "Terms_Condition.qml"
+            default:                return pathPrefix + "ProfileMain.qml"
             }
         }
 
@@ -101,13 +102,15 @@ Item {
             if (item.hasOwnProperty("mobileNo_from_db")) item.mobileNo_from_db = profilescreen.mobileNo_from_db
             if (item.hasOwnProperty("rpcCompletedStatus")) item.rpcCompletedStatus = profilescreen.rpcCompletedStatus
 
-            // Connect Signals
+            // select the App then go to the Homescreen
             if (item && typeof item.appSelected !== "undefined") {
                 item.appSelected.connect(function() {
                     if (typeof mainWindow !== "undefined") mainWindow.openHomeScreen();
                     else if (MapGlobals.rootWindow) MapGlobals.rootWindow.openHomeScreen();
                 })
             }
+
+            //Handle the BackClick
             if (item && typeof item.backClicked !== "undefined") {
                 item.backClicked.connect(function() {
                     if (currentView === "profile") {
@@ -118,16 +121,32 @@ Item {
                     }
                 })
             }
+
+            // click the MenuItem
             if (item && typeof item.menuItemSelected !== "undefined") {
+
                 item.menuItemSelected.connect(function(screen) {
+
                     if (screen === "logout") logoutDialog.createObject(profilescreen).open()
+
                     else if (screen === "accountUpdate") {
                         loadUserData() // Refresh before editing
                         currentView = screen
+                    }else if (screen === "logfiles") {
+                        currentView = screen
                     }
+
                     else currentView = screen
                 })
             }
+
+            if (currentView === "logfiles") {
+                if (item && typeof item.triggerLoad === "function") {
+                    item.triggerLoad()
+                }
+            }
+
+            //Profile Update
             if (item && typeof item.updated !== "undefined") {
                 item.updated.connect(function() {
                     loadUserData(); // Refresh data

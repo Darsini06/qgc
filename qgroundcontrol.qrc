@@ -339,6 +339,7 @@
         <file alias="LoginPages/AccountUpdate.qml">src/QmlControls/LoginPages/AccountUpdate.qml</file>
         <file alias="LoginPages/ProfileMain.qml">src/QmlControls/LoginPages/ProfileMain.qml</file>
         <file alias="LoginPages/PrivacyScreen.qml">src/QmlControls/LoginPages/PrivacyScreen.qml</file>
+        <file alias="LoginPages/LogFiles.qml">src/QmlControls/LoginPages/LogFiles.qml</file>
 
         <file alias="Viewer3D/Viewer3D.qml">src/Viewer3D/Viewer3DQml/Viewer3D.qml</file>
         <file alias="Viewer3D/qmldir">src/QmlControls/Viewer3D/qmldir</file>
