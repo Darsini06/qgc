@@ -565,6 +565,7 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                     QGCLabel {
                         visible: !threshold1visible
                         text: qsTr("") + batterySettings.threshold1.rawValue.toString() + qsTr("%")
+                        color: "white"
                     }
 
                     // Threshold 2
@@ -594,6 +595,7 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                     QGCLabel {
                         visible: !threshold2visible
                         text: qsTr("") + batterySettings.threshold2.rawValue.toString() + qsTr("%")
+                        color: "white"
                     }
 
                     // Low state

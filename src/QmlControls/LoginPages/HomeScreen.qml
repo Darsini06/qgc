@@ -91,14 +91,37 @@ Item {
             }
         }
 
+        // Gradient backgrounds for specific modes
+        Rectangle {
+            anchors.fill: parent
+            visible: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri")
+            
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.0
+                    color: {
+                        if (droneType === "Agri") return "#79AE6F" // Vibrant Green
+                        if (droneType === "Mapping") return "#D45500" // Vibrant Orange
+                        return "#919396" // DJI-style lighter studio top gray
+                    }
+                }
+                GradientStop {
+                    position: 1.0
+                    color: {
+                        if (droneType === "Agri") return "#141c12" // Green-black blend for bottom
+                        if (droneType === "Mapping") return "#150800" // Orange-black blend for bottom
+                        return "#2A2A2D" // DJI-style dark bottom charcoal
+                    }
+                }
+            }
+        }
+
         Image {
             id: bgImage
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            // Hide for loadpage, and now for Camera/Mapping/Agri as they use solid colors
+            visible: (droneType !== "loadpage" && droneType !== "Camera" && droneType !== "Mapping" && droneType !== "Agri")
             source: {
-                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
-                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
-                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
                 return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
             }
             fillMode: Image.PreserveAspectCrop
@@ -118,7 +141,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: 0.6
-            visible: (droneType !== "loadpage")
+            visible: bgImage.visible
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }
                 GradientStop { position: 0.5; color: "transparent" }
@@ -129,7 +152,7 @@ Item {
         // Darkening overlay for cinematic look and text readability - with vignette
         Rectangle {
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            visible: bgImage.visible
             gradient: Gradient {
                 id: vignetteGradient
                 GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.2) }
@@ -143,8 +166,8 @@ Item {
             id: agriDrone
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(1) : 40
-            width: (isSmallScreen || isMobile) ? parent.width * 0.35 : parent.width * 0.45
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(1) : dp(5)
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.60
             height: width
             source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
             fillMode: Image.PreserveAspectFit
@@ -159,8 +182,8 @@ Item {
             id: showMappingDrone
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(1) : 40
-            width: (isSmallScreen || isMobile) ? parent.width * 0.35 : parent.width * 0.45
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(1) : dp(5)
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.60
             height: width
             source: "qrc:/qmlimages/NewImages/mapping_AIImage.png"
             fillMode: Image.PreserveAspectFit
@@ -172,11 +195,11 @@ Item {
         }
 
         Image {
-            id:cameraDrone
+            id: cameraDrone
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(8) : 0
-            width: (isSmallScreen || isMobile) ? parent.width * 0.50 : parent.width * 0.70
+            anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(8) : dp(5)
+            width: (isSmallScreen || isMobile) ? parent.width * 0.70 : parent.width * 0.85
             height: width
             source: "qrc:/qmlimages/NewImages/cameraDrone_png.png"
             fillMode: Image.PreserveAspectFit
@@ -193,7 +216,7 @@ Item {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(5) : dp(5)
-            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.40
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.60
             height: width
             source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
             fillMode: Image.PreserveAspectFit
@@ -216,8 +239,8 @@ Item {
         Image {
             id: mainLogo
             source: "qrc:/qmlimages/NewImages/dronecommanderlogo.svg"
-            width: ScreenTools.defaultFontPixelWidth * (isMobile ? 10 : 14)
-            height: width * (100 / 220)
+            height: dp(6)
+            width: height * (220 / 100)
             fillMode: Image.PreserveAspectFit
             anchors.left: parent.left
             anchors.top: parent.top
@@ -227,6 +250,21 @@ Item {
             opacity: 0
             Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.OutCubic } }
             Component.onCompleted: opacity = 1
+        }
+
+        Label {
+            id: cursiveLogoText
+            text: "Drone Commander"
+            font.family: "Brush Script MT" // Handwriting format
+            font.italic: true
+            font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+            color: (droneType === "loadpage" || droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? "#262626" : "#FFFFFF"
+            anchors.top: mainLogo.bottom
+            anchors.left: mainLogo.left
+            anchors.leftMargin: dp(1)
+            anchors.topMargin: -dp(0.5)
+            z: 50
+            opacity: mainLogo.opacity
         }
 
         Label {
@@ -295,34 +333,26 @@ Item {
 
             // Profile
             Item {
-                width: isSmallScreen ? dp(6) : dp(16)
+                width: dp(6)
                 height: dp(6)
                 
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: (droneType === "loadpage") ? (profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: profileMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: profileMouse.containsMouse ? Qt.rgba(0.5, 0.5, 0.5, 0.4) : Qt.rgba(0.5, 0.5, 0.5, 0.2)
+                    border.color: profileMouse.containsMouse ? accent_color : Qt.rgba(0.5, 0.5, 0.5, 0.3)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: dp(1.5)
+                    spacing: 0
                     Image {
                         Layout.preferredWidth: dp(2.8)
                         Layout.preferredHeight: dp(2.8)
                         source: "qrc:/qmlimages/NewImages/user_profile.svg"
                         fillMode: Image.PreserveAspectFit
-                    }
-                    Label {
-                        text: qsTr("PROFILE")
-                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
-                        visible: !isSmallScreen
-                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                        font.bold: true
-                        font.family: "Outfit"
                     }
                 }
 
@@ -337,34 +367,26 @@ Item {
 
             // Application
             Item {
-                width: isSmallScreen ? dp(6) : dp(20)
+                width: dp(6)
                 height: dp(6)
                 
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: (droneType === "loadpage") ? (appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: appMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: appMouse.containsMouse ? Qt.rgba(0.5, 0.5, 0.5, 0.4) : Qt.rgba(0.5, 0.5, 0.5, 0.2)
+                    border.color: appMouse.containsMouse ? accent_color : Qt.rgba(0.5, 0.5, 0.5, 0.3)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: dp(1.5)
+                    spacing: 0
                     Image {
                         Layout.preferredWidth: dp(2.8)
                         Layout.preferredHeight: dp(2.8)
                         source: "qrc:/qmlimages/NewImages/select_drone_type_color.svg"
                         fillMode: Image.PreserveAspectFit
-                    }
-                    Label {
-                        text: qsTr("APPLICATION")
-                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
-                        visible: !isSmallScreen
-                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                        font.bold: true
-                        font.family: "Outfit"
                     }
                 }
 
@@ -379,34 +401,26 @@ Item {
 
             // Logout
             Item {
-                width: isSmallScreen ? dp(6) : dp(16)
+                width: dp(6)
                 height: dp(6)
                 
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: logoutMouse.containsMouse ? Qt.rgba(1.0, 107/255, 107/255, 0.3) : Qt.rgba(0.5, 0.5, 0.5, 0.2)
+                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : Qt.rgba(0.5, 0.5, 0.5, 0.3)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: dp(1.5)
+                    spacing: 0
                     Image {
                         Layout.preferredWidth: dp(2.8)
                         Layout.preferredHeight: dp(2.8)
                         source: "qrc:/qmlimages/NewImages/logout_color.svg"
                         fillMode: Image.PreserveAspectFit
-                    }
-                    Label {
-                        text: qsTr("LOGOUT")
-                        color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? "#262626" : "#FFFFFF")
-                        visible: !isSmallScreen
-                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                        font.bold: true
-                        font.family: "Outfit"
                     }
                 }
 
@@ -444,7 +458,9 @@ Item {
             z: 10
 
             // Main Title
+            /* // HIDDEN BY REQUEST
             Label {
+                
                 id: heroTitle
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -472,6 +488,7 @@ Item {
                         return baseSize * 0.85
                     }
                 }
+
                 font.bold: true
                 font.family: "Outfit"
                 font.letterSpacing: (droneType === "loadpage" && !isSmallScreen) ? 4 : 1.2
@@ -510,7 +527,7 @@ Item {
                     if (isTablet)  return baseSize * 1.1 * scaleMultiplier
                     return baseSize * 0.8 // Mobile
                 }
-                font.family: "Outfit"
+                 font.family: "Outfit"
                 font.italic: droneType === "loadpage"
                 font.bold: false
                 lineHeight: 1.3
@@ -525,6 +542,7 @@ Item {
                     shadowVerticalOffset: 1
                 }
             }
+            */
 
             // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
             Rectangle {
@@ -661,14 +679,12 @@ Item {
                     }
                 }
 
-                // Interactive element to demo toggling
+                // Interactive element for Airspace Redirect
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        if (!isCheckingAirspace) {
-                            isClearToFly = !isClearToFly;
-                        }
+                        Qt.openUrlExternally("https://www.airspacemap.in")
                     }
                 }
             }
@@ -692,9 +708,8 @@ Item {
             Item {
                 id: connectClick
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
+                Layout.fillWidth: false
+                Layout.preferredWidth: connectLabel.implicitWidth + dp(12)
                 Layout.preferredHeight: dp(7)
 
                 Rectangle {
@@ -711,6 +726,7 @@ Item {
                         spacing: dp(1.5)
 
                         Rectangle {
+                            id: connectIcon
                             Layout.preferredWidth: parent.height - dp(1)
                             Layout.preferredHeight: Layout.preferredWidth
                             radius: width / 2
@@ -726,12 +742,14 @@ Item {
                         }
 
                         Label {
+                            id: connectLabel
                             Layout.fillWidth: true
                             text: qsTr("CONNECT")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
                             font.pointSize: ScreenTools.defaultFontPointSize
+                            horizontalAlignment: Text.AlignHCenter
                         }
                     }
                 }

@@ -53,7 +53,7 @@ ToolIndicatorPage {
                     text:                   qsTr("Select Link to Connect")
                     font.bold:              true
                     font.pointSize:         11
-                    color:                  "#000000"
+                    color:                  "white"
                     font.family:            "Outfit"
                 }
 
@@ -89,7 +89,7 @@ ToolIndicatorPage {
                         text:               "+"
                         font.bold:          true
                         font.pointSize:     14
-                        color:              ma.containsMouse ? "#301934" : "black"
+                        color:              ma.containsMouse ? "#301934" : "white"
                         anchors.verticalCenterOffset: -1 // Visual alignment
                     }
                     
@@ -113,7 +113,7 @@ ToolIndicatorPage {
                 QGCLabel {
                     text:       qsTr("No Links Configured")
                     visible:    noLinks
-                    color:      "#999999"
+                    color:      "#CCCCCC"
                     font.family: "Outfit"
                     width:      parent.width
                     horizontalAlignment: Text.AlignHCenter
@@ -131,8 +131,8 @@ ToolIndicatorPage {
                         
                         gradient: Gradient {
                             orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: object.link ? "#301934" : (mouseArea.containsMouse ? "#F1F5F9" : "#FFFFFF") }
-                            GradientStop { position: 1.0; color: object.link ? "#301d4a" : (mouseArea.containsMouse ? "#E2E8F0" : "#F8F9FA") }
+                            GradientStop { position: 0.0; color: object.link ? "#301934" : (mouseArea.containsMouse ? "#F1F5F9" : "transparent") }
+                            GradientStop { position: 1.0; color: object.link ? "#301d4a" : (mouseArea.containsMouse ? "#E2E8F0" : "transparent") }
                         }
                         
                         visible: !object.dynamic
@@ -157,7 +157,7 @@ ToolIndicatorPage {
                             QGCLabel {
                                 Layout.fillWidth: true
                                 text:           object.name
-                                color:          object.link ? "white" : "black"
+                                color:          "white"
                                 font.bold:      true
                                 font.pointSize: 10
                                 font.family:    "Outfit"
@@ -223,7 +223,7 @@ ToolIndicatorPage {
             Rectangle {
                 Layout.fillWidth: true
                 height:         120
-                color:          "#F8F9FA"
+                color:          "transparent"
                 radius:         10
                 border.color:   "#DDE1EA"
                 
@@ -234,20 +234,20 @@ ToolIndicatorPage {
                     
                     QGCLabel {
                         text: qsTr("Auto-Connect Configuration")
-                        color: "black"
+                        color: "white"
                         font.bold: true
                         font.family: "Outfit"
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Pixhawk USB"); color: "#1E1E2E"; Layout.fillWidth: true }
+                        QGCLabel { text: qsTr("Pixhawk USB"); color: "white"; Layout.fillWidth: true }
                         FactCheckBoxSlider { fact: autoConnectSettings.autoConnectPixhawk }
                     }
                     
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("UDP Network"); color: "#1E1E2E"; Layout.fillWidth: true }
+                        QGCLabel { text: qsTr("UDP Network"); color: "white"; Layout.fillWidth: true }
                         FactCheckBoxSlider { fact: autoConnectSettings.autoConnectUDP }
                     }
                 }

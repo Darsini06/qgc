@@ -428,7 +428,13 @@ Popup {
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 8
-                        color: acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
+                        color: {
+                            var isAgri = QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+                            if (isAgri) {
+                                return acceptButton.pressed ? "#588D4E" : (acceptButton.hovered ? "#8CC881" : "#79AE6F")
+                            }
+                            return acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
+                        }
                     }
                     contentItem: Text {
                         text: acceptButton.text

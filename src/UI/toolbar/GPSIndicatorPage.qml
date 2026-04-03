@@ -69,6 +69,7 @@ ToolIndicatorPage {
 
                 QGCLabel {
                     text: (QGroundControl.gpsRtk.active.value) ? qsTr("Survey-in Active") : qsTr("RTK Streaming")
+                    color: "white"
                 }
 
                 LabelledLabel {
@@ -173,6 +174,7 @@ ToolIndicatorPage {
                     Layout.fillWidth:   true;
                     text:               qsTr("Current Base Position")
                     enabled:            saveBasePositionButton.enabled
+                    color:              "white"
                 }
 
                 QGCButton {

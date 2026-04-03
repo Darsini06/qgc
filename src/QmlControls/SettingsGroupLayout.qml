@@ -38,7 +38,7 @@ ColumnLayout {
             text:           heading
             font.pointSize: ScreenTools.defaultFontPointSize + 1
             font.bold:      true
-            color: "#3A3A3A"
+            color: "white"
         }
 
         QGCLabel {
@@ -48,7 +48,7 @@ ColumnLayout {
             font.pointSize:     ScreenTools.smallFontPointSize
             visible:            headingDescription !== ""
             font.bold:      true
-            color: "#301934"
+            color: "white"
         }
     }
 
@@ -59,7 +59,7 @@ ColumnLayout {
         Layout.fillWidth:   true
         implicitWidth:      _contentLayout.implicitWidth + (showBorder ? _margins * 2 : 0)
         implicitHeight:     _contentLayout.implicitHeight + (showBorder ? _margins * 2: 0)
-        color:              "white"
+        color:              "transparent"
         //border.color:       QGroundControl.globalPalette.groupBorder
         //border.width:       2//showBorder ? 1 : 0
         //radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -67,7 +67,7 @@ ColumnLayout {
                             id: shadowSource
                             anchors.fill: parent
                             radius: 10//dp(4)
-                            color: "white"
+                            color: "transparent"
                             visible: false
                             anchors.margins: 2
 

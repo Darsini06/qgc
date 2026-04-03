@@ -2727,9 +2727,9 @@ ApplicationWindow {
         }
 
         background: Rectangle {
-            color: "#252525" // Dark Grey Background
+            color: Qt.rgba(0, 0, 0, 0.4) // Modern Semi-Transparent Background
             radius: 12
-            border.color: "#333333"
+            border.color: "#3d3d3d"
             border.width: 1
         }
 

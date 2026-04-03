@@ -49,19 +49,19 @@ RowLayout {
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
-                    _mainStatusBGColor = "red"//"transparent"//"#A6ADFF"//
+                    _mainStatusBGColor = "transparent"
                     return mainStatusLabel._commLostText
                 }
                 if (_activeVehicle.armed) {
-                    _mainStatusBGColor ="green"// "transparent"//"#A6ADFF"//
+                    _mainStatusBGColor ="transparent"
 
                     if (_healthAndArmingChecksSupported) {
                         if (_activeVehicle.healthAndArmingCheckReport.canArm) {
                             if (_activeVehicle.healthAndArmingCheckReport.hasWarningsOrErrors) {
-                                _mainStatusBGColor = "yellow"//"transparent"//"#A6ADFF"//
+                                _mainStatusBGColor = "transparent"
                             }
                         } else {
-                            _mainStatusBGColor = "red"//"transparent"//"#A6ADFF"//
+                            _mainStatusBGColor = "transparent"
                         }
                     }
 
@@ -81,34 +81,34 @@ RowLayout {
                     if (_healthAndArmingChecksSupported) {
                         if (_activeVehicle.healthAndArmingCheckReport.canArm) {
                             if (_activeVehicle.healthAndArmingCheckReport.hasWarningsOrErrors) {
-                                _mainStatusBGColor ="yellow" //"transparent"//"#A6ADFF"//
+                                _mainStatusBGColor ="transparent"
                             } else {
-                                _mainStatusBGColor = "green"//"transparent"//"#A6ADFF"//
+                                _mainStatusBGColor = "transparent"
                             }
                             console.log("healthAndArmingCheckReport")
                             return mainStatusLabel._readyToFlyText
                         } else {
                             console.log("healthAndArmingCheckReport1")
-                            _mainStatusBGColor = "red"//"transparent"//"#A6ADFF"//
+                            _mainStatusBGColor = "transparent"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
                             console.log("readyToFlyAvailable readyToFly")
-                            _mainStatusBGColor = "green"//"transparent"//"#A6ADFF"//
+                            _mainStatusBGColor = "transparent"
                             return mainStatusLabel._readyToFlyText
                         } else {
                             console.log("readyToFlyAvailable  readyToFly1")
-                            _mainStatusBGColor ="yellow"// "transparent"//"#A6ADFF"//
+                            _mainStatusBGColor ="transparent"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else {
                         // Best we can do is determine readiness based on AutoPilot component setup and health indicators from SYS_STATUS
                         if (_activeVehicle.allSensorsHealthy && _activeVehicle.autopilot.setupComplete) {
-                            _mainStatusBGColor = "green"//"transparent"//"#A6ADFF"//
+                            _mainStatusBGColor = "transparent"
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "yellow"//"transparent"//"#A6ADFF"//
+                            _mainStatusBGColor = "transparent"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     }
@@ -187,9 +187,8 @@ RowLayout {
                 Rectangle {
                     width:  parent.width
                     height: 48    // Slightly taller for a great feel
-                    radius: 12
-                    color: enabledBtn ? (armActionMouse.pressed ? (isArmed ? "#8c1f36" : "#301934") : (armActionMouse.hovered ? (isArmed ? "#e33959" : "#301934") : (isArmed ? "#c92a47" : "#301934"))) : "#333333"
-                    border.color: enabledBtn ? (isArmed ? "#ff5e7b" : "#301934") : "#555555"
+                    color: armActionMouse.pressed ? "#33ffffff" : (armActionMouse.hovered ? "#11ffffff" : "transparent")
+                    border.color: "white"
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 150 } }
 
@@ -200,7 +199,7 @@ RowLayout {
                     Text {
                         anchors.centerIn: parent
                         text: parent.isArmed ? qsTr("Disarm") : (parent.forceArm ? qsTr("Force Arm") : qsTr("Arm"))
-                        color: parent.enabledBtn ? "white" : "#888888"
+                        color: "white"
                         font.bold: true
                         font.pixelSize: 15
                         font.family: "Outfit"
@@ -246,42 +245,37 @@ RowLayout {
                     visible: !_healthAndArmingChecksSupported
                     color: "white"
                     font.pointSize: 10
+                    font.family: "Outfit"
                     font.bold: true
                     font.letterSpacing: 1.5
-                    opacity: 0.9
+                    opacity: 1.0
                 }
 
                 GridLayout {
-                    width: parent.width
+                    width:          parent.width
                     rowSpacing:     14
                     columnSpacing:  ScreenTools.defaultFontPixelWidth * 2
-                    columns: 2
+                    columns:        2
                     visible:        !_healthAndArmingChecksSupported
 
                     Repeater {
-                        model: _activeVehicle ? _activeVehicle.sysStatusSensorInfo.sensorNames : 0
-                        QGCLabel { 
-                            text: modelData
-                            color: "white"
-                            opacity: 0.7
-                            font.pointSize: 10
-                            Layout.fillWidth: true
-                        }
-                    }
-
-                    Repeater {
-                        model: _activeVehicle ? _activeVehicle.sysStatusSensorInfo.sensorStatus : 0
-                        QGCLabel { 
-                            text: modelData
-                            color: {
-                                var status = String(modelData).toLowerCase()
-                                if (status.includes("normal") || status.includes("ok")) return "#2ECC71"
-                                if (status.includes("disabled")) return "#95A5A6"
-                                return "#E74C3C" 
-                            }
-                            font.pointSize: 10
-                            font.bold: true
-                            Layout.alignment: Qt.AlignRight
+                        model: _activeVehicle ? _activeVehicle.sysStatusSensorInfo.sensorNames.length * 2 : 0
+                        delegate: QGCLabel {
+                            property int  sensorIndex: Math.floor(index / 2)
+                            property bool isName:      (index % 2) === 0
+                            
+                            text: isName ? 
+                                _activeVehicle.sysStatusSensorInfo.sensorNames[sensorIndex] : 
+                                _activeVehicle.sysStatusSensorInfo.sensorStatus[sensorIndex]
+                            
+                            color: isName ? "white" : (String(text).toLowerCase().indexOf("normal") !== -1 || String(text).toLowerCase().indexOf("ok") !== -1 ? "#2ECC71" : (String(text).toLowerCase().indexOf("disabled") !== -1 ? "#95A5A6" : "#E74C3C"))
+                            
+                            opacity:            isName ? 0.7 : 1.0
+                            font.pointSize:     10
+                            font.family:        "Outfit"
+                            font.bold:          !isName
+                            Layout.fillWidth:   isName
+                            Layout.alignment:   isName ? Qt.AlignLeft : Qt.AlignRight
                         }
                     }
                 }
@@ -300,9 +294,10 @@ RowLayout {
                     visible: _healthAndArmingChecksSupported && _activeVehicle && _activeVehicle.healthAndArmingCheckReport.problemsForCurrentMode.count > 0
                     color: "white"
                     font.pointSize: 10
+                    font.family: "Outfit"
                     font.bold: true
                     font.letterSpacing: 1.5
-                    opacity: 0.9
+                    opacity: 1.0
                 }
             // List health and arming checks
             Repeater {
