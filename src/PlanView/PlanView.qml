@@ -1379,7 +1379,7 @@ Item {
                         readOnly: false
 
                         onClicked: (sequenceNumber) => {
-                                       _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                                       _missionController.setCurrentPlanViewSeqNum(missionItemDialog.currentMissionItem.sequenceNumber, false)
                                    }
 
                         onRemove: {

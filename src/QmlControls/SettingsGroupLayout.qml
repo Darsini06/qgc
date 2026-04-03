@@ -10,8 +10,8 @@ ColumnLayout {
     spacing:        _margins / 2
     implicitWidth:  _contentLayout.implicitWidth //+ (_margins * 2)
     implicitHeight: _contentLayout.implicitHeight + (_margins * 2)
-    Layout.leftMargin: 100
-    Layout.rightMargin: 100
+    Layout.leftMargin:  ScreenTools.defaultFontPixelWidth * 2
+    Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 2
 
 
     default property alias contentItem: _contentLayout.data

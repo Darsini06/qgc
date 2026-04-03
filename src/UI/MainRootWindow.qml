@@ -94,7 +94,7 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: "#262626"
+    property color app_color: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" ? "#79AE6F" : "#808080"
 
     property bool connecting_drone : false
 
@@ -1817,6 +1817,14 @@ ApplicationWindow {
         visible: false
         z: 999                 // Ensure it covers toolbar/FlyView completely
         color: "#0d0d0f"
+
+        // Block background clicks
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {}
+            onDoubleClicked: {}
+            onWheel: { wheel.accepted = true }
+        }
 
         // Smooth fade-in
         Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutQuad } }

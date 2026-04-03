@@ -1735,7 +1735,7 @@ Item {
                     height: parent.height * 0.9
                     radius: 10
                     color: "#ffffffcc" // semi-transparent white
-                    border.color: "#301934"
+                    border.color: app_color
                     border.width: 2
 
                     Column {
@@ -1748,7 +1748,7 @@ Item {
                             width: parent.width + 40
                             height: 50
                             anchors.horizontalCenter: parent.horizontalCenter
-                            color: "#301934"
+                            color: app_color
                             radius: 10
                             // Rounded top only
                             Rectangle {
@@ -1780,7 +1780,7 @@ Item {
                                 background: Rectangle {
                                     radius: 8
                                     color: "white"
-                                    border.color: filenameTextField.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.color: filenameTextField.activeFocus ? app_color : "#DDE1EA"
                                     border.width: 1
                                 }
                             }
@@ -1800,7 +1800,7 @@ Item {
                                 background: Rectangle {
                                     radius: 8
                                     color: "white"
-                                    border.color: filenameTextField1.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.color: filenameTextField1.activeFocus ? app_color : "#DDE1EA"
                                     border.width: 1
                                 }
                             }
@@ -1818,7 +1818,7 @@ Item {
                                 background: Rectangle {
                                     radius: 8
                                     color: "white"
-                                    border.color: filenameTextField2.activeFocus ? "#301934" : "#DDE1EA"
+                                    border.color: filenameTextField2.activeFocus ? app_color : "#DDE1EA"
                                     border.width: 1
                                 }
                             }
@@ -1853,7 +1853,7 @@ Item {
                                 width: 100
                                 background: Rectangle {
                                     radius: 12
-                                    color: confirmBtnMobile.pressed ? "#1a0d1c" : (confirmBtnMobile.hovered ? "#4a2650" : "#301934")
+                                    color: confirmBtnMobile.pressed ? Qt.darker(app_color, 1.2) : (confirmBtnMobile.hovered ? Qt.lighter(app_color, 1.2) : app_color)
                                 }
                                 contentItem: Text {
                                     text: parent.text
@@ -2011,7 +2011,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
-                    color: "#262626"
+                    color: app_color
                     radius: 20
                     // Top rounded corners only
                     Rectangle {
@@ -2183,12 +2183,8 @@ Item {
                                 }
                                 background: Rectangle {
                                     radius:     12
-                                    gradient: Gradient {
-                                        GradientStop { position: 0.0; color: "#262626" }
-                                        GradientStop { position: 1.0; color: "#262626" }
-                                    }
+                                    color:      confirmBtn.pressed ? Qt.darker(app_color, 1.2) : (confirmBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
                                     border.width: 0
-                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
                                 }
                                 contentItem: Text {
                                     text:               qsTr("Confirm")

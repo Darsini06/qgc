@@ -22,9 +22,10 @@ ColumnLayout  {
     Layout.fillWidth: true
     spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
-    property var _linkManager: QGroundControl.linkManager
-    property color app_color: "#301934"
-    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+    property bool _isNarrow:    width < ScreenTools.defaultFontPixelWidth * 80
+    property var _linkManager:  QGroundControl.linkManager
+    property color app_color:   "#301934"
+    property var  activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
 
 
     // Success path
@@ -65,34 +66,35 @@ ColumnLayout  {
 
     RowLayout {
         Layout.fillWidth: true
-        spacing:          15
+        spacing:          _isNarrow ? 8 : 15
 
         Text {
             text:             qsTr("Communication Links")
-            font.pixelSize:   ScreenTools.mediumFontPointSize
+            font.pixelSize:   _isNarrow ? ScreenTools.smallFontPointSize : ScreenTools.mediumFontPointSize
             color:            "black"
             font.bold:        true
             bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.3
+            Layout.fillWidth: _isNarrow
         }
 
-        Item { Layout.fillWidth: true } // Spacer pushes button to the right
+        Item { visible: !_isNarrow; Layout.fillWidth: true } // Spacer pushes button to the right
 
         Rectangle {
             Layout.alignment:   Qt.AlignVCenter
             Layout.rightMargin: 10
-            width:              130
-            height:             36
-            radius:             18
+            width:              _isNarrow ? 110 : 130
+            height:             32
+            radius:             16
             color:              addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
             border.color:       "#301934"
             border.width:       1
 
             Text {
                 anchors.centerIn: parent
-                text:             qsTr("+ Add New Link")
+                text:             qsTr("+ Add New")
                 color:            "#301934"
                 font.bold:        true
-                font.pixelSize:   14
+                font.pixelSize:   _isNarrow ? 12 : 14
             }
 
             MouseArea {
@@ -116,7 +118,7 @@ ColumnLayout  {
 
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight:   mainRowWrapper.implicitHeight + 30
+                implicitHeight:   mainRowWrapper.implicitHeight + (_isNarrow ? 40 : 30)
                 color:            object.link ? "#F4FDF8" : "#FFFFFF"
                 radius:           10
                 border.color:     object.link ? "#301934" : "#E2E8F0"
@@ -127,14 +129,14 @@ ColumnLayout  {
                     anchors.left:     parent.left
                     anchors.right:    parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.margins:  20
+                    anchors.margins:  _isNarrow ? 10 : 20
                     spacing:          _isNarrow ? 10 : 20
 
                     // Status Dot
                     Rectangle {
-                        width:  12
-                        height: 12
-                        radius: 6
+                        width:  _isNarrow ? 10 : 12
+                        height: _isNarrow ? 10 : 12
+                        radius: width / 2
                         color:  object.link ? "#301934" : "#9E9E9E"
                         Layout.alignment: Qt.AlignVCenter
                     }
@@ -142,22 +144,22 @@ ColumnLayout  {
                     // Link Details
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 4
+                        spacing: 2
 
                         Text {
                             Layout.fillWidth: true
                             text:             object.name
                             color:            "#2C3E50"
                             font.bold:        true
-                            //font.pixelSize:   18
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize:   _isNarrow ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
                             elide:            Text.ElideRight
                         }
 
                         Text {
                             text:             object.link ? qsTr("Connected") : qsTr("Disconnected")
                             color:            object.link ? "#301934" : "#7F8C8D"
-                            font.pointSize: ScreenTools.smallFontPointSize
+                            font.pointSize:   ScreenTools.smallFontPointSize
+                            visible:          !_isNarrow || !object.link
                         }
                     }
 

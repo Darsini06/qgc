@@ -45,6 +45,7 @@ Rectangle {
     //     visible:        qgcPal.globalTheme === QGCPalette.Light
     // }
 
+    /*
     Rectangle {
         anchors.fill: viewButtonRow
 
@@ -52,10 +53,11 @@ Rectangle {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0;                                     color: _mainStatusBGColor }
-            GradientStop { position: currentButton.x + currentButton.width; color: _mainStatusBGColor }
+            GradientStop { position: currentButton1.x + currentButton1.width; color: _mainStatusBGColor }
             GradientStop { position: 1;                                     color: _root.color }
         }
     }
+    */
 
     RowLayout {
         id:                     viewButtonRow
@@ -77,7 +79,13 @@ Rectangle {
         }
 
         MainStatusIndicator {
+            id:                     mainStatusIndicator
             Layout.preferredHeight: viewButtonRow.height
+        }
+
+        FlightModeIndicator {
+            Layout.preferredHeight: viewButtonRow.height
+            visible:                _activeVehicle && !_communicationLost
         }
 
         QGCButton {

@@ -21,8 +21,6 @@ import QGroundControl.Palette
 Item {
     id:             control
     width:          gpsIndicatorRow.width
-    anchors.top:    parent.top
-    anchors.bottom: parent.bottom
 
     property var    _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property bool   _rtkConnected:  QGroundControl.gpsRtk.connected.value

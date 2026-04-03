@@ -28,7 +28,7 @@ Map {
     id: _map
 
     plugin:              Plugin { name: "QGroundControl" }
-    opacity:             0.99
+    opacity:             1.0
     // prefetchingEnabled:  true  // Not supported in Qt 6.6+ Map or causing issues
 
     bearing: MapGlobals.mapRotation
@@ -43,7 +43,7 @@ Map {
     property bool   firstVehiclePositionReceived:   false   ///< true: first vehicle position update was responded to
     property bool   planView:                       false   ///< true: map being using for Plan view, items should be draggable
 
-    readonly property real  maxZoomLevel: 20
+    readonly property real  maxZoomLevel: 22
 
     Component.onCompleted: {
         MapGlobals.activeFlightMap = this

@@ -23,8 +23,6 @@ import MAVLink
 //-- Battery Indicator
 Item {
     id:             control
-    anchors.top:    parent.top
-    anchors.bottom: parent.bottom
     //width:          batteryIndicatorRow.width
 
     property bool       showIndicator:      true
@@ -56,8 +54,6 @@ property real lastPercentage : 100  // Keep it global so it's preserved
 
     Row {
         id:             batteryIndicatorRow
-        anchors.top:    parent.top
-        anchors.bottom: parent.bottom
 
         Repeater {
             model: _activeVehicle ? _activeVehicle.batteries : 0
