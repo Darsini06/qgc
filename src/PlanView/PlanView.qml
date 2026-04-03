@@ -893,9 +893,10 @@ Item {
         // Left tool strip
         ToolStrip {
             id:                 toolStrip
-            anchors.margins:    _toolsMargin
             anchors.left:       parent.left
             anchors.top:        parent.top
+            anchors.leftMargin: 8
+            anchors.topMargin:  _toolsMargin
             z:                  QGroundControl.zOrderWidgets
             maxHeight:          parent.height - toolStrip.y
             title:              qsTr("Plan")
@@ -1607,7 +1608,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: 60
-            anchors.leftMargin: 10
+            anchors.leftMargin: 8
 
             Row {
                 spacing: 10    // space between the two buttons
@@ -2385,7 +2386,7 @@ Item {
         height:             baseSize
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
-        anchors.topMargin:  2
+        anchors.topMargin:  _toolsMargin
         anchors.leftMargin: 8
         z:                  QGroundControl.zOrderWidgets + 1
 
