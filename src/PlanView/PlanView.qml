@@ -82,8 +82,8 @@ Item {
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
 
-    property real compassBottomY: compassNorth.y + compassNorth.height + 10
-    property real compassNorthX:   compassNorth.x
+    property real compassBottomY: leftIconColumn.y + leftIconColumn.height + 10
+    property real compassNorthX:   leftIconColumn.x
     
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
@@ -2414,3 +2414,4 @@ Item {
             }
         }
     }
+}
