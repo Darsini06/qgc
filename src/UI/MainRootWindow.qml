@@ -94,7 +94,13 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property color app_color: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" ? "#79AE6F" : "#808080"
+    property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
+    property color app_color: droneType === "Agri" ? "#79AE6F" : "#808080"
+
+    function updateAppTheme(newMode) {
+        droneType = newMode
+        QGroundControl.saveGlobalSetting("loadpage", newMode)
+    }
 
     property bool connecting_drone : false
 

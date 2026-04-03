@@ -880,7 +880,7 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        QGroundControl.saveGlobalSetting("loadpage", "Camera")
+                        mainWindow.updateAppTheme("Camera")
                         MapGlobals.comefrom = "Camera"
                         mainWindow.cameraView()
                         QGroundControl.saveGlobalSetting("waypoint","waypoint")
@@ -968,7 +968,7 @@ Item {
                                 showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type")
 
                             } else {
-                                QGroundControl.saveGlobalSetting("loadpage", "Agri")
+                                mainWindow.updateAppTheme("Agri")
 
                                 mainWindow.showFlyView()
                                 MapGlobals.comefrom="Plan"
@@ -988,7 +988,7 @@ Item {
                             }
 
                         } else {
-                            QGroundControl.saveGlobalSetting("loadpage", "Agri")
+                            mainWindow.updateAppTheme("Agri")
                             mainWindow.showFlyView()
                             MapGlobals.comefrom="Plan"
                             console.log("MapGlobals.comefrom",MapGlobals.comefrom)
@@ -1065,7 +1065,7 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        QGroundControl.saveGlobalSetting("loadpage", "Mapping")
+                        mainWindow.updateAppTheme("Mapping")
                         mainWindow.showMapping()
                         MapGlobals.comefrom = "Start"
                         _appSettings.screen = "Start"
