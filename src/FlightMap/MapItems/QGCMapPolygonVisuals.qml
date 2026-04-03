@@ -24,8 +24,8 @@ import QGroundControl.FactSystem
 import QGroundControl.FactControls
 import QGroundControl.Controllers
 
-import MapGlobals 1.0
-import Qt.labs.platform 1.1 as Platform
+import MapGlobals
+import Qt.labs.platform as Platform
 
 /// QGCMapPolygon map visuals
 Item {

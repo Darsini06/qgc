@@ -8,6 +8,7 @@
  ****************************************************************************/
 
 #include "Vehicle.h"
+#include "AirspaceManager.h"
 #include "Actuators.h"
 #include "ADSBVehicleManager.h"
 #include "AudioOutput.h"
@@ -272,6 +273,7 @@ void Vehicle::_commonInit()
     connect(this, &Vehicle::homePositionChanged,    this, &Vehicle::_updateDistanceHeadingToHome);
     connect(this, &Vehicle::hobbsMeterChanged,      this, &Vehicle::_updateHobbsMeter);
     connect(this, &Vehicle::coordinateChanged,      this, &Vehicle::_updateAltAboveTerrain);
+    connect(this, &Vehicle::coordinateChanged,      this, &Vehicle::_checkRedZoneRestrictions);
     // Initialize alt above terrain to Nan so frontend can display it correctly in case the terrain query had no response
     _altitudeAboveTerrFact.setRawValue(qQNaN());
 
@@ -1598,6 +1600,16 @@ QGeoCoordinate Vehicle::homePosition()
 
 void Vehicle::setArmed(bool armed, bool showError)
 {
+    if (armed) {
+        AirspaceManager* airspaceManager = _toolbox->airspaceManager();
+        if (airspaceManager && airspaceManager->isCoordinateInRedZone(_coordinate)) {
+            if (showError) {
+                qgcApp()->showAppMessage(tr("Arming denied: Vehicle is in a prohibited or restricted zone."));
+            }
+            return;
+        }
+    }
+
     // We specifically use COMMAND_LONG:MAV_CMD_COMPONENT_ARM_DISARM since it is supported by more flight stacks.
     sendMavCommand(_defaultComponentId,
                    MAV_CMD_COMPONENT_ARM_DISARM,
@@ -3405,11 +3417,26 @@ void Vehicle::_updateMissionItemIndex()
 
 void Vehicle::_updateDistanceToGCS()
 {
-    QGeoCoordinate gcsPosition = _toolbox->qgcPositionManager()->gcsPosition();
-    if (coordinate().isValid() && gcsPosition.isValid()) {
-        _distanceToGCSFact.setRawValue(coordinate().distanceTo(gcsPosition));
+    if (_coordinate.isValid() && _toolbox->qgcPositionManager()->gcsPosition().isValid()) {
+        _distanceToGCSFact.setRawValue(_coordinate.distanceTo(_toolbox->qgcPositionManager()->gcsPosition()));
     } else {
         _distanceToGCSFact.setRawValue(qQNaN());
+    }
+}
+
+void Vehicle::_checkRedZoneRestrictions()
+{
+    if (_offlineEditingVehicle) return;
+
+    AirspaceManager* airspaceManager = _toolbox->airspaceManager();
+    if (!airspaceManager) return;
+
+    if (airspaceManager->isCoordinateInRedZone(_coordinate)) {
+        if (armed() && flying()) {
+            qCDebug(VehicleLog) << "Vehicle entered Red Zone at" << _coordinate << ". Triggering RTL.";
+            guidedModeRTL(false); // false for normal RTL, true for smart RTL if supported
+            qgcApp()->showAppMessage(tr("Warning: Vehicle entered a prohibited or restricted zone! Triggering emergency Return to Launch."));
+        }
     }
 }
 

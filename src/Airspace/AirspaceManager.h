@@ -22,7 +22,9 @@
 #include <QSqlDatabase>
 #include <QMutex>
 
-class QGCToolbox;
+#include "QGCToolbox.h"
+
+class QGCApplication;
 class AirspaceRestriction;
 class AirspaceZone;
 
@@ -39,7 +41,11 @@ enum class AirspaceZoneType {
     OuterYellow,    // Outer restricted warning zone
     CTR,            // Control Zone
     RunwayApproach, // Runway approach path
-    Temporary       // Temporary restriction (NOTAM)
+    Temporary,      // Temporary restriction (NOTAM)
+    Boundary,       // International Boundary
+    Others,         // Other restricted areas
+    StateBorder,    // State boundaries
+    Helipad         // Helipad restricted area
 };
 
 /**
@@ -123,7 +129,7 @@ private:
 /**
  * @brief Manages airspace data fetching, caching, and rendering
  */
-class AirspaceManager : public QObject
+class AirspaceManager : public QGCTool
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList zones READ zones NOTIFY zonesChanged)
@@ -136,7 +142,7 @@ class AirspaceManager : public QObject
     Q_PROPERTY(bool showIcons READ showIcons WRITE setShowIcons NOTIFY showIconsChanged)
 
 public:
-    explicit AirspaceManager(QGCToolbox* toolbox, QObject* parent = nullptr);
+    AirspaceManager(QGCApplication* app, QGCToolbox* toolbox);
     ~AirspaceManager() override;
 
     // Property getters
@@ -161,7 +167,11 @@ public:
     Q_INVOKABLE void refreshAirspaceData();
     Q_INVOKABLE bool checkMissionRestrictions(const QVariantList& waypoints, QString& errorMessage);
     Q_INVOKABLE QVariantList getRestrictionsAtCoordinate(double lat, double lon, double altitude);
+    Q_INVOKABLE bool isCoordinateInRedZone(const QGeoCoordinate& coord);
     Q_INVOKABLE void clearCache();
+
+    // From QGCTool
+    void setToolbox(QGCToolbox* toolbox) override;
 
 signals:
     void zonesChanged();
