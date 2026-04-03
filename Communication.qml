@@ -1,6 +1,6 @@
 // KmlLoader.qml
-import QtQuick 2.15
-import QtQuick.Dialogs 1.3
+import QtQuick
+import QtQuick.Dialogs
 import QGroundControl 1.0
 import QGroundControl.Controls 1.0
 

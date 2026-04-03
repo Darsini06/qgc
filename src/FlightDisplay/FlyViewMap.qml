@@ -23,7 +23,7 @@ import QGroundControl.Palette
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
 
-import MapGlobals 1.0
+import MapGlobals
 
  FlightMap {
     id:                         _root

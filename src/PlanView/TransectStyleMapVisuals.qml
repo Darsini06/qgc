@@ -17,7 +17,7 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controls
 import QGroundControl.FlightMap
-import MapGlobals 1.0
+import MapGlobals
 /// Base control for both Survey and Corridor Scan map visuals
 
 Item {

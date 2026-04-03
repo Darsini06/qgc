@@ -63,7 +63,7 @@ QGCToolbox::QGCToolbox(QGCApplication* app)
 #ifdef QGC_UTM_ADAPTER
     _utmspManager            = new UTMSPManager               (app, this);
 #endif
-    _airspaceManager         = new AirspaceManager            (this, app);
+    _airspaceManager         = new AirspaceManager            (app, this);
 }
 
 void QGCToolbox::setChildToolboxes(void)
@@ -81,6 +81,7 @@ void QGCToolbox::setChildToolboxes(void)
     _joystickManager->setToolbox(this);
     _linkManager->setToolbox(this);
     _mavlinkProtocol->setToolbox(this);
+    _airspaceManager->setToolbox(this);
     _missionCommandTree->setToolbox(this);
     _multiVehicleManager->setToolbox(this);
     _qgcPositionManager->setToolbox(this);

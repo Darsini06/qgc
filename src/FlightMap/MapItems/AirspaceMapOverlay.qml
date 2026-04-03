@@ -30,17 +30,30 @@ Item {
 
     visible: showAirspace && airspaceManager
 
-    property var _lastFetchCenter: QtPositioning.coordinate(0, 0)
-    property real _lastFetchZoom: 0
+    property bool _isMapMoving: false
+
+    // Timer to reset moving state
+    Timer {
+        id: _movingStateTimer
+        interval: 250
+        repeat: false
+        onTriggered: _isMapMoving = false
+    }
+
+    function _setMapMoving() {
+        _isMapMoving = true
+        _movingStateTimer.restart()
+    }
 
     // Auto-fetch airspace data when map moves significantly
     Connections {
         target: map
         
         function onCenterChanged() {
+            _setMapMoving()
             if (_root.visible && airspaceManager) {
                 var distanceMoved = map.center.distanceTo(_lastFetchCenter)
-                // Threshold: 500m or if zoom changed
+                // Threshold: 500m
                 if (distanceMoved > 500) {
                     _fetchTimer.restart()
                 }
@@ -48,6 +61,7 @@ Item {
         }
         
         function onZoomLevelChanged() {
+            _setMapMoving()
             if (_root.visible && airspaceManager) {
                 if (Math.abs(map.zoomLevel - _lastFetchZoom) > 0.5) {
                     _fetchTimer.restart()
@@ -60,12 +74,16 @@ Item {
                 _fetchTimer.restart()
             }
         }
+
+        function onRotationChanged() {
+            _setMapMoving()
+        }
     }
 
     // Debounce timer for fetching airspace data
     Timer {
         id: _fetchTimer
-        interval: 1500 // Increased debounce for smoother panning
+        interval: 2000 // Increased further for even better "fast action" performance
         repeat: false
         onTriggered: {
             if (map && airspaceManager) {
@@ -89,14 +107,14 @@ Item {
         var topLeft = bbox.topLeft
         var bottomRight = bbox.bottomRight
 
-        // Add buffer (expanded to 20% for "static" feel as you pan)
+        // Add buffer (expanded to 30% for even more "static" feel as you pan)
         var latDiff = Math.abs(topLeft.latitude - bottomRight.latitude)
         var lonDiff = Math.abs(bottomRight.longitude - topLeft.longitude)
         
         if (latDiff === 0 || lonDiff === 0) return
 
-        var latBuffer = latDiff * 0.2
-        var lonBuffer = lonDiff * 0.2
+        var latBuffer = latDiff * 0.3
+        var lonBuffer = lonDiff * 0.3
 
         var minLat = Math.min(topLeft.latitude, bottomRight.latitude) - latBuffer
         var maxLat = Math.max(topLeft.latitude, bottomRight.latitude) + latBuffer
@@ -111,21 +129,22 @@ Item {
         id:                 mapItemsView
         parent:             _root.map 
         model:              airspaceManager ? airspaceManager.zones : []
-        visible:            _root.visible
+        // Performance: Hide overlay while panning and only show if zoomed in essentially (zoom > 1)
+        visible:            _root.visible && !_isMapMoving && map.zoomLevel > 1
         
         delegate: MapItemGroup {
             id: zoneGroup
             property var zone: modelData
 
-            // Circle rendering (Faster for point-based zones)
+            // Circle rendering
             MapCircle {
                 visible: zone.radius > 0
                 center: zone.iconPosition
                 radius: zone.radius
                 color: zone.fillColor
                 opacity: zone.fillOpacity
-                border.color: zone.borderColor
                 border.width: zone.borderWidth
+                border.color: zone.borderColor
             }
 
             // Polygon rendering
@@ -133,42 +152,17 @@ Item {
                 visible: zone.radius === 0
                 color: zone.fillColor
                 opacity: zone.fillOpacity
-                border.color: zone.borderColor
                 border.width: zone.borderWidth
-                path: zone.path // Direct C++ property, no JS loop
-            }
-
-            // Zone label (Hidden by default, shown on click via popup)
-            // Keeping this for reference but setting visible to false
-            MapQuickItem {
-                visible: false
-                coordinate: zone.iconPosition
-                // ... rest of static label code
-            }
-
-            // Airport/Facility icon (Keep if desired, or hide)
-            MapQuickItem {
-                visible: _root.showIcons && zone.zoneType === "airport"
-                coordinate: zone.iconPosition
-                anchorPoint.x: airportIcon.width / 2
-                anchorPoint.y: airportIcon.height / 2
-                sourceItem: QGCColoredImage {
-                    id: airportIcon
-                    width: ScreenTools.defaultFontPixelHeight * 1.5
-                    height: ScreenTools.defaultFontPixelHeight * 1.5
-                    source: "/qmlimages/Airframe/Plane.svg"
-                    color: zone.borderColor
-                    fillMode: Image.PreserveAspectFit
-                    opacity: 0.8
-                }
+                border.color: zone.borderColor
+                path: zone.path 
             }
         }
     }
 
-    // Timer to hide popup after 2 seconds
+    // Timer to hide popup after 5 seconds
     Timer {
         id: _popupHideTimer
-        interval: 2000
+        interval: 5000
         repeat: false
         onTriggered: _zoneInfoPopup.hide()
     }
@@ -180,9 +174,9 @@ Item {
             var restrictions = _root.airspaceManager.getRestrictionsAtCoordinate(coord.latitude, coord.longitude, 0)
             
             if (restrictions.length > 0) {
-                // Prioritize zones: Red > InnerYellow > OuterYellow > Others
+                // Prioritize zones: Red > Temporary > Boundary > Runway > Yellow > Others
                 var selectedZone = restrictions[0]
-                var priority = { "red": 4, "inneryellow": 3, "outeryellow": 2, "green": 1 }
+                var priority = { "red": 7, "temporary": 6, "boundary": 5, "runway": 4, "inneryellow": 3, "outeryellow": 2, "others": 1, "green": 0 }
                 
                 var currentPri = priority[selectedZone.zoneType] || 0
                 
@@ -195,7 +189,7 @@ Item {
                     }
                 }
                 
-                _zoneInfoPopup.show(selectedZone)
+                _zoneInfoPopup.show(selectedZone, position)
                 _popupHideTimer.restart()
             }
         }
@@ -204,20 +198,22 @@ Item {
     // Zone information popup (UI Overlay - Screen Coordinates)
     Rectangle {
         id: _zoneInfoPopup
-        anchors.centerIn: parent
-        width: Math.max(_zoneInfoColumn.width + ScreenTools.defaultFontPixelWidth * 4, ScreenTools.defaultFontPixelWidth * 25)
-        height: _zoneInfoColumn.height + ScreenTools.defaultFontPixelHeight * 1.5
-        radius: ScreenTools.defaultFontPixelHeight * 0.5
-        color: Qt.rgba(0, 0, 0, 0.85)
-        border.color: currentZone ? currentZone.borderColor : "white"
-        border.width: 2
+        width: Math.max(_zoneInfoColumn.width + ScreenTools.defaultFontPixelWidth * 4, ScreenTools.defaultFontPixelWidth * 20)
+        height: _zoneInfoColumn.height + ScreenTools.defaultFontPixelHeight * 2
+        radius: 4
+        color: "white"
+        border.color: "#A020F0"
+        border.width: 3
         visible: false
-        z: 9999 // Ensure it's on top of everything
+        z: 9999 
 
         property var currentZone: null
 
-        function show(zone) {
+        function show(zone, pos) {
             currentZone = zone
+            // Position near the click location
+            x = Math.max(0, Math.min(_root.width - width, pos.x - width / 2))
+            y = Math.max(0, Math.min(_root.height - height, pos.y - height - 20))
             visible = true
         }
 
@@ -233,10 +229,18 @@ Item {
             width: parent.width - ScreenTools.defaultFontPixelWidth * 2
 
             QGCLabel {
-                text: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.name : ""
-                color: "white"
+                text: {
+                    if (!_zoneInfoPopup.currentZone) return ""
+                    // If it's a "red" zone and name is generic, use "Red Zone"
+                    var name = _zoneInfoPopup.currentZone.name
+                    if (name.toLowerCase().indexOf("red") === -1 && _zoneInfoPopup.currentZone.zoneType === "red") {
+                        return name + " (Red Zone)"
+                    }
+                    return name
+                }
+                color: "#FF4500" // Bright orange-red like screenshot
                 font.bold: true
-                font.pixelSize: ScreenTools.mediumFontPointSize
+                font.pixelSize: ScreenTools.largeFontPointSize
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WordWrap
                 width: parent.width
@@ -244,17 +248,9 @@ Item {
             }
 
             QGCLabel {
-                text: _zoneInfoPopup.currentZone ? 
-                      "(" + _zoneInfoPopup.currentZone.zoneType.toUpperCase() + ")" : ""
-                color: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.borderColor : "yellow"
-                font.pixelSize: ScreenTools.smallFontPointSize
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            QGCLabel {
-                visible: _zoneInfoPopup.currentZone && _zoneInfoPopup.currentZone.description !== ""
+                visible: _zoneInfoPopup.currentZone && _zoneInfoPopup.currentZone.description !== "" && _zoneInfoPopup.currentZone.description !== _zoneInfoPopup.currentZone.name
                 text: _zoneInfoPopup.currentZone ? _zoneInfoPopup.currentZone.description : ""
-                color: "white"
+                color: "#333333" // Dark grey for description
                 font.pixelSize: ScreenTools.smallFontPointSize
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WordWrap

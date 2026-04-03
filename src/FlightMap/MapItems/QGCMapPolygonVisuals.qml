@@ -24,8 +24,8 @@ import QGroundControl.FactSystem
 import QGroundControl.FactControls
 import QGroundControl.Controllers
 
-import MapGlobals 1.0
-import Qt.labs.platform 1.1 as Platform
+import MapGlobals
+import Qt.labs.platform as Platform
 
 /// QGCMapPolygon map visuals
 Item {
@@ -1342,6 +1342,11 @@ Item {
                 z: 100
                 spacing: 8
                 visible: mapping
+
+                Item {
+                    width: buttonSize
+                    height: buttonSize + 28  // 2 button heights + spacing gap
+                }
 
                 Button {
                     id: boundryMarkingBtn1

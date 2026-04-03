@@ -12,7 +12,7 @@ import QGroundControl.Palette
 import QGroundControl.QGCMapEngineManager 1.0
 import QGroundControl.FlightMap
 import QGroundControl.Vehicle
-import MapGlobals 1.0
+import MapGlobals
 
 Row {
     id: icons_row

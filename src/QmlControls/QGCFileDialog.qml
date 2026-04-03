@@ -9,7 +9,7 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controllers
 import Qt.labs.settings 1.0
-import MapGlobals 1.0
+import MapGlobals
 /// This control is meant to be a direct replacement for the standard Qml FileDialog control.
 /// It differs for mobile builds which uses a completely custom file picker.
 Item {

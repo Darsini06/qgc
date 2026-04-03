@@ -13,7 +13,7 @@ import QtLocation
 import QtPositioning
 import QtQuick.Dialogs
 
-import MapGlobals 1.0
+import MapGlobals
 
 import QGroundControl
 import QGroundControl.FactSystem
@@ -28,9 +28,8 @@ Map {
     id: _map
 
     plugin:              Plugin { name: "QGroundControl" }
-    opacity:             0.99 // https://bugreports.qt.io/browse/QTBUG-82185
+    opacity:             0.99
     // prefetchingEnabled:  true  // Not supported in Qt 6.6+ Map or causing issues
-    // copyrightsVisible:   false // Not supported in Qt 6.6+ Map or causing issues
 
     bearing: MapGlobals.mapRotation
 

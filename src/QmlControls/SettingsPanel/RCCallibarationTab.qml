@@ -1,4 +1,4 @@
-import QtQuick 2.15
+import QtQuick
 
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -13,7 +13,7 @@ import QGroundControl.Palette
 import QGroundControl.FlightMap
 import QGroundControl.Vehicle
 import QGroundControl.Controllers
-import MapGlobals 1.0
+import MapGlobals
 
 
 Item {
