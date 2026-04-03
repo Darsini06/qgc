@@ -83,6 +83,7 @@ Item {
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
 
     property real compassBottomY: compassNorth.y + compassNorth.height + 10
+    property real compassNorthX:   compassNorth.x
     
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
@@ -93,7 +94,7 @@ Item {
 
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
-    property real iconSize: baseSize * 0.5   // icon inside the circle
+    property real iconSize: baseSize * 0.8   // icon inside the circle
 
     //     Component.onCompleted: {
     //         console.log("PlanView received planType:", _appSettings.screenplanType);
@@ -202,6 +203,17 @@ Item {
         //mobileFileSaveDialogComponent.createObject(mainWindow).open()
     }
 
+
+    function newmapfile(file) {
+
+        console.log("file data:",file)
+        _planMasterController.loadFromFile(file)
+        _planMasterController.fitViewportToItems()
+        _missionController.setCurrentPlanViewSeqNum(0, true)
+        //close()
+
+        mainWindow.showPlanView()
+    }
 
 
     // Left Top Back Arrow Navigation explicitly removed as requested by user
@@ -634,18 +646,13 @@ Item {
                                close()
 
 
-                                mainWindow.showPlanView()
+                               mainWindow.showPlanView()
                            }
     }
 
 
     AirspaceRestrictionDialog {
         id: _airspaceRestrictionDialog
-    }
-
-    TransectStyleMapVisuals {
-        id:                     transect
-
     }
 
 
@@ -738,19 +745,19 @@ Item {
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
-                    onClicked:   (sequenceNumber) => { 
-                        _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
-                        for (var i = 0; i < _missionController.visualItems.count; i++) {
-                            var item = _missionController.visualItems.get(i)
-                            if (item.sequenceNumber === sequenceNumber) {
-                                missionItemDialog.currentMissionItem = item
-                                missionItemDialog.currentIndex = i
-                                missionItemDialog.open()
-                                missionItemDialog.visible = true
-                                break
-                            }
-                        }
-                    }
+                    onClicked:   (sequenceNumber) => {
+                                     _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+                                     for (var i = 0; i < _missionController.visualItems.count; i++) {
+                                         var item = _missionController.visualItems.get(i)
+                                         if (item.sequenceNumber === sequenceNumber) {
+                                             missionItemDialog.currentMissionItem = item
+                                             missionItemDialog.currentIndex = i
+                                             missionItemDialog.open()
+                                             missionItemDialog.visible = true
+                                             break
+                                         }
+                                     }
+                                 }
                 }
             }
 
@@ -1372,8 +1379,8 @@ Item {
                         readOnly: false
 
                         onClicked: (sequenceNumber) => {
-                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                        }
+                                       _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                                   }
 
                         onRemove: {
                             var removeVIIndex = missionItemDialog.currentIndex
@@ -1418,7 +1425,7 @@ Item {
             closePolicy: Popup.NoAutoClose
             parent: Overlay.overlay
             visible: _editingLayer == _layerGeoFence
-            onClosed: { 
+            onClosed: {
                 if (layerTabBar.currentIndex === 1) {
                     layerTabBar.currentIndex = 0;
                 }
@@ -1632,7 +1639,7 @@ Item {
 
                     onClicked: {
                         console.log("Upload clicked")
-
+                        waypointMark=false
                         if(_activeVehicle) {
                             if (_utmspEnabled) {
                                 QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
@@ -1687,8 +1694,6 @@ Item {
                 }
             }
         }
-
-
 
 
         Component {
@@ -2371,5 +2376,49 @@ Item {
         planMasterController:   _planMasterController
         z:                      100
         //plantypes:planType
+    }
+
+    // Compass icon — placed as direct child of _root so anchor to planToolBar.bottom works correctly
+    Item {
+        id:                 compassNorth
+        width:              baseSize
+        height:             baseSize
+        anchors.top:        planToolBar.bottom
+        anchors.left:       parent.left
+        anchors.topMargin:  2
+        anchors.leftMargin: 8
+        z:                  QGroundControl.zOrderWidgets + 1
+
+        Rectangle {
+            width:        baseSize
+            height:       baseSize
+            radius:       width / 2
+            color:        "#4a2c6d"
+            border.width: 1
+            border.color: "#8e6abb"
+            clip:         true
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    MapGlobals.mapRotation = 0
+                }
+            }
+
+            QGCColoredImage {
+                id:               compassArrow
+                source:           "/qmlimages/NewImages/cardinal_point.svg"
+                anchors.centerIn: parent
+                width:            iconSize
+                height:           iconSize
+                fillMode:         Image.PreserveAspectFit
+                transform: Rotation {
+                    origin.x: compassArrow.width  / 2
+                    origin.y: compassArrow.height / 2
+                    angle:    -MapGlobals.mapRotation
+                }
+                color: "white"
+            }
+        }
     }
 }

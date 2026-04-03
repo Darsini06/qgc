@@ -2,7 +2,10 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import QGroundControl
+import QGroundControl.ScreenTools
 import QGroundControl.Palette
+
 
 TextField {
     id:                 control

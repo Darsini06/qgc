@@ -96,6 +96,8 @@ ApplicationWindow {
 
     property color app_color: "#262626"
 
+    property bool connecting_drone : false
+
 
     function dp(value) {
         return value * baseUnit;
@@ -253,6 +255,10 @@ ApplicationWindow {
 
     //-------------------------------------------------------------------------
     //-- Global Scope Functions
+
+    function fileload(file) {
+        planView.newmapfile(file)
+    }
 
     function planmap() {
         planView.newmap()
@@ -812,6 +818,10 @@ ApplicationWindow {
         pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
+    function logfiles() {
+        pageLoader.source = "qrc:/qml/LoginPages/LogFiles.qml"
+    }
+
     function closeScreens() {
         pageLoader.source = ""
     }
@@ -1035,6 +1045,37 @@ ApplicationWindow {
                         anchors.fill: parent
                         anchors.margins: 15
                         source: tabModel.get(sidebarList.currentIndex).file
+                    }
+
+                    Item {
+                        id: drone_loading
+                        anchors.fill: parent
+                        visible: connecting_drone
+                        z: 100
+
+                        // Blocks ALL touch/mouse input when the loading screen is enabled
+                        MouseArea {
+                            anchors.fill: parent
+                            enabled: drone_loading.visible
+
+                            // propagateComposedEvents: false is actually the default, but stating it explicitly
+                            // makes the intent clear and protects against any parent-level event forwarding that
+                            // might be configured elsewhere in QGC's codebase.
+                            propagateComposedEvents: false
+
+                            onClicked: {}
+                            onPressed: {}
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#80000000"
+                        }
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: drone_loading.visible
+                        }
                     }
                 }
             }

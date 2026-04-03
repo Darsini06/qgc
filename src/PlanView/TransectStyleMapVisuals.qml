@@ -287,44 +287,42 @@ Item {
     }
 
     Item {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.leftMargin: 60
-            anchors.topMargin: 10
+        x: map.parent.parent.compassNorthX
+        y: map.parent.parent.compassBottomY
 
-            Button {
-                id: editBtn
-                padding: 0
-                visible: MapGlobals.share_edit_visibility
-                implicitWidth: baseSize
-                implicitHeight: baseSize
+        Button {
+            id: editBtn
+            padding: 0
+            visible: MapGlobals.share_edit_visibility
+            implicitWidth: baseSize
+            implicitHeight: baseSize
 
-                background: Rectangle {
-                    radius: width / 2
-                    color: "white"//"#1b1c3e"
-                    //border.color: "#005BBB"
-                    //border.width: 2
-                }
+            background: Rectangle {
+                radius: width / 2
+                color: "white"//"#1b1c3e"
+                //border.color: "#005BBB"
+                //border.width: 2
+            }
 
-                contentItem: Item {
-                    anchors.fill: parent
+            contentItem: Item {
+                anchors.fill: parent
 
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                        width: iconSize * 0.5
-                        height: iconSize * 0.5
-                        anchors.centerIn: parent
-                        color: "black"
-                    }
-                }
-
-                onClicked: {
-                    console.log("Edit clicked")
-                    if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
-
-                    MapGlobals.share_edit_visibility = false
+                QGCColoredImage {
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                    width: iconSize * 0.5
+                    height: iconSize * 0.5
+                    anchors.centerIn: parent
+                    color: "black"
                 }
             }
+
+            onClicked: {
+                console.log("Edit clicked")
+                if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                MapGlobals.share_edit_visibility = false
+            }
         }
+    }
 }
 

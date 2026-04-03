@@ -418,106 +418,121 @@ ColumnLayout  {
 
     // Second Dialog - Configuration (without type dropdown)
     Component {
-        id: linkConfigDialogComponent
+           id: linkConfigDialogComponent
 
-        QGCPopupDialog {
-            id : linkConfigDialog
-            title: selectedType === 3 ? "Bluetooth Devices"
-                                      : originalConfig ? qsTr("Edit Link")
-                                                       : qsTr("Add New Link")
-            buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== ""
+           QGCPopupDialog {
+               id : linkConfigDialog
+               title: selectedType === 0 ? "Bluetooth Devices"
+                                         : originalConfig ? qsTr("Edit Link")
+                                                          : qsTr("Add New Link")
+               buttons:        Dialog.Save | Dialog.Cancel
+               acceptAllowed:  nameField.text !== ""
 
-            property var originalConfig
-            property var editingConfig
-            property int selectedType
+               property var originalConfig
+               property var editingConfig
+               property int selectedType
 
-            property bool _connectionInitiated: false
+               property bool _connectionInitiated: false
 
-            Connections {
-                target: linkConfigDialog.editingConfig
-                enabled: linkConfigDialog.editingConfig !== null
+               Connections {
+                   target: linkConfigDialog.editingConfig
+                   enabled: linkConfigDialog.editingConfig !== null
 
-                function onShowToast(message) {
-                    mainWindow.showToastMessage(message)
-                }
-            }
+                   function onShowToast(message) {
+                       mainWindow.showToastMessage(message)
+                   }
+               }
 
-            onAccepted: {
+               onAccepted: {
 
-                if ( _connectionInitiated ) {
-                    console.log("linkConfigDialog: ignoring duplicate accept")
-                    return
-                }
+                   if ( _connectionInitiated ) {
+                       console.log("linkConfigDialog: ignoring duplicate accept")
+                       return
+                   }
 
-                linkSettingsLoader.item.saveSettings()
-                editingConfig.devName = nameField.text
-                editingConfig.name    = editingConfig.devName
+                   linkSettingsLoader.item.saveSettings()
+                   editingConfig.devName = nameField.text
+                   editingConfig.name    = editingConfig.devName
 
-                if (originalConfig) {
+                   if (originalConfig) {
 
-                    _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+                       _linkManager.endConfigurationEditing(originalConfig, editingConfig)
 
-                } else {
-                    editingConfig.dynamic = false
-                    _linkManager.endCreateConfiguration(editingConfig)
+                   } else {
+                       editingConfig.dynamic = false
+                       _linkManager.endCreateConfiguration(editingConfig)
 
-                    if (activeVehicle) {
-                        mainWindow.showToastMessage(
-                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
-                        return
-                    }
+                       if (activeVehicle) {
+                           mainWindow.showToastMessage(
+                                       qsTr("Please disconnect the active vehicle before connecting a new one"))
+                           return
+                       }
 
-                    _connectionInitiated = true         // mark as initiated
-                    mainWindow.connecting_drone = true  // only set true once
-                    _linkManager.createConnectedLink(editingConfig)
-                    console.log("click save button editingConfig : ")
-                }
-            }
+                       _connectionInitiated = true         // mark as initiated
+                       mainWindow.connecting_drone = true  // only set true once
+                       _linkManager.createConnectedLink(editingConfig)
+                       console.log("click save button editingConfig : ")
+                   }
+               }
 
-            onRejected: {
-                _connectionInitiated = false  // reset on cancel
-                _linkManager.cancelConfigurationEditing(editingConfig)
-            }
+               onRejected: {
+                   _connectionInitiated = false  // reset on cancel
+                   _linkManager.cancelConfigurationEditing(editingConfig)
+               }
 
-            // ---------- MAIN LAYOUT ----------
-            ColumnLayout {
-                id: mainColumn
-                spacing: ScreenTools.defaultFontPixelHeight / 2
-                Layout.fillWidth: true
+               // ---------- MAIN LAYOUT ----------
+               ColumnLayout {
+                   id: mainColumn
+                   spacing: ScreenTools.defaultFontPixelHeight / 2
+                   Layout.fillWidth: true
 
 
-                // ---- Name row (not shown for Bluetooth) ----
-                RowLayout {
-                    Layout.fillWidth: true    // row stretches full width
-                    spacing: ScreenTools.defaultFontPixelWidth
-                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+                   // ---- Name row (not shown for Bluetooth) ----
+                   RowLayout {
+                       spacing: linkSettingsLoader._colSpacing
+                       visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
-                    QGCLabel { text: qsTr("Name") }
+                       QGCLabel {
+                           text: qsTr("Name")
+                           color: "black"
+                           Layout.preferredWidth: linkSettingsLoader._firstColumnWidth
+                       }
 
-                    QGCTextField {
-                        id:               nameField
-                        Layout.fillWidth: true   // text field grows to take remaining width
-                        text:             linkConfigDialog.editingConfig.devName
-                        placeholderText:  qsTr("Enter name")
-                    }
-                }
+                       QGCTextField {
+                           id:               nameField
+                           Layout.preferredWidth: linkSettingsLoader._secondColumnWidth
+                           text:             linkConfigDialog.editingConfig.devName
+                           placeholderText:  qsTr("Enter name")
+                           textColor:        "black"
+                           leftPadding:      16
+                           rightPadding:     16
+                           background: Rectangle {
+                               color: "#FFFFFF"
+                               radius: 8
+                               border.color: nameField.activeFocus ? "#301934" : "#DDE1EA"
+                               border.width: nameField.activeFocus ? 2 : 1
+                               implicitHeight: 44
+                               Behavior on border.color { ColorAnimation { duration: 200 } }
+                           }
+                       }
+                   }
 
-                // ---- Device list / settings loader ----
-                Loader {
-                    id: linkSettingsLoader
-                    Layout.fillWidth: true        // << ensures it spans the whole dialog
-                    source: subEditConfig.settingsURL
+                   // ---- Device list / settings loader ----
+                   Loader {
+                       id: linkSettingsLoader
+                       Layout.fillWidth: true        // << ensures it spans the whole dialog
+                       source: subEditConfig.settingsURL
 
-                    property var subEditConfig:         linkConfigDialog.editingConfig
-                    property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
-                    property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
-                    property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
-                    property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
-                }
-            }
-        }
-    }
+                       property var subEditConfig:         linkConfigDialog.editingConfig
+                       property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
+                       property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
+                       property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
+                       property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+                   }
+               }
+           }
+       }
+
 
 }
 
