@@ -24,8 +24,8 @@ import QGroundControl.FactSystem
 import QGroundControl.FactControls
 import QGroundControl.Controllers
 
-import MapGlobals 1.0
-import Qt.labs.platform 1.1 as Platform
+import MapGlobals
+import Qt.labs.platform as Platform
 
 /// QGCMapPolygon map visuals
 Item {
@@ -369,64 +369,271 @@ Item {
                            }
     }
 
-    QGCMenu {
-        id: menu
+    // QGCMenu {
+    //     id: menu
+
+    //     property int _editingVertexIndex: -1
+
+    //     function popupVertex(curIndex) {
+    //         menu._editingVertexIndex = curIndex
+    //         removeVertexItem.visible = (mapPolygon.count > 0 && menu._editingVertexIndex >= 0)
+    //         menu.popup()
+    //     }
+
+    //     function popupCenter() {
+    //         menu.popup()
+    //     }
+
+    //     QGCMenuItem {
+    //         id:             removeVertexItem
+    //         visible:        !_circleMode
+    //         text:           qsTr("Remove vertex")
+    //         onTriggered: {
+    //             if (menu._editingVertexIndex >= 0) {
+    //                 mapPolygon.removeVertex(menu._editingVertexIndex)
+    //             }
+    //         }
+    //     }
+
+    //     QGCMenuSeparator {
+    //         visible:        removeVertexItem.visible
+    //     }
+
+    //     QGCMenuItem {
+    //         text:           qsTr("Set radius..." )
+    //         visible:        _circleMode
+    //         onTriggered:    _editCircleRadius = true
+    //     }
+
+    //     QGCMenuItem {
+    //         text:           qsTr("Edit position..." )
+    //         visible:        _circleMode
+    //         onTriggered:    editCenterPositionDialog.createObject(mainWindow).open()
+    //     }
+
+    //     QGCMenuItem {
+    //         text:           qsTr("Edit position..." )
+    //         visible:        !_circleMode && menu._editingVertexIndex >= 0
+    //         onTriggered:    editVertexPositionDialog.createObject(mainWindow).open()
+    //     }
+
+    //     QGCMenuItem {
+    //         text:           qsTr("Adjust with arrows")
+    //         visible:        !_circleMode
+    //         onTriggered:    {
+    //             _root.selectedVertexIndex = menu._editingVertexIndex
+    //             //arrowDrawer.open()
+    //         }
+    //     }
+    // }
+
+    MouseArea {
+        id: dismissOverlay
+        // Cover the full map area. _root has no size so we bind to mapControl's dimensions.
+        x:      0
+        y:      0
+        width:  mapControl.width
+        height: mapControl.height
+        z:              vertexMenu.z - 1
+        visible:        vertexMenu.visible
+        preventStealing: true
+        onClicked:      vertexMenu.closeMenu()
+    }
+
+    // Custom animated context menu popup
+    Rectangle {
+        id: vertexMenu
+        visible: false
+        x: 30
+        y: 60
+        z: 1000
+        radius: 8
+        color: "white"
+        border.color: "#000000"
+        border.width: 1
+        opacity: 0
+
+        width:  menuColumn.implicitWidth  + 28
+        height: menuColumn.implicitHeight + 8
+
+        // Drop shadow effect
+        layer.enabled: true
+        layer.effect: null
 
         property int _editingVertexIndex: -1
+        property bool _showRemove: false
 
         function popupVertex(curIndex) {
-            menu._editingVertexIndex = curIndex
-            removeVertexItem.visible = (mapPolygon.count > 0 && menu._editingVertexIndex >= 0)
-            menu.popup()
+            vertexMenu._editingVertexIndex = curIndex
+            vertexMenu._showRemove = (mapPolygon.count > 3 && curIndex >= 0)
+            openAnimation.start()
         }
 
         function popupCenter() {
-            menu.popup()
+            vertexMenu._editingVertexIndex = -1
+            vertexMenu._showRemove = false
+            openAnimation.start()
         }
 
-        QGCMenuItem {
-            id:             removeVertexItem
-            visible:        !_circleMode
-            text:           qsTr("Remove vertex")
-            onTriggered: {
-                if (menu._editingVertexIndex >= 0) {
-                    mapPolygon.removeVertex(menu._editingVertexIndex)
+        function closeMenu() {
+            closeAnimation.start()
+        }
+
+        // Slide-in from left animation
+        NumberAnimation {
+            id: openAnimation
+            target: vertexMenu
+            property: "x"
+            from: -vertexMenu.width
+            to: 30
+            duration: 280
+            easing.type: Easing.OutCubic
+            onStarted: {
+                vertexMenu.visible = true
+                vertexMenu.opacity = 1
+            }
+        }
+
+        // Slide-out to right animation
+        NumberAnimation {
+            id: closeAnimation
+            target: vertexMenu
+            property: "x"
+            from: 30
+            to: vertexMenu.width + 20
+            duration: 220
+            easing.type: Easing.InCubic
+            onFinished: {
+                vertexMenu.visible = false
+                vertexMenu.x = 30
+            }
+        }
+
+        Column {
+            id: menuColumn
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                margins: 2
+            }
+            spacing: 0
+
+            // Remove vertex
+            Rectangle {
+                visible:        vertexMenu._showRemove
+                implicitWidth:  removeRow.implicitWidth  + 28
+                implicitHeight: removeRow.implicitHeight + 20
+                color:          "transparent"//removeMouseArea.containsMouse ? app_color : "transparent"
+                radius:         8
+
+                Behavior on color {
+
+                    ColorAnimation {
+                        duration: 120
+                    }
+                }
+
+                Row {
+
+                    id: removeRow
+                    anchors.centerIn: parent
+                    spacing: 10
+
+                    // Trash icon
+                    QGCColoredImage {
+                        width:              ScreenTools.defaultFontPixelHeight
+                        height:             ScreenTools.defaultFontPixelHeight
+                        anchors.verticalCenter: parent.verticalCenter
+                        sourceSize.height:  height
+                        source:             "/res/TrashDelete.svg"
+                        fillMode:           Image.PreserveAspectFit
+                        mipmap:             true
+                        smooth:             true
+                        color:              qgcPal.text
+                    }
+
+                    Text {
+                        text:               qsTr("Remove vertex...")
+                        color:              "#000000"
+                        font.pointSize:     ScreenTools.defaultFontPointSize
+                        font.weight:        Font.Medium
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    id: removeMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (vertexMenu._editingVertexIndex >= 0) {
+                            mapPolygon.removeVertex(vertexMenu._editingVertexIndex)
+                        }
+                        vertexMenu.closeMenu()
+                    }
+                }
+            }
+
+            // Divider
+            Rectangle {
+                visible: vertexMenu._showRemove
+                width:  menuColumn.implicitWidth
+                height: 1
+                color: "#DDDDDD"
+                //anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            // "Edit position..." item
+            Rectangle {
+                id: editBtn
+                visible: !_circleMode && vertexMenu._editingVertexIndex >= 0
+                implicitWidth:  editRow.implicitWidth  + 28
+                implicitHeight: editRow.implicitHeight + 20
+                color:  "transparent"//editMouseArea.containsMouse ? app_color  : "transparent"
+                radius: 8
+
+                Behavior on color { ColorAnimation { duration: 120 } }
+
+                Row {
+                    id: editRow
+                    anchors.centerIn: parent
+                    spacing: 10
+
+                    QGCColoredImage {
+                        width:              ScreenTools.defaultFontPixelHeight * 0.9
+                        height:             ScreenTools.defaultFontPixelHeight * 0.9
+                        anchors.verticalCenter: parent.verticalCenter
+                        sourceSize.height:  height
+                        source:             "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                        fillMode:           Image.PreserveAspectFit
+                        mipmap:             true
+                        smooth:             true
+                        color:              qgcPal.text
+                    }
+
+                    Text {
+                        text: qsTr("Edit position...")
+                        color: "#000000"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    id: editMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        vertexMenu.closeMenu()
+                        editVertexPositionDialog.createObject(mainWindow).open()
+                    }
                 }
             }
         }
 
-        QGCMenuSeparator {
-            visible:        removeVertexItem.visible
-        }
-
-        QGCMenuItem {
-            text:           qsTr("Set radius..." )
-            visible:        _circleMode
-            onTriggered:    _editCircleRadius = true
-        }
-
-        QGCMenuItem {
-            text:           qsTr("Edit position..." )
-            visible:        _circleMode
-            onTriggered:    editCenterPositionDialog.createObject(mainWindow).open()
-        }
-
-        QGCMenuItem {
-            text:           qsTr("Edit position..." )
-            visible:        !_circleMode && menu._editingVertexIndex >= 0
-            onTriggered:    editVertexPositionDialog.createObject(mainWindow).open()
-        }
-
-        QGCMenuItem {
-            text:           qsTr("Adjust with arrows")
-            visible:        !_circleMode
-            onTriggered:    {
-                _root.selectedVertexIndex = menu._editingVertexIndex
-                //arrowDrawer.open()
-            }
-        }
     }
-
 
     PlanMasterController {
         id:         planMasterController
@@ -709,9 +916,13 @@ Item {
                     mapPolygon.adjustVertex(polygonVertex, itemCoordinate)
                 }
             }
-            onClicked: if(_root.interactive) menu.popupVertex(polygonVertex)
+            onClicked: {
+                console.log("Click the Point:", polygonVertex)
+                if(_root.interactive) vertexMenu.popupVertex(polygonVertex)
+            }
         }
     }
+
 
     Component {
         id: centerDragHandle
@@ -1021,82 +1232,16 @@ Item {
             // Buttons positioned directly below the compass icon
             // cardinalLeftScreenX and cardinalBottomScreenY are in mapControl (panel) space
             Column {
-                x: cardinalLeftScreenX
+                x: cardinalLeftScreenX + 7
                 y: cardinalBottomScreenY
-                z: 1000
+                z: 100
                 spacing: 8
                 visible: mapPolygon.traceMode
 
-                Rectangle {
-                    width:  buttonSize
-                    height: buttonSize
-                    radius: width / 2
-                    color:  Qt.rgba(0, 0, 0, 0.40)
-                    anchors.margins: 3
-
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/home.svg"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.6
-                        height: width
-                        fillMode: Image.PreserveAspectFit
-                        color : "white"
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            QGroundControl.saveGlobalSetting("waypointvisible", "")
-                            QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
-                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                                mainWindow.cameraView()
-                                mainWindow.closefile()
-                            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                mainWindow.showMapping()
-                                mainWindow.closefile()
-                            }
-                            else{
-                                if (planType === "Plan") {
-                                    mainWindow.showFlyView()
-                                    mainWindow.closefile()
-                                } else {
-                                    mainWindow.showFlyView1()
-                                    mainWindow.closefile()
-                                }
-                            }
-                        }
-                    }
+                Item {
+                    width: buttonSize
+                    height: buttonSize + 28  // 2 button heights + spacing gap
                 }
-
-                Rectangle {
-                    width:  buttonSize
-                    height: buttonSize
-                    radius: width / 2
-                    color:  Qt.rgba(0, 0, 0, 0.40)
-                    anchors.margins: 3
-
-                    QGCColoredImage {
-                        id: compassArrow
-                        source: "qrc:/qmlimages/NewImages/cardinal_point.svg"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.7
-                        height: width
-                        fillMode: Image.PreserveAspectFit
-                        transform: Rotation {
-                            origin.x: compassArrow.width / 2
-                            origin.y: compassArrow.height / 2
-                            angle: -mapRotation
-                        }
-                        color : "white"
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: MapGlobals.mapRotation = 0
-                    }
-                }
-
-
 
                 Button {
                     id: boundryMarkingBtn
@@ -1128,16 +1273,6 @@ Item {
                             if (gcsPosition.isValid) {
 
                                 mapPolygon.appendVertex(gcsPosition)
-
-                                // if (mapPolygon) {
-                                // mapPolygon.appendVertex(gcsPosition)
-
-                                // if (isObstacleMode) {
-                                // addObstacleVisual()
-                                // } else {
-                                // addCommonVisuals()
-                                // }
-                                // }
                             }
 
                         }
@@ -1149,14 +1284,6 @@ Item {
 
                                 mapPolygon.appendVertex(activeVehicleCoordinate)
 
-                                // if (mapPolygon) {
-                                // mapPolygon.appendVertex(activeVehicleCoordinate)
-                                // if (isObstacleMode) {
-                                // addObstacleVisual()
-                                // } else {
-                                // addCommonVisuals()
-                                // }
-                                // }
                             }
 
                         }
@@ -1168,17 +1295,6 @@ Item {
                             // Then convert that point (in pixels) to a geographic coordinate.
                             var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
                             mapPolygon.appendVertex(bottomCoord)
-
-
-                            // if (mapPolygon) {
-                            // mapPolygon.appendVertex(bottomCoord)
-
-                            // if (isObstacleMode) {
-                            // addObstacleVisual()
-                            // } else {
-                            // addCommonVisuals()
-                            // }
-                            // }
 
                         }
 
@@ -1221,82 +1337,16 @@ Item {
 
             //only for Mapping
             Column {
-                x: cardinalLeftScreenX
+                x: cardinalLeftScreenX + 7
                 y: cardinalBottomScreenY
-                z: 1000
+                z: 100
                 spacing: 8
                 visible: mapping
 
-                Rectangle {
-                    width:  buttonSize
-                    height: buttonSize
-                    radius: width / 2
-                    color:  Qt.rgba(0, 0, 0, 0.40)
-                    anchors.margins: 3
-
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/home.svg"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.6
-                        height: width
-                        fillMode: Image.PreserveAspectFit
-                        color : "white"
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            QGroundControl.saveGlobalSetting("waypointvisible", "")
-                            QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
-                            if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                                mainWindow.cameraView()
-                                mainWindow.closefile()
-                            }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                mainWindow.showMapping()
-                                mainWindow.closefile()
-                            }
-                            else{
-                                if (planType === "Plan") {
-                                    mainWindow.showFlyView()
-                                    mainWindow.closefile()
-                                } else {
-                                    mainWindow.showFlyView1()
-                                    mainWindow.closefile()
-                                }
-                            }
-                        }
-                    }
+                Item {
+                    width: buttonSize
+                    height: buttonSize + 28  // 2 button heights + spacing gap
                 }
-
-                Rectangle {
-                    width:  buttonSize
-                    height: buttonSize
-                    radius: width / 2
-                    color:  Qt.rgba(0, 0, 0, 0.40)
-                    anchors.margins: 3
-
-                    QGCColoredImage {
-                        id: compassArrow1
-                        source: "qrc:/qmlimages/NewImages/cardinal_point.svg"
-                        anchors.centerIn: parent
-                        width: parent.width * 0.7
-                        height: width
-                        fillMode: Image.PreserveAspectFit
-                        transform: Rotation {
-                            origin.x: compassArrow1.width / 2
-                            origin.y: compassArrow1.height / 2
-                            angle: -mapRotation
-                        }
-                        color : "white"
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: MapGlobals.mapRotation = 0
-                    }
-                }
-
-
 
                 Button {
                     id: boundryMarkingBtn1
@@ -1330,16 +1380,6 @@ Item {
                             if (gcsPosition.isValid) {
 
                                 mapPolygon.appendVertex(gcsPosition)
-
-                                // if (mapPolygon) {
-                                // mapPolygon.appendVertex(gcsPosition)
-
-                                // if (isObstacleMode) {
-                                // addObstacleVisual()
-                                // } else {
-                                // addCommonVisuals()
-                                // }
-                                // }
                             }
 
                         }
@@ -1351,14 +1391,6 @@ Item {
 
                                 mapPolygon.appendVertex(activeVehicleCoordinate)
 
-                                // if (mapPolygon) {
-                                // mapPolygon.appendVertex(activeVehicleCoordinate)
-                                // if (isObstacleMode) {
-                                // addObstacleVisual()
-                                // } else {
-                                // addCommonVisuals()
-                                // }
-                                // }
                             }
 
                         }
@@ -1370,17 +1402,6 @@ Item {
                             // Then convert that point (in pixels) to a geographic coordinate.
                             var bottomCoord = mapControl.toCoordinate(bottomPoint, false);
                             mapPolygon.appendVertex(bottomCoord)
-
-
-                            // if (mapPolygon) {
-                            // mapPolygon.appendVertex(bottomCoord)
-
-                            // if (isObstacleMode) {
-                            // addObstacleVisual()
-                            // } else {
-                            // addCommonVisuals()
-                            // }
-                            // }
 
                         }
 

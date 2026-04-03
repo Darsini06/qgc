@@ -60,9 +60,7 @@ Rectangle {
                 //waypoint visible logic
                 QGroundControl.saveGlobalSetting("waypointvisible", "")
 
-
                 QGroundControl.saveGlobalSetting("waypointMark", "false")
-
 
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")

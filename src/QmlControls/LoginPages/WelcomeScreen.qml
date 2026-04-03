@@ -26,6 +26,8 @@ Item {
     anchors.fill: parent
 
     property string currentView: "signin"   // signin // signup
+    property bool otpSent: false
+    property bool isOtpVerified: false
 
     property string rightSide: "signup"
 
@@ -709,64 +711,165 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(2)
-                            //anchors.horizontalCenter: parent.horizontalCenter
 
                             Row {
-                                //anchors.horizontalCenter: parent.horizontalCenter
                                 x: parent.width * 0.05
                                 spacing: dp(1)
 
                                 Text {
                                     text: "Email"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
                                 }
 
                                 Text {
                                     text: "*"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.8
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.8
                                     font.weight: Font.Medium
                                     color: "red"
                                 }
-
-                                // QGCColoredImage {
-                                //     source: "/qmlimages/NewImages/gmail.svg"
-                                //     fillMode: Image.PreserveAspectFit
-                                //     width: 12
-                                //     height: 12
-                                //     anchors.verticalCenter: parent.verticalCenter
-                                //     color: textPrimary
-                                // }
                             }
 
-                            Rectangle {
+                            Row {
                                 width: parent.width * 0.9
-                                height: dp(10)
-                                radius: dp(1)
-                                color: surfaceColor
-                                border.width: regEmail.activeFocus ? 2 : 1
-                                border.color: regEmail.activeFocus ? app_color : borderColor
+                                spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                TextField {
-                                    id: regEmail
-                                    anchors.fill: parent
-                                    placeholderText: "your.email@example.com"
-                                    //font.pixelSize: dp(4)
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.family: "Arial"
-                                    color: "black"
-                                    background: null
-                                    selectByMouse: true
+                                Rectangle {
+                                    width: parent.width - sendOtpBtn.width - parent.spacing
+                                    height: dp(10)
+                                    radius: dp(1)
+                                    color: surfaceColor
+                                    border.width: regEmail.activeFocus ? 2 : 1
+                                    border.color: regEmail.activeFocus ? app_color : borderColor
 
-                                    validator: RegularExpressionValidator {
-                                        regularExpression: /^[a-zA-Z0-9@._-]*$/ // Email allowed characters
+                                    TextField {
+                                        id: regEmail
+                                        anchors.fill: parent
+                                        placeholderText: "your.email@example.com"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.family: "Arial"
+                                        color: "black"
+                                        background: null
+                                        selectByMouse: true
+                                        validator: RegularExpressionValidator {
+                                            regularExpression: /^[a-zA-Z0-9@._-]*$/
+                                        }
+                                        inputMethodHints: Qt.ImhEmailCharactersOnly
                                     }
+                                }
 
-                                    inputMethodHints: Qt.ImhEmailCharactersOnly
+                                Button {
+                                    id: sendOtpBtn
+                                    width: dp(25)
+                                    height: dp(10)
+                                    text: "Send OTP"
+                                    background: Rectangle {
+                                        radius: dp(1)
+                                        color: sendOtpBtn.pressed ? primaryHover : app_color
+                                    }
+                                    contentItem: Text {
+                                        text: sendOtpBtn.text
+                                        color: "white"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    onClicked: {
+                                        if (!MapGlobals.validateEmail(regEmail.text, regEmail)) return;
+                                        MapGlobals.sendOTP(regEmail.text, function(success) {
+                                            if (success) {
+                                                otpSent = true;
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        // OTP Field
+                        Column {
+                            width: parent.width
+                            spacing: dp(2)
+                            visible: otpSent
+
+                            Row {
+                                x: parent.width * 0.05
+                                spacing: dp(1)
+                                Text {
+                                    text: isOtpVerified ? "OTP Verified" : "OTP Verification"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                    font.weight: Font.Bold
+                                    color: isOtpVerified ? "green" : app_color
+                                }
+                                Text {
+                                    text: "*"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.8
+                                    font.weight: Font.Medium
+                                    color: "red"
+                                    visible: !isOtpVerified
+                                }
+                            }
+
+                            Row {
+                                width: parent.width * 0.9
+                                spacing: dp(2)
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                Rectangle {
+                                    width: isOtpVerified ? parent.width : (parent.width - verifyOtpBtn.width - parent.spacing)
+                                    height: dp(10)
+                                    radius: dp(1)
+                                    color: surfaceColor
+                                    border.width: regOtp.activeFocus ? 2 : 1
+                                    border.color: isOtpVerified ? "green" : (regOtp.activeFocus ? app_color : borderColor)
+
+                                    TextField {
+                                        id: regOtp
+                                        anchors.fill: parent
+                                        placeholderText: "Enter 6-digit OTP"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.family: "Arial"
+                                        color: "black"
+                                        enabled: !isOtpVerified
+                                        background: null
+                                        selectByMouse: true
+                                        inputMethodHints: Qt.ImhDigitsOnly
+                                    }
+                                }
+
+                                Button {
+                                    id: verifyOtpBtn
+                                    width: dp(20)
+                                    height: dp(10)
+                                    text: "Verify"
+                                    visible: !isOtpVerified
+                                    background: Rectangle {
+                                        radius: dp(1)
+                                        color: verifyOtpBtn.pressed ? primaryHover : app_color
+                                    }
+                                    contentItem: Text {
+                                        text: verifyOtpBtn.text
+                                        color: "white"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.bold: true
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    onClicked: {
+                                        if (regOtp.text.length < 6) {
+                                            mainWindow.showToastMessage("Please enter a valid 6-digit OTP");
+                                            return;
+                                        }
+                                        MapGlobals.verifyOTP(regEmail.text, regOtp.text, function(success) {
+                                            if (success) {
+                                                isOtpVerified = true;
+                                                mainWindow.showToastMessage("OTP verified! Please set your password.");
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -775,7 +878,7 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(2)
-                            //anchors.horizontalCenter: parent.horizontalCenter
+                            visible: isOtpVerified
 
                             Row {
                                 //anchors.horizontalCenter: parent.horizontalCenter
@@ -870,7 +973,7 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(2)
-                            //anchors.horizontalCenter: parent.horizontalCenter
+                            visible: isOtpVerified
 
                             Row {
                                 //anchors.horizontalCenter: parent.horizontalCenter
@@ -970,6 +1073,7 @@ Item {
                             Button {
                                 id: signUpActionBtn
                                 text: "Create Account"
+                                visible: isOtpVerified
                                 width: parent.width * 0.9
                                 height: dp(10)
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1014,7 +1118,7 @@ Item {
                                     if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
                                     if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
 
-                                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, function(result, response) {
+                                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
                                                             if (result) {
                                                                 mainWindow.showToastMessage("Account created successfully!");
                                                                 
@@ -1034,8 +1138,11 @@ Item {
                                                                 regUser.text = "";
                                                                 regDisplay.text = "";
                                                                 regEmail.text = "";
+                                                                regOtp.text = "";
                                                                 regPass.text = "";
                                                                 regConfirm.text = "";
+                                                                otpSent = false;
+                                                                isOtpVerified = false;
 
                                                                 // Go into the app!
                                                                 MapGlobals.rootWindow.homescreen();

@@ -23,17 +23,17 @@ import QGroundControl.FlightMap
 
 
 import QGroundControl.UTMSP
-import QGroundControl.Palette 1.0
+import QGroundControl.Palette
 
-import MapGlobals 1.0
+import MapGlobals
 
-import QtQuick.LocalStorage 2.0
+import QtQuick.LocalStorage
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import Qt.labs.folderlistmodel 2.1
-import Qt.labs.platform 1.1 as Platform
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Qt.labs.folderlistmodel
+import Qt.labs.platform as Platform
 
 import "qrc:/qml/SettingsPanel"
 
@@ -95,6 +95,8 @@ ApplicationWindow {
     property real baseUnit: 8 * scaleRatio
 
     property color app_color: "#262626"
+
+    property bool connecting_drone : false
 
 
     function dp(value) {
@@ -253,6 +255,10 @@ ApplicationWindow {
 
     //-------------------------------------------------------------------------
     //-- Global Scope Functions
+
+    function fileload(file) {
+        planView.newmapfile(file)
+    }
 
     function planmap() {
         planView.newmap()
@@ -1039,6 +1045,37 @@ ApplicationWindow {
                         anchors.fill: parent
                         anchors.margins: 15
                         source: tabModel.get(sidebarList.currentIndex).file
+                    }
+
+                    Item {
+                        id: drone_loading
+                        anchors.fill: parent
+                        visible: connecting_drone
+                        z: 100
+
+                        // Blocks ALL touch/mouse input when the loading screen is enabled
+                        MouseArea {
+                            anchors.fill: parent
+                            enabled: drone_loading.visible
+
+                            // propagateComposedEvents: false is actually the default, but stating it explicitly
+                            // makes the intent clear and protects against any parent-level event forwarding that
+                            // might be configured elsewhere in QGC's codebase.
+                            propagateComposedEvents: false
+
+                            onClicked: {}
+                            onPressed: {}
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "#80000000"
+                        }
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: drone_loading.visible
+                        }
                     }
                 }
             }

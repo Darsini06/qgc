@@ -17,7 +17,7 @@ import QtPositioning
 import QtQuick.Window
 import QtQml.Models
 
-import MapGlobals 1.0
+import MapGlobals
 
 import QGroundControl
 import QGroundControl.Controls
@@ -28,7 +28,7 @@ import QGroundControl.FlightMap
 import QGroundControl.Palette
 import QGroundControl.ScreenTools
 import QGroundControl.Vehicle
-import Qt.labs.platform 1.1 as Platform
+import Qt.labs.platform as Platform
 
 // This is the ui overlay layer for the widgets/tools for Fly View
 Item {

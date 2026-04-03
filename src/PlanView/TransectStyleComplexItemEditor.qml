@@ -12,7 +12,7 @@ import QGroundControl.FactControls
 import QGroundControl.Palette
 import QGroundControl.FlightMap
 
-import MapGlobals 1.0
+import MapGlobals
 
 Rectangle {
     id:         _root

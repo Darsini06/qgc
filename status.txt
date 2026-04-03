@@ -1,0 +1,20 @@
+ M MapGlobals.qml
+D  Newscreen.qml
+D  ProfileScreenNew.qml
+ m libs/libevents/libevents
+M  qgroundcontrol.qrc
+ M src/Airspace/AirspaceManager.cc
+ M src/Airspace/AirspaceManager.h
+ M src/Airspace/AirspaceRestrictionValidator.cc
+ M src/FlightMap/FlightMap.qml
+ M src/FlightMap/MapItems/AirspaceMapOverlay.qml
+ M src/PlanView/PlanView.qml
+ M src/QGCToolbox.cc
+D  src/QmlControls/LoginPages/AccountUpdate.qml
+D  src/QmlControls/LoginPages/Feedback.qml
+D  src/QmlControls/LoginPages/PrivacyPolicy.qml
+M  src/QmlControls/LoginPages/ProfileScreen.qml
+D  src/QmlControls/LoginPages/ReportScreen.qml
+D  src/QmlControls/LoginPages/SelectApplication.qml
+D  src/QmlControls/LoginPages/Terms_Condition.qml
+?? status.txt

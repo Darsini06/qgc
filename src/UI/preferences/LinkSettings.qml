@@ -17,14 +17,13 @@ import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
-
 ColumnLayout  {
 
     Layout.fillWidth: true
     spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
     property var _linkManager: QGroundControl.linkManager
-    property color app_color: "#4a2c6d"
+    property color app_color: "#301934"
     property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
 
 
@@ -55,33 +54,6 @@ ColumnLayout  {
         }
     }
 
-    // SettingsGroupLayout {
-    //     heading:        qsTr("AutoConnect")
-    //     visible:        _autoConnectSettings.visible
-
-    //     Repeater {
-    //         id: autoConnectRepeater
-
-    //         model: [
-    //             _autoConnectSettings.autoConnectPixhawk,
-    //             _autoConnectSettings.autoConnectSiKRadio,
-    //             _autoConnectSettings.autoConnectLibrePilot,
-    //             _autoConnectSettings.autoConnectUDP,
-    //             _autoConnectSettings.autoConnectZeroConf,
-    //             _autoConnectSettings.autoConnectRTKGPS,
-    //         ]
-
-    //         property var names: [ qsTr("Pixhawk"), qsTr("SiK Radio"), qsTr("LibrePilot"), qsTr("UDP"), qsTr("Zero-Conf"), qsTr("RTK") ]
-
-    //         FactCheckBoxSlider {
-    //             Layout.fillWidth:   true
-    //             text:               autoConnectRepeater.names[index]
-    //             fact:               modelData
-    //             visible:            modelData.visible
-    //         }
-    //     }
-    // }
-
     // --- Links Section ---
     Rectangle {
         Layout.fillWidth: true
@@ -93,31 +65,32 @@ ColumnLayout  {
 
     RowLayout {
         Layout.fillWidth: true
+        spacing:          15
 
         Text {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.fillWidth: true
             text:             qsTr("Communication Links")
             font.pixelSize:   ScreenTools.mediumFontPointSize
             color:            "black"
             font.bold:        true
-            //topPadding:       ScreenTools.defaultFontPixelHeight
-            bottomPadding:   ScreenTools.defaultFontPixelHeight * 0.3
+            bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.3
         }
 
+        Item { Layout.fillWidth: true } // Spacer pushes button to the right
+
         Rectangle {
-            Layout.alignment: Qt.AlignVCenter
-            width:            130
-            height:           36
-            radius:           18
-            color:            addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
-            border.color:     "#4a2c6d"
-            border.width:     1
+            Layout.alignment:   Qt.AlignVCenter
+            Layout.rightMargin: 10
+            width:              130
+            height:             36
+            radius:             18
+            color:              addMouse.containsMouse ? "#D6EAF8" : "#EBF5FB"
+            border.color:       "#301934"
+            border.width:       1
 
             Text {
                 anchors.centerIn: parent
                 text:             qsTr("+ Add New Link")
-                color:            "#4a2c6d"
+                color:            "#301934"
                 font.bold:        true
                 font.pixelSize:   14
             }
@@ -146,7 +119,7 @@ ColumnLayout  {
                 implicitHeight:   mainRowWrapper.implicitHeight + 30
                 color:            object.link ? "#F4FDF8" : "#FFFFFF"
                 radius:           10
-                border.color:     object.link ? "#4a2c6d" : "#E2E8F0"
+                border.color:     object.link ? "#301934" : "#E2E8F0"
                 border.width:     object.link ? 2 : 1
 
                 RowLayout {
@@ -162,7 +135,7 @@ ColumnLayout  {
                         width:  12
                         height: 12
                         radius: 6
-                        color:  object.link ? "#4a2c6d" : "#9E9E9E"
+                        color:  object.link ? "#301934" : "#9E9E9E"
                         Layout.alignment: Qt.AlignVCenter
                     }
 
@@ -183,7 +156,7 @@ ColumnLayout  {
 
                         Text {
                             text:             object.link ? qsTr("Connected") : qsTr("Disconnected")
-                            color:            object.link ? "#4a2c6d" : "#7F8C8D"
+                            color:            object.link ? "#301934" : "#7F8C8D"
                             font.pointSize: ScreenTools.smallFontPointSize
                         }
                     }
@@ -192,37 +165,6 @@ ColumnLayout  {
                     RowLayout {
                         spacing: _isNarrow ? 8 : 15
                         Layout.alignment: Qt.AlignVCenter
-
-                        // Edit Action
-                        // Rectangle {
-                        //     width:  36
-                        //     height: 36
-                        //     radius: 8
-                        //     color:  editArea.containsMouse ? "#EBF5FB" : "transparent"
-                        //     visible: !object.link
-                        //     border.color: editArea.containsMouse ? "#4a2c6d" : "transparent"
-
-                        //     QGCColoredImage {
-                        //         anchors.centerIn: parent
-                        //         height:           18
-                        //         width:            18
-                        //         sourceSize.height: 18
-                        //         fillMode:         Image.PreserveAspectFit
-                        //         color:            "#4a2c6d"
-                        //         source:           "/res/pencil.svg"
-                        //     }
-
-                        //     MouseArea {
-                        //         id: editArea
-                        //         anchors.fill: parent
-                        //         hoverEnabled: true
-                        //         cursorShape: Qt.PointingHandCursor
-                        //         onClicked: {
-                        //             var editingConfig = _linkManager.startConfigurationEditing(object)
-                        //             linkDialogComponent.createObject(mainWindow, { editingConfig: editingConfig, originalConfig: object }).open()
-                        //         }
-                        //     }
-                        // }
 
                         // Delete Action
                         Rectangle {
@@ -265,7 +207,7 @@ ColumnLayout  {
                             width:            100
                             height:           36
                             radius:           18
-                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#5B2C6F" : "#4A2C6D")
+                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#301934" : "#301934")
                             border.color:     object.link ? "#E74C3C" : "transparent"
                             border.width:     1
 
@@ -346,70 +288,98 @@ ColumnLayout  {
             buttons: false
             closeOnClickOutside: true
 
+            popupWidth: ScreenTools.isMobile ? Math.min(mainWindow.width * 0.9, 380) : 520
+            
             property int selectedType: -1
 
             ColumnLayout {
-                spacing: 15                     // we’ll control spacing ourselves
+                spacing: ScreenTools.isMobile ? 8 : 12
+                width: parent.width - 24
+                anchors.horizontalCenter: parent.horizontalCenter
                 Layout.fillWidth: true
 
                 Repeater {
                     model: _linkManager.linkTypeStrings
-
-                    delegate: RowLayout {
-                        visible: modelData !== "Mock Link" &&
-                                 modelData !== "Log Replay"
+                    delegate: Rectangle {
+                        id: typeItem
+                        visible: modelData !== "Mock Link" && modelData !== "Log Replay"
                         Layout.fillWidth: true
-                        spacing: 20
+                        Layout.preferredHeight: visible ? (ScreenTools.isMobile ? 46 : 56) : 0
+                        radius: 8
+                        color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
+                        border.color: typeMouseArea.containsMouse ? "#301934" : "#E2E8F0"
+                        border.width: 1
 
-                        Rectangle {
-                            width: 25
-                            height: 25
-                            radius: width/2
-                            color: app_color
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
 
-                            Text {
-                                anchors.centerIn: parent
-                                font.pixelSize: 14
-                                color: "white"
-                                text: index + 1
-                            }
-                        }
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 16
+                            anchors.rightMargin: 16
+                            spacing: ScreenTools.isMobile ? 12 : 16
 
-                        //Item { Layout.fillWidth: true }
+                            // Number Icon Box
+                            Rectangle {
+                                width: ScreenTools.isMobile ? 28 : 34
+                                height: width
+                                radius: 8
+                                Layout.alignment: Qt.AlignVCenter
+                                color: typeMouseArea.containsMouse ? "#301934" : "#F1F5F9"
+                                border.color: typeMouseArea.containsMouse ? "#301934" : "#DDE1EA"
+                                border.width: 1
 
-                        // clickable text
-                        Text {
-                            text: modelData
-                            //Layout.alignment: Qt.AlignHCenter
-                            font.pixelSize: 16
-                            color: "black"   // adjust to your theme
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-
-                                    typeDialog.selectedType = index
-                                    typeDialog.close()
-
-                                    var editingConfig = _linkManager.createConfiguration(index, "")
-
-                                    linkConfigDialogComponent.createObject(mainWindow, {
-                                                                               editingConfig: editingConfig,
-                                                                               originalConfig: null,
-                                                                               selectedType: index
-                                                                           }).open()
+                                Text {
+                                    anchors.centerIn: parent
+                                    font.family: "Outfit"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                    font.bold: true
+                                    color: typeMouseArea.containsMouse ? "white" : "black"
+                                    text: (index + 1)
                                 }
                             }
+
+                            // Connection Type Title
+                            Text {
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignVCenter
+                                text: modelData
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                font.bold: true
+                                color: "black"
+                                elide: Text.ElideRight
+                            }
+
+                            // Arrow Indicator
+                            Text {
+                                Layout.alignment: Qt.AlignVCenter
+                                text: "→"
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.4
+                                font.bold: true
+                                color: typeMouseArea.containsMouse ? "white" : "#666666"
+                            }
                         }
 
-                        Item { Layout.fillWidth: true }
+                        MouseArea {
+                            id: typeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                typeDialog.selectedType = index
+                                typeDialog.close()
 
-                        // // full-width divider
-                        // Rectangle {
-                        //     Layout.fillWidth: true
-                        //     height: 1
-                        //     color: "#aaaaaa"  // divider colour
-                        // }
+                                var editingConfig = _linkManager.createConfiguration(index, "")
+
+                                linkConfigDialogComponent.createObject(mainWindow, {
+                                                                           editingConfig: editingConfig,
+                                                                           originalConfig: null,
+                                                                           selectedType: index
+                                                                       }).open()
+                            }
+                        }
                     }
                 }
             }
@@ -420,13 +390,15 @@ ColumnLayout  {
     Component {
         id: linkConfigDialogComponent
 
+
         QGCPopupDialog {
             id : linkConfigDialog
-            title: selectedType === 3 ? "Bluetooth Devices"
+            title: selectedType === 0 ? "Bluetooth Devices"
                                       : originalConfig ? qsTr("Edit Link")
                                                        : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
             acceptAllowed:  nameField.text !== ""
+
 
             property var originalConfig
             property var editingConfig
@@ -486,20 +458,33 @@ ColumnLayout  {
                 spacing: ScreenTools.defaultFontPixelHeight / 2
                 Layout.fillWidth: true
 
-
                 // ---- Name row (not shown for Bluetooth) ----
                 RowLayout {
-                    Layout.fillWidth: true    // row stretches full width
-                    spacing: ScreenTools.defaultFontPixelWidth
+                    spacing: linkSettingsLoader._colSpacing
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
-                    QGCLabel { text: qsTr("Name") }
+                    QGCLabel {
+                        text: qsTr("Name")
+                        color: "black"
+                        Layout.preferredWidth: linkSettingsLoader._firstColumnWidth
+                    }
 
                     QGCTextField {
                         id:               nameField
-                        Layout.fillWidth: true   // text field grows to take remaining width
+                        Layout.preferredWidth: linkSettingsLoader._secondColumnWidth
                         text:             linkConfigDialog.editingConfig.devName
                         placeholderText:  qsTr("Enter name")
+                        textColor:        "black"
+                        leftPadding:      16
+                        rightPadding:     16
+                        background: Rectangle {
+                            color: "#FFFFFF"
+                            radius: 8
+                            border.color: nameField.activeFocus ? "#301934" : "#DDE1EA"
+                            border.width: nameField.activeFocus ? 2 : 1
+                            implicitHeight: 44
+                            Behavior on border.color { ColorAnimation { duration: 200 } }
+                        }
                     }
                 }
 
@@ -519,8 +504,8 @@ ColumnLayout  {
         }
     }
 
-}
 
+}
 
 // LabelledButton {
 //     label:      qsTr("Add New Link")
@@ -628,3 +613,7 @@ ColumnLayout  {
 //         }
 //     }
 // }
+
+
+
+

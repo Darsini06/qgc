@@ -1,5 +1,5 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -9,8 +9,8 @@ import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
-import MapGlobals 1.0
-import QtQuick.Layouts 1.15
+import MapGlobals
+import QtQuick.Layouts
 
 import QtQuick.Effects
 
@@ -34,8 +34,6 @@ Item {
     property bool isCheckingAirspace: true
     property bool isClearToFly: true
 
-
-
     property real screenWidth: parent.width
     property real screenHeight: parent.height
     // Use ScreenTools for consistent scaling across devices, falling back to a ratio-based approach if needed
@@ -46,6 +44,12 @@ Item {
     property bool isTablet: ScreenTools.isMobile && !ScreenTools.isTinyScreen
     property bool isDesktop: !ScreenTools.isMobile
     property bool isSmallScreen: ScreenTools.isTinyScreen
+
+    property string planType: "Standard"
+    property var _appSettings: QGroundControl.settingsManager.appSettings
+    property var _linkManager: QGroundControl.linkManager
+
+    property bool connecting_drone : false
 
     // DYNAMIC SCALING: Professional responsive multiplier
     property real dynamicScaleFactor: {
@@ -75,15 +79,57 @@ Item {
         }
     }
 
+
+    // Success path
+    Connections {
+        target: QGroundControl.multiVehicleManager
+
+        function onActiveVehicleChanged(vehicle) {
+            if (vehicle) {
+                mainWindow.showToastMessage("Drone Connected")
+            } else {
+                mainWindow.showToastMessage("Drone DisConnected")
+            }
+
+            connecting_drone = false
+        }
+    }
+
+    // Failure path
+    Connections {
+        target: QGroundControl.linkManager
+
+        function onCommunicationError(linkName, errorMessage) {
+
+            console.log("LinkSettings: connect failed for", linkName)
+
+            connecting_drone = false     // stop loading screen
+
+            mainWindow.showToastMessage("Connection failed: " + errorMessage)
+        }
+    }
+
+
     /* ========= DYNAMIC BACKGROUND ========= */
     Item {
         id: bgContainer
         anchors.fill: parent
         z: 0
 
+        // Grey Gradient background specifically for the startup/loadpage state
+        Rectangle {
+            anchors.fill: parent
+            visible: (droneType === "loadpage")
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#E0E0E0" } // Light grey top
+                GradientStop { position: 1.0; color: "#EDEEF4" } // Standard background grey bottom
+            }
+        }
+
         Image {
             id: bgImage
             anchors.fill: parent
+            visible: (droneType !== "loadpage")
             source: {
                 if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
                 if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
@@ -107,6 +153,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: 0.6
+            visible: (droneType !== "loadpage")
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }
                 GradientStop { position: 0.5; color: "transparent" }
@@ -117,6 +164,7 @@ Item {
         // Darkening overlay for cinematic look and text readability - with vignette
         Rectangle {
             anchors.fill: parent
+            visible: (droneType !== "loadpage")
             gradient: Gradient {
                 id: vignetteGradient
                 GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.2) }
@@ -142,7 +190,7 @@ Item {
             mipmap: true
         }
 
-         Image {
+        Image {
             id: showMappingDrone
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
@@ -172,6 +220,56 @@ Item {
             asynchronous: true
             cache: true
             mipmap: true
+        }
+
+        // Startup/Loadpage Specific Drone (Right Side Corner)
+        Image {
+            id: loadpageDrone
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(5) : dp(5)
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : parent.width * 0.40
+            height: width
+            source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
+            fillMode: Image.PreserveAspectFit
+            visible: (droneType === "loadpage")
+            opacity: 0.85
+            asynchronous: true
+            cache: true
+            mipmap: true
+            
+            // Note: Shake/Floating animation removed per user request
+        }
+    }
+
+    //Bluetooth Loading Screen
+    Item {
+        id : drone_loading
+        anchors.fill: parent
+        visible: connecting_drone
+        z: 100
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: drone_loading.visible
+
+            // propagateComposedEvents: false is actually the default, but stating it explicitly
+            // makes the intent clear and protects against any parent-level event forwarding that
+            // might be configured elsewhere in QGC's codebase.
+            propagateComposedEvents: false
+
+            onClicked: {}
+            onPressed: {}
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            color: "#80000000"
+        }
+
+        BusyIndicator {
+            anchors.centerIn : parent
+            running: true
         }
     }
 
@@ -213,7 +311,7 @@ Item {
                     return dp(16) // Moved down for more style
                 }
             }
-            color: "#FFFFFF"
+            color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
             font.family: "Outfit"
             font.bold: true
             font.letterSpacing: isTablet || isDesktop ? 8 : 4
@@ -269,8 +367,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: profileMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
+                    color: (droneType === "loadpage") ? (profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: profileMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -286,7 +384,7 @@ Item {
                     }
                     Label {
                         text: qsTr("PROFILE")
-                        color: "white"
+                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -311,8 +409,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: appMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.1)
+                    color: (droneType === "loadpage") ? (appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: appMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -328,7 +426,7 @@ Item {
                     }
                     Label {
                         text: qsTr("APPLICATION")
-                        color: "white"
+                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -353,8 +451,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : Qt.rgba(255, 255, 255, 0.08)
-                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : Qt.rgba(255, 255, 255, 0.1)
+                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(255, 255, 255, 0.08))
+                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -370,7 +468,7 @@ Item {
                     }
                     Label {
                         text: qsTr("LOGOUT")
-                        color: logoutMouse.containsMouse ? "#FF6B6B" : "white"
+                        color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? "#262626" : "#FFFFFF")
                         visible: !isSmallScreen
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -408,7 +506,7 @@ Item {
             }
             // Reduced basic spacing between elements
             spacing: isSmallScreen ? dp(0.5) : dp(1.5)
-            opacity: 1 
+            opacity: 1
             z: 10
 
             // Main Title
@@ -424,7 +522,7 @@ Item {
                     if (droneType === "Agri")    return "AGRICULTURAL PRECISION"
                     return ""
                 }
-                color: "#FFFFFF"
+                color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                 // Massive size for Drone Commander, slightly larger for others
                 font.pointSize: {
                     var baseSize = ScreenTools.largeFontPointSize
@@ -449,7 +547,7 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.8)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.2) : Qt.rgba(0,0,0,0.8)
                     shadowBlur: 0.3
                     shadowHorizontalOffset: 2
                     shadowVerticalOffset: 2
@@ -469,7 +567,7 @@ Item {
                     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
                     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
                 }
-                color: Qt.rgba(255, 255, 255, 0.9)
+                color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
                     var baseSize = ScreenTools.defaultFontPointSize
                     var scaleMultiplier = dynamicScaleFactor
@@ -488,17 +586,17 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.6)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.1) : Qt.rgba(0,0,0,0.6)
                     shadowBlur: 0.2
                     shadowVerticalOffset: 1
                 }
             }
 
             // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
-/*
+
             Rectangle {
                 id: airspaceWidget
-                visible: droneType !== "loadpage"
+                visible: true // Always show or adapt as needed
                 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
@@ -549,7 +647,7 @@ Item {
                     repeat: false
                     onTriggered: {
                         isCheckingAirspace = false;
-                        isClearToFly = true; 
+                        isClearToFly = true;
                     }
                 }
 
@@ -591,7 +689,7 @@ Item {
                         }
 
                         Label {
-                            
+
                             Layout.fillWidth: true
                             text: qsTr("FLIGHT ZONE STATUS")
                             color: "white"
@@ -605,7 +703,7 @@ Item {
 
                     Label {
                         Layout.fillWidth: true
-                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") : 
+                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") :
                              (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
                         color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
                         font.family: "Outfit"
@@ -622,7 +720,7 @@ Item {
                              (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
                         color: "white"
                         opacity: 0.6
-                        font.family: "Outfit" 
+                        font.family: "Outfit"
                         font.pointSize: ScreenTools.smallFontPointSize * 0.85
                         lineHeight: 1.2
                         
@@ -641,7 +739,6 @@ Item {
                     }
                 }
             }
-*/
         }
 
         // ---- BOTTOM BUTTONS BAR ----
@@ -713,8 +810,8 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         var editingConfig = _linkManager.createConfiguration(
-                            ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
-                        );
+                                    ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
+                                    );
                         typeSelectionDialogComponent.createObject(mainWindow1, { editingConfig: editingConfig, originalConfig: null }).open();
                     }
                 }
@@ -763,7 +860,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START CAMERA")
+                            text: qsTr("CAMERA")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
@@ -835,7 +932,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START MISSION")
+                            text: qsTr("SPRAYING")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
@@ -850,18 +947,59 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        QGroundControl.saveGlobalSetting("loadpage", "Agri")
-                        mainWindow.showFlyView()
-                        MapGlobals.comefrom = "Plan"
-                        _appSettings.screen = "Plan"
+                        var frameType = QGroundControl.loadBoolGlobalSetting("frametypeDialog", false)
                         var videoSettings = QGroundControl.settingsManager.videoSettings
-                        if (videoSettings) {
-                            var videoSourceFact = videoSettings.videoSource
-                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                videoSourceFact.value = videoSourceFact.enumValues[0]
+                        var videoSourceFact = videoSettings.videoSource
+
+                        if (activeVehicle) {
+
+                            if (!activeVehicle.parameterManager.parametersReady){
+                                mainWindow.showToastMessage("Plese Wait Vehicle parameters are still loading...")
+                                return
                             }
+
+                            if (!frameType) {
+                                QGroundControl.saveBoolGlobalSetting("frametypeDialog", true)
+                                showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type")
+
+                            } else {
+                                QGroundControl.saveGlobalSetting("loadpage", "Agri")
+
+                                mainWindow.showFlyView()
+                                MapGlobals.comefrom="Plan"
+                                console.log("MapGlobals.comefrom",MapGlobals.comefrom)
+                                _appSettings.screen = "Plan"
+
+                                //var videoSettings = QGroundControl.settingsManager.videoSettings
+
+                                if (videoSettings) {
+                                    //var videoSourceFact = videoSettings.videoSource
+                                    if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                                        videoSourceFact.value = videoSourceFact.enumValues[0]
+                                    }
+                                }
+
+                                swapCamera();
+                            }
+
+                        } else {
+                            QGroundControl.saveGlobalSetting("loadpage", "Agri")
+                            mainWindow.showFlyView()
+                            MapGlobals.comefrom="Plan"
+                            console.log("MapGlobals.comefrom",MapGlobals.comefrom)
+                            _appSettings.screen = "Plan"
+
+                            //var videoSettings = QGroundControl.settingsManager.videoSettings
+
+                            if (videoSettings) {
+                                //var videoSourceFact = videoSettings.videoSource
+                                if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
+                                    videoSourceFact.value = videoSourceFact.enumValues[0]
+                                }
+                            }
+
+                            swapCamera();
                         }
-                        swapCamera();
                     }
                 }
             }
@@ -894,7 +1032,7 @@ Item {
                             Layout.preferredHeight: Layout.preferredWidth
                             radius: width / 2
                             color: "#1a1a2a" // Subtle dark blue tint for mapping background
-                            
+
                             QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/mapping_Application.svg"
                                 width: parent.width * 0.5
@@ -907,7 +1045,7 @@ Item {
 
                         Label {
                             Layout.fillWidth: true
-                            text: qsTr("START MAPPING")
+                            text: qsTr("MAPPING")
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
@@ -981,11 +1119,11 @@ Item {
             buttons: 0
             showButtons: false
             closeOnClickOutside: true
-            
+
             // Set the overall popup UI width tightly
             // Set a properly balanced dialog width to prevent text truncation
             popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
-            
+
             property int selectedType: -1
 
             ColumnLayout {
@@ -1009,7 +1147,7 @@ Item {
                     model: _linkManager.linkTypeStrings
                     delegate: Rectangle {
                         id: typeItem
-                        property bool isDisabled: index === 4 || index === 5 
+                        property bool isDisabled: index === 4 || index === 5
                         visible: !isDisabled
                         Layout.fillWidth: true
                         Layout.preferredHeight: visible ? 56 : 0
@@ -1097,6 +1235,7 @@ Item {
         id: linkConfigDialogComponent
 
         QGCPopupDialog {
+            id :linkConfigDialog
             title:          selectedType === 0 ? "Bluetooth Devices"
                                                : originalConfig ? qsTr("Edit Link")
                                                                 : qsTr("Add New Link")
@@ -1107,9 +1246,12 @@ Item {
             property var editingConfig
             property int selectedType
 
+            property bool _connectionInitiated: false
+
+            // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
             Connections {
-                target: editingConfig
-                enabled: editingConfig !== null
+                target: linkConfigDialog.editingConfig
+                enabled: linkConfigDialog.editingConfig !== null
 
                 function onShowToast(message) {
                     mainWindow.showToastMessage(message)
@@ -1117,20 +1259,45 @@ Item {
             }
 
             onAccepted: {
+                console.log("Click Save")
+
+                if ( _connectionInitiated ) {
+                    console.log("linkConfigDialog: ignoring duplicate accept")
+                    return
+                }
+
                 linkSettingsLoader.item.saveSettings()
                 editingConfig.devName = nameField.text
                 editingConfig.name    = editingConfig.devName
 
+                //connecting_drone = true
+
                 if (originalConfig) {
+
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
+
                 } else {
                     editingConfig.dynamic = false
                     _linkManager.endCreateConfiguration(editingConfig)
+
+                    if (activeVehicle) {
+                        mainWindow.showToastMessage(
+                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
+                        return
+                    }
+
+                    _connectionInitiated = true         // mark as initiated
+                    connecting_drone = true  // only set true once
                     _linkManager.createConnectedLink(editingConfig)
                 }
             }
 
-            onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+            onRejected: {
+                console.log("Click Cancel")
+                _connectionInitiated = false  //reset on cancel
+                _linkManager.cancelConfigurationEditing(editingConfig)
+
+            }
 
             // ---------- MAIN LAYOUT ----------
             ColumnLayout {
@@ -1145,8 +1312,8 @@ Item {
                     spacing: 16
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
-                    QGCLabel { 
-                        text: qsTr("Connection Name") 
+                    QGCLabel {
+                        text: qsTr("Connection Name")
                         font.bold: true
                         font.pointSize: ScreenTools.defaultFontPointSize
                         color: "black"
@@ -1157,12 +1324,12 @@ Item {
                         Layout.fillWidth: true
                         text:             editingConfig.devName
                         placeholderText:  qsTr("e.g. My Custom Drone Connection")
-                        
+
                         font.pointSize: ScreenTools.defaultFontPointSize
                         color: "black"
                         leftPadding: 16
                         rightPadding: 16
-                        
+
                         background: Rectangle {
                             radius: 8
                             color: "#FFFFFF"
@@ -1188,7 +1355,7 @@ Item {
                     Layout.fillWidth: true
                     source: subEditConfig.settingsURL
 
-                    property var subEditConfig:         editingConfig
+                    property var subEditConfig:         linkConfigDialog.editingConfig
                     property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
                     property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
                     property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
@@ -1198,7 +1365,4 @@ Item {
         }
     }
 
-    property string planType: "Standard"
-    property var _appSettings: QGroundControl.settingsManager.appSettings
-    property var _linkManager: QGroundControl.linkManager
 }

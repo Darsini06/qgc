@@ -430,6 +430,7 @@ elseif(ANDROID)
 
     set_target_properties(${PROJECT_NAME}
         PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/android-build/libs/${ANDROID_ABI}"
             # QT_ANDROID_ABIS ${ANDROID_ABI}
             QT_ANDROID_MIN_SDK_VERSION 25
             QT_ANDROID_TARGET_SDK_VERSION 35
