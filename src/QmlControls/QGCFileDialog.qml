@@ -45,7 +45,10 @@ Item {
 
 
             if(MapGlobals.save==="save1"){
-                savefiledialog.createObject(mainWindow).open()
+                //savefiledialog.createObject(mainWindow).open()
+                savefiledialog.createObject(mainWindow, {
+                                    userName: _appSettings.username
+                                }).open()
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
                 var strippedFileName1=_appSettings.username
@@ -152,6 +155,24 @@ Item {
             title:      _root.title
             buttons:    Dialog.Cancel
 
+            property bool showAllFiles: false
+                        property var  fullFileList: []
+                        property var  displayList: []
+
+            function refreshFiles() {
+                            fullFileList = controller.getFiles(folder, _rgExtensions)
+                            //fullFileList.reverse()    // 🔥 LIFO
+
+                            if (showAllFiles)
+                                displayList = fullFileList
+                            else
+                                displayList = fullFileList.slice(0, 3)
+                        }
+
+                        onShowAllFilesChanged: refreshFiles()
+                        Component.onCompleted: refreshFiles()
+
+
             Column {
                 id:         fileOpenColumn
                 width:      parent.width
@@ -180,7 +201,7 @@ Item {
 
                         Repeater {
                             id:     fileRepeater
-                            model:  controller.getFiles(folder, _rgExtensions)
+                            model:  mobileFileOpenDialog.displayList
 
                             Item {
                                 width: parent.width
@@ -220,6 +241,7 @@ Item {
                                             onTriggered: {
                                                 controller.deleteFile(hamburgerMenu.fileToDelete)
                                                 fileRepeater.model = controller.getFiles(folder, _rgExtensions)
+                                                mobileFileOpenDialog.refreshFiles()
                                             }
                                         }
                                     }
@@ -244,7 +266,40 @@ Item {
                         font.bold: true
                         visible:    fileRepeater.model.length === 0
                     }
+
+
                 }
+
+                Button {
+                                    visible: !mobileFileOpenDialog.showAllFiles &&
+                                             mobileFileOpenDialog.fullFileList.length > 3
+                                    text: qsTr("See More")
+                                    background: Rectangle {
+                                            color: "#262626"
+                                            radius: 10
+                                        }
+
+                                        contentItem: Text {
+                                            text: control.text
+                                            color: "white"
+                                            font.bold: true
+                                            anchors.centerIn: parent
+                                        }
+
+                                    onClicked: {
+                                        mainWindow.homescreen()
+                                        mobileFileOpenDialog.visible = false
+                                        MapGlobals.currentView_profile = "dronePage"
+                                                                        mainWindow.logfiles()
+                                    }
+                                }
+
+                                Button {
+                                    visible: mobileFileOpenDialog.showAllFiles
+                                    text: qsTr("Show Less")
+
+                                    onClicked: mobileFileOpenDialog.showAllFiles = false
+                                }
             }
         }
     }
@@ -256,16 +311,18 @@ Item {
             id: popup
             title: qsTr("Save Options")
             closeOnClickOutside: true
+            property string userName: ""
 
 
             buttons: Dialog.NoToAll | Dialog.Save
 
             onAccepted: {
-                var strippedFileName1 = _appSettings.username
-                if (strippedFileName1 == "") {
-                    mobileFileSaveDialog.preventClose = true
-                    return
-                }
+                var strippedFileName1 = userName
+                                console.log("data saved name:",strippedFileName1)
+                                if (strippedFileName1 == "") {
+                                    mobileFileSaveDialog.preventClose = true
+                                    return
+                                }
                 _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
                 popup.visible = false
             }
