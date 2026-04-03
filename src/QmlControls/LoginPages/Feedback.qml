@@ -14,9 +14,9 @@ Item {
     anchors.fill: parent
 
     property string userName: QGroundControl.loadGlobalSetting("username", "")
-    property color app_color: "#301934"
-    property color accent_color: "#7c4dff"
-    property color sidebar_color: "#2d1b4d"
+    property color app_color: "#262626"
+    property color accent_color: "#262626"
+    property color sidebar_color: "#262626"
     property color bg_color: "#FFFFFF"
     property color input_bg: "#F9FAFB"
     property color border_color: "#E5E7EB"
@@ -262,7 +262,7 @@ Item {
                                 layer.enabled: true
                                 layer.effect: MultiEffect {
                                     shadowEnabled: submitBtn.hovered
-                                    shadowColor: Qt.rgba(74, 44, 109, 0.3)
+                                    shadowColor: Qt.rgba(0, 0, 0, 0.3)
                                     shadowBlur: 0.6
                                     shadowVerticalOffset: 4
                                 }

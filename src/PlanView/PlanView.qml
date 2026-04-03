@@ -1632,6 +1632,7 @@ Item {
 
                     onClicked: {
                         console.log("Upload clicked")
+                        waypointMark=false
 
                         if(_activeVehicle) {
                             if (_utmspEnabled) {

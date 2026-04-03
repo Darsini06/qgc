@@ -19,8 +19,8 @@
 #include "LinkInterface.h"
 
 #ifdef Q_OS_IOS
-    class QBluetoothServiceInfo;
-    class QBluetoothServiceDiscoveryAgent;
+class QBluetoothServiceInfo;
+class QBluetoothServiceDiscoveryAgent;
 #endif
 
 class QBluetoothDeviceDiscoveryAgent;
@@ -40,7 +40,13 @@ public:
 #ifdef Q_OS_IOS
         return uuid == other.uuid && name == other.name;
 #else
-        return name == other.name && address == other.address;
+        // Address is the hardware unique identifier
+        // If both have addresses, compare by address only
+        if (!address.isEmpty() && !other.address.isEmpty()) {
+            return address == other.address;
+        }
+        // Fallback: if address missing on either side, compare by name
+        return name.trimmed() == other.name.trimmed();
 #endif
     }
     BluetoothData& operator=(const BluetoothData& other)
@@ -78,6 +84,8 @@ public:
 
     Q_INVOKABLE void startScan  (void);
     Q_INVOKABLE void stopScan   (void);
+
+    Q_INVOKABLE bool isBluetoothAvailable();
 
     QString         devName     (void) const                 { return _device.name; }
     QString         address     (void) const;
@@ -158,8 +166,15 @@ private:
     bool _hardwareConnect   (void);
     void _createSocket      (void);
 
+    void _attemptConnect();
+
+    int  _connectAttempt = 0;
+
+    bool _isConnecting = false;
+
     BluetoothConfiguration*             _bluetoothConfig;
     QBluetoothSocket*                   _targetSocket    = nullptr;
+
 #ifdef Q_OS_IOS
     QBluetoothServiceDiscoveryAgent*    _discoveryAgent = nullptr;
 #endif

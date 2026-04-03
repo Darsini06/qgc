@@ -16,8 +16,8 @@ Item {
     property string userEmail: ""
     property string totalDurationFormatted: "0h 0m"
     property int missionsCompleted: 0
-    property color app_color: "#301934" 
-    property color accent_color: "#7c4dff" 
+    property color app_color: "#262626"
+    property color accent_color: "#262626"
     property color surface_color: "#ffffff"
     property color bg_color: "#f8f9fa"
 
@@ -187,6 +187,8 @@ Item {
                             model: [
                                 { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/accountUpdate_black.svg" },
                                 { "id": "reports", "name": "Mission History", "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
+                                { "id": "logfiles","name": "Log Files", "desc": "View logs and performance of previous flights",
+                                    "icon": "qrc:/qmlimages/NewImages/report_color.svg", "color": "#475569" },
                                 { "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
                                 { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_color.svg" },
                                 { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },

@@ -163,6 +163,10 @@ bool LinkManager::createConnectedLink(SharedLinkConfigurationPtr &config)
     config->setLink(link);
 
     (void) connect(link.get(), &LinkInterface::communicationError, _app, &QGCApplication::criticalMessageBoxOnMainThread);
+
+    // Add this - forwards signal to LinkManager so QML can hear it
+    (void) connect(link.get(), &LinkInterface::communicationError, this, &LinkManager::communicationError);
+
     (void) connect(link.get(), &LinkInterface::bytesReceived, _mavlinkProtocol, &MAVLinkProtocol::receiveBytes);
     (void) connect(link.get(), &LinkInterface::bytesSent, _mavlinkProtocol, &MAVLinkProtocol::logSentBytes);
     (void) connect(link.get(), &LinkInterface::disconnected, this, &LinkManager::_linkDisconnected);
@@ -216,24 +220,71 @@ void LinkManager::_linkDisconnected()
 {
     LinkInterface* const link = qobject_cast<LinkInterface*>(sender());
 
+    qDebug() << "LinkManager::_linkDisconnected called, sender:" << link
+             << "containsLink:" << (link ? containsLink(link) : false);
+
     if (!link || !containsLink(link)) {
+        qDebug() << "LinkManager::_linkDisconnected EARLY RETURN";
         return;
     }
 
-    (void) disconnect(link, &LinkInterface::communicationError, _app, &QGCApplication::criticalMessageBoxOnMainThread);
-    (void) disconnect(link, &LinkInterface::bytesReceived, _mavlinkProtocol, &MAVLinkProtocol::receiveBytes);
-    (void) disconnect(link, &LinkInterface::bytesSent, _mavlinkProtocol, &MAVLinkProtocol::logSentBytes);
-    (void) disconnect(link, &LinkInterface::disconnected, this, &LinkManager::_linkDisconnected);
+    (void) disconnect(link, &LinkInterface::communicationError,
+                      _app, &QGCApplication::criticalMessageBoxOnMainThread);
+    (void) disconnect(link, &LinkInterface::communicationError,
+                      this, &LinkManager::communicationError);
+    (void) disconnect(link, &LinkInterface::bytesReceived,
+                      _mavlinkProtocol, &MAVLinkProtocol::receiveBytes);
+    (void) disconnect(link, &LinkInterface::bytesSent,
+                      _mavlinkProtocol, &MAVLinkProtocol::logSentBytes);
+    (void) disconnect(link, &LinkInterface::disconnected,
+                      this, &LinkManager::_linkDisconnected);
 
     link->_freeMavlinkChannel();
 
     for (auto it = _rgLinks.begin(); it != _rgLinks.end(); ++it) {
         if (it->get() == link) {
-            qCDebug(LinkManagerLog) << "LinkManager::_linkDisconnected" << it->get()->linkConfiguration()->name() << it->use_count();
+            auto config = it->get()->linkConfiguration();
+            qDebug() << "LinkManager::_linkDisconnected found link, config:" << config.get();
             (void) _rgLinks.erase(it);
+            if (config) {
+                qDebug() << "LinkManager::_linkDisconnected calling setLink(nullptr)";
+                QMetaObject::invokeMethod(this, [config]() {
+                    config->setLink(SharedLinkInterfacePtr(nullptr));
+                }, Qt::QueuedConnection);
+            }
             return;
         }
     }
+    qDebug() << "LinkManager::_linkDisconnected link NOT FOUND in _rgLinks";
+}
+
+
+void LinkManager::disconnectLink(LinkConfiguration* config)
+{
+    if (!config) {
+        qWarning() << "LinkManager::disconnectLink: null config";
+        return;
+    }
+
+    // Clear saved autoConnect device if this is it
+    QSettings settings;
+    if (settings.value("LastConnectedBluetoothDevice").toString() == config->name()) {
+        settings.remove("LastConnectedBluetoothDevice");
+        qDebug() << "LinkManager: cleared last connected device on manual disconnect";
+    }
+
+    // Find the link safely through our own list
+    for (auto& link : _rgLinks) {
+        if (link->linkConfiguration().get() == config) {
+            qCDebug(LinkManagerLog) << "LinkManager::disconnectLink:"
+                                    << config->name();
+            link->disconnect();  // safe — we control the lifecycle
+            return;
+        }
+    }
+
+    qWarning() << "LinkManager::disconnectLink: link not found for config"
+               << config->name();
 }
 
 SharedLinkInterfacePtr LinkManager::sharedLinkInterfacePointerForLink(const LinkInterface *link)
@@ -290,6 +341,11 @@ void LinkManager::saveLinkConfigurationList()
 void LinkManager::loadLinkConfigurationList()
 {
     QSettings settings;
+
+    // Read last connected BT device BEFORE the loop
+    QString lastDevice = settings.value("LastConnectedBluetoothDevice", "").toString();
+    qDebug() << "LinkManager: last connected BT device:" << lastDevice;
+
     // Is the group even there?
     if (settings.contains(LinkConfiguration::settingsRoot() + "/count")) {
         // Find out how many configurations we have
@@ -300,24 +356,20 @@ void LinkManager::loadLinkConfigurationList()
                 qCWarning(LinkManagerLog) << "Link Configuration" << root << "has no type.";
                 continue;
             }
-
             LinkConfiguration::LinkType type = static_cast<LinkConfiguration::LinkType>(settings.value(root + "/type").toInt());
             if (type >= LinkConfiguration::TypeLast) {
                 qCWarning(LinkManagerLog) << "Link Configuration" << root << "an invalid type:" << type;
                 continue;
             }
-
             if (!settings.contains(root + "/name")) {
                 qCWarning(LinkManagerLog) << "Link Configuration" << root << "has no name.";
                 continue;
             }
-
             const QString name = settings.value(root + "/name").toString();
             if (name.isEmpty()) {
                 qCWarning(LinkManagerLog) << "Link Configuration" << root << "has an empty name.";
                 continue;
             }
-
             LinkConfiguration* link = nullptr;
             switch(type) {
 #ifndef NO_SERIAL_LINK
@@ -353,21 +405,62 @@ void LinkManager::loadLinkConfigurationList()
             default:
                 break;
             }
-
             if (link) {
-                const bool autoConnect = settings.value(root + "/auto").toBool();
-                link->setAutoConnect(autoConnect);
                 const bool highLatency = settings.value(root + "/high_latency").toBool();
                 link->setHighLatency(highLatency);
                 link->loadSettings(settings, root);
+
+#ifdef QGC_ENABLE_BLUETOOTH
+                if (type == LinkConfiguration::TypeBluetooth) {
+                    // For Bluetooth: only autoConnect the last successfully connected device
+                    // Prevents all saved BT configs from attempting connection on startup
+                    if (!lastDevice.isEmpty() && name == lastDevice) {
+                        link->setAutoConnect(true);
+                        qDebug() << "LinkManager: autoConnect ENABLED for last BT device:" << name;
+                    } else {
+                        link->setAutoConnect(false);
+                        qDebug() << "LinkManager: autoConnect DISABLED for BT device:" << name;
+                    }
+                } else {
+#endif
+    // Non-Bluetooth: respect the saved autoConnect setting as normal
+                    const bool autoConnect = settings.value(root + "/auto").toBool();
+                    link->setAutoConnect(autoConnect);
+#ifdef QGC_ENABLE_BLUETOOTH
+                }
+#endif
                 addConfiguration(link);
             }
         }
     }
-
     // Enable automatic Serial PX4/3DR Radio hunting
+
+
+#ifdef QGC_ENABLE_BLUETOOTH
+    // First launch — no saved device — autoConnect only the first Bluetooth config found
+    if (lastDevice.isEmpty()) {
+        bool firstFound = false;
+        for (auto& config : _rgLinkConfigs) {
+            if (config->type() == LinkConfiguration::TypeBluetooth) {
+                if (!firstFound) {
+                    config->setAutoConnect(true);
+                    firstFound = true;
+                    qDebug() << "LinkManager: first launch, autoConnect enabled for:"
+                             << config->name();
+                } else {
+                    config->setAutoConnect(false);
+                    qDebug() << "LinkManager: first launch, autoConnect disabled for:"
+                             << config->name();
+                }
+            }
+        }
+    }
+#endif
+
     _configurationsLoaded = true;
 }
+
+
 
 void LinkManager::_addUDPAutoConnectLink()
 {
@@ -388,6 +481,7 @@ void LinkManager::_addUDPAutoConnectLink()
     SharedLinkConfigurationPtr config = addConfiguration(udpConfig);
     createConnectedLink(config);
 }
+
 
 void LinkManager::_addMAVLinkForwardingLink()
 {
@@ -601,6 +695,7 @@ void LinkManager::removeConfiguration(LinkConfiguration *config)
     }
 
     LinkInterface* const link = config->link();
+
     if (link) {
         link->disconnect();
     }

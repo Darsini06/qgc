@@ -152,9 +152,54 @@ void LinkConfiguration::setName(const QString &name)
     }
 }
 
+// void LinkConfiguration::setLink(const SharedLinkInterfacePtr link)
+// {
+//     if (link.get() != this->link()) {
+//         _link = link;
+//         emit linkChanged();
+//     }
+// }
+
+// void LinkConfiguration::setLink(const SharedLinkInterfacePtr link)
+// {
+//     // Compare weak_ptr correctly — don't rely on raw pointer comparison
+//     // when dealing with nullptr/expired weak_ptr
+//     SharedLinkInterfacePtr currentLink = _link.lock();
+
+//     if (currentLink.get() != link.get()) {
+//         _link = link;  // assign new shared_ptr (or nullptr) to weak_ptr
+//         emit linkChanged();
+//     }
+// }
+
+// void LinkConfiguration::setLink(const SharedLinkInterfacePtr link)
+// {
+//     SharedLinkInterfacePtr currentLink = _link.lock();
+//     qDebug() << "LinkConfiguration::setLink called"
+//              << "current:" << currentLink.get()
+//              << "new:" << link.get();
+
+//     if (currentLink.get() != link.get()) {
+//         _link = link;
+//         qDebug() << "LinkConfiguration::setLink emitting linkChanged";
+//         emit linkChanged();
+//     } else {
+//         qDebug() << "LinkConfiguration::setLink condition failed - NOT emitting";
+//     }
+// }
+
 void LinkConfiguration::setLink(const SharedLinkInterfacePtr link)
 {
-    if (link.get() != this->link()) {
+    SharedLinkInterfacePtr currentLink = _link.lock();
+
+    if (link == nullptr) {
+        // Always emit when explicitly clearing — don't check condition
+        _link.reset();
+        emit linkChanged();
+        return;
+    }
+
+    if (currentLink.get() != link.get()) {
         _link = link;
         emit linkChanged();
     }

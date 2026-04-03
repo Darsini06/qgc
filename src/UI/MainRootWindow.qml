@@ -812,6 +812,10 @@ ApplicationWindow {
         pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
+    function logfiles() {
+        pageLoader.source = "qrc:/qml/LoginPages/LogFiles.qml"
+    }
+
     function closeScreens() {
         pageLoader.source = ""
     }
@@ -1088,7 +1092,7 @@ ApplicationWindow {
         anchors.top: toolbar.bottom
         anchors.left: parent.left
         anchors.topMargin: ScreenTools.defaultFontPixelHeight * 0.8
-        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 2.5
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
 
@@ -1168,7 +1172,7 @@ ApplicationWindow {
 
         //     QGCColoredImage {
         //         id: takeofficon
-        //         source: "/qmlimages/NewImages/takeOff.svg"
+        //         source: "/qmlimages/PaperPlane.svg"
         //         width: parent.width * 0.5   // 60% of button size
         //         height: width
         //         anchors.centerIn: parent
@@ -1178,7 +1182,7 @@ ApplicationWindow {
         //     MouseArea {
         //         anchors.fill: parent
         //         onClicked: {
-        //             myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+        //             myDialog.imageSource = "/qmlimages/PaperPlane.svg"
         //             myDialog.dialogText = "settings"
         //             myDialog.open()
         //         }
@@ -1198,7 +1202,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: takeofficon
-                source: "/qmlimages/NewImages/takeOff.svg"
+                source: "/qmlimages/PaperPlane.svg"
                 width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
@@ -1210,7 +1214,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     //guidedValueSlider.visible = true
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+                    myDialog.imageSource = "/qmlimages/PaperPlane.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }
@@ -1298,7 +1302,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: camerabtnicon
-                source: "/qmlimages/NewImages/takeOff.svg"
+                source: "/qmlimages/PaperPlane.svg"
                 width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
@@ -1312,7 +1316,7 @@ ApplicationWindow {
                 onClicked: {
                     // //whatsappImageSlider.visible=true
                     // mainWindow.showToastMessage("Camera clicked");
-                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"
+                    myDialog.imageSource = "/qmlimages/PaperPlane.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }
@@ -1464,7 +1468,7 @@ ApplicationWindow {
         id: myDialog
         width: 260
         height: 350
-        property string imageSource: "/qmlimages/NewImages/takeOff.svg"
+        property string imageSource: "/qmlimages/PaperPlane.svg"
         property string dialogText: "Default Text"
 
         x: (parent.width - width) / 2
@@ -1541,12 +1545,12 @@ ApplicationWindow {
                 visible: myDialog.dialogText === "settings"
 
                 // Minus Button
-                    Rectangle {
-                        width: 48
-                        height: 48
-                        radius: 24
-                        color: "#2a2b3e"
-                        border.width: 0
+                Rectangle {
+                    width: 48
+                    height: 48
+                    radius: 24
+                    color: "#2a2b3e"
+                    border.width: 0
                     
                     Text {
                         text: "-"
@@ -1567,12 +1571,12 @@ ApplicationWindow {
                 }
 
                 // Plus Button
-                    Rectangle {
-                        width: 48
-                        height: 48
-                        radius: 24
-                        color: "#2a2b3e"
-                        border.width: 0
+                Rectangle {
+                    width: 48
+                    height: 48
+                    radius: 24
+                    color: "#2a2b3e"
+                    border.width: 0
 
                     Text {
                         text: "+"
@@ -1738,7 +1742,7 @@ ApplicationWindow {
             height: 48
             radius: width / 2
             color:  Qt.rgba(0, 0, 0, 0.40)      // More transparent black toolbars button
-            visible: plan === "Plan" 
+            visible: plan === "Plan"
 
             Text {
                 text: "+"
