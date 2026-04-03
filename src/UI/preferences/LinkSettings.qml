@@ -390,6 +390,7 @@ ColumnLayout  {
     Component {
         id: linkConfigDialogComponent
 
+
         QGCPopupDialog {
             id : linkConfigDialog
             title: selectedType === 0 ? "Bluetooth Devices"
@@ -397,6 +398,7 @@ ColumnLayout  {
                                                        : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
             acceptAllowed:  nameField.text !== ""
+
 
             property var originalConfig
             property var editingConfig
@@ -456,13 +458,12 @@ ColumnLayout  {
                 spacing: ScreenTools.defaultFontPixelHeight / 2
                 Layout.fillWidth: true
 
-
                 // ---- Name row (not shown for Bluetooth) ----
                 RowLayout {
                     spacing: linkSettingsLoader._colSpacing
                     visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
 
-                    QGCLabel { 
+                    QGCLabel {
                         text: qsTr("Name")
                         color: "black"
                         Layout.preferredWidth: linkSettingsLoader._firstColumnWidth
@@ -502,6 +503,7 @@ ColumnLayout  {
             }
         }
     }
+
 
 }
 
