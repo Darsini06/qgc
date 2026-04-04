@@ -207,6 +207,8 @@
         <file alias="NewImages/camera_AIImage_transparent.png">src/NewImages/camera_AIImage_transparent.png</file>
         <file alias="NewImages/agriculture.jpg">src/NewImages/agriculture.jpg</file>
         <file alias="NewImages/agri_bg_image5.png">src/NewImages/agri_bg_image5.png</file>
+        <file alias="NewImages/camera_bg_image.png">src/NewImages/camera_bg_image.png</file>
+        <file alias="NewImages/mapping_bg_image.png">src/NewImages/mapping_bg_image.png</file>
         <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
         <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>
         <file alias="NewImages/camerabg.png">src/NewImages/camerabg.png</file>

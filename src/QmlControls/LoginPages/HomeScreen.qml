@@ -131,8 +131,8 @@ Item {
             anchors.fill: parent
             visible: (droneType !== "loadpage")
             source: {
-                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
-                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
+                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
+                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
                 if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
                 return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
             }
@@ -174,6 +174,20 @@ Item {
             }
         }
 
+        // Subtle atmospheric white top blend for logo visibility and professional natural look
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: dp(35) // Deep atmospheric blend
+            visible: (droneType !== "loadpage")
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(255/255, 255/255, 255/255, 0.45) } // Much subtler starting opacity (was 0.85)
+                GradientStop { position: 0.4; color: Qt.rgba(255/255, 255/255, 255/255, 0.15) } // Extremely soft fade
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+        }
+
         // Layered Agri Drone for theme
         Image {
             id: agriDrone
@@ -201,7 +215,7 @@ Item {
             height: width
             source: "qrc:/qmlimages/NewImages/mapping_AIImage.png"
             fillMode: Image.PreserveAspectFit
-            visible: droneType === "Mapping"
+            visible: false // Hidden to avoid redundancy with cinematic background
             opacity: 0.94
             asynchronous: true
             cache: true
@@ -218,7 +232,7 @@ Item {
             height: width
             source: "qrc:/qmlimages/NewImages/cameraDrone_png.png"
             fillMode: Image.PreserveAspectFit
-            visible: droneType === "Camera"
+            visible: false // Removed redundant drone as it is now in the background image
             opacity: 0.94
             asynchronous: true
             cache: true
@@ -374,8 +388,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: (droneType === "loadpage") ? (profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (profileMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: profileMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)
+                    border.color: profileMouse.containsMouse ? accent_color : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -388,10 +402,11 @@ Item {
                         Layout.preferredHeight: dp(2.8)
                         source: "qrc:/qmlimages/NewImages/user_profile.svg"
                         fillMode: Image.PreserveAspectFit
+                        // Removed colorization to allow original dark icon to show on the white top header
                     }
                     Label {
                         text: qsTr("PROFILE")
-                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
+                        color: "#262626"
                         visible: false
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -416,8 +431,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: (droneType === "loadpage") ? (appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)) : (appMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: appMouse.containsMouse ? accent_color : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)
+                    border.color: appMouse.containsMouse ? accent_color : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -433,7 +448,7 @@ Item {
                     }
                     Label {
                         text: qsTr("APPLICATION")
-                        color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
+                        color: "#262626"
                         visible: false
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -458,8 +473,8 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(255, 255, 255, 0.08))
-                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(255, 255, 255, 0.1))
+                    color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : Qt.rgba(0, 0, 0, 0.05)
+                    border.color: logoutMouse.containsMouse ? "#FF6B6B" : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
@@ -475,7 +490,7 @@ Item {
                     }
                     Label {
                         text: qsTr("LOGOUT")
-                        color: logoutMouse.containsMouse ? "#FF6B6B" : ((droneType === "loadpage") ? "#262626" : "#FFFFFF")
+                        color: logoutMouse.containsMouse ? "#FF6B6B" : "#262626"
                         visible: false
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                         font.bold: true
@@ -509,7 +524,7 @@ Item {
 
             width: {
                 if (isSmallScreen || isMobile) return parent.width * 0.75 // Wider on mobile to prevent excessive wrapping
-                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.55, dp(180))
+                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140)) // Reduced width to prevent overlap with background drone
             }
             // Reduced basic spacing between elements
             spacing: isSmallScreen ? dp(0.5) : dp(1.5)
@@ -569,7 +584,7 @@ Item {
                 wrapMode: Text.WordWrap
                 horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
                 text: {
-                    if (droneType === "Camera")  return "Master the sky with cinematic 4K streaming and precise gimbal control.\nCapture high-definition visuals for professional surveillance."
+                    if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
                     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
                     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
                     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"

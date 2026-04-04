@@ -285,8 +285,7 @@ Rectangle {
 
         BatteryIndicator {
             id: batteryIndicator
-            width:40
-            height: 40                // Fixed height for the indicator
+            height: 40
             visible: _activeVehicle ? true : false
         }
 
@@ -335,8 +334,7 @@ Rectangle {
 
                 GPSIndicator {
                     id: gpsindicator
-                    width:60 // Adjust width as needed
-                    height: 50                // Fixed height for the indicator
+                    height: 40
                     visible: _activeVehicle ? true : false
                 }
             }

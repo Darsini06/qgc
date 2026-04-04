@@ -763,6 +763,22 @@ Item {
             border.color:   borderColor
             border.width:   borderWidth
             path:           mapPolygon.path
+
+            // Modern subtle pulsing fill effect for an active mission coverage area
+            SequentialAnimation on opacity {
+                loops: Animation.Infinite
+                running: interactive && (interiorOpacity > 0) 
+                NumberAnimation { to: Math.max(0.05, interiorOpacity * 0.4); duration: 1800; easing.type: Easing.InOutSine }
+                NumberAnimation { to: interiorOpacity; duration: 1800; easing.type: Easing.InOutSine }
+            }
+
+            // Glow ring expansion on the border
+            SequentialAnimation on border.width {
+                loops: Animation.Infinite
+                running: interactive && (borderWidth > 0)
+                NumberAnimation { to: borderWidth + 2; duration: 1800; easing.type: Easing.InOutSine }
+                NumberAnimation { to: borderWidth; duration: 1800; easing.type: Easing.InOutSine }
+            }
         }
     }
 

@@ -23,7 +23,8 @@ import MAVLink
 //-- Battery Indicator
 Item {
     id:             control
-    //width:          batteryIndicatorRow.width
+    width:          batteryIndicatorRow.width
+    height:         batteryIndicatorRow.height
 
     property bool       showIndicator:      true
     property bool       waitForParameters:  false   // UI won't show until parameters are ready
@@ -68,7 +69,9 @@ property real lastPercentage : 100  // Keep it global so it's preserved
         }
     }
     MouseArea {
+        id: mouseArea
         anchors.fill:   parent
+        hoverEnabled:   true
         onClicked: {
             mainWindow.showIndicatorDrawer(batteryPopup, control)
         }
@@ -88,11 +91,42 @@ property real lastPercentage : 100  // Keep it global so it's preserved
     Component {
         id: batteryVisual
 
-        Row {
+        Item {
             anchors.top:    parent.top
-                        anchors.bottom: parent.bottom
+            anchors.bottom: parent.bottom
+            width:          batteryContainer.width
+            
+            Rectangle {
+                id: batteryContainer
+                height: parent.height
+                width: contentRow.width + ScreenTools.defaultFontPixelWidth * 1.5
+                radius: height / 2
+                color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(0, 0, 0, 0.3)
+                border.color: mouseArea.containsMouse ? "white" : Qt.rgba(1, 1, 1, 0.2)
+                border.width: 1
+                clip: true
 
-                        function calculatePercentageFromVoltage() {
+                Behavior on color { ColorAnimation { duration: 200 } }
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+
+                // The inner gauge fill background
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    
+                    width: {
+                        var pct = !isNaN(battery.percentRemaining.rawValue) ? battery.percentRemaining.rawValue : calculatePercentageFromVoltage()
+                        pct = Math.max(0, Math.min(100, pct || 0))
+                        return parent.width * (pct / 100)
+                    }
+                    
+                    color: getBatteryColor()
+                    opacity: 0.25
+                    radius: parent.radius
+                }
+
+                function calculatePercentageFromVoltage() {
                             if (isNaN(battery.voltage.rawValue)) return NaN;
 
                             var cellCount = control.cellCount > 0 ? control.cellCount : 3; // fallback if undefined
@@ -341,42 +375,44 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                 return qsTr("n/a")
             }
 
-            QGCColoredImage {
-                anchors.top:        parent.top
-                anchors.bottom:     parent.bottom
-                width:              20
-                height:20
-                sourceSize.width:   width
-                source:             getBatterySvgSource()
-                fillMode:           Image.PreserveAspectFit
-                color:              getBatteryColor()
-            }
+                RowLayout {
+                    id: contentRow
+                    anchors.centerIn: parent
+                    spacing: ScreenTools.defaultFontPixelWidth / 2
 
-           ColumnLayout {
-                id:                     batteryInfoColumn
-                anchors.top:            parent.top
-                anchors.bottom:         parent.bottom
-                spacing:                0
+                    QGCColoredImage {
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredWidth: 20
+                        Layout.preferredHeight: 20
+                        sourceSize.width: Layout.preferredWidth
+                        source: getBatterySvgSource()
+                        fillMode: Image.PreserveAspectFit
+                        color: getBatteryColor()
+                    }
 
-                QGCLabel {
-                    Layout.alignment:       Qt.AlignHCenter
-                    verticalAlignment:      Text.AlignVCenter
-                    color:                  "white"
-                    width: 10
-                                        height: 20
-                    text:                   getBatteryPercentageText()
-                    //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
-                    visible:                _showBoth || _showPercentage
-                }
+                    ColumnLayout {
+                        Layout.alignment: Qt.AlignVCenter
+                        spacing: -2
+                        visible: _showBoth || _showPercentage || _showVoltage
 
-                QGCLabel {
-                    Layout.alignment:       Qt.AlignHCenter
-                    width: 10
-                    height: 20
-                    //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
-                    color:                  "white"
-                    text:                   getBatteryVoltageText()
-                    visible:                _showBoth || _showVoltage
+                        QGCLabel {
+                            Layout.alignment: Qt.AlignHCenter
+                            color: "white"
+                            text: getBatteryPercentageText()
+                            font.pointSize: ScreenTools.smallFontPointSize
+                            visible: _showBoth || _showPercentage
+                            font.bold: true
+                        }
+
+                        QGCLabel {
+                            Layout.alignment: Qt.AlignHCenter
+                            color: "white"
+                            text: getBatteryVoltageText()
+                            font.pointSize: ScreenTools.smallFontPointSize - 2
+                            visible: _showBoth || _showVoltage
+                            opacity: 0.8
+                        }
+                    }
                 }
             }
         }

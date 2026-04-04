@@ -82,8 +82,8 @@ Item {
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
 
-    property real compassBottomY: leftIconColumn.y + leftIconColumn.height + 10
-    property real compassNorthX:   leftIconColumn.x
+    property real compassBottomY: compassNorth.y + compassNorth.height + 10
+    property real compassNorthX:   compassNorth.x
     
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
@@ -893,10 +893,9 @@ Item {
         // Left tool strip
         ToolStrip {
             id:                 toolStrip
+            anchors.margins:    _toolsMargin
             anchors.left:       parent.left
             anchors.top:        parent.top
-            anchors.leftMargin: 8
-            anchors.topMargin:  _toolsMargin
             z:                  QGroundControl.zOrderWidgets
             maxHeight:          parent.height - toolStrip.y
             title:              qsTr("Plan")
@@ -1603,6 +1602,98 @@ Item {
         // }
 
 
+        Item {
+            id: editdata
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.bottomMargin: 60
+            anchors.leftMargin: 20
+
+            Row {
+                spacing: 10    // space between the two buttons
+
+                // ========== Upload Button ==========
+                Button {
+                    id: fileUploadbtn
+                    width: baseSize
+                    height: baseSize
+
+                    background: Rectangle {
+                        radius: width / 2
+                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
+                        border.color: "transparent"
+                        border.width: 0
+                        anchors.fill: parent
+                    }
+
+                    contentItem: Item {
+                        anchors.fill: parent
+                        QGCColoredImage {
+                            source: "/qmlimages/NewImages/fileupload.svg"
+                            width: iconSize
+                            height: iconSize
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                    }
+
+                    onClicked: {
+                        console.log("Upload clicked")
+                        waypointMark=false
+                        if(_activeVehicle) {
+                            if (_utmspEnabled) {
+                                QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+                                UTMSPStateStorage.removeFlightPlanState = true
+                                UTMSPStateStorage.indicatorDisplayStatus = true
+                            }
+                            _planMasterController.upload()
+                        } else {
+                            mainWindow.showToastMessage("Drone Not Connected");
+                        }
+                    }
+                }
+
+                // ========== Return Waypoint Button ==========
+                Button {
+                    width: baseSize
+                    height: baseSize
+
+                    visible: showReturnWaypoint
+                    enabled: returnWaypointEnabled
+
+                    background: Rectangle {
+                        radius: width / 2
+                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
+                        border.color: "transparent"
+                        border.width: 0
+                        anchors.fill: parent
+                    }
+
+                    contentItem: Item {
+                        anchors.fill: parent
+                        QGCColoredImage {
+                            source: "/res/rtl.svg"
+                            width: iconSize
+                            height: iconSize
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                    }
+
+                    onClicked: {
+                        waypointMark=false
+                        // MapGlobals.waypoint="waypoint1"
+                        // QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
+                        console.log("returnWaypoint clicked")
+
+                        toolStrip.allAddClickBoolsOff()
+                        insertLandItemAfterCurrent()
+                        QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+                        returnWaypointEnabled = false
+                    }
+                }
+            }
+        }
 
 
         Component {
@@ -2287,130 +2378,46 @@ Item {
         //plantypes:planType
     }
 
-    // Unified left-side vertical icon column: Compass → Land/RTL → Upload
-    Column {
-        id:                 leftIconColumn
+    // Compass icon — placed as direct child of _root so anchor to planToolBar.bottom works correctly
+    Item {
+        id:                 compassNorth
+        width:              baseSize
+        height:             baseSize
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
-        anchors.topMargin:  _toolsMargin
-        anchors.leftMargin: 8
-        spacing:            8
+        anchors.topMargin:  2
+        anchors.leftMargin: 20
         z:                  QGroundControl.zOrderWidgets + 1
 
-        // ── Compass / North ──────────────────────────────────────────
-        Item {
-            id:     compassNorth
-            width:  baseSize
-            height: baseSize
+        Rectangle {
+            width:        baseSize
+            height:       baseSize
+            radius:       width / 2
+            color:        Qt.rgba(0, 0, 0, 0.40)
+            border.width: 0
+            border.color: "transparent"
+            clip:         true
 
-            Rectangle {
+            MouseArea {
                 anchors.fill: parent
-                radius:       width / 2
-                color:        "#4a2c6d"
-                border.width: 1
-                border.color: "#8e6abb"
-                clip:         true
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked:    MapGlobals.mapRotation = 0
-                }
-
-                QGCColoredImage {
-                    id:               compassArrow
-                    source:           "/qmlimages/NewImages/cardinal_point.svg"
-                    anchors.centerIn: parent
-                    width:            iconSize
-                    height:           iconSize
-                    fillMode:         Image.PreserveAspectFit
-                    color:            "white"
-                    transform: Rotation {
-                        origin.x: compassArrow.width  / 2
-                        origin.y: compassArrow.height / 2
-                        angle:    -MapGlobals.mapRotation
-                    }
-                }
-            }
-        }
-
-        // ── Land / RTL button ────────────────────────────────────────
-        Button {
-            id:      landMarkBtn
-            width:   baseSize
-            height:  baseSize
-            enabled: returnWaypointEnabled
-            visible: true  // Always visible
-            opacity: returnWaypointEnabled ? 1.0 : 0.4
-
-            background: Rectangle {
-                anchors.fill: parent
-                radius:       width / 2
-                color:        Qt.rgba(0, 0, 0, 0.40)
-                border.color: returnWaypointEnabled ? "#8e6abb" : "transparent"
-                border.width: 1
-            }
-
-            contentItem: Item {
-                anchors.fill: parent
-                QGCColoredImage {
-                    source:           "/res/rtl.svg"
-                    width:            iconSize
-                    height:           iconSize
-                    anchors.centerIn: parent
-                    color:            "white"
-                    smooth:           true
-                    mipmap:           true
+                onClicked: {
+                    MapGlobals.mapRotation = 0
                 }
             }
 
-            onClicked: {
-                waypointMark = false
-                console.log("Land/RTL clicked")
-                toolStrip.allAddClickBoolsOff()
-                insertLandItemAfterCurrent()
-                QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
-                returnWaypointEnabled = false
-            }
-        }
-
-        // ── Upload / Save button ─────────────────────────────────────
-        Button {
-            id:     fileUploadbtn
-            width:  baseSize
-            height: baseSize
-
-            background: Rectangle {
-                anchors.fill: parent
-                radius:       width / 2
-                color:        Qt.rgba(0, 0, 0, 0.40)
-            }
-
-            contentItem: Item {
-                anchors.fill: parent
-                QGCColoredImage {
-                    source:           "/qmlimages/NewImages/fileupload.svg"
-                    width:            iconSize
-                    height:           iconSize
-                    anchors.centerIn: parent
-                    color:            "white"
-                    smooth:           true
-                    mipmap:           true
+            QGCColoredImage {
+                id:               compassArrow
+                source:           "/qmlimages/NewImages/cardinal_point.svg"
+                anchors.centerIn: parent
+                width:            iconSize
+                height:           iconSize
+                fillMode:         Image.PreserveAspectFit
+                transform: Rotation {
+                    origin.x: compassArrow.width  / 2
+                    origin.y: compassArrow.height / 2
+                    angle:    -MapGlobals.mapRotation
                 }
-            }
-
-            onClicked: {
-                console.log("Upload clicked")
-                waypointMark = false
-                if (_activeVehicle) {
-                    if (_utmspEnabled) {
-                        QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true)
-                        UTMSPStateStorage.removeFlightPlanState = true
-                        UTMSPStateStorage.indicatorDisplayStatus = true
-                    }
-                    _planMasterController.upload()
-                } else {
-                    mainWindow.showToastMessage("Drone Not Connected")
-                }
+                color: "white"
             }
         }
     }
