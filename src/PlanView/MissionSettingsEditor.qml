@@ -56,6 +56,8 @@ Rectangle {
     readonly property string _vehicleLabel:     qsTr("Vehicle")
     readonly property real  _margin:            ScreenTools.defaultFontPixelWidth / 2
 
+    property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
+
     QGCPalette { id: qgcPal }
     QGCFileDialogController { id: fileController }
     Component { id: altModeDialogComponent; AltModeDialog { } }
@@ -79,7 +81,7 @@ Rectangle {
                 border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
                 border.width: 1
                 
-                QGCLabel { 
+                QGCLabel {
                     anchors.centerIn: parent
                     text: "−"
                     font.pointSize: ScreenTools.mediumFontPointSize
@@ -91,7 +93,7 @@ Rectangle {
                     id: minusArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: { 
+                    onClicked: {
                         if (parent.parent.fact) {
                             var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
                             parent.parent.fact.value -= step;
@@ -163,7 +165,7 @@ Rectangle {
                 border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
                 border.width: 1
                 
-                QGCLabel { 
+                QGCLabel {
                     anchors.centerIn: parent
                     text: "+"
                     font.pointSize: ScreenTools.mediumFontPointSize
@@ -175,7 +177,7 @@ Rectangle {
                     id: plusArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: { 
+                    onClicked: {
                         if (parent.parent.fact) {
                             var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
                             parent.parent.fact.value += step;
@@ -200,6 +202,14 @@ Rectangle {
                     radius: 15
                 }
             }
+
+            QGCLabel {
+                visible:            parent.fact && parent.fact.units
+                text:               parent.fact ? parent.fact.units : ""
+                Layout.alignment:   Qt.AlignVCenter
+                color:              _unitColor
+                font.pointSize:     ScreenTools.smallFontPointSize
+            }
         }
     }
 
@@ -221,8 +231,6 @@ Rectangle {
         topPadding:         ScreenTools.defaultFontPixelHeight * 0.5
         spacing:            ScreenTools.defaultFontPixelHeight * 1.0
 
-
-
         // --- Altitude Panel ---
         Rectangle {
             width:              parent.width
@@ -241,7 +249,7 @@ Rectangle {
                 spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
                 QGCLabel {
-                    text:   qsTr("Altitude")
+                    text:   qsTr("All Altitudes")
                     color:  _labelColor
                     font.bold: true
                 }
@@ -262,55 +270,76 @@ Rectangle {
                         border.width:           1
                         enabled:                _noMissionItemsAdded
 
+                        // Sibling, not parent-child
+                        RowLayout {
+                            anchors.fill:           parent
+                            anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.8
+                            anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.5
+                            enabled: false  // prevents this layout from consuming touch
+
+                            QGCLabel {
+                                Layout.fillWidth:   true
+                                text:               QGroundControl.altitudeModeShortDescription(_missionController.globalAltitudeMode)
+                                color:              _noMissionItemsAdded ? _valueColor : _unitColor
+                                font.pixelSize:     Math.round(ScreenTools.defaultFontPixelHeight * 0.75)
+                            }
+
+                            QGCColoredImage {
+                                height:     ScreenTools.defaultFontPixelHeight * 0.45
+                                width:      height
+                                source:     "/res/DropArrow.svg"
+                                color:      _unitColor
+                            }
+                        }
+
                         MouseArea {
-                            anchors.fill:   parent
+                            anchors.fill: parent
                             onClicked: {
+                                console.log("--- Altitude Panel ---")
                                 var removeModes = []
-                                var updateFunction = function(altMode){ _missionController.globalAltitudeMode = altMode }
+                                var updateFunction = function(altMode) {
+                                    _missionController.globalAltitudeMode = altMode
+                                }
                                 if (!_controllerVehicle.supportsTerrainFrame) {
                                     removeModes.push(QGroundControl.AltitudeModeTerrainFrame)
                                 }
-                                altModeDialogComponent.createObject(mainWindow, { rgRemoveModes: removeModes, updateAltModeFn: updateFunction }).open()
-                            }
-
-                            RowLayout {
-                                anchors.fill:           parent
-                                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.8
-                                anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.5
-
-                                QGCLabel {
-                                    Layout.fillWidth:   true
-                                    text:               QGroundControl.altitudeModeShortDescription(_missionController.globalAltitudeMode)
-                                    color:              _valueColor
-                                    font.pixelSize:     Math.round(ScreenTools.defaultFontPixelHeight * 0.75)
-                                }
-                                QGCColoredImage {
-                                    height:     ScreenTools.defaultFontPixelHeight * 0.45
-                                    width:      height
-                                    source:     "/res/DropArrow.svg"
-                                    color:      _unitColor
-                                }
+                                altModeDialogComponent.createObject(
+                                            mainWindow,
+                                            { rgRemoveModes: removeModes, updateAltModeFn: updateFunction }
+                                            ).open()
                             }
                         }
                     }
 
-                    Loader {
-                        Layout.fillWidth:   true
-                        sourceComponent:    volumeSliderComponent
-                        property var targetFact: QGroundControl.settingsManager.appSettings.defaultMissionItemAltitude
-                        onTargetFactChanged: if (item) item.fact = targetFact
-                        onLoaded: {
-                            if (item) {
-                                item.fact = targetFact
-                                item.trackFillColor = _colorAccent
-                                item.showMinusButton = true
-                                item.showPlusButton = true
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: ScreenTools.defaultFontPixelHeight * 0.2
+
+                        QGCLabel {
+                            text:   qsTr("Initial Point")
+                            color:  _labelColor
+                            font.bold: true
+                        }
+
+                        Loader {
+                            Layout.fillWidth:   true
+                            sourceComponent:    volumeSliderComponent
+                            property var targetFact: QGroundControl.settingsManager.appSettings.defaultMissionItemAltitude
+                            onTargetFactChanged: if (item) item.fact = targetFact
+                            onLoaded: {
+
+                                if (item) {
+                                    item.fact = targetFact
+                                    item.trackFillColor = _colorAccent
+                                    item.showMinusButton = false
+                                    item.showPlusButton = true
+                                }
                             }
                         }
-                    }
-                }
-            }
-        }
+                    } // ColumnLayout
+                } // GridLayout
+            } // ColumnLayout altCol
+        } // Rectangle
 
         // --- Speed Panel ---
         Rectangle {
@@ -331,7 +360,7 @@ Rectangle {
                 spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
                 QGCLabel {
-                    text:   qsTr("Speed")
+                    text:   qsTr("Flight speed")
                     color:  _labelColor
                     font.bold: true
                 }
@@ -360,7 +389,7 @@ Rectangle {
             color:              _panelColor
             radius:             _panelRadius
             border.color:       _panelBorder
-            visible:            !_simpleMissionStart && _showCameraSection
+            visible:            !_simpleMissionStart && _showCameraSection && _application !== "Agri"
 
             ColumnLayout {
                 id: camCol
@@ -407,93 +436,93 @@ Rectangle {
                 anchors.topMargin: ScreenTools.defaultFontPixelHeight
                 spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
-                SectionHeader {
-                    id:             vehicleInfoSectionHeader
-                    width:          parent.width
-                    text:           qsTr("Vehicle Info")
-                    checked:        false
-                    color:          _labelColor
-                }
+                // SectionHeader {
+                //     id:             vehicleInfoSectionHeader
+                //     width:          parent.width
+                //     text:           qsTr("Vehicle Info")
+                //     checked:        false
+                //     color:          _labelColor
+                // }
 
                 Column {
                     width:          parent.width
                     spacing:        ScreenTools.defaultFontPixelHeight * 0.5
                     visible:        vehicleInfoSectionHeader.checked
 
-                    GridLayout {
-                        width:          parent.width
-                        columnSpacing:  ScreenTools.defaultFontPixelWidth
-                        rowSpacing:     columnSpacing
-                        columns:        2
+                    // GridLayout {
+                    //     width:          parent.width
+                    //     columnSpacing:  ScreenTools.defaultFontPixelWidth
+                    //     rowSpacing:     columnSpacing
+                    //     columns:        2
 
-                        QGCLabel { text: _firmwareLabel; color: _labelColor; visible: _multipleFirmware }
-                        FactComboBox {
-                            fact:                   QGroundControl.settingsManager.appSettings.offlineEditingFirmwareClass
-                            indexModel:             false
-                            width:                  parent.width / 2
-                            visible:                _multipleFirmware && _allowFWVehicleTypeSelection
-                            background: Rectangle {
-                                radius: _fieldRadius
-                                color: _fieldColor
-                                border.color: _fieldBorder
-                                border.width: 1
-                            }
-                        }
-                        QGCLabel { text: _controllerVehicle.firmwareTypeString; color: _valueColor; visible: _multipleFirmware && !_allowFWVehicleTypeSelection }
+                    //     QGCLabel { text: _firmwareLabel; color: _labelColor; visible: _multipleFirmware }
+                    //     FactComboBox {
+                    //         fact:                   QGroundControl.settingsManager.appSettings.offlineEditingFirmwareClass
+                    //         indexModel:             false
+                    //         width:                  parent.width / 2
+                    //         visible:                _multipleFirmware && _allowFWVehicleTypeSelection
+                    //         background: Rectangle {
+                    //             radius: _fieldRadius
+                    //             color: _fieldColor
+                    //             border.color: _fieldBorder
+                    //             border.width: 1
+                    //         }
+                    //     }
+                    //     QGCLabel { text: _controllerVehicle.firmwareTypeString; color: _valueColor; visible: _multipleFirmware && !_allowFWVehicleTypeSelection }
 
-                        QGCLabel { text: _vehicleLabel; color: _labelColor; visible: _multipleVehicleTypes }
-                        FactComboBox {
-                            fact:                   QGroundControl.settingsManager.appSettings.offlineEditingVehicleClass
-                            indexModel:             false
-                            width:                  parent.width / 2
-                            visible:                _multipleVehicleTypes && _allowFWVehicleTypeSelection
-                            background: Rectangle {
-                                radius: _fieldRadius
-                                color: _fieldColor
-                                border.color: _fieldBorder
-                                border.width: 1
-                            }
-                        }
-                        QGCLabel { text: _controllerVehicle.vehicleTypeString; color: _valueColor; visible: _multipleVehicleTypes && !_allowFWVehicleTypeSelection }
-                    }
+                    //     QGCLabel { text: _vehicleLabel; color: _labelColor; visible: _multipleVehicleTypes }
+                    //     FactComboBox {
+                    //         fact:                   QGroundControl.settingsManager.appSettings.offlineEditingVehicleClass
+                    //         indexModel:             false
+                    //         width:                  parent.width / 2
+                    //         visible:                _multipleVehicleTypes && _allowFWVehicleTypeSelection
+                    //         background: Rectangle {
+                    //             radius: _fieldRadius
+                    //             color: _fieldColor
+                    //             border.color: _fieldBorder
+                    //             border.width: 1
+                    //         }
+                    //     }
+                    //     QGCLabel { text: _controllerVehicle.vehicleTypeString; color: _valueColor; visible: _multipleVehicleTypes && !_allowFWVehicleTypeSelection }
+                    // }
 
-                    QGCLabel {
-                        width:                  parent.width
-                        wrapMode:               Text.WordWrap
-                        font.pointSize:         ScreenTools.smallFontPointSize
-                        text:                   qsTr("Speed values used to calculate total mission time.")
-                        color:                  _unitColor
-                    }
+                    // QGCLabel {
+                    //     width:                  parent.width
+                    //     wrapMode:               Text.WordWrap
+                    //     font.pointSize:         ScreenTools.smallFontPointSize
+                    //     text:                   qsTr("Speed values used to calculate total mission time.")
+                    //     color:                  _unitColor
+                    // }
 
-                    Column {
-                        width:      parent.width
-                        spacing:    ScreenTools.defaultFontPixelHeight * 0.3
-                        visible:    _showCruiseSpeed
+                    // Column {
+                    //     width:      parent.width
+                    //     spacing:    ScreenTools.defaultFontPixelHeight * 0.3
+                    //     visible:    _showCruiseSpeed
 
-                        QGCLabel { 
-                            text: qsTr("Cruise speed")
-                            color: _labelColor
-                        }
-                        Loader {
-                            width:              parent.width
-                            sourceComponent:    volumeSliderComponent
-                            property var targetFact: QGroundControl.settingsManager.appSettings.offlineEditingCruiseSpeed
-                            onTargetFactChanged: if (item) item.fact = targetFact
-                            onLoaded: {
-                                if (item) {
-                                    item.fact = targetFact
-                                    item.trackFillColor = _colorAccent
-                                }
-                            }
-                        }
-                    }
+                    //     QGCLabel {
+                    //         text: qsTr("Cruise speed")
+                    //         color: _labelColor
+                    //     }
+                    //     Loader {
+                    //         width:              parent.width
+                    //         sourceComponent:    volumeSliderComponent
+                    //         property var targetFact: QGroundControl.settingsManager.appSettings.offlineEditingCruiseSpeed
+                    //         onTargetFactChanged: if (item) item.fact = targetFact
+                    //         onLoaded: {
+                    //             if (item) {
+                    //                 item.fact = targetFact
+                    //                 item.trackFillColor = _colorAccent
+                    //             }
+                    //         }
+                    //     }
+                    // }
 
                     Column {
                         width:      parent.width
                         spacing:    ScreenTools.defaultFontPixelHeight * 0.3
                         visible:    _showHoverSpeed
 
-                        QGCLabel { 
+                        QGCLabel {
                             text: qsTr("Hover speed")
                             color: _labelColor
                         }

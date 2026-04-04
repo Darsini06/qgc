@@ -50,6 +50,9 @@ Rectangle {
     readonly property color _colorDangerDark:    "#C42B2B"
     readonly property real  _radius:             8
 
+    property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
+
+
     Component.onCompleted: {
         MapGlobals.acres = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
     }
@@ -238,6 +241,7 @@ Rectangle {
             TransectStyleComplexItemTabBar {
                 id:                 tabBar
                 Layout.fillWidth:   true
+                visible: _application !== "Agri"
             }
 
             // ─── Grid tab ───────────────────────────────────────────────────
@@ -408,7 +412,7 @@ Rectangle {
                 radius:           _radius
                 border.color:     _colorBorder
                 border.width:     1
-                visible:          tabBar.currentIndex === 1
+                visible:          tabBar.currentIndex === 1 && _application !== "Agri"
 
                 CameraCalcCamera {
                     id: cameraCalcCamera
@@ -428,7 +432,7 @@ Rectangle {
                 radius:           _radius
                 border.color:     _colorBorder
                 border.width:     1
-                visible:          tabBar.currentIndex === 2
+                visible:          tabBar.currentIndex === 2 && _application !== "Agri"
 
                 TransectStyleComplexItemTerrainFollow {
                     id:          terrainFollow
@@ -445,7 +449,7 @@ Rectangle {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing:          _margin
-                visible:          tabBar.currentIndex === 3
+                visible:          tabBar.currentIndex === 3 && _application !== "Agri"
 
                 Rectangle {
                     Layout.fillWidth: true

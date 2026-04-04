@@ -81,7 +81,6 @@ Item {
 
     property real cardinalLeftScreenX:   0
     property real cardinalBottomScreenY: 0
-    property real mapRotation:           0
 
     onVisibleChanged : {
         if (visible) {
@@ -171,7 +170,6 @@ Item {
         console.log("removeEditingVisuals method")
         _objMgrEditingVisuals.destroyObjects()
     }
-
 
     function addToolbarVisuals() {
         console.log("new_addToolbarVisuals")
@@ -1232,37 +1230,40 @@ Item {
             // Buttons positioned directly below the compass icon
             // cardinalLeftScreenX and cardinalBottomScreenY are in mapControl (panel) space
             Column {
-                x: cardinalLeftScreenX + 7
+                anchors.right:  parent.right
+                anchors.rightMargin: _root.cardinalLeftScreenX + 2
                 y: cardinalBottomScreenY
-                z: 100
+                z: 2000
                 spacing: 8
                 visible: mapPolygon.traceMode
 
                 Item {
                     width: buttonSize
-                    height: buttonSize + 28  // 2 button heights + spacing gap
+                    height: buttonSize + 8  // 2 button heights + spacing gap
                 }
 
                 Button {
                     id: boundryMarkingBtn
                     text: ""
-                    width: buttonSize
+                    width: 120
                     height: buttonSize
                     padding: 10
 
                     background: Rectangle {
-                        radius: width / 2
+                        radius: 8
                         color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/qmlimages/NewImages/boundaryMarkingIcon.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent
-                        color: "white"
+                    contentItem: Text {
+                        text:               qsTr("Boundary Point")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:     ScreenTools.defaultFontPointSize
+                        horizontalAlignment:    Text.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        font.family:        "Outfit"
                     }
 
                     onClicked: {
@@ -1305,23 +1306,25 @@ Item {
                 Button {
                     id: saveBtn
                     text: ""
-                    width: buttonSize
+                    width: 120
                     height: buttonSize
                     padding: 12
 
                     background: Rectangle {
-                        radius: width / 2
+                        radius: 8
                         color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/qmlimages/NewImages/savefile.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent
-                        color: "white"
+                    contentItem: Text {
+                        text:               qsTr("Save")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:    ScreenTools.defaultFontPointSize
+                        horizontalAlignment:    Text.AlignHCenter
+                        verticalAlignment:      Text.AlignVCenter
+                        font.family:        "Outfit"
                     }
 
                     onClicked: {
@@ -1337,38 +1340,35 @@ Item {
 
             //only for Mapping
             Column {
-                x: cardinalLeftScreenX + 7
+                anchors.right:  parent.right
+                anchors.rightMargin: _root.cardinalLeftScreenX + 7
                 y: cardinalBottomScreenY
-                z: 100
+                z: 2000
                 spacing: 8
                 visible: mapping
-
-                Item {
-                    width: buttonSize
-                    height: buttonSize + 28  // 2 button heights + spacing gap
-                }
 
                 Button {
                     id: boundryMarkingBtn1
                     text: ""
-                    width: buttonSize
+                    width: 180
                     height: buttonSize
 
                     padding: 10
 
                     background: Rectangle {
-                        radius: width / 2
+                        radius: 8
                         color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/qmlimages/NewImages/boundaryMarkingIcon.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                    contentItem: Text {
+                        text:               qsTr("Boundary Mark")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:     14
+                        anchors.centerIn:    parent
+                        font.family:        "Outfit"
                     }
 
                     onClicked: {
@@ -1411,24 +1411,25 @@ Item {
                 Button {
                     id: saveBtn1
                     text: ""
-                    width: buttonSize
+                    width: 180
                     height: buttonSize
 
                     padding: 12
 
                     background: Rectangle {
-                        radius: width / 2
+                        radius: 8
                         color: Qt.rgba(0, 0, 0, 0.40)
                         anchors.fill: parent
                         anchors.margins: 3
                     }
 
-                    contentItem: QGCColoredImage {
-                        source: "/qmlimages/NewImages/savefile.svg"
-                        width: iconSize
-                        height: iconSize
-                        anchors.centerIn: parent // Center the icon within the container
-                        color: "white"
+                    contentItem: Text {
+                        text:               qsTr("Save")
+                        font.bold:          true
+                        color:              "white"
+                        font.pointSize:     14
+                        anchors.centerIn:    parent
+                        font.family:        "Outfit"
                     }
                     onClicked: {
                         console.log("Mapping clicked")
@@ -1996,7 +1997,7 @@ Item {
             width:          ScreenTools.defaultFontPixelWidth * 38
             height:         ScreenTools.defaultFontPixelHeight * 11
             padding:        0
-            
+
             background: Rectangle {
                 radius: 20
                 color: "white"
@@ -2161,7 +2162,7 @@ Item {
 
                                     let concatenatedText = nameField.text.substring(0, 10)
                                     _appSettings.username = concatenatedText
-                                    
+
                                     if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
                                         _saveCurrentVertices()
                                         _circleMode = false

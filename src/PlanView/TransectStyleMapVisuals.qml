@@ -108,7 +108,7 @@ Item {
             line.color: "white"
             line.width: 5
             path:       _transectPoints
-            visible:    _currentItem
+            visible:    false
             opacity:    _root.opacity
         }
     }
@@ -121,7 +121,7 @@ Item {
             line.color: "white"
             line.width: 2
             path:       _showPartialEntryExit ? [ _transectPoints[0], _transectPoints[1] ] : []
-            visible:    _showPartialEntryExit
+            visible:    false
             opacity:    _root.opacity
         }
     }
@@ -134,7 +134,7 @@ Item {
             line.color: "white"
             line.width: 2
             path:       _showPartialEntryExit ? [ _transectPoints[_lastPointIndex - 1], _transectPoints[_lastPointIndex] ] : []
-            visible:    _showPartialEntryExit
+            visible:    false
             opacity:    _root.opacity
         }
     }
@@ -173,7 +173,7 @@ Item {
             fromCoord:      _transectPoints[_firstTrueTransectIndex]
             toCoord:        _transectPoints[_firstTrueTransectIndex + 1]
             arrowPosition:  1
-            visible:        _currentItem
+            visible:        false
             opacity:        _root.opacity
         }
     }
@@ -185,7 +185,7 @@ Item {
             fromCoord:      _transectPoints[nextTrueTransectIndex]
             toCoord:        _transectPoints[nextTrueTransectIndex + 1]
             arrowPosition:  1
-            visible:        _currentItem && _transectCount > 3
+            visible:        false
             opacity:        _root.opacity
 
             property int nextTrueTransectIndex: _firstTrueTransectIndex + (_hasTurnaround ? 4 : 2)
@@ -199,7 +199,7 @@ Item {
             fromCoord:      _transectPoints[_lastTrueTransectIndex - 1]
             toCoord:        _transectPoints[_lastTrueTransectIndex]
             arrowPosition:  3
-            visible:        _currentItem
+            visible:        false
             opacity:        _root.opacity
         }
     }
@@ -211,7 +211,7 @@ Item {
             fromCoord:      _transectPoints[prevTrueTransectIndex - 1]
             toCoord:        _transectPoints[prevTrueTransectIndex]
             arrowPosition:  13
-            visible:        _currentItem && _transectCount > 3
+            visible:        false
             opacity:        _root.opacity
 
             property int prevTrueTransectIndex: _lastTrueTransectIndex - (_hasTurnaround ? 4 : 2)
