@@ -1509,8 +1509,8 @@ ApplicationWindow {
 
     Dialog {
         id: myDialog
-        width: 260
-        height: 350
+        width: myDialog.dialogText === "settings" ? 340 : 260
+        height: myDialog.dialogText === "settings" ? 220 : 190
         property string imageSource: "/qmlimages/PaperPlane.svg"
         property string dialogText: "Default Text"
 
@@ -1521,9 +1521,10 @@ ApplicationWindow {
         closePolicy: Popup.CloseOnPressOutside
 
         background: Rectangle {
-            radius: 15
-            color: "white"
-            border.width: 0
+            radius: 20
+            color: Qt.rgba(0, 0, 0, 0.65)
+            border.width: 1
+            border.color: "white"
         }
 
         QtObject {
@@ -1533,72 +1534,42 @@ ApplicationWindow {
 
         QtObject {
             id: takeoffSettings
-            property real sliderOutputValue: 1.0
+            property real sliderOutputValue: 2.0
         }
 
         contentItem: ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 20
-            spacing: 15
+            anchors.margins: 15
+            spacing: 8
 
-            // Header/Title
+            // --- Top Area (Altitude Settings Header / Normal Header) ---
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("TAKEOFF SETTINGS")
-                color: "black"
-                font.pointSize: 11
+                text: myDialog.dialogText === "settings" ? qsTr("Take off altitude") : myDialog.dialogText
+                color: "white"
+                font.pointSize: 12
                 font.bold: true
-                opacity: 0.8
-                Layout.topMargin: 10
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                height: 1
-                color: "#3d3a50"
-                opacity: 0.5
-            }
-
-            // Altitude Display Area
-            ColumnLayout {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: 2
-                
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: myDialog.dialogText === "settings" ? qsTr("Takeoff Altitude") : qsTr("Confirm Action")
-                    color: "#9898bb"
-                    font.pointSize: 9
-                }
-
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: takeoffSettings.sliderOutputValue.toFixed(1) + " m"
-                    color: "black"
-                    font.pointSize: 28
-                    font.bold: true
-                    visible: myDialog.dialogText === "settings"
-                }
-            }
-
-            // Controls
+            // --- Altitude Controls ---
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
+                spacing: 25
                 visible: myDialog.dialogText === "settings"
 
                 // Minus Button
                 Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#2a2b3e"
-                    border.width: 0
+                    width: 34
+                    height: 34
+                    radius: 17
+                    color: Qt.rgba(1, 1, 1, 0.15)
+                    border.width: 1
+                    border.color: "white"
                     
                     Text {
                         text: "-"
                         color: "white"
-                        font.pointSize: 20
+                        font.pointSize: 16
                         anchors.centerIn: parent
                         anchors.verticalCenterOffset: -2
                     }
@@ -1613,18 +1584,28 @@ ApplicationWindow {
                     }
                 }
 
+                // Altitude Value
+                Text {
+                    text: takeoffSettings.sliderOutputValue.toFixed(1) + " m"
+                    color: "white"
+                    font.pointSize: 22
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
                 // Plus Button
                 Rectangle {
-                    width: 48
-                    height: 48
-                    radius: 24
-                    color: "#2a2b3e"
-                    border.width: 0
+                    width: 34
+                    height: 34
+                    radius: 17
+                    color: Qt.rgba(1, 1, 1, 0.15)
+                    border.width: 1
+                    border.color: "white"
 
                     Text {
                         text: "+"
                         color: "white"
-                        font.pointSize: 20
+                        font.pointSize: 16
                         anchors.centerIn: parent
                         anchors.verticalCenterOffset: -1
                     }
@@ -1642,7 +1623,7 @@ ApplicationWindow {
 
             Item { Layout.fillHeight: true }
 
-            // Center Circular Action Button
+            // --- Bottom Area (Action Button) ---
             Item {
                 Layout.alignment: Qt.AlignHCenter
                 width: 90
@@ -1651,9 +1632,10 @@ ApplicationWindow {
                 Rectangle {
                     id: circularButton
                     anchors.fill: parent
-                    radius: 50
-                    color: "#301934"
-                    border.width: 0
+                    radius: 45
+                    color: Qt.rgba(0, 0, 0, 0.4)
+                    border.width: 1
+                    border.color: "white"
                     
                     Canvas {
                         id: progressCircle
@@ -1664,7 +1646,7 @@ ApplicationWindow {
                             ctx.beginPath()
                             ctx.arc(width/2, height/2, 45, -Math.PI/2, (2 * Math.PI * progressState.value) - Math.PI/2, false)
                             ctx.lineWidth = 4
-                            ctx.strokeStyle = "white"
+                            ctx.strokeStyle = "#79AE6F"
                             ctx.stroke()
                         }
                     }
@@ -1690,12 +1672,12 @@ ApplicationWindow {
                     }
                 }
             }
-            // Instruction text
+
             Text {
-                Layout.alignment:       Qt.AlignHCenter
-                text:                   qsTr("Press and hold to confirm")
-                color:                  "#9898bb"
-                font.pointSize:         9
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("press & hold to confirm")
+                color: "#dddddd"
+                font.pointSize: 10
             }
         }
 

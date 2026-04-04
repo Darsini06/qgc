@@ -124,7 +124,7 @@ Rectangle {
                             height: parent.height
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: parent.height * 0.55
+                                width: parent.height * 0.45
                                 height: width
                                 source: "/qmlimages/camera_photo.svg"
                                 color: _cameraInPhotoMode ? "black" : "white"
@@ -144,7 +144,7 @@ Rectangle {
                             height: parent.height
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: parent.height * 0.55
+                                width: parent.height * 0.45
                                 height: width
                                 source: "/qmlimages/camera_video.svg"
                                 color: "white" // Always white on red or dark background
@@ -162,7 +162,7 @@ Rectangle {
                 // Animated Shutter Button
                 Item {
                     Layout.alignment: Qt.AlignHCenter
-                    width: ScreenTools.defaultFontPixelWidth * 6.5
+                    width: ScreenTools.defaultFontPixelWidth * 5.5
                     height: width
 
                     Rectangle {
@@ -316,7 +316,7 @@ Rectangle {
                 QGCColoredImage {
                     id: gearIcon
                     anchors.centerIn: parent
-                    height: parent.height * 0.8
+                    height: parent.height * 0.6
                     width: height
                     source: "/res/gear-black.svg"
                     mipmap: true

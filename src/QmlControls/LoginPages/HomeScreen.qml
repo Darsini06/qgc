@@ -51,6 +51,8 @@ Item {
 
     property bool connecting_drone : false
 
+    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+
     // DYNAMIC SCALING: Professional responsive multiplier
     property real dynamicScaleFactor: {
         var baseWidth = 1200
@@ -1097,7 +1099,11 @@ Item {
             }
         }
     }
-
+    function showDynamicCalibrationDialog(qmlFile,title) {
+        dynamicCalDialog.dialogTitleText = title
+        dialogLoader.source = qmlFile
+        dynamicCalDialog.open()
+    }
     // Logout Dialog Component
     Component {
         id: logoutdialog

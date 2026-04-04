@@ -795,8 +795,6 @@ Rectangle {
 
     //     // MouseArea {
     //     //     anchors.fill:   parent
-    //     //     onClicked:      largeProgressBar._userHide = true
-    //     // }
     // }
 
 }
