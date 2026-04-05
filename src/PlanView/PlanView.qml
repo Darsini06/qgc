@@ -623,6 +623,7 @@ Item {
         property bool planFiles: true    ///< true: working with plan files, false: working with kml file
 
         onAcceptedForSave: (file) => {
+                               console.log("Clicke Files at onAcceptedForSave")
                                if (planFiles) {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
@@ -639,6 +640,8 @@ Item {
                            }
 
         onAcceptedForLoad: (file) => {
+                               console.log("Click Files at onAcceptedForLoad")
+                                MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
@@ -741,6 +744,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
+                    visible:     MapGlobals.gridLines
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
