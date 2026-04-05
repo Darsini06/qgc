@@ -135,7 +135,7 @@ Item {
             source: {
                 if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
                 if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
-                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image5.png"
+                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
                 return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
             }
             fillMode: Image.PreserveAspectCrop
@@ -200,7 +200,7 @@ Item {
             height: width
             source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
             fillMode: Image.PreserveAspectFit
-            visible: droneType === "Agri"
+            visible: false // Hidden to avoid redundancy with professional cinematic background
             opacity: 0.94
             asynchronous: true
             cache: true
