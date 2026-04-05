@@ -84,7 +84,7 @@ Item {
 
     property real compassBottomY: compassNorth.y + compassNorth.height + 10
     property real compassNorthX:   compassNorth.x
-    
+
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
             return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)
@@ -371,7 +371,7 @@ Item {
                     height:             dp(8)
                     radius:             12
                     color:              keepMA.pressed ? Qt.darker("#471880", 1.2) : (keepMA.containsMouse ? Qt.lighter("#471880", 1.1) : "#471880")
-                    
+
                     Text {
                         anchors.centerIn: parent
                         width:          parent.width * 0.9
@@ -613,8 +613,7 @@ Item {
     QGCMapPolygonVisuals {
         id:                     filename
         cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
-        cardinalLeftScreenX:    15
-        mapRotation:            MapGlobals.mapRotation
+        cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
     }
 
     QGCFileDialog {
@@ -624,6 +623,7 @@ Item {
         property bool planFiles: true    ///< true: working with plan files, false: working with kml file
 
         onAcceptedForSave: (file) => {
+                               console.log("Clicke Files at onAcceptedForSave")
                                if (planFiles) {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
@@ -640,6 +640,8 @@ Item {
                            }
 
         onAcceptedForLoad: (file) => {
+                               console.log("Click Files at onAcceptedForLoad")
+                                MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
@@ -742,6 +744,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
+                    visible:     MapGlobals.gridLines
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
@@ -1100,419 +1103,589 @@ Item {
 
         //-----------------------------------------------------------
         // Right pane for mission editing controls
-        Rectangle {
-            id:                 rightPanel
-            height:             parent.height
-            width:{
-                if(_utmspEnabled){
-                    _rightPanelWidth + ScreenTools.defaultFontPixelWidth * 21.667
-                }
-                else{
-                    _rightPanelWidth
-                }
-            }
-            color:              qgcPal.window
-            opacity:            layerTabBar.visible ? 0.2 : 0
-            anchors.bottom:     parent.bottom
-            anchors.right:      parent.right
-            anchors.rightMargin: _toolsMargin
-            visible:            _editingLayer != _layerMission
-        }
-        //-------------------------------------------------------
-        // Right Panel Controls
+        // Rectangle {
+        //     id:                 rightPanel
+        //     height:             parent.height
+        //     width:{
+        //         if(_utmspEnabled){
+        //             _rightPanelWidth + ScreenTools.defaultFontPixelWidth * 21.667
+        //         }
+        //         else{
+        //             _rightPanelWidth
+        //         }
+        //     }
+        //     color:              qgcPal.window
+        //     opacity:            layerTabBar.visible ? 0.2 : 0
+        //     anchors.bottom:     parent.bottom
+        //     anchors.right:      parent.right
+        //     anchors.rightMargin: _toolsMargin
+        //     visible:            _editingLayer != _layerMission
+        // }
+        // //-------------------------------------------------------
+        // // Right Panel Controls
 
-        Item {
-            anchors.fill:           rightPanel
-            anchors.topMargin:      _toolsMargin
-            visible:                _editingLayer != _layerMission
+        // Item {
+        //     anchors.fill:           rightPanel
+        //     anchors.topMargin:      _toolsMargin
+        //     //visible: false
 
-            DeadMouseArea {
-                anchors.fill:   parent
-            }
+        //     DeadMouseArea {
+        //         anchors.fill:   parent
+        //     }
 
-            Column {
-                id:                 rightControls
-                spacing:            ScreenTools.defaultFontPixelHeight * 0.5
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-                anchors.top:        parent.top
-                //-------------------------------------------------------
+        //     Column {
+        //         id:                 rightControls
+        //         spacing:            ScreenTools.defaultFontPixelHeight * 0.5
+        //         anchors.left:       parent.left
+        //         anchors.right:      parent.right
+        //         anchors.top:        parent.top
+        //         //-------------------------------------------------------
 
-                // Layer tabs moved to bottomCenterContainer
-            }
-            //-------------------------------------------------------
-            // Mission Item Editor
-            Item {
-                id:                     missionItemEditor
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.25
-                visible:                false // Hidden per user request; bottom popup used instead
-                QGCListView {
-                    id:                 missionItemEditorListView
-                    anchors.fill:       parent
-                    spacing:            ScreenTools.defaultFontPixelHeight / 4
-                    orientation:        ListView.Vertical
-                    model:              _missionController.visualItems
-                    cacheBuffer:        Math.max(height * 2, 0)
-                    clip:               true
-                    currentIndex:       _missionController.currentPlanViewSeqNum
-                    highlightMoveDuration: 250
-                    visible:            _editingLayer == _layerMission && !planControlColapsed
+        //         // Mission Controls - Professional Purple Theme Slider
+        //         Rectangle {
+        //             id:         layerTabBar1
+        //             width:      parent.width
+        //             height:     42
+        //             color:      "#2d1c42"  // Dark purple background
+        //             radius:     21
+        //             border.color: "#4a2c6d"
+        //             border.width: 1
+        //             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
-                    // // Remove items with commandName "Takeoff" when the component is completed.
-                    // Component.onCompleted:
-                    // {
-                    //     // Loop backwards to avoid index shifting.
-                    //     for (var i = _missionController.visualItems.count - 1; i >= 0; i--) {
-                    //         var item = _missionController.visualItems.get(i);
-                    //         if (item.commandName === "Takeoff") {
-                    //             _missionController.visualItems.remove(i);
-                    //         }
-                    //     }
-                    // }
+        //             property int currentIndex: 0
+        //             property bool fenceVisible: _geoFenceController.supported
 
-                    //-- List Elements
+        //             property int _visibleTabCount: fenceVisible ? 2 : 1
 
-                    delegate: MissionExpand {
-                        //visible: missionItem.commandName !== "Takeoff"
-                        map:            editorMap
-                        masterController:  _planMasterController
-                        missionItem:    object
-                        width:          missionItemEditorListView.width
-                        readOnly:       false
-                        //onClicked: (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false) }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                                missionItemDialog.currentMissionItem = object
-                                missionItemDialog.currentIndex = index
-                                missionItemDialog.open()
-                                missionItemDialog.visible = true
-                            }
-                        }
-                        // onRemove: {
-                        //     var removeVIIndex = index
-                        //     _missionController.removeVisualItem(removeVIIndex)
-                        //     if (removeVIIndex >= _missionController.visualItems.count) {
-                        //         removeVIIndex--
-                        //     }
-                        // }
-                        //onSelectNextNotReadyItem:   selectNextNotReady()
-                    }
-                }
-            }
+        //             // Active pill highlight
+        //             Rectangle {
+        //                 id: sliderHighlight1
+        //                 width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+        //                 height: layerTabBar.height - 6
+        //                 y: 3
+        //                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
+        //                 gradient: Gradient {
+        //                     orientation: Gradient.Horizontal
+        //                     GradientStop { position: 0.0; color: "#6a4c8d" }
+        //                     GradientStop { position: 1.0; color: "#4a2c6d" }
+        //                 }
+        //                 radius: height / 2
+        //                 border.color: "#8a6cad"
+        //                 border.width: 1
+        //                 Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        //             }
 
+        //             Row {
+        //                 anchors.fill: parent
+        //                 anchors.margins: 3
+        //                 spacing: 0
 
-            // Rally Point Editor
-            RallyPointEditorHeader {
-                id:                     rallyPointHeader
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                visible:                _editingLayer == _layerRallyPoints
-                controller:             _rallyPointController
-            }
+        //                 MouseArea {
+        //                     width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+        //                     height: parent.height
+        //                     cursorShape: Qt.PointingHandCursor
+        //                     onClicked: layerTabBar.currentIndex = 0
+        //                     Text {
+        //                         text: qsTr("Mission")
+        //                         anchors.centerIn: parent
+        //                         font.pointSize: 11
+        //                         font.bold: layerTabBar.currentIndex === 0
+        //                         color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
+        //                         Behavior on color { ColorAnimation { duration: 200 } }
+        //                     }
+        //                 }
 
+        //                 MouseArea {
+        //                     width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
+        //                     height: parent.height
+        //                     visible: layerTabBar.fenceVisible
+        //                     cursorShape: Qt.PointingHandCursor
+        //                     onClicked:{
 
-            RallyPointItemEditor {
-                id:                     rallyPointEditor
-                anchors.top:            rallyPointHeader.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                visible:                _editingLayer == _layerRallyPoints && _rallyPointController.points.count
-                rallyPoint:             _rallyPointController.currentRallyPoint
-                controller:             _rallyPointController
-            }
+        //                         layerTabBar.currentIndex = 1
+        //                         _geoFenceController.supported
+        //                     }
+        //                     Text {
+        //                         text: qsTr("Fence")
+        //                         anchors.centerIn: parent
+        //                         font.pointSize: 11
+        //                         font.bold: layerTabBar.currentIndex === 1
+        //                         color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
+        //                         Behavior on color { ColorAnimation { duration: 200 } }
+        //                     }
+        //                 }
+        //             }
+        //         }
 
+        //         Rectangle {
+        //             id:         layerTabBarUTMSP
+        //             width:      parent.width
+        //             height:     40
+        //             color:      "#f1f5f9"
+        //             radius:     8
+        //             border.color: "#e2e8f0"
+        //             border.width: 1
+        //             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled
 
-            UTMSPAdapterEditor{
-                id: utmspEditor
-                enabled:                 _utmspEnabled
-                anchors.top:             rightControls.bottom
-                anchors.topMargin:       ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:          parent.bottom
-                anchors.left:            parent.left
-                anchors.right:           parent.right
-                currentMissionItems:     _visualItems
-                myGeoFenceController:    _geoFenceController
-                flightMap:               editorMap
-                visible:                 _editingLayer == _layerUTMSP
-                triggerSubmitButton:     _triggerSubmit
-                resetRegisterFlightPlan: _resetRegisterFlightPlan
-            }
+        //             property int currentIndex: 0
+        //             property bool rallyVisible: _rallyPointController.supported
+        //             property int _visibleTabCount: 1 + (rallyVisible ? 1 : 0) + 1
 
-        }
+        //             Rectangle {
+        //                 id: sliderHighlightUTMSP
+        //                 width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+        //                 height: layerTabBarUTMSP.height - 8
+        //                 y: 4
+        //                 x: {
+        //                     var tabWidth = width;
+        //                     if (layerTabBarUTMSP.currentIndex === 0) return 4;
+        //                     if (layerTabBarUTMSP.currentIndex === 1) return 4 + tabWidth;
+        //                     if (layerTabBarUTMSP.currentIndex === 2) return 4 + tabWidth * (layerTabBarUTMSP.rallyVisible ? 2 : 1);
+        //                     return 4;
+        //                 }
+        //                 color: "white"
+        //                 radius: 6
+        //                 border.color: "#d1d5db"
+        //                 border.width: 1
 
-        QGCLabel {
-            // Elevation provider notice on top of terrain plot
-            readonly property string _licenseString: QGroundControl.elevationProviderNotice
+        //                 Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
+        //             }
 
-            id:                         licenseLabel
-            visible:                    terrainStatus.visible && _licenseString !== ""
-            anchors.bottom:             terrainStatus.top
-            anchors.horizontalCenter:   terrainStatus.horizontalCenter
-            anchors.bottomMargin:       ScreenTools.defaultFontPixelWidth * 0.5
-            font.pointSize:             ScreenTools.smallFontPointSize
-            text:                       qsTr("Powered by %1").arg(_licenseString)
-        }
+        //             Row {
+        //                 anchors.fill: parent
+        //                 anchors.margins: 4
+        //                 spacing: 0
 
-        Popup {
-            id: missionItemDialog
-            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
-            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
-            
-            // Position in the bottom-right corner
-            x: parent.width - width - 20
-            property real targetY: parent.height - height - 20
-            y: targetY
-            
-            modal: false
-            dim: false
-            closePolicy: Popup.NoAutoClose
-            parent: Overlay.overlay
-            
-            property int currentIndex: -1
-            property var currentMissionItem: null
+        //                 MouseArea {
+        //                     width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+        //                     height: parent.height
+        //                     cursorShape: Qt.PointingHandCursor
+        //                     onClicked: layerTabBarUTMSP.currentIndex = 0
+        //                     Text {
+        //                         text: qsTr("Mission")
+        //                         anchors.centerIn: parent
+        //                         font.pointSize: 12
+        //                         font.bold: layerTabBarUTMSP.currentIndex === 0
+        //                         color: layerTabBarUTMSP.currentIndex === 0 ? "black" : "#64748b"
+        //                         Behavior on color { ColorAnimation { duration: 200 } }
+        //                     }
+        //                 }
 
-            // Slide animation from bottom
-            enter: Transition {
-                NumberAnimation { property: "y"; from: missionItemDialog.parent.height; to: missionItemDialog.targetY; duration: 350; easing.type: Easing.OutExpo }
-            }
-            exit: Transition {
-                NumberAnimation { property: "y"; to: missionItemDialog.parent.height; duration: 250; easing.type: Easing.InCubic }
-            }
+        //                 MouseArea {
+        //                     width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+        //                     height: parent.height
+        //                     visible: layerTabBarUTMSP.rallyVisible
+        //                     cursorShape: Qt.PointingHandCursor
+        //                     onClicked: layerTabBarUTMSP.currentIndex = 1
+        //                     Text {
+        //                         text: qsTr("Rally")
+        //                         anchors.centerIn: parent
+        //                         font.pointSize: 12
+        //                         font.bold: layerTabBarUTMSP.currentIndex === 1
+        //                         color: layerTabBarUTMSP.currentIndex === 1 ? "black" : "#64748b"
+        //                         Behavior on color { ColorAnimation { duration: 200 } }
+        //                     }
+        //                 }
 
-            background: Rectangle {
-                color:        "#BF000000" // Dark Transparent Black 75% alpha
-                radius:       15          // Rounded dialog corners (as shown in image)
-                border.color: "#3a3750"
-                border.width: 1
-            }
+        //                 MouseArea {
+        //                     width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
+        //                     height: parent.height
+        //                     visible: _utmspEnabled
+        //                     cursorShape: Qt.PointingHandCursor
+        //                     onClicked: layerTabBarUTMSP.currentIndex = 2
+        //                     Text {
+        //                         text: qsTr("UTM-Adapter")
+        //                         anchors.centerIn: parent
+        //                         font.pointSize: 12
+        //                         font.bold: layerTabBarUTMSP.currentIndex === 2
+        //                         color: layerTabBarUTMSP.currentIndex === 2 ? "black" : "#64748b"
+        //                         Behavior on color { ColorAnimation { duration: 200 } }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     //-------------------------------------------------------
+        //     // Mission Item Editor
+        //     Item {
+        //         id:                     missionItemEditor
+        //         anchors.left:           parent.left
+        //         anchors.right:          parent.right
+        //         anchors.top:            rightControls.bottom
+        //         anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+        //         anchors.bottom:         parent.bottom
+        //         anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.25
+        //         visible:                _editingLayer == _layerMission && !planControlColapsed
 
-            // Header Area
-            Item {
-                id: drawerHeader
-                width: parent.width
-                height: 60
-                anchors.top: parent.top
-                
-                Text {
-                    text: missionItemDialog.currentMissionItem ? missionItemDialog.currentMissionItem.commandName : "Edit Item"
-                    font.pixelSize: 18
-                    font.bold: true
-                    color: "#e8e4f0"   // Light text on dark background
-                    anchors.centerIn: parent
-                }
+        //         QGCListView {
+        //             id:                 missionItemEditorListView
+        //             anchors.fill:       parent
+        //             spacing:            ScreenTools.defaultFontPixelHeight / 4
+        //             orientation:        ListView.Vertical
+        //             model:              _missionController.visualItems
+        //             cacheBuffer:        Math.max(height * 2, 0)
+        //             clip:               true
+        //             currentIndex:       _missionController.currentPlanViewSeqNum
+        //             highlightMoveDuration: 250
+        //             visible:            _editingLayer == _layerMission && !planControlColapsed
 
-                Rectangle {
-                    id: closeBtn
-                    width: 32
-                    height: 32
-                    radius: 16
-                    color: closeBtnArea.pressed ? "#3d3a50" : (closeBtnArea.containsMouse ? "#2e2b42" : "#1e1b2e")
-                    border.color: "#4a4560"
-                    border.width: 1
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.margins: 15
-                    Behavior on color { ColorAnimation { duration: 100 } }
+        //             // // Remove items with commandName "Takeoff" when the component is completed.
+        //             // Component.onCompleted:
+        //             // {
+        //             //     // Loop backwards to avoid index shifting.
+        //             //     for (var i = _missionController.visualItems.count - 1; i >= 0; i--) {
+        //             //         var item = _missionController.visualItems.get(i);
+        //             //         if (item.commandName === "Takeoff") {
+        //             //             _missionController.visualItems.remove(i);
+        //             //         }
+        //             //     }
+        //             // }
 
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/close.svg"
-                        color: closeBtnArea.containsMouse ? "#e0dcf8" : "#9898bb"
-                        width: 14
-                        height: 14
-                        anchors.centerIn: parent
-                        Behavior on color { ColorAnimation { duration: 100 } }
-                    }
+        //             //-- List Elements
 
-                    MouseArea {
-                        id: closeBtnArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            missionItemDialog.close()
-                            mainWindow.showPlanView()
-                        }
-                    }
-                }
-                
-                // Subtle divider line
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: "#3d3a50"
-                    anchors.bottom: parent.bottom
-                }
-            }
+        //             delegate: MissionExpand {
+        //                 //visible: missionItem.commandName !== "Takeoff"
+        //                 map:            editorMap
+        //                 masterController:  _planMasterController
+        //                 missionItem:    object
+        //                 width:          missionItemEditorListView.width
+        //                 readOnly:       false
+        //                 onClicked: (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false) }
+        //                 // MouseArea {
+        //                 //     anchors.fill: parent
+        //                 //     onClicked: {
+        //                 //         _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+        //                 //         missionItemDialog.currentMissionItem = object
+        //                 //         missionItemDialog.currentIndex = index
+        //                 //         missionItemDialog.open()
+        //                 //         missionItemDialog.visible = true
+        //                 //     }
+        //                 // }
+        //                 // onRemove: {
+        //                 //     var removeVIIndex = index
+        //                 //     _missionController.removeVisualItem(removeVIIndex)
+        //                 //     if (removeVIIndex >= _missionController.visualItems.count) {
+        //                 //         removeVIIndex--
+        //                 //     }
+        //                 // }
+        //                 //onSelectNextNotReadyItem:   selectNextNotReady()
+        //             }
+        //         }
+        //     }
 
-            QGCFlickable {
-                id: flickableEditor
-                anchors.top: drawerHeader.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                contentWidth: width
-                anchors.margins: 10
-                contentHeight: editorContent.implicitHeight
-                clip: true
-                flickableDirection: Flickable.VerticalFlick
+        //     GeoFenceEditor {
+        //         anchors.top:            rightControls.bottom
+        //         anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+        //         anchors.bottom:         parent.bottom
+        //         anchors.left:           parent.left
+        //         anchors.right:          parent.right
+        //         myGeoFenceController:   _geoFenceController
+        //         flightMap:              editorMap
+        //         visible:                _editingLayer == _layerGeoFence
+        //     }
 
-                Column {
-                    id: editorContent
-                    width: flickableEditor.width
+        //     // Rally Point Editor
+        //     RallyPointEditorHeader {
+        //         id:                     rallyPointHeader
+        //         anchors.top:            rightControls.bottom
+        //         anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+        //         anchors.left:           parent.left
+        //         anchors.right:          parent.right
+        //         visible:                _editingLayer == _layerRallyPoints
+        //         controller:             _rallyPointController
+        //     }
 
-                    MissionItemEditor {
-                        id: editor
-                        width: parent.width
-                        map: editorMap
-                        masterController: _planMasterController
-                        missionItem: missionItemDialog.currentMissionItem
-                        readOnly: false
+        //     RallyPointItemEditor {
+        //         id:                     rallyPointEditor
+        //         anchors.top:            rallyPointHeader.bottom
+        //         anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+        //         anchors.left:           parent.left
+        //         anchors.right:          parent.right
+        //         visible:                _editingLayer == _layerRallyPoints && _rallyPointController.points.count
+        //         rallyPoint:             _rallyPointController.currentRallyPoint
+        //         controller:             _rallyPointController
+        //     }
 
-                        onClicked: (sequenceNumber) => {
-                                       _missionController.setCurrentPlanViewSeqNum(missionItemDialog.currentMissionItem.sequenceNumber, false)
-                                   }
+        //     UTMSPAdapterEditor{
+        //         id: utmspEditor
+        //         enabled:                 _utmspEnabled
+        //         anchors.top:             rightControls.bottom
+        //         anchors.topMargin:       ScreenTools.defaultFontPixelHeight * 0.25
+        //         anchors.bottom:          parent.bottom
+        //         anchors.left:            parent.left
+        //         anchors.right:           parent.right
+        //         currentMissionItems:     _visualItems
+        //         myGeoFenceController:    _geoFenceController
+        //         flightMap:               editorMap
+        //         visible:                 _editingLayer == _layerUTMSP
+        //         triggerSubmitButton:     _triggerSubmit
+        //         resetRegisterFlightPlan: _resetRegisterFlightPlan
+        //     }
 
-                        onRemove: {
-                            var removeVIIndex = missionItemDialog.currentIndex
-                            _missionController.removeVisualItem(removeVIIndex)
-                            if (removeVIIndex >= _missionController.visualItems.count) {
-                                removeVIIndex--
-                            }
+        // }
 
-                            if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
-                                QGroundControl.saveGlobalSetting("waypoint", "waypoint")
-                                MapGlobals.waypoint="waypoint"
-                                returnWaypointEnabled=true
-                                waypointMark=true
-                            } else if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Takeoff"){
-                                QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
-                                mapclear()
-                            }
+        // QGCLabel {
+        //     // Elevation provider notice on top of terrain plot
+        //     readonly property string _licenseString: QGroundControl.elevationProviderNotice
 
-                            missionItemDialog.close()
-                        }
+        //     id:                         licenseLabel
+        //     visible:                    terrainStatus.visible && _licenseString !== ""
+        //     anchors.bottom:             terrainStatus.top
+        //     anchors.horizontalCenter:   terrainStatus.horizontalCenter
+        //     anchors.bottomMargin:       ScreenTools.defaultFontPixelWidth * 0.5
+        //     font.pointSize:             ScreenTools.smallFontPointSize
+        //     text:                       qsTr("Powered by %1").arg(_licenseString)
+        // }
 
-                        onSelectNextNotReadyItem: {
-                            selectNextNotReady()
-                        }
-                    }
-                }
-            }
-        }
+        // Popup {
+        //     id: missionItemDialog
+        //     width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+        //     height: ScreenTools.isMobile ? parent.height * 0.75 : 600
 
-        Popup {
-            id: geoFenceDrawer
-            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
-            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
-            
-            // Position in the bottom-right corner
-            x: parent.width - width - 20
-            property real targetY: parent.height - height - 20
-            y: targetY
-            
-            modal: false
-            dim: false
-            closePolicy: Popup.NoAutoClose
-            parent: Overlay.overlay
-            visible: _editingLayer == _layerGeoFence
-            onClosed: {
-                if (layerTabBar.currentIndex === 1) {
-                    layerTabBar.currentIndex = 0;
-                }
-            }
+        //     // Position in the bottom-right corner
+        //     x: parent.width - width - 20
+        //     property real targetY: parent.height - height - 20
+        //     y: targetY
 
-            // Slide animation from bottom
-            enter: Transition {
-                NumberAnimation { property: "y"; from: geoFenceDrawer.parent.height; to: geoFenceDrawer.targetY; duration: 350; easing.type: Easing.OutExpo }
-            }
-            exit: Transition {
-                NumberAnimation { property: "y"; to: geoFenceDrawer.parent.height; duration: 250; easing.type: Easing.InCubic }
-            }
+        //     modal: false
+        //     dim: false
+        //     closePolicy: Popup.NoAutoClose
+        //     parent: Overlay.overlay
 
-            background: Rectangle {
-                color:        "#BF000000" // Dark Transparent Black 75% alpha
-                radius:       15
-                border.color: "#3a3750"
-                border.width: 1
-            }
+        //     property int currentIndex: -1
+        //     property var currentMissionItem: null
 
-            Item {
-                id: geoFenceDrawerHeader
-                width: parent.width
-                height: 60
-                anchors.top: parent.top
-                
-                Text {
-                    text: qsTr("GeoFence Settings")
-                    font.pixelSize: 18
-                    font.bold: true
-                    color: "#e8e4f0"
-                    anchors.centerIn: parent
-                }
+        //     // Slide animation from bottom
+        //     enter: Transition {
+        //         NumberAnimation { property: "y"; from: missionItemDialog.parent.height; to: missionItemDialog.targetY; duration: 350; easing.type: Easing.OutExpo }
+        //     }
+        //     exit: Transition {
+        //         NumberAnimation { property: "y"; to: missionItemDialog.parent.height; duration: 250; easing.type: Easing.InCubic }
+        //     }
 
-                Rectangle {
-                    id: geoFenceCloseBtn
-                    width: 32
-                    height: 32
-                    radius: 16
-                    color: closeGeoArea.pressed ? "#3d3a50" : (closeGeoArea.containsMouse ? "#2e2b42" : "#1e1b2e")
-                    border.color: "#4a4560"
-                    border.width: 1
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: 15
-                    Behavior on color { ColorAnimation { duration: 100 } }
-                    
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/close.svg"
-                        color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
-                        width: 14
-                        height: 14
-                        anchors.centerIn: parent
-                        Behavior on color { ColorAnimation { duration: 100 } }
-                    }
+        //     background: Rectangle {
+        //         color:        "#BF000000" // Dark Transparent Black 75% alpha
+        //         radius:       15          // Rounded dialog corners (as shown in image)
+        //         border.color: "#3a3750"
+        //         border.width: 1
+        //     }
 
-                    MouseArea {
-                        id: closeGeoArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            geoFenceDrawer.close()
-                        }
-                    }
-                }
-                
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: "#3d3a50"
-                    anchors.bottom: parent.bottom
-                }
-            }
+        //     // Header Area
+        //     Item {
+        //         id: drawerHeader
+        //         width: parent.width
+        //         height: 60
+        //         anchors.top: parent.top
 
-            GeoFenceEditor {
-                id: geoFenceEditor
-                anchors.top: geoFenceDrawerHeader.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.margins: 10
-                myGeoFenceController: _geoFenceController
-                flightMap: editorMap
-            }
-        }
+        //         Text {
+        //             text: missionItemDialog.currentMissionItem ? missionItemDialog.currentMissionItem.commandName : "Edit Item"
+        //             font.pixelSize: 18
+        //             font.bold: true
+        //             color: "#e8e4f0"   // Light text on dark background
+        //             anchors.centerIn: parent
+        //         }
 
+        //         Rectangle {
+        //             id: closeBtn
+        //             width: 32
+        //             height: 32
+        //             radius: 16
+        //             color: closeBtnArea.pressed ? "#3d3a50" : (closeBtnArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+        //             border.color: "#4a4560"
+        //             border.width: 1
+        //             anchors.right: parent.right
+        //             anchors.verticalCenter: parent.verticalCenter
+        //             anchors.margins: 15
+        //             Behavior on color { ColorAnimation { duration: 100 } }
+
+        //             QGCColoredImage {
+        //                 source: "qrc:/InstrumentValueIcons/close.svg"
+        //                 color: closeBtnArea.containsMouse ? "#e0dcf8" : "#9898bb"
+        //                 width: 14
+        //                 height: 14
+        //                 anchors.centerIn: parent
+        //                 Behavior on color { ColorAnimation { duration: 100 } }
+        //             }
+
+        //             MouseArea {
+        //                 id: closeBtnArea
+        //                 anchors.fill: parent
+        //                 hoverEnabled: true
+        //                 cursorShape: Qt.PointingHandCursor
+        //                 onClicked: {
+        //                     missionItemDialog.close()
+        //                     mainWindow.showPlanView()
+        //                 }
+        //             }
+        //         }
+
+        //         // Subtle divider line
+        //         Rectangle {
+        //             width: parent.width
+        //             height: 1
+        //             color: "#3d3a50"
+        //             anchors.bottom: parent.bottom
+        //         }
+        //     }
+
+        //     QGCFlickable {
+        //         id: flickableEditor
+        //         anchors.top: drawerHeader.bottom
+        //         anchors.left: parent.left
+        //         anchors.right: parent.right
+        //         anchors.bottom: parent.bottom
+        //         contentWidth: width
+        //         anchors.margins: 10
+        //         contentHeight: editorContent.implicitHeight
+        //         clip: true
+        //         flickableDirection: Flickable.VerticalFlick
+
+        //         Column {
+        //             id: editorContent
+        //             width: flickableEditor.width
+
+        //             MissionItemEditor {
+        //                 id: editor
+        //                 width: parent.width
+        //                 map: editorMap
+        //                 masterController: _planMasterController
+        //                 missionItem: missionItemDialog.currentMissionItem
+        //                 readOnly: false
+
+        //                 onClicked: (sequenceNumber) => {
+        //                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+        //                            }
+
+        //                 onRemove: {
+        //                     var removeVIIndex = missionItemDialog.currentIndex
+        //                     _missionController.removeVisualItem(removeVIIndex)
+        //                     if (removeVIIndex >= _missionController.visualItems.count) {
+        //                         removeVIIndex--
+        //                     }
+
+        //                     if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
+        //                         QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+        //                         MapGlobals.waypoint="waypoint"
+        //                         returnWaypointEnabled=true
+        //                         waypointMark=true
+        //                     } else if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Takeoff"){
+        //                         QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
+        //                         mapclear()
+        //                     }
+
+        //                     missionItemDialog.close()
+        //                 }
+
+        //                 onSelectNextNotReadyItem: {
+        //                     selectNextNotReady()
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // Popup {
+        //     id: geoFenceDrawer
+        //     width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+        //     height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+
+        //     // Position in the bottom-right corner
+        //     x: parent.width - width - 20
+        //     property real targetY: parent.height - height - 20
+        //     y: targetY
+
+        //     modal: false
+        //     dim: false
+        //     closePolicy: Popup.NoAutoClose
+        //     parent: Overlay.overlay
+        //     visible: _editingLayer == _layerGeoFence
+        //     onClosed: {
+        //         if (layerTabBar.currentIndex === 1) {
+        //             layerTabBar.currentIndex = 0;
+        //         }
+        //     }
+
+        //     // Slide animation from bottom
+        //     enter: Transition {
+        //         NumberAnimation { property: "y"; from: geoFenceDrawer.parent.height; to: geoFenceDrawer.targetY; duration: 350; easing.type: Easing.OutExpo }
+        //     }
+        //     exit: Transition {
+        //         NumberAnimation { property: "y"; to: geoFenceDrawer.parent.height; duration: 250; easing.type: Easing.InCubic }
+        //     }
+
+        //     background: Rectangle {
+        //         color:        "#BF000000" // Dark Transparent Black 75% alpha
+        //         radius:       15
+        //         border.color: "#3a3750"
+        //         border.width: 1
+        //     }
+
+        //     Item {
+        //         id: geoFenceDrawerHeader
+        //         width: parent.width
+        //         height: 60
+        //         anchors.top: parent.top
+
+        //         Text {
+        //             text: qsTr("GeoFence Settings")
+        //             font.pixelSize: 18
+        //             font.bold: true
+        //             color: "#e8e4f0"
+        //             anchors.centerIn: parent
+        //         }
+
+        //         Rectangle {
+        //             id: geoFenceCloseBtn
+        //             width: 32
+        //             height: 32
+        //             radius: 16
+        //             color: closeGeoArea.pressed ? "#3d3a50" : (closeGeoArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+        //             border.color: "#4a4560"
+        //             border.width: 1
+        //             anchors.right: parent.right
+        //             anchors.verticalCenter: parent.verticalCenter
+        //             anchors.rightMargin: 15
+        //             Behavior on color { ColorAnimation { duration: 100 } }
+
+        //             QGCColoredImage {
+        //                 source: "qrc:/InstrumentValueIcons/close.svg"
+        //                 color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
+        //                 width: 14
+        //                 height: 14
+        //                 anchors.centerIn: parent
+        //                 Behavior on color { ColorAnimation { duration: 100 } }
+        //             }
+
+        //             MouseArea {
+        //                 id: closeGeoArea
+        //                 anchors.fill: parent
+        //                 hoverEnabled: true
+        //                 cursorShape: Qt.PointingHandCursor
+        //                 onClicked: {
+        //                     geoFenceDrawer.close()
+        //                 }
+        //             }
+        //         }
+
+        //         Rectangle {
+        //             width: parent.width
+        //             height: 1
+        //             color: "#3d3a50"
+        //             anchors.bottom: parent.bottom
+        //         }
+        //     }
+
+        //     GeoFenceEditor {
+        //         id: geoFenceEditor
+        //         anchors.top: geoFenceDrawerHeader.bottom
+        //         anchors.left: parent.left
+        //         anchors.right: parent.right
+        //         anchors.bottom: parent.bottom
+        //         anchors.margins: 10
+        //         myGeoFenceController: _geoFenceController
+        //         flightMap: editorMap
+        //     }
+        // }
 
         // Item {
         //     id: editdata
@@ -2154,11 +2327,11 @@ Item {
         id: missionActionsPopup
         width: ScreenTools.defaultFontPixelWidth * 45
         height: 60
-        
+
         x: (parent.width - width) / 2
         property real targetY: parent.height - height - 80 // Anchor exactly above the bottom tab bar
         y: targetY
-        
+
         modal: false    // So user can still click map while open
         dim: false
 
@@ -2175,7 +2348,7 @@ Item {
 
         contentItem: RowLayout {
             spacing: 12
-            
+
             Repeater {
                 model: {
                     var actions = [ { "text": qsTr("Mission Start"), "action": "start" } ]
@@ -2371,6 +2544,7 @@ Item {
             }
         }
     }
+
     PlanViewToolBar {
         id:                     planToolBar
         planMasterController:   _planMasterController

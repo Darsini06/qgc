@@ -969,11 +969,14 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+
                         var frameType = QGroundControl.loadBoolGlobalSetting("frametypeDialog", false)
                         var videoSettings = QGroundControl.settingsManager.videoSettings
                         var videoSourceFact = videoSettings.videoSource
 
                         if (activeVehicle) {
+
+                            console.log("Inside the active Vehicle",frameType)
 
                             if (!activeVehicle.parameterManager.parametersReady){
                                 mainWindow.showToastMessage("Plese Wait Vehicle parameters are still loading...")
@@ -981,10 +984,13 @@ Item {
                             }
 
                             if (!frameType) {
+                                console.log("Frame Dialog Open",frameType)
                                 QGroundControl.saveBoolGlobalSetting("frametypeDialog", true)
                                 showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type")
 
                             } else {
+                                console.log("Frame Dialog not open",frameType)
+                                QGroundControl.saveGlobalSetting("loadpage", "Agri")
                                 mainWindow.updateAppTheme("Agri")
 
                                 mainWindow.showFlyView()
@@ -1024,6 +1030,7 @@ Item {
                         }
                     }
                 }
+
             }
 
             // Click to Mapping
@@ -1099,11 +1106,13 @@ Item {
             }
         }
     }
+
     function showDynamicCalibrationDialog(qmlFile,title) {
         dynamicCalDialog.dialogTitleText = title
         dialogLoader.source = qmlFile
         dynamicCalDialog.open()
     }
+
     // Logout Dialog Component
     Component {
         id: logoutdialog

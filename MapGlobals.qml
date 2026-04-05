@@ -1,4 +1,4 @@
- pragma Singleton
+pragma Singleton
 
 import QtQuick
 import QGroundControl
@@ -38,6 +38,15 @@ QtObject {
     property bool share_edit_visibility : false
 
     signal newSessionAdded()
+    
+    // Grid lines setting for Map Items
+    property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
+    
+    function setGridLines(value) {
+        gridLines = value
+        QGroundControl.saveBoolGlobalSetting("gridLines", value)
+        console.log("gridLines" , value)
+    }
 
     //MainRootWindow reference variables.
     property var rootWindow
@@ -299,9 +308,9 @@ QtObject {
                         var db = getDatabase();
                         db.transaction(function(tx) {
                             tx.executeSql(
-                                "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
-                                [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
-                            );
+                                        "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
+                                        [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
+                                        );
                         });
                     }
                     if (callback) callback(true, responseData);
@@ -442,9 +451,9 @@ QtObject {
                     var db = getDatabase();
                     db.transaction(function(tx) {
                         var rs = tx.executeSql(
-                            "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
-                            [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
-                        );
+                                    "UPDATE users SET username = ?, displayname = ?, email = ?, mobile_number = ?, rpc_completed = ? WHERE username = ?",
+                                    [new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, old_userName]
+                                    );
                         if (rs.rowsAffected > 0) {
                             console.log("Local user database updated successfully");
                         }
@@ -712,17 +721,17 @@ QtObject {
                         var db = getDatabase();
                         db.transaction(function(tx) {
                             tx.executeSql(
-                                "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
-                                [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
-                            );
+                                        "INSERT OR REPLACE INTO users (username, displayname, email, password, mobile_number, rpc_completed) VALUES (?, ?, ?, ?, ?, ?)",
+                                        [user.username, user.displayname, user.email, user.password, user.mobile_number || "", user.rpc_completed || 0]
+                                        );
                         });
 
-                    if (rootWindow) {
-                        rootWindow.homescreen();
-                        rootWindow.showToastMessage("Login Successfully");
-                    } else {
-                        console.error("MapGlobals: rootWindow is null, cannot navigate to homescreen");
-                    }
+                        if (rootWindow) {
+                            rootWindow.homescreen();
+                            rootWindow.showToastMessage("Login Successfully");
+                        } else {
+                            console.error("MapGlobals: rootWindow is null, cannot navigate to homescreen");
+                        }
                         login = "login";
 
                         if (callback) callback(true);
