@@ -44,6 +44,9 @@ Item {
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
     }
+    function toggleIcons() {
+        iconsContainer.visible = !iconsContainer.visible
+    }
 
     // MAIN COLUMN: Action Buttons on top, Slider below
     Column {

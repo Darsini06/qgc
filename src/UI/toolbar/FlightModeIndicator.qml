@@ -38,12 +38,13 @@ RowLayout {
 
         QGCColoredImage {
             id:         flightModeIcon
-            width:      ScreenTools.defaultFontPixelWidth * 2.3
+            width:      0
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true
             color:      "white"
             source:     "/qmlimages/FlightModesComponentIcon.png"
+            visible:    false
         }
 
         QGCLabel {

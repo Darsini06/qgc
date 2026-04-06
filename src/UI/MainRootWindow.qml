@@ -1440,7 +1440,7 @@ ApplicationWindow {
             height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
             radius: height / 2   // pill/capsule shaped
             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
-            visible: activeVehicle
+            visible: false // Only visible in toolbar per user request
 
             border.width: 0
             border.color:  "transparent"

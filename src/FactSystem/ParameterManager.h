@@ -72,7 +72,7 @@ public:
     /// Returns true if the specifed parameter exists
     ///     @param componentId: Component id or ParameterManager::defaultComponentId
     ///     @param name: Parameter name
-    bool parameterExists(int componentId, const QString& paramName);
+    Q_INVOKABLE bool parameterExists(int componentId, const QString& paramName);
 
     /// Returns all parameter names
     QStringList parameterNames(int componentId);
@@ -81,7 +81,7 @@ public:
     /// a missing parameter error to user if parameter does not exist.
     ///     @param componentId: Component id or ParameterManager::defaultComponentId
     ///     @param name: Parameter name
-    Fact* getParameter(int componentId, const QString& paramName);
+    Q_INVOKABLE Fact* getParameter(int componentId, const QString& paramName);
 
     /// Returns error messages from loading
     QString readParametersFromStream(QTextStream& stream);
