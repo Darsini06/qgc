@@ -293,7 +293,6 @@ Item {
         planMasterController:       _planMasterController
     }
 
-
     Connections {
         target: _appSettings ? _appSettings.defaultMissionItemAltitude : null
         function onRawValueChanged() {
@@ -557,7 +556,6 @@ Item {
         }
     }
 
-
     Connections {
         target: _missionController
 
@@ -610,11 +608,11 @@ Item {
         }
     }
 
-    QGCMapPolygonVisuals {
-        id:                     filename
-        cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
-        cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
-    }
+    // QGCMapPolygonVisuals {
+    //     id:                     filename
+    //     cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
+    //     cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
+    // }
 
     QGCFileDialog {
         id:             fileDialog
@@ -623,6 +621,7 @@ Item {
         property bool planFiles: true    ///< true: working with plan files, false: working with kml file
 
         onAcceptedForSave: (file) => {
+                               console.log("Clicke Files at onAcceptedForSave")
                                if (planFiles) {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
@@ -639,6 +638,8 @@ Item {
                            }
 
         onAcceptedForLoad: (file) => {
+                               console.log("Click Files at onAcceptedForLoad")
+                                MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
@@ -649,11 +650,9 @@ Item {
                            }
     }
 
-
     AirspaceRestrictionDialog {
         id: _airspaceRestrictionDialog
     }
-
 
     Item {
         id:             panel
@@ -661,6 +660,8 @@ Item {
         anchors.right:  parent.right
         anchors.top:    parent.top
         anchors.bottom: parent.bottom
+
+
 
         FlightMap {
             id:                         editorMap
@@ -741,6 +742,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
+                    visible:     MapGlobals.gridLines
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
@@ -1112,11 +1114,14 @@ Item {
             }
             color:              qgcPal.window
             opacity:            layerTabBar.visible ? 0.2 : 0
+            anchors.top: parent.top
             anchors.bottom:     parent.bottom
             anchors.right:      parent.right
             anchors.rightMargin: _toolsMargin
             visible:            _editingLayer != _layerMission
         }
+
+
         // //-------------------------------------------------------
         // // Right Panel Controls
 
@@ -1425,7 +1430,14 @@ Item {
 
                 }
 
-
+        QGCMapPolygonVisuals {
+                id: filename
+                anchors.top: rightPanel.bottom          // ← below rightPanel
+                anchors.right: parent.right
+                anchors.rightMargin: _toolsMargin
+                // cardinalBottomScreenY: planToolBar.y + planToolBar.height + 12
+                // cardinalLeftScreenX: (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
+            }
         // Popup {
         //     id: missionItemDialog
         //     width: ScreenTools.isMobile ? parent.width * 0.45 : 450

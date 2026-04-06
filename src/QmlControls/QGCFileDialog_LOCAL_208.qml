@@ -47,10 +47,8 @@ Item {
             if(MapGlobals.save==="save1"){
                 //savefiledialog.createObject(mainWindow).open()
                 savefiledialog.createObject(mainWindow, {
-
                                     userName: _appSettings.username
                                 }).open()
-
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
                 var strippedFileName1=_appSettings.username
@@ -158,7 +156,6 @@ Item {
             buttons:    Dialog.Cancel
 
             property bool showAllFiles: false
-
                         property var  fullFileList: []
                         property var  displayList: []
 
@@ -176,14 +173,13 @@ Item {
                         Component.onCompleted: refreshFiles()
 
 
-
             Column {
                 id:         fileOpenColumn
                 width:      parent.width
                 spacing:    20
 
-                QGCLabel {
-                    text:   qsTr("Path: %1").arg(_mobileShortPath)
+                QGCLabel { 
+                    text:   qsTr("Path: %1").arg(_mobileShortPath) 
                     color:  "black"
                     font.pointSize: ScreenTools.smallFontPointSize
                     font.bold: true
@@ -197,7 +193,7 @@ Item {
                     border.width:   1
                     radius:         8
                     clip:           true
-
+                    
                     Column {
                         id:             fileListColumn
                         width:          parent.width
@@ -272,7 +268,6 @@ Item {
                     }
 
 
-
                 }
 
                 Button {
@@ -323,12 +318,11 @@ Item {
 
             onAccepted: {
                 var strippedFileName1 = userName
-
-                console.log("data saved name:",strippedFileName1)
-                if (strippedFileName1 == "") {
-                    mobileFileSaveDialog.preventClose = true
-                    return
-                }
+                                console.log("data saved name:",strippedFileName1)
+                                if (strippedFileName1 == "") {
+                                    mobileFileSaveDialog.preventClose = true
+                                    return
+                                }
                 _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
                 popup.visible = false
             }
@@ -356,6 +350,8 @@ Item {
             }
         }
     }
+
+
     Component {
         id: mobileFileSaveDialogComponent
 
@@ -490,87 +486,100 @@ Item {
     }
 
     Component {
-        id: filename
+                id: filename
 
-        QGCPopupDialog {
-            id:         mobileFileSaveDialog
-            title:      _root.title
-            buttons:    Dialog.Cancel | Dialog.Ok
+                QGCPopupDialog {
+                    id:         mobileFileSaveDialog
+                    title:      _root.title
+                    buttons:    Dialog.Cancel | Dialog.Ok
 
-            onAccepted: {
-                if (filenameTextField.text.length < 3 || filenameTextField1.text.length < 3 || filenameTextField2.text.length < 3) {
-                    mobileFileSaveDialog.preventClose = true
-                    return
-                }
+                    onAccepted: {
+                        if (filenameTextField.text.length < 3 || filenameTextField1.text.length < 3 || filenameTextField2.text.length < 3) {
+                                mobileFileSaveDialog.preventClose = true
+                                return
+                            }
 
-                let concatenatedText = filenameTextField.text.substring(0, 3) +
-                    filenameTextField1.text.substring(0, 3) +
-                    filenameTextField2.text.substring(0, 3);
+                        let concatenatedText = filenameTextField.text.substring(0, 3) +
+                                                   filenameTextField1.text.substring(0, 3) +
+                                                   filenameTextField2.text.substring(0, 3);
 
 
-                _appSettings.username = concatenatedText;
-                console.log(concatenatedText);
+    _appSettings.username = concatenatedText;
+                           console.log(concatenatedText);
 
-                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
 
-            }
+                            // if (filenameTextField.text == "") {
+                            //     mobileFileSaveDialog.preventClose = true
+                            //     return
+                            // }
+                            // if (!replaceMessage.visible) {
+                            //     if (controller.fileExists(controller.fullyQualifiedFilename(folder, filenameTextField.text, _rgExtensions))) {
+                            //         replaceMessage.visible = true
+                            //         mobileFileSaveDialog.preventClose = true
+                            //         return
+                            //     }
+                            // }
+                            _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
 
-            onRejected:{
-                mainWindow.filename()
-            }
 
-            Column {
-                id:         fileSaveColumn
-                width:      parent.width
-                spacing:    ScreenTools.defaultFontPixelHeight / 2
 
-                RowLayout {
-                    anchors.left:   parent.left
-                    anchors.right:  parent.right
-                    spacing:        ScreenTools.defaultFontPixelWidth
-
-                    QGCLabel { text: qsTr("File name:") }
-
-                    QGCTextField {
-                        id:                 filenameTextField
-                        Layout.fillWidth:   true
-                        onTextChanged:      replaceMessage.visible = false
                     }
-                }
-
-                RowLayout {
-                    anchors.left:   parent.left
-                    anchors.right:  parent.right
-                    spacing:        ScreenTools.defaultFontPixelWidth
-
-                    QGCLabel { text: qsTr("Mobile Number:") }
-
-                    QGCTextField {
-                        id:                 filenameTextField1
-                        Layout.fillWidth:   true
-                        validator:          RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
-                        inputMethodHints:   Qt.ImhDigitsOnly
-                        onTextChanged:      replaceMessage.visible = false
+                    onRejected:{
+        mainWindow.filename()
                     }
+
+                    Column {
+                        id:         fileSaveColumn
+                        width:      parent.width
+                        spacing:    ScreenTools.defaultFontPixelHeight / 2
+
+                        RowLayout {
+                            anchors.left:   parent.left
+                            anchors.right:  parent.right
+                            spacing:        ScreenTools.defaultFontPixelWidth
+
+                            QGCLabel { text: qsTr("File name:") }
+
+                            QGCTextField {
+                                id:                 filenameTextField
+                                Layout.fillWidth:   true
+                                onTextChanged:      replaceMessage.visible = false
+                            }
+                        }
+
+                        RowLayout {
+                            anchors.left:   parent.left
+                            anchors.right:  parent.right
+                            spacing:        ScreenTools.defaultFontPixelWidth
+
+                            QGCLabel { text: qsTr("Mobile Number:") }
+
+                            QGCTextField {
+                                id:                 filenameTextField1
+                                Layout.fillWidth:   true
+                                validator:          RegularExpressionValidator { regularExpression: /^[0-9]{0,10}$/ }
+                                inputMethodHints:   Qt.ImhDigitsOnly
+                                onTextChanged:      replaceMessage.visible = false
+                            }
+                        }
+
+                        RowLayout {
+                            anchors.left:   parent.left
+                            anchors.right:  parent.right
+                            spacing:        ScreenTools.defaultFontPixelWidth
+
+                            QGCLabel { text: qsTr("Ground name:") }
+
+                            QGCTextField {
+                                id:                 filenameTextField2
+                                Layout.fillWidth:   true
+                                onTextChanged:      replaceMessage.visible = false
+                            }
+                        }
+
+                        }
                 }
-
-                RowLayout {
-                    anchors.left:   parent.left
-                    anchors.right:  parent.right
-                    spacing:        ScreenTools.defaultFontPixelWidth
-
-                    QGCLabel { text: qsTr("Ground name:") }
-
-                    QGCTextField {
-                        id:                 filenameTextField2
-                        Layout.fillWidth:   true
-                        onTextChanged:      replaceMessage.visible = false
-                    }
-                }
-
             }
-        }
-    }
 
 
 
@@ -739,22 +748,19 @@ Item {
                                 width: 125
                                 height: 36
                                 onClicked: {
-
-                                    MapGlobals.setGridLines(false)
-
                                     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                                         if (nameField.text.length < 3 ) {
-                                            mobileFileSaveDialog.preventClose = true
-                                            return
-                                        }
+                                                mobileFileSaveDialog.preventClose = true
+                                                return
+                                            }
                                         let concatenatedText = nameField.text.substring(0, 10);
                                         _appSettings.username = concatenatedText;
                                         _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
                                     } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
                                         if (nameField.text.length < 3 ) {
-                                            mobileFileSaveDialog.preventClose = true
-                                            return
-                                        }
+                                                mobileFileSaveDialog.preventClose = true
+                                                return
+                                            }
                                         let concatenatedText = nameField.text.substring(0, 10);
                                         _appSettings.username = concatenatedText;
                                         _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
@@ -786,4 +792,5 @@ Item {
             }
         }
     }
+
 }

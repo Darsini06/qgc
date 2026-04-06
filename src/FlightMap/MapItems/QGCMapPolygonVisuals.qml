@@ -1338,7 +1338,7 @@ Item {
                 }
             }
 
-            //only for Mapping
+            //only for mapping
             Column {
                 anchors.right:  parent.right
                 anchors.rightMargin: _root.cardinalLeftScreenX + 7
@@ -1346,6 +1346,11 @@ Item {
                 z: 2000
                 spacing: 8
                 visible: mapping
+
+                Item {
+                    width: buttonSize
+                    height: buttonSize + 8  // 2 button heights + spacing gap
+                }
 
                 Button {
                     id: boundryMarkingBtn1
@@ -1710,20 +1715,20 @@ Item {
                     filenameTextField1.text.substring(0, 3) +
                     filenameTextField2.text.substring(0, 3);
 
-
                 _appSettings.username = concatenatedText;
                 console.log(concatenatedText);
                 console.log("confirm action");
 
-
+                MapGlobals.setGridLines(false)
 
                 _saveCurrentVertices()
+
                 _circleMode = false
                 mapPolygon.traceMode = true
                 mapPolygon.clear();
             }
-            onRejected: mainWindow.showFlyView()
 
+            onRejected: mainWindow.showFlyView()
 
             Rectangle {
                 width: 400
@@ -2109,6 +2114,7 @@ Item {
                                 height: 36
                                 onClicked: {
                                     QGroundControl.saveGlobalSetting("load", "load")
+
                                     customDialog.close()
                                     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                                         mainWindow.showFlyView()
@@ -2155,10 +2161,13 @@ Item {
                                 height: 36
                                 onClicked: {
                                     QGroundControl.saveGlobalSetting("load", "load1")
+
                                     if (nameField.text.length < 3) {
                                         mainWindow.showToastMessage(qsTr("Please enter a valid project name"))
                                         return
                                     }
+
+                                    MapGlobals.setGridLines(false)
 
                                     let concatenatedText = nameField.text.substring(0, 10)
                                     _appSettings.username = concatenatedText
