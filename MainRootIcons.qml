@@ -52,17 +52,10 @@ Item {
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
     }
+
     function toggleIcons() {
         iconsContainer.visible = !iconsContainer.visible
     }
-
-    function toggleIcons() {
-         if (iconsContainer.opened) {
-             iconsContainer.close();
-         } else {
-             iconsContainer.open();
-         }
-     }
 
     // MAIN COLUMN: Action Buttons on top, Slider below
     Column {
@@ -316,22 +309,22 @@ Item {
                             MapIconColumn {
                                 label: qsTr("Default")
                                 typeNameSuffix: "street"
-                                iconSource: "map_default.jpg"
+                                iconSource: "map_default.jpeg"
                             }
                             MapIconColumn {
                                 label: qsTr("Satellite")
                                 typeNameSuffix: "satellite"
-                                iconSource: "map_satellite.jpg"
+                                iconSource: "map_satellite.jpeg"
                             }
                             MapIconColumn {
                                 label: qsTr("Terrain")
                                 typeNameSuffix: "terrain"
-                                iconSource: "map_terrain.jpg"
+                                iconSource: "map_terrain.jpeg"
                             }
                             MapIconColumn {
                                 label: qsTr("Hybrid")
                                 typeNameSuffix: "hybrid"
-                                iconSource: "map_hybrid.jpg"
+                                iconSource: "map_hybrid.jpeg"
                             }
                         }
                     }
