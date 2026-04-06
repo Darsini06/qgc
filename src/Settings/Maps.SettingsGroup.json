@@ -19,8 +19,8 @@
     "units":                "MB",
     "min":                  1,
     "max":                  1024,
-    "default":              128,
-    "mobileDefault":        16,
+    "default":              256,
+    "mobileDefault":        128,
     "qgcRebootRequired":    true
 }
 ]

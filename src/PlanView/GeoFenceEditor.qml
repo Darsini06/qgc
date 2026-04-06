@@ -32,6 +32,8 @@ QGCFlickable {
     readonly property color _colorTextSecondary:"#8e8e93"
     readonly property color _colorDanger:       "#FF453A"
     readonly property color _colorDangerDark:   "#C42B2B"
+    readonly property bool  isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    readonly property color _agriGreen:        "#79AE6F"
 
     Component {
         id: volumeSliderComponent
@@ -314,13 +316,13 @@ QGCFlickable {
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
+                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
                             }
                             contentItem: Text {
-                                text: qsTr("Polygon Fence")
+                                text: qsTr("Inclusion Poly")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 11
+                                font.pointSize: 10
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -337,13 +339,42 @@ QGCFlickable {
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
+                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
                             }
                             contentItem: Text {
-                                text: qsTr("Circular Fence")
+                                text: qsTr("Obstacle Poly")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 11
+                                font.pointSize: 10
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: {
+                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
+                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
+                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                myGeoFenceController.addExclusionPolygon(topLeftCoord, bottomRightCoord)
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        spacing: _margin
+
+                        Button {
+                            Layout.fillWidth:   true
+                            height: 40
+                            background: Rectangle {
+                                radius: _radius
+                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                            }
+                            contentItem: Text {
+                                text: qsTr("Inclusion Circle")
+                                color: "white"
+                                font.bold: true
+                                font.pointSize: 10
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -352,6 +383,29 @@ QGCFlickable {
                                 var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
                                 var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
                                 myGeoFenceController.addInclusionCircle(topLeftCoord, bottomRightCoord)
+                            }
+                        }
+
+                        Button {
+                            Layout.fillWidth:   true
+                            height: 40
+                            background: Rectangle {
+                                radius: _radius
+                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                            }
+                            contentItem: Text {
+                                text: qsTr("Obstacle Circle")
+                                color: "white"
+                                font.bold: true
+                                font.pointSize: 10
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            onClicked: {
+                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
+                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
+                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                myGeoFenceController.addExclusionCircle(topLeftCoord, bottomRightCoord)
                             }
                         }
                     }

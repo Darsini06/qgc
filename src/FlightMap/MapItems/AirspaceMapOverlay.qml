@@ -31,6 +31,8 @@ Item {
     visible: showAirspace && airspaceManager
 
     property bool _isMapMoving: false
+    property var  _lastFetchCenter: QtPositioning.coordinate(0, 0)
+    property real _lastFetchZoom:   0
 
     // Timer to reset moving state
     Timer {
@@ -83,7 +85,7 @@ Item {
     // Debounce timer for fetching airspace data
     Timer {
         id: _fetchTimer
-        interval: 2000 // Increased further for even better "fast action" performance
+        interval: 500 // Faster fetching for better responsiveness
         repeat: false
         onTriggered: {
             if (map && airspaceManager) {
@@ -289,7 +291,7 @@ Item {
         }
     }
 
-    // Error message (UI Overlay)
+    // Error message (UI Overlay) - Suppressed as per user request
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
@@ -300,7 +302,7 @@ Item {
         color: Qt.rgba(0.8, 0, 0, 0.9)
         border.color: "red"
         border.width: 2
-        visible: airspaceManager && airspaceManager.errorMessage !== ""
+        visible: false // airspaceManager && airspaceManager.errorMessage !== ""
 
         QGCLabel {
             id: _errorLabel

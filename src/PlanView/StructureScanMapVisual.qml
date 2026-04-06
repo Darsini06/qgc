@@ -41,15 +41,19 @@ Item {
 
     QGCDynamicObjectManager { id: objMgr }
 
+    property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    property color _themeColor: _isAgri ? "#79AE6F" : "#808080"
+    property color _themeBorder: _isAgri ? Qt.darker("#79AE6F", 1.2) : "black"
+
     QGCMapPolygonVisuals {
         mapControl:         map
         mapPolygon:         _structurePolygon
         interactive:        _missionItem.isCurrentItem && _root.interactive
-        borderWidth:        1
-        borderColor:        "black"
-        interiorColor:      "green"
+        borderWidth:        _missionItem.isCurrentItem ? 4 : 2
+        borderColor:        _missionItem.isCurrentItem ? "white" : _themeBorder
+        interiorColor:      _themeColor
         altColor:           "red"
-        interiorOpacity:    0.5 * _root.opacity
+        interiorOpacity:    (_missionItem.isCurrentItem ? 0.35 : 0.15) * _root.opacity
     }
 
     QGCMapPolygonVisuals {

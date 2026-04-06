@@ -193,6 +193,7 @@ private:
     // Network methods
     void _fetchFromServer(const QString& bbox);
     void _parseGeoJsonResponse(const QByteArray& data);
+    void _processParsedJson(const QJsonDocument& doc);
     AirspaceZone* _parseGeoJsonFeature(const QJsonObject& feature);
 
     // Database methods

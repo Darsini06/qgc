@@ -1,17 +1,19 @@
 import QtQuick
 import QtQuick.Controls
-
+import QGroundControl
 import QGroundControl.Palette
 import QGroundControl.ScreenTools
 
 Menu {
     id: menu
 
+    property bool isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+
     background: Rectangle {
         implicitWidth:  ScreenTools.defaultFontPixelWidth * 12
         implicitHeight: 40
         color:          "#FFFFFF"
-        border.color:   "#301934"
+        border.color:   isAgri ? "#79AE6F" : "#808080"
         border.width:   1
         radius:         8
     }
@@ -35,7 +37,7 @@ Menu {
         background: Rectangle {
             implicitWidth:  ScreenTools.defaultFontPixelWidth * 12
             implicitHeight: 40
-            color:          menuItem.highlighted ? "#301934" : "transparent"
+            color:          menuItem.highlighted ? (isAgri ? "#79AE6F" : "#808080") : "transparent"
             radius:         6
         }
     }

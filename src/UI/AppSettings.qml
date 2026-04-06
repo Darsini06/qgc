@@ -27,6 +27,7 @@ Rectangle {
     readonly property real _horizontalMargin:   _defaultTextWidth / 2
     readonly property real _verticalMargin:     _defaultTextHeight / 2
     readonly property real _buttonHeight:       ScreenTools.isTinyScreen ? ScreenTools.defaultFontPixelHeight * 3 : ScreenTools.defaultFontPixelHeight * 2
+    readonly property bool _isNarrow:           width < ScreenTools.defaultFontPixelWidth * 100
 
     property bool _first: true
 
@@ -59,7 +60,7 @@ Rectangle {
 
     QGCFlickable {
         id:                 buttonList
-        width:              buttonColumn.width
+        width:              _isNarrow ? ScreenTools.defaultFontPixelHeight * 3 : buttonColumn.width
         anchors.topMargin:  _verticalMargin
         anchors.top:        parent.top
         anchors.bottom:     parent.bottom
@@ -71,6 +72,7 @@ Rectangle {
 
         ColumnLayout {
             id:         buttonColumn
+            width:      _isNarrow ? parent.width : undefined
             spacing:    ScreenTools.defaultFontPixelHeight / 4
 
             property real _maxButtonWidth: 0
@@ -80,6 +82,7 @@ Rectangle {
                 model:  settingsPagesModel
 
                 Button {
+                    id:                 menuButton
                     Layout.fillWidth:   true
                     text:               name
                     padding:            ScreenTools.defaultFontPixelWidth / 2
@@ -96,20 +99,23 @@ Rectangle {
 
                     contentItem: RowLayout {
                         spacing: ScreenTools.defaultFontPixelWidth
+                        Layout.alignment: Qt.AlignVCenter
 
                         QGCColoredImage {
                             source: iconUrl
-                            color:  displayText.color
-                            width:  ScreenTools.defaultFontPixelHeight
-                            height: ScreenTools.defaultFontPixelHeight
+                            color:  menuButton.checked || menuButton.pressed ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                            width:  ScreenTools.defaultFontPixelHeight * 1.5
+                            height: ScreenTools.defaultFontPixelHeight * 1.5
+                            Layout.alignment: Qt.AlignVCenter
                         }
 
                         QGCLabel {
                             id:                     displayText
                             Layout.fillWidth:       true
                             text:                   name
-                            color:                  checked || pressed ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                            color:                  menuButton.checked || menuButton.pressed ? qgcPal.buttonHighlightText : qgcPal.buttonText
                             horizontalAlignment:    QGCLabel.AlignLeft
+                            visible:                !_isNarrow
                         }
                     }
 
@@ -168,6 +174,13 @@ Rectangle {
         anchors.right:          parent.right
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom
+
+        onLoaded: {
+            if (item.hasOwnProperty("_isNarrow")) {
+                item._isNarrow = settingsView._isNarrow
+            }
+        }
     }
 }
+
 

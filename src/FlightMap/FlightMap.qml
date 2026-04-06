@@ -27,9 +27,20 @@ import QGroundControl.QGCPositionManager
 Map {
     id: _map
 
-    plugin:              Plugin { name: "QGroundControl" }
-    opacity:             0.99
-    // prefetchingEnabled:  true  // Not supported in Qt 6.6+ Map or causing issues
+    plugin:             Plugin { name: "QGroundControl" }
+    opacity:            1.0
+
+    // Behind map to avoid white flashes
+    Rectangle {
+        anchors.fill:   parent
+        color:          "#333333"
+        z:              -1
+    }
+
+    Behavior on zoomLevel {
+        enabled:         !pinch.active && !dragHandler.active
+        NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+    }
 
     bearing: MapGlobals.mapRotation
 
@@ -43,7 +54,7 @@ Map {
     property bool   firstVehiclePositionReceived:   false   ///< true: first vehicle position update was responded to
     property bool   planView:                       false   ///< true: map being using for Plan view, items should be draggable
 
-    readonly property real  maxZoomLevel: 20
+    readonly property real  maxZoomLevel: 22
 
     Component.onCompleted: {
         MapGlobals.activeFlightMap = this
@@ -219,7 +230,8 @@ Map {
     }
 
     DragHandler {
-        target: null
+        id:             dragHandler
+        target:         null
         grabPermissions: PointerHandler.TakeOverForbidden
 
         onActiveChanged: {

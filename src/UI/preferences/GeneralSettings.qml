@@ -69,8 +69,7 @@ SettingsPage {
         Layout.fillWidth:   true
         Layout.alignment:   Qt.AlignLeft
         Layout.leftMargin:  ScreenTools.defaultFontPixelWidth * 2
-        Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 15 // Absolute maximum margin to force visibility
-        Layout.maximumWidth: root.width > 200 ? root.width - 250 : 800 // Account for sidebar and scrollbar
+        Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 2
         spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight / 2 : ScreenTools.defaultFontPixelHeight
 
         Text {
@@ -141,7 +140,7 @@ SettingsPage {
 
             GridLayout {
                 Layout.fillWidth: true
-                columns:          3
+                columns:          _isNarrow ? 1 : 2
                 columnSpacing:    20
                 rowSpacing:       10
 
@@ -314,7 +313,7 @@ SettingsPage {
 
                 GridLayout {
                     Layout.fillWidth: true
-                    columns:          3
+                    columns:          _isNarrow ? 1 : 2
                     columnSpacing:    20
                     rowSpacing:       10
 
@@ -482,7 +481,7 @@ SettingsPage {
 
             GridLayout {
                 Layout.fillWidth: true
-                columns:          3
+                columns:          _isNarrow ? 1 : 2
                 columnSpacing:    20
                 rowSpacing:       10
                 visible:          _videoSettings.videoSource.visible

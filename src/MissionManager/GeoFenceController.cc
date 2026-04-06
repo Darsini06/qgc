@@ -414,22 +414,24 @@ void GeoFenceController::addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoordin
     // Initial polygon is inset to take 3/4s of viewport with max width/height of 3000 meters
     halfWidthMeters =   qMin(halfWidthMeters * 0.75, 1500.0);
     halfHeightMeters =  qMin(halfHeightMeters * 0.75, 1500.0);
-
-    // Initial polygon has max width and height of 3000 meters
-    topLeft =           center.atDistanceAndAzimuth(halfWidthMeters, -90).atDistanceAndAzimuth(halfHeightMeters, 0);
-    topRight =          center.atDistanceAndAzimuth(halfWidthMeters, 90).atDistanceAndAzimuth(halfHeightMeters, 0);
-    bottomLeft =        center.atDistanceAndAzimuth(halfWidthMeters, -90).atDistanceAndAzimuth(halfHeightMeters, 180);
-    bottomRight =       center.atDistanceAndAzimuth(halfWidthMeters, 90).atDistanceAndAzimuth(halfHeightMeters, 180);
-
     QGCFencePolygon* polygon = new QGCFencePolygon(true /* inclusion */, this);
     polygon->appendVertex(topLeft);
-    polygon->appendVertex(topRight);
+    polygon->appendVertex(QGeoCoordinate(topLeft.latitude(), bottomRight.longitude()));
     polygon->appendVertex(bottomRight);
-    polygon->appendVertex(bottomLeft);
+    polygon->appendVertex(QGeoCoordinate(bottomRight.latitude(), topLeft.longitude()));
     _polygons.append(polygon);
+    setDirty(true);
+}
 
-    clearAllInteractive();
-    polygon->setInteractive(true);
+void GeoFenceController::addExclusionPolygon(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
+{
+    QGCFencePolygon* polygon = new QGCFencePolygon(false /* inclusion */, this);
+    polygon->appendVertex(topLeft);
+    polygon->appendVertex(QGeoCoordinate(topLeft.latitude(), bottomRight.longitude()));
+    polygon->appendVertex(bottomRight);
+    polygon->appendVertex(QGeoCoordinate(bottomRight.latitude(), topLeft.longitude()));
+    _polygons.append(polygon);
+    setDirty(true);
 }
 
 void GeoFenceController::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
@@ -437,20 +439,37 @@ void GeoFenceController::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordina
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());
     QGeoCoordinate bottomLeft(bottomRight.latitude(), topLeft.longitude());
 
-    // Initial radius is inset to take 3/4s of viewport and max of 1500 meters
     double halfWidthMeters = topLeft.distanceTo(topRight) / 2.0;
     double halfHeightMeters = topLeft.distanceTo(bottomLeft) / 2.0;
-    double radius = qMin(qMin(halfWidthMeters, halfHeightMeters) * 0.75, 1500.0);
 
     QGeoCoordinate centerLeftEdge = topLeft.atDistanceAndAzimuth(halfHeightMeters, 180);
     QGeoCoordinate centerTopEdge = topLeft.atDistanceAndAzimuth(halfWidthMeters, 90);
     QGeoCoordinate center(centerLeftEdge.latitude(), centerTopEdge.longitude());
 
+    double radius = qMin(qMin(halfWidthMeters, halfHeightMeters) * 0.75, 1500.0);
+
     QGCFenceCircle* circle = new QGCFenceCircle(center, radius, true /* inclusion */, this);
     _circles.append(circle);
+    setDirty(true);
+}
 
-    clearAllInteractive();
-    circle->setInteractive(true);
+void GeoFenceController::addExclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
+{
+    QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());
+    QGeoCoordinate bottomLeft(bottomRight.latitude(), topLeft.longitude());
+
+    double halfWidthMeters = topLeft.distanceTo(topRight) / 2.0;
+    double halfHeightMeters = topLeft.distanceTo(bottomLeft) / 2.0;
+
+    QGeoCoordinate centerLeftEdge = topLeft.atDistanceAndAzimuth(halfHeightMeters, 180);
+    QGeoCoordinate centerTopEdge = topLeft.atDistanceAndAzimuth(halfWidthMeters, 90);
+    QGeoCoordinate center(centerLeftEdge.latitude(), centerTopEdge.longitude());
+
+    double radius = qMin(qMin(halfWidthMeters, halfHeightMeters) * 0.75, 1500.0);
+
+    QGCFenceCircle* circle = new QGCFenceCircle(center, radius, false /* inclusion */, this);
+    _circles.append(circle);
+    setDirty(true);
 }
 
 void GeoFenceController::deletePolygon(int index)

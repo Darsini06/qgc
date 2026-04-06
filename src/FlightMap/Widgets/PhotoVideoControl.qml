@@ -23,10 +23,13 @@ import QGroundControl.FactSystem
 import QGroundControl.FactControls
 
 Rectangle {
-    width:      mainLayout.width + (_margins * 2)
-    height:     mainLayout.height + (_margins * 0.8)
-    color:      Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.5)
-    radius:     _margins
+    id: bgRect
+    width:      mainLayout.width + (_margins * 2.5)
+    height:     mainLayout.height + (_margins * 2.5)
+    color:      Qt.rgba(0, 0, 0, 0.45) // Modern dark frosted panel
+    radius:     16
+    border.color: Qt.rgba(1, 1, 1, 0.15)
+    border.width: 1
     visible:    _camera.capturesVideo || _camera.capturesPhotos
 
     anchors.top: parent.top
@@ -43,8 +46,7 @@ Rectangle {
     property bool   _photoCaptureSingleIdle:    _camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_IDLE
     property bool   _photoCaptureIntervalIdle:  _camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_INTERVAL_IDLE
     property bool   _photoCaptureIdle:          _photoCaptureSingleIdle || _photoCaptureIntervalIdle
-    property bool   _isSelectingMode:           true
-
+    property bool   _isSelectingMode:           false
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     DeadMouseArea { anchors.fill: parent }
@@ -92,102 +94,111 @@ Rectangle {
                     visible:            _cameraManager.cameras.length > 1
                 }
 
-                // 1. Mobile-style Mode Selector & Indicator
-                Column {
+                // Premium Mode Toggle Switch
+                Rectangle {
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: ScreenTools.defaultFontPixelWidth * 1.5
-
-                    // Video Mode Icon Button
+                    width: ScreenTools.defaultFontPixelWidth * 11
+                    height: ScreenTools.defaultFontPixelHeight * 2.2
+                    radius: height / 2
+                    color: Qt.rgba(0, 0, 0, 0.45)
+                    border.color: Qt.rgba(1, 1, 1, 0.2)
+                    border.width: 1
+                    
+                    // Highlight Toggle Pill
                     Rectangle {
-                        width: ScreenTools.defaultFontPixelWidth * 4.5
-                        height: width
-                        radius: width * 0.5
-                        color: qgcPal.windowShadeLight
-                        border.color: _cameraInVideoMode && !_isSelectingMode ? qgcPal.colorGreen : qgcPal.buttonText
-                        border.width: _cameraInVideoMode && !_isSelectingMode ? 2 : 1
-                        visible: _isSelectingMode || _cameraInVideoMode
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width: parent.width * 0.6
-                            height: width * 0.6
-                            source: "/qmlimages/camera_video.svg"
-                            fillMode: Image.PreserveAspectFit
-                            color: _cameraInVideoMode && !_isSelectingMode ? qgcPal.colorGreen : qgcPal.text
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if (_isSelectingMode) {
-                                    _camera.setCameraModeVideo()
-                                    _isSelectingMode = false
-                                } else {
-                                    _isSelectingMode = true
-                                }
-                            }
-                        }
+                        width: parent.width / 2
+                        height: parent.height
+                        radius: parent.radius
+                        color: _cameraInPhotoMode ? "white" : qgcPal.colorRed
+                        x: _cameraInPhotoMode ? 0 : parent.width / 2
+                        Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+                        Behavior on color { ColorAnimation { duration: 300 } }
                     }
 
-                    // Photo Mode Icon Button
-                    Rectangle {
-                        width: ScreenTools.defaultFontPixelWidth * 4.5
-                        height: width
-                        radius: width * 0.5
-                        color: qgcPal.windowShadeLight
-                        border.color: _cameraInPhotoMode && !_isSelectingMode ? qgcPal.colorGreen : qgcPal.buttonText
-                        border.width: _cameraInPhotoMode && !_isSelectingMode ? 2 : 1
-                        visible: _isSelectingMode || _cameraInPhotoMode
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width: parent.width * 0.6
-                            height: width * 0.6
-                            source: "/qmlimages/camera_photo.svg"
-                            fillMode: Image.PreserveAspectFit
-                            color: _cameraInPhotoMode && !_isSelectingMode ? qgcPal.colorGreen : qgcPal.text
+                    Row {
+                        anchors.fill: parent
+                        
+                        // Photo Button
+                        Item {
+                            width: parent.width / 2
+                            height: parent.height
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: parent.height * 0.45
+                                height: width
+                                source: "/qmlimages/camera_photo.svg"
+                                color: _cameraInPhotoMode ? "black" : "white"
+                                Behavior on color { ColorAnimation { duration: 300 } }
+                                fillMode: Image.PreserveAspectFit
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: _camera.setCameraModePhoto()
+                            }
                         }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if (_isSelectingMode) {
-                                    _camera.setCameraModePhoto()
-                                    _isSelectingMode = false
-                                } else {
-                                    _isSelectingMode = true
-                                }
+                        // Video Button
+                        Item {
+                            width: parent.width / 2
+                            height: parent.height
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: parent.height * 0.45
+                                height: width
+                                source: "/qmlimages/camera_video.svg"
+                                color: "white" // Always white on red or dark background
+                                fillMode: Image.PreserveAspectFit
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: _camera.setCameraModeVideo()
                             }
                         }
                     }
                 }
 
-                // 2. Mobile-style Universal Shutter Button
-                Rectangle {
+                // Animated Shutter Button
+                Item {
                     Layout.alignment: Qt.AlignHCenter
-                    color: "transparent"
-                    width: ScreenTools.defaultFontPixelWidth * 5
+                    width: ScreenTools.defaultFontPixelWidth * 5.5
                     height: width
-                    radius: width * 0.5
-                    border.color: qgcPal.text // Mobile phones usually have a white outer ring
-                    border.width: 3
-                    visible: !_isSelectingMode
+
+                    Rectangle {
+                        id: outerShutterRing
+                        anchors.centerIn: parent
+                        width: parent.width
+                        height: width
+                        radius: width / 2
+                        border.color: "white"
+                        border.width: 3
+                        color: "transparent"
+                        opacity: shutterMouseArea.containsMouse ? 0.8 : 1.0
+                        scale: shutterMouseArea.pressed ? 0.94 : (shutterMouseArea.containsMouse ? 1.05 : 1.0)
+                        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                    }
 
                     Rectangle {
                         anchors.centerIn: parent
                         width: parent.width * (_isShootingInCurrentMode ? 0.45 : 0.8)
                         height: width
-                        radius: _isShootingInCurrentMode ? 8 : width * 0.5
-                        // White for photo, Red for video
+                        radius: _isShootingInCurrentMode ? 6 : width / 2
                         color: _cameraInPhotoMode ? "white" : qgcPal.colorRed
-
+                        
                         property bool _isShootingInPhotoMode: _cameraInPhotoMode && _camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_IN_PROGRESS
                         property bool _isShootingInVideoMode: (!_cameraInPhotoMode && _camera.videoCaptureStatus === MavlinkCameraControl.VIDEO_CAPTURE_STATUS_RUNNING)
                         property bool _isShootingInCurrentMode: _cameraInPhotoMode ? _isShootingInPhotoMode : _isShootingInVideoMode
+                        
+                        Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+                        Behavior on radius { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+                        Behavior on color { ColorAnimation { duration: 300 } }
                     }
 
                     MouseArea {
+                        id: shutterMouseArea
                         anchors.fill: parent
+                        hoverEnabled: true
                         onClicked: {
                             if (_cameraInPhotoMode) {
                                 if (_camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_INTERVAL_IN_PROGRESS) {
@@ -202,35 +213,33 @@ Rectangle {
                     }
                 }
 
-                // Record time / Capture count
-                Rectangle {
-                    Layout.alignment:       Qt.AlignHCenter
-                    color:                  !_videoCaptureIdle && !_photoCaptureIdle ? "transparent" : qgcPal.colorRed
-                    Layout.preferredWidth:  (_cameraInVideoMode ? videoRecordTime.width : photoCaptureCount.width) + (_smallMargins * 3)
-                    Layout.preferredHeight: (_cameraInVideoMode ? videoRecordTime.height : photoCaptureCount.height)
-                    radius:                 _margins / 2
-                    visible:                !_isSelectingMode
-
-                    // Video record time
-                    QGCLabel {
-                        id:                 videoRecordTime
-                        anchors.leftMargin: _smallMargins
-                        anchors.left:       parent.left
-                        anchors.top:        parent.top
-                        text:               _videoCaptureIdle ? "00:00:00" : _camera.recordTimeStr
-                        font.pointSize:     ScreenTools.defultFontPointSize
-                        visible:            _cameraInVideoMode
+                // Record time / Capture count with animated recording pulse
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: _smallMargins
+                    
+                    // Recording Red Dot indicator
+                    Rectangle {
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: qgcPal.colorRed
+                        visible: _cameraInVideoMode && !_videoCaptureIdle
+                        
+                        SequentialAnimation on opacity {
+                            loops: Animation.Infinite
+                            running: _cameraInVideoMode && !_videoCaptureIdle
+                            NumberAnimation { to: 0.2; duration: 800 }
+                            NumberAnimation { to: 1.0; duration: 800 }
+                        }
                     }
 
-                    // Photo capture count
                     QGCLabel {
-                        id:                 photoCaptureCount
-                        anchors.leftMargin: _smallMargins
-                        anchors.left:       parent.left
-                        anchors.top:        parent.top
-                        text:               _activeVehicle ? ('00000' + _activeVehicle.cameraTriggerPoints.count).slice(-5) : "00000"
-                        font.pointSize:     ScreenTools.defultFontPointSize
-                        visible:            _cameraInPhotoMode
+                        text: _cameraInVideoMode ? (_videoCaptureIdle ? "00:00:00" : _camera.recordTimeStr) :
+                                                   (_activeVehicle ? ('00000' + _activeVehicle.cameraTriggerPoints.count).slice(-5) : "00000")
+                        color: "white"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.bold: !_videoCaptureIdle
                     }
                 }
 
@@ -299,20 +308,33 @@ Rectangle {
                 }
             }
 
-            QGCColoredImage {
-                Layout.alignment:       Qt.AlignHCenter
-                source:                 "/res/gear-black.svg"
-                mipmap:                 true
-                Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 1.2
+            Item {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 1.5
                 Layout.preferredWidth:  Layout.preferredHeight
-                sourceSize.height:      Layout.preferredHeight
-                color:                  qgcPal.text
-                fillMode:               Image.PreserveAspectFit
-                visible:                !_isSelectingMode
+                
+                QGCColoredImage {
+                    id: gearIcon
+                    anchors.centerIn: parent
+                    height: parent.height * 0.6
+                    width: height
+                    source: "/res/gear-black.svg"
+                    mipmap: true
+                    sourceSize.height: height
+                    color: "white"
+                    fillMode: Image.PreserveAspectFit
+                    
+                    scale: gearMouseArea.containsMouse ? 1.15 : 1.0
+                    rotation: gearMouseArea.containsMouse ? 45 : 0
+                    Behavior on scale { NumberAnimation { duration: 200 } }
+                    Behavior on rotation { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
+                }
 
-                QGCMouseArea {
-                    fillItem:   parent
-                    onClicked:  settingsDialogComponent.createObject(mainWindow).open()
+                MouseArea {
+                    id: gearMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: settingsDialogComponent.createObject(mainWindow).open()
                 }
             }
         }
