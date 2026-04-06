@@ -896,8 +896,8 @@ Rectangle {
                     }
                     QGCSlider {
                         Layout.fillWidth: true
-                        minimumValue:     0
-                        maximumValue:     100
+                        from:             0
+                        to:               100
                         value:            sprayPopup._stagedPumpRate
                         onValueChanged:   sprayPopup._stagedPumpRate = value
                     }
