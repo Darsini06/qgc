@@ -51,6 +51,8 @@ Item {
 
     property bool connecting_drone : false
 
+    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+
     // DYNAMIC SCALING: Professional responsive multiplier
     property real dynamicScaleFactor: {
         var baseWidth = 1200
@@ -704,7 +706,7 @@ Item {
                     Label {
                         Layout.fillWidth: true
                         text: isCheckingAirspace ? qsTr("Analyzing Airspace...") :
-                             (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
+                                                   (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
                         color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
                         font.family: "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize * 1.05
@@ -717,7 +719,7 @@ Item {
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                         text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
-                             (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                                                   (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
@@ -947,11 +949,14 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
+
                         var frameType = QGroundControl.loadBoolGlobalSetting("frametypeDialog", false)
                         var videoSettings = QGroundControl.settingsManager.videoSettings
                         var videoSourceFact = videoSettings.videoSource
 
                         if (activeVehicle) {
+
+                            console.log("Inside the active Vehicle",frameType)
 
                             if (!activeVehicle.parameterManager.parametersReady){
                                 mainWindow.showToastMessage("Plese Wait Vehicle parameters are still loading...")
@@ -959,10 +964,12 @@ Item {
                             }
 
                             if (!frameType) {
+                                console.log("Frame Dialog Open",frameType)
                                 QGroundControl.saveBoolGlobalSetting("frametypeDialog", true)
                                 showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type")
 
                             } else {
+                                console.log("Frame Dialog not open",frameType)
                                 QGroundControl.saveGlobalSetting("loadpage", "Agri")
 
                                 mainWindow.showFlyView()
@@ -1002,6 +1009,7 @@ Item {
                         }
                     }
                 }
+
             }
 
             // Click to Mapping
@@ -1076,6 +1084,12 @@ Item {
                 }
             }
         }
+    }
+
+    function showDynamicCalibrationDialog(qmlFile,title) {
+        dynamicCalDialog.dialogTitleText = title
+        dialogLoader.source = qmlFile
+        dynamicCalDialog.open()
     }
 
     // Logout Dialog Component

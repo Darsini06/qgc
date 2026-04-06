@@ -274,17 +274,17 @@ Item {
                                     visible: !mobileFileOpenDialog.showAllFiles &&
                                              mobileFileOpenDialog.fullFileList.length > 3
                                     text: qsTr("See More")
-                                    background: Rectangle {
-                                            color: "#262626"
-                                            radius: 10
-                                        }
+                                    // background: Rectangle {
+                                    //         color: "#262626"
+                                    //         radius: 10
+                                    //     }
 
-                                        contentItem: Text {
-                                            text: control.text
-                                            color: "white"
-                                            font.bold: true
-                                            anchors.centerIn: parent
-                                        }
+                                    //     contentItem: Text {
+                                    //         text: control.text
+                                    //         color: "white"
+                                    //         font.bold: true
+                                    //         anchors.centerIn: parent
+                                    //     }
 
                                     onClicked: {
                                         mainWindow.homescreen()
