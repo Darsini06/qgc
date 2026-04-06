@@ -687,6 +687,7 @@ Item {
             onZoomLevelChanged: {
                 QGroundControl.flightMapZoom = editorMap.zoomLevel
             }
+
             onCenterChanged: {
                 QGroundControl.flightMapPosition = editorMap.center
             }
@@ -816,7 +817,6 @@ Item {
                     }
                 }
 
-
                 Connections {
                     target:                 _missionController
                     function onSplitSegmentChanged()  { splitSegmentItem._updateSplitCoord() }
@@ -877,6 +877,7 @@ Item {
                     resetTimer.start()
                 }
             }
+
             Timer {
                 id: resetTimer
                 interval: 2500
