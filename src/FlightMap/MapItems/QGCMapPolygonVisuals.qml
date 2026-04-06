@@ -1338,7 +1338,7 @@ Item {
                 }
             }
 
-            //only for Mapping
+            //only for
             Column {
                 anchors.right:  parent.right
                 anchors.rightMargin: _root.cardinalLeftScreenX + 7

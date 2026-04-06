@@ -293,7 +293,6 @@ Item {
         planMasterController:       _planMasterController
     }
 
-
     Connections {
         target: _appSettings ? _appSettings.defaultMissionItemAltitude : null
         function onRawValueChanged() {
@@ -557,7 +556,6 @@ Item {
         }
     }
 
-
     Connections {
         target: _missionController
 
@@ -652,11 +650,9 @@ Item {
                            }
     }
 
-
     AirspaceRestrictionDialog {
         id: _airspaceRestrictionDialog
     }
-
 
     Item {
         id:             panel
