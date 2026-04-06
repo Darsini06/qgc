@@ -52,6 +52,9 @@ Item {
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
     }
+    function toggleIcons() {
+        iconsContainer.visible = !iconsContainer.visible
+    }
 
     function toggleIcons() {
          if (iconsContainer.opened) {

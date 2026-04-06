@@ -22,6 +22,8 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QDebug>
+#include <QtConcurrent>
+#include <QFuture>
 
 //-----------------------------------------------------------------------------
 // AirspaceZone Implementation
@@ -436,9 +438,24 @@ void AirspaceManager::_handleNetworkReply()
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        qDebug() << "AirspaceManager: Received data:" << data.length() << "bytes";
-        // qDebug() << "AirspaceManager: Data content:" << data; // Be careful with large data
-        _parseGeoJsonResponse(data);
+        
+        // Offset parsing to background thread to prevent UI hang
+        QtConcurrent::run([this, data] {
+            QJsonParseError parseError;
+            QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+            
+            if (parseError.error != QJsonParseError::NoError) {
+                QString errorMsg = QString("JSON parse error: %1").arg(parseError.errorString());
+                QMetaObject::invokeMethod(this, [this, errorMsg] { _setErrorMessage(errorMsg); });
+                return;
+            }
+            
+            // Re-dispatch the heavy processing to the main thread in a way that doesn't block it entirely
+            // Or better: pass the parsed document to a processing function
+            QMetaObject::invokeMethod(this, [this, doc] {
+                _processParsedJson(doc);
+            });
+        });
     } else {
         QString errorMsg = QString("Network error: %1").arg(reply->errorString());
         _setErrorMessage(errorMsg);
@@ -480,20 +497,15 @@ void AirspaceManager::_handleNetworkError(QNetworkReply::NetworkError error)
 
 void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
 {
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+    // Now done in the background in _handleNetworkReply
+    Q_UNUSED(data);
+}
 
-    if (parseError.error != QJsonParseError::NoError) {
-        QString errorMsg = QString("JSON parse error: %1").arg(parseError.errorString());
-        _setErrorMessage(errorMsg);
-        qWarning() << "AirspaceManager:" << errorMsg;
-        return;
-    }
-
+void AirspaceManager::_processParsedJson(const QJsonDocument& doc)
+{
     QJsonArray features;
     if (doc.isArray()) {
         features = doc.array();
-        qDebug() << "AirspaceManager: Received raw array of" << features.size() << "items";
     } else {
         QJsonObject rootObj = doc.object();
         QString type = rootObj["type"].toString();
@@ -507,23 +519,17 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
         } else if (rootObj.contains("facilities") && rootObj["facilities"].isArray()) {
             features = rootObj["facilities"].toArray();
         } else if (rootObj.contains("_id") && rootObj.contains("geometry")) {
-            // Case where server returns a single raw Mongoose document instead of a Feature
             features.append(rootObj);
         } else {
-            QString snippet = data.left(100);
-            QString errorMsg = QString("Invalid GeoJSON structure. Type: %1. Data starts with: %2").arg(type).arg(snippet);
-            _setErrorMessage(errorMsg);
-            qWarning() << "AirspaceManager:" << errorMsg;
             return;
         }
     }
-    QList<AirspaceZone*> newZones;
 
+    QList<AirspaceZone*> newZones;
     for (const QJsonValue& featureVal : features) {
         QJsonObject featureObj = featureVal.toObject();
         bool foundSubZones = false;
 
-        // Production API has sub-zones in 'finalZones' or 'zones'
         QJsonObject zonesContainer;
         if (featureObj.contains("finalZones") && featureObj["finalZones"].isObject()) {
             zonesContainer = featureObj["finalZones"].toObject();
@@ -531,7 +537,6 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
             zonesContainer = featureObj["zones"].toObject();
         }
 
-        // Extract parent center if available (for radius-based subzones)
         QJsonObject parentGeometry;
         if (featureObj.contains("geometry")) parentGeometry = featureObj["geometry"].toObject();
         else if (featureObj.contains("geojson")) parentGeometry = featureObj["geojson"].toObject();
@@ -546,28 +551,21 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
                 QJsonObject featureToParse;
                 bool isRadiusZone = false;
 
-                // 1. Check for explicit geometry
                 if (subObj.contains("geometry") || subObj.contains("geojson")) {
                     featureToParse = subObj;
-                } 
-                // 2. Check for raw geometry object
-                else if (subObj.contains("type") && 
+                } else if (subObj.contains("type") && 
                           (subObj["type"].toString() == "Polygon" || subObj["type"].toString() == "MultiPolygon")) {
                     featureToParse["geometry"] = subObj;
-                }
-                // 3. Check for radius-only zone (requires parent Point)
-                else if (subObj.contains("radius") && parentIsPoint) {
+                } else if (subObj.contains("radius") && parentIsPoint) {
                     featureToParse["geometry"] = parentGeometry;
-                    featureToParse["properties"] = QJsonObject(); // Placeholder
+                    featureToParse["properties"] = QJsonObject(); 
                     isRadiusZone = true;
                 } else {
                     continue;
                 }
 
-                // Inject properties if missing or for radius zones
                 if (!featureToParse.contains("properties") || isRadiusZone) {
                     QJsonObject props = featureToParse.contains("properties") ? featureToParse["properties"].toObject() : QJsonObject();
-                    
                     if (!props.contains("name")) {
                         props["name"] = QString("%1 (%2)").arg(featureObj["name"].toString()).arg(it.key());
                     }
@@ -588,7 +586,6 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
             }
         }
 
-        // If no sub-zones were found, or as fallback, parse the main object
         if (!foundSubZones) {
             AirspaceZone* zone = _parseGeoJsonFeature(featureObj);
             if (zone) {
@@ -597,47 +594,31 @@ void AirspaceManager::_parseGeoJsonResponse(const QByteArray& data)
         }
     }
 
-    // Merge with existing zones instead of replacing
+    // High-performance duplicate check using a temporary HashSet
+    QSet<QString> existingKeys;
+    for (AirspaceZone* z : _zones) {
+        existingKeys.insert(z->name() + ":" + z->zoneTypeString());
+    }
+
     int addedCount = 0;
     for (AirspaceZone* newZone : newZones) {
-        bool isDuplicate = false;
-        for (AirspaceZone* existingZone : _zones) {
-            // Check for potential duplicate by name and zone type
-            if (existingZone->name() == newZone->name() && 
-                existingZone->zoneType() == newZone->zoneType()) {
-                
-                // Fine-grained check: compare coordinate count and first point
-                if (existingZone->coordinates().size() == newZone->coordinates().size()) {
-                    isDuplicate = true;
-                    break;
-                }
-            }
-        }
-
-        if (isDuplicate) {
+        QString key = newZone->name() + ":" + newZone->zoneTypeString();
+        if (existingKeys.contains(key)) {
             delete newZone;
         } else {
             _zones.append(newZone);
+            existingKeys.insert(key);
             addedCount++;
         }
     }
 
     if (addedCount > 0) {
-        qInfo() << "AirspaceManager: Added" << addedCount << "new unique zones. Total zones now:" << _zones.size();
+        qInfo() << "AirspaceManager: Added" << addedCount << "new unique zones via Background Thread processing. Total:" << _zones.size();
         _updateZonesVariantList();
-    } else {
-        qInfo() << "AirspaceManager: No new unique zones found in this area.";
-    }
-
-    // Save to cache
-    _saveToCache(_zones);
-
-    if (_zones.isEmpty()) {
-        qInfo() << "AirspaceManager: Successfully parsed response, but found 0 valid zones. Raw data snippet:" << data.left(100);
-    } else {
-        qInfo() << "AirspaceManager: Successfully loaded" << _zones.size() << "zones";
+        _saveToCache(_zones);
     }
 }
+
 
 AirspaceZone* AirspaceManager::_parseGeoJsonFeature(const QJsonObject& feature)
 {
@@ -705,16 +686,25 @@ AirspaceZone* AirspaceManager::_parseGeoJsonFeature(const QJsonObject& feature)
 
             QGeoCoordinate center(lat, lon);
             if (center.isValid()) {
-                // Generate 36-sided polygon (approx circle)
-                for (int i = 0; i <= 36; i++) { // Closed loop
-                    double azimuth = i * 10.0;
-                    QGeoCoordinate vertex = center.atDistanceAndAzimuth(radiusKm * 1000.0, azimuth);
+                // Optimized linear approximation for circle generation (36 sides)
+                // Much faster than atDistanceAndAzimuth for mobile UI
+                const double R = 6378137.0; // Earth radius in meters
+                static const double deg2rad = M_PI / 180.0;
+                static const double rad2deg = 180.0 / M_PI;
+
+                double latRad = lat * deg2rad;
+                double deltaLat = (radiusKm * 1000.0 / R) * rad2deg;
+                double deltaLon = deltaLat / cos(latRad);
+
+                for (int i = 0; i <= 36; i++) {
+                    double angle = i * 10.0 * deg2rad;
+                    double vLat = lat + deltaLat * cos(angle);
+                    double vLon = lon + deltaLon * sin(angle);
+                    
                     QVariantList coord;
-                    coord << vertex.longitude() << vertex.latitude(); // GeoJSON is [lon, lat]
+                    coord << vLon << vLat;
                     coordsList.append(QVariant(coord));
                 }
-                // Ensure closure (redundant with <= 36 but safe)
-                if (coordsList.size() == 36) coordsList.append(coordsList.first());
             }
         }
     } else if (geometryType == "Polygon") {
@@ -906,7 +896,10 @@ void AirspaceManager::_saveToCache(const QList<AirspaceZone*>& zones)
 
     QMutexLocker locker(&_mutex);
 
-    // Delete old entries for this bbox
+    // Use transaction for massive performance boost in batch inserts
+    _cacheDatabase.transaction();
+
+    // Delete old entries for this bbox efficiently
     QSqlQuery deleteQuery(_cacheDatabase);
     deleteQuery.prepare("DELETE FROM airspace_zones WHERE bbox = ?");
     deleteQuery.addBindValue(_currentBbox);
@@ -936,7 +929,12 @@ void AirspaceManager::_saveToCache(const QList<AirspaceZone*>& zones)
         insertQuery.exec();
     }
 
-    qDebug() << "AirspaceManager: Saved" << zones.size() << "zones to cache";
+    if (!_cacheDatabase.commit()) {
+        qWarning() << "AirspaceManager: Failed to commit cache transaction";
+        _cacheDatabase.rollback();
+    }
+
+    qDebug() << "AirspaceManager: Saved" << zones.size() << "zones to cache via batch transaction";
 }
 
 QList<AirspaceZone*> AirspaceManager::_loadFromCache(const QString& bbox)

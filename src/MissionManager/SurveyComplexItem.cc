@@ -23,6 +23,8 @@
 #include <QtGui/QPolygonF>
 #include <QtCore/QJsonArray>
 #include <QtCore/QLineF>
+#include <algorithm>
+#include "QGCFencePolygon.h"
 
 QGC_LOGGING_CATEGORY(SurveyComplexItemLog, "SurveyComplexItemLog")
 
@@ -528,7 +530,7 @@ void SurveyComplexItem::_intersectLinesWithRect(const QList<QLineF>& lineList, c
     }
 }
 
-void SurveyComplexItem::_intersectLinesWithPolygon(const QList<QLineF>& lineList, const QPolygonF& polygon, QList<QLineF>& resultLines)
+void SurveyComplexItem::_intersectLinesWithPolygon(const QList<QLineF>& lineList, const QPolygonF& polygon, const QList<QPolygonF>& exclusionPolygons, QList<QLineF>& resultLines)
 {
     resultLines.clear();
 
@@ -536,40 +538,59 @@ void SurveyComplexItem::_intersectLinesWithPolygon(const QList<QLineF>& lineList
         const QLineF& line = lineList[i];
         QList<QPointF> intersections;
 
-        // Intersect the line with all the polygon edges
-        for (int j=0; j<polygon.count()-1; j++) {
-            QPointF intersectPoint;
-            QLineF polygonLine = QLineF(polygon[j], polygon[j+1]);
-
-            auto intersect = line.intersects(polygonLine, &intersectPoint);
-            if (intersect == QLineF::BoundedIntersection) {
-                if (!intersections.contains(intersectPoint)) {
-                    intersections.append(intersectPoint);
-                }
-            }
-        }
-
-        // We now have one or more intersection points all along the same line. Find the two
-        // which are furthest away from each other to form the transect.
-        if (intersections.count() > 1) {
-            QPointF firstPoint;
-            QPointF secondPoint;
-            double currentMaxDistance = 0;
-
-            for (int i=0; i<intersections.count(); i++) {
-                for (int j=0; j<intersections.count(); j++) {
-                    QLineF lineTest(intersections[i], intersections[j]);
-                    \
-                    double newMaxDistance = lineTest.length();
-                    if (newMaxDistance > currentMaxDistance) {
-                        firstPoint = intersections[i];
-                        secondPoint = intersections[j];
-                        currentMaxDistance = newMaxDistance;
+        // Helper to add intersections safely
+        auto addIntersections = [&](const QPolygonF& poly) {
+            if (poly.count() < 3) return;
+            for (int j=0; j<poly.count()-1; j++) {
+                QPointF intersectPoint;
+                QLineF edge(poly[j], poly[j+1]);
+                if (line.intersects(edge, &intersectPoint) == QLineF::BoundedIntersection) {
+                    if (!intersections.contains(intersectPoint)) {
+                        intersections.append(intersectPoint);
                     }
                 }
             }
+        };
 
-            resultLines += QLineF(firstPoint, secondPoint);
+        // Intersect with main polygon
+        addIntersections(polygon);
+        // Intersect with exclusion polygons
+        for (const QPolygonF& excl : exclusionPolygons) {
+            addIntersections(excl);
+        }
+
+        if (intersections.count() < 2) continue;
+
+        // Sort intersections along the line (from P1 to P2)
+        std::sort(intersections.begin(), intersections.end(), [&](const QPointF& a, const QPointF& b) {
+            return QLineF(line.p1(), a).length() < QLineF(line.p1(), b).length();
+        });
+
+        // Check each segment between consecutive intersection points
+        for (int j=0; j<intersections.count()-1; j++) {
+            QPointF p1 = intersections[j];
+            QPointF p2 = intersections[j+1];
+            QPointF mid = (p1 + p2) / 2.0;
+
+            // Segment is valid if midpoint is inside main polygon...
+            bool insideMain = polygon.containsPoint(mid, Qt::OddEvenFill);
+            if (!insideMain) continue;
+
+            // ...and NOT inside any exclusion polygon
+            bool insideExclusion = false;
+            for (const QPolygonF& excl : exclusionPolygons) {
+                if (excl.containsPoint(mid, Qt::OddEvenFill)) {
+                    insideExclusion = true;
+                    break;
+                }
+            }
+
+            if (!insideExclusion) {
+                // Ensure the segment has significant length to avoid noise
+                if (QLineF(p1, p2).length() > 0.01) {
+                    resultLines.append(QLineF(p1, p2));
+                }
+            }
         }
     }
 }
@@ -725,7 +746,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
     // Now intersect the lines with the polygon
     QList<QLineF> intersectLines;
 #if 1
-    _intersectLinesWithPolygon(lineList, polygon, intersectLines);
+    _intersectLinesWithPolygon(lineList, polygon, QList<QPolygonF>(), intersectLines);
 #else
     // This is handy for debugging grid problems, not for release
     intersectLines = lineList;
@@ -743,7 +764,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         lineList.clear();
         lineList.append(firstLine);
         intersectLines = lineList;
-        _intersectLinesWithPolygon(lineList, polygon, intersectLines);
+        _intersectLinesWithPolygon(lineList, polygon, QList<QPolygonF>(), intersectLines);
     }
 
     // Make sure all lines are going the same direction. Polygon intersection leads to lines which
@@ -1120,10 +1141,30 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         transectX += gridSpacing;
     }
 
-    // Now intersect the lines with the polygon
+    // Now intersect the lines with the polygon and exclusions
+    QList<QPolygonF> exclusionPolygons;
+    if (_masterController && _masterController->geoFenceController()) {
+        GeoFenceController* fenceController = _masterController->geoFenceController();
+        for (int i=0; i<fenceController->polygons()->count(); i++) {
+            QGCFencePolygon* fencePolygon = fenceController->polygons()->value<QGCFencePolygon*>(i);
+            if (fencePolygon && !fencePolygon->inclusion()) {
+                QPolygonF exclusionPolygon;
+                for (int j=0; j<fencePolygon->count(); j++) {
+                    double x, y, z;
+                    QGCGeo::convertGeoToNed(fencePolygon->vertexCoordinate(j), tangentOrigin, x, y, z);
+                    exclusionPolygon << QPointF(x, y);
+                }
+                if (exclusionPolygon.count() > 0) {
+                    exclusionPolygon << exclusionPolygon.front(); // Close it
+                    exclusionPolygons.append(exclusionPolygon);
+                }
+            }
+        }
+    }
+
     QList<QLineF> intersectLines;
 #if 1
-    _intersectLinesWithPolygon(lineList, polygon, intersectLines);
+    _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons, intersectLines);
 #else
     // This is handy for debugging grid problems, not for release
     intersectLines = lineList;
@@ -1141,7 +1182,7 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         lineList.clear();
         lineList.append(firstLine);
         intersectLines = lineList;
-        _intersectLinesWithPolygon(lineList, polygon, intersectLines);
+        _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons, intersectLines);
     }
 
     // Make sure all lines are going the same direction. Polygon intersection leads to lines which

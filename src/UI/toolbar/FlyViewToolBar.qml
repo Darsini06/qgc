@@ -18,6 +18,8 @@ import QGroundControl.Palette
 import QGroundControl.MultiVehicleManager
 import QGroundControl.ScreenTools
 import QGroundControl.Controllers
+import QGroundControl.FactSystem
+import QGroundControl.FactControls
 
 Rectangle {
     id:     _root
@@ -28,6 +30,14 @@ Rectangle {
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
     property color  _mainStatusBGColor: qgcPal.toolBarColor
+
+    property var _sprayEnable:      _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_ENABLE") : null
+    property var _sprayPumpRate:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_RATE") : null
+    property var _sprayPumpMin:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_MIN") : null
+    property var _spraySpinner:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPINNER") : null
+    property var _spraySpeedMin:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPEED_MIN") : null
+
+    property bool _isAgri:          mainWindow ? mainWindow.droneType === "Agri" : false
 
     function dropMessageIndicatorTool() {
         toolIndicators.dropMessageIndicatorTool();
@@ -45,6 +55,7 @@ Rectangle {
     //     visible:        qgcPal.globalTheme === QGCPalette.Light
     // }
 
+    /*
     Rectangle {
         anchors.fill: viewButtonRow
 
@@ -52,10 +63,11 @@ Rectangle {
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0;                                     color: _mainStatusBGColor }
-            GradientStop { position: currentButton.x + currentButton.width; color: _mainStatusBGColor }
+            GradientStop { position: currentButton1.x + currentButton1.width; color: _mainStatusBGColor }
             GradientStop { position: 1;                                     color: _root.color }
         }
     }
+    */
 
     RowLayout {
         id:                     viewButtonRow
@@ -77,7 +89,39 @@ Rectangle {
         }
 
         MainStatusIndicator {
+            id:                     mainStatusIndicator
             Layout.preferredHeight: viewButtonRow.height
+        }
+
+        FlightModeIndicator {
+            Layout.preferredHeight: viewButtonRow.height
+            visible:                _activeVehicle && !_communicationLost
+        }
+
+        // Spray Control Button
+        Rectangle {
+            id:         sprayButton
+            width:      60
+            height:     parent.height * 0.9
+            radius:     4
+            color:      sprayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : "transparent"
+            visible:    _isAgri && _activeVehicle
+            Layout.alignment: Qt.AlignVCenter
+
+            QGCColoredImage {
+                width:                  28
+                height:                 28
+                source:                 "qrc:/qmlimages/NewImages/spray_parameter.svg"
+                color:                  "white"
+                anchors.centerIn:       parent
+            }
+
+            MouseArea {
+                id:             sprayMouseArea
+                anchors.fill:   parent
+                hoverEnabled:   true
+                onClicked:      sprayPopup.open()
+            }
         }
 
         QGCButton {
@@ -277,10 +321,12 @@ Rectangle {
 
         BatteryIndicator {
             id: batteryIndicator
-            width:40
-            height: 40                // Fixed height for the indicator
+            height: 40
             visible: _activeVehicle ? true : false
         }
+
+        Rectangle { width: 2; height: 40; color: "transparent" } // Separator
+
 
         // // Battery Icon
         // Column {
@@ -327,8 +373,7 @@ Rectangle {
 
                 GPSIndicator {
                     id: gpsindicator
-                    width:60 // Adjust width as needed
-                    height: 50                // Fixed height for the indicator
+                    height: 40
                     visible: _activeVehicle ? true : false
                 }
             }
@@ -393,7 +438,8 @@ Rectangle {
 
 
 
-        //Rectangle { width: 2; height: 40; color: "gray" } // Separator
+
+        Rectangle { width: 2; height: 40; color: "transparent" } // Separator
 
 
         Row {
@@ -650,16 +696,10 @@ Rectangle {
         property bool _showLargeProgress:       !_initialDownloadComplete && !_userHide
         property real progress:                  _activeVehicle ? _activeVehicle.loadProgress : 0
 
-        // Subtle gradient background glow
+        // Background
         Rectangle {
             anchors.fill: parent
-            opacity: 0.15
-            gradient: Gradient {
-                orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.5; color: "#301934" }
-                GradientStop { position: 1.0; color: "transparent" }
-            }
+            color:        "#FFFFFF"
         }
 
         RowLayout {
@@ -690,49 +730,14 @@ Rectangle {
         Rectangle {
             anchors.bottom: parent.bottom
             anchors.left:   parent.left
-            height:         3
+            height:         4
             width:          parent.width * largeProgressBar.progress
             color:          "#301934"
             
-            // Add a glowing effect to the tip
-            Rectangle {
-                anchors.right: parent.right
-                width:  40
-                height: parent.height
-                visible: largeProgressBar.progress > 0 && largeProgressBar.progress < 1
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0.0; color: "transparent" }
-                    GradientStop { position: 1.0; color: "#FFFFFF" }
-                }
-            }
-
-            Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutQuad } }
+            // Removed Behavior on width for performance (prevents UI stutter during heavy parameter load)
         }
 
-        // Subtle scanning pulse animation
-        Rectangle {
-            id: scanPulse
-            height: 1
-            width: 100
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 1
-            opacity: 0.5
-            gradient: Gradient {
-                orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 0.5; color: "#301934" }
-                GradientStop { position: 1.0; color: "transparent" }
-            }
-
-            NumberAnimation on x {
-                from: -100
-                to: largeProgressBar.width
-                duration: 2000
-                running: largeProgressBar.visible
-                loops: Animation.Infinite
-            }
-        }
+        // Removed scanPulse animation to save CPU overhead on mobile during connection phase
 
         MouseArea {
             anchors.fill: parent
@@ -789,8 +794,197 @@ Rectangle {
 
     //     // MouseArea {
     //     //     anchors.fill:   parent
-    //     //     onClicked:      largeProgressBar._userHide = true
-    //     // }
     // }
 
+    // Spray Settings Popup
+    Popup {
+        id:             sprayPopup
+        x:              sprayButton.x
+        y:              _root.height + 5
+        width:          340
+        padding:        0
+        modal:          true
+        background: Rectangle {
+            color:          Qt.rgba(30/255, 30/255, 30/255, 0.95)
+            radius:         8
+            border.color:   "white"
+            border.width:   1
+        }
+
+        // --- Local parameter staging for Save/Cancel/Reset logic ---
+        property bool _stagedEnable: _sprayEnable ? _sprayEnable.rawValue > 0 : false
+        property real _stagedPumpRate: _sprayPumpRate ? _sprayPumpRate.rawValue : 0
+        property real _stagedSpinner: _spraySpinner ? _spraySpinner.rawValue : 0
+        property real _stagedPumpMin: _sprayPumpMin ? _sprayPumpMin.rawValue : 0
+        property real _stagedSpeedMin: _spraySpeedMin ? _spraySpeedMin.rawValue : 0
+
+        function resetStaging() {
+            _stagedEnable = _sprayEnable ? _sprayEnable.rawValue > 0 : false
+            _stagedPumpRate = _sprayPumpRate ? _sprayPumpRate.rawValue : 0
+            _stagedSpinner = _spraySpinner ? _spraySpinner.rawValue : 0
+            _stagedPumpMin = _sprayPumpMin ? _sprayPumpMin.rawValue : 0
+            _stagedSpeedMin = _spraySpeedMin ? _spraySpeedMin.rawValue : 0
+        }
+
+        onAboutToShow: resetStaging()
+
+        ColumnLayout {
+            width:      parent.width
+            spacing:    0
+
+            // Header
+            Rectangle {
+                Layout.fillWidth: true
+                height:           45
+                color:            "#252525"
+                radius:           8 
+
+                RowLayout {
+                    anchors.fill:       parent
+                    anchors.leftMargin: 15
+                    anchors.rightMargin: 15
+                    
+                    QGCLabel {
+                        text:           qsTr("SPRAYING CONTROLS")
+                        font.bold:      true
+                        font.pointSize: ScreenTools.mediumFontPointSize
+                        color:          "white"
+                        Layout.fillWidth: true
+                    }
+                    
+                    QGCColoredImage {
+                        width:  22
+                        height: 22
+                        source: "qrc:/qmlimages/NewImages/spray_parameter.svg"
+                        color:  "white"
+                    }
+                }
+            }
+
+            Rectangle { width: parent.width; height: 1; color: "#444444" }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.margins:   20
+                spacing:          18
+
+                // Master Enable Toggle
+                RowLayout {
+                    Layout.fillWidth: true
+                    QGCLabel { 
+                        text:             qsTr("Master System Enable")
+                        font.bold:        true
+                        Layout.fillWidth: true 
+                    }
+                    QGCCheckBox {
+                        checked: sprayPopup._stagedEnable
+                        onClicked: sprayPopup._stagedEnable = checked
+                    }
+                }
+
+                // Pump Rate Control (using staged value)
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    RowLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("Pump Flow Rate"); color: "white" }
+                        QGCLabel { 
+                            text: sprayPopup._stagedPumpRate.toFixed(0) + " %"
+                            font.bold: true; color: "white" 
+                        }
+                    }
+                    QGCSlider {
+                        Layout.fillWidth: true
+                        from:             0
+                        to:               100
+                        value:            sprayPopup._stagedPumpRate
+                        onValueChanged:   sprayPopup._stagedPumpRate = value
+                    }
+                }
+
+                // Spinner Speed Control
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+                    RowLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("Granule Spinner Speed"); color: "white" }
+                        QGCLabel { 
+                            text: sprayPopup._stagedSpinner.toFixed(0) + " ms"
+                            font.bold: true; color: "white" 
+                        }
+                    }
+                    QGCTextField {
+                        Layout.fillWidth: true
+                        text:             sprayPopup._stagedSpinner.toString()
+                        onEditingFinished: sprayPopup._stagedSpinner = parseFloat(text)
+                    }
+                }
+
+                // Advanced Thresholds
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 20
+                    
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("Min Pump %"); font.pointSize: ScreenTools.smallFontPointSize; color: "white" }
+                        QGCTextField {
+                            Layout.fillWidth: true
+                            text:             sprayPopup._stagedPumpMin.toString()
+                            onEditingFinished: sprayPopup._stagedPumpMin = parseFloat(text)
+                        }
+                    }
+                    
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        QGCLabel { text: qsTr("Min Speed (m/s)"); font.pointSize: ScreenTools.smallFontPointSize; color: "white" }
+                        QGCTextField {
+                            Layout.fillWidth: true
+                            text:             sprayPopup._stagedSpeedMin.toString()
+                            onEditingFinished: sprayPopup._stagedSpeedMin = parseFloat(text)
+                        }
+                    }
+                }
+
+                Rectangle { width: parent.width; height: 1; color: "#444444" }
+
+                // Actions: Save / Cancel / Reset
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    Layout.topMargin: 5
+
+                    QGCButton {
+                        text: qsTr("RESET")
+                        onClicked: sprayPopup.resetStaging()
+                        Layout.preferredWidth: 80
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    QGCButton {
+                        text: qsTr("CANCEL")
+                        onClicked: sprayPopup.close()
+                        Layout.preferredWidth: 80
+                    }
+
+                    QGCButton {
+                        text: qsTr("SAVE")
+                        primary: true
+                        Layout.preferredWidth: 80
+                        onClicked: {
+                            if (_sprayEnable)  _sprayEnable.rawValue = sprayPopup._stagedEnable ? 1 : 0
+                            if (_sprayPumpRate) _sprayPumpRate.rawValue = sprayPopup._stagedPumpRate
+                            if (_spraySpinner) _spraySpinner.rawValue = sprayPopup._stagedSpinner
+                            if (_sprayPumpMin) _sprayPumpMin.rawValue = sprayPopup._stagedPumpMin
+                            if (_spraySpeedMin) _spraySpeedMin.rawValue = sprayPopup._stagedSpeedMin
+                            sprayPopup.close()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

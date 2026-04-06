@@ -63,6 +63,7 @@ Popup {
     property bool   destroyOnClose:         true
     property bool   preventClose:           false
     property bool   closeOnClickOutside:    false  // NEW: Control close on outside click
+    property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 
     readonly property real headerMinWidth: titleLable.implicitWidth + rejectButton.width + acceptButton.width + titleLable.spacing * 2
 
@@ -268,7 +269,7 @@ Popup {
             Rectangle {
                 Layout.fillWidth: true
                 height: Math.max(titleLable.implicitHeight + 20, 50) // More breathing room
-                color: "#262626" // Faded charcoal black as requested
+                color: isAgri ? "#79AE6F" : "#262626" // Agri Green or Faded charcoal black
                 radius: 20
 
                 // Mask bottom rounded corners
@@ -302,7 +303,7 @@ Popup {
                         width: 28
                         height: 28
                         radius: 0
-                        color: closeBtnMouseArea.containsMouse ? "#262626" : "#262626"
+                        color: closeBtnMouseArea.containsMouse ? (isAgri ? "#588D4E" : "#262626") : (isAgri ? "#79AE6F" : "#262626")
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -428,7 +429,12 @@ Popup {
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 8
-                        color: acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
+                        color: {
+                            if (isAgri) {
+                                return acceptButton.pressed ? "#588D4E" : (acceptButton.hovered ? "#8CC881" : "#79AE6F")
+                            }
+                            return acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
+                        }
                     }
                     contentItem: Text {
                         text: acceptButton.text

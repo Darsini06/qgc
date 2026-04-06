@@ -101,6 +101,9 @@ Item {
 
     function _setupFileExtensions() {
         _rgExtensions = [ ]
+        if (!_root.nameFilters || _root.nameFilters.length === 0) {
+            return
+        }
         for (var i=0; i<_root.nameFilters.length; i++) {
             var filter = _root.nameFilters[i]
             var regExp = /^.*\((.*)\)$/

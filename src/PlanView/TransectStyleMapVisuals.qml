@@ -89,17 +89,21 @@ Item {
         id: objMgr
     }
 
+    property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    property color _themeColor: _isAgri ? "#79AE6F" : "#808080" // Agri Green or Professional Gray
+    property color _themeBorder: _isAgri ? Qt.darker("#79AE6F", 1.2) : "black"
+
     // Area polygon
     QGCMapPolygonVisuals {
         id:                 mapPolygonVisuals
         mapControl:         map
         mapPolygon:         _mapPolygon
         interactive:        polygonInteractive && _missionItem.isCurrentItem && _root.interactive
-        borderWidth:        5
-        borderColor:        "black"
-        interiorColor:      QGroundControl.globalPalette.surveyPolygonInterior
+        borderWidth:        _missionItem.isCurrentItem ? 4 : 2
+        borderColor:        _missionItem.isCurrentItem ? "white" : _themeBorder
+        interiorColor:      _themeColor
         altColor:           QGroundControl.globalPalette.surveyPolygonTerrainCollision
-        interiorOpacity:    0.5 * _root.opacity
+        interiorOpacity:    (_missionItem.isCurrentItem ? 0.35 : 0.15) * _root.opacity
     }
 
     // Full set of transects lines. Shown when item is selected.

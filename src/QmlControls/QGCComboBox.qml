@@ -12,6 +12,7 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Templates as T
 
+import QGroundControl
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controls
@@ -37,6 +38,8 @@ T.ComboBox {
     property real   _popupWidth
     property bool   _onCompleted:   false
     property bool   _showBorder:    qgcPal.globalTheme === QGCPalette.Light
+    property bool   isAgri:         QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    property color  app_color:      isAgri ? "#79AE6F" : "#808080"
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
@@ -94,9 +97,9 @@ T.ComboBox {
         }
 
         background: Rectangle {
-            color:                  control.currentIndex === index ? "#301934" : (highlighted ? "#301934" : "white")
+            color:                  control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : (highlighted ? (isAgri ? "#79AE6F" : "#808080") : "white")
             radius: 8
-            border.color:           control.currentIndex === index ? "#301934" : "#E2E8F0"
+            border.color:           control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : "#E2E8F0"
             border.width:           1
         }
 
@@ -124,8 +127,8 @@ T.ComboBox {
     }
 
     background: Rectangle {
-        color:          "white"
-        border.color:   "#301934"
+        color:          "black"
+        border.color:   isAgri ? "#79AE6F" : "#808080"
         border.width:   1
         radius:         8
     }
@@ -151,7 +154,7 @@ T.ComboBox {
         background: Rectangle {
             color: "white"
             radius: 8
-            border.color: "#301934"
+            border.color: isAgri ? "#79AE6F" : "#808080"
             border.width: 1
         }
     }

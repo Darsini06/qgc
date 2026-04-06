@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Network Positioning Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Network Positioning Sql Concurrent)
 
 set(AIRSPACE_SOURCES
     AirspaceManager.cc
@@ -23,6 +23,7 @@ target_link_libraries(Airspace
         Qt6::Network
         Qt6::Positioning
         Qt6::Sql
+        Qt6::Concurrent
     PRIVATE
         Qt6::CorePrivate
         MAVLink

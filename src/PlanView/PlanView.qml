@@ -1777,7 +1777,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: 60
-            anchors.leftMargin: 10
+            anchors.leftMargin: 20
 
             Row {
                 spacing: 10    // space between the two buttons
@@ -2557,16 +2557,16 @@ Item {
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
         anchors.topMargin:  2
-        anchors.leftMargin: 8
+        anchors.leftMargin: 20
         z:                  QGroundControl.zOrderWidgets + 1
 
         Rectangle {
             width:        baseSize
             height:       baseSize
             radius:       width / 2
-            color:        "#4a2c6d"
-            border.width: 1
-            border.color: "#8e6abb"
+            color:        Qt.rgba(0, 0, 0, 0.40)
+            border.width: 0
+            border.color: "transparent"
             clip:         true
 
             MouseArea {

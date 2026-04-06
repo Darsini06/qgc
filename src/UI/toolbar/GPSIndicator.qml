@@ -21,67 +21,114 @@ import QGroundControl.Palette
 Item {
     id:             control
     width:          gpsIndicatorRow.width
-    anchors.top:    parent.top
-    anchors.bottom: parent.bottom
 
     property var    _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property bool   _rtkConnected:  QGroundControl.gpsRtk.connected.value
 
-    Row {
+    Item {
         id:             gpsIndicatorRow
         anchors.top:    parent.top
         anchors.bottom: parent.bottom
-        spacing:        ScreenTools.defaultFontPixelWidth / 2
+        width:          bgRect.width
 
-        Row {
-            anchors.top:    parent.top
-            anchors.bottom: parent.bottom
-            spacing:        -ScreenTools.defaultFontPixelWidth / 2
+        Rectangle {
+            id: bgRect
+            height: parent.height
+            width: contentRowLayout.width + ScreenTools.defaultFontPixelWidth * 1.5
+            radius: height / 2
+            color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(0, 0, 0, 0.3)
+            border.color: mouseArea.containsMouse ? "white" : Qt.rgba(1, 1, 1, 0.2)
+            border.width: 1
+            clip: true
 
-            QGCLabel {
-                id:                     gpsLabel
-                rotation:               90
-                text:                   qsTr("RTK")
-                color:                  qgcPal.buttonText
-                anchors.verticalCenter: parent.verticalCenter
-                visible:                _rtkConnected
+            Behavior on color { ColorAnimation { duration: 200 } }
+            Behavior on border.color { ColorAnimation { duration: 200 } }
+
+            // Inner gauge fill based on satellite count (max 20)
+            Rectangle {
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                
+                width: {
+                    var satCount = _activeVehicle ? _activeVehicle.gps.count.value : 0
+                    var pct = Math.max(0, Math.min(100, (satCount / 20.0) * 100))
+                    return parent.width * (pct / 100.0)
+                }
+                
+                color: {
+                    var hdop = _activeVehicle ? _activeVehicle.gps.hdop.value : 99
+                    if (hdop <= 1.5) return qgcPal.colorGreen
+                    if (hdop <= 2.5) return qgcPal.colorYellow
+                    return qgcPal.colorRed
+                }
+                opacity: 0.25
+                radius: parent.radius
             }
 
-            QGCColoredImage {
-                id:                 gpsIcon
-                width:              height
-                anchors.top:        parent.top
-                anchors.bottom:     parent.bottom
-                source:             "/qmlimages/Gps.svg"
-                fillMode:           Image.PreserveAspectFit
-                sourceSize.height:  height
-                opacity:            (_activeVehicle && _activeVehicle.gps.count.value >= 0) ? 1 : 0.5
-                color:              "white" //qgcPal.buttonText
-            }
-        }
+            RowLayout {
+                id: contentRowLayout
+                anchors.centerIn: parent
+                spacing: ScreenTools.defaultFontPixelWidth / 2
 
-        Column {
-            id:                     gpsValuesColumn
-            anchors.verticalCenter: parent.verticalCenter
-            visible:                _activeVehicle && !isNaN(_activeVehicle.gps.hdop.value)
-            spacing:                0
+                RowLayout {
+                    Layout.alignment: Qt.AlignVCenter
+                    spacing: 2
+                    
+                    QGCLabel {
+                        id:                     gpsLabel
+                        rotation:               _rtkConnected ? 90 : 0
+                        text:                   qsTr("RTK")
+                        color:                  "white"
+                        Layout.alignment:       Qt.AlignVCenter
+                        visible:                _rtkConnected
+                        font.pointSize:         ScreenTools.smallFontPointSize - 2
+                    }
 
-            QGCLabel {
-                anchors.horizontalCenter:   hdopValue.horizontalCenter
-                color:             "white" //qgcPal.buttonText
-                text:               _activeVehicle ? _activeVehicle.gps.count.valueString : ""
-            }
+                    QGCColoredImage {
+                        id:                 gpsIcon
+                        Layout.preferredWidth:  20
+                        Layout.preferredHeight: 20
+                        source:             "/qmlimages/Gps.svg"
+                        fillMode:           Image.PreserveAspectFit
+                        sourceSize.height:  Layout.preferredHeight
+                        opacity:            (_activeVehicle && _activeVehicle.gps.count.value >= 0) ? 1 : 0.5
+                        color:              "white"
+                        Layout.alignment:   Qt.AlignVCenter
+                    }
+                }
 
-            QGCLabel {
-                id:     hdopValue
-                color:  "white" //qgcPal.buttonText
-                text:   _activeVehicle ? _activeVehicle.gps.hdop.value.toFixed(1) : ""
+                ColumnLayout {
+                    id:                     gpsValuesColumn
+                    Layout.alignment:       Qt.AlignVCenter
+                    visible:                _activeVehicle && !isNaN(_activeVehicle.gps.hdop.value)
+                    spacing:                -2
+
+                    QGCLabel {
+                        Layout.alignment:   Qt.AlignHCenter
+                        color:              "white"
+                        text:               _activeVehicle ? _activeVehicle.gps.count.valueString : ""
+                        font.pointSize:     ScreenTools.smallFontPointSize
+                        font.bold:          true
+                    }
+
+                    QGCLabel {
+                        id:                 hdopValue
+                        Layout.alignment:   Qt.AlignHCenter
+                        color:              "white"
+                        text:               _activeVehicle ? _activeVehicle.gps.hdop.value.toFixed(1) : ""
+                        font.pointSize:     ScreenTools.smallFontPointSize - 2
+                        opacity:            0.8
+                    }
+                }
             }
         }
     }
 
     MouseArea {
+        id: mouseArea
         anchors.fill:   parent
+        hoverEnabled:   true
         onClicked:      mainWindow.showIndicatorDrawer(gpsIndicatorPage, control)
     }
 

@@ -279,7 +279,6 @@ SetupPage {
             //     compassDialog.dialogWarningText = warningText
             //     compassDialog.open()
             // }
-
             function showDynamicCalibrationDialog(qmlFile,title) {
                 dynamicCalDialog.dialogTitleText = title
                 dialogLoader.source = qmlFile

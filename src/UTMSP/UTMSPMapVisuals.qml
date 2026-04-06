@@ -49,10 +49,10 @@ Item {
             parent:             _root
             mapControl:         map
             mapPolygon:         object
-            borderWidth:        object.inclusion ? _borderWidthExclusion : _borderWidthInclusion
+            borderWidth:        object.inclusion ? _borderWidthInclusion : _borderWidthExclusion
             borderColor:        _borderColor
-            interiorColor:      object.inclusion ? _interiorColorExclusion : _interiorColorInclusion
-            interiorOpacity:    object.inclusion ? _interiorOpacityExclusion : _interiorOpacityInclusion
+            interiorColor:      object.inclusion ? _interiorColorInclusion : _interiorColorExclusion
+            interiorOpacity:    object.inclusion ? _interiorOpacityInclusion : _interiorOpacityExclusion
             interactive:        _root.interactive && mapPolygon && mapPolygon.interactive
             resetChecked:       resetCheck
             missionItems:       currentMissionItems

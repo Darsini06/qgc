@@ -38,19 +38,20 @@ RowLayout {
 
         QGCColoredImage {
             id:         flightModeIcon
-            width:      ScreenTools.defaultFontPixelWidth * 2.3
+            width:      0
             height:     ScreenTools.defaultFontPixelHeight
             fillMode:   Image.PreserveAspectFit
             mipmap:     true
-            color:      "black"
+            color:      "white"
             source:     "/qmlimages/FlightModesComponentIcon.png"
+            visible:    false
         }
 
         QGCLabel {
             text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
             font.pointSize:     fontPointSize
             Layout.alignment:   Qt.AlignCenter
-            color:      "black"
+            color:      "white"
             MouseArea {
                 anchors.fill:   parent
                 onClicked:      if(_activeVehicle){
@@ -87,9 +88,9 @@ RowLayout {
             implicitHeight: Math.min(ScreenTools.screenHeight * 0.8, contentColumn.implicitHeight + headerArea.height + ScreenTools.defaultFontPixelHeight * 2)
             radius:         15
             clip:           true
-            color:          "#FFFFFF"
-            border.color:   "#301934"
-            border.width:   1
+            color:          "transparent"
+            border.color:   "transparent"
+            border.width:   0
 
             ColumnLayout {
                 anchors.fill: parent
@@ -110,7 +111,7 @@ RowLayout {
                         QGCLabel {
                             Layout.fillWidth: true
                             text:             activeVehicle ? activeVehicle.flightMode : qsTr("Stabilize")
-                            color:            "#000000"
+                            color:            "white"
                             font.pointSize:   ScreenTools.mediumFontPointSize
                             font.bold:        true
                         }
@@ -124,7 +125,7 @@ RowLayout {
 
                             QGCLabel {
                                 text:             "X" // Use standard character to ensure display
-                                color:            "#000000"
+                                color:            "white"
                                 anchors.centerIn: parent
                                 font.pixelSize:   parent.height * 0.5
                                 font.bold:        true
@@ -142,8 +143,8 @@ RowLayout {
                 Rectangle {
                     Layout.fillWidth: true
                     height:           1
-                    color:            "#DDE1EA"
-                    opacity:          1.0
+                    color:            "white"
+                    opacity:          0.2
                 }
 
                 // Scrollable content
@@ -201,7 +202,7 @@ RowLayout {
                                     id:                 modeButton
                                     Layout.fillWidth:   true
                                     height:             ScreenTools.defaultFontPixelHeight * 3
-                                    color:              modeMouseArea.pressed ? "#F1F5F9" : (_activeVehicle.flightMode === modelData ? "#301934" : "transparent")
+                                    color:              modeMouseArea.pressed ? "#40FFFFFF" : (_activeVehicle.flightMode === modelData ? "#40FFFFFF" : "transparent")
                                     radius:             8
                                     
                                     RowLayout {
@@ -212,7 +213,7 @@ RowLayout {
                                         QGCLabel {
                                             Layout.fillWidth: true
                                             text:             modelData
-                                            color:            (_activeVehicle.flightMode === modelData) ? "white" : "black"
+                                            color:            "white"
                                             font.pointSize:   ScreenTools.defaultFontPointSize
                                             font.bold:        _activeVehicle.flightMode === modelData
                                         }
@@ -252,8 +253,8 @@ RowLayout {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     height:           1
-                                    color:            "#DDE1EA"
-                                    opacity:          1.0
+                                    color:            "white"
+                                    opacity:          0.2
                                     visible:          index < modeRepeater.count - 1
                                 }
                             }
