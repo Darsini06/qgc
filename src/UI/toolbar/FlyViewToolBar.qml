@@ -298,6 +298,7 @@ Rectangle {
         BatteryIndicator {
             id: batteryIndicator
             height: 40
+            width: 45 // Fixed width to ensure it doesn't collapse
             Layout.alignment: Qt.AlignVCenter
             visible: _activeVehicle ? true : false
         }
@@ -353,7 +354,7 @@ Rectangle {
             visible: _isAgri && _activeVehicle
         }
 
-        // ── SPRAY Button (Text only, matched to FlightModeIndicator style) ──
+        // ── SPRAY Button ──
         Item {
             id:               sprayButton
             width:            labelCol.width + 10
@@ -364,7 +365,7 @@ Rectangle {
             QGCLabel {
                 id:               labelCol
                 anchors.centerIn: parent
-                text:             qsTr("SPRAY")
+                text:             qsTr("Spray")
                 font.bold:        true
                 font.pointSize:   ScreenTools.defaultFontPointSize
                 color:            sprayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
@@ -373,6 +374,59 @@ Rectangle {
 
             MouseArea {
                 id:           sprayMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked:    sprayPopup.open()
+            }
+        }
+
+        // ── Thin vertical divider ──
+        Rectangle {
+            width:  1
+            height: parent.height * 0.55
+            color:  Qt.rgba(1, 1, 1, 0.25)
+            Layout.alignment: Qt.AlignVCenter
+            visible: _isAgri && _activeVehicle && !_communicationLost
+        }
+
+        // ── Pump Rate Status ──
+        Item {
+            id:               pumpRateStatus
+            width:            pumpRow.width + 10
+            height:           parent.height * 0.8
+            visible:          _isAgri && _activeVehicle && !_communicationLost
+            Layout.alignment: Qt.AlignVCenter
+
+            Row {
+                id:               pumpRow
+                anchors.centerIn: parent
+                spacing:          4
+
+                QGCColoredImage {
+                    width:            16
+                    height:           16
+                    source:           "qrc:/qmlimages/NewImages/spray_parameter.svg"
+                    color:            pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
+                    anchors.verticalCenter: parent.verticalCenter
+                    Behavior on color { ColorAnimation { duration: 120 } }
+                }
+
+                QGCLabel {
+                    text: {
+                        var val = _sprayPumpRate ? _sprayPumpRate.rawValue : -1
+                        if (val < 0 || val > 100) return "0%"
+                        return Math.round(val) + "%"
+                    }
+                    font.bold:        true
+                    font.pointSize:   ScreenTools.defaultFontPointSize
+                    color:            pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
+                    anchors.verticalCenter: parent.verticalCenter
+                    Behavior on color { ColorAnimation { duration: 120 } }
+                }
+            }
+
+            MouseArea {
+                id:           pumpMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked:    sprayPopup.open()
