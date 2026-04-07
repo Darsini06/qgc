@@ -67,6 +67,17 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                 property var battery: object
             }
         }
+
+        // Fallback battery icon if no batteries are reported but a vehicle is connected
+        Loader {
+            anchors.top:        parent.top
+            anchors.bottom:     parent.bottom
+            visible:            _activeVehicle && (_activeVehicle.batteries === null || _activeVehicle.batteries.count === 0)
+            sourceComponent:    batteryVisual
+            
+            // We'll let batteryVisual handle the null battery case by displaying defaults
+            property var battery: null
+        }
     }
     MouseArea {
         id: mouseArea
@@ -183,10 +194,8 @@ property real lastPercentage : 100  // Keep it global so it's preserved
                 id: batteryContainer
                 height: parent.height
                 width: contentRow.width + ScreenTools.defaultFontPixelWidth * 1.5
-                radius: height / 2
-                color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(0, 0, 0, 0.3)
-                border.color: mouseArea.containsMouse ? "white" : Qt.rgba(1, 1, 1, 0.2)
-                border.width: 1
+                color: "transparent"
+                border.width: 0
                 clip: true
 
                 Rectangle {

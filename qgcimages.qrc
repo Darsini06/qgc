@@ -209,6 +209,7 @@
         <file alias="NewImages/agri_bg_image5.png">src/NewImages/agri_bg_image5.png</file>
         <file alias="NewImages/agri_bg_image_pro.png">src/NewImages/agri_bg_image_pro.png</file>
         <file alias="NewImages/camera_bg_image.png">src/NewImages/camera_bg_image.png</file>
+        <file alias="NewImages/nature_bg_rice_fields.jpg">src/NewImages/nature_bg_rice_fields.jpg</file>
         <file alias="NewImages/mapping_bg_image.png">src/NewImages/mapping_bg_image.png</file>
         <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
         <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>

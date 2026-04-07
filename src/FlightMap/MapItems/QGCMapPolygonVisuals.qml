@@ -765,7 +765,7 @@ Item {
             // Modern subtle pulsing fill effect for an active mission coverage area
             SequentialAnimation on opacity {
                 loops: Animation.Infinite
-                running: interactive && (interiorOpacity > 0) 
+                running: interactive && (interiorOpacity > 0)
                 NumberAnimation { to: Math.max(0.05, interiorOpacity * 0.4); duration: 1800; easing.type: Easing.InOutSine }
                 NumberAnimation { to: interiorOpacity; duration: 1800; easing.type: Easing.InOutSine }
             }
@@ -1257,7 +1257,6 @@ Item {
                     width: buttonSize
                     height: buttonSize + 8  // 2 button heights + spacing gap
                 }
-
                 Button {
                     id: boundryMarkingBtn
                     text: ""

@@ -149,7 +149,6 @@ Item {
         onAccepted: _root.acceptedForLoad(controller.urlToLocalFile(folder))
         onRejected: _root.rejected()
     }
-
     Component {
         id: mobileFileOpenDialogComponent
 
@@ -159,6 +158,7 @@ Item {
             buttons:    Dialog.Cancel
 
             property bool showAllFiles: false
+
             property var  fullFileList: []
             property var  displayList: []
 
@@ -174,6 +174,7 @@ Item {
 
             onShowAllFilesChanged: refreshFiles()
             Component.onCompleted: refreshFiles()
+
 
 
             Column {
@@ -271,6 +272,7 @@ Item {
                     }
 
 
+
                 }
 
                 Button {
@@ -306,7 +308,6 @@ Item {
             }
         }
     }
-
     Component {
         id: savefiledialog
 

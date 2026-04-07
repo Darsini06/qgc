@@ -89,18 +89,18 @@ T.ComboBox {
         }
 
         contentItem: Text {
+            leftPadding:            ScreenTools.defaultFontPixelWidth * 2
+            rightPadding:           ScreenTools.defaultFontPixelWidth * 2
             text:                   _text
             font:                   control.font
             color:                  control.currentIndex === index ? "white" : (highlighted ? "white" : "black")
             verticalAlignment:      Text.AlignVCenter
-            horizontalAlignment:    Text.AlignHCenter
+            horizontalAlignment:    Text.AlignLeft
         }
 
         background: Rectangle {
-            color:                  control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : (highlighted ? (isAgri ? "#79AE6F" : "#808080") : "white")
-            radius: 8
-            border.color:           control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : "#E2E8F0"
-            border.width:           1
+            color:                  control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : (highlighted ? (isAgri ? "#79AE6F" : "#808080") : "transparent")
+            radius:                 0
         }
 
         highlighted:                control.highlightedIndex === index
@@ -110,36 +110,39 @@ T.ComboBox {
         anchors.rightMargin:    control.padding
         anchors.right:          parent.right
         anchors.verticalCenter: parent.verticalCenter
-        height:                 ScreenTools.defaultFontPixelWidth
+        height:                 ScreenTools.defaultFontPixelWidth * 0.8
         width:                  height
         source:                 "/qmlimages/arrow-down.png"
-        color:                  "black"
+        color:                  "#808080"
     }
 
     // The label of the button
     contentItem: QGCLabel {
         id:                         text
         anchors.verticalCenter:     parent.verticalCenter
-        horizontalAlignment:        Text.AlignHCenter
+        leftPadding:                ScreenTools.defaultFontPixelWidth * 2
+        rightPadding:               ScreenTools.defaultFontPixelWidth * 4
+        horizontalAlignment:        Text.AlignLeft
         text:                       control.alternateText === "" ? control.currentText : control.alternateText
         font:                       control.font
         color:                      "black"
+        elide:                      Text.ElideRight
     }
 
     background: Rectangle {
-        color:          "black"
+        color:          "white"
         border.color:   isAgri ? "#79AE6F" : "#808080"
         border.width:   1
-        radius:         8
+        radius:         12
     }
 
     popup: T.Popup {
         x:              control.width - _popupWidth
         y:              control.height
         width:          _popupWidth
-        height:         Math.min(contentItem.implicitHeight, control.Window.height - topMargin - bottomMargin)
-        topMargin:      6
-        bottomMargin:   6
+        height:         Math.min(contentItem.implicitHeight, control.Window.window ? control.Window.window.height - topMargin - bottomMargin : 500)
+        topMargin:      ScreenTools.toolbarHeight + ScreenTools.defaultFontPixelHeight
+        bottomMargin:   ScreenTools.defaultFontPixelHeight
 
         contentItem: ListView {
             clip:                   true
@@ -153,7 +156,7 @@ T.ComboBox {
 
         background: Rectangle {
             color: "white"
-            radius: 8
+            radius: 12
             border.color: isAgri ? "#79AE6F" : "#808080"
             border.width: 1
         }

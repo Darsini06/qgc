@@ -34,7 +34,7 @@ SettingsPage {
     property bool   _isTCP:                     _isStreamSource && (_videoSource === _videoSettings.tcpVideoSource)
     property bool   _isMPEGTS:                  _isStreamSource && (_videoSource === _videoSettings.mpegtsVideoSource)
     property bool   _videoAutoStreamConfig:     _videoManager.autoStreamConfigured
-    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 45
+    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 30
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
 
     //Telemetry Settings ------------------------------------------------------------------------------------
@@ -55,14 +55,7 @@ SettingsPage {
 
 
 
-    //General Settings
-    // Text {
-    //     Layout.alignment: Qt.AlignHCenter
-    //     text: "General Settings"
-    //     font.pixelSize: 20
-    //     color: "black"
-    //     font.bold: true
-    // }
+
 
     ColumnLayout {
         id:                 contentLayout
@@ -72,14 +65,6 @@ SettingsPage {
         Layout.rightMargin: ScreenTools.defaultFontPixelWidth * 2
         spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight / 2 : ScreenTools.defaultFontPixelHeight
 
-        Text {
-            Layout.fillWidth: true
-            text:             qsTr("General Settings")
-            font.pointSize:   ScreenTools.mediumFontPointSize
-            color:            "black"
-            font.bold:        true
-            horizontalAlignment: Text.AlignLeft
-        }
 
         Rectangle {
             Layout.fillWidth: true
@@ -127,8 +112,8 @@ SettingsPage {
         // }
 
 
-        ColumnLayout {
-            spacing: 12
+        RowLayout {
+            spacing: 20
             visible: _appSettings.followTarget.visible
             Layout.fillWidth: true
 
@@ -136,50 +121,15 @@ SettingsPage {
                 text: qsTr("Stream GCS Position")
                 color: "black"
                 font.bold: true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
             }
 
-            GridLayout {
-                Layout.fillWidth: true
-                columns:          _isNarrow ? 1 : 2
-                columnSpacing:    20
-                rowSpacing:       10
+            Item { Layout.fillWidth: true }
 
-                Repeater {
-                    model: _appSettings.followTarget.enumStrings
-
-                    RowLayout {
-                        spacing: 12
-
-                        Rectangle {
-                            width:        26
-                            height:       26
-                            border.color: _appSettings.followTarget.rawValue === _appSettings.followTarget.enumValues[index] ? "black" : "#CCC"
-                            border.width: 2
-                            radius:       4
-                            color:        "white"
-
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width:            18
-                                height:           18
-                                source:           "/qmlimages/checkbox-check.svg"
-                                color:            "black"
-                                visible:          _appSettings.followTarget.rawValue === _appSettings.followTarget.enumValues[index]
-                            }
-                        }
-
-                        QGCLabel {
-                            text:  modelData
-                            color: "black"
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked:    _appSettings.followTarget.rawValue = _appSettings.followTarget.enumValues[index]
-                        }
-                    }
-                }
+            FactComboBox {
+                fact:           _appSettings.followTarget
+                indexModel:     false
+                Layout.preferredWidth: _urlFieldWidth
             }
         }
 
@@ -189,34 +139,42 @@ SettingsPage {
             Layout.fillWidth: true
             visible: _appSettings.androidSaveToSDCard.visible
 
-            Rectangle {
-                width: 26
-                height: 26
-                border.color: _appSettings.androidSaveToSDCard.value != 0 ? "black" : "#CCC"
-                border.width: 2
-                radius: 4
-                color: "white"
-
-                QGCColoredImage {
-                    anchors.centerIn: parent
-                    width: 18
-                    height: 18
-                    source: "/qmlimages/checkbox-check.svg"
-                    color: "black"
-                    visible: _appSettings.androidSaveToSDCard.value != 0
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: _appSettings.androidSaveToSDCard.value = (_appSettings.androidSaveToSDCard.value == 0 ? 1 : 0)
-                }
+            QGCLabel {
+                text:           qsTr("Save application data to SD Card")
+                color:          "black"
+                font.bold:      true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
             }
 
-            QGCLabel {
-                text: qsTr("Save application data to SD Card")
-                color: "black"
-                font.bold: true
-                Layout.fillWidth: true
+            Item { Layout.fillWidth: true }
+
+            Item {
+                Layout.preferredWidth:  _urlFieldWidth
+                Layout.preferredHeight: 26
+
+                Rectangle {
+                    anchors.right:  parent.right
+                    width:          26
+                    height:         26
+                    border.color:   _appSettings.androidSaveToSDCard.value != 0 ? "black" : "#CCC"
+                    border.width:   2
+                    radius:         4
+                    color:          "white"
+
+                    QGCColoredImage {
+                        anchors.centerIn: parent
+                        width:            18
+                        height:           18
+                        source:           "/qmlimages/checkbox-check.svg"
+                        color:            "black"
+                        visible:          _appSettings.androidSaveToSDCard.value != 0
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked:    _appSettings.androidSaveToSDCard.value = (_appSettings.androidSaveToSDCard.value == 0 ? 1 : 0)
+                    }
+                }
             }
         }
 
@@ -286,7 +244,6 @@ SettingsPage {
         // }
 
         Repeater {
-
             visible: _settingsManager.unitsSettings.visible
 
             model:   [
@@ -297,67 +254,25 @@ SettingsPage {
                 _settingsManager.unitsSettings.temperatureUnits
             ]
 
-            ColumnLayout {
-
-                id: unitRow
-                spacing: 12
+            RowLayout {
+                spacing: 20
                 Layout.fillWidth: true
-
                 property var unitFact: modelData
 
                 QGCLabel {
                     text: unitFact.shortDescription
                     color: "black"
                     font.bold: true
+                    Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
                 }
 
-                GridLayout {
-                    Layout.fillWidth: true
-                    columns:          _isNarrow ? 1 : 2
-                    columnSpacing:    20
-                    rowSpacing:       10
+                Item { Layout.fillWidth: true }
 
-                    Repeater {
-                        model: unitFact.enumStrings
-
-                        RowLayout {
-                            spacing: 12
-
-                            Rectangle {
-                                width:        26
-                                height:       26
-                                border.color: unitFact.value === unitFact.enumValues[index] ? "black" : "#CCC"
-                                border.width: 2
-                                radius:       4
-                                color:        "white"
-
-                                QGCColoredImage {
-                                    anchors.centerIn: parent
-                                    width:            18
-                                    height:           18
-                                    source:           "/qmlimages/checkbox-check.svg"
-                                    color:            "black"
-                                    visible:          unitFact.value === unitFact.enumValues[index]
-                                }
-                            }
-
-                            QGCLabel {
-                                text:  modelData
-                                color: "black"
-                                font.pointSize: ScreenTools.smallFontPointSize
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked:    unitFact.value = unitFact.enumValues[index]
-                            }
-                        }
-                    }
+                FactComboBox {
+                    fact:           unitFact
+                    indexModel:     false
+                    Layout.preferredWidth: _urlFieldWidth
                 }
-
-                Item {
-                    Layout.preferredHeight: 3
-                } // Spacer
             }
         }
 
@@ -468,65 +383,30 @@ SettingsPage {
             visible:          _videoSettings.videoSource.visible
         }
 
-        ColumnLayout {
-
-            spacing: 10
+        RowLayout {
+            spacing: 20
             visible: _videoSettings.videoSource.visible
+            Layout.fillWidth: true
 
             QGCLabel {
                 text: qsTr("Source")
                 color: "black"
                 font.bold: true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
             }
 
-            GridLayout {
-                Layout.fillWidth: true
-                columns:          _isNarrow ? 1 : 2
-                columnSpacing:    20
-                rowSpacing:       10
-                visible:          _videoSettings.videoSource.visible
+            Item { Layout.fillWidth: true }
 
-                Repeater {
-                    model: _videoSettings.videoSource.enumStrings
-
-                    RowLayout {
-                        spacing: 12
-
-                        Rectangle {
-                            width:        26
-                            height:       26
-                            border.color: _videoSettings.videoSource.rawValue === _videoSettings.videoSource.enumValues[index] ? "black" : "#CCC"
-                            border.width: 2
-                            radius:       4
-                            color:        "white"
-
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width:            18
-                                height:           18
-                                source:           "/qmlimages/checkbox-check.svg"
-                                color:            "black"
-                                visible:          _videoSettings.videoSource.rawValue === _videoSettings.videoSource.enumValues[index]
-                            }
-                        }
-
-                        QGCLabel {
-                            text:  modelData
-                            color: "black"
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked:    _videoSettings.videoSource.rawValue = _videoSettings.videoSource.enumValues[index]
-                        }
-                    }
-                }
+            FactComboBox {
+                fact:           _videoSettings.videoSource
+                indexModel:     false
+                Layout.preferredWidth: _urlFieldWidth
             }
         }
 
         GridLayout {
-            columns:            2
-            columnSpacing:      25
+            columns:            3
+            columnSpacing:      0
             rowSpacing:         12
             Layout.fillWidth:   true
             visible:            _isStreamSource && _videoSettings.videoSource.visible
@@ -534,19 +414,24 @@ SettingsPage {
             // RTSP URL
             QGCLabel {
                 text:           qsTr("RTSP URL")
-                color:          "#1a237e"
+                color:          "black"
                 font.bold:      true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
                 visible:        _isRTSP && _videoSettings.rtspUrl.visible
             }
 
+            Item {
+                Layout.fillWidth: true
+                visible:          _isRTSP && _videoSettings.rtspUrl.visible
+            }
+
             Rectangle {
-                Layout.fillWidth:       true
+                Layout.preferredWidth:  _urlFieldWidth
                 Layout.preferredHeight: 40
-                Layout.maximumWidth:    _urlFieldWidth
                 color:                  "white"
-                border.color:           "#301934"
+                border.color:           "#808080"
                 border.width:           1
-                radius:                 6
+                radius:                 12
                 visible:                _isRTSP && _videoSettings.rtspUrl.visible
 
                 FactTextField {
@@ -561,19 +446,24 @@ SettingsPage {
             // TCP URL
             QGCLabel {
                 text:           qsTr("TCP URL")
-                color:          "#1a237e"
+                color:          "black"
                 font.bold:      true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
                 visible:        _isTCP && _videoSettings.tcpUrl.visible
             }
 
+            Item {
+                Layout.fillWidth: true
+                visible:          _isTCP && _videoSettings.tcpUrl.visible
+            }
+
             Rectangle {
-                Layout.fillWidth:       true
+                Layout.preferredWidth:  _urlFieldWidth
                 Layout.preferredHeight: 40
-                Layout.maximumWidth:    _urlFieldWidth
                 color:                  "white"
-                border.color:           "#301934"
+                border.color:           "#808080"
                 border.width:           1
-                radius:                 6
+                radius:                 12
                 visible:                _isTCP && _videoSettings.tcpUrl.visible
 
                 FactTextField {
@@ -588,18 +478,24 @@ SettingsPage {
             // UDP Port
             QGCLabel {
                 text:           qsTr("UDP Port")
-                color:          "#1a237e"
+                color:          "black"
                 font.bold:      true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
                 visible:        _requiresUDPPort && _videoSettings.udpPort.visible
             }
 
+            Item {
+                Layout.fillWidth: true
+                visible:          _requiresUDPPort && _videoSettings.udpPort.visible
+            }
+
             Rectangle {
-                Layout.preferredWidth:  120
+                Layout.preferredWidth:  _urlFieldWidth
                 Layout.preferredHeight: 40
                 color:                  "white"
-                border.color:           "#301934"
+                border.color:           "#808080"
                 border.width:           1
-                radius:                 6
+                radius:                 12
                 visible:                _requiresUDPPort && _videoSettings.udpPort.visible
 
                 FactTextField {
@@ -614,18 +510,24 @@ SettingsPage {
             // Aspect Ratio
             QGCLabel {
                 text:           qsTr("Aspect Ratio")
-                color:          "#1a237e"
+                color:          "black"
                 font.bold:      true
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
                 visible:        !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
             }
 
+            Item {
+                Layout.fillWidth: true
+                visible:          !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+            }
+
             Rectangle {
-                Layout.preferredWidth:  120
+                Layout.preferredWidth:  _urlFieldWidth
                 Layout.preferredHeight: 40
                 color:                  "white"
-                border.color:           "#301934"
+                border.color:           "#808080"
                 border.width:           1
-                radius:                 6
+                radius:                 8
                 visible:                !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
 
                 FactTextField {
@@ -669,34 +571,44 @@ SettingsPage {
                 delegate: RowLayout {
                     spacing: 15
                     visible: modelData.v
-
-                    Rectangle {
-                        width: 26
-                        height: 26
-                        border.color: modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width: 2
-                        radius: 4
-                        color: "white"
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width: 18
-                            height: 18
-                            source: "/qmlimages/checkbox-check.svg"
-                            color: "black"
-                            visible: modelData.f.value != 0
-                        }
-                    }
+                    Layout.fillWidth: true
 
                     QGCLabel {
-                        text: modelData.t
-                        color: "black"
-                        Layout.fillWidth: true
+                        text:           modelData.t
+                        color:          "black"
+                        font.bold:      true
+                        Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    Item {
+                        Layout.preferredWidth:  _urlFieldWidth
+                        Layout.preferredHeight: 26
+
+                        Rectangle {
+                            anchors.right:  parent.right
+                            width:          26
+                            height:         26
+                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                            border.width:   2
+                            radius:         4
+                            color:          "white"
+
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          modelData.f.value != 0
+                            }
+                        }
                     }
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                        onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
                     }
                 }
             }
@@ -736,35 +648,45 @@ SettingsPage {
                     spacing: 15
                     visible: modelData.v
                     opacity: modelData.e ? 1 : 0.5
-
-                    Rectangle {
-                        width: 26
-                        height: 26
-                        border.color: modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width: 2
-                        radius: 4
-                        color: "white"
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width: 18
-                            height: 18
-                            source: "/qmlimages/checkbox-check.svg"
-                            color: "black"
-                            visible: modelData.f.value != 0
-                        }
-                    }
+                    Layout.fillWidth: true
 
                     QGCLabel {
-                        text: modelData.t
-                        color: "black"
-                        Layout.fillWidth: true
+                        text:           modelData.t
+                        color:          "black"
+                        font.bold:      true
+                        Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    Item {
+                        Layout.preferredWidth:  _urlFieldWidth
+                        Layout.preferredHeight: 26
+
+                        Rectangle {
+                            anchors.right:  parent.right
+                            width:          26
+                            height:         26
+                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                            border.width:   2
+                            radius:         4
+                            color:          "white"
+
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          modelData.f.value != 0
+                            }
+                        }
                     }
 
                     MouseArea {
                         anchors.fill: parent
-                        enabled: modelData.e
-                        onClicked: modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                        enabled:      modelData.e
+                        onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
                     }
                 }
             }
