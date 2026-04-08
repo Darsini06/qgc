@@ -743,7 +743,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
-                    visible:     MapGlobals.gridLines && object.sequenceNumber !== 0
+                    visible:     MapGlobals.gridLines
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle

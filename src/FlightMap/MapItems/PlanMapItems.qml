@@ -42,7 +42,6 @@ Item {
         delegate: MissionItemMapVisual {
             map:        _map
             vehicle:    _vehicle
-            visible:    object && object.sequenceNumber !== 0
             onClicked:  _guidedController.confirmAction(_guidedController.actionSetWaypoint, Math.max(object.sequenceNumber, 1))
         }
     }

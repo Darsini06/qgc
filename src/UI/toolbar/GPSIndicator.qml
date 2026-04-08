@@ -35,14 +35,9 @@ Item {
             id: bgRect
             height: parent.height
             width: contentRowLayout.width + ScreenTools.defaultFontPixelWidth * 1.5
-            radius: height / 2
-            color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.15) : Qt.rgba(0, 0, 0, 0.3)
-            border.color: mouseArea.containsMouse ? "white" : Qt.rgba(1, 1, 1, 0.2)
-            border.width: 1
+            color: "transparent"
+            border.width: 0
             clip: true
-
-            Behavior on color { ColorAnimation { duration: 200 } }
-            Behavior on border.color { ColorAnimation { duration: 200 } }
 
             // Inner gauge fill based on satellite count (max 20)
             Rectangle {

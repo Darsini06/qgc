@@ -48,8 +48,8 @@ Item {
                 //savefiledialog.createObject(mainWindow).open()
                 savefiledialog.createObject(mainWindow, {
 
-                                    userName: _appSettings.username
-                                }).open()
+                                                userName: _appSettings.username
+                                            }).open()
 
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
@@ -151,7 +151,6 @@ Item {
         onAccepted: _root.acceptedForLoad(controller.urlToLocalFile(folder))
         onRejected: _root.rejected()
     }
-
     Component {
         id: mobileFileOpenDialogComponent
 
@@ -162,21 +161,24 @@ Item {
 
             property bool showAllFiles: false
 
-                        property var  fullFileList: []
-                        property var  displayList: []
+
+            property var  fullFileList: []
+            property var  displayList: []
+
 
             function refreshFiles() {
-                            fullFileList = controller.getFiles(folder, _rgExtensions)
-                            //fullFileList.reverse()    // 🔥 LIFO
+                fullFileList = controller.getFiles(folder, _rgExtensions)
+                //fullFileList.reverse()    // 🔥 LIFO
 
-                            if (showAllFiles)
-                                displayList = fullFileList
-                            else
-                                displayList = fullFileList.slice(0, 3)
-                        }
+                if (showAllFiles)
+                    displayList = fullFileList
+                else
+                    displayList = fullFileList.slice(0, 3)
+            }
 
-                        onShowAllFilesChanged: refreshFiles()
-                        Component.onCompleted: refreshFiles()
+            onShowAllFilesChanged: refreshFiles()
+            Component.onCompleted: refreshFiles()
+
 
 
 
@@ -279,39 +281,38 @@ Item {
                 }
 
                 Button {
-                                    visible: !mobileFileOpenDialog.showAllFiles &&
-                                             mobileFileOpenDialog.fullFileList.length > 3
-                                    text: qsTr("See More")
-                                    // background: Rectangle {
-                                    //         color: "#262626"
-                                    //         radius: 10
-                                    //     }
+                    visible: !mobileFileOpenDialog.showAllFiles &&
+                             mobileFileOpenDialog.fullFileList.length > 3
+                    text: qsTr("See More")
+                    // background: Rectangle {
+                    //         color: "#262626"
+                    //         radius: 10
+                    //     }
 
-                                    //     contentItem: Text {
-                                    //         text: control.text
-                                    //         color: "white"
-                                    //         font.bold: true
-                                    //         anchors.centerIn: parent
-                                    //     }
+                    //     contentItem: Text {
+                    //         text: control.text
+                    //         color: "white"
+                    //         font.bold: true
+                    //         anchors.centerIn: parent
+                    //     }
 
-                                    onClicked: {
-                                        mainWindow.homescreen()
-                                        mobileFileOpenDialog.visible = false
-                                        MapGlobals.currentView_profile = "dronePage"
-                                                                        mainWindow.logfiles()
-                                    }
-                                }
+                    onClicked: {
+                        mainWindow.homescreen()
+                        mobileFileOpenDialog.visible = false
+                        MapGlobals.currentView_profile = "dronePage"
+                        mainWindow.logfiles()
+                    }
+                }
 
-                                Button {
-                                    visible: mobileFileOpenDialog.showAllFiles
-                                    text: qsTr("Show Less")
+                Button {
+                    visible: mobileFileOpenDialog.showAllFiles
+                    text: qsTr("Show Less")
 
-                                    onClicked: mobileFileOpenDialog.showAllFiles = false
-                                }
+                    onClicked: mobileFileOpenDialog.showAllFiles = false
+                }
             }
         }
     }
-
     Component {
         id: savefiledialog
 

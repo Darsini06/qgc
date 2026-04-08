@@ -16,21 +16,25 @@
 
 QGC_LOGGING_CATEGORY(QGCFileDialogControllerLog, "QGCFileDialogControllerLog")
 
-QStringList QGCFileDialogController::getFiles(const QString& directoryPath, const QStringList& nameFilters)
+QStringList QGCFileDialogController::getFiles(const QString& path,
+                                              const QStringList& nameFilters)
 {
-    qCDebug(QGCFileDialogControllerLog) << "getFiles" << directoryPath << nameFilters;
-    QStringList files;
+    QDir dir(path);
+    dir.setNameFilters(nameFilters);
+    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
 
-    QDir fileDir(directoryPath);
+    QFileInfoList fileInfoList = dir.entryInfoList(
+        QDir::Files,
+        QDir::Time   // 🔥 Sort by last modified time (Newest first)
+        );
 
-    QFileInfoList fileInfoList = fileDir.entryInfoList(nameFilters,  QDir::Files, QDir::Name);
+    QStringList fileList;
 
-    for (const QFileInfo& fileInfo: fileInfoList) {
-        qCDebug(QGCFileDialogControllerLog) << "getFiles found" << fileInfo.fileName();
-        files << fileInfo.fileName();
+    for (const QFileInfo& fileInfo : fileInfoList) {
+        fileList << fileInfo.fileName();
     }
 
-    return files;
+    return fileList;   // LIFO (Latest first)
 }
 
 bool QGCFileDialogController::fileExists(const QString& filename)

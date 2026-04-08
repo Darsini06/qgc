@@ -1515,7 +1515,7 @@ ApplicationWindow {
         property string dialogText: "Default Text"
 
         x: (parent.width - width) / 2
-        y: toolbar.y + toolbar.height + 20
+        y: (parent.height - height) / 2
         modal: false
         dim: false
         closePolicy: Popup.CloseOnPressOutside
