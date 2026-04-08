@@ -79,8 +79,7 @@ Item {
     property bool   _mobileDlg:    QGroundControl.corePlugin.options.useMobileFileDialog
     property var    _rgExtensions
     property string _mobileShortPath
-
-    signal backClicked()
+    //===========================================================================================
 
     function dp(value) {
         return value * baseUnit;
@@ -438,7 +437,7 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: logfiles.backClicked()
+                                onClicked: mainWindow.openHomeScreen()
                             }
                         }
 

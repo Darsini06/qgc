@@ -272,6 +272,7 @@ Item {
                         color: root.selectedIndex === -1 ? "#C8CDD8" : brandAccent
                         Behavior on color { ColorAnimation { duration: 160 } }
                     }
+
                     Text {
                         id: hintText
                         text: root.selectedIndex === -1

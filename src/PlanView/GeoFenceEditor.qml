@@ -178,10 +178,12 @@ QGCFlickable {
         anchors.left:   parent.left
         anchors.right:  parent.right
         height:         geoFenceItems.y + geoFenceItems.height + _margin
-        radius:         _radius
-        color:          _colorBgPrimary
-        border.color:   _colorBorder
-        border.width:   1
+
+            color:        "#BF000000" // Dark Transparent Black 75% alpha
+            radius:       15
+            border.color: "#3a3750"
+            border.width: 1
+
 
         QGCLabel {
             id:                 geoFenceLabel
@@ -471,56 +473,52 @@ QGCFlickable {
                                 border.width: 1
                                 
                                 ColumnLayout {
-                                    id: polyCol
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.top: parent.top
-                                    anchors.margins: _margin
-                                    spacing: 12
-                                    
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 15
-                                        
-                                        QGCCheckBox {
-                                            text: qsTr("Include")
-                                            checked: object.inclusion
-                                            onClicked: object.inclusion = checked
-                                            Layout.alignment: Qt.AlignVCenter
-                                        }
-                                        
-                                        QGCRadioButton {
-                                            text: qsTr("Edit Mode")
-                                            checked: object.interactive
-                                            onClicked: {
-                                                myGeoFenceController.clearAllInteractive()
-                                                object.interactive = checked
-                                            }
-                                            Layout.alignment: Qt.AlignVCenter
-                                        }
+                                                                    id: polyCol
+                                                                    anchors.left: parent.left
+                                                                    anchors.right: parent.right
+                                                                    anchors.top: parent.top
+                                                                    anchors.margins: _margin
+                                                                    spacing: 12
 
-                                        Item { Layout.fillWidth: true }
+                                                                    ColumnLayout {
+                                                                        Layout.fillWidth: true
+                                                                        spacing: 10
 
-                                        Button {
-                                            height: 30
-                                            width: 60
-                                            background: Rectangle {
-                                                radius: 15
-                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
-                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                border.width: 1
-                                            }
-                                            contentItem: Text {
-                                                text: qsTr("Delete")
-                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                font.bold: true
-                                                horizontalAlignment: Text.AlignHCenter
-                                                verticalAlignment: Text.AlignVCenter
-                                            }
-                                            onClicked: myGeoFenceController.deletePolygon(index)
-                                        }
-                                    }
-                                }
+                                                                        QGCCheckBox {
+                                                                            text: qsTr("Include")
+                                                                            checked: object.inclusion
+                                                                            onClicked: object.inclusion = checked
+                                                                        }
+
+                                                                        QGCRadioButton {
+                                                                            text: qsTr("Edit Mode")
+                                                                            checked: object.interactive
+                                                                            onClicked: {
+                                                                                myGeoFenceController.clearAllInteractive()
+                                                                                object.interactive = checked
+                                                                            }
+                                                                        }
+
+                                                                        Button {
+                                                                            height: 30
+                                                                            Layout.fillWidth: true
+                                                                            background: Rectangle {
+                                                                                radius: 15
+                                                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
+                                                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                border.width: 1
+                                                                            }
+                                                                            contentItem: Text {
+                                                                                text: qsTr("Delete")
+                                                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                font.bold: true
+                                                                                horizontalAlignment: Text.AlignHCenter
+                                                                                verticalAlignment: Text.AlignVCenter
+                                                                            }
+                                                                            onClicked: myGeoFenceController.deletePolygon(index)
+                                                                        }
+                                                                    }
+                                                                }
                             }
                         }
                     }
@@ -588,74 +586,70 @@ QGCFlickable {
                                 border.width: 1
                                 
                                 ColumnLayout {
-                                    id: circleCol
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.top: parent.top
-                                    anchors.margins: _margin
-                                    spacing: 12
-                                    
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 15
-                                        
-                                        QGCCheckBox {
-                                            text: qsTr("Include")
-                                            checked: object.inclusion
-                                            onClicked: object.inclusion = checked
-                                            Layout.alignment: Qt.AlignVCenter
-                                        }
-                                        
-                                        QGCRadioButton {
-                                            text: qsTr("Edit Mode")
-                                            checked: object.interactive
-                                            onClicked: {
-                                                myGeoFenceController.clearAllInteractive()
-                                                object.interactive = checked
-                                            }
-                                            Layout.alignment: Qt.AlignVCenter
-                                        }
+                                                                    id: circleCol
+                                                                    anchors.left: parent.left
+                                                                    anchors.right: parent.right
+                                                                    anchors.top: parent.top
+                                                                    anchors.margins: _margin
+                                                                    spacing: 12
 
-                                        Item { Layout.fillWidth: true }
+                                                                    ColumnLayout {
+                                                                        Layout.fillWidth: true
+                                                                        spacing: 10
 
-                                        Button {
-                                            height: 30
-                                            width: 60
-                                            background: Rectangle {
-                                                radius: 15
-                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
-                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                border.width: 1
-                                            }
-                                            contentItem: Text {
-                                                text: qsTr("Delete")
-                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                font.bold: true
-                                                horizontalAlignment: Text.AlignHCenter
-                                                verticalAlignment: Text.AlignVCenter
-                                            }
-                                            onClicked: myGeoFenceController.deleteCircle(index)
-                                        }
-                                    }
-                                    
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 10
-                                        
-                                        QGCLabel {
-                                            text: qsTr("Radius:")
-                                            color: _colorTextPrimary
-                                            font.bold: true
-                                        }
-                                        Loader {
-                                            Layout.fillWidth: true
-                                            sourceComponent: volumeSliderComponent
-                                            property var targetFact: object.radius
-                                            onTargetFactChanged: if (item) item.fact = targetFact
-                                            onLoaded: if (item) item.fact = targetFact
-                                        }
-                                    }
-                                }
+                                                                        QGCCheckBox {
+                                                                            text: qsTr("Include")
+                                                                            checked: object.inclusion
+                                                                            onClicked: object.inclusion = checked
+                                                                        }
+
+                                                                        QGCRadioButton {
+                                                                            text: qsTr("Edit Mode")
+                                                                            checked: object.interactive
+                                                                            onClicked: {
+                                                                                myGeoFenceController.clearAllInteractive()
+                                                                                object.interactive = checked
+                                                                            }
+                                                                        }
+
+                                                                        Button {
+                                                                            height: 30
+                                                                            Layout.fillWidth: true
+                                                                            background: Rectangle {
+                                                                                radius: 15
+                                                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
+                                                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                border.width: 1
+                                                                            }
+                                                                            contentItem: Text {
+                                                                                text: qsTr("Delete")
+                                                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                font.bold: true
+                                                                                horizontalAlignment: Text.AlignHCenter
+                                                                                verticalAlignment: Text.AlignVCenter
+                                                                            }
+                                                                            onClicked: myGeoFenceController.deleteCircle(index)
+                                                                        }
+                                                                    }
+
+                                                                    ColumnLayout {
+                                                                        Layout.fillWidth: true
+                                                                        spacing: 5
+
+                                                                        QGCLabel {
+                                                                            text: qsTr("Radius:")
+                                                                            color: _colorTextPrimary
+                                                                            font.bold: true
+                                                                        }
+                                                                        Loader {
+                                                                            Layout.fillWidth: true
+                                                                            sourceComponent: volumeSliderComponent
+                                                                            property var targetFact: object.radius
+                                                                            onTargetFactChanged: if (item) item.fact = targetFact
+                                                                            onLoaded: if (item) item.fact = targetFact
+                                                                        }
+                                                                    }
+                                                                }
                             }
                         }
                     }

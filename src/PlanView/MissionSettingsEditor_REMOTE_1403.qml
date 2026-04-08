@@ -65,151 +65,152 @@ Rectangle {
     Component {
         id: volumeSliderComponent
 
-        ColumnLayout {
-                    id: rootCol
-                    spacing: ScreenTools.defaultFontPixelHeight * 0.5
-                    property var fact: null
-                    property color trackFillColor: _colorAccent
-                    property bool showMinusButton: true
-                    property bool showPlusButton: true
+        RowLayout {
+            spacing: ScreenTools.defaultFontPixelWidth * 0.7
+            property var fact: null
+            property color trackFillColor: _colorAccent
+            property bool showMinusButton: true
+            property bool showPlusButton: true
 
-
-                    FactTextField {
-                        id: factField
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                        fact: rootCol.fact
-                        showUnits: true
-                        color: _valueColor
-                        horizontalAlignment: Qt.AlignHCenter
-                        background: Rectangle {
-                            color: factField.activeFocus ? _fieldColor : _panelColor
-                            border.color: factField.activeFocus ? _colorAccent : _panelBorder
-                            border.width: factField.activeFocus ? 2 : 1
-                            radius: 15
-                        }
-                    }
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: ScreenTools.defaultFontPixelWidth * 0.7
-
-                        Rectangle {
-                            visible: rootCol.showMinusButton
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth: Layout.preferredHeight
-                            radius: 15
-                            color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _fieldColor : _panelColor)
-                            border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
-                            border.width: 1
-
-                            QGCLabel {
-                                anchors.centerIn: parent
-                                text: "−"
-                                font.pointSize: ScreenTools.mediumFontPointSize
-                                font.bold: true
-                                color: _headingColor
-                            }
-
-                            MouseArea {
-                                id: minusArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: {
-                                    if (rootCol.fact) {
-                                        var step = rootCol.fact.increment ? rootCol.fact.increment : 1;
-                                        rootCol.fact.value -= step;
-                                    }
-                                }
-                            }
-                        }
-
-                        Slider {
-                            id: factSlider
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-
-                            from: {
-                                if (!rootCol.fact) return 0;
-                                if (isNaN(rootCol.fact.min) || rootCol.fact.min < -1000) return 0;
-                                return rootCol.fact.min;
-                            }
-                            to: {
-                                if (!rootCol.fact) return 100;
-                                if (isNaN(rootCol.fact.max) || rootCol.fact.max > 1000) return (from + 200);
-                                return rootCol.fact.max;
-                            }
-                            value: rootCol.fact ? rootCol.fact.value : 0
-                            stepSize: rootCol.fact ? (rootCol.fact.increment ? rootCol.fact.increment : 1) : 1
-
-                            background: Rectangle {
-                                x: factSlider.leftPadding
-                                y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                                implicitWidth: 100
-                                implicitHeight: 6
-                                width: factSlider.availableWidth
-                                height: implicitHeight
-                                radius: 3
-                                color: _fieldColor
-
-                                Rectangle {
-                                    width: factSlider.visualPosition * parent.width
-                                    height: parent.height
-                                    color: rootCol.trackFillColor
-                                    radius: 3
-                                }
-                            }
-
-                            handle: Rectangle {
-                                x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
-                                y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                                implicitWidth: 18
-                                implicitHeight: 18
-                                radius: 9
-                                color: _valueColor
-                                border.color: _colorAccent
-                                border.width: factSlider.pressed ? 4 : 2
-
-                                Behavior on border.width { NumberAnimation { duration: 150 } }
-                            }
-
-                            onMoved: {
-                                if (rootCol.fact) rootCol.fact.value = value;
-                            }
-                        }
-
-                        Rectangle {
-                            visible: rootCol.showPlusButton
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth: Layout.preferredHeight
-                            radius: 15
-                            color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _fieldColor : _panelColor)
-                            border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
-                            border.width: 1
-
-                            QGCLabel {
-                                anchors.centerIn: parent
-                                text: "+"
-                                font.pointSize: ScreenTools.mediumFontPointSize
-                                font.bold: true
-                                color: _headingColor
-                            }
-
-                            MouseArea {
-                                id: plusArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: {
-                                    if (rootCol.fact) {
-                                        var step = rootCol.fact.increment ? rootCol.fact.increment : 1;
-                                        rootCol.fact.value += step;
-                                    }
-                                }
-                            }
+            Rectangle {
+                visible: parent.showMinusButton
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth: Layout.preferredHeight
+                radius: 15
+                color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _fieldColor : _panelColor)
+                border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
+                border.width: 1
+                
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "−"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _headingColor
+                }
+                
+                MouseArea {
+                    id: minusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
+                            parent.parent.fact.value -= step;
                         }
                     }
                 }
+            }
 
+            Slider {
+                id: factSlider
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                
+                from: {
+                    if (!parent.fact) return 0;
+                    if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0;
+                    return parent.fact.min;
+                }
+                to: {
+                    if (!parent.fact) return 100;
+                    if (isNaN(parent.fact.max) || parent.fact.max > 1000) return (from + 200);
+                    return parent.fact.max;
+                }
+                value: parent.fact ? parent.fact.value : 0
+                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 1) : 1
+                
+                background: Rectangle {
+                    x: factSlider.leftPadding
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 100
+                    implicitHeight: 6
+                    width: factSlider.availableWidth
+                    height: implicitHeight
+                    radius: 3
+                    color: _fieldColor
+                    
+                    Rectangle {
+                        width: factSlider.visualPosition * parent.width
+                        height: parent.height
+                        color: parent.parent.parent.trackFillColor
+                        radius: 3
+                    }
+                }
+                
+                handle: Rectangle {
+                    x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
+                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
+                    implicitWidth: 18
+                    implicitHeight: 18
+                    radius: 9
+                    color: _valueColor
+                    border.color: _colorAccent
+                    border.width: factSlider.pressed ? 4 : 2
+                    
+                    Behavior on border.width { NumberAnimation { duration: 150 } }
+                }
+                
+                onMoved: {
+                    if (parent.fact) parent.fact.value = value;
+                }
+            }
+
+            Rectangle {
+                visible: parent.showPlusButton
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth: Layout.preferredHeight
+                radius: 15
+                color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _fieldColor : _panelColor)
+                border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
+                border.width: 1
+                
+                QGCLabel {
+                    anchors.centerIn: parent
+                    text: "+"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: _headingColor
+                }
+                
+                MouseArea {
+                    id: plusArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1;
+                            parent.parent.fact.value += step;
+                        }
+                    }
+                }
+            }
+
+            FactTextField {
+                id: factField
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 8
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.alignment: Qt.AlignVCenter
+                fact: parent.fact
+                showUnits: true
+                color: _valueColor
+                horizontalAlignment: Qt.AlignHCenter
+                background: Rectangle {
+                    color: factField.activeFocus ? _fieldColor : _panelColor
+                    border.color: factField.activeFocus ? _colorAccent : _panelBorder
+                    border.width: factField.activeFocus ? 2 : 1
+                    radius: 15
+                }
+            }
+
+            QGCLabel {
+                visible:            parent.fact && parent.fact.units
+                text:               parent.fact ? parent.fact.units : ""
+                Layout.alignment:   Qt.AlignVCenter
+                color:              _unitColor
+                font.pointSize:     ScreenTools.smallFontPointSize
+            }
+        }
     }
 
     Connections {

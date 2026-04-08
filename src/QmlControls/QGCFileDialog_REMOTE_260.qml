@@ -47,10 +47,8 @@ Item {
             if(MapGlobals.save==="save1"){
                 //savefiledialog.createObject(mainWindow).open()
                 savefiledialog.createObject(mainWindow, {
-
                                                 userName: _appSettings.username
                                             }).open()
-
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
                 var strippedFileName1=_appSettings.username
@@ -103,9 +101,6 @@ Item {
 
     function _setupFileExtensions() {
         _rgExtensions = [ ]
-        if (!_root.nameFilters || _root.nameFilters.length === 0) {
-            return
-        }
         for (var i=0; i<_root.nameFilters.length; i++) {
             var filter = _root.nameFilters[i]
             var regExp = /^.*\((.*)\)$/
@@ -151,6 +146,7 @@ Item {
         onAccepted: _root.acceptedForLoad(controller.urlToLocalFile(folder))
         onRejected: _root.rejected()
     }
+
     Component {
         id: mobileFileOpenDialogComponent
 
@@ -160,11 +156,8 @@ Item {
             buttons:    Dialog.Cancel
 
             property bool showAllFiles: false
-
-
             property var  fullFileList: []
             property var  displayList: []
-
 
             function refreshFiles() {
                 fullFileList = controller.getFiles(folder, _rgExtensions)
@@ -178,8 +171,6 @@ Item {
 
             onShowAllFilesChanged: refreshFiles()
             Component.onCompleted: refreshFiles()
-
-
 
 
             Column {
@@ -277,7 +268,6 @@ Item {
                     }
 
 
-
                 }
 
                 Button {
@@ -313,6 +303,7 @@ Item {
             }
         }
     }
+
     Component {
         id: savefiledialog
 
@@ -327,7 +318,6 @@ Item {
 
             onAccepted: {
                 var strippedFileName1 = userName
-
                 console.log("data saved name:",strippedFileName1)
                 if (strippedFileName1 == "") {
                     mobileFileSaveDialog.preventClose = true
@@ -349,7 +339,6 @@ Item {
 
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
-
                 QGCLabel {
                     text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
                     Layout.fillWidth:   true
@@ -361,7 +350,6 @@ Item {
             }
         }
     }
-
     Component {
         id: mobileFileSaveDialogComponent
 
@@ -578,6 +566,8 @@ Item {
         }
     }
 
+
+
     Component {
         id: customdialogedit
 
@@ -640,7 +630,6 @@ Item {
                 Item {
                     Layout.fillWidth:   true
                     Layout.fillHeight:  true
-
                     RowLayout {
                         anchors {
                             left:           parent.left
@@ -699,7 +688,6 @@ Item {
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-
                             Button {
                                 id:             cancelBtn
                                 anchors.centerIn: parent
@@ -708,13 +696,11 @@ Item {
                                 onClicked: {
                                     customDialog.visible = false
                                 }
-
                                 background: Rectangle {
                                     radius:     12
                                     color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
                                     border.width: 0
                                 }
-
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
                                     color:              "white"

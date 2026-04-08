@@ -30,6 +30,7 @@ import Qt.labs.platform as Platform
 /// QGCMapPolygon map visuals
 Item {
     id: _root
+    //implicitHeight: mapPolygonButtons.visible ? mapPolygonButtons.height : 0
     property int selectedVertexIndex : -1                   // Will store the MapQuickItem the user clicked
     property var    mapControl                                  ///< Map control to place item in
     property var    mapPolygon                                  ///< QGCMapPolygon object
@@ -81,6 +82,7 @@ Item {
 
     property real cardinalLeftScreenX:   0
     property real cardinalBottomScreenY: 0
+
 
     onVisibleChanged : {
         if (visible) {
@@ -1257,6 +1259,7 @@ Item {
                     width: buttonSize
                     height: buttonSize + 8  // 2 button heights + spacing gap
                 }
+
                 Button {
                     id: boundryMarkingBtn
                     text: ""
@@ -1353,7 +1356,7 @@ Item {
                 }
             }
 
-            //only for Mapping
+            // only for Mapping
             Column {
                 anchors.right:  parent.right
                 anchors.rightMargin: _root.cardinalLeftScreenX + 7
@@ -1459,9 +1462,7 @@ Item {
                     }
                 }
 
-
             }
-
 
             // Click-outside-to-dismiss overlay — sibling of vertexMenu, fills the whole mapControl area
             MouseArea {
@@ -1661,6 +1662,7 @@ Item {
         }
 
     }
+
 
     // Function to move the selected marker by dx/dy meters
     function moveSelectedMarker(dxMeters, dyMeters) {
@@ -2222,7 +2224,6 @@ Item {
         }
     }
 
-
     Component {
         id: radiusDragAreaComponent
 
@@ -2275,5 +2276,109 @@ Item {
             }
         }
     }
+
+    // Column {
+    //     id: mapPolygonButtons
+    //     anchors.top: parent.top
+    //     anchors.left: parent.left
+    //     anchors.right: parent.right
+    //     spacing: 12
+    //     height: childrenRect.height
+    //     visible: mapping || (mapPolygon && mapPolygon.traceMode)
+
+    //     Button {
+    //         id: boundryMarkingBtn1
+    //         visible: mapping || (mapPolygon && mapPolygon.traceMode)
+    //         text: ""
+    //         width: parent.width - 20
+    //         height: 45
+    //         anchors.horizontalCenter: parent.horizontalCenter
+    //         padding: 10
+    //         background: Rectangle {
+    //             radius: 8
+    //             color: Qt.rgba(0, 0, 0, 0.40)
+    //             anchors.fill: parent
+    //             anchors.margins: 3
+    //         }
+
+    //         contentItem: Text {
+    //             text: mapping ? qsTr("Boundary Mark") : qsTr("Boundary Point")
+    //             font.bold: true
+    //             color: "white"
+    //             font.pointSize: 14 // matching original mapping font size
+    //             anchors.centerIn: parent
+    //             font.family: "Outfit"
+    //         }
+
+    //         onClicked: {
+    //             console.log("Boundary marking clicked")
+
+    //             if(MapGlobals.mark_with === "Mark_With_GPS") {
+    //                 if (gcsPosition.isValid) mapPolygon.appendVertex(gcsPosition)
+    //             } else if (MapGlobals.mark_with === "Mark_With_Drone") {
+    //                 if (activeVehicle && activeVehicleCoordinate.isValid) mapPolygon.appendVertex(activeVehicleCoordinate)
+    //             } else {
+
+    //                 if (!mapControl) {
+    //                     console.warn("mapControl is null — cannot compute center coordinate")
+    //                     return
+    //                 }
+
+    //                 var viewport = mapControl.centerViewport
+
+    //                 if (!viewport) {
+    //                     console.warn("mapControl.centerViewport is undefined")
+    //                     return
+    //                 }
+
+    //                 var centerX = mapControl.centerViewport.x + mapControl.centerViewport.width / 2
+    //                 var centerY = mapControl.centerViewport.y + mapControl.centerViewport.height / 2 + 16
+    //                 var bottomCoord = mapControl.toCoordinate(Qt.point(centerX, centerY), false)
+    //                 mapPolygon.appendVertex(bottomCoord)
+    //             }
+    //         }
+    //     }
+
+    //     Button {
+    //         id: saveBtn1
+    //         visible: mapping || mapPolygon.traceMode
+    //         text: ""
+    //         width: parent.width - 20
+    //         height: 45
+    //         anchors.horizontalCenter: parent.horizontalCenter
+    //         padding: 12
+    //         background: Rectangle {
+    //             radius: 8
+    //             color: Qt.rgba(0, 0, 0, 0.40)
+    //             anchors.fill: parent
+    //             anchors.margins: 3
+    //         }
+    //         contentItem: Text {
+    //             text: qsTr("Save")
+    //             font.bold: true
+    //             color: "white"
+    //             font.pointSize: 14
+    //             anchors.centerIn: parent
+    //             font.family: "Outfit"
+    //         }
+    //         onClicked: {
+    //             if (mapPolygon.count < 3) {
+    //                 _restorePreviousVertices()
+    //             } else {
+    //                 if (mapping) {
+    //                     _planMasterController.saveToSelectedFile1()
+    //                     mainWindow.planmap()
+    //                     mainWindow.showMapping()
+    //                 } else {
+    //                     _planMasterController.saveToSelectedFile()
+    //                     mainWindow.planmap()
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // Optional extra spacing after the buttons
+    //     Item { height: 4; width: 1 }
+    // }
 
 }

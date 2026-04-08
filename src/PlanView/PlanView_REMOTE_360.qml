@@ -84,7 +84,7 @@ Item {
 
     property real compassBottomY: compassNorth.y + compassNorth.height + 10
     property real compassNorthX:   compassNorth.x
-
+    
     property var _airspaceValidator: {
         if (QGroundControl.airspaceManager) {
             return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)
@@ -293,6 +293,7 @@ Item {
         planMasterController:       _planMasterController
     }
 
+
     Connections {
         target: _appSettings ? _appSettings.defaultMissionItemAltitude : null
         function onRawValueChanged() {
@@ -370,7 +371,7 @@ Item {
                     height:             dp(8)
                     radius:             12
                     color:              keepMA.pressed ? Qt.darker("#471880", 1.2) : (keepMA.containsMouse ? Qt.lighter("#471880", 1.1) : "#471880")
-
+                    
                     Text {
                         anchors.centerIn: parent
                         width:          parent.width * 0.9
@@ -556,6 +557,7 @@ Item {
         }
     }
 
+
     Connections {
         target: _missionController
 
@@ -611,7 +613,8 @@ Item {
     QGCMapPolygonVisuals {
         id:                     filename
         cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
-        cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
+        cardinalLeftScreenX:    15
+        mapRotation:            MapGlobals.mapRotation
     }
 
     QGCFileDialog {
@@ -621,7 +624,6 @@ Item {
         property bool planFiles: true    ///< true: working with plan files, false: working with kml file
 
         onAcceptedForSave: (file) => {
-                               console.log("Clicke Files at onAcceptedForSave")
                                if (planFiles) {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
@@ -638,8 +640,6 @@ Item {
                            }
 
         onAcceptedForLoad: (file) => {
-                               console.log("Click Files at onAcceptedForLoad")
-                               MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
@@ -650,9 +650,11 @@ Item {
                            }
     }
 
+
     AirspaceRestrictionDialog {
         id: _airspaceRestrictionDialog
     }
+
 
     Item {
         id:             panel
@@ -673,12 +675,10 @@ Item {
             center:                     QGroundControl.flightMapPosition
 
             // This is the center rectangle of the map which is not obscured by tools
-
-            property real _rightToolWidth:      rightPanel.width + rightPanel.anchors.rightMargin
             property rect centerViewport:   Qt.rect(_leftToolWidth + _margin,  _margin, editorMap.width - _leftToolWidth - _rightToolWidth - (_margin * 2), (terrainStatus.visible ? terrainStatus.y : height - _margin) - _margin)
 
             property real _leftToolWidth:       toolStrip.x + toolStrip.width
-
+            property real _rightToolWidth:      rightPanel.width + rightPanel.anchors.rightMargin
             property real _nonInteractiveOpacity:  0.5
 
             // Initial map position duplicates Fly view position
@@ -689,7 +689,6 @@ Item {
             onZoomLevelChanged: {
                 QGroundControl.flightMapZoom = editorMap.zoomLevel
             }
-
             onCenterChanged: {
                 QGroundControl.flightMapPosition = editorMap.center
             }
@@ -743,7 +742,6 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
-                    visible:     MapGlobals.gridLines
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
@@ -819,6 +817,7 @@ Item {
                     }
                 }
 
+
                 Connections {
                     target:                 _missionController
                     function onSplitSegmentChanged()  { splitSegmentItem._updateSplitCoord() }
@@ -879,7 +878,6 @@ Item {
                     resetTimer.start()
                 }
             }
-
             Timer {
                 id: resetTimer
                 interval: 2500
@@ -1101,7 +1099,7 @@ Item {
         }
 
         //-----------------------------------------------------------
-        //Right pane for mission editing controls
+        // Right pane for mission editing controls
         Rectangle {
             id:                 rightPanel
             height:             parent.height
@@ -1113,23 +1111,20 @@ Item {
                     _rightPanelWidth
                 }
             }
-            color:              "transparent"//qgcPal.window
+            color:              qgcPal.window
             opacity:            layerTabBar.visible ? 0.2 : 0
             anchors.bottom:     parent.bottom
             anchors.right:      parent.right
             anchors.rightMargin: _toolsMargin
-            anchors.top:      parent.top
-            anchors.topMargin: _toolsMargin * 5
-            visible:           _editingLayer != _layerMission
+            visible:            _editingLayer != _layerMission
         }
-
         //-------------------------------------------------------
         // Right Panel Controls
 
         Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
-            visible: false
+            visible:                _editingLayer != _layerMission
 
             DeadMouseArea {
                 anchors.fill:   parent
@@ -1141,177 +1136,10 @@ Item {
                 anchors.left:       parent.left
                 anchors.right:      parent.right
                 anchors.top:        parent.top
-
                 //-------------------------------------------------------
 
-                // Mission Controls
-                Rectangle {
-                    id:         layerTabBar1
-                    width:      parent.width
-                    height:     42
-                    color:      "#2d1c42"  // Dark purple background
-                    radius:     21
-                    border.color: "#4a2c6d"
-                    border.width: 1
-                    visible:    false //QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
-
-                    property int currentIndex: 0
-                    property bool fenceVisible: _geoFenceController.supported
-
-                    property int _visibleTabCount: fenceVisible ? 2 : 1
-
-                    // Active pill highlight
-                    Rectangle {
-                        id: sliderHighlight1
-                        width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                        height: layerTabBar.height - 6
-                        y: 3
-                        x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: "#6a4c8d" }
-                            GradientStop { position: 1.0; color: "#4a2c6d" }
-                        }
-                        radius: height / 2
-                        border.color: "#8a6cad"
-                        border.width: 1
-                        Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-                    }
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 3
-                        spacing: 0
-                        visible:false
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBar.currentIndex = 0
-
-                            Text {
-                                text: qsTr("Mission")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 0
-                                color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            visible: layerTabBar.fenceVisible
-                            cursorShape: Qt.PointingHandCursor
-
-                            onClicked : {
-                                layerTabBar.currentIndex = 1
-                                _geoFenceController.supported
-                            }
-
-                            Text {
-                                text: qsTr("Fence")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 1
-                                color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id:         layerTabBarUTMSP
-                    width:      parent.width
-                    height:     40
-                    color:      "#f1f5f9"
-                    radius:     8
-                    border.color: "#e2e8f0"
-                    border.width: 1
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled
-
-                    property int currentIndex: 0
-                    property bool rallyVisible: _rallyPointController.supported
-                    property int _visibleTabCount: 1 + (rallyVisible ? 1 : 0) + 1
-
-                    Rectangle {
-                        id: sliderHighlightUTMSP
-                        width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                        height: layerTabBarUTMSP.height - 8
-                        y: 4
-                        x: {
-                            var tabWidth = width;
-                            if (layerTabBarUTMSP.currentIndex === 0) return 4;
-                            if (layerTabBarUTMSP.currentIndex === 1) return 4 + tabWidth;
-                            if (layerTabBarUTMSP.currentIndex === 2) return 4 + tabWidth * (layerTabBarUTMSP.rallyVisible ? 2 : 1);
-                            return 4;
-                        }
-                        color: "white"
-                        radius: 6
-                        border.color: "#d1d5db"
-                        border.width: 1
-
-                        Behavior on x { NumberAnimation { duration: 300; easing.type: Easing.OutExpo } }
-                    }
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        spacing: 0
-
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 0
-                            Text {
-                                text: qsTr("Mission")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 0
-                                color: layerTabBarUTMSP.currentIndex === 0 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            visible: layerTabBarUTMSP.rallyVisible
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 1
-                            Text {
-                                text: qsTr("Rally")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 1
-                                color: layerTabBarUTMSP.currentIndex === 1 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
-                            height: parent.height
-                            visible: _utmspEnabled
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 2
-                            Text {
-                                text: qsTr("UTM-Adapter")
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.bold: layerTabBarUTMSP.currentIndex === 2
-                                color: layerTabBarUTMSP.currentIndex === 2 ? "black" : "#64748b"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-                    }
-                }
+                // Layer tabs moved to bottomCenterContainer
             }
-
             //-------------------------------------------------------
             // Mission Item Editor
             Item {
@@ -1319,11 +1147,10 @@ Item {
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
                 anchors.bottom:         parent.bottom
-                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
-                visible:                _editingLayer == _layerMission && !planControlColapsed
-
+                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.25
+                visible:                false // Hidden per user request; bottom popup used instead
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -1357,17 +1184,17 @@ Item {
                         missionItem:    object
                         width:          missionItemEditorListView.width
                         readOnly:       false
-                        onClicked: (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false) }
-                        // MouseArea {
-                        //     anchors.fill: parent
-                        //     onClicked: {
-                        //         _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                        //         missionItemDialog.currentMissionItem = object
-                        //         missionItemDialog.currentIndex = index
-                        //         missionItemDialog.open()
-                        //         missionItemDialog.visible = true
-                        //     }
-                        // }
+                        //onClicked: (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false) }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                                missionItemDialog.currentMissionItem = object
+                                missionItemDialog.currentIndex = index
+                                missionItemDialog.open()
+                                missionItemDialog.visible = true
+                            }
+                        }
                         // onRemove: {
                         //     var removeVIIndex = index
                         //     _missionController.removeVisualItem(removeVIIndex)
@@ -1380,16 +1207,6 @@ Item {
                 }
             }
 
-            GeoFenceEditor {
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
-            }
 
             // Rally Point Editor
             RallyPointEditorHeader {
@@ -1402,6 +1219,7 @@ Item {
                 controller:             _rallyPointController
             }
 
+
             RallyPointItemEditor {
                 id:                     rallyPointEditor
                 anchors.top:            rallyPointHeader.bottom
@@ -1412,6 +1230,7 @@ Item {
                 rallyPoint:             _rallyPointController.currentRallyPoint
                 controller:             _rallyPointController
             }
+
 
             UTMSPAdapterEditor{
                 id: utmspEditor
@@ -1444,163 +1263,163 @@ Item {
             text:                       qsTr("Powered by %1").arg(_licenseString)
         }
 
-        // Popup {
-        //     id: missionItemDialog
-        //     width: ScreenTools.isMobile ? parent.width * 0.45 : 450
-        //     height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+        Popup {
+            id: missionItemDialog
+            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+            
+            // Position in the bottom-right corner
+            x: parent.width - width - 20
+            property real targetY: parent.height - height - 20
+            y: targetY
+            
+            modal: false
+            dim: false
+            closePolicy: Popup.NoAutoClose
+            parent: Overlay.overlay
+            
+            property int currentIndex: -1
+            property var currentMissionItem: null
 
-        //     // Position in the bottom-right corner
-        //     x: parent.width - width - 20
-        //     property real targetY: parent.height - height - 20
-        //     y: targetY
+            // Slide animation from bottom
+            enter: Transition {
+                NumberAnimation { property: "y"; from: missionItemDialog.parent.height; to: missionItemDialog.targetY; duration: 350; easing.type: Easing.OutExpo }
+            }
+            exit: Transition {
+                NumberAnimation { property: "y"; to: missionItemDialog.parent.height; duration: 250; easing.type: Easing.InCubic }
+            }
 
-        //     modal: false
-        //     dim: false
-        //     closePolicy: Popup.NoAutoClose
-        //     parent: Overlay.overlay
+            background: Rectangle {
+                color:        "#BF000000" // Dark Transparent Black 75% alpha
+                radius:       15          // Rounded dialog corners (as shown in image)
+                border.color: "#3a3750"
+                border.width: 1
+            }
 
-        //     property int currentIndex: -1
-        //     property var currentMissionItem: null
+            // Header Area
+            Item {
+                id: drawerHeader
+                width: parent.width
+                height: 60
+                anchors.top: parent.top
+                
+                Text {
+                    text: missionItemDialog.currentMissionItem ? missionItemDialog.currentMissionItem.commandName : "Edit Item"
+                    font.pixelSize: 18
+                    font.bold: true
+                    color: "#e8e4f0"   // Light text on dark background
+                    anchors.centerIn: parent
+                }
 
-        //     // Slide animation from bottom
-        //     enter: Transition {
-        //         NumberAnimation { property: "y"; from: missionItemDialog.parent.height; to: missionItemDialog.targetY; duration: 350; easing.type: Easing.OutExpo }
-        //     }
-        //     exit: Transition {
-        //         NumberAnimation { property: "y"; to: missionItemDialog.parent.height; duration: 250; easing.type: Easing.InCubic }
-        //     }
+                Rectangle {
+                    id: closeBtn
+                    width: 32
+                    height: 32
+                    radius: 16
+                    color: closeBtnArea.pressed ? "#3d3a50" : (closeBtnArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+                    border.color: "#4a4560"
+                    border.width: 1
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins: 15
+                    Behavior on color { ColorAnimation { duration: 100 } }
 
-        //     background: Rectangle {
-        //         color:        "#BF000000" // Dark Transparent Black 75% alpha
-        //         radius:       15          // Rounded dialog corners (as shown in image)
-        //         border.color: "#3a3750"
-        //         border.width: 1
-        //     }
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/close.svg"
+                        color: closeBtnArea.containsMouse ? "#e0dcf8" : "#9898bb"
+                        width: 14
+                        height: 14
+                        anchors.centerIn: parent
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                    }
 
-        //     // Header Area
-        //     Item {
-        //         id: drawerHeader
-        //         width: parent.width
-        //         height: 60
-        //         anchors.top: parent.top
+                    MouseArea {
+                        id: closeBtnArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            missionItemDialog.close()
+                            mainWindow.showPlanView()
+                        }
+                    }
+                }
+                
+                // Subtle divider line
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "#3d3a50"
+                    anchors.bottom: parent.bottom
+                }
+            }
 
-        //         Text {
-        //             text: missionItemDialog.currentMissionItem ? missionItemDialog.currentMissionItem.commandName : "Edit Item"
-        //             font.pixelSize: 18
-        //             font.bold: true
-        //             color: "#e8e4f0"   // Light text on dark background
-        //             anchors.centerIn: parent
-        //         }
+            QGCFlickable {
+                id: flickableEditor
+                anchors.top: drawerHeader.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                contentWidth: width
+                anchors.margins: 10
+                contentHeight: editorContent.implicitHeight
+                clip: true
+                flickableDirection: Flickable.VerticalFlick
 
-        //         Rectangle {
-        //             id: closeBtn
-        //             width: 32
-        //             height: 32
-        //             radius: 16
-        //             color: closeBtnArea.pressed ? "#3d3a50" : (closeBtnArea.containsMouse ? "#2e2b42" : "#1e1b2e")
-        //             border.color: "#4a4560"
-        //             border.width: 1
-        //             anchors.right: parent.right
-        //             anchors.verticalCenter: parent.verticalCenter
-        //             anchors.margins: 15
-        //             Behavior on color { ColorAnimation { duration: 100 } }
+                Column {
+                    id: editorContent
+                    width: flickableEditor.width
 
-        //             QGCColoredImage {
-        //                 source: "qrc:/InstrumentValueIcons/close.svg"
-        //                 color: closeBtnArea.containsMouse ? "#e0dcf8" : "#9898bb"
-        //                 width: 14
-        //                 height: 14
-        //                 anchors.centerIn: parent
-        //                 Behavior on color { ColorAnimation { duration: 100 } }
-        //             }
+                    MissionItemEditor {
+                        id: editor
+                        width: parent.width
+                        map: editorMap
+                        masterController: _planMasterController
+                        missionItem: missionItemDialog.currentMissionItem
+                        readOnly: false
 
-        //             MouseArea {
-        //                 id: closeBtnArea
-        //                 anchors.fill: parent
-        //                 hoverEnabled: true
-        //                 cursorShape: Qt.PointingHandCursor
-        //                 onClicked: {
-        //                     missionItemDialog.close()
-        //                     mainWindow.showPlanView()
-        //                 }
-        //             }
-        //         }
+                        onClicked: (sequenceNumber) => {
+                                       _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                                   }
 
-        //         // Subtle divider line
-        //         Rectangle {
-        //             width: parent.width
-        //             height: 1
-        //             color: "#3d3a50"
-        //             anchors.bottom: parent.bottom
-        //         }
-        //     }
+                        onRemove: {
+                            var removeVIIndex = missionItemDialog.currentIndex
+                            _missionController.removeVisualItem(removeVIIndex)
+                            if (removeVIIndex >= _missionController.visualItems.count) {
+                                removeVIIndex--
+                            }
 
-        //     QGCFlickable {
-        //         id: flickableEditor
-        //         anchors.top: drawerHeader.bottom
-        //         anchors.left: parent.left
-        //         anchors.right: parent.right
-        //         anchors.bottom: parent.bottom
-        //         contentWidth: width
-        //         anchors.margins: 10
-        //         contentHeight: editorContent.implicitHeight
-        //         clip: true
-        //         flickableDirection: Flickable.VerticalFlick
+                            if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
+                                QGroundControl.saveGlobalSetting("waypoint", "waypoint")
+                                MapGlobals.waypoint="waypoint"
+                                returnWaypointEnabled=true
+                                waypointMark=true
+                            } else if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Takeoff"){
+                                QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
+                                mapclear()
+                            }
 
-        //         Column {
-        //             id: editorContent
-        //             width: flickableEditor.width
+                            missionItemDialog.close()
+                        }
 
-        //             MissionItemEditor {
-        //                 id: editor
-        //                 width: parent.width
-        //                 map: editorMap
-        //                 masterController: _planMasterController
-        //                 missionItem: missionItemDialog.currentMissionItem
-        //                 readOnly: false
-
-        //                 onClicked: (sequenceNumber) => {
-        //                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-        //                            }
-
-        //                 onRemove: {
-        //                     var removeVIIndex = missionItemDialog.currentIndex
-        //                     _missionController.removeVisualItem(removeVIIndex)
-        //                     if (removeVIIndex >= _missionController.visualItems.count) {
-        //                         removeVIIndex--
-        //                     }
-
-        //                     if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Return To Launch"){
-        //                         QGroundControl.saveGlobalSetting("waypoint", "waypoint")
-        //                         MapGlobals.waypoint="waypoint"
-        //                         returnWaypointEnabled=true
-        //                         waypointMark=true
-        //                     } else if(missionItemDialog.currentMissionItem && missionItemDialog.currentMissionItem.commandName==="Takeoff"){
-        //                         QGroundControl.saveGlobalSetting("Takeoff", "Takeoff")
-        //                         mapclear()
-        //                     }
-
-        //                     missionItemDialog.close()
-        //                 }
-
-        //                 onSelectNextNotReadyItem: {
-        //                     selectNextNotReady()
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                        onSelectNextNotReadyItem: {
+                            selectNextNotReady()
+                        }
+                    }
+                }
+            }
+        }
 
         Popup {
             id: geoFenceDrawer
             width: ScreenTools.isMobile ? parent.width * 0.45 : 450
             height: ScreenTools.isMobile ? parent.height * 0.75 : 600
-
+            
             // Position in the bottom-right corner
             x: parent.width - width - 20
             property real targetY: parent.height - height - 20
             y: targetY
-
+            
             modal: false
             dim: false
             closePolicy: Popup.NoAutoClose
@@ -1632,7 +1451,7 @@ Item {
                 width: parent.width
                 height: 60
                 anchors.top: parent.top
-
+                
                 Text {
                     text: qsTr("GeoFence Settings")
                     font.pixelSize: 18
@@ -1653,7 +1472,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin: 15
                     Behavior on color { ColorAnimation { duration: 100 } }
-
+                    
                     QGCColoredImage {
                         source: "qrc:/InstrumentValueIcons/close.svg"
                         color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
@@ -1673,7 +1492,7 @@ Item {
                         }
                     }
                 }
-
+                
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -1694,12 +1513,101 @@ Item {
             }
         }
 
+
+        // Item {
+        //     id: editdata
+        //     anchors.bottom: parent.bottom
+        //     anchors.left: parent.left
+        //     anchors.bottomMargin: 60   // increased from 20 → lifts it up
+        //     anchors.leftMargin: 10
+
+        //     Button {
+        //         id: uploadBtn
+        //         text: ""
+        //         width: 46
+        //         height: 46
+
+        //         //padding: 15
+
+        //         background: Rectangle {
+        //             radius: width / 2
+        //             color: "#471880"
+        //             border.color: "#005BBB"
+        //             border.width: 2
+        //             anchors.fill: parent
+        //             anchors.margins: 5
+        //         }
+
+        //         contentItem: QGCColoredImage {
+        //             source: "/qmlimages/NewImages/fileupload.svg"
+        //             width: 16
+        //             height: 16
+        //             anchors.centerIn: parent // Center the icon within the container
+        //             color: "white"
+        //         }
+
+        //         onClicked: {
+        //             if (_utmspEnabled) {
+        //                 QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
+        //                 UTMSPStateStorage.removeFlightPlanState = true
+        //                 UTMSPStateStorage.indicatorDisplayStatus = true
+        //             }
+        //             _planMasterController.upload();
+        //             console.log("Upload_data")
+        //         }
+        //     }
+
+        //     Button {
+        //         id: returnWaypoint
+        //         //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"?true:false
+        //         visible: showReturnWaypoint
+        //         enabled: returnWaypointEnabled
+        //         text: ""
+        //         width: 46
+        //         height: 46
+        //         anchors.left: uploadBtn.right
+        //         anchors.leftMargin: 10
+        //         anchors.bottom: uploadBtn.bottom
+        //         //padding: 15
+
+        //         background: Rectangle {
+        //             radius: width / 2
+        //             color: "#471880"
+        //             border.color: "#005BBB"
+        //             border.width: 2
+        //             anchors.fill: parent
+        //             anchors.margins: 5
+        //         }
+
+        //         contentItem: QGCColoredImage {
+        //             source: "/res/rtl.svg"
+        //             width: 16
+        //             height: 16
+        //             anchors.centerIn: parent // Center the icon within the container
+        //             color: "white"
+        //         }
+
+        //         onClicked: {
+
+        //             console.log("returnWaypoint clicked")
+
+        //             toolStrip.allAddClickBoolsOff()
+        //             insertLandItemAfterCurrent()
+
+        //             QGroundControl.saveGlobalSetting("returnWaypointEnabled", "false")
+        //             returnWaypointEnabled = false
+        //         }
+        //     }
+
+        // }
+
+
         Item {
             id: editdata
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: 60
-            anchors.leftMargin: 20
+            anchors.leftMargin: 10
 
             Row {
                 spacing: 10    // space between the two buttons
@@ -2207,6 +2115,7 @@ Item {
 
     function newmap() {
 
+
         var creator = _planMasterController.planCreators[0] // or selectedPlanCreator
         if (creator) {
             var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
@@ -2233,7 +2142,6 @@ Item {
 
     Connections {
         target: utmspEditor
-
         function onRemoveFlightPlanTriggered() {
             _planMasterController.removeAllFromVehicle();
             _missionController.setCurrentPlanViewSeqNum(0, true);
@@ -2242,139 +2150,139 @@ Item {
     }
 
     // --- Slide-up Mission Actions Popup ---
-    // Popup {
-    //     id: missionActionsPopup
-    //     width: ScreenTools.defaultFontPixelWidth * 45
-    //     height: 60
+    Popup {
+        id: missionActionsPopup
+        width: ScreenTools.defaultFontPixelWidth * 45
+        height: 60
+        
+        x: (parent.width - width) / 2
+        property real targetY: parent.height - height - 80 // Anchor exactly above the bottom tab bar
+        y: targetY
+        
+        modal: false    // So user can still click map while open
+        dim: false
 
-    //     x: (parent.width - width) / 2
-    //     property real targetY: parent.height - height - 80 // Anchor exactly above the bottom tab bar
-    //     y: targetY
+        enter: Transition {
+            NumberAnimation { property: "y"; from: missionActionsPopup.parent.height; to: missionActionsPopup.targetY; duration: 250; easing.type: Easing.OutQuart }
+        }
+        exit: Transition {
+            NumberAnimation { property: "y"; to: missionActionsPopup.parent.height; duration: 250; easing.type: Easing.OutQuart }
+        }
 
-    //     modal: false    // So user can still click map while open
-    //     dim: false
+        background: Rectangle {
+            color: "transparent"
+        }
 
-    //     enter: Transition {
-    //         NumberAnimation { property: "y"; from: missionActionsPopup.parent.height; to: missionActionsPopup.targetY; duration: 250; easing.type: Easing.OutQuart }
-    //     }
-    //     exit: Transition {
-    //         NumberAnimation { property: "y"; to: missionActionsPopup.parent.height; duration: 250; easing.type: Easing.OutQuart }
-    //     }
+        contentItem: RowLayout {
+            spacing: 12
+            
+            Repeater {
+                model: {
+                    var actions = [ { "text": qsTr("Mission Start"), "action": "start" } ]
+                    if (droneType !== "Agri") {
+                        actions.push({ "text": qsTr("Takeoff"), "action": "takeoff" })
+                    }
+                    actions.push({ "text": qsTr("Survey"), "action": "survey" })
+                    actions.push({ "text": qsTr("Return To Launch"), "action": "rtl" })
+                    return actions
+                }
 
-    //     background: Rectangle {
-    //         color: "transparent"
-    //     }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 12
+                    color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black popup item
+                    border.color: "transparent"
+                    border.width: 0
 
-    //     contentItem: RowLayout {
-    //         spacing: 12
+                    Text {
+                        anchors.centerIn: parent
+                        text: modelData.text
+                        color: "white"
+                        font.pointSize: 10
+                        font.bold: true
+                        font.family: "Outfit"
+                    }
 
-    //         Repeater {
-    //             model: {
-    //                 var actions = [ { "text": qsTr("Mission Start"), "action": "start" } ]
-    //                 if (droneType !== "Agri") {
-    //                     actions.push({ "text": qsTr("Takeoff"), "action": "takeoff" })
-    //                 }
-    //                 actions.push({ "text": qsTr("Survey"), "action": "survey" })
-    //                 actions.push({ "text": qsTr("Return To Launch"), "action": "rtl" })
-    //                 return actions
-    //             }
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            missionActionsPopup.close()
 
-    //             Rectangle {
-    //                 Layout.fillWidth: true
-    //                 Layout.fillHeight: true
-    //                 radius: 12
-    //                 color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black popup item
-    //                 border.color: "transparent"
-    //                 border.width: 0
+                            var items = _missionController.visualItems
+                            var targetIndex = -1
+                            var targetItem  = null
 
-    //                 Text {
-    //                     anchors.centerIn: parent
-    //                     text: modelData.text
-    //                     color: "white"
-    //                     font.pointSize: 10
-    //                     font.bold: true
-    //                     font.family: "Outfit"
-    //                 }
+                            if (modelData.action === "start") {
+                                // Always open item 0 (Mission Start / planned home)
+                                targetIndex = 0
+                                targetItem  = items.get(0)
+                                if (targetItem)
+                                    _missionController.setCurrentPlanViewSeqNum(targetItem.sequenceNumber, false)
 
-    //                 MouseArea {
-    //                     anchors.fill: parent
-    //                     cursorShape: Qt.PointingHandCursor
-    //                     onClicked: {
-    //                         missionActionsPopup.close()
+                            } else if (modelData.action === "survey") {
+                                // Find first existing Survey; insert new one only if absent
+                                for (var i = 0; i < items.count; i++) {
+                                    var it = items.get(i)
+                                    if (it && it.commandName === "Survey") {
+                                        targetIndex = i
+                                        targetItem  = it
+                                        _missionController.setCurrentPlanViewSeqNum(it.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertComplexItemAfterCurrent("Survey")
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem  = items.get(targetIndex)
+                                }
 
-    //                         var items = _missionController.visualItems
-    //                         var targetIndex = -1
-    //                         var targetItem  = null
+                            } else if (modelData.action === "takeoff") {
+                                for (var k = 0; k < items.count; k++) {
+                                    var tkfIt = items.get(k)
+                                    if (tkfIt && tkfIt.commandName === "Takeoff") {
+                                        targetIndex = k
+                                        targetItem = tkfIt
+                                        _missionController.setCurrentPlanViewSeqNum(tkfIt.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertTakeItemAfterCurrent()
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem = items.get(targetIndex)
+                                }
 
-    //                         if (modelData.action === "start") {
-    //                             // Always open item 0 (Mission Start / planned home)
-    //                             targetIndex = 0
-    //                             targetItem  = items.get(0)
-    //                             if (targetItem)
-    //                                 _missionController.setCurrentPlanViewSeqNum(targetItem.sequenceNumber, false)
+                            } else if (modelData.action === "rtl") {
+                                // Find first existing Return-To-Launch; insert new one only if absent
+                                for (var j = 0; j < items.count; j++) {
+                                    var rtlIt = items.get(j)
+                                    if (rtlIt && rtlIt.commandName === "Return To Launch") {
+                                        targetIndex = j
+                                        targetItem  = rtlIt
+                                        _missionController.setCurrentPlanViewSeqNum(rtlIt.sequenceNumber, false)
+                                        break
+                                    }
+                                }
+                                if (!targetItem) {
+                                    insertLandItemAfterCurrent()
+                                    targetIndex = _missionController.currentPlanViewVIIndex
+                                    targetItem  = items.get(targetIndex)
+                                }
+                            }
 
-    //                         } else if (modelData.action === "survey") {
-    //                             // Find first existing Survey; insert new one only if absent
-    //                             for (var i = 0; i < items.count; i++) {
-    //                                 var it = items.get(i)
-    //                                 if (it && it.commandName === "Survey") {
-    //                                     targetIndex = i
-    //                                     targetItem  = it
-    //                                     _missionController.setCurrentPlanViewSeqNum(it.sequenceNumber, false)
-    //                                     break
-    //                                 }
-    //                             }
-    //                             if (!targetItem) {
-    //                                 insertComplexItemAfterCurrent("Survey")
-    //                                 targetIndex = _missionController.currentPlanViewVIIndex
-    //                                 targetItem  = items.get(targetIndex)
-    //                             }
-
-    //                         } else if (modelData.action === "takeoff") {
-    //                             for (var k = 0; k < items.count; k++) {
-    //                                 var tkfIt = items.get(k)
-    //                                 if (tkfIt && tkfIt.commandName === "Takeoff") {
-    //                                     targetIndex = k
-    //                                     targetItem = tkfIt
-    //                                     _missionController.setCurrentPlanViewSeqNum(tkfIt.sequenceNumber, false)
-    //                                     break
-    //                                 }
-    //                             }
-    //                             if (!targetItem) {
-    //                                 insertTakeItemAfterCurrent()
-    //                                 targetIndex = _missionController.currentPlanViewVIIndex
-    //                                 targetItem = items.get(targetIndex)
-    //                             }
-
-    //                         } else if (modelData.action === "rtl") {
-    //                             // Find first existing Return-To-Launch; insert new one only if absent
-    //                             for (var j = 0; j < items.count; j++) {
-    //                                 var rtlIt = items.get(j)
-    //                                 if (rtlIt && rtlIt.commandName === "Return To Launch") {
-    //                                     targetIndex = j
-    //                                     targetItem  = rtlIt
-    //                                     _missionController.setCurrentPlanViewSeqNum(rtlIt.sequenceNumber, false)
-    //                                     break
-    //                                 }
-    //                             }
-    //                             if (!targetItem) {
-    //                                 insertLandItemAfterCurrent()
-    //                                 targetIndex = _missionController.currentPlanViewVIIndex
-    //                                 targetItem  = items.get(targetIndex)
-    //                             }
-    //                         }
-
-    //                         if (targetItem) {
-    //                             missionItemDialog.currentMissionItem = targetItem
-    //                             missionItemDialog.currentIndex       = targetIndex
-    //                             missionItemDialog.open()
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+                            if (targetItem) {
+                                missionItemDialog.currentMissionItem = targetItem
+                                missionItemDialog.currentIndex       = targetIndex
+                                missionItemDialog.open()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Central Mission Control Container - Tabs & Actions
     Column {
@@ -2425,14 +2333,13 @@ Item {
                     height: parent.height
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        // if (layerTabBar.currentIndex === 0) {
-                        //     if (missionActionsPopup.opened) missionActionsPopup.close()
-                        //     else missionActionsPopup.open()
-                        // } else {
-                        //     layerTabBar.currentIndex = 0
-                        //     missionActionsPopup.open()
-                        // }
-                        layerTabBar.currentIndex = 0
+                        if (layerTabBar.currentIndex === 0) {
+                            if (missionActionsPopup.opened) missionActionsPopup.close()
+                            else missionActionsPopup.open()
+                        } else {
+                            layerTabBar.currentIndex = 0
+                            missionActionsPopup.open()
+                        }
                     }
                     Text {
                         text: qsTr("Mission")
@@ -2450,7 +2357,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         layerTabBar.currentIndex = 1
-                        //missionActionsPopup.close()
+                        missionActionsPopup.close()
                         if (!geoFenceDrawer.opened) geoFenceDrawer.open()
                     }
                     Text {
@@ -2464,7 +2371,6 @@ Item {
             }
         }
     }
-
     PlanViewToolBar {
         id:                     planToolBar
         planMasterController:   _planMasterController
@@ -2480,16 +2386,16 @@ Item {
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
         anchors.topMargin:  2
-        anchors.leftMargin: 20
+        anchors.leftMargin: 8
         z:                  QGroundControl.zOrderWidgets + 1
 
         Rectangle {
             width:        baseSize
             height:       baseSize
             radius:       width / 2
-            color:        Qt.rgba(0, 0, 0, 0.40)
-            border.width: 0
-            border.color: "transparent"
+            color:        "#4a2c6d"
+            border.width: 1
+            border.color: "#8e6abb"
             clip:         true
 
             MouseArea {
@@ -2515,5 +2421,4 @@ Item {
             }
         }
     }
-
 }

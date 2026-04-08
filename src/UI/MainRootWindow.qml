@@ -1975,7 +1975,7 @@ ApplicationWindow {
                         onClicked: {
                             planView.mapclear()
                             QGroundControl.saveGlobalSetting("mapping", "basic")
-                            MapGlobals.mark_with = "Mark_With_Manual"
+                            MapGlobals.mark_with = "Mark_With_Manual";
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
                             mainWindow.showPlanView(); dialog.visible = false; planView.data1()

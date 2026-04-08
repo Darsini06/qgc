@@ -48,8 +48,8 @@ Item {
                 //savefiledialog.createObject(mainWindow).open()
                 savefiledialog.createObject(mainWindow, {
 
-                                                userName: _appSettings.username
-                                            }).open()
+                                    userName: _appSettings.username
+                                }).open()
 
             }else{
                 //mobileFileSaveDialogComponent.createObject(mainWindow).open()
@@ -103,9 +103,6 @@ Item {
 
     function _setupFileExtensions() {
         _rgExtensions = [ ]
-        if (!_root.nameFilters || _root.nameFilters.length === 0) {
-            return
-        }
         for (var i=0; i<_root.nameFilters.length; i++) {
             var filter = _root.nameFilters[i]
             var regExp = /^.*\((.*)\)$/
@@ -151,6 +148,7 @@ Item {
         onAccepted: _root.acceptedForLoad(controller.urlToLocalFile(folder))
         onRejected: _root.rejected()
     }
+
     Component {
         id: mobileFileOpenDialogComponent
 
@@ -161,24 +159,21 @@ Item {
 
             property bool showAllFiles: false
 
-
-            property var  fullFileList: []
-            property var  displayList: []
-
+                        property var  fullFileList: []
+                        property var  displayList: []
 
             function refreshFiles() {
-                fullFileList = controller.getFiles(folder, _rgExtensions)
-                //fullFileList.reverse()    // 🔥 LIFO
+                            fullFileList = controller.getFiles(folder, _rgExtensions)
+                            //fullFileList.reverse()    // 🔥 LIFO
 
-                if (showAllFiles)
-                    displayList = fullFileList
-                else
-                    displayList = fullFileList.slice(0, 3)
-            }
+                            if (showAllFiles)
+                                displayList = fullFileList
+                            else
+                                displayList = fullFileList.slice(0, 3)
+                        }
 
-            onShowAllFilesChanged: refreshFiles()
-            Component.onCompleted: refreshFiles()
-
+                        onShowAllFilesChanged: refreshFiles()
+                        Component.onCompleted: refreshFiles()
 
 
 
@@ -281,38 +276,39 @@ Item {
                 }
 
                 Button {
-                    visible: !mobileFileOpenDialog.showAllFiles &&
-                             mobileFileOpenDialog.fullFileList.length > 3
-                    text: qsTr("See More")
-                    // background: Rectangle {
-                    //         color: "#262626"
-                    //         radius: 10
-                    //     }
+                                    visible: !mobileFileOpenDialog.showAllFiles &&
+                                             mobileFileOpenDialog.fullFileList.length > 3
+                                    text: qsTr("See More")
+                                    // background: Rectangle {
+                                    //         color: "#262626"
+                                    //         radius: 10
+                                    //     }
 
-                    //     contentItem: Text {
-                    //         text: control.text
-                    //         color: "white"
-                    //         font.bold: true
-                    //         anchors.centerIn: parent
-                    //     }
+                                    //     contentItem: Text {
+                                    //         text: control.text
+                                    //         color: "white"
+                                    //         font.bold: true
+                                    //         anchors.centerIn: parent
+                                    //     }
 
-                    onClicked: {
-                        mainWindow.homescreen()
-                        mobileFileOpenDialog.visible = false
-                        MapGlobals.currentView_profile = "dronePage"
-                        mainWindow.logfiles()
-                    }
-                }
+                                    onClicked: {
+                                        mainWindow.homescreen()
+                                        mobileFileOpenDialog.visible = false
+                                        MapGlobals.currentView_profile = "dronePage"
+                                                                        mainWindow.logfiles()
+                                    }
+                                }
 
-                Button {
-                    visible: mobileFileOpenDialog.showAllFiles
-                    text: qsTr("Show Less")
+                                Button {
+                                    visible: mobileFileOpenDialog.showAllFiles
+                                    text: qsTr("Show Less")
 
-                    onClicked: mobileFileOpenDialog.showAllFiles = false
-                }
+                                    onClicked: mobileFileOpenDialog.showAllFiles = false
+                                }
             }
         }
     }
+
     Component {
         id: savefiledialog
 
@@ -349,7 +345,6 @@ Item {
 
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
-
                 QGCLabel {
                     text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
                     Layout.fillWidth:   true
@@ -361,7 +356,6 @@ Item {
             }
         }
     }
-
     Component {
         id: mobileFileSaveDialogComponent
 
@@ -578,6 +572,8 @@ Item {
         }
     }
 
+
+
     Component {
         id: customdialogedit
 
@@ -640,7 +636,6 @@ Item {
                 Item {
                     Layout.fillWidth:   true
                     Layout.fillHeight:  true
-
                     RowLayout {
                         anchors {
                             left:           parent.left
@@ -699,7 +694,6 @@ Item {
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-
                             Button {
                                 id:             cancelBtn
                                 anchors.centerIn: parent
@@ -708,13 +702,11 @@ Item {
                                 onClicked: {
                                     customDialog.visible = false
                                 }
-
                                 background: Rectangle {
                                     radius:     12
                                     color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
                                     border.width: 0
                                 }
-
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
                                     color:              "white"
