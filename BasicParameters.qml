@@ -30,13 +30,15 @@ Item {
 
     property var agri: [
         { text: "All", icon: "qrc:/qmlimages/NewImages/all_parameter.svg", color: "#2c3e50" },
-        { text: "SPARY", icon: "qrc:/qmlimages/NewImages/spray_parameter.svg", color: "#8e44ad" }
+        { text: "SPRAY", icon: "qrc:/qmlimages/NewImages/spray_parameter.svg", color: "#8e44ad" }
     ]
+
     property var agrigimbalModels: [
         { text: "Servo Gimbal", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#3498db" },
         { text: "STorM32", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#9b59b6" },
         { text: "Brushless PWM", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#e74c3c" }
     ]
+
     property var gimbalModels: [
         { text: "All", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#2c3e50" },
         { text: "Servo Gimbal", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#3498db" },

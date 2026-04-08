@@ -1354,7 +1354,7 @@ Item {
                 }
             }
 
-            //only for mapping
+            //only for
             Column {
                 anchors.right:  parent.right
                 anchors.rightMargin: _root.cardinalLeftScreenX + 7
@@ -1362,11 +1362,6 @@ Item {
                 z: 2000
                 spacing: 8
                 visible: mapping
-
-                Item {
-                    width: buttonSize
-                    height: buttonSize + 8  // 2 button heights + spacing gap
-                }
 
                 Button {
                     id: boundryMarkingBtn1

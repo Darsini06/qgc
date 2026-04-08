@@ -348,6 +348,7 @@ Item {
 
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
+
                 QGCLabel {
                     text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
                     Layout.fillWidth:   true
@@ -359,6 +360,7 @@ Item {
             }
         }
     }
+
     Component {
         id: mobileFileSaveDialogComponent
 
@@ -575,8 +577,6 @@ Item {
         }
     }
 
-
-
     Component {
         id: customdialogedit
 
@@ -639,6 +639,7 @@ Item {
                 Item {
                     Layout.fillWidth:   true
                     Layout.fillHeight:  true
+
                     RowLayout {
                         anchors {
                             left:           parent.left
@@ -697,6 +698,7 @@ Item {
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+
                             Button {
                                 id:             cancelBtn
                                 anchors.centerIn: parent
@@ -705,11 +707,13 @@ Item {
                                 onClicked: {
                                     customDialog.visible = false
                                 }
+
                                 background: Rectangle {
                                     radius:     12
                                     color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
                                     border.width: 0
                                 }
+
                                 contentItem: Text {
                                     text:               qsTr("Cancel")
                                     color:              "white"
