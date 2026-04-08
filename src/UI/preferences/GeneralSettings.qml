@@ -36,7 +36,6 @@ SettingsPage {
     property bool   _videoAutoStreamConfig:     _videoManager.autoStreamConfigured
     property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 30
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
-
     //Telemetry Settings ------------------------------------------------------------------------------------
     property bool   _disableAllDataPersistence: _appSettings.disableAllPersistence.rawValue
     property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
@@ -44,11 +43,9 @@ SettingsPage {
     property bool   _isAPM:                     _activeVehicle ? _activeVehicle.apmFirmware : true
     property bool   _showAPMStreamRates:        QGroundControl.apmFirmwareSupported && _settingsManager.apmMavlinkStreamRateSettings.visible && _isAPM
     property var    _apmStartMavlinkStreams:   _appSettings.apmStartMavlinkStreams
-
     //Drone Settings ------------------------------------------------------------------------------------
-    property var _linkManager:          QGroundControl.linkManager
-    property var _autoConnectSettings:  QGroundControl.settingsManager.autoConnectSettings
-
+    property var    _linkManager:               QGroundControl.linkManager
+    property var    _autoConnectSettings:       QGroundControl.settingsManager.autoConnectSettings
     property bool   _isNarrow:                  root.width < ScreenTools.defaultFontPixelWidth * 80
     property real   _innerMargin:               ScreenTools.defaultFontPixelWidth * 2
     property real   _contentWidth:              Math.min(root.width - (_innerMargin * 3), ScreenTools.defaultFontPixelWidth * 100)
@@ -112,67 +109,82 @@ SettingsPage {
         // }
 
 
-        RowLayout {
-            spacing: 20
-            visible: _appSettings.followTarget.visible
-            Layout.fillWidth: true
+        ColumnLayout {
+            spacing:            _isNarrow ? 5 : 20
+            visible:            _appSettings.followTarget.visible
+            Layout.fillWidth:   true
 
-            QGCLabel {
-                text: qsTr("Stream GCS Position")
-                color: "black"
-                font.bold: true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
 
-            Item { Layout.fillWidth: true }
+                QGCLabel {
+                    text:               qsTr("Stream GCS Position")
+                    color:              "black"
+                    font.bold:          true
+                    Layout.fillWidth:   _isNarrow
+                    Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                }
 
-            FactComboBox {
-                fact:           _appSettings.followTarget
-                indexModel:     false
-                Layout.preferredWidth: _urlFieldWidth
+                Item { Layout.fillWidth: true; visible: !_isNarrow }
+
+                FactComboBox {
+                    fact:                   _appSettings.followTarget
+                    indexModel:             false
+                    Layout.fillWidth:       _isNarrow
+                    Layout.preferredWidth: _isNarrow ? parent.width : _urlFieldWidth
+                }
             }
         }
 
         // --- SD Card Save (Tick Style) ---
-        RowLayout {
-            spacing: 12
-            Layout.fillWidth: true
-            visible: _appSettings.androidSaveToSDCard.visible
+        ColumnLayout {
+            spacing:            _isNarrow ? 5 : 12
+            Layout.fillWidth:   true
+            visible:            _appSettings.androidSaveToSDCard.visible
 
-            QGCLabel {
-                text:           qsTr("Save application data to SD Card")
-                color:          "black"
-                font.bold:      true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
 
-            Item { Layout.fillWidth: true }
+                QGCLabel {
+                    text:                   qsTr("Save application data to SD Card")
+                    color:                  "black"
+                    font.bold:              true
+                    Layout.fillWidth:       _isNarrow
+                    Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                }
 
-            Item {
-                Layout.preferredWidth:  _urlFieldWidth
-                Layout.preferredHeight: 26
+                Item { Layout.fillWidth: true; visible: !_isNarrow }
 
-                Rectangle {
-                    anchors.right:  parent.right
-                    width:          26
-                    height:         26
-                    border.color:   _appSettings.androidSaveToSDCard.value != 0 ? "black" : "#CCC"
-                    border.width:   2
-                    radius:         4
-                    color:          "white"
+                Item {
+                    Layout.preferredWidth:  _isNarrow ? 26 : _urlFieldWidth
+                    Layout.preferredHeight: 26
+                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
 
-                    QGCColoredImage {
-                        anchors.centerIn: parent
-                        width:            18
-                        height:           18
-                        source:           "/qmlimages/checkbox-check.svg"
-                        color:            "black"
-                        visible:          _appSettings.androidSaveToSDCard.value != 0
-                    }
+                    Rectangle {
+                        anchors.right:  _isNarrow ? undefined : parent.right
+                        anchors.left:   _isNarrow ? parent.left : undefined
+                        width:          26
+                        height:         26
+                        border.color:   _appSettings.androidSaveToSDCard.value != 0 ? "black" : "#CCC"
+                        border.width:   2
+                        radius:         4
+                        color:          "white"
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked:    _appSettings.androidSaveToSDCard.value = (_appSettings.androidSaveToSDCard.value == 0 ? 1 : 0)
+                        QGCColoredImage {
+                            anchors.centerIn: parent
+                            width:            18
+                            height:           18
+                            source:           "/qmlimages/checkbox-check.svg"
+                            color:            "black"
+                            visible:          _appSettings.androidSaveToSDCard.value != 0
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:    _appSettings.androidSaveToSDCard.value = (_appSettings.androidSaveToSDCard.value == 0 ? 1 : 0)
+                        }
                     }
                 }
             }
@@ -254,24 +266,32 @@ SettingsPage {
                 _settingsManager.unitsSettings.temperatureUnits
             ]
 
-            RowLayout {
-                spacing: 20
-                Layout.fillWidth: true
+            ColumnLayout {
+                spacing:            _isNarrow ? 5 : 20
+                Layout.fillWidth:   true
                 property var unitFact: modelData
 
-                QGCLabel {
-                    text: unitFact.shortDescription
-                    color: "black"
-                    font.bold: true
-                    Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    Layout.preferredWidth: parent.width
 
-                Item { Layout.fillWidth: true }
+                    QGCLabel {
+                        text:                   unitFact.shortDescription
+                        color:                  "black"
+                        font.bold:              true
+                        Layout.fillWidth:       _isNarrow
+                        Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                    }
 
-                FactComboBox {
-                    fact:           unitFact
-                    indexModel:     false
-                    Layout.preferredWidth: _urlFieldWidth
+                    Item { Layout.fillWidth: true; visible: !_isNarrow }
+
+                    FactComboBox {
+                        fact:                   unitFact
+                        indexModel:             false
+                        Layout.fillWidth:       _isNarrow
+                        Layout.preferredWidth: _isNarrow ? parent.width : _urlFieldWidth
+                    }
                 }
             }
         }
@@ -383,31 +403,38 @@ SettingsPage {
             visible:          _videoSettings.videoSource.visible
         }
 
-        RowLayout {
-            spacing: 20
-            visible: _videoSettings.videoSource.visible
-            Layout.fillWidth: true
+        ColumnLayout {
+            spacing:            _isNarrow ? 5 : 20
+            visible:            _videoSettings.videoSource.visible
+            Layout.fillWidth:   true
 
-            QGCLabel {
-                text: qsTr("Source")
-                color: "black"
-                font.bold: true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
 
-            Item { Layout.fillWidth: true }
+                QGCLabel {
+                    text:                   qsTr("Source")
+                    color:                  "black"
+                    font.bold:              true
+                    Layout.fillWidth:       _isNarrow
+                    Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                }
 
-            FactComboBox {
-                fact:           _videoSettings.videoSource
-                indexModel:     false
-                Layout.preferredWidth: _urlFieldWidth
+                Item { Layout.fillWidth: true; visible: !_isNarrow }
+
+                FactComboBox {
+                    fact:                   _videoSettings.videoSource
+                    indexModel:             false
+                    Layout.fillWidth:       _isNarrow
+                    Layout.preferredWidth: _isNarrow ? parent.width : _urlFieldWidth
+                }
             }
         }
 
         GridLayout {
-            columns:            3
-            columnSpacing:      0
-            rowSpacing:         12
+            columns:            _isNarrow ? 1 : 3
+            columnSpacing:      _isNarrow ? 0 : 10
+            rowSpacing:         _isNarrow ? 5 : 12
             Layout.fillWidth:   true
             visible:            _isStreamSource && _videoSettings.videoSource.visible
 
@@ -416,18 +443,20 @@ SettingsPage {
                 text:           qsTr("RTSP URL")
                 color:          "black"
                 font.bold:      true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                Layout.fillWidth:      _isNarrow
                 visible:        _isRTSP && _videoSettings.rtspUrl.visible
             }
 
             Item {
                 Layout.fillWidth: true
-                visible:          _isRTSP && _videoSettings.rtspUrl.visible
+                visible:          !_isNarrow && _isRTSP && _videoSettings.rtspUrl.visible
             }
 
             Rectangle {
-                Layout.preferredWidth:  _urlFieldWidth
+                Layout.preferredWidth:  _isNarrow ? parent.width : _urlFieldWidth
                 Layout.preferredHeight: 40
+                Layout.fillWidth:       _isNarrow
                 color:                  "white"
                 border.color:           "#808080"
                 border.width:           1
@@ -448,18 +477,20 @@ SettingsPage {
                 text:           qsTr("TCP URL")
                 color:          "black"
                 font.bold:      true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                Layout.fillWidth:      _isNarrow
                 visible:        _isTCP && _videoSettings.tcpUrl.visible
             }
 
             Item {
                 Layout.fillWidth: true
-                visible:          _isTCP && _videoSettings.tcpUrl.visible
+                visible:          !_isNarrow && _isTCP && _videoSettings.tcpUrl.visible
             }
 
             Rectangle {
-                Layout.preferredWidth:  _urlFieldWidth
+                Layout.preferredWidth:  _isNarrow ? parent.width : _urlFieldWidth
                 Layout.preferredHeight: 40
+                Layout.fillWidth:       _isNarrow
                 color:                  "white"
                 border.color:           "#808080"
                 border.width:           1
@@ -480,18 +511,20 @@ SettingsPage {
                 text:           qsTr("UDP Port")
                 color:          "black"
                 font.bold:      true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                Layout.fillWidth:      _isNarrow
                 visible:        _requiresUDPPort && _videoSettings.udpPort.visible
             }
 
             Item {
                 Layout.fillWidth: true
-                visible:          _requiresUDPPort && _videoSettings.udpPort.visible
+                visible:          !_isNarrow && _requiresUDPPort && _videoSettings.udpPort.visible
             }
 
             Rectangle {
-                Layout.preferredWidth:  _urlFieldWidth
+                Layout.preferredWidth:  _isNarrow ? parent.width : _urlFieldWidth
                 Layout.preferredHeight: 40
+                Layout.fillWidth:       _isNarrow
                 color:                  "white"
                 border.color:           "#808080"
                 border.width:           1
@@ -512,18 +545,20 @@ SettingsPage {
                 text:           qsTr("Aspect Ratio")
                 color:          "black"
                 font.bold:      true
-                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
+                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                Layout.fillWidth:      _isNarrow
                 visible:        !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
             }
 
             Item {
                 Layout.fillWidth: true
-                visible:          !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+                visible:          !_isNarrow && !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
             }
 
             Rectangle {
-                Layout.preferredWidth:  _urlFieldWidth
+                Layout.preferredWidth:  _isNarrow ? parent.width : _urlFieldWidth
                 Layout.preferredHeight: 40
+                Layout.fillWidth:       _isNarrow
                 color:                  "white"
                 border.color:           "#808080"
                 border.width:           1
@@ -560,55 +595,59 @@ SettingsPage {
             Layout.fillWidth: true
 
             Repeater {
-
                 model: [
-
-                    //{ t: qsTr("Stop recording when disarmed"), f: _videoSettings.disableWhenDisarmed, v: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.disableWhenDisarmed.visible, e: true },
                     { t: qsTr("Low Latency Mode"), f: _videoSettings.lowLatencyMode, v: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.lowLatencyMode.visible && _isGST, e: true }
-                    //{ t: qsTr("Auto-Delete Saved Recordings"), f: _videoSettings.enableStorageLimit, v: _videoSettings.enableStorageLimit.visible, e: true }
                 ]
 
-                delegate: RowLayout {
-                    spacing: 15
-                    visible: modelData.v
-                    Layout.fillWidth: true
+                delegate: ColumnLayout {
+                    spacing:            _isNarrow ? 5 : 15
+                    visible:            modelData.v
+                    Layout.fillWidth:   true
 
-                    QGCLabel {
-                        text:           modelData.t
-                        color:          "black"
-                        font.bold:      true
-                        Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
 
-                    Item { Layout.fillWidth: true }
+                        QGCLabel {
+                            text:                   modelData.t
+                            color:                  "black"
+                            font.bold:              true
+                            Layout.fillWidth:       _isNarrow
+                            Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                        }
 
-                    Item {
-                        Layout.preferredWidth:  _urlFieldWidth
-                        Layout.preferredHeight: 26
+                        Item { Layout.fillWidth: true; visible: !_isNarrow }
 
-                        Rectangle {
-                            anchors.right:  parent.right
-                            width:          26
-                            height:         26
-                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                            border.width:   2
-                            radius:         4
-                            color:          "white"
+                        Item {
+                            Layout.preferredWidth:  _isNarrow ? 26 : _urlFieldWidth
+                            Layout.preferredHeight: 26
+                            Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
 
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width:            18
-                                height:           18
-                                source:           "/qmlimages/checkbox-check.svg"
-                                color:            "black"
-                                visible:          modelData.f.value != 0
+                            Rectangle {
+                                anchors.right:  _isNarrow ? undefined : parent.right
+                                anchors.left:   _isNarrow ? parent.left : undefined
+                                width:          26
+                                height:         26
+                                border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                                border.width:   2
+                                radius:         4
+                                color:          "white"
+
+                                QGCColoredImage {
+                                    anchors.centerIn: parent
+                                    width:            18
+                                    height:           18
+                                    source:           "/qmlimages/checkbox-check.svg"
+                                    color:            "black"
+                                    visible:          modelData.f.value != 0
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                                }
                             }
                         }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
                     }
                 }
             }
@@ -644,49 +683,57 @@ SettingsPage {
                     { t: qsTr("Save log after each flight"), f: _appSettings.telemetrySave, v: _appSettings.telemetrySave.visible, e: true },
                     { t: qsTr("Save logs even if vehicle was not armed"), f: _appSettings.telemetrySaveNotArmed, v: _appSettings.telemetrySaveNotArmed.visible, e: _appSettings.telemetrySave.rawValue },
                 ]
-                delegate: RowLayout {
-                    spacing: 15
-                    visible: modelData.v
-                    opacity: modelData.e ? 1 : 0.5
-                    Layout.fillWidth: true
+                delegate: ColumnLayout {
+                    spacing:            _isNarrow ? 5 : 15
+                    visible:            modelData.v
+                    opacity:            modelData.e ? 1 : 0.5
+                    Layout.fillWidth:   true
 
-                    QGCLabel {
-                        text:           modelData.t
-                        color:          "black"
-                        font.bold:      true
-                        Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 30
-                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
 
-                    Item { Layout.fillWidth: true }
+                        QGCLabel {
+                            text:                   modelData.t
+                            color:                  "black"
+                            font.bold:              true
+                            Layout.fillWidth:       _isNarrow
+                            Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                        }
 
-                    Item {
-                        Layout.preferredWidth:  _urlFieldWidth
-                        Layout.preferredHeight: 26
+                        Item { Layout.fillWidth: true; visible: !_isNarrow }
 
-                        Rectangle {
-                            anchors.right:  parent.right
-                            width:          26
-                            height:         26
-                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                            border.width:   2
-                            radius:         4
-                            color:          "white"
+                        Item {
+                            Layout.preferredWidth:  _isNarrow ? 26 : _urlFieldWidth
+                            Layout.preferredHeight: 26
+                            Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
 
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width:            18
-                                height:           18
-                                source:           "/qmlimages/checkbox-check.svg"
-                                color:            "black"
-                                visible:          modelData.f.value != 0
+                            Rectangle {
+                                anchors.right:  _isNarrow ? undefined : parent.right
+                                anchors.left:   _isNarrow ? parent.left : undefined
+                                width:          26
+                                height:         26
+                                border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                                border.width:   2
+                                radius:         4
+                                color:          "white"
+
+                                QGCColoredImage {
+                                    anchors.centerIn: parent
+                                    width:            18
+                                    height:           18
+                                    source:           "/qmlimages/checkbox-check.svg"
+                                    color:            "black"
+                                    visible:          modelData.f.value != 0
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    enabled:      modelData.e
+                                    onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                                }
                             }
                         }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled:      modelData.e
-                        onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
                     }
                 }
             }
@@ -726,6 +773,5 @@ SettingsPage {
         Item {
             Layout.preferredHeight: 20
         }
-
     }
 }

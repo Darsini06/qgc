@@ -64,19 +64,19 @@ Item {
         spacing: 20
 
         // ROW OF ACTION ICONS
-        Row {
+        RowLayout {
             id: icons_row
-            spacing: 12
+            spacing: 15
             layoutDirection: Qt.RightToLeft
+            anchors.right: parent.right
 
-            //  ========== COMPASS ARROW ==========
+            // ========== COMPASS ARROW ==========
             Rectangle {
-                width: baseSize
-                height: baseSize
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"//"white"//"#1b1c3e"
-                //border.width: width * 0.05
-                //border.color: "white"//"white"//"#005BBB"
+                color: "white"
                 clip: true
 
                 MouseArea {
@@ -86,11 +86,6 @@ Item {
                         iconsContainer.close();
                     }
                 }
-
-                // CompassDial {
-                //     anchors.fill: parent
-                //     visible: true
-                // }
 
                 QGCColoredImage {
                     id: compassArrow
@@ -112,13 +107,14 @@ Item {
 
             // Erase
             Rectangle {
-                width: baseSize
-                height: baseSize
-                radius: width / 2   // Makes it a circle
-                color: "white"//"#1b1c3e"    // Dark blue background
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
+                radius: width / 2
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
-                clip: true          // This ensures content stays within the circular bounds
+                border.color: "white"
+                clip: true
 
                 MouseArea {
                     anchors.fill: parent
@@ -139,13 +135,14 @@ Item {
             // ========== MAP SWITCH ==========
             Rectangle {
                 id: mapSwitchButton
-                width: baseSize
-                height: baseSize
-                radius: width / 2   // Makes it a circle
-                color: "white"//"#1b1c3e"    // Dark blue background
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
+                radius: width / 2
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
-                clip: true          // This ensures content stays within the circular bounds
+                border.color: "white"
+                clip: true
 
                 MouseArea {
                     anchors.fill: parent
@@ -334,12 +331,13 @@ Item {
             // ========== MAP REDIRECT ==========
             Rectangle {
                 id : mapRedirect
-                width: baseSize
-                height: baseSize
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"//"#1b1c3e"
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
+                border.color: "white"
 
                 MouseArea {
                     anchors.fill: parent
@@ -354,7 +352,6 @@ Item {
                     anchors.centerIn: parent
                     width: iconSize * 0.5
                     height: iconSize * 0.5
-                    //color: "transparent"
                     color : "black"
                 }
 
@@ -388,7 +385,6 @@ Item {
                                 height: iconSize * 0.5
                                 fillMode: Image.PreserveAspectFit
                                 color: "white"
-                                //color : "black"
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -419,7 +415,6 @@ Item {
                                 height: iconSize * 0.5
                                 fillMode: Image.PreserveAspectFit
                                 color: "white"
-                                //color : "black"
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -446,11 +441,12 @@ Item {
 
             QGCCompassWidget {
                 id:                     compass
-                //anchors.centerIn: parent
-                size:                   _innerRadius * 1.5
+                Layout.preferredHeight: baseSize * 1.5
+                Layout.preferredWidth:  baseSize * 1.5
+                Layout.alignment:       Qt.AlignVCenter
+                size:                   baseSize * 1.5
                 vehicle:                _activeVehicle
                 visible :               _activeVehicle
-                //anchors.verticalCenter: parent.verticalCenter
             }
 
         }

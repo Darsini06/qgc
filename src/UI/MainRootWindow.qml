@@ -550,7 +550,7 @@ ApplicationWindow {
             Rectangle {
                 width: parent.width
                 height: titleLabel.implicitHeight + 14
-                color: "#301934"
+                color: app_color
                 radius: 14
                 antialiasing: true
                 clip: true
@@ -561,38 +561,35 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     height: 14
-                    color: "#301934"
+                    color: app_color
                     radius: 0
                 }
 
-                RowLayout {
+                Item {
                     anchors.fill: parent
-                    anchors.margins: 0
 
                     QGCLabel {
                         id: titleLabel
                         text: dynamicCalDialog.dialogTitleText
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        anchors.centerIn: parent
                         font.pointSize: ScreenTools.mediumFontPointSize
                         font.bold: true
                         color: "white"
                     }
 
                     MouseArea {
-                        Layout.alignment: Qt.AlignRight
-                        width: 30
-                        height: 30
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: parent.height
                         onClicked: dynamicCalDialog.close()
 
-                        Text {
+                        QGCColoredImage {
                             anchors.centerIn: parent
-                            text: "\u2715"
+                            width: 16
+                            height: 16
+                            source: "qrc:/res/XDelete.svg"
                             color: "white"
-                            font.pixelSize: 18
                         }
                     }
                 }
