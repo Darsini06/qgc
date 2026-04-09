@@ -25,7 +25,7 @@ Item {
     property int totalMinutes: 0
     property int missionsCompleted: 0
     property string totalDurationFormatted: "0h 0m"
-    property color app_color: "#262626"
+    property color app_color: "#1A1A1A"
 
     // Load logic
     function loadSessions() {

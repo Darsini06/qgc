@@ -35,24 +35,9 @@ Item {
             id: leftPanel
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width * 0.45
-            color: app_color
+            // Background Charcoal Color
+            color: "#1A1A1A"
             clip: true
-
-            // Background Image Overlay
-            Image {
-                anchors.fill: parent
-                source: "qrc:/qmlimages/NewImages/nature_background.png"
-                fillMode: Image.PreserveAspectCrop
-                opacity: 0.3
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.6) }
-                    GradientStop { position: 1.0; color: Qt.rgba(0,0,0,0.2) }
-                }
-            }
 
             // Back Arrow Navigation
             Rectangle {
