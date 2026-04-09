@@ -1,12 +1,3 @@
-/****************************************************************************
- *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <https://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- ****************************************************************************/
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -89,18 +80,19 @@ ApplicationWindow {
     property string sessionEnd: ""
     property bool sessionSaved: false
 
-    // Arming session tracking
-    property string armSessionDate: ""
-    property string armSessionStart: ""
-    property string armSessionEnd: ""
-
     property real screenWidth: width
     property real screenHeight: height
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
-    property color app_color: droneType === "Agri" ? "#79AE6F" : "#808080"
+    property color app_color: {
+        var source = pageLoader.source.toString()
+        if (source.indexOf("ProfileScreen.qml") !== -1) return "#262626"
+        if (droneType === "Agri") return "#79AE6F"
+        if (droneType === "Camera" || droneType === "Mapping") return "#808080"
+        return "#262626"
+    }
 
     function updateAppTheme(newMode) {
         droneType = newMode
@@ -108,7 +100,6 @@ ApplicationWindow {
     }
 
     property bool connecting_drone : false
-    property bool isParametersVerified: false
 
 
     function dp(value) {
@@ -135,24 +126,10 @@ ApplicationWindow {
                 sessionStart = timeString;
                 console.log("Drone Connected at:", sessionStart, "on", sessionDate);
             } else {
-                // If drone disconnects while armed, close the armed session first
-                if (armSessionStart !== "") {
-                    armSessionEnd = timeString;
-                    console.log("Drone Disconnected while ARMED at:", armSessionEnd);
-                    MapGlobals.saveDroneSession(armSessionDate, armSessionStart, armSessionEnd, "Flight");
-                    
-                    // Also log activity
-                    let username = QGroundControl.loadGlobalSetting("username", "Guest")
-                    let email = QGroundControl.loadGlobalSetting("email", "N/A")
-                    MapGlobals.logParameterActivity(username, email, "Drone Disconnected (Signal Lost while Armed)")
-                    
-                    armSessionStart = "";
-                }
-
                 if (sessionStart !== "") { // Only save if we have a start time
                     sessionEnd = timeString;
                     console.log("Drone Disconnected at:", sessionEnd,"on", sessionDate);
-                    MapGlobals.saveDroneSession(sessionDate, sessionStart, sessionEnd, "Connection");
+                    MapGlobals.saveDroneSession(sessionDate, sessionStart, sessionEnd);
                     // Reset for next session
                     sessionStart = "";
                     sessionEnd = "";
@@ -162,44 +139,6 @@ ApplicationWindow {
 
         function updateTabModel() {
             tabModel.updateSettingsTab();
-        }
-    }
-
-    Connections {
-        target: activeVehicle
-        ignoreUnknownSignals: true
-        onArmedChanged: {
-            if (!activeVehicle) return;
-
-            let now = new Date();
-            let timeString = now.toLocaleTimeString(Qt.locale(), "HH:mm:ss");
-            let dateString = now.toLocaleDateString(Qt.locale(), "dd-MM-yyyy");
-            let username = QGroundControl.loadGlobalSetting("username", "Guest")
-            let email = QGroundControl.loadGlobalSetting("email", "N/A")
-
-            if (activeVehicle.armed) {
-                // Drone Armed - Start Flight Session
-                armSessionDate = dateString;
-                armSessionStart = timeString;
-                console.log("Drone ARMED - Flight Session Started at:", armSessionStart);
-                
-                // Log activity to Admin Panel
-                MapGlobals.logParameterActivity(username, email, "Drone Armed (Flight Started)")
-            } else {
-                // Drone Disarmed - End Flight Session
-                if (armSessionStart !== "") {
-                    armSessionEnd = timeString;
-                    console.log("Drone DISARMED - Flight Session Ended at:", armSessionEnd);
-                    MapGlobals.saveDroneSession(armSessionDate, armSessionStart, armSessionEnd, "Flight");
-                    
-                    // Log activity to Admin Panel
-                    MapGlobals.logParameterActivity(username, email, "Drone Disarmed (Flight Ended)")
-                    
-                    // Reset for next flight
-                    armSessionStart = "";
-                    armSessionEnd = "";
-                }
-            }
         }
     }
 
@@ -675,200 +614,6 @@ ApplicationWindow {
         onClosed: dialogLoader.source = ""
     }
 
-    Component {
-        id: otpDialogComponent
-        Dialog {
-            id: otpDialog
-            modal: true
-            anchors.centerIn: parent
-            width: Math.min(parent.width * 0.8, 400)
-            height: Math.min(parent.height * 0.8, 450)
-            clip: true
-
-            closePolicy: Popup.NoAutoClose
-            padding: 0
-
-            background: Rectangle {
-                radius: 14
-                color: "white"
-                border.color: "#E0E0E0"
-                border.width: 1
-            }
-
-            property bool otpSent: false
-            property string email: QGroundControl.loadGlobalSetting("email", "")
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 15
-
-                Text {
-                    text: "Parameters Verification"
-                    Layout.alignment: Qt.AlignHCenter
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.bold: true
-                    color: app_color
-                }
-
-                Text {
-                    text: "Please verify your identity with an OTP to access vehicle parameters."
-                    Layout.fillWidth: true
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    font.pointSize: ScreenTools.smallFontPointSize
-                    color: "#666666"
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 45
-                    radius: 8
-                    color: "#F5F5F5"
-                    border.color: emailField.activeFocus ? app_color : "#E0E0E0"
-
-                    TextField {
-                        id: emailField
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        placeholderText: "Email for OTP"
-                        text: otpDialog.email
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "black"
-                        background: null
-                        enabled: !otpDialog.otpSent
-                    }
-                }
-
-                Button {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40
-                    visible: !otpDialog.otpSent
-                    background: Rectangle {
-                        color: parent.pressed ? Qt.darker(app_color, 1.2) : app_color
-                        radius: 8
-                    }
-                    contentItem: Text {
-                        text: "Send OTP"
-                        color: "white"
-                        font.bold: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: {
-                        if (emailField.text === "") {
-                            mainWindow.showToastMessage("Please enter an email")
-                            return
-                        }
-                        MapGlobals.sendOTP(emailField.text, function(success) {
-                            if (success) {
-                                otpDialog.otpSent = true
-                            }
-                        })
-                    }
-                }
-
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    visible: otpDialog.otpSent
-                    spacing: 10
-
-                    Text {
-                        text: "Enter OTP"
-                        font.bold: true
-                        font.pointSize: ScreenTools.smallFontPointSize
-                        color: app_color
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 45
-                        radius: 8
-                        color: "#F5F5F5"
-                        border.color: otpField.activeFocus ? app_color : "#E0E0E0"
-
-                        TextField {
-                            id: otpField
-                            anchors.fill: parent
-                            anchors.margins: 5
-                            placeholderText: "6-digit OTP"
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            color: "black"
-                            background: null
-                            inputMethodHints: Qt.ImhDigitsOnly
-                        }
-                    }
-
-                    Button {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 40
-                        background: Rectangle {
-                            color: parent.pressed ? Qt.darker(app_color, 1.2) : app_color
-                            radius: 8
-                        }
-                        contentItem: Text {
-                            text: "Verify & Open Parameters"
-                            color: "white"
-                            font.bold: true
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            if (otpField.text === "") {
-                                mainWindow.showToastMessage("Please enter OTP")
-                                return
-                            }
-                            MapGlobals.verifyOTP(emailField.text, otpField.text, function(success) {
-                                if (success) {
-                                    isParametersVerified = true
-                                    otpDialog.close()
-                                    
-                                    // Log activity for Admin Panel
-                                    let username = QGroundControl.loadGlobalSetting("username", "Guest")
-                                    MapGlobals.logParameterActivity(username, emailField.text)
-
-                                    // Load parameters page
-                                    sidebarList.currentIndex = 4
-                                    tabBarDummy.currentIndex = 4
-                                    loaders.source = tabModel.get(4).file
-                                    mainWindow.showToastMessage("Parameters Access Verified")
-                                } else {
-                                    mainWindow.showToastMessage("Invalid OTP")
-                                }
-                            })
-                        }
-                    }
-
-                    Text {
-                        text: "Did not receive? Resend OTP"
-                        Layout.alignment: Qt.AlignHCenter
-                        font.pointSize: ScreenTools.smallFontPointSize * 0.9
-                        color: app_color
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                MapGlobals.sendOTP(emailField.text, function(success) {
-                                    if (success) {
-                                        mainWindow.showToastMessage("OTP Resent")
-                                    }
-                                })
-                            }
-                        }
-                    }
-                }
-
-                Item { Layout.fillHeight: true }
-
-                Button {
-                    Layout.alignment: Qt.AlignRight
-                    text: "Cancel"
-                    flat: true
-                    onClicked: otpDialog.close()
-                }
-            }
-        }
-    }
-
     // Starting of DB code
 
     // // JavaScript function to read from DB
@@ -1070,6 +815,7 @@ ApplicationWindow {
     }
 
     function openProfileScreen() {
+        MapGlobals.comefrom = "Profile"
         pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
@@ -1094,11 +840,6 @@ ApplicationWindow {
     function showToolSelectDialog1(index) {
 
         if (!mainWindow.preventViewSwitch()) {
-            if (index === 4 && !isParametersVerified) {
-                sideDrawer.open()
-                otpDialogComponent.createObject(mainWindow).open()
-                return
-            }
             sideDrawer.open()
             tabBar.currentIndex = index; // 3rd index (0-based index)
             loaders.source = tabModel.get(index).file; // Load that page
@@ -1217,7 +958,7 @@ ApplicationWindow {
                     Layout.preferredWidth: ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 20 : ScreenTools.defaultFontPixelWidth * 28
                     Layout.fillHeight: true
                     color: "#f8f9fa" // Light aesthetic sidebar
-                    
+
                     // Sidebar Right Border
                     Rectangle {
                         anchors.right: parent.right
@@ -1234,20 +975,20 @@ ApplicationWindow {
                         clip: true
                         topMargin: 20
                         spacing: 2
-                        
+
                         // Fake TabBar for index tracking and logic preservation
                         TabBar { id: tabBarDummy; visible: false; currentIndex: 0 }
 
                         delegate: Item {
                             width: parent.width
                             height: 60
-                            
+
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
                                 color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
-                                
+
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
                                 RowLayout {
@@ -1269,7 +1010,7 @@ ApplicationWindow {
                                         font.bold: sidebarList.currentIndex === index
                                         color: sidebarList.currentIndex === index ? app_color : "#444444"
                                     }
-                                    
+
                                     // Selection Indicator (vertical line)
                                     Rectangle {
                                         width: 4
@@ -1284,10 +1025,6 @@ ApplicationWindow {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        if (index === 4 && !isParametersVerified) {
-                                            otpDialogComponent.createObject(mainWindow).open()
-                                            return
-                                        }
                                         sidebarList.currentIndex = index
                                         tabBarDummy.currentIndex = index
                                         loaders.source = model.file
@@ -1823,7 +1560,7 @@ ApplicationWindow {
                     color: Qt.rgba(1, 1, 1, 0.15)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Text {
                         text: "-"
                         color: "white"
@@ -1894,7 +1631,7 @@ ApplicationWindow {
                     color: Qt.rgba(0, 0, 0, 0.4)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Canvas {
                         id: progressCircle
                         anchors.fill: parent
