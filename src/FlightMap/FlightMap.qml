@@ -268,20 +268,12 @@ Map {
                 onTriggered: {
                     var page = QGroundControl.loadGlobalSetting("loadpage", "loadpage")
                     if (page === "Agri") mapItemImage.color = "green"
-                    else if (page === "Camera") mapItemImage.color = "black"
-                    else mapItemImage.color = "red"
+                    else if (page === "Camera") mapItemImage.color = "grey"
+                    else mapItemImage.color = "grey"
                 }
             }
 
-            Rectangle {
-                anchors.centerIn: parent
-                width: parent.width * 0.95
-                height: width
-                radius: width / 2
-                color: "white"
-                border.color: "#DDDDDD"
-                border.width: 1
-            }
+            // White circular background removed per user request
 
             QGCColoredImage {
                 id:             mapItemImage
