@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <https://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -454,6 +454,7 @@ Item {
 
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
+                MapGlobals.saveMissionLog(_planMasterController.currentPlanFile || "New Mission", _missionController.visualItems)
                 sendToVehicle()
                 console.log("upload_clicked1")
                 break

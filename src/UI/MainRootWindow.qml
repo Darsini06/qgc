@@ -1,12 +1,3 @@
-/****************************************************************************
- *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- ****************************************************************************/
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -967,7 +958,7 @@ ApplicationWindow {
                     Layout.preferredWidth: ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 20 : ScreenTools.defaultFontPixelWidth * 28
                     Layout.fillHeight: true
                     color: "#f8f9fa" // Light aesthetic sidebar
-                    
+
                     // Sidebar Right Border
                     Rectangle {
                         anchors.right: parent.right
@@ -984,20 +975,20 @@ ApplicationWindow {
                         clip: true
                         topMargin: 20
                         spacing: 2
-                        
+
                         // Fake TabBar for index tracking and logic preservation
                         TabBar { id: tabBarDummy; visible: false; currentIndex: 0 }
 
                         delegate: Item {
                             width: parent.width
                             height: 60
-                            
+
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
                                 color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
-                                
+
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
                                 RowLayout {
@@ -1019,7 +1010,7 @@ ApplicationWindow {
                                         font.bold: sidebarList.currentIndex === index
                                         color: sidebarList.currentIndex === index ? app_color : "#444444"
                                     }
-                                    
+
                                     // Selection Indicator (vertical line)
                                     Rectangle {
                                         width: 4
@@ -1569,7 +1560,7 @@ ApplicationWindow {
                     color: Qt.rgba(1, 1, 1, 0.15)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Text {
                         text: "-"
                         color: "white"
@@ -1640,7 +1631,7 @@ ApplicationWindow {
                     color: Qt.rgba(0, 0, 0, 0.4)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Canvas {
                         id: progressCircle
                         anchors.fill: parent
