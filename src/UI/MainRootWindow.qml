@@ -95,7 +95,13 @@ ApplicationWindow {
     property real baseUnit: 8 * scaleRatio
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
-    property color app_color: droneType === "Agri" ? "#79AE6F" : "#808080"
+    property color app_color: {
+        var source = pageLoader.source.toString()
+        if (source.indexOf("ProfileScreen.qml") !== -1) return "#262626"
+        if (droneType === "Agri") return "#79AE6F"
+        if (droneType === "Camera" || droneType === "Mapping") return "#808080"
+        return "#262626"
+    }
 
     function updateAppTheme(newMode) {
         droneType = newMode
@@ -818,6 +824,7 @@ ApplicationWindow {
     }
 
     function openProfileScreen() {
+        MapGlobals.comefrom = "Profile"
         pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
