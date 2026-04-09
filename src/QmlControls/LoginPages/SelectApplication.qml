@@ -1,12 +1,12 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Effects
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
-import MapGlobals 1.0
+import MapGlobals
 
 Item {
     id: root
@@ -15,7 +15,7 @@ Item {
     // ── Palette ─────────────────────────────────────────────────
     readonly property color brandDark:    "#1A1A1A"
     readonly property color brandPrimary: "#262626"
-    readonly property color brandAccent:  "#262626"
+    property color brandAccent:  MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#4A2C6D"
     readonly property color pageBg:       "#EDEEF4"
 
     // ── Adaptive sizing helpers ──────────────────────────────────
@@ -36,9 +36,9 @@ Item {
     property int selectedIndex: -1
 
     readonly property var appModel: [
-        { label: "Camera",  desc: "Aerial photography & video",    image: "qrc:/qmlimages/NewImages/camerabg.png" },
-        { label: "Agri",    desc: "Precision agriculture & spray", image: "qrc:/qmlimages/NewImages/agribg.png"   },
-        { label: "Mapping", desc: "3-D mapping & surveying",       image: "qrc:/qmlimages/NewImages/mapbg.png"    }
+        { label: "Camera",  desc: "Aerial photography & video",    image: "qrc:/qmlimages/NewImages/camerabg.png", color: "#F39C12" },
+        { label: "Agri",    desc: "Precision agriculture & spray", image: "qrc:/qmlimages/NewImages/agribg.png",   color: "#79AE6F" },
+        { label: "Mapping", desc: "3-D mapping & surveying",       image: "qrc:/qmlimages/NewImages/mapbg.png",    color: "#4F9DDF" }
     ]
 
     Component.onCompleted: {
@@ -155,7 +155,7 @@ Item {
 
                         color: {
                             if (cardMa.containsMouse) {
-                                return modelData.label === "Agri" ? "#79AE6F" : "#808080"
+                                return modelData.color
                             }
                             return "white"
                         }

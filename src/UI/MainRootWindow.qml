@@ -95,11 +95,26 @@ ApplicationWindow {
     property real baseUnit: 8 * scaleRatio
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
-    property color app_color: droneType === "Agri" ? "#79AE6F" : "#808080"
+
+    // --- Dynamic Theming ---
+    property color app_color: {
+        if (droneType === "Agri")    return "#79AE6F" // Forest Green
+        if (droneType === "Mapping") return "#4F9DDF" // Clear Blue
+        if (droneType === "Camera")  return "#F39C12" // Sunset Orange
+        return "#4A2C6D" // Professional Purple (Default)
+    }
+
+    property color accent_color: {
+        if (droneType === "Agri")    return "#5D8A54" // Darker Green
+        if (droneType === "Mapping") return "#347DBD" // Darker Blue
+        if (droneType === "Camera")  return "#D35400" // Darker Orange
+        return "#673AB7" // Vibrant Purple
+    }
 
     function updateAppTheme(newMode) {
         droneType = newMode
         QGroundControl.saveGlobalSetting("loadpage", newMode)
+        console.log("App Theme Updated to:", newMode)
     }
 
     property bool connecting_drone : false

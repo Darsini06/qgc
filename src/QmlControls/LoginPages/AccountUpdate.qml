@@ -1,21 +1,21 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Effects
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
-import MapGlobals 1.0
+import MapGlobals
 
 Item {
     id: accountUpdateRoot
     anchors.fill: parent
 
     // --- Design Tokens (Consistent with ProfileMain.qml) ---
-    property color app_color:       "#262626" 
-    property color accent_color:    "#262626" 
+    property color app_color:       MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#262626" 
+    property color accent_color:    MapGlobals.rootWindow ? MapGlobals.rootWindow.accent_color : "#4A2C6D"
     property color surface_color:   "#ffffff"
     property color bg_color:        "#f8f9fa"
     property color text_primary:    "#1e293b"

@@ -1,38 +1,31 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.LocalStorage 2.0
+import QtQuick.Dialogs
+import QtQuick.LocalStorage
 import QtQuick.Effects
-
-import QtWebView 1.1
+import QtWebView
 
 import Qt.labs.lottieqt 1.0
+import Qt.labs.settings 1.0
 
-import QGroundControl
-import QGroundControl.Controls
-import QGroundControl.Controllers
-import QGroundControl.FactControls
-import QGroundControl.ScreenTools
-import QGroundControl.Palette
-import MapGlobals 1.0
+import QGroundControl 1.0
+import QGroundControl.Controls 1.0
+import QGroundControl.Controllers 1.0
+import QGroundControl.FactControls 1.0
+import QGroundControl.FactSystem 1.0
+import QGroundControl.ScreenTools 1.0
+import QGroundControl.Palette 1.0
+import QGroundControl.FlightMap 1.0
+import QGroundControl.FlightDisplay 1.0
+import QGroundControl.ShapeFileHelper 1.0
+import QGroundControl.UTMSP 1.0
 
-//=============================
-import QGroundControl.FlightMap
-
+import MapGlobals
 import QtLocation
 import QtPositioning
 import QtQuick.Window
-import Qt.labs.settings 1.0
 
-import QGroundControl.FactSystem
-
-import QGroundControl.ShapeFileHelper
-import QGroundControl.FlightDisplay
-import QGroundControl.UTMSP
 //================================
 
 Item {
@@ -62,7 +55,8 @@ Item {
     property int totalMinutes: 0
     property int missionsCompleted: 0
     property string totalDurationFormatted: "0h 0m"
-    property color app_color: "#4a2c6d"
+    property color app_color: MapGlobals.comefrom === "Profile" ? "#262626" : mainWindow.app_color
+    signal backClicked()
 
     property bool privacyLoading: true
 
@@ -437,14 +431,30 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: mainWindow.openHomeScreen()
+                                onClicked: {
+                                    if (MapGlobals.comefrom === "Profile") {
+                                        backClicked()
+                                        // Fallback if standalone
+                                        if (typeof pageLoader !== 'undefined' && pageLoader.source.toString().indexOf("LogFiles.qml") !== -1) {
+                                            mainWindow.openProfileScreen()
+                                        }
+                                    } else if (MapGlobals.comefrom === "Camera") {
+                                        mainWindow.cameraView()
+                                    } else if (MapGlobals.comefrom === "Plan") {
+                                        mainWindow.showFlyView()
+                                    } else if (MapGlobals.comefrom === "Start") {
+                                        mainWindow.showMapping()
+                                    } else {
+                                        mainWindow.openHomeScreen()
+                                    }
+                                }
                             }
                         }
 
                         Item { Layout.fillWidth: true }
 
                         Text {
-                            text:           "Profile"
+                            text:           "Log files"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             color:          "white"
                             font.bold:      true
@@ -462,107 +472,6 @@ Item {
                     Layout.rightMargin:  20
                     Layout.bottomMargin: 20
                     spacing: 20
-
-                    // ── Left Card: Profile Info & Stats ──────────────────────
-                    Rectangle {
-                        Layout.preferredWidth: parent.width * 0.45
-                        Layout.fillHeight: true
-                        color:        "white"
-                        radius:       5
-                        border.color: "#e0e0e0"
-                        border.width: 1
-
-                        ColumnLayout {
-                            anchors.fill:    parent
-                            anchors.margins: 20
-                            spacing: 10
-                            clip:    true
-
-                            // Profile image
-                            Rectangle {
-                                Layout.alignment: Qt.AlignHCenter
-                                width:        85
-                                height:       85
-                                radius:       width / 2
-                                border.color: "#000000"
-                                border.width: 2
-                                color:        "transparent"
-                                clip:         true
-
-                                AnimatedImage {
-                                    anchors.centerIn: parent
-                                    source:   "qrc:/qmlimages/NewImages/report_gif.gif"
-                                    width:    80
-                                    height:   80
-                                    cache:    true
-                                    fillMode: Image.PreserveAspectFit
-                                }
-                            }
-
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text:           displayName || "Anonymous"
-                                font.pointSize: ScreenTools.mediumFontPointSize
-                                font.bold:      true
-                                color:          "#333333"
-                            }
-
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
-                                text:           userEmail || "user@example.com"
-                                font.pointSize: ScreenTools.smallFontPointSize
-                                color:          "#666666"
-                            }
-
-                            // Stats
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 10
-
-                                RowLayout {
-                                    spacing: 10
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/time.svg"
-                                        width: 20; height: 20
-                                        color: "#2c3e50"
-                                    }
-                                    Text {
-                                        text:           "Total Hours Flown"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        color:          "#666666"
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        text:           totalDurationFormatted
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        font.bold:      true
-                                        color:          "#2c3e50"
-                                    }
-                                }
-
-                                RowLayout {
-                                    spacing: 10
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/checkmark.svg"
-                                        width: 20; height: 20
-                                        color: "#2c3e50"
-                                    }
-                                    Text {
-                                        text:           "Missions Completed"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        color:          "#666666"
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        text:           missionsCompleted
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        font.bold:      true
-                                        color:          "#2c3e50"
-                                    }
-                                }
-                            }
-                        }
-                    }
 
                     // ── Right Card: Menu + Inline File List ──────────────────
                     Rectangle {
@@ -684,6 +593,7 @@ Item {
                         anchors.topMargin:   6
                         anchors.left:        parent.left
                         anchors.right:       parent.right
+                        anchors.bottom:      parent.bottom
                         clip:                true
                         contentWidth:        width
 
