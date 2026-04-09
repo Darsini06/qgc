@@ -153,21 +153,27 @@ Item {
 
                         readonly property bool isSelected: root.selectedIndex === index
 
-                        color: "white"
-                        border.color: isSelected ? brandAccent : "#DDE1EA"
+                        color: {
+                            if (cardMa.containsMouse) {
+                                return modelData.label === "Agri" ? "#79AE6F" : "#808080"
+                            }
+                            return "white"
+                        }
+                        border.color: isSelected ? brandAccent : (cardMa.containsMouse ? "transparent" : "#DDE1EA")
                         border.width: isSelected ? 3 : 1
 
+                        Behavior on color { ColorAnimation { duration: 180 } }
                         Behavior on border.color { ColorAnimation { duration: 180 } }
                         Behavior on border.width  { NumberAnimation  { duration: 180 } }
 
                         layer.enabled: true
                         layer.effect: MultiEffect {
                             shadowEnabled: true
-                            shadowColor: isSelected
+                            shadowColor: isSelected || cardMa.containsMouse
                                          ? Qt.rgba(44,44,44,0.25)
                                          : Qt.rgba(0,0,0,0.08)
                             shadowBlur: 0.85
-                            shadowVerticalOffset: isSelected ? 8 : 3
+                            shadowVerticalOffset: isSelected || cardMa.containsMouse ? 8 : 3
                         }
 
                         // ── Image fills top portion ───────────────
@@ -176,7 +182,7 @@ Item {
                             anchors { top: parent.top; left: parent.left; right: parent.right }
                             height: card.height - labelStrip.height
                             clip: true
-                            color: brandDark
+                            color: "transparent"
                             // top-left / top-right rounded, bottom flat
                             radius: root.r
 
@@ -191,7 +197,8 @@ Item {
                                 anchors.fill: parent
                                 source: modelData.image
                                 fillMode: Image.PreserveAspectCrop
-                                opacity: 0.9
+                                opacity: cardMa.containsMouse ? 0.7 : 0.9
+                                Behavior on opacity { NumberAnimation { duration: 180 } }
                             }
 
                             // ── Check badge (top-right) ───────────
@@ -219,7 +226,7 @@ Item {
                             anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                             height: root.labelH
                             radius: root.r
-                            color: isSelected ? Qt.rgba(44,44,44,0.05) : "white"
+                            color: cardMa.containsMouse ? "transparent" : (isSelected ? Qt.rgba(44,44,44,0.05) : "white")
                             Behavior on color { ColorAnimation { duration: 180 } }
 
                             // flatten top corners
@@ -237,13 +244,16 @@ Item {
                                     pointSize: ScreenTools.defaultFontPointSize
                                     bold: true
                                 }
-                                color: isSelected ? brandPrimary : "#1E1E2E"
+                                color: cardMa.containsMouse ? "white" : (isSelected ? brandPrimary : "#1E1E2E")
+                                Behavior on color { ColorAnimation { duration: 180 } }
                                 elide: Text.ElideRight
                             }
                         }
 
                         MouseArea {
+                            id: cardMa
                             anchors.fill: parent
+                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: root.selectedIndex = index
                         }

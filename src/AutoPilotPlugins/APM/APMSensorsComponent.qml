@@ -214,92 +214,71 @@ SetupPage {
                                     shadowColor: "#40000000"   // soft black
                                 }
 
-                                Rectangle {
-                                    anchors.fill: parent
-                                    //anchors.margins: 5
-                                    color: {
-                                        if (modelData.status === "success") return "#2ecc71";   // Success: Green
-                                        if (modelData.status === "failure") return "#e74c3c";   // Failure: Red
-
-                                        switch (model.type) {
-                                        case "accel":        return "white";  // Blue
-                                        case "compass":      return "white";  // Purple
-                                        case "level":        return "white";  // Teal
-                                        case "gyro":         return "white";  // Orange
-                                        case "pressure":     return "white";  // Yellow Orange
-                                        case "rc":           return "white";  // Navy Blue
-                                        case "flightModes":  return "white";  // Dark Red
-                                        case "esc":          return "white";  // Green
-                                        case "motors":       return "white";  // Gray
-                                        case "tuning":       return "white";  // Light Purple
-                                        default:             return "white";
-                                        }
-                                    }
-
-                                    radius: 8
-                                    border.color: app_color
-                                    border.width: 1
-
-                                    Column {
-                                        anchors.centerIn: parent
-                                        spacing: 10
-                                        width: parent.width
-
-                                        // Icon above the text
-                                        Image {
-                                            source: modelData.icon
-                                            width: 50
-                                            height: 50
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            fillMode: Image.PreserveAspectFit
-                                        }
-
-                                        // Label below the icon
-                                        QGCLabel {
-                                            text: modelData.text//model.type === "pressure" ? _calibratePressureText : model.name
-                                            color: "black"
-                                            horizontalAlignment: Text.AlignHCenter
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            wrapMode: Text.WordWrap
-                                            font.bold: true
-                                        }
-                                    }
-
-                                    // Indicator for calibration status
-                                    // Rectangle {
-                                    //     visible: modelData.indicator
-                                    //     width: ScreenTools.defaultFontPixelHeight * 0.75
-                                    //     height: width
-                                    //     anchors.top: parent.top
-                                    //     anchors.right: parent.right
-                                    //     anchors.margins: 5
-                                    //     radius: width * 0.5
-                                    //     color: app_color
-                                    //     // color: {
-                                    //     //     if (model.type === "accel") return !controller.accelSetupNeeded ? "green" : "red";
-                                    //     //     if (model.type === "compass") return !controller.compassSetupNeeded ? "green" : "red";
-                                    //     //     return "transparent";
-                                    //     // }
-                                    // }
-
-                                    // QGCLabel {
-                                    //     anchors.centerIn: parent
-                                    //     text: {
-                                    //         if (model.type === "pressure") return _calibratePressureText;
-                                    //         return model.name;
-                                    //     }
-                                    //     color: qgcPal.buttonText
-                                    // }
-
-                                    MouseArea {
-                                        id: mouseArea
+                                    Rectangle {
                                         anchors.fill: parent
-                                        enabled: gridView.buttonsEnabled
-                                        onClicked: {
-                                            mainWindow.close_dialog_showToast("Drone not connected")
+                                        //anchors.margins: 5
+                                        color: {
+                                            if (mouseArea.containsMouse) return mainWindow.app_color;
+                                            if (modelData.status === "success") return "#2ecc71";   // Success: Green
+                                            if (modelData.status === "failure") return "#e74c3c";   // Failure: Red
+
+                                            switch (model.type) {
+                                            case "accel":        return "white";  // Blue
+                                            case "compass":      return "white";  // Purple
+                                            case "level":        return "white";  // Teal
+                                            case "gyro":         return "white";  // Orange
+                                            case "pressure":     return "white";  // Yellow Orange
+                                            case "rc":           return "white";  // Navy Blue
+                                            case "flightModes":  return "white";  // Dark Red
+                                            case "esc":          return "white";  // Green
+                                            case "motors":       return "white";  // Gray
+                                            case "tuning":       return "white";  // Light Purple
+                                            default:             return "white";
+                                            }
+                                        }
+
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        radius: 8
+                                        border.color: mainWindow.app_color
+                                        border.width: 1
+
+                                        Column {
+                                            anchors.centerIn: parent
+                                            spacing: 10
+                                            width: parent.width
+
+                                            // Icon above the text
+                                            Image {
+                                                source: modelData.icon
+                                                width: 50
+                                                height: 50
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                fillMode: Image.PreserveAspectFit
+                                            }
+
+                                            // Label below the icon
+                                            QGCLabel {
+                                                text: modelData.text//model.type === "pressure" ? _calibratePressureText : model.name
+                                                color: mouseArea.containsMouse ? "white" : "black"
+                                                horizontalAlignment: Text.AlignHCenter
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                wrapMode: Text.WordWrap
+                                                font.bold: true
+                                                Behavior on color { ColorAnimation { duration: 150 } }
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            id: mouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            enabled: gridView.buttonsEnabled
+                                            onClicked: {
+                                                mainWindow.close_dialog_showToast("Drone not connected")
+                                            }
                                         }
                                     }
-                                }
 
                             }
 

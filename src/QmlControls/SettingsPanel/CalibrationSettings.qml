@@ -559,14 +559,17 @@ SetupPage {
                             anchors.fill: parent
                             anchors.margins: 5
                             color: {
-                                if (model.status === "success") return "lightgreen";
-                                if (model.status === "failure") return "#ff9999";
-                                if (model.status === "inprogress") return "blue";
+                                if (model.status === "success")     return "lightgreen";
+                                if (model.status === "failure")     return "#ff9999";
+                                if (model.status === "inprogress")  return "blue";
+                                if (mouseArea.containsMouse)        return app_color;
                                 return mouseArea.containsPress ? qgcPal.buttonHighlight : qgcPal.button;
                             }
                             radius: 8
                             border.color: "black"
                             border.width: 1
+
+                            Behavior on color { ColorAnimation { duration: 150 } }
 
                             Column {
                                 anchors.centerIn: parent
@@ -608,18 +611,10 @@ SetupPage {
                                 }
                             }
 
-                            // QGCLabel {
-                            //     anchors.centerIn: parent
-                            //     text: {
-                            //         if (model.type === "pressure") return _calibratePressureText;
-                            //         return model.name;
-                            //     }
-                            //     color: qgcPal.buttonText
-                            // }
-
                             MouseArea {
                                 id: mouseArea
                                 anchors.fill: parent
+                                hoverEnabled: true
                                 enabled: gridView.buttonsEnabled
                                 onClicked: handleButtonClick(model.type)
                             }
