@@ -1441,7 +1441,7 @@ Item {
 
                                     Rectangle {
                                         width: parent.width - verifyResetOtpBtn2.width - parent.spacing
-                                        height: 80
+                                        height: 45
                                         radius: 8
                                         color: surfaceColor
                                         border.width: resetOtpField.activeFocus ? 2 : 1
@@ -1458,12 +1458,13 @@ Item {
                                             background: null
                                             selectByMouse: true
                                             inputMethodHints: Qt.ImhDigitsOnly
+                                            verticalAlignment: TextInput.AlignVCenter
                                         }
                                     }
                                     Button {
                                         id: verifyResetOtpBtn2
-                                        width: 160
-                                        height: 80
+                                        width: 130
+                                        height: 45
                                         text: "Verify OTP"
                                         background: Rectangle {
                                             radius: 8
@@ -1472,8 +1473,10 @@ Item {
                                         contentItem: Text {
                                             text: "Verify OTP"
                                             color: "white"
-                                            font.pointSize: ScreenTools.smallFontPointSize
-                                            font.bold: true
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
                                         }
                                         onClicked: {
                                             if (resetOtpField.text.length < 6) {
@@ -1656,7 +1659,7 @@ Item {
                                 text: "Reset Password"
                                 visible: resetRoot.isOtpVerified
                                 width: parent.width * 0.9
-                                height: 30
+                                height: 45
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 background: Rectangle {
@@ -1732,27 +1735,34 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 background: Rectangle {
-                                    radius: 2
+                                    radius: 8
                                     color: sendResetOtpBtn.pressed ? primaryHover : app_color
                                 }
 
-                                contentItem: Row {
-                                    anchors.centerIn: parent
-                                    spacing: 16
+                                contentItem: Item {
+                                    anchors.fill: parent
 
-                                    Text {
-                                        text: sendResetOtpBtn.text
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.weight: Font.Medium
-                                        color: "white"
-                                    }
+                                    Row {
+                                        anchors.centerIn: parent
+                                        spacing: 10
 
-                                    QGCColoredImage {
-                                        source: "/qmlimages/NewImages/send_mail.svg"
-                                        fillMode: Image.PreserveAspectFit
-                                        width: 20
-                                        height: 20
-                                        color: "white"
+                                        Text {
+                                            text: sendResetOtpBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/send_mail.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 18
+                                            height: 18
+                                            color: "white"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
                                     }
                                 }
 
@@ -1764,7 +1774,7 @@ Item {
                             // Back to Sign In link
                             Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                height: 64
+                                height: 48
                                 width: backRow.width
 
                                 Row {

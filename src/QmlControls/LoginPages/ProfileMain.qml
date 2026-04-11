@@ -243,251 +243,406 @@ Item {
     // Change Password Dialog
     Dialog {
         id: changePasswordDialog
-    property bool showOldPass: false
-            property bool showNewPass: false
-            property bool showConfirmPass: false
+        property bool showOldPass: false
+        property bool showNewPass: false
+        property bool showConfirmPass: false
         modal: true
         anchors.centerIn: parent
-        width: parent.width * 0.9
-        height: parent.height * 0.8
-        title: "Change Password"
+        width: Math.min(parent.width * 0.9, 400) // Small, professional compact size
+        padding: 0 // Use custom padding in contentItem to avoid QML bugs
 
         background: Rectangle {
             color: "white"
             radius: 16
+            layer.enabled: true
         }
 
-        contentItem: ColumnLayout {
-            spacing: 15
-            anchors.fill: parent
-            anchors.margins: 20
+        // Custom header
+        header: Item {
+            height: 64
+
+            Rectangle {
+                anchors.fill: parent
+                color: app_color
+                radius: 16
+
+                // Square off bottom corners
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+                    height: 16
+                    color: app_color
+                }
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 24
+                anchors.rightMargin: 16
+
+                QGCColoredImage {
+                    source: "/qmlimages/NewImages/privacy_policy_black.svg"
+                    width: 22; height: 22
+                    color: "white"
+                }
+
+                Text {
+                    text: "Change Password"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.weight: Font.Bold
+                    font.family: "Outfit"
+                    color: "white"
+                    Layout.fillWidth: true
+                }
+
+                // Close button
+                Rectangle {
+                    width: 32; height: 32; radius: 16
+                    color: closeBtnMouse.containsMouse ? Qt.rgba(1,1,1,0.2) : "transparent"
+
+                    Item {
+                        anchors.centerIn: parent
+                        width: 12
+                        height: 12
+                        
+                        Rectangle {
+                            width: parent.width * 1.414
+                            height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
+                            color: "white"
+                            anchors.centerIn: parent
+                            rotation: 45
+                            antialiasing: true
+                        }
+                        
+                        Rectangle {
+                            width: parent.width * 1.414
+                            height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
+                            color: "white"
+                            anchors.centerIn: parent
+                            rotation: -45
+                            antialiasing: true
+                        }
+                    }
+
+                    MouseArea {
+                        id: closeBtnMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: changePasswordDialog.close()
+                    }
+                }
+            }
+        }
+
+        contentItem: Item {
+            // Set max height dynamically (up to 80% of screen) to enforce scrolling if content is too large
+            property real maxDialogHeight: Overlay.overlay ? Overlay.overlay.height * 0.8 : 500
+            implicitHeight: Math.min(scrollContainer.implicitHeight, maxDialogHeight)
 
             ScrollView {
-                id: scrollView
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                anchors.fill: parent
+                contentWidth: availableWidth
                 clip: true
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                 ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
-                ColumnLayout {
-                    width: scrollView.availableWidth
-                    spacing: 20
+                Item {
+                    id: scrollContainer
+                    width: parent.width
+                    implicitHeight: mainLayout.implicitHeight + 48
 
-                    // Old Password
                     ColumnLayout {
-                        spacing: 8
-                        Layout.fillWidth: true
+                        id: mainLayout
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.margins: 24 // Flawless padding around all edges inside the scroll area
+                        spacing: 20
 
+                        // Subtitle
                         Text {
-                            text: "Old Password";
-                            font.pixelSize: 16;
-                            font.bold: true;
-                            color: "#1e293b"
+                            text: "Enter your current password and set a new one"
+                            font.pointSize: ScreenTools.smallFontPointSize
+                            color: "#94a3b8"
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
                         }
 
-                        property bool showOldPass: false
-
-                        Rectangle {
+                        // Old Password
+                        ColumnLayout {
+                            spacing: 8
                             Layout.fillWidth: true
-                            height: 50
-                            radius: 8
-                            border.color: "#e2e8f0"
-                            border.width: 1
-                            color: "white"
 
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 8
-
-                                TextField {
-                                    id: oldPasswordInput
-                                    Layout.fillWidth: true
-                                    echoMode: showOldPass ? TextInput.Normal : TextInput.Password
-                                    placeholderText: "Enter current password"
-                                    background: null
+                            Row {
+                                spacing: 4
+                                Text {
+                                    text: "Current Password"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                    font.weight: Font.DemiBold
+                                    color: "#1e293b"
                                 }
+                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+                            }
 
-                                MouseArea {
-                                    width: 30
-                                    height: 30
-                                    onClicked: showOldPass = !showOldPass
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 45
+                                radius: 8
+                                border.color: oldPasswordInput.activeFocus ? app_color : "#e2e8f0"
+                                border.width: oldPasswordInput.activeFocus ? 2 : 1
+                                color: "#f8fafc"
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: showOldPass ? "🙈" : "👁"
-                                        font.pixelSize: 18
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 12
+                                    anchors.rightMargin: 6
+                                    spacing: 8
+
+                                    TextField {
+                                        id: oldPasswordInput
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        echoMode: changePasswordDialog.showOldPass ? TextInput.Normal : TextInput.Password
+                                        placeholderText: "Enter current password"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.family: "Outfit"
+                                        color: "#1e293b"
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        background: null
+                                    }
+
+                                    Button {
+                                        width: 32; height: 32
+                                        checkable: true
+                                        checked: changePasswordDialog.showOldPass
+                                        onCheckedChanged: changePasswordDialog.showOldPass = checked
+                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+                                        contentItem: QGCColoredImage {
+                                            anchors.fill: parent; anchors.margins: 6
+                                            fillMode: Image.PreserveAspectFit
+                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+                                            color: app_color
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // New Password
-                    ColumnLayout {
-                        spacing: 8
-                        Layout.fillWidth: true
-
-                        Text {
-                            text: "New Password";
-                            font.pixelSize: 16;
-                            font.bold: true;
-                            color: "#1e293b"
-                        }
-
-                        property bool showNewPass: false
-
+                        // Separator
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 50
-                            radius: 8
-                            border.color: "#e2e8f0"
-                            border.width: 1
-                            color: "white"
+                            height: 1
+                            color: "#f1f5f9"
+                        }
 
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 8
+                        // New Password
+                        ColumnLayout {
+                            spacing: 8
+                            Layout.fillWidth: true
 
-                                TextField {
-                                    id: newPasswordInput
-                                    Layout.fillWidth: true
-                                    echoMode: showNewPass ? TextInput.Normal : TextInput.Password
-                                    placeholderText: "Enter new password"
-                                    background: null
+                            Row {
+                                spacing: 4
+                                Text {
+                                    text: "New Password"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                    font.weight: Font.DemiBold
+                                    color: "#1e293b"
                                 }
+                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+                            }
 
-                                MouseArea {
-                                    width: 30
-                                    height: 30
-                                    onClicked: showNewPass = !showNewPass
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 45
+                                radius: 8
+                                border.color: newPasswordInput.activeFocus ? app_color : "#e2e8f0"
+                                border.width: newPasswordInput.activeFocus ? 2 : 1
+                                color: "#f8fafc"
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: showNewPass ? "🙈" : "👁"
-                                        font.pixelSize: 18
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 12
+                                    anchors.rightMargin: 6
+                                    spacing: 8
+
+                                    TextField {
+                                        id: newPasswordInput
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        echoMode: changePasswordDialog.showNewPass ? TextInput.Normal : TextInput.Password
+                                        placeholderText: "Min 4 characters"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.family: "Outfit"
+                                        color: "#1e293b"
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        background: null
+                                    }
+
+                                    Button {
+                                        width: 32; height: 32
+                                        checkable: true
+                                        checked: changePasswordDialog.showNewPass
+                                        onCheckedChanged: changePasswordDialog.showNewPass = checked
+                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+                                        contentItem: QGCColoredImage {
+                                            anchors.fill: parent; anchors.margins: 6
+                                            fillMode: Image.PreserveAspectFit
+                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+                                            color: app_color
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Confirm Password
-                    ColumnLayout {
-                        spacing: 8
-                        Layout.fillWidth: true
+                        // Confirm Password
+                        ColumnLayout {
+                            spacing: 8
+                            Layout.fillWidth: true
 
-                        Text {
-                            text: "Confirm New Password";
-                            font.pixelSize: 16
-                            font.bold: true;
-                            color: "#1e293b"
+                            Row {
+                                spacing: 4
+                                Text {
+                                    text: "Confirm Password"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                    font.weight: Font.DemiBold
+                                    color: "#1e293b"
+                                }
+                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 45
+                                radius: 8
+                                border.color: confirmPasswordInput.activeFocus ? app_color : "#e2e8f0"
+                                border.width: confirmPasswordInput.activeFocus ? 2 : 1
+                                color: "#f8fafc"
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 12
+                                    anchors.rightMargin: 6
+                                    spacing: 8
+
+                                    TextField {
+                                        id: confirmPasswordInput
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        echoMode: changePasswordDialog.showConfirmPass ? TextInput.Normal : TextInput.Password
+                                        placeholderText: "Confirm new password"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.family: "Outfit"
+                                        color: "#1e293b"
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        background: null
+                                    }
+
+                                    Button {
+                                        width: 32; height: 32
+                                        checkable: true
+                                        checked: changePasswordDialog.showConfirmPass
+                                        onCheckedChanged: changePasswordDialog.showConfirmPass = checked
+                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+                                        contentItem: QGCColoredImage {
+                                            anchors.fill: parent; anchors.margins: 6
+                                            fillMode: Image.PreserveAspectFit
+                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+                                            color: app_color
+                                        }
+                                    }
+                                }
+                            }
                         }
 
-                        property bool showConfirmPass: false
+                        // Spacer
+                        Item { Layout.fillHeight: true; Layout.minimumHeight: 8 }
 
-                        Rectangle {
+                        // Buttons at bottom
+                        RowLayout {
                             Layout.fillWidth: true
-                            height: 50
-                            radius: 8
-                            border.color: "#e2e8f0"
-                            border.width: 1
-                            color: "white"
+                            spacing: 12
 
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 8
-
-                                TextField {
-                                    id: confirmPasswordInput
-                                    Layout.fillWidth: true
-                                    echoMode: showConfirmPass ? TextInput.Normal : TextInput.Password
-                                    placeholderText: "Confirm password"
-                                    background: null
+                            Button {
+                                id: cancelBtn
+                                Layout.fillWidth: true
+                                height: 45
+                                text: "Cancel"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: cancelBtn.hovered ? "#e2e8f0" : "#f1f5f9"
+                                    border.color: "#e2e8f0"
+                                    border.width: 1
+                                    Behavior on color { ColorAnimation { duration: 150 } }
                                 }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "#475569"
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    font.weight: Font.Medium
+                                    font.family: "Outfit"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    changePasswordDialog.close()
+                                    oldPasswordInput.text = ""
+                                    newPasswordInput.text = ""
+                                    confirmPasswordInput.text = ""
+                                    changePasswordDialog.showOldPass = false
+                                    changePasswordDialog.showNewPass = false
+                                    changePasswordDialog.showConfirmPass = false
+                                }
+                            }
 
-                                MouseArea {
-                                    width: 30
-                                    height: 30
-                                    onClicked: showConfirmPass = !showConfirmPass
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: showConfirmPass ? "🙈" : "👁"
-                                        font.pixelSize: 18
+                            Button {
+                                id: changePwdBtn
+                                Layout.fillWidth: true
+                                height: 45
+                                text: "Save Password"
+                                background: Rectangle {
+                                    radius: 8
+                                    color: changePwdBtn.pressed ? Qt.darker(app_color, 1.15) : (changePwdBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "white"
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    font.weight: Font.DemiBold
+                                    font.family: "Outfit"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    if (oldPasswordInput.text === "") {
+                                        showMessage("Enter current password!", "error");
+                                        return;
                                     }
+
+                                    if (newPasswordInput.text !== confirmPasswordInput.text) {
+                                        showMessage("Passwords do not match!", "error");
+                                        return;
+                                    }
+
+                                    if (newPasswordInput.text.length < 4) {
+                                        showMessage("Min 4 characters required!", "error");
+                                        return;
+                                    }
+
+                                    changePasswordAPI();
                                 }
                             }
                         }
                     }
                 }
             }
+        }
 
-            // Buttons at bottom (always visible)
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 12
-
-                Button {
-                    Layout.fillWidth: true
-                    height: 48
-                    text: "Cancel"
-                    background: Rectangle {
-                        color: "#f1f5f9";
-                        radius: 8
-                    }
-                    contentItem: Text {
-                        text: parent.text;
-                        color: "#475569";
-                        horizontalAlignment: Text.AlignHCenter;
-                        font.pixelSize: 15
-                    }
-                    onClicked: {
-                        changePasswordDialog.close()
-                        oldPasswordInput.text = ""
-                        newPasswordInput.text = ""
-                        confirmPasswordInput.text = ""
-                        // Reset show password buttons
-                        showOldPassword.checked = false
-                        showNewPassword.checked = false
-                        showConfirmPassword.checked = false
-                    }
-                }
-
-                Button {
-                    Layout.fillWidth: true
-                    height: 48
-                    text: "Change Password"
-                    background: Rectangle {
-                        color: "#3b82f6";
-                        radius: 8
-                    }
-                    contentItem: Text {
-                        text: parent.text;
-                        color: "white";
-                        horizontalAlignment: Text.AlignHCenter;
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
-                    onClicked: {
-                        if (oldPasswordInput.text === "") {
-                            showMessage("Enter current password!", "error");
-                            return;
-                        }
-
-                        if (newPasswordInput.text !== confirmPasswordInput.text) {
-                            showMessage("Passwords do not match!", "error");
-                            return;
-                        }
-
-                        if (newPasswordInput.text.length < 4) {
-                            showMessage("Min 4 characters required!", "error");
-                            return;
-                        }
-
-                        changePasswordAPI();  // ✅ CALL HERE
-                    }
-                }
-            }
+        // Dim overlay
+        Overlay.modal: Rectangle {
+            color: Qt.rgba(0, 0, 0, 0.5)
         }
     }
 
@@ -495,41 +650,65 @@ Item {
         id: messageDialog
         modal: true
         anchors.centerIn: parent
-        width: 300
-        height: 160
+        width: 320
+        padding: 0 // Reset padding for custom margins
 
         property string messageDialogText: ""
 
         background: Rectangle {
             color: "white"
             radius: 12
+            layer.enabled: true
         }
 
-        Column {
-            anchors.centerIn: parent
-            spacing: 20
-            width: parent.width * 0.8
+        contentItem: Item {
+            implicitHeight: msgColumn.implicitHeight + 48
 
-            Text {
-                text: messageDialog.messageDialogText
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width
-            }
+            ColumnLayout {
+                id: msgColumn
+                anchors.centerIn: parent
+                width: parent.width - 48
+                spacing: 24
 
-            Button {
-                text: "OK"
-                width: 100
-                height: 40
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                contentItem: Text {
-                    text: parent.text
-                    anchors.centerIn: parent
+                Text {
+                    text: messageDialog.messageDialogText
+                    font.pointSize: ScreenTools.defaultFontPointSize * 1.05
+                    font.weight: Font.Medium
+                    font.family: "Outfit"
+                    color: "#1e293b"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
                 }
 
-                onClicked: messageDialog.close()
+                Button {
+                    id: msgOkBtn
+                    Layout.fillWidth: true
+                    height: 45
+                    text: "OK"
+                    background: Rectangle {
+                        radius: 8
+                        color: msgOkBtn.pressed ? Qt.darker(app_color, 1.15) : (msgOkBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: "white"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.DemiBold
+                        font.family: "Outfit"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: messageDialog.close()
+                }
             }
+        }
+
+        // Dim overlay
+        Overlay.modal: Rectangle {
+            color: Qt.rgba(0, 0, 0, 0.5)
         }
     }
 
