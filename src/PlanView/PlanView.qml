@@ -477,6 +477,7 @@ Item {
             fileDialog.planFiles =      true
             fileDialog.nameFilters =    _planMasterController.loadNameFilters1
             fileDialog.openForLoad()
+            console.log("nameFilters",nameFilters)
         }
 
         function loadFromSelectedFile1() {
@@ -484,6 +485,7 @@ Item {
             fileDialog.planFiles =      true
             fileDialog.nameFilters =    _planMasterController.loadNameFilters
             fileDialog.openForLoad()
+            console.log("nameFilters",nameFilters)
         }
         function saveToSelectedFile() {
             if (!checkReadyForSaveUpload(true /* save */)) {
@@ -710,7 +712,7 @@ Item {
                                   case _layerMission:
                                   if (addWaypointRallyPointAction.checked) {
 
-                                      if(waypointMark){
+                                      if(QGroundControl.loadGlobalSetting("waypointMark","true")==="true"){
                                           insertSimpleItemAfterCurrent(coordinate)
                                       }
 
@@ -1088,7 +1090,7 @@ Item {
                 _addROIOnClick =        false
 
 
-                if(waypointMark===true){
+                if(QGroundControl.loadGlobalSetting("waypointMark","true")==="true"){
                     console.log("waypointMark",waypointMark)
                     addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
                 }
@@ -1130,7 +1132,7 @@ Item {
         Item {
                     anchors.fill:           rightPanel
                     anchors.topMargin:      _toolsMargin
-                    //visible: false
+                    visible: false
 
                     DeadMouseArea {
                         anchors.fill:   parent

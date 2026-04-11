@@ -447,7 +447,7 @@ Item {
             QGCCompassWidget {
                 id:                     compass
                 //anchors.centerIn: parent
-                size:                   _innerRadius * 1.5
+                size:                   _innerRadius * 2.5
                 vehicle:                _activeVehicle
                 visible :               _activeVehicle
                 //anchors.verticalCenter: parent.verticalCenter

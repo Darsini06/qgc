@@ -446,7 +446,7 @@ Rectangle {
                 Column {
                     width:          parent.width
                     spacing:        ScreenTools.defaultFontPixelHeight * 0.5
-                    visible:        vehicleInfoSectionHeader.checked
+                    //visible:        vehicleInfoSectionHeader.checked
 
                     // GridLayout {
                     //     width:          parent.width

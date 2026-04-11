@@ -29,13 +29,12 @@ import MapGlobals
 
 import QtQuick.LocalStorage
 
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
+
 import Qt.labs.folderlistmodel
 import Qt.labs.platform as Platform
 
 import "qrc:/qml/SettingsPanel"
+
 
 
 /// @brief Native QML top level window
