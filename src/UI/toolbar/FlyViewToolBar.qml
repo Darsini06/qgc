@@ -22,28 +22,31 @@ import QGroundControl.FactSystem
 import QGroundControl.FactControls
 
 Rectangle {
-    id:     _root
-    width:  parent.width
+    id: _root
+    width: parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black toolbar
+    color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black toolbar
 
-    property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
-    property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
-    property color  _mainStatusBGColor: qgcPal.toolBarColor
+    property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
+    property bool _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
+    property color _mainStatusBGColor: qgcPal.toolBarColor
 
-    property var _sprayEnable:      _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_ENABLE") : null
-    property var _sprayPumpRate:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_RATE") : null
-    property var _sprayPumpMin:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_MIN") : null
-    property var _spraySpinner:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPINNER") : null
-    property var _spraySpeedMin:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPEED_MIN") : null
+    property var _sprayEnable: _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_ENABLE") : null
 
-    property bool _isAgri:          mainWindow ? mainWindow.droneType === "Agri" : false
+    // //property var _sprayPumpRate:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_RATE") : null
+    // property var _sprayPumpMin:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_MIN") : null
+    //property var _spraySpinner:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPINNER") : null
+    // property var _spraySpeedMin:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPEED_MIN") : null
+
+    property bool _isAgri: mainWindow ? mainWindow.droneType === "Agri" : false
 
     function dropMessageIndicatorTool() {
         toolIndicators.dropMessageIndicatorTool();
     }
 
-    QGCPalette { id: qgcPal }
+    QGCPalette {
+        id: qgcPal
+    }
 
     /// Bottom single pixel divider
     // Rectangle {
@@ -70,89 +73,88 @@ Rectangle {
     */
 
     RowLayout {
-        id:                     viewButtonRow
-        anchors.left:           parent.left
-        anchors.top:            parent.top
-        anchors.bottom:         parent.bottom
-        anchors.bottomMargin:   1
-        spacing:                ScreenTools.defaultFontPixelWidth / 2
+        id: viewButtonRow
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 1
+        spacing: ScreenTools.defaultFontPixelWidth / 2
 
         QGCToolBarButton {
-            id:                     currentButton1
+            id: currentButton1
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "qrc:/InstrumentValueIcons/home.svg"
-            logo:                   true
-            onClicked:              {
-
-                mainWindow.homescreen()
+            icon.source: "qrc:/InstrumentValueIcons/home.svg"
+            logo: true
+            onClicked: {
+                mainWindow.homescreen();
             }
-            icon.color:"white"
+            icon.color: "white"
         }
 
         MainStatusIndicator {
-            id:                     mainStatusIndicator
+            id: mainStatusIndicator
             Layout.preferredHeight: viewButtonRow.height
         }
 
         QGCButton {
-            id:                 disconnectButton
-            text:               qsTr("Disconnect")
-            onClicked:          _activeVehicle.closeVehicle()
-            visible:            _activeVehicle && _communicationLost
-            leftPadding:        ScreenTools.defaultFontPixelWidth
-            rightPadding:       ScreenTools.defaultFontPixelWidth
+            id: disconnectButton
+            text: qsTr("Disconnect")
+            onClicked: _activeVehicle.closeVehicle()
+            visible: _activeVehicle && _communicationLost
+            leftPadding: ScreenTools.defaultFontPixelWidth
+            rightPadding: ScreenTools.defaultFontPixelWidth
         }
-
     }
 
     QGCFlickable {
-        id:                     toolsFlickable
-        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
-        anchors.left:           viewButtonRow.right
-        anchors.bottomMargin:   1
-        anchors.top:            parent.top
-        anchors.bottom:         parent.bottom
-        anchors.right:          rightToolsRow.left
-        anchors.rightMargin:    4
-        contentWidth:           toolIndicators.width
-        flickableDirection:     Flickable.HorizontalFlick
+        id: toolsFlickable
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        anchors.left: viewButtonRow.right
+        anchors.bottomMargin: 1
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: rightToolsRow.left
+        anchors.rightMargin: 4
+        contentWidth: toolIndicators.width
+        flickableDirection: Flickable.HorizontalFlick
 
-        FlyViewToolBarIndicators { id: toolIndicators }
-
+        FlyViewToolBarIndicators {
+            id: toolIndicators
+        }
     }
 
     //-------------------------------------------------------------------------
     //-- Branding Logo
     Image {
-        anchors.right:          parent.right
-        anchors.top:            parent.top
-        anchors.bottom:         parent.bottom
-        anchors.margins:        ScreenTools.defaultFontPixelHeight * 0.66
-        visible:                false//_activeVehicle && !_communicationLost && x > (toolsFlickable.x + toolsFlickable.contentWidth + ScreenTools.defaultFontPixelWidth)
-        fillMode:               Image.PreserveAspectFit
-        source:                 _outdoorPalette ? _brandImageOutdoor : _brandImageIndoor
-        mipmap:                 true
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: ScreenTools.defaultFontPixelHeight * 0.66
+        visible: false//_activeVehicle && !_communicationLost && x > (toolsFlickable.x + toolsFlickable.contentWidth + ScreenTools.defaultFontPixelWidth)
+        fillMode: Image.PreserveAspectFit
+        source: _outdoorPalette ? _brandImageOutdoor : _brandImageIndoor
+        mipmap: true
 
-        property bool   _outdoorPalette:        qgcPal.globalTheme === QGCPalette.Light
-        property bool   _corePluginBranding:    QGroundControl.corePlugin.brandImageIndoor.length != 0
-        property string _userBrandImageIndoor:  QGroundControl.settingsManager.brandImageSettings.userBrandImageIndoor.value
+        property bool _outdoorPalette: qgcPal.globalTheme === QGCPalette.Light
+        property bool _corePluginBranding: QGroundControl.corePlugin.brandImageIndoor.length != 0
+        property string _userBrandImageIndoor: QGroundControl.settingsManager.brandImageSettings.userBrandImageIndoor.value
         property string _userBrandImageOutdoor: QGroundControl.settingsManager.brandImageSettings.userBrandImageOutdoor.value
-        property bool   _userBrandingIndoor:    QGroundControl.settingsManager.brandImageSettings.visible && _userBrandImageIndoor.length != 0
-        property bool   _userBrandingOutdoor:   QGroundControl.settingsManager.brandImageSettings.visible && _userBrandImageOutdoor.length != 0
-        property string _brandImageIndoor:      brandImageIndoor()
-        property string _brandImageOutdoor:     brandImageOutdoor()
+        property bool _userBrandingIndoor: QGroundControl.settingsManager.brandImageSettings.visible && _userBrandImageIndoor.length != 0
+        property bool _userBrandingOutdoor: QGroundControl.settingsManager.brandImageSettings.visible && _userBrandImageOutdoor.length != 0
+        property string _brandImageIndoor: brandImageIndoor()
+        property string _brandImageOutdoor: brandImageOutdoor()
 
         function brandImageIndoor() {
             if (_userBrandingIndoor) {
-                return _userBrandImageIndoor
+                return _userBrandImageIndoor;
             } else {
                 if (_userBrandingOutdoor) {
-                    return _userBrandImageOutdoor
+                    return _userBrandImageOutdoor;
                 } else {
                     if (_corePluginBranding) {
-                        return QGroundControl.corePlugin.brandImageIndoor
+                        return QGroundControl.corePlugin.brandImageIndoor;
                     } else {
-                        return _activeVehicle ? _activeVehicle.brandImageIndoor : ""
+                        return _activeVehicle ? _activeVehicle.brandImageIndoor : "";
                     }
                 }
             }
@@ -160,15 +162,15 @@ Rectangle {
 
         function brandImageOutdoor() {
             if (_userBrandingOutdoor) {
-                return _userBrandImageOutdoor
+                return _userBrandImageOutdoor;
             } else {
                 if (_userBrandingIndoor) {
-                    return _userBrandImageIndoor
+                    return _userBrandImageIndoor;
                 } else {
                     if (_corePluginBranding) {
-                        return QGroundControl.corePlugin.brandImageOutdoor
+                        return QGroundControl.corePlugin.brandImageOutdoor;
                     } else {
-                        return _activeVehicle ? _activeVehicle.brandImageOutdoor : ""
+                        return _activeVehicle ? _activeVehicle.brandImageOutdoor : "";
                     }
                 }
             }
@@ -270,21 +272,19 @@ Rectangle {
     //                 }
     //             }
 
-
     //         }
 
     //     }
     // }
 
-
     RowLayout {
-        id:                      rightToolsRow
-        anchors.verticalCenter:  parent.verticalCenter
-        anchors.right:           parent.right
-        anchors.rightMargin:     12
-        anchors.top:             parent.top
-        anchors.bottom:          parent.bottom
-        spacing:                 10
+        id: rightToolsRow
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        spacing: 10
 
         WeatherIndicator {
             id: weatherIndicator
@@ -293,7 +293,12 @@ Rectangle {
         }
 
         // ── Thin vertical divider ──
-        Rectangle { width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25); Layout.alignment: Qt.AlignVCenter }
+        Rectangle {
+            width: 1
+            height: parent.height * 0.55
+            color: Qt.rgba(1, 1, 1, 0.25)
+            Layout.alignment: Qt.AlignVCenter
+        }
 
         BatteryIndicator {
             id: batteryIndicator
@@ -304,9 +309,12 @@ Rectangle {
         }
 
         // ── Thin vertical divider ──
-        Rectangle { 
-            width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25); Layout.alignment: Qt.AlignVCenter; 
-            visible: _activeVehicle ? true : false 
+        Rectangle {
+            width: 1
+            height: parent.height * 0.55
+            color: Qt.rgba(1, 1, 1, 0.25)
+            Layout.alignment: Qt.AlignVCenter
+            visible: _activeVehicle ? true : false
         }
         // Satellite / GPS Icon
         Row {
@@ -331,113 +339,126 @@ Rectangle {
 
         // ── Thin vertical divider ──
         Rectangle {
-            width:  1
+            width: 1
             height: parent.height * 0.55
-            color:  Qt.rgba(1, 1, 1, 0.25)
+            color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             visible: _activeVehicle && !_communicationLost
         }
 
         // ── Flight Mode (Stabilize) ──
         FlightModeIndicator {
-            id:               flightModeIndicatorRight
+            id: flightModeIndicatorRight
             Layout.alignment: Qt.AlignVCenter
-            visible:          _activeVehicle && !_communicationLost
+            visible: _activeVehicle && !_communicationLost
         }
 
         // ── Thin vertical divider ──
         Rectangle {
-            width:  1
+            width: 1
             height: parent.height * 0.55
-            color:  Qt.rgba(1, 1, 1, 0.25)
+            color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             visible: _isAgri && _activeVehicle
         }
 
         // ── SPRAY Button ──
         Item {
-            id:               sprayButton
-            width:            labelCol.width + 10
-            height:           parent.height * 0.8
-            visible:          _isAgri && _activeVehicle && !_communicationLost
+            id: sprayButton
+            width: labelCol.width + 10
+            height: parent.height * 0.8
+            visible: _isAgri && _activeVehicle && !_communicationLost
             Layout.alignment: Qt.AlignVCenter
 
             QGCLabel {
-                id:               labelCol
+                id: labelCol
                 anchors.centerIn: parent
-                text:             qsTr("Spray")
-                font.bold:        true
-                font.pointSize:   ScreenTools.defaultFontPointSize
-                color:            sprayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
-                Behavior on color { ColorAnimation { duration: 120 } }
+                text: qsTr("Spray")
+                font.bold: true
+                font.pointSize: ScreenTools.defaultFontPointSize
+                color: sprayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 120
+                    }
+                }
             }
 
             MouseArea {
-                id:           sprayMouseArea
+                id: sprayMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked:    sprayPopup.open()
+                onClicked: sprayPopup.open()
             }
         }
 
         // ── Thin vertical divider ──
         Rectangle {
-            width:  1
+            width: 1
             height: parent.height * 0.55
-            color:  Qt.rgba(1, 1, 1, 0.25)
+            color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             visible: _isAgri && _activeVehicle && !_communicationLost
         }
 
         // ── Pump Rate Status ──
         Item {
-            id:               pumpRateStatus
-            width:            pumpRow.width + 10
-            height:           parent.height * 0.8
-            visible:          _isAgri && _activeVehicle && !_communicationLost
+            id: pumpRateStatus
+            width: pumpRow.width + 10
+            height: parent.height * 0.8
+            visible: _isAgri && _activeVehicle && !_communicationLost
             Layout.alignment: Qt.AlignVCenter
 
             Row {
-                id:               pumpRow
+                id: pumpRow
                 anchors.centerIn: parent
-                spacing:          4
+                spacing: 4
 
                 QGCColoredImage {
-                    width:            16
-                    height:           16
-                    source:           "qrc:/qmlimages/NewImages/spray_parameter.svg"
-                    color:            pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
+                    width: 16
+                    height: 16
+                    source: "qrc:/qmlimages/NewImages/spray_parameter.svg"
+                    color: pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
                     anchors.verticalCenter: parent.verticalCenter
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 120
+                        }
+                    }
                 }
 
                 QGCLabel {
                     text: {
-                        var val = _sprayPumpRate ? _sprayPumpRate.rawValue : -1
-                        if (val < 0 || val > 100) return "0%"
-                        return Math.round(val) + "%"
+                        var val = _sprayPumpRate ? _sprayPumpRate.rawValue : -1;
+                        if (val < 0 || val > 100)
+                            return "0%";
+                        return Math.round(val) + "%";
                     }
-                    font.bold:        true
-                    font.pointSize:   ScreenTools.defaultFontPointSize
-                    color:            pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
+                    font.bold: true
+                    font.pointSize: ScreenTools.defaultFontPointSize
+                    color: pumpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
                     anchors.verticalCenter: parent.verticalCenter
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 120
+                        }
+                    }
                 }
             }
 
             MouseArea {
-                id:           pumpMouseArea
+                id: pumpMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked:    sprayPopup.open()
+                onClicked: sprayPopup.open()
             }
         }
 
         // ── Thin vertical divider ──
         Rectangle {
-            width:  1
+            width: 1
             height: parent.height * 0.55
-            color:  Qt.rgba(1, 1, 1, 0.25)
+            color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
         }
 
@@ -459,8 +480,6 @@ Rectangle {
                 onClicked: mainWindow.showToolSelectDialog()
             }
         }
-
-
     }
 
     //     Rectangle {
@@ -470,7 +489,6 @@ Rectangle {
     //             anchors.verticalCenter:  parent.verticalCenter
     //             anchors.right: parent.right
     //             color: "#A6ADFF"
-
 
     //         RowLayout {
     //             anchors.verticalCenter:  parent.verticalCenter
@@ -482,9 +500,6 @@ Rectangle {
     //                                                 height: 40                // Fixed height for the indicator
     //                                                 visible: activeVehicle ? true : false
     //                                               }
-
-
-
 
     //             // Battery Icon
     //             Column {
@@ -509,12 +524,7 @@ Rectangle {
     //                 }
     //             }
 
-
-
-
     //            //Rectangle { width: 2; height: 40; color: "gray" } // Separator
-
-
 
     //             // Satellite Icon
     //             Column {
@@ -530,7 +540,6 @@ Rectangle {
     //                                color: "white"
     //                            }
 
-
     //                        GPSIndicator {
     //                                                                id: gpsindicator
     //                                                                width:50 // Adjust width as needed
@@ -539,10 +548,6 @@ Rectangle {
     //                                                               }
     //                        }
     //             }
-
-
-
-
 
     //             // // Spray Icon
     //             // Column {
@@ -580,7 +585,6 @@ Rectangle {
     //             //             }
     //             // }
 
-
     //             // Radar Icon
     //             Column {
     //                 spacing: 2
@@ -595,13 +599,9 @@ Rectangle {
 
     //                         }
 
-
     //             }
 
-
-
     //             //Rectangle { width: 2; height: 40; color: "gray" } // Separator
-
 
     //                 Row {
     //                             spacing: 5
@@ -640,42 +640,38 @@ Rectangle {
     //                             //                                             }
     //                             //                             }
 
-
-
     // }
 
-
     //         }
-
 
     //     }
 
     // Small parameter download progress bar
     Rectangle {
         anchors.bottom: parent.bottom
-        height:         ScreenTools.toolbarHeight//_root.height * 0.05
-        width:          _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
-        color:          "#301934"//qgcPal.colorGreen
-        visible:        !largeProgressBar.visible
+        height: ScreenTools.toolbarHeight//_root.height * 0.05
+        width: _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
+        color: "#301934"//qgcPal.colorGreen
+        visible: !largeProgressBar.visible
     }
 
     // Professional high-tech parameter download progress bar
     Rectangle {
-        id:             largeProgressBar
-        anchors.fill:   parent
-        color:          "#FFFFFF" // High-contrast White Background
-        visible:        _showLargeProgress
-        z:              100
+        id: largeProgressBar
+        anchors.fill: parent
+        color: "#FFFFFF" // High-contrast White Background
+        visible: _showLargeProgress
+        z: 100
 
         property bool _initialDownloadComplete: _activeVehicle ? _activeVehicle.initialConnectComplete : true
-        property bool _userHide:                false
-        property bool _showLargeProgress:       !_initialDownloadComplete && !_userHide
-        property real progress:                  _activeVehicle ? _activeVehicle.loadProgress : 0
+        property bool _userHide: false
+        property bool _showLargeProgress: !_initialDownloadComplete && !_userHide
+        property real progress: _activeVehicle ? _activeVehicle.loadProgress : 0
 
         // Background
         Rectangle {
             anchors.fill: parent
-            color:        "#FFFFFF"
+            color: "#FFFFFF"
         }
 
         RowLayout {
@@ -705,11 +701,11 @@ Rectangle {
         // The sleek progress line at the bottom
         Rectangle {
             anchors.bottom: parent.bottom
-            anchors.left:   parent.left
-            height:         4
-            width:          parent.width * largeProgressBar.progress
-            color:          "#301934"
-            
+            anchors.left: parent.left
+            height: 4
+            width: parent.width * largeProgressBar.progress
+            color: "#301934"
+
             // Removed Behavior on width for performance (prevents UI stutter during heavy parameter load)
         }
 
@@ -720,10 +716,6 @@ Rectangle {
             onClicked: largeProgressBar._userHide = true
         }
     }
-
-
-
-
 
     // // Large parameter download progress bar
     // Rectangle {
@@ -766,148 +758,364 @@ Rectangle {
     //     //     property real _margin: ScreenTools.defaultFontPixelWidth / 2
     //     // }
 
-
-
     //     // MouseArea {
     //     //     anchors.fill:   parent
     // }
 
     // Spray Settings Popup
     Popup {
-        id:             sprayPopup
-        x:              sprayButton.mapToItem(_root, 0, 0).x - (width - sprayButton.width)
-        y:              _root.height + 5
-        width:          340
-        padding:        0
-        modal:          true
+        id: sprayPopup
+        x: sprayButton.mapToItem(_root, 0, 0).x - (width - sprayButton.width)
+        y: _root.height + 5
+        width: 490
+        padding: 0
+        modal: true
         background: Rectangle {
-            color:          Qt.rgba(0, 0, 0, 0.70)
-            radius:         8
-            border.color:   "white"
-            border.width:   1
+            color: Qt.rgba(0, 0, 0, 0.70)
+            radius: 8
+            border.color: "white"
+            border.width: 1
         }
 
         ColumnLayout {
-            width:      parent.width
-            spacing:    0
+            width: parent.width
+            anchors.left: parent.left   // ← add explicit anchoring
+            anchors.right: parent.right
+            spacing: 0
 
-            // Header
+            // Header - CENTERED
             Rectangle {
                 Layout.fillWidth: true
-                height:           45
-                color:            "#252525"
-                radius:           8 
+                height: 45
+                color: "#252525"
+                radius: 8
 
                 RowLayout {
-                    anchors.fill:       parent
+                    anchors.fill: parent
                     anchors.leftMargin: 15
                     anchors.rightMargin: 15
-                    
-                    QGCLabel {
-                        text:           qsTr("SPRAYING CONTROLS")
-                        font.bold:      true
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        color:          "white"
+
+                    Item {
                         Layout.fillWidth: true
                     }
-                    
+
+                    QGCLabel {
+                        text: qsTr("SPRAYING CONTROLS")
+                        font.bold: true
+                        font.pointSize: ScreenTools.mediumFontPointSize
+                        color: "white"
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
                     QGCColoredImage {
-                        width:  22
+                        width: 22
                         height: 22
                         source: "qrc:/qmlimages/NewImages/spray_parameter.svg"
-                        color:  "white"
+                        color: "white"
                     }
                 }
             }
 
-            Rectangle { width: parent.width; height: 1; color: "#333333" }
+            // Rectangle {
+            //     width: parent.width
+            //     height: 1
+            //     color: "#333333"
+            // }
 
-            ColumnLayout {
+            // Two-column body with vertical divider
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.margins:   20
-                spacing:          18
+                Layout.topMargin: 16
+                Layout.bottomMargin: 16
+                spacing: 0
 
-                // Master Enable Toggle
-                RowLayout {
-                    Layout.fillWidth: true
-                    QGCLabel { 
-                        text:             qsTr("Master System Enable")
-                        font.bold:        true
-                        Layout.fillWidth: true 
-                    }
-                    FactCheckBox {
-                        fact: _sprayEnable
-                    }
-                }
-
-                // Pump Rate Control (with slider)
+                // ── LEFT COLUMN: Master System Enable + Pump Flow Rate ──
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 8
+                    Layout.leftMargin: 16
+                    Layout.rightMargin: 12
+                    spacing: 18
+
+                    // Master Enable Toggle
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Pump Flow Rate"); color: "white" }
-                        QGCLabel { 
-                            text: _sprayPumpRate ? _sprayPumpRate.valueString + " %" : "N/A"
-                            font.bold: true; color: "white" 
+                        QGCLabel {
+                            text: qsTr("Master System Enable")
+                            font.bold: true
+                            Layout.fillWidth: true
+                            color: "white"
+                        }
+                        FactCheckBox {
+                            fact: _sprayEnable
                         }
                     }
-                    FactSlider {
+
+                    // Pump Rate Control (with slider)
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        fact:             _sprayPumpRate
+                        spacing: 8
+                        visible: _sprayEnable ? _sprayEnable.rawValue >= 1 : false
+                        RowLayout {
+                            Layout.fillWidth: true
+                            QGCLabel {
+                                text: qsTr("Pump Flow Rate")
+                                color: "white"
+                            }
+                            QGCLabel {
+                                text: /* _sprayPumpRate ? _sprayPumpRate.valueString + " %" : */          "N/A"
+                                font.bold: true
+                                color: "white"
+                            }
+                        }
+
+                        FactPanelController {
+                            id: controller
+                        }
+
+                        Loader {
+                            id: sliderLoader
+                            Layout.fillWidth: true
+                            active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
+                            visible: active
+                            sourceComponent: sliderComponent
+                        }
                     }
                 }
 
-                // Spinner Speed Control
+                // ── VERTICAL DIVIDER ──
+                Rectangle {
+                    width: 1
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 120
+                    color: "#555555"
+                }
+
+                // ── RIGHT COLUMN: Granule Spinner Speed + Spray Pump Rate + Min fields ──
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 8
+                    Layout.leftMargin: 12
+                    Layout.rightMargin: 16
+                    spacing: 18
+                    visible: _sprayEnable ? _sprayEnable.rawValue >= 1 : false
+                    // Spinner Speed Control
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            QGCLabel {
+                                text: qsTr("Granule Spinner Speed")
+                                color: "white"
+                            }
+                            QGCLabel {
+                                text: /* _spraySpinner ? _spraySpinner.valueString + " ms" : */          "N/A"
+                                font.bold: true
+                                color: "white"
+                            }
+                        }
+
+                        Loader {
+                            id: textloader
+                            width: parent.width
+                            Layout.fillWidth: true
+                            active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
+                            visible: active
+                            sourceComponent: textcomponent
+                        }
+                    }
+
+                    // Advanced Thresholds: Min Pump % + Min Speed
                     RowLayout {
                         Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Granule Spinner Speed"); color: "white" }
-                        QGCLabel { 
-                            text: _spraySpinner ? _spraySpinner.valueString + " ms" : "N/A"
-                            font.bold: true; color: "white" 
-                        }
-                    }
-                    FactTextField {
-                        Layout.fillWidth: true
-                        fact:             _spraySpinner
-                        showUnits:        true
-                    }
-                }
+                        spacing: 4
 
-                // Advanced Thresholds
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 20
-                    
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Min Pump %"); font.pointSize: ScreenTools.smallFontPointSize; color: "white" }
-                        FactTextField {
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            fact:             _sprayPumpMin
+                            spacing: 2
+                            QGCLabel {
+                                text: qsTr("Min Pump %")
+                                font.pointSize: ScreenTools.smallFontPointSize
+                                color: "white"
+                            }
+                            Loader {
+                                id: minimumpumprate
+                                width: parent.width
+                                Layout.fillWidth: true
+                                active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
+                                visible: active
+                                sourceComponent: minimumpumpratecomponent
+                            }
                         }
-                    }
-                    
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        QGCLabel { text: qsTr("Min Speed (m/s)"); font.pointSize: ScreenTools.smallFontPointSize; color: "white" }
-                        FactTextField {
-                            Layout.fillWidth: true
-                            fact:             _spraySpeedMin
-                        }
-                    }
-                }
 
-                QGCButton {
-                    Layout.alignment: Qt.AlignRight
-                    Layout.topMargin: 10
-                    text:             qsTr("CLOSE")
-                    onClicked:        sprayPopup.close()
-                    primary:          true
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            QGCLabel {
+                                text: qsTr("Min Speed (m/s)")
+                                font.pointSize: ScreenTools.smallFontPointSize
+                                color: "white"
+                            }
+                            Loader {
+                                id: minimumspeedrate
+                                width: parent.width
+                                Layout.fillWidth: true
+                                active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
+                                visible: active
+                                sourceComponent: minimumspeedratecomponent
+                            }
+                        }
+                    }
                 }
+            }
+
+            // ── ALL COMPONENTS UNCHANGED ──────────────────────────────────────────
+
+            Component {
+                id: sliderComponent
+                Rectangle {
+                    id: sliderContainer
+                    width: parent.width // ScreenTools.defaultFontPixelWidth * 30
+                    height: sliderColumn.height + 20
+                    color: Qt.rgba(0, 0, 0, 0.40)
+                    radius: 8
+
+                    FactPanelController {
+                        id: controller
+                    }
+
+                    Column {
+                        id: sliderColumn
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 20
+                        Text {
+                            // text: qsTr("Spray Pump Rate")
+                            // color: "white"
+                            font.bold: true
+                            font.pixelSize: ScreenTools.defaultFontPointSize
+                        }
+                        FactSlider {
+                            id: pumpSlider
+                            fact: controller.getParameterFact(-1, "SPRAY_PUMP_RATE")
+                            width: parent.width
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: textcomponent
+                Rectangle {
+                    id: sliderContainer
+                    width: ScreenTools.defaultFontPixelWidth * 30
+                    height: sliderColumn.height + 20
+                    color: Qt.rgba(0, 0, 0, 0.40)
+                    radius: 8
+
+                    FactPanelController {
+                        id: controller
+                    }
+
+                    Column {
+                        id: sliderColumn
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 20
+                        Text {
+                            // text: qsTr("Spray Pump Rate")
+                            // color: "white"
+                            font.bold: true
+                            font.pixelSize: ScreenTools.defaultFontPointSize
+                        }
+                        FactTextField {
+                            width: parent.width
+                            fact: controller.getParameterFact(-1, "SPRAY_SPINNER")
+                            showUnits: true
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: minimumpumpratecomponent
+                Rectangle {
+                    id: sliderContainer
+                    width: parent.width //ScreenTools.defaultFontPixelWidth * 30
+                    height: sliderColumn.height + 20
+                    color: Qt.rgba(0, 0, 0, 0.40)
+                    radius: 8
+
+                    FactPanelController {
+                        id: controller
+                    }
+
+                    Column {
+                        id: sliderColumn
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 20
+                        Text {
+                            // text: qsTr("Spray Pump Rate")
+                            // color: "white"
+                            font.bold: true
+                            font.pixelSize: ScreenTools.defaultFontPointSize
+                        }
+                        FactTextField {
+                            width: parent.width
+                            fact: controller.getParameterFact(-1, "SPRAY_PUMP_MIN")
+                            showUnits: true
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: minimumspeedratecomponent
+                Rectangle {
+                    id: sliderContainer
+                    width: parent.width// ScreenTools.defaultFontPixelWidth * 30
+                    height: sliderColumn.height + 20
+                    color: Qt.rgba(0, 0, 0, 0.40)
+                    radius: 8
+
+                    FactPanelController {
+                        id: controller
+                    }
+
+                    Column {
+                        id: sliderColumn
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 20
+                        Text {
+                            // text: qsTr("Spray Pump Rate")
+                            // color: "white"
+                            font.bold: true
+                            font.pixelSize: ScreenTools.defaultFontPointSize
+                        }
+                        FactTextField {
+                            width: parent.width
+                            fact: controller.getParameterFact(-1, "SPRAY_SPEED_MIN")
+                            showUnits: true
+                        }
+                    }
+                }
+            }
+
+            // Close button
+            QGCButton {
+                Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: 16
+                Layout.topMargin: 4
+                Layout.bottomMargin: 12
+                text: qsTr("CLOSE")
+                onClicked: sprayPopup.close()
+                primary: true
             }
         }
     }

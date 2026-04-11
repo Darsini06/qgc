@@ -20,7 +20,6 @@ import MapGlobals 1.0
 
 import Qt.labs.lottieqt 1.0
 
-
 Item {
     id: root
     anchors.fill: parent
@@ -48,14 +47,9 @@ Item {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-
-
-
-
     function dp(value) {
         return value * baseUnit;
     }
-
 
     /* ========= BACKGROUND IMAGE ========= */
     /* ========= BACKGROUND IMAGE ========= */
@@ -75,8 +69,7 @@ Item {
         radius: 12
         anchors.centerIn: parent
         color: surfaceColor
-        z : 1
-
+        z: 1
 
         Rectangle {
             id: shadowSource
@@ -111,11 +104,12 @@ Item {
 
                     Loader {
                         anchors.fill: parent
+
                         // sourceComponent: currentView === "signin"
                         //                  ? signInComponent
                         //                  : signUpComponent
 
-                        sourceComponent : signInComponent
+                        sourceComponent: signInComponent
                     }
                 }
 
@@ -126,25 +120,26 @@ Item {
 
                     Loader {
                         anchors.fill: parent
+
                         // sourceComponent: currentView === "signin"
                         //                  ? signInComponent
                         //                  : signUpComponent
 
-                        sourceComponent : rightSide === "reset" ? resetpwdComponent : signUpComponent
+                        sourceComponent: rightSide === "reset" ? resetpwdComponent : signUpComponent
                     }
                 }
             }
         }
 
         // === SLIDING OVERLAY PANEL ===
-        Rectangle  {
+        Rectangle {
             id: overlayPanel
             width: parent.width / 2
             height: parent.height
             radius: 12
             clip: true          // IMPORTANT for rounded corners
 
-            x: currentView === "signin" ? parent.width/2 : 0
+            x: currentView === "signin" ? parent.width / 2 : 0
 
             Behavior on x {
                 NumberAnimation {
@@ -164,14 +159,18 @@ Item {
                 Rectangle {
                     anchors.fill: parent
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(48/255, 25/255, 52/255, 0.4) } // Theme Purple
-                        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.6) }
+                        GradientStop {
+                            position: 0.0
+                            color: Qt.rgba(48 / 255, 25 / 255, 52 / 255, 0.4)
+                        } // Theme Purple
+                        GradientStop {
+                            position: 1.0
+                            color: Qt.rgba(0, 0, 0, 0.6)
+                        }
                     }
                 }
             }
-
         }
-
     }
 
     // === COMPONENTS ===
@@ -206,7 +205,7 @@ Item {
                         spacing: dp(2)
 
                         Text {
-                            text: "Welcome Back"
+                            text: "WELCOME BACK"
                             font.pointSize: ScreenTools.mediumFontPointSize
                             font.weight: Font.Bold
                             color: app_color
@@ -338,9 +337,7 @@ Item {
                                             anchors.fill: parent
                                             anchors.margins: dp(1)
                                             fillMode: Image.PreserveAspectFit
-                                            source: parent.checked
-                                                    ? "/qmlimages/NewImages/password_visible.svg"
-                                                    : "/qmlimages/NewImages/password_hidden.svg"
+                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
                                             color: app_color
                                         }
                                     }
@@ -355,9 +352,7 @@ Item {
 
                             background: Rectangle {
                                 radius: dp(1)
-                                color: loginBtn.pressed
-                                       ? Qt.darker(app_color, 1.2)
-                                       : app_color
+                                color: loginBtn.pressed ? Qt.darker(app_color, 1.2) : app_color
                             }
 
                             contentItem: Item {
@@ -387,23 +382,17 @@ Item {
 
                             onClicked: {
                                 if (loginUser.text.trim() === "" || loginPass.text === "") {
-                                    mainWindow.showToastMessage("Please fill all fields")
-                                    return
+                                    mainWindow.showToastMessage("Please fill all fields");
+                                    return;
                                 }
-
-                                MapGlobals.loginUserFunc(
-                                            loginUser.text.trim(),
-                                            loginPass.text,
-                                            function(result) {
-                                                if (result) {
-                                                    loginUser.text = ""
-                                                    loginPass.text = ""
-                                                }
-                                            }
-                                            )
+                                MapGlobals.loginUserFunc(loginUser.text.trim(), loginPass.text, function (result) {
+                                    if (result) {
+                                        loginUser.text = "";
+                                        loginPass.text = "";
+                                    }
+                                });
                             }
                         }
-
 
                         Row {
                             spacing: dp(1)
@@ -434,10 +423,10 @@ Item {
                                     cursorShape: Qt.PointingHandCursor
 
                                     onClicked: {
-                                        currentView = "signup"
-                                        rightSide = "signup"
-                                        loginUser.text = ""
-                                        loginPass.text = ""
+                                        currentView = "signup";
+                                        rightSide = "signup";
+                                        loginUser.text = "";
+                                        loginPass.text = "";
                                     }
                                 }
                             }
@@ -462,14 +451,13 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
 
                                 onClicked: {
-                                    currentView = "reset"
-                                    rightSide = "reset"
-                                    loginUser.text = ""
-                                    loginPass.text = ""
+                                    currentView = "reset";
+                                    rightSide = "reset";
+                                    loginUser.text = "";
+                                    loginPass.text = "";
                                 }
                             }
                         }
-
                     }
 
                     // Bottom spacer (ensures proper scroll padding)
@@ -585,6 +573,7 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(2)
+
                             //anchors.horizontalCenter: parent.horizontalCenter
 
                             Row {
@@ -595,7 +584,7 @@ Item {
                                 Text {
                                     text: "Full Name"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
                                 }
@@ -640,6 +629,7 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(2)
+
                             //anchors.horizontalCenter: parent.horizontalCenter
 
                             Row {
@@ -649,7 +639,7 @@ Item {
                                 Text {
                                     text: "Username"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
                                 }
@@ -666,7 +656,7 @@ Item {
                                 Text {
                                     text: "*"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.8
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.8
                                     font.weight: Font.Medium
                                     color: "red"
                                 }
@@ -674,7 +664,7 @@ Item {
                                 Text {
                                     text: "(Used for login, must be unique)"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Medium
                                     color: textSecondary
                                 }
@@ -694,7 +684,7 @@ Item {
                                     anchors.fill: parent
                                     placeholderText: "Ex: dharun_sure_5522"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black"
                                     background: null
@@ -778,8 +768,9 @@ Item {
                                         verticalAlignment: Text.AlignVCenter
                                     }
                                     onClicked: {
-                                        if (!MapGlobals.validateEmail(regEmail.text, regEmail)) return;
-                                        MapGlobals.sendOTP(regEmail.text, function(success) {
+                                        if (!MapGlobals.validateEmail(regEmail.text, regEmail))
+                                            return;
+                                        MapGlobals.sendOTP(regEmail.text, function (success) {
                                             if (success) {
                                                 otpSent = true;
                                             }
@@ -863,7 +854,7 @@ Item {
                                             mainWindow.showToastMessage("Please enter a valid 6-digit OTP");
                                             return;
                                         }
-                                        MapGlobals.verifyOTP(regEmail.text, regOtp.text, function(success) {
+                                        MapGlobals.verifyOTP(regEmail.text, regOtp.text, function (success) {
                                             if (success) {
                                                 isOtpVerified = true;
                                                 mainWindow.showToastMessage("OTP verified! Please set your password.");
@@ -888,7 +879,7 @@ Item {
                                 Text {
                                     text: "Password"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
                                 }
@@ -896,7 +887,7 @@ Item {
                                 Text {
                                     text: "*"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.8
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.8
                                     font.weight: Font.Medium
                                     color: "red"
                                 }
@@ -931,7 +922,7 @@ Item {
                                     }
                                     placeholderText: "Enter your password"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
                                     color: "black" //textPrimary
                                     echoMode: showPasswordBtn_crtAc.checked ? TextInput.Normal : TextInput.Password
@@ -959,13 +950,10 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: dp(1)
                                         fillMode: Image.PreserveAspectFit
-                                        source: parent.checked
-                                                ? "/qmlimages/NewImages/password_visible.svg"
-                                                : "/qmlimages/NewImages/password_hidden.svg"
+                                        source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
                                         color: app_color
                                     }
                                 }
-
                             }
                         }
 
@@ -983,7 +971,7 @@ Item {
                                 Text {
                                     text: "Confirm Password"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
                                 }
@@ -991,7 +979,7 @@ Item {
                                 Text {
                                     text: "*"
                                     //font.pixelSize: dp(4)
-                                    font.pointSize:     ScreenTools.defaultFontPointSize * 0.8
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.8
                                     font.weight: Font.Medium
                                     color: "red"
                                 }
@@ -1034,7 +1022,6 @@ Item {
                                     selectByMouse: true
                                 }
 
-
                                 Button {
                                     id: confirmPswBtn
                                     width: dp(6) // Adjusted size
@@ -1055,9 +1042,7 @@ Item {
                                         anchors.fill: parent
                                         anchors.margins: dp(1)
                                         fillMode: Image.PreserveAspectFit
-                                        source: parent.checked
-                                                ? "/qmlimages/NewImages/password_visible.svg"
-                                                : "/qmlimages/NewImages/password_hidden.svg"
+                                        source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
                                         color: app_color
                                     }
                                 }
@@ -1085,6 +1070,7 @@ Item {
 
                                 contentItem: Item {
                                     anchors.fill: parent
+
                                     // clip: true
 
                                     Row {
@@ -1097,7 +1083,6 @@ Item {
                                             width: 22
                                             height: 22
                                             anchors.verticalCenter: parent.verticalCenter
-
                                         }
 
                                         Text {
@@ -1112,43 +1097,45 @@ Item {
 
                                 onClicked: {
                                     // Execute validations in order
-                                    if (!MapGlobals.validateUsername(regUser.text,regUser)) return;
-                                    if (!MapGlobals.validateDisplayName(regDisplay.text,regDisplay)) return;
-                                    if (!MapGlobals.validateEmail(regEmail.text,regEmail)) return;
-                                    if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
-                                    if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
+                                    if (!MapGlobals.validateUsername(regUser.text, regUser))
+                                        return;
+                                    if (!MapGlobals.validateDisplayName(regDisplay.text, regDisplay))
+                                        return;
+                                    if (!MapGlobals.validateEmail(regEmail.text, regEmail))
+                                        return;
+                                    if (!MapGlobals.validatePassword(regPass.text, regPass))
+                                        return;
+                                    if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text, regConfirm))
+                                        return;
+                                    MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function (result, response) {
+                                        if (result) {
+                                            mainWindow.showToastMessage("Account created successfully!");
 
-                                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
-                                                            if (result) {
-                                                                mainWindow.showToastMessage("Account created successfully!");
-                                                                
-                                                                // Use response data if available, otherwise fallback to form fields
-                                                                var user = (response && response.user) ? response.user : {
-                                                                    "username": regUser.text,
-                                                                    "displayname": regDisplay.text,
-                                                                    "email": regEmail.text
-                                                                };
+                                            // Use response data if available, otherwise fallback to form fields
+                                            var user = (response && response.user) ? response.user : {
+                                                "username": regUser.text,
+                                                "displayname": regDisplay.text,
+                                                "email": regEmail.text
+                                            };
+                                            QGroundControl.saveGlobalSetting("username", user.username);
+                                            QGroundControl.saveGlobalSetting("name", user.displayname);
+                                            QGroundControl.saveGlobalSetting("email", user.email);
+                                            QGroundControl.saveBoolGlobalSetting("login", true);
 
-                                                                QGroundControl.saveGlobalSetting("username", user.username);
-                                                                QGroundControl.saveGlobalSetting("name", user.displayname);
-                                                                QGroundControl.saveGlobalSetting("email", user.email);
-                                                                QGroundControl.saveBoolGlobalSetting("login", true);
+                                            // Clear fields
+                                            regUser.text = "";
+                                            regDisplay.text = "";
+                                            regEmail.text = "";
+                                            regOtp.text = "";
+                                            regPass.text = "";
+                                            regConfirm.text = "";
+                                            otpSent = false;
+                                            isOtpVerified = false;
 
-                                                                // Clear fields
-                                                                regUser.text = "";
-                                                                regDisplay.text = "";
-                                                                regEmail.text = "";
-                                                                regOtp.text = "";
-                                                                regPass.text = "";
-                                                                regConfirm.text = "";
-                                                                otpSent = false;
-                                                                isOtpVerified = false;
-
-                                                                // Go into the app!
-                                                                MapGlobals.rootWindow.homescreen();
-                                                            }
-                                                        });
-
+                                            // Go into the app!
+                                            MapGlobals.rootWindow.homescreen();
+                                        }
+                                    });
                                 }
                             }
 
@@ -1173,23 +1160,20 @@ Item {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
-                                            currentView = "signin"
+                                            currentView = "signin";
                                         }
                                     }
                                 }
                             }
-
                         }
-
                     }
                 }
             }
         }
-
     }
 
     Component {
-        id : resetpwdComponent
+        id: resetpwdComponent
 
         Item {
 
@@ -1229,7 +1213,6 @@ Item {
             //     }
             // }
 
-
             ScrollView {
                 anchors.fill: parent
                 z: 1
@@ -1257,6 +1240,7 @@ Item {
                         Column {
                             width: parent.width
                             spacing: dp(1.5)
+
                             //anchors.horizontalCenter: parent.horizontalCenter
 
                             Text {
@@ -1345,7 +1329,6 @@ Item {
                                 spacing: dp(2)
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-
                                 Row {
                                     //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.05
@@ -1354,7 +1337,7 @@ Item {
                                     Text {
                                         text: "New Password"
                                         //font.pixelSize: dp(4)
-                                        font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                         font.weight: Font.Bold
                                         color: app_color
                                         //x: parent.width * 0.25
@@ -1398,7 +1381,6 @@ Item {
                                         selectByMouse: true
                                     }
 
-
                                     Button {
                                         id: newPasswors_resetbtn
                                         width: dp(6) // Adjusted size
@@ -1419,9 +1401,7 @@ Item {
                                             anchors.fill: parent
                                             anchors.margins: dp(1)
                                             fillMode: Image.PreserveAspectFit
-                                            source: parent.checked
-                                                    ? "/qmlimages/NewImages/password_visible.svg"
-                                                    : "/qmlimages/NewImages/password_hidden.svg"
+                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
                                             color: app_color
                                         }
                                     }
@@ -1455,6 +1435,7 @@ Item {
 
                             contentItem: Item {
                                 anchors.fill: parent
+
                                 // clip: true
 
                                 Row {
@@ -1484,7 +1465,6 @@ Item {
                                     mainWindow.showToastMessage("Please fill all fields");
                                     return;
                                 }
-
                                 if (newPassword.text.length < 8) {
                                     mainWindow.showToastMessage("Password must be at least 8 characters");
                                     newPassword.focus = true;
@@ -1496,7 +1476,7 @@ Item {
                                 resetBtn.text = "Resetting...";
 
                                 // Call the resetPassword function with a callback
-                                MapGlobals.resetPassword(resetUser.text, newPassword.text, function(result) {
+                                MapGlobals.resetPassword(resetUser.text, newPassword.text, function (result) {
                                     if (result.success) {
                                         mainWindow.showToastMessage(result.message);
                                         currentView = "signin";
@@ -1549,19 +1529,14 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
 
                                 onClicked: {
-                                    console.log("BACK CLICKED")
-                                    currentView = "signin"
+                                    console.log("BACK CLICKED");
+                                    currentView = "signin";
                                 }
                             }
                         }
-
-
-
                     }
                 }
             }
-
         }
     }
 }
-
