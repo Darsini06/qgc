@@ -50,7 +50,9 @@ Item {
     property bool   _lightWidgetBorders:                editorMap.isSatelliteMap
     property bool   _addROIOnClick:                     false
     property bool   _singleComplexItem:                 _missionController.complexMissionItemNames.length === 1
-    property int    _editingLayer:                      {if(!_utmspEnabled){layerTabBar.currentIndex ? _layers[layerTabBar.currentIndex] : _layerMission}else{layerTabBarUTMSP.currentIndex ? _layersUTMSP[layerTabBarUTMSP.currentIndex] : _layerMission}}
+    property int    _editingLayer:                      _layerMission
+    property bool   isMissionTab:                       _editingLayer === _layerMission
+    property bool   isFenceTab:                         _editingLayer === _layerGeoFence
     property int    _toolStripBottom:                   toolStrip.height + toolStrip.y
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     property var    _planViewSettings:                  QGroundControl.settingsManager.planViewSettings
@@ -95,25 +97,16 @@ Item {
     // Shared responsive base
     property real baseSize: parent.width * 0.045    // 6% of screen width
     property real iconSize: baseSize * 0.8   // icon inside the circle
+    property var _currentVIIndex: _missionController.currentPlanViewVIIndex
+    property var _currentItem:   (_currentVIIndex >= 0 && _currentVIIndex < _missionController.visualItems.count) ? _missionController.visualItems.get(_currentVIIndex) : null
+    property var activePolygon:  (_currentItem && _currentItem.surveyAreaPolygon) ? _currentItem.surveyAreaPolygon : mapPolygonvisuals.mapPolygon
 
-    //     Component.onCompleted: {
-    //         console.log("PlanView received planType:", _appSettings.screenplanType);
-
-    // console.log("PlanView creater", _planMasterController.planCreators);
-
-    //         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
-    //                                    editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
-    //         var centerCoord = editorMap.toCoordinate(centerPoint, false)
-    //         _planMasterController.planCreators[0].createPlan(centerCoord)
-
-    //             //createPlanRemoveAllPromptDialog.createObject(mainWindow, { mapCenter: _mapCenter(), planCreator: object }).open()
-    //             //_planMasterController.planCreator[0].createPlan(mapCenter)
-
-    //     }
+    property bool gridLines : MapGlobals.gridLines
 
     Component.onCompleted: {
         QGroundControl.saveGlobalSetting("waypointvisible", "");  // reset when entering PlanView
         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
+        _editingLayer = _layerMission
     }
 
     onVisibleChanged: {
@@ -485,6 +478,7 @@ Item {
             fileDialog.nameFilters =    _planMasterController.loadNameFilters
             fileDialog.openForLoad()
         }
+
         function saveToSelectedFile() {
             if (!checkReadyForSaveUpload(true /* save */)) {
                 return
@@ -522,13 +516,10 @@ Item {
                 console.log("Survey plan creator not found")
             }
             if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-                filename._resetPolygon()
+                mapPolygonvisuals._resetPolygon()
             }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-                filename._resetCircle()
+                mapPolygonvisuals._resetCircle()
             }
-
-
-
         }
 
         function saveToSelectedFile1() {
@@ -609,7 +600,8 @@ Item {
     }
 
     QGCMapPolygonVisuals {
-        id:                     filename
+        id:                     mapPolygonvisuals
+        mapControl:             editorMap
         cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
         cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
     }
@@ -743,7 +735,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
-                    visible:     MapGlobals.gridLines
+                    visible:     !object.isPlannedHomePosition && (object.commandName !== "Mission Start") && (object.abbreviation !== "L")
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
@@ -765,8 +757,9 @@ Item {
 
             // Add lines between waypoints
             MissionLineView {
-                showSpecialVisual:  _missionController.isROIBeginCurrentItem
-                model:              _missionController.simpleFlightPathSegments
+                showSpecialVisual:      _missionController.isROIBeginCurrentItem
+                model:                  _missionController.simpleFlightPathSegments
+                plannedHomePosition:    _missionController.plannedHomePosition
                 opacity:            _editingLayer == _layerMission ||  _editingLayer == _layerUTMSP  ? 1 : editorMap._nonInteractiveOpacity
             }
 
@@ -777,6 +770,7 @@ Item {
                 delegate: MapLineArrow {
                     fromCoord:      object ? object.coordinate1 : undefined
                     toCoord:        object ? object.coordinate2 : undefined
+                    visible:        object && fromCoord && fromCoord.isValid && toCoord && toCoord.isValid && (fromCoord.distanceTo(_missionController.plannedHomePosition) > 0.5) && (toCoord.distanceTo(_missionController.plannedHomePosition) > 0.5)
                     arrowPosition:  3
                     z:              QGroundControl.zOrderWaypointLines + 1
                 }
@@ -1024,7 +1018,6 @@ Item {
                 ]
             }
 
-
             Dialog {
                 id: dialog
                 modal: true
@@ -1092,9 +1085,6 @@ Item {
                     console.log("waypointMark",waypointMark)
                     addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
                 }
-
-
-
             }
 
             onDropped: allAddClickBoolsOff()
@@ -1113,6 +1103,7 @@ Item {
                     _rightPanelWidth
                 }
             }
+            z : -1
             color:              "transparent"//qgcPal.window
             opacity:            layerTabBar.visible ? 0.2 : 0
             anchors.bottom:     parent.bottom
@@ -1129,10 +1120,12 @@ Item {
         Item {
             anchors.fill:           rightPanel
             anchors.topMargin:      _toolsMargin
-            visible: false
+            z : 0
+            visible: true
 
             DeadMouseArea {
                 anchors.fill:   parent
+                visible:        false
             }
 
             Column {
@@ -1140,9 +1133,95 @@ Item {
                 spacing:            ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.left:       parent.left
                 anchors.right:      parent.right
+
                 anchors.top:        parent.top
 
                 //-------------------------------------------------------
+
+                Loader {
+                    id:                 boundaryButtonsLoader
+                    width:              parent.width
+                    active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
+                    visible:            active
+
+                    sourceComponent: Column {
+                        spacing:            12
+                        width:              boundaryButtonsLoader.width
+                        topPadding:         10
+
+                        Button {
+                            id: boundaryPointBtn
+                            width:              parent.width
+                            height:             45
+                            padding:            10
+                            background: Rectangle {
+                                radius: 8
+                                color: Qt.rgba(0, 0, 0, 0.40)
+                                anchors.fill: parent
+                            }
+                            contentItem: Text {
+                                text:               qsTr("Boundary Point")
+                                font.bold:          true
+                                color:              "white"
+                                font.pointSize:     14
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                font.family:        "Outfit"
+                            }
+                            onClicked: {
+                                console.log("Boundary Point clicked in PlanView")
+                                mapPolygonvisuals.appendVertexToPolygon(activePolygon)
+                            }
+                        }
+
+                        Button {
+                            id: savePlanBtn
+                            width:              parent.width
+                            height:             45
+                            padding:            10
+
+                            background: Rectangle {
+                                radius: 8
+                                color: Qt.rgba(0, 0, 0, 0.40)
+                                anchors.fill: parent
+                            }
+
+                            contentItem: Text {
+                                text:               qsTr("Save")
+                                font.bold:          true
+                                color:              "white"
+                                font.pointSize:     14
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                font.family:        "Outfit"
+                            }
+                            onClicked: {
+                                if (!activePolygon || activePolygon.count < 3) {
+                                    console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                                    mapPolygonvisuals.restorePreviousVertices()
+                                } else {
+                                    if (activePolygon.traceMode) {
+                                        activePolygon.traceMode = false
+                                        console.log("Save: traceMode set to false — survey item marked complete")
+                                    }
+
+                                    console.log("_appSettings.screen", _appSettings.screen)
+
+                                    if (_appSettings.screen==="Start") {
+                                        console.log("_appSettings.screen", _appSettings.screen)
+                                        _planMasterController.saveToSelectedFile1()
+                                        mainWindow.planmap()
+                                        mainWindow.showMapping()
+                                    } else {
+                                        console.log("_appSettings.screen", _appSettings.screen)
+                                        _planMasterController.saveToSelectedFile()
+                                        mainWindow.planmap()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Mission Controls
                 Rectangle {
@@ -1169,7 +1248,9 @@ Item {
                         x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
                         gradient: Gradient {
                             orientation: Gradient.Horizontal
+
                             GradientStop { position: 0.0; color: "#6a4c8d" }
+
                             GradientStop { position: 1.0; color: "#4a2c6d" }
                         }
                         radius: height / 2
@@ -1188,7 +1269,10 @@ Item {
                             width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
                             height: parent.height
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBar.currentIndex = 0
+                            onClicked: {
+                                layerTabBar.currentIndex = 0
+                                _editingLayer = _layerMission
+                            }
 
                             Text {
                                 text: qsTr("Mission")
@@ -1206,8 +1290,9 @@ Item {
                             visible: layerTabBar.fenceVisible
                             cursorShape: Qt.PointingHandCursor
 
-                            onClicked : {
+                            onClicked: {
                                 layerTabBar.currentIndex = 1
+                                _editingLayer = _layerGeoFence
                                 _geoFenceController.supported
                             }
 
@@ -1266,7 +1351,10 @@ Item {
                             width: (layerTabBarUTMSP.width - 8) / Math.max(1, layerTabBarUTMSP._visibleTabCount)
                             height: parent.height
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 0
+                            onClicked: {
+                                layerTabBarUTMSP.currentIndex = 0
+                                _editingLayer = _layerMission
+                            }
                             Text {
                                 text: qsTr("Mission")
                                 anchors.centerIn: parent
@@ -1282,7 +1370,10 @@ Item {
                             height: parent.height
                             visible: layerTabBarUTMSP.rallyVisible
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 1
+                            onClicked: {
+                                layerTabBarUTMSP.currentIndex = 1
+                                _editingLayer = _layerRallyPoints
+                            }
                             Text {
                                 text: qsTr("Rally")
                                 anchors.centerIn: parent
@@ -1298,7 +1389,10 @@ Item {
                             height: parent.height
                             visible: _utmspEnabled
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: layerTabBarUTMSP.currentIndex = 2
+                            onClicked: {
+                                layerTabBarUTMSP.currentIndex = 2
+                                _editingLayer = _layerUTMSP
+                            }
                             Text {
                                 text: qsTr("UTM-Adapter")
                                 anchors.centerIn: parent
@@ -1350,32 +1444,25 @@ Item {
 
                     //-- List Elements
 
-                    delegate: MissionExpand {
-                        //visible: missionItem.commandName !== "Takeoff"
-                        map:            editorMap
-                        masterController:  _planMasterController
-                        missionItem:    object
-                        width:          missionItemEditorListView.width
-                        readOnly:       false
-                        onClicked: (sequenceNumber) => { _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false) }
-                        // MouseArea {
-                        //     anchors.fill: parent
-                        //     onClicked: {
-                        //         _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                        //         missionItemDialog.currentMissionItem = object
-                        //         missionItemDialog.currentIndex = index
-                        //         missionItemDialog.open()
-                        //         missionItemDialog.visible = true
-                        //     }
-                        // }
-                        // onRemove: {
-                        //     var removeVIIndex = index
-                        //     _missionController.removeVisualItem(removeVIIndex)
-                        //     if (removeVIIndex >= _missionController.visualItems.count) {
-                        //         removeVIIndex--
-                        //     }
-                        // }
-                        //onSelectNextNotReadyItem:   selectNextNotReady()
+                    delegate: Item {
+                        property bool _showItem : gridLines ? true : (object && object.commandName !== "Mission Start" && object.commandName !== "Return To Launch")
+                        width: missionItemEditorListView.width
+                        height: _showItem ? innerEditor.height : 0
+                        visible: _showItem
+
+                        MissionExpand {
+                            id: innerEditor
+                            map: editorMap
+                            masterController:  _planMasterController
+                            missionItem:    object
+                            width:          parent.width
+                            readOnly:       false
+                            onClicked: (sequenceNumber) => {
+
+                                           _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+
+                                       }
+                        }
                     }
                 }
             }
@@ -1413,7 +1500,7 @@ Item {
                 controller:             _rallyPointController
             }
 
-            UTMSPAdapterEditor{
+            UTMSPAdapterEditor {
                 id: utmspEditor
                 enabled:                 _utmspEnabled
                 anchors.top:             rightControls.bottom
@@ -1591,108 +1678,108 @@ Item {
         //     }
         // }
 
-        Popup {
-            id: geoFenceDrawer
-            width: ScreenTools.isMobile ? parent.width * 0.45 : 450
-            height: ScreenTools.isMobile ? parent.height * 0.75 : 600
+        // Popup {
+        //     id: geoFenceDrawer
+        //     width: ScreenTools.isMobile ? parent.width * 0.45 : 450
+        //     height: ScreenTools.isMobile ? parent.height * 0.75 : 600
 
-            // Position in the bottom-right corner
-            x: parent.width - width - 20
-            property real targetY: parent.height - height - 20
-            y: targetY
+        //     // Position in the bottom-right corner
+        //     x: parent.width - width - 20
+        //     property real targetY: parent.height - height - 20
+        //     y: targetY
 
-            modal: false
-            dim: false
-            closePolicy: Popup.NoAutoClose
-            parent: Overlay.overlay
-            visible: _editingLayer == _layerGeoFence
-            onClosed: {
-                if (layerTabBar.currentIndex === 1) {
-                    layerTabBar.currentIndex = 0;
-                }
-            }
+        //     modal: false
+        //     dim: false
+        //     closePolicy: Popup.NoAutoClose
+        //     parent: Overlay.overlay
+        //     visible: _editingLayer == _layerGeoFence
+        //     onClosed: {
+        //         if (layerTabBar.currentIndex === 1) {
+        //             layerTabBar.currentIndex = 0;
+        //         }
+        //     }
 
-            // Slide animation from bottom
-            enter: Transition {
-                NumberAnimation { property: "y"; from: geoFenceDrawer.parent.height; to: geoFenceDrawer.targetY; duration: 350; easing.type: Easing.OutExpo }
-            }
-            exit: Transition {
-                NumberAnimation { property: "y"; to: geoFenceDrawer.parent.height; duration: 250; easing.type: Easing.InCubic }
-            }
+        //     // Slide animation from bottom
+        //     enter: Transition {
+        //         NumberAnimation { property: "y"; from: geoFenceDrawer.parent.height; to: geoFenceDrawer.targetY; duration: 350; easing.type: Easing.OutExpo }
+        //     }
+        //     exit: Transition {
+        //         NumberAnimation { property: "y"; to: geoFenceDrawer.parent.height; duration: 250; easing.type: Easing.InCubic }
+        //     }
 
-            background: Rectangle {
-                color:        "#BF000000" // Dark Transparent Black 75% alpha
-                radius:       15
-                border.color: "#3a3750"
-                border.width: 1
-            }
+        //     background: Rectangle {
+        //         color:        "#BF000000" // Dark Transparent Black 75% alpha
+        //         radius:       15
+        //         border.color: "#3a3750"
+        //         border.width: 1
+        //     }
 
-            Item {
-                id: geoFenceDrawerHeader
-                width: parent.width
-                height: 60
-                anchors.top: parent.top
+        //     Item {
+        //         id: geoFenceDrawerHeader
+        //         width: parent.width
+        //         height: 60
+        //         anchors.top: parent.top
 
-                Text {
-                    text: qsTr("GeoFence Settings")
-                    font.pixelSize: 18
-                    font.bold: true
-                    color: "#e8e4f0"
-                    anchors.centerIn: parent
-                }
+        //         Text {
+        //             text: qsTr("GeoFence Settings")
+        //             font.pixelSize: 18
+        //             font.bold: true
+        //             color: "#e8e4f0"
+        //             anchors.centerIn: parent
+        //         }
 
-                Rectangle {
-                    id: geoFenceCloseBtn
-                    width: 32
-                    height: 32
-                    radius: 16
-                    color: closeGeoArea.pressed ? "#3d3a50" : (closeGeoArea.containsMouse ? "#2e2b42" : "#1e1b2e")
-                    border.color: "#4a4560"
-                    border.width: 1
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: 15
-                    Behavior on color { ColorAnimation { duration: 100 } }
+        //         Rectangle {
+        //             id: geoFenceCloseBtn
+        //             width: 32
+        //             height: 32
+        //             radius: 16
+        //             color: closeGeoArea.pressed ? "#3d3a50" : (closeGeoArea.containsMouse ? "#2e2b42" : "#1e1b2e")
+        //             border.color: "#4a4560"
+        //             border.width: 1
+        //             anchors.right: parent.right
+        //             anchors.verticalCenter: parent.verticalCenter
+        //             anchors.rightMargin: 15
+        //             Behavior on color { ColorAnimation { duration: 100 } }
 
-                    QGCColoredImage {
-                        source: "qrc:/InstrumentValueIcons/close.svg"
-                        color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
-                        width: 14
-                        height: 14
-                        anchors.centerIn: parent
-                        Behavior on color { ColorAnimation { duration: 100 } }
-                    }
+        //             QGCColoredImage {
+        //                 source: "qrc:/InstrumentValueIcons/close.svg"
+        //                 color: closeGeoArea.containsMouse ? "#e0dcf8" : "#9898bb"
+        //                 width: 14
+        //                 height: 14
+        //                 anchors.centerIn: parent
+        //                 Behavior on color { ColorAnimation { duration: 100 } }
+        //             }
 
-                    MouseArea {
-                        id: closeGeoArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            geoFenceDrawer.close()
-                        }
-                    }
-                }
+        //             MouseArea {
+        //                 id: closeGeoArea
+        //                 anchors.fill: parent
+        //                 hoverEnabled: true
+        //                 cursorShape: Qt.PointingHandCursor
+        //                 onClicked: {
+        //                     geoFenceDrawer.close()
+        //                 }
+        //             }
+        //         }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: "#3d3a50"
-                    anchors.bottom: parent.bottom
-                }
-            }
+        //         Rectangle {
+        //             width: parent.width
+        //             height: 1
+        //             color: "#3d3a50"
+        //             anchors.bottom: parent.bottom
+        //         }
+        //     }
 
-            GeoFenceEditor {
-                id: geoFenceEditor
-                anchors.top: geoFenceDrawerHeader.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.margins: 10
-                myGeoFenceController: _geoFenceController
-                flightMap: editorMap
-            }
-        }
+        //     GeoFenceEditor {
+        //         id: geoFenceEditor
+        //         anchors.top: geoFenceDrawerHeader.bottom
+        //         anchors.left: parent.left
+        //         anchors.right: parent.right
+        //         anchors.bottom: parent.bottom
+        //         anchors.margins: 10
+        //         myGeoFenceController: _geoFenceController
+        //         flightMap: editorMap
+        //     }
+        // }
 
         Item {
             id: editdata
@@ -2425,14 +2512,8 @@ Item {
                     height: parent.height
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        // if (layerTabBar.currentIndex === 0) {
-                        //     if (missionActionsPopup.opened) missionActionsPopup.close()
-                        //     else missionActionsPopup.open()
-                        // } else {
-                        //     layerTabBar.currentIndex = 0
-                        //     missionActionsPopup.open()
-                        // }
                         layerTabBar.currentIndex = 0
+                        _editingLayer = _layerMission
                     }
                     Text {
                         text: qsTr("Mission")
@@ -2448,11 +2529,12 @@ Item {
                     height: parent.height
                     visible: layerTabBar.fenceVisible
                     cursorShape: Qt.PointingHandCursor
+
                     onClicked: {
                         layerTabBar.currentIndex = 1
-                        //missionActionsPopup.close()
-                        if (!geoFenceDrawer.opened) geoFenceDrawer.open()
+                        _editingLayer = _layerGeoFence
                     }
+
                     Text {
                         text: qsTr("Fence")
                         anchors.centerIn: parent
@@ -2515,5 +2597,6 @@ Item {
             }
         }
     }
+    // Floating buttons overlay
 
 }

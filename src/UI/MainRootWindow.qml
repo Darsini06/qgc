@@ -24,11 +24,8 @@ import QGroundControl.FlightMap
 
 import QGroundControl.UTMSP
 import QGroundControl.Palette
-
 import MapGlobals
-
 import QtQuick.LocalStorage
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -1970,15 +1967,24 @@ ApplicationWindow {
                         }
                     }
                     MouseArea {
-                        id: ma1; anchors.fill: parent; hoverEnabled: true
+                        id: ma1
+                        anchors.fill: parent
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             planView.mapclear()
                             QGroundControl.saveGlobalSetting("mapping", "basic")
-                            MapGlobals.mark_with = "Mark_With_Manual";
-                            MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
+                            MapGlobals.mark_with = "Mark_With_Manual"
+                            MapGlobals.edit = "edit"
+                            MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
-                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+
+                            //Grid Lines set to false
+                            MapGlobals.setGridLines(false)
+
+                            mainWindow.showPlanView()
+                            dialog.visible = false
+                            planView.data1()
                         }
                     }
                 }
@@ -2025,6 +2031,10 @@ ApplicationWindow {
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
+
+                            //Grid Lines set to false
+                            MapGlobals.setGridLines(false)
+
                             mainWindow.showPlanView(); dialog.visible = false; planView.data1()
                         }
                     }
@@ -2070,6 +2080,10 @@ ApplicationWindow {
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
+
+                            //Grid Lines set to false
+                            MapGlobals.setGridLines(false)
+
                             mainWindow.showPlanView(); dialog.visible = false; planView.data1()
                         }
                     }
@@ -2117,6 +2131,10 @@ ApplicationWindow {
                                 planView.mapclear()
                                 MapGlobals.mark_with = "Mark_With_Drone"
                                 MapGlobals.edit = "edit"
+
+                                //Grid Lines set to false
+                                MapGlobals.setGridLines(false)
+
                                 mainWindow.showPlanView(); dialog.visible = false; planView.data1()
                             } else {
                                 dialog.visible = false
@@ -2169,6 +2187,10 @@ ApplicationWindow {
                             MapGlobals.mark_with = "Mark_With_GPS"
                             MapGlobals.edit = "edit"
                             MapGlobals.share_edit_visibility = false
+
+                            //Grid Lines set to false
+                            MapGlobals.setGridLines(false)
+
                             mainWindow.showPlanView(); dialog.visible = false; planView.data1()
                         }
                     }
