@@ -153,7 +153,7 @@ Item {
             anchorPoint.y:  sourceItem.anchorPointY
             z:              QGroundControl.zOrderMapItems
             coordinate:     _missionItem.coordinate
-            visible:        gridLines ? _missionItem.exitCoordinate.isValid : false
+            visible:        false//gridLines ? _missionItem.exitCoordinate.isValid : false
             opacity:        _root.opacity
 
             sourceItem: MissionItemIndexLabel {
@@ -232,7 +232,7 @@ Item {
             anchorPoint.y:  sourceItem.anchorPointY
             z:              QGroundControl.zOrderMapItems
             coordinate:     _missionItem.exitCoordinate
-            visible:        gridLines ? _missionItem.exitCoordinate.isValid : false
+            visible:       false //gridLines ? _missionItem.exitCoordinate.isValid : false
             opacity:        _root.opacity
 
             sourceItem: MissionItemIndexLabel {

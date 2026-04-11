@@ -126,7 +126,7 @@ Item {
 
         MissionItemIndicator {
             coordinate:     _missionItem.coordinate
-            visible:        _missionItem.specifiesCoordinate
+            visible:        _missionItem.specifiesCoordinate && !_missionItem.isPlannedHomePosition && (_missionItem.commandName !== "Mission Start") && (_missionItem.abbreviation !== "L")
             z:              QGroundControl.zOrderMapItems
             missionItem:    _missionItem
             sequenceNumber: _missionItem.sequenceNumber

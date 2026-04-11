@@ -136,7 +136,7 @@ Item {
             border.width:   _borderWidthInclusion
             center:         homePosition
             radius:         _radius
-            visible:        homePosition.isValid && _radius > 0
+            visible:        false // homePosition.isValid && _radius > 0
 
             property real _radius: myGeoFenceController.paramCircularFence
 

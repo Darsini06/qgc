@@ -16,9 +16,16 @@ import QGroundControl.Palette
 
 /// The MissionLineView control is used to add lines between mission items
 MapItemView {
-    property bool showSpecialVisual: false
+    property bool showSpecialVisual:    false
+    property var  plannedHomePosition:  QtPositioning.coordinate()
+
+    function isHome(coord) {
+        return coord && coord.isValid && plannedHomePosition.isValid && (coord.distanceTo(plannedHomePosition) < 0.5)
+    }
+
     delegate: MapPolyline {
         line.width: 3
+        visible:    object && !isHome(object.coordinate1) && !isHome(object.coordinate2)
         // Note: Special visuals for ROI are hacked out for now since they are not working correctly
         line.color: _terrainCollision ?
                         "red" :

@@ -35,7 +35,7 @@ Item {
             if (component.status === Component.Error) {
                 console.log("Error loading Qml: ", object.mapVisualQML, component.errorString())
             }
-            _visualItem = component.createObject(map, { "map": _root.map, vehicle: _root.vehicle, 'opacity': Qt.binding(function() { return _root.opacity }), 'interactive': Qt.binding(function() { return _root.interactive }) })
+            _visualItem = component.createObject(map, { "map": _root.map, vehicle: _root.vehicle, 'opacity': Qt.binding(function() { return _root.opacity }), 'interactive': Qt.binding(function() { return _root.interactive }), 'visible': Qt.binding(function() { return _root.visible }) })
             _visualItem.clicked.connect(_root.clicked)
         }
     }

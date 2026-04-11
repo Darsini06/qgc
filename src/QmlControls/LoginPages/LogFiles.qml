@@ -552,6 +552,9 @@ Item {
                                                 _planMasterController._updateMobileShortPath()
                                                 _planMasterController._setupFileExtensions()
                                                 inlineLoader.sourceComponent = fileListComponent
+                                                console.log("gridlines True")
+                                                MapGlobals.setGridLines(true)
+
                                             } else {
                                                 if (model.screen === "privacy_policy") {
                                                     privacyLoading = true
