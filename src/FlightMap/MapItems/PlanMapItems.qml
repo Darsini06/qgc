@@ -42,6 +42,7 @@ Item {
         delegate: MissionItemMapVisual {
             map:        _map
             vehicle:    _vehicle
+            visible:    !object.isPlannedHomePosition && (object.commandName !== "Mission Start") && (object.abbreviation !== "L")
             onClicked:  _guidedController.confirmAction(_guidedController.actionSetWaypoint, Math.max(object.sequenceNumber, 1))
         }
     }
@@ -64,7 +65,7 @@ Item {
             line.width: 3
             line.color: "white"//"#be781c"                           // Hack, can't get palette to work in here
             z:          QGroundControl.zOrderWaypointLines
-            path:       _missionController.waypointPath
+            path:       (_missionController.waypointPath.length > 0 && _missionController.waypointPath[0].distanceTo(_missionController.plannedHomePosition) < 0.5) ? _missionController.waypointPath.slice(1) : _missionController.waypointPath
         }
     }
 }

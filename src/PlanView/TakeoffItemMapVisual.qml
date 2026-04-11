@@ -79,7 +79,7 @@ Item {
             mapControl:     _root.map
             itemIndicator:  _takeoffIndicatorItem
             itemCoordinate: _missionItem.specifiesCoordinate ? _missionItem.coordinate : _missionItem.launchCoordinate
-            visible:        _root.interactive
+            visible:        false // _root.interactive
 
             onItemCoordinateChanged: {
                 if (_missionItem.specifiesCoordinate) {
