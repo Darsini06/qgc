@@ -33,6 +33,7 @@ TransectStyleComplexItemEditor {
     // Placeholder text color — muted grey, NOT white
     readonly property color _colorPlaceholder:   "#5a5a6a"
     readonly property color _colorSuccess:       "#2ECC71"
+    readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 
     function _smartOptimize() {
         if (missionItem.surveyAreaPolygon.count < 3) return
@@ -208,6 +209,7 @@ TransectStyleComplexItemEditor {
                 Button {
                     Layout.fillWidth:       true
                     Layout.preferredHeight: 32
+                    visible:                !_isAgri
                     
                     background: Rectangle {
                         radius: 8
@@ -233,34 +235,31 @@ TransectStyleComplexItemEditor {
                     }
                     onClicked: _smartOptimize()
                 }
-            }
 
-            // Divider
-            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5 }
-
-            // ─── Turnaround Distance (volume slider) ──────────────────────
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing:          _margin * 0.5
-                visible:          !forPresets
-
-                QGCLabel {
-                    text:           qsTr("Turnaround dist")
-                    color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.smallFontPointSize
-                }
-
-                Loader {
+                // --- Indentation / Turnaround Section ---
+                ColumnLayout {
                     Layout.fillWidth: true
-                    sourceComponent:  _volumeSlider
-                    property var targetFact: missionItem.turnAroundDistance
-                    onTargetFactChanged: if (item) item.fact = targetFact
-                    onLoaded:            if (item) item.fact = targetFact
+                    spacing:          _margin * 0.5
+                    
+                    QGCLabel {
+                        text:           qsTr("Indentation / Turnaround dist")
+                        color:          _colorTextSecondary
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        font.bold:      true
+                    }
+
+                    Loader {
+                        Layout.fillWidth: true
+                        sourceComponent:  _volumeSlider
+                        property var targetFact: missionItem.turnAroundDistance
+                        onTargetFactChanged: if (item) item.fact = targetFact
+                        onLoaded:            if (item) item.fact = targetFact
+                    }
                 }
             }
 
             // Divider
-            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets }
+            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets && !_isAgri }
 
             // ─── Options ComboBox ─────────────────────────────────────────
             // Styled wrapper so the combobox background matches dark theme
@@ -271,7 +270,7 @@ TransectStyleComplexItemEditor {
                 radius:           8
                 border.color:     _colorBorder
                 border.width:     1
-                visible:          !forPresets
+                visible:          !forPresets && !_isAgri
 
                 QGCOptionsComboBox {
                     id:               optionsCombo
