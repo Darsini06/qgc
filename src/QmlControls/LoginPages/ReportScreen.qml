@@ -13,8 +13,8 @@ Item {
     id: reportsRoot
     anchors.fill: parent
 
-    property color app_color: "#262626"
-    property color sidebar_color: "#262626"
+    property color app_color: "#1A1A1A"
+    property color sidebar_color: "#1A1A1A"
     property color bg_color: "#F9FAFB"
     property color border_color: "#E5E7EB"
     property color text_primary: "#111827"
@@ -70,7 +70,7 @@ Item {
                     anchors.fill: parent
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: sidebar_color }
-                        GradientStop { position: 1.0; color: "#262626" }
+                        GradientStop { position: 1.0; color: "#1A1A1A" }
                     }
                 }
 

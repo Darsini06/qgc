@@ -21,9 +21,30 @@ GridLayout {
     readonly property color _colorTextSecondary: "#8e8e93"
     readonly property color _colorAccent:        "#301934"
 
+    property real currentArea: missionItem.surveyAreaPolygon.area
+
+    Connections {
+        target: missionItem.surveyAreaPolygon
+        onPathChanged: {
+            currentArea = missionItem.surveyAreaPolygon.area
+            MapGlobals.acres = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(currentArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
+        }
+    }
+
     // Label column
     QGCLabel { text: qsTr("Survey Area");     color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
-    QGCLabel { text: QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString; color: _colorTextPrimary; font.bold: true }
+    QGCLabel { 
+        text: {
+            var val = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(currentArea)
+            var unitStr = QGroundControl.unitsConversion.appSettingsAreaUnitsString
+            if (val > 0 && val < 0.01) {
+                return val.toFixed(4) + " " + unitStr
+            }
+            return val.toFixed(2) + " " + unitStr
+        }
+        color: _colorTextPrimary
+        font.bold: true 
+    }
 
     QGCLabel { text: qsTr("Photo Count");     color: _colorTextSecondary; font.pointSize: ScreenTools.smallFontPointSize }
     QGCLabel { text: missionItem.cameraShots; color: _colorTextPrimary; font.bold: true }

@@ -276,27 +276,28 @@ Item {
 
                 }
 
-                Button {
-                    visible: !mobileFileOpenDialog.showAllFiles &&
-                             mobileFileOpenDialog.fullFileList.length > 3
-                    text: qsTr("See More")
-                    // background: Rectangle {
-                    //         color: "#262626"
-                    //         radius: 10
-                    //     }
+                Item {
+                    width:      parent.width
+                    height:     20
+                    visible:    !mobileFileOpenDialog.showAllFiles &&
+                                mobileFileOpenDialog.fullFileList.length > 3
 
-                    //     contentItem: Text {
-                    //         text: control.text
-                    //         color: "white"
-                    //         font.bold: true
-                    //         anchors.centerIn: parent
-                    //     }
+                    Text {
+                        anchors.right:  parent.right
+                        text:           qsTr("See More")
+                        color:          "#007AFF" // Blue link color
+                        font.bold:      true
+                        font.underline: true
 
-                    onClicked: {
-                        mainWindow.homescreen()
-                        mobileFileOpenDialog.visible = false
-                        MapGlobals.currentView_profile = "dronePage"
-                        mainWindow.logfiles()
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                mainWindow.homescreen()
+                                mobileFileOpenDialog.visible = false
+                                MapGlobals.currentView_profile = "dronePage"
+                                mainWindow.logfiles()
+                            }
+                        }
                     }
                 }
 

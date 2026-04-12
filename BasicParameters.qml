@@ -167,7 +167,7 @@ Item {
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.weight: Font.DemiBold
                     bottomPadding: 20
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+                    visible: false // Hidden for all modes as per user request (Agri ONLY needs All/SPRAY)
                 }
 
                 // Grid layout for gimbal models
@@ -177,7 +177,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+                    visible: false // Hidden for all modes
                     // Horizontal spacing (between columns)
                     columnSpacing: 30
                     // Vertical spacing (between rows)
@@ -230,6 +230,7 @@ Item {
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.weight: Font.DemiBold
                     bottomPadding: 20
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") !== "Agri"
                 }
 
                 // Grid layout for camera gimbals
@@ -239,6 +240,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") !== "Agri"
                     // Horizontal spacing (between columns)
                     columnSpacing: 30
                     // Vertical spacing (between rows)
@@ -259,6 +261,7 @@ Item {
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.weight: Font.DemiBold
                     bottomPadding: 20
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") !== "Agri"
                 }
 
                 // Grid layout for agriall
@@ -268,6 +271,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     columns: cardsPerRow
                     spacing: columnSpacing
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") !== "Agri"
 
 
                     // Horizontal spacing (between columns)

@@ -1,12 +1,3 @@
-/****************************************************************************
- *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- ****************************************************************************/
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -91,7 +82,13 @@ ApplicationWindow {
     property real baseUnit: 8 * scaleRatio
 
     property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
-    property color app_color: droneType === "Agri" ? "#79AE6F" : "#808080"
+    property color app_color: {
+        var source = pageLoader.source.toString()
+        if (source.indexOf("ProfileScreen.qml") !== -1) return "#262626"
+        if (droneType === "Agri") return "#79AE6F"
+        if (droneType === "Camera" || droneType === "Mapping") return "#808080"
+        return "#262626"
+    }
 
     function updateAppTheme(newMode) {
         droneType = newMode
@@ -546,7 +543,7 @@ ApplicationWindow {
             Rectangle {
                 width: parent.width
                 height: titleLabel.implicitHeight + 14
-                color: "#301934"
+                color: app_color
                 radius: 14
                 antialiasing: true
                 clip: true
@@ -557,38 +554,35 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
                     height: 14
-                    color: "#301934"
+                    color: app_color
                     radius: 0
                 }
 
-                RowLayout {
+                Item {
                     anchors.fill: parent
-                    anchors.margins: 0
 
                     QGCLabel {
                         id: titleLabel
                         text: dynamicCalDialog.dialogTitleText
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                        anchors.centerIn: parent
                         font.pointSize: ScreenTools.mediumFontPointSize
                         font.bold: true
                         color: "white"
                     }
 
                     MouseArea {
-                        Layout.alignment: Qt.AlignRight
-                        width: 30
-                        height: 30
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: parent.height
                         onClicked: dynamicCalDialog.close()
 
-                        Text {
+                        QGCColoredImage {
                             anchors.centerIn: parent
-                            text: "\u2715"
+                            width: 16
+                            height: 16
+                            source: "qrc:/res/XDelete.svg"
                             color: "white"
-                            font.pixelSize: 18
                         }
                     }
                 }
@@ -817,6 +811,7 @@ ApplicationWindow {
     }
 
     function openProfileScreen() {
+        MapGlobals.comefrom = "Profile"
         pageLoader.source = "qrc:/qml/LoginPages/ProfileScreen.qml"
     }
 
@@ -959,7 +954,7 @@ ApplicationWindow {
                     Layout.preferredWidth: ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 20 : ScreenTools.defaultFontPixelWidth * 28
                     Layout.fillHeight: true
                     color: "#f8f9fa" // Light aesthetic sidebar
-                    
+
                     // Sidebar Right Border
                     Rectangle {
                         anchors.right: parent.right
@@ -976,20 +971,20 @@ ApplicationWindow {
                         clip: true
                         topMargin: 20
                         spacing: 2
-                        
+
                         // Fake TabBar for index tracking and logic preservation
                         TabBar { id: tabBarDummy; visible: false; currentIndex: 0 }
 
                         delegate: Item {
                             width: parent.width
                             height: 60
-                            
+
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
                                 color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
-                                
+
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
                                 RowLayout {
@@ -1011,7 +1006,7 @@ ApplicationWindow {
                                         font.bold: sidebarList.currentIndex === index
                                         color: sidebarList.currentIndex === index ? app_color : "#444444"
                                     }
-                                    
+
                                     // Selection Indicator (vertical line)
                                     Rectangle {
                                         width: 4
@@ -1561,7 +1556,7 @@ ApplicationWindow {
                     color: Qt.rgba(1, 1, 1, 0.15)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Text {
                         text: "-"
                         color: "white"
@@ -1632,7 +1627,7 @@ ApplicationWindow {
                     color: Qt.rgba(0, 0, 0, 0.4)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Canvas {
                         id: progressCircle
                         anchors.fill: parent

@@ -64,19 +64,18 @@ Item {
         spacing: 20
 
         // ROW OF ACTION ICONS
-        Row {
+        RowLayout {
             id: icons_row
             spacing: 12
             //layoutDirection: Qt.RightToLeft
 
-            //  ========== COMPASS ARROW ==========
+            // ========== COMPASS ARROW ==========
             Rectangle {
-                width: baseSize
-                height: baseSize
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"//"white"//"#1b1c3e"
-                //border.width: width * 0.05
-                //border.color: "white"//"white"//"#005BBB"
+                color: "white"
                 clip: true
 
                 MouseArea {
@@ -86,11 +85,6 @@ Item {
                         iconsContainer.close();
                     }
                 }
-
-                // CompassDial {
-                //     anchors.fill: parent
-                //     visible: true
-                // }
 
                 QGCColoredImage {
                     id: compassArrow
@@ -112,13 +106,14 @@ Item {
 
             // Erase
             Rectangle {
-                width: baseSize
-                height: baseSize
-                radius: width / 2   // Makes it a circle
-                color: "white"//"#1b1c3e"    // Dark blue background
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
+                radius: width / 2
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
-                clip: true          // This ensures content stays within the circular bounds
+                border.color: "white"
+                clip: true
 
                 MouseArea {
                     anchors.fill: parent
@@ -139,13 +134,14 @@ Item {
             // ========== MAP SWITCH ==========
             Rectangle {
                 id: mapSwitchButton
-                width: baseSize
-                height: baseSize
-                radius: width / 2   // Makes it a circle
-                color: "white"//"#1b1c3e"    // Dark blue background
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
+                radius: width / 2
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
-                clip: true          // This ensures content stays within the circular bounds
+                border.color: "white"
+                clip: true
 
                 MouseArea {
                     anchors.fill: parent
@@ -334,12 +330,13 @@ Item {
             // ========== MAP REDIRECT ==========
             Rectangle {
                 id : mapRedirect
-                width: baseSize
-                height: baseSize
+                Layout.preferredWidth: baseSize
+                Layout.preferredHeight: baseSize
+                Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"//"#1b1c3e"
+                color: "white"
                 border.width: width * 0.05
-                border.color: "white"//"#005BBB"
+                border.color: "white"
 
                 MouseArea {
                     anchors.fill: parent
@@ -354,7 +351,6 @@ Item {
                     anchors.centerIn: parent
                     width: iconSize * 0.5
                     height: iconSize * 0.5
-                    //color: "transparent"
                     color : "black"
                 }
 
@@ -388,7 +384,6 @@ Item {
                                 height: iconSize * 0.5
                                 fillMode: Image.PreserveAspectFit
                                 color: "white"
-                                //color : "black"
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -419,7 +414,6 @@ Item {
                                 height: iconSize * 0.5
                                 fillMode: Image.PreserveAspectFit
                                 color: "white"
-                                //color : "black"
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -447,46 +441,16 @@ Item {
                 id:                     compass
                 //anchors.centerIn: parent
                 size:                   _innerRadius * 2.5
+
+                                        Layout.preferredHeight: baseSize * 1.5
+                Layout.preferredWidth:  baseSize * 1.5
+                Layout.alignment:       Qt.AlignVCenter
                 vehicle:                _activeVehicle
                 visible :               _activeVehicle
-                //anchors.verticalCenter: parent.verticalCenter
             }
 
         }
 
-        // --- SPRAY_PUMP_RATE Seekbar Loader ---
-        // We wait for parametersReady so that getParameter() calls will succeed.
-        Loader {
-            id: sliderLoader
-            anchors.right: parent.right
-            active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
-            visible: active
-            sourceComponent: sliderComponent
-        }
-    }
-
-    Component {
-        id: sliderComponent
-        Rectangle {
-            id: sliderContainer
-            width: ScreenTools.defaultFontPixelWidth * 30
-            height: sliderColumn.height + 20
-            color: Qt.rgba(0, 0, 0, 0.40)
-            radius: 8
-
-            FactPanelController { id: controller }
-
-            Column {
-                id: sliderColumn
-                anchors.centerIn: parent; spacing: 8; width: parent.width - 20
-                Text { text: qsTr("Spray Pump Rate"); color: "white"; font.bold: true; font.pixelSize: ScreenTools.defaultFontPointSize }
-                FactSlider {
-                    id:     pumpSlider
-                    fact:   controller.getParameterFact(-1, "SPRAY_PUMP_RATE")
-                    width:  parent.width
-                }
-            }
-        }
     }
 
     // Import dialog component (kept for reference)

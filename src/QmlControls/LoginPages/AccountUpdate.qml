@@ -47,26 +47,9 @@ Item {
                 id: leftCard
                 Layout.preferredWidth: isSmallScreen ? parent.width * 0.4 : parent.width * 0.35
                 Layout.fillHeight: true
-                color: app_color
+                color: "#1A1A1A"
                 clip: true
-                visible: !isSmallScreen // Hide left panel on small screens to prioritize the form, or we can stack it. 
-                // Wait, usually we want it to stack. But if it's full screen split, maybe we hide it on mobile.
-                // Let's make it responsive.
-
-                Image {
-                    anchors.fill: parent
-                    source: "qrc:/qmlimages/NewImages/nature_background.png"
-                    fillMode: Image.PreserveAspectCrop
-                    opacity: 0.3
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.6) }
-                        GradientStop { position: 1.0; color: Qt.rgba(0,0,0,0.2) }
-                    }
-                }
+                visible: !isSmallScreen
 
                 // Back Button
                 Rectangle {

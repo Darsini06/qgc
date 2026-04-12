@@ -54,7 +54,7 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
-    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use loc      alhost
+    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api"
 
 
     function recenterMap() {
@@ -98,15 +98,16 @@ QtObject {
     }
 
     //saveDroneSession
-    function saveDroneSession(date, startTime, endTime) {
-        console.log("MapGlobals.saveDroneSession()")
+    function saveDroneSession(date, startTime, endTime, sessionType = "Connection") {
+        console.log("MapGlobals.saveDroneSession() - Type:", sessionType)
         var duration = calculateDuration(startTime, endTime);
         var data = {
             "username": QGroundControl.loadGlobalSetting("username", "Guest"),
             "date": date,
             "start_time": startTime,
             "end_time": endTime,
-            "duration": duration
+            "duration": duration,
+            "session_type": sessionType
         };
 
         var xhr = new XMLHttpRequest();
@@ -123,6 +124,47 @@ QtObject {
                 }
             }
         }
+        xhr.send(JSON.stringify(data));
+    }
+
+    function saveMissionLog(missionName, visualItems) {
+        console.log("MapGlobals.saveMissionLog() -", missionName)
+        var coords = [];
+        for (var i = 0; i < visualItems.count; i++) {
+            var item = visualItems.get(i);
+            if (item.coordinate && item.coordinate.latitude !== undefined && item.coordinate.latitude !== 0) {
+                // Check if it's a valid coordinate for the line
+                coords.push([item.coordinate.longitude, item.coordinate.latitude]);
+            }
+        }
+
+        if (coords.length < 1) {
+            console.log("Mission too short or invalid to log geometry");
+            return;
+        }
+
+        // Extract filename from path if needed
+        var name = missionName.toString().split('/').pop().split('\\').pop() || "Unnamed Mission";
+
+        var data = {
+            "username": QGroundControl.loadGlobalSetting("username", "Guest"),
+            "mission_name": name,
+            "plan_data": { "itemCount": visualItems.count }, // Basic metadata
+            "geometry": {
+                "type": coords.length === 1 ? "Point" : "LineString",
+                "coordinates": coords.length === 1 ? coords[0] : coords
+            },
+            "date": new Date().toLocaleDateString(Qt.locale(), "dd-MM-yyyy")
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/missions");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log save response:", xhr.status);
+            }
+        };
         xhr.send(JSON.stringify(data));
     }
 
@@ -256,6 +298,28 @@ QtObject {
                     } catch (e) {}
                     if (rootWindow) rootWindow.showToastMessage(errorMsg);
                     if (callback) callback(false);
+                }
+            }
+        }
+        xhr.send(JSON.stringify(data));
+    }
+
+    function logParameterActivity(username, email, activity = "Accessed Parameters") {
+        console.log("MapGlobals.logParameterActivity() - Logging activity for:", username);
+        var data = {
+            "username": username,
+            "email": email,
+            "activity": activity
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/parameter-activity");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    console.log("Parameter activity logged successfully");
+                } else {
+                    console.error("Failed to log parameter activity:", xhr.responseText);
                 }
             }
         }
