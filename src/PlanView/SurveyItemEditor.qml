@@ -32,6 +32,32 @@ TransectStyleComplexItemEditor {
     readonly property color _colorTextSecondary: "#8e8e93"
     // Placeholder text color — muted grey, NOT white
     readonly property color _colorPlaceholder:   "#5a5a6a"
+    readonly property color _colorSuccess:       "#2ECC71"
+
+    function _smartOptimize() {
+        if (missionItem.surveyAreaPolygon.count < 3) return
+        
+        var maxDist = 0
+        var bestAngle = 0
+        
+        // Find the longest edge to align the grid for minimum turns
+        for (var i = 0; i < missionItem.surveyAreaPolygon.count; i++) {
+            var c1 = missionItem.surveyAreaPolygon.path[i]
+            var c2 = missionItem.surveyAreaPolygon.path[(i + 1) % missionItem.surveyAreaPolygon.count]
+            var d = c1.distanceTo(c2)
+            if (d > maxDist) {
+                maxDist = d
+                bestAngle = c1.azimuthTo(c2)
+            }
+        }
+        
+        // Normalize angle to 0-180 (survey grids are symmetric)
+        bestAngle = Math.round(bestAngle) % 180
+        if (bestAngle < 0) bestAngle += 180
+        
+        missionItem.gridAngle.value = bestAngle
+        if (angleSlider) angleSlider.value = bestAngle
+    }
 
     Component {
         id: _transectValuesComponent
@@ -178,6 +204,35 @@ TransectStyleComplexItemEditor {
                     }
                 }
 
+                // --- Optimized Alignment Button ---
+                Button {
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: 32
+                    
+                    background: Rectangle {
+                        radius: 8
+                        color:  parent.pressed ? "#1E1E24" : (parent.hovered ? _colorBgTertiary : _colorBgSecondary)
+                        border.color: parent.hovered ? _colorSuccess : _colorBorder
+                        border.width: 1
+                    }
+                    
+                    contentItem: RowLayout {
+                        spacing: 8
+                        anchors.centerIn: parent
+                        QGCColoredImage {
+                            source: "/resources/InstrumentValueIcons/check.svg"
+                            width:  14; height: 14
+                            color:  _colorSuccess
+                        }
+                        QGCLabel {
+                            text: qsTr("Smart Path Optimization")
+                            font.pixelSize: ScreenTools.smallFontPointSize
+                            font.bold: true
+                            color: _colorTextPrimary
+                        }
+                    }
+                    onClicked: _smartOptimize()
+                }
             }
 
             // Divider
