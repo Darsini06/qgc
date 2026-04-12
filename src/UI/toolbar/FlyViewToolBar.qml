@@ -302,10 +302,11 @@ Rectangle {
 
         BatteryIndicator {
             id: batteryIndicator
-            height: 40
-            width: 45 // Fixed width to ensure it doesn't collapse
+            Layout.preferredHeight: 40
+            Layout.preferredWidth: 45 // Fixed width to ensure it doesn't collapse
             Layout.alignment: Qt.AlignVCenter
-            visible: _activeVehicle ? true : false
+            visible: true // _activeVehicle ? true : false
+
         }
 
         // ── Thin vertical divider ──
@@ -866,7 +867,7 @@ Rectangle {
                                 color: "white"
                             }
                             QGCLabel {
-                                text: /* _sprayPumpRate ? _sprayPumpRate.valueString + " %" : */           "N/A"
+                                text: /* _sprayPumpRate ? _sprayPumpRate.valueString + " %" : */               "N/A"
                                 font.bold: true
                                 color: "white"
                             }
@@ -913,7 +914,7 @@ Rectangle {
                                 color: "white"
                             }
                             QGCLabel {
-                                text: /* _spraySpinner ? _spraySpinner.valueString + " ms" : */           "N/A"
+                                text: /* _spraySpinner ? _spraySpinner.valueString + " ms" : */               "N/A"
                                 font.bold: true
                                 color: "white"
                             }
