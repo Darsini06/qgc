@@ -19,6 +19,8 @@ Item {
     readonly property color _colorAccent:        "#471880"
     readonly property color _colorBgTertiary:    "#32323b"
 
+    property string _application: QGroundControl.loadGlobalSetting("loadpage","loadpage");
+
     ColumnLayout {
         id:             mainLayout
         anchors.fill:   parent
@@ -41,7 +43,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 2
                     QGCLabel {
-                        text: qsTr("SURVEY AREA")
+                        text: _application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
                         font.pixelSize: ScreenTools.smallFontPointSize * 0.8
                         font.bold: true
                         color: _colorTextSecondary
@@ -64,6 +66,7 @@ Item {
                 radius:           12
                 color:            _colorBgTertiary
                 border.color:     Qt.rgba(255,255,255,0.05)
+                visible:          _application !== "Agri"
                 
                 Column {
                     anchors.centerIn: parent
@@ -98,6 +101,7 @@ Item {
                 radius:           12
                 color:            _colorBgTertiary
                 border.color:     Qt.rgba(255,255,255,0.05)
+                visible:          _application !== "Agri"
                 
                 Column {
                     anchors.centerIn: parent
