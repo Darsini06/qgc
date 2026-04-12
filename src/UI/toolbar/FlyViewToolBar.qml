@@ -651,7 +651,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         height: ScreenTools.toolbarHeight//_root.height * 0.05
         width: _activeVehicle ? _activeVehicle.loadProgress * parent.width : 0
-        color: "#301934"//qgcPal.colorGreen
+        color: "transparent"//qgcPal.colorGreen
         visible: !largeProgressBar.visible
     }
 
@@ -866,7 +866,7 @@ Rectangle {
                                 color: "white"
                             }
                             QGCLabel {
-                                text: /* _sprayPumpRate ? _sprayPumpRate.valueString + " %" : */          "N/A"
+                                text: /* _sprayPumpRate ? _sprayPumpRate.valueString + " %" : */           "N/A"
                                 font.bold: true
                                 color: "white"
                             }
@@ -913,7 +913,7 @@ Rectangle {
                                 color: "white"
                             }
                             QGCLabel {
-                                text: /* _spraySpinner ? _spraySpinner.valueString + " ms" : */          "N/A"
+                                text: /* _spraySpinner ? _spraySpinner.valueString + " ms" : */           "N/A"
                                 font.bold: true
                                 color: "white"
                             }

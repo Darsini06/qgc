@@ -263,13 +263,13 @@ RowLayout {
                         delegate: QGCLabel {
                             property int  sensorIndex: Math.floor(index / 2)
                             property bool isName:      (index % 2) === 0
-                            
-                            text: isName ? 
-                                _activeVehicle.sysStatusSensorInfo.sensorNames[sensorIndex] : 
+
+                            text: isName ?
+                                _activeVehicle.sysStatusSensorInfo.sensorNames[sensorIndex] :
                                 _activeVehicle.sysStatusSensorInfo.sensorStatus[sensorIndex]
-                            
+
                             color: isName ? "white" : (String(text).toLowerCase().indexOf("normal") !== -1 || String(text).toLowerCase().indexOf("ok") !== -1 ? "#2ECC71" : (String(text).toLowerCase().indexOf("disabled") !== -1 ? "#95A5A6" : "#E74C3C"))
-                            
+
                             opacity:            isName ? 0.7 : 1.0
                             font.pointSize:     10
                             font.family:        "Outfit"
