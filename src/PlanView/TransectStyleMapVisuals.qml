@@ -92,6 +92,7 @@ Item {
     property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
     property color _themeColor: _isAgri ? "#79AE6F" : "#808080" // Agri Green or Professional Gray
     property color _themeBorder: _isAgri ? Qt.darker("#79AE6F", 1.2) : "black"
+    property color _gridColor: _isAgri ? "#0D4D15" : "#4A4A4A" // Dark Green or Dark Gray
 
     // Area polygon
     QGCMapPolygonVisuals {
@@ -110,7 +111,7 @@ Item {
     Component {
         id: fullTransectsComponent
         MapPolyline {
-            line.color: "white"
+            line.color: _gridColor
             line.width: 5
             path:       _transectPoints
             visible:    gridLines ? _currentItem : false
@@ -123,7 +124,7 @@ Item {
         id: entryTransectComponent
 
         MapPolyline {
-            line.color: "white"
+            line.color: _gridColor
             line.width: 2
             path:       _showPartialEntryExit ? [ _transectPoints[0], _transectPoints[1] ] : []
             visible:    gridLines ? _showPartialEntryExit : false
@@ -136,7 +137,7 @@ Item {
         id: exitTransectComponent
 
         MapPolyline {
-            line.color: "white"
+            line.color: _gridColor
             line.width: 2
             path:       _showPartialEntryExit ? [ _transectPoints[_lastPointIndex - 1], _transectPoints[_lastPointIndex] ] : []
             visible:    gridLines ? _showPartialEntryExit : false

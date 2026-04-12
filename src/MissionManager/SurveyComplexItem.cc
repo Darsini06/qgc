@@ -642,7 +642,7 @@ bool SurveyComplexItem::_nextTransectCoord(const QList<QGeoCoordinate>& transect
 
 bool SurveyComplexItem::_hasTurnaround(void) const
 {
-    return _turnAroundDistance() > 0;
+    return _turnAroundDistance() != 0;
 }
 
 double SurveyComplexItem::_turnaroundDistance(void) const
@@ -831,20 +831,31 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         QList<TransectStyleComplexItem::CoordInfo_t>    coordInfoTransect;
         TransectStyleComplexItem::CoordInfo_t           coordInfo;
 
-        coordInfo = { transect[0], CoordTypeSurveyEntry };
+        // Handle Entry/Exit points (with optional indentation)
+        QGeoCoordinate entryCoord = transect[0];
+        QGeoCoordinate exitCoord  = transect[1];
+        double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+
+        if (turnAroundDistance < 0) {
+            double azimuth = transect[0].azimuthTo(transect[1]);
+            entryCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            exitCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+        }
+
+        coordInfo = { entryCoord, CoordTypeSurveyEntry };
         coordInfoTransect.append(coordInfo);
-        coordInfo = { transect[1], CoordTypeSurveyExit };
+        coordInfo = { exitCoord, CoordTypeSurveyExit };
         coordInfoTransect.append(coordInfo);
 
         // For hover and capture we need points for each camera location within the transect
         if (triggerCamera() && hoverAndCaptureEnabled()) {
-            double transectLength = transect[0].distanceTo(transect[1]);
-            double transectAzimuth = transect[0].azimuthTo(transect[1]);
+            double transectLength = entryCoord.distanceTo(exitCoord);
+            double transectAzimuth = entryCoord.azimuthTo(exitCoord);
             if (triggerDistance() < transectLength) {
                 int cInnerHoverPoints = static_cast<int>(floor(transectLength / triggerDistance()));
-                qCDebug(SurveyComplexItemLog) << "cInnerHoverPoints" << cInnerHoverPoints;
                 for (int i=0; i<cInnerHoverPoints; i++) {
-                    QGeoCoordinate hoverCoord = transect[0].atDistanceAndAzimuth(triggerDistance() * (i + 1), transectAzimuth);
+                    QGeoCoordinate hoverCoord = entryCoord.atDistanceAndAzimuth(triggerDistance() * (i + 1), transectAzimuth);
                     TransectStyleComplexItem::CoordInfo_t coordInfo = { hoverCoord, CoordTypeInteriorHoverTrigger };
                     coordInfoTransect.insert(1 + i, coordInfo);
                 }
@@ -852,11 +863,8 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         }
 
         // Extend the transect ends for turnaround
-        if (_hasTurnaround()) {
+        if (turnAroundDistance > 0) {
             QGeoCoordinate turnaroundCoord;
-            double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
-            //double turnAroundDistance = 0.0; //_turnAroundDistanceFact.rawValue().toDouble();
-
             double azimuth = transect[0].azimuthTo(transect[1]);
             turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
@@ -1259,20 +1267,31 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         QList<TransectStyleComplexItem::CoordInfo_t>    coordInfoTransect;
         TransectStyleComplexItem::CoordInfo_t           coordInfo;
 
-        coordInfo = { transect[0], CoordTypeSurveyEntry };
+        // Handle Entry/Exit points (with optional indentation)
+        QGeoCoordinate entryCoord = transect[0];
+        QGeoCoordinate exitCoord  = transect[1];
+        double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+
+        if (turnAroundDistance < 0) {
+            double azimuth = transect[0].azimuthTo(transect[1]);
+            entryCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            exitCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+        }
+
+        coordInfo = { entryCoord, CoordTypeSurveyEntry };
         coordInfoTransect.append(coordInfo);
-        coordInfo = { transect[1], CoordTypeSurveyExit };
+        coordInfo = { exitCoord, CoordTypeSurveyExit };
         coordInfoTransect.append(coordInfo);
 
         // For hover and capture we need points for each camera location within the transect
         if (triggerCamera() && hoverAndCaptureEnabled()) {
-            double transectLength = transect[0].distanceTo(transect[1]);
-            double transectAzimuth = transect[0].azimuthTo(transect[1]);
+            double transectLength = entryCoord.distanceTo(exitCoord);
+            double transectAzimuth = entryCoord.azimuthTo(exitCoord);
             if (triggerDistance() < transectLength) {
                 int cInnerHoverPoints = static_cast<int>(floor(transectLength / triggerDistance()));
-                qCDebug(SurveyComplexItemLog) << "cInnerHoverPoints" << cInnerHoverPoints;
                 for (int i=0; i<cInnerHoverPoints; i++) {
-                    QGeoCoordinate hoverCoord = transect[0].atDistanceAndAzimuth(triggerDistance() * (i + 1), transectAzimuth);
+                    QGeoCoordinate hoverCoord = entryCoord.atDistanceAndAzimuth(triggerDistance() * (i + 1), transectAzimuth);
                     TransectStyleComplexItem::CoordInfo_t coordInfo = { hoverCoord, CoordTypeInteriorHoverTrigger };
                     coordInfoTransect.insert(1 + i, coordInfo);
                 }
@@ -1280,11 +1299,8 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         }
 
         // Extend the transect ends for turnaround
-        if (_hasTurnaround()) {
+        if (turnAroundDistance > 0) {
             QGeoCoordinate turnaroundCoord;
-            double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
-            //double turnAroundDistance = 0.0; //_turnAroundDistanceFact.rawValue().toDouble();
-
             double azimuth = transect[0].azimuthTo(transect[1]);
             turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
