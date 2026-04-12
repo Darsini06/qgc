@@ -178,9 +178,6 @@ Item {
             onShowAllFilesChanged: refreshFiles()
             Component.onCompleted: refreshFiles()
 
-
-
-
             Column {
                 id:         fileOpenColumn
                 width:      parent.width
