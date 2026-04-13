@@ -248,6 +248,43 @@ TransectStyleComplexItemEditor {
                         font.bold:      true
                     }
 
+                    // --- Corner Adjustment Mode Selection ---
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing:          4
+                        
+                        Repeater {
+                            model: [
+                                { label: qsTr("Both"),   mode: 0 },
+                                { label: qsTr("Entry"),  mode: 1 },
+                                { label: qsTr("Exit"),   mode: 2 }
+                            ]
+                            
+                            delegate: Rectangle {
+                                Layout.fillWidth:  true
+                                Layout.preferredHeight: 28
+                                radius:            14
+                                color:             missionItem.adjustmentMode === modelData.mode ? _colorAccent : _colorBgTertiary
+                                border.color:      missionItem.adjustmentMode === modelData.mode ? _colorAccent : _colorBorder
+                                border.width:      1
+                                opacity:           parent.enabled ? 1.0 : 0.5
+                                
+                                QGCLabel {
+                                    anchors.centerIn: parent
+                                    text:             modelData.label
+                                    font.pointSize:   ScreenTools.smallFontPointSize
+                                    font.bold:        true
+                                    color:            missionItem.adjustmentMode === modelData.mode ? "white" : _colorTextPrimary
+                                }
+                                
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked:    missionItem.adjustmentMode = modelData.mode
+                                }
+                            }
+                        }
+                    }
+
                     Loader {
                         Layout.fillWidth: true
                         sourceComponent:  _volumeSlider
@@ -255,6 +292,7 @@ TransectStyleComplexItemEditor {
                         onTargetFactChanged: if (item) item.fact = targetFact
                         onLoaded:            if (item) item.fact = targetFact
                     }
+
                 }
             }
 

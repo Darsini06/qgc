@@ -38,8 +38,8 @@ Item {
     property color  interiorColor:      "transparent"
     property color  altColor:           "transparent"
     property real   interiorOpacity:    1
-    property int    borderWidth:        0
-    property color  borderColor:        "black"
+    property int    borderWidth:        mapping ? 4 : 0
+    property color  borderColor:        mapping ? "white" : "black"
 
     property bool   _circleMode:                false
     property real   _circleRadius
@@ -788,6 +788,7 @@ Item {
         id: polygonComponent
 
         MapPolygon {
+            z:              QGroundControl.zOrderMapItems + 5
             color:          mapPolygon.showAltColor ? altColor : interiorColor
             opacity:        interiorOpacity
             border.color:   borderColor

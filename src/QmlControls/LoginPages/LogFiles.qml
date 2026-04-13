@@ -692,99 +692,193 @@ Item {
                 id: fileListComponent
 
                 Item {
+                    id: fileListRoot
                     anchors.fill: parent
 
-                    // Track file list so delete can trigger a refresh
+                    property bool isCloudView: false
                     property var fileList: controller.getFiles(folder, _rgExtensions)
 
                     function refreshFiles() {
-                        fileList = controller.getFiles(folder, _rgExtensions)
-                        console.log("filename",fileList)
+                        if (isCloudView) {
+                            fetchCloudFiles()
+                        } else {
+                            fileList = controller.getFiles(folder, _rgExtensions)
+                        }
                     }
 
-
-
-
-                    // Scrollable file list
-                    ScrollView {
-                        anchors.top:         parent.top
-                        anchors.topMargin:   6
-                        anchors.left:        parent.left
-                        anchors.right:       parent.right
-                        clip:                true
-                        contentWidth:        width
-
-                        Column {
-                            width:   parent.width
-                            spacing: ScreenTools.defaultFontPixelHeight / 2
-                            padding: 4
-
-                            QGCLabel {
-                                text: qsTr("Path: %1").arg(_mobileShortPath)
+                    function fetchCloudFiles() {
+                        cloudPlansLoading = true
+                        MapGlobals.fetchCloudPlans(userEmail, function(plans) {
+                            cloudPlansModel.clear()
+                            for (var i = 0; i < plans.length; i++) {
+                                cloudPlansModel.append(plans[i])
                             }
+                            cloudPlansLoading = false
+                        })
+                    }
 
-                            Repeater {
-                                id:    fileRepeater
-                                model: fileList
+                    property bool cloudPlansLoading: false
+                    ListModel { id: cloudPlansModel }
 
-                                FileButton {
-                                    width:  parent ? parent.width : 0
-                                    text:   modelData
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 10
 
-                                    onClicked: {
-                                        console.log("Loading file:", modelData)
-                                        console.log("Folder:", folder)
-                                        console.log("Filename stripped:", modelData.split(".")[0])
+                        // View Toggle
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 40
+                            spacing: 10
 
-                                        mainWindow.openHomeScreen()
-                                        mainWindow.showFlyView()
-                                        mainWindow.showPlanView()
-
-                                        var strippedFileName = modelData.split(".")[0]
-                                        _appSettings.username = strippedFileName
-
-                                        MapGlobals.comefrom = "Plan"
-                                        console.log("MapGlobals.comefrom", MapGlobals.comefrom)
-                                        _appSettings.screen = "Plan"
-
-                                        swapCamera()
-                                        mainWindow.fileload(folder + "/" + modelData)
-                                    }
-
-                                    onHamburgerClicked: {
-                                        highlight = true
-                                        fileHamburgerMenu.fileToDelete =
-                                            controller.fullyQualifiedFilename(folder, modelData)
-                                        fileHamburgerMenu.popup()
-                                    }
-
-                                    QGCMenu {
-                                        id: fileHamburgerMenu
-                                        property string fileToDelete
-
-                                        onAboutToHide: parent.highlight = false
-
-                                        QGCMenuItem {
-                                            text: qsTr("Delete")
-                                            onTriggered: {
-                                                controller.deleteFile(fileHamburgerMenu.fileToDelete)
-                                                // Refresh file list after deletion
-                                                var root = fileRepeater.parent
-                                                while (root && !root.refreshFiles) { root = root.parent }
-                                                if (root) root.refreshFiles()
-                                            }
-                                        }
-                                    }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 36
+                                radius: 18
+                                color: !isCloudView ? app_color : "#f0f0f0"
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Local Files"
+                                    color: !isCloudView ? "white" : "#666666"
+                                    font.bold: !isCloudView
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: isCloudView = false
                                 }
                             }
 
-                            QGCLabel {
-                                text:    qsTr("No files")
-                                visible: fileList.length === 0
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 36
+                                radius: 18
+                                color: isCloudView ? app_color : "#f0f0f0"
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Cloud Plans"
+                                    color: isCloudView ? "white" : "#666666"
+                                    font.bold: isCloudView
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        isCloudView = true
+                                        fetchCloudFiles()
+                                    }
+                                }
                             }
                         }
 
+                        // Scrollable list content
+                        ScrollView {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            clip: true
+                            contentWidth: width
 
+                            Column {
+                                width: parent.width
+                                spacing: 8
+                                padding: 4
+
+                                // Local View
+                                Column {
+                                    width: parent.width
+                                    visible: !isCloudView
+                                    spacing: 8
+
+                                    QGCLabel {
+                                        text: qsTr("Path: %1").arg(_mobileShortPath)
+                                        font.pointSize: 10
+                                        color: "#888888"
+                                    }
+
+                                    Repeater {
+                                        model: fileList
+                                        FileButton {
+                                            width: parent ? parent.width : 0
+                                            text: modelData
+                                            onClicked: {
+                                                mainWindow.openHomeScreen()
+                                                mainWindow.showFlyView()
+                                                mainWindow.showPlanView()
+                                                _appSettings.username = modelData.split(".")[0]
+                                                MapGlobals.comefrom = "Plan"
+                                                _appSettings.screen = "Plan"
+                                                swapCamera()
+                                                mainWindow.fileload(folder + "/" + modelData)
+                                            }
+                                            onHamburgerClicked: {
+                                                highlight = true
+                                                fileHamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
+                                                fileHamburgerMenu.popup()
+                                            }
+                                            QGCMenu {
+                                                id: fileHamburgerMenu
+                                                property string fileToDelete
+                                                onAboutToHide: parent.highlight = false
+                                                QGCMenuItem {
+                                                    text: qsTr("Delete")
+                                                    onTriggered: {
+                                                        controller.deleteFile(fileHamburgerMenu.fileToDelete)
+                                                        refreshFiles()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    QGCLabel {
+                                        text: qsTr("No local files found")
+                                        visible: fileList.length === 0
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+
+                                // Cloud View
+                                Column {
+                                    width: parent.width
+                                    visible: isCloudView
+                                    spacing: 8
+
+                                    QGCLabel {
+                                        text: qsTr("Cloud-synced plans associated with %1").arg(userEmail)
+                                        font.pointSize: 10
+                                        color: "#888888"
+                                    }
+
+                                    BusyIndicator {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        visible: cloudPlansLoading
+                                    }
+
+                                    Repeater {
+                                        model: cloudPlansModel
+                                        FileButton {
+                                            width: parent ? parent.width : 0
+                                            text: model.plan_name + " (Cloud)"
+                                            onClicked: {
+                                                mainWindow.showMessageDialog(qsTr("Download Plan"),
+                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                    Dialog.Yes | Dialog.Cancel,
+                                                    function() {
+                                                        mainWindow.openHomeScreen()
+                                                        mainWindow.showFlyView()
+                                                        mainWindow.showPlanView()
+                                                        // Load the plan data directly into the controller
+                                                        _planMasterController.loadFromJson(model.plan_data)
+                                                        mainWindow.showToastMessage("Cloud plan loaded")
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+                                    QGCLabel {
+                                        text: qsTr("No cloud plans found")
+                                        visible: !cloudPlansLoading && cloudPlansModel.count === 0
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

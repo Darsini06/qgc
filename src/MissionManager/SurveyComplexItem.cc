@@ -11,6 +11,7 @@
 #include "SurveyComplexItem.h"
 #include "JsonHelper.h"
 #include "QGCGeo.h"
+#include "QGCMapPolygon.h"
 #include "QGCQGeoCoordinate.h"
 #include "SettingsManager.h"
 #include "AppSettings.h"
@@ -24,7 +25,10 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QLineF>
 #include <algorithm>
+#include "QGC.h"
 #include "QGCFencePolygon.h"
+#include "QGCFenceCircle.h"
+#include "GeoFenceController.h"
 
 QGC_LOGGING_CATEGORY(SurveyComplexItemLog, "SurveyComplexItemLog")
 
@@ -67,6 +71,34 @@ SurveyComplexItem::SurveyComplexItem(PlanMasterController* masterController, boo
         _surveyAreaPolygon.loadKMLOrSHPFile(kmlOrShpFile);
         _surveyAreaPolygon.setDirty(false);
     }
+
+    // Sync initial indentation values
+    _entryIndentation = _turnAroundDistance();
+    _exitIndentation = _turnAroundDistance();
+
+    connect(&_turnAroundDistanceFact, &Fact::valueChanged, this, [this](QVariant value){
+        double dist = value.toDouble();
+        if (_adjustmentMode == 0) {
+            _entryIndentation = dist;
+            _exitIndentation = dist;
+            emit entryIndentationChanged(dist);
+            emit exitIndentationChanged(dist);
+        } else if (_adjustmentMode == 1) {
+            _entryIndentation = dist;
+            emit entryIndentationChanged(dist);
+        } else if (_adjustmentMode == 2) {
+            _exitIndentation = dist;
+            emit exitIndentationChanged(dist);
+        }
+    });
+
+    if (_masterController && _masterController->geoFenceController()) {
+        GeoFenceController* fenceController = _masterController->geoFenceController();
+        connect(fenceController->polygons(), &QmlObjectListModel::countChanged, this, &SurveyComplexItem::_rebuildTransects);
+        connect(fenceController->circles(),  &QmlObjectListModel::countChanged, this, &SurveyComplexItem::_rebuildTransects);
+        connect(fenceController,             &GeoFenceController::dirtyChanged, this, &SurveyComplexItem::_rebuildTransects);
+    }
+
     setDirty(false);
 }
 
@@ -102,6 +134,10 @@ void SurveyComplexItem::_saveCommon(QJsonObject& saveObject)
     _surveyAreaPolygon.saveToJson(saveObject);
 }
 
+void SurveyComplexItem::setEntryIndentation(double val) { if (!QGC::fuzzyCompare(_entryIndentation, val)) { _entryIndentation = val; emit entryIndentationChanged(val); _rebuildTransects(); } }
+void SurveyComplexItem::setExitIndentation(double val) { if (!QGC::fuzzyCompare(_exitIndentation, val)) { _exitIndentation = val; emit exitIndentationChanged(val); _rebuildTransects(); } }
+void SurveyComplexItem::setAdjustmentMode(int mode) { if (_adjustmentMode != mode) { _adjustmentMode = mode; emit adjustmentModeChanged(mode); if (mode == 1) _turnAroundDistanceFact.setRawValue(_entryIndentation); else if (mode == 2) _turnAroundDistanceFact.setRawValue(_exitIndentation); } }
+
 void SurveyComplexItem::loadPreset(const QString& name)
 {
     QString errorString;
@@ -111,6 +147,23 @@ void SurveyComplexItem::loadPreset(const QString& name)
         qgcApp()->showAppMessage(QStringLiteral("Internal Error: Preset load failed. Name: %1 Error: %2").arg(name).arg(errorString));
     }
     _rebuildTransects();
+}
+
+void SurveyComplexItem::setMapPolygon(QGCMapPolygon* mapPolygon)
+{
+    qCDebug(SurveyComplexItemLog) << "setMapPolygon" << mapPolygon;
+    if (_mapPolygon != mapPolygon) {
+        if (_mapPolygon) {
+            disconnect(_mapPolygon, &QGCMapPolygon::pathChanged, this, &SurveyComplexItem::_rebuildTransects);
+        }
+        _mapPolygon = mapPolygon;
+        if (_mapPolygon) {
+            connect(_mapPolygon, &QGCMapPolygon::pathChanged,   this, &SurveyComplexItem::_rebuildTransects);
+            connect(_mapPolygon, &QGCMapPolygon::centerChanged, this, &SurveyComplexItem::_rebuildTransects);
+        }
+        emit mapPolygonChanged();
+        _rebuildTransects();
+    }
 }
 
 bool SurveyComplexItem::load(const QJsonObject& complexObject, int sequenceNumber, QString& errorString)
@@ -573,13 +626,13 @@ void SurveyComplexItem::_intersectLinesWithPolygon(const QList<QLineF>& lineList
             QPointF mid = (p1 + p2) / 2.0;
 
             // Segment is valid if midpoint is inside main polygon...
-            bool insideMain = polygon.containsPoint(mid, Qt::OddEvenFill);
+            bool insideMain = polygon.containsPoint(mid, Qt::WindingFill);
             if (!insideMain) continue;
 
             // ...and NOT inside any exclusion polygon
             bool insideExclusion = false;
             for (const QPolygonF& excl : exclusionPolygons) {
-                if (excl.containsPoint(mid, Qt::OddEvenFill)) {
+                if (excl.containsPoint(mid, Qt::WindingFill)) {
                     insideExclusion = true;
                     break;
                 }
@@ -743,10 +796,89 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         transectX += gridSpacing;
     }
 
+    // Now intersect the lines with the polygon and exclusions
+    QList<QPolygonF> exclusionPolygons;
+    if (_masterController && _masterController->geoFenceController()) {
+        GeoFenceController* fenceController = _masterController->geoFenceController();
+        // Polygons
+        for (int i=0; i<fenceController->polygons()->count(); i++) {
+            QGCFencePolygon* fencePolygon = fenceController->polygons()->value<QGCFencePolygon*>(i);
+            if (fencePolygon && !fencePolygon->inclusion()) {
+                QPolygonF exclusionPolygon;
+                for (int j=0; j<fencePolygon->count(); j++) {
+                    double north, east, down;
+                    QGCGeo::convertGeoToNed(fencePolygon->vertexCoordinate(j), tangentOrigin, north, east, down);
+                    exclusionPolygon << QPointF(east, north);
+                }
+                if (exclusionPolygon.count() > 0) {
+                    exclusionPolygon << exclusionPolygon.front(); // Close it
+                    exclusionPolygons.append(exclusionPolygon);
+                }
+            }
+        }
+        // Circles 
+        for (int i=0; i<fenceController->circles()->count(); i++) {
+            QGCFenceCircle* fenceCircle = fenceController->circles()->value<QGCFenceCircle*>(i);
+            if (fenceCircle && !fenceCircle->inclusion()) {
+                QPolygonF exclusionPolygon;
+                QGeoCoordinate center = fenceCircle->center();
+                double radius = fenceCircle->radius()->rawValue().toDouble();
+                for (int j=0; j<36; j++) {
+                    double angle = (360.0 / 36.0) * j;
+                    QGeoCoordinate vertex = center.atDistanceAndAzimuth(radius, angle);
+                    double north, east, down;
+                    QGCGeo::convertGeoToNed(vertex, tangentOrigin, north, east, down);
+                    exclusionPolygon << QPointF(east, north);
+                }
+                if (exclusionPolygon.count() > 0) {
+                    exclusionPolygon << exclusionPolygon.front(); // Close it
+                    exclusionPolygons.append(exclusionPolygon);
+                }
+            }
+        }
+    }
+
+    if (_mapPolygon && _mapPolygon->count() >= 3) {
+        QPolygonF exclusionPolygon;
+        qCDebug(SurveyComplexItemLog) << "Processing _mapPolygon exclusion. Vertices:" << _mapPolygon->count();
+        for (int i=0; i<_mapPolygon->count(); i++) {
+            double north, east, down;
+            QGeoCoordinate coord = _mapPolygon->vertexCoordinate(i);
+            QGCGeo::convertGeoToNed(coord, tangentOrigin, north, east, down);
+            exclusionPolygon << QPointF(east, north);
+            qCDebug(SurveyComplexItemLog) << "  Vertex" << i << coord << "-> NED:" << east << north;
+        }
+        if (exclusionPolygon.count() > 0) {
+            exclusionPolygon << exclusionPolygon.front(); // Close it
+            
+            // Verify winding for WindingFill consistency
+            double sum = 0;
+            for (int i=0; i<exclusionPolygon.count()-1; i++) {
+                sum += (exclusionPolygon[i+1].x() - exclusionPolygon[i].x()) * (exclusionPolygon[i+1].y() + exclusionPolygon[i].y());
+            }
+            if (sum < 0) {
+                // Reverse for clockwise
+                QPolygonF reversed;
+                for (int i=exclusionPolygon.count()-1; i>=0; i--) reversed << exclusionPolygon[i];
+                exclusionPolygon = reversed;
+            }
+
+            exclusionPolygons.append(exclusionPolygon);
+        }
+    }
+
     // Now intersect the lines with the polygon
     QList<QLineF> intersectLines;
+    qCDebug(SurveyComplexItemLog) << "Rebuilding transects. Main polygon vertices:" << polygon.count() << "Exclusion polygons:" << exclusionPolygons.count();
+    for (int i=0; i<exclusionPolygons.count(); i++) {
+        qCDebug(SurveyComplexItemLog) << "Exclusion Polygon" << i << "vertices:" << exclusionPolygons[i].count();
+        if (exclusionPolygons[i].count() > 0) {
+             qCDebug(SurveyComplexItemLog) << "First vertex:" << exclusionPolygons[i].front();
+        }
+    }
+
 #if 1
-    _intersectLinesWithPolygon(lineList, polygon, QList<QPolygonF>(), intersectLines);
+    _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons, intersectLines);
 #else
     // This is handy for debugging grid problems, not for release
     intersectLines = lineList;
@@ -764,7 +896,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         lineList.clear();
         lineList.append(firstLine);
         intersectLines = lineList;
-        _intersectLinesWithPolygon(lineList, polygon, QList<QPolygonF>(), intersectLines);
+        _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons, intersectLines);
     }
 
     // Make sure all lines are going the same direction. Polygon intersection leads to lines which
@@ -834,13 +966,16 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
         // Handle Entry/Exit points (with optional indentation)
         QGeoCoordinate entryCoord = transect[0];
         QGeoCoordinate exitCoord  = transect[1];
-        double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+        double entryDist = _entryIndentation;
+        double exitDist  = _exitIndentation;
 
-        if (turnAroundDistance < 0) {
+        if (entryDist < 0) {
             double azimuth = transect[0].azimuthTo(transect[1]);
-            entryCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
-            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
-            exitCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            entryCoord = transect[0].atDistanceAndAzimuth(-entryDist, azimuth);
+        }
+        if (exitDist < 0) {
+            double azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            exitCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
         }
 
         coordInfo = { entryCoord, CoordTypeSurveyEntry };
@@ -862,19 +997,21 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly)
             }
         }
 
-        // Extend the transect ends for turnaround
-        if (turnAroundDistance > 0) {
+        // Extend the transect ends for turnaround (only if positive)
+        if (entryDist > 0) {
             QGeoCoordinate turnaroundCoord;
             double azimuth = transect[0].azimuthTo(transect[1]);
-            turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            turnaroundCoord = transect[0].atDistanceAndAzimuth(-entryDist, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
             TransectStyleComplexItem::CoordInfo_t coordInfo = { turnaroundCoord, CoordTypeTurnaround };
             coordInfoTransect.prepend(coordInfo);
-
-            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
-            turnaroundCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+        }
+        if (exitDist > 0) {
+            QGeoCoordinate turnaroundCoord;
+            double azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            turnaroundCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
-            coordInfo = { turnaroundCoord, CoordTypeTurnaround };
+            TransectStyleComplexItem::CoordInfo_t coordInfo = { turnaroundCoord, CoordTypeTurnaround };
             coordInfoTransect.append(coordInfo);
         }
 
@@ -1158,9 +1295,29 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
             if (fencePolygon && !fencePolygon->inclusion()) {
                 QPolygonF exclusionPolygon;
                 for (int j=0; j<fencePolygon->count(); j++) {
-                    double x, y, z;
-                    QGCGeo::convertGeoToNed(fencePolygon->vertexCoordinate(j), tangentOrigin, x, y, z);
-                    exclusionPolygon << QPointF(x, y);
+                    double north, east, down;
+                    QGCGeo::convertGeoToNed(fencePolygon->vertexCoordinate(j), tangentOrigin, north, east, down);
+                    exclusionPolygon << QPointF(east, north);
+                }
+                if (exclusionPolygon.count() > 0) {
+                    exclusionPolygon << exclusionPolygon.front(); // Close it
+                    exclusionPolygons.append(exclusionPolygon);
+                }
+            }
+        }
+        // Circles 
+        for (int i=0; i<fenceController->circles()->count(); i++) {
+            QGCFenceCircle* fenceCircle = fenceController->circles()->value<QGCFenceCircle*>(i);
+            if (fenceCircle && !fenceCircle->inclusion()) {
+                QPolygonF exclusionPolygon;
+                QGeoCoordinate center = fenceCircle->center();
+                double radius = fenceCircle->radius()->rawValue().toDouble();
+                for (int j=0; j<36; j++) {
+                    double angle = (360.0 / 36.0) * j;
+                    QGeoCoordinate vertex = center.atDistanceAndAzimuth(radius, angle);
+                    double north, east, down;
+                    QGCGeo::convertGeoToNed(vertex, tangentOrigin, north, east, down);
+                    exclusionPolygon << QPointF(east, north);
                 }
                 if (exclusionPolygon.count() > 0) {
                     exclusionPolygon << exclusionPolygon.front(); // Close it
@@ -1270,13 +1427,16 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
         // Handle Entry/Exit points (with optional indentation)
         QGeoCoordinate entryCoord = transect[0];
         QGeoCoordinate exitCoord  = transect[1];
-        double turnAroundDistance = _turnAroundDistanceFact.rawValue().toDouble();
+        double entryDist = _entryIndentation;
+        double exitDist  = _exitIndentation;
 
-        if (turnAroundDistance < 0) {
+        if (entryDist < 0) {
             double azimuth = transect[0].azimuthTo(transect[1]);
-            entryCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
-            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
-            exitCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            entryCoord = transect[0].atDistanceAndAzimuth(-entryDist, azimuth);
+        }
+        if (exitDist < 0) {
+            double azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            exitCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
         }
 
         coordInfo = { entryCoord, CoordTypeSurveyEntry };
@@ -1298,19 +1458,21 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(bool refly, const QPolygonF
             }
         }
 
-        // Extend the transect ends for turnaround
-        if (turnAroundDistance > 0) {
+        // Extend the transect ends for turnaround (only if positive)
+        if (entryDist > 0) {
             QGeoCoordinate turnaroundCoord;
             double azimuth = transect[0].azimuthTo(transect[1]);
-            turnaroundCoord = transect[0].atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+            turnaroundCoord = transect[0].atDistanceAndAzimuth(-entryDist, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
             TransectStyleComplexItem::CoordInfo_t coordInfo = { turnaroundCoord, CoordTypeTurnaround };
             coordInfoTransect.prepend(coordInfo);
-
-            azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
-            turnaroundCoord = transect.last().atDistanceAndAzimuth(-turnAroundDistance, azimuth);
+        }
+        if (exitDist > 0) {
+            QGeoCoordinate turnaroundCoord;
+            double azimuth = transect.last().azimuthTo(transect[transect.count() - 2]);
+            turnaroundCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
             turnaroundCoord.setAltitude(qQNaN());
-            coordInfo = { turnaroundCoord, CoordTypeTurnaround };
+            TransectStyleComplexItem::CoordInfo_t coordInfo = { turnaroundCoord, CoordTypeTurnaround };
             coordInfoTransect.append(coordInfo);
         }
 

@@ -116,11 +116,38 @@ QtObject {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200 || xhr.status === 201) {
-                    console.log("Session saved successfully:", xhr.responseText);
+                    console.log("Session saved to cloud successfully:", xhr.responseText);
+                    
+                    // Also save to local DB
+                    var db = getDatabase();
+                    db.transaction(function(tx) {
+                        try {
+                            tx.executeSql(
+                                "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
+                                [date, startTime, endTime, duration]
+                            );
+                            console.log("Session saved to local DB successfully");
+                        } catch (e) {
+                            console.error("Error saving session to local DB:", e);
+                        }
+                    });
+
                     sessionSaved = true;
                     newSessionAdded();
                 } else {
-                    console.error("Error saving session:", xhr.responseText);
+                    console.error("Error saving session to cloud:", xhr.responseText);
+                    // Still save to local DB even if cloud fails? 
+                    // Let's do it to ensure local visibility.
+                    var db = getDatabase();
+                    db.transaction(function(tx) {
+                        try {
+                            tx.executeSql(
+                                "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
+                                [date, startTime, endTime, duration]
+                            );
+                            newSessionAdded();
+                        } catch (e) {}
+                    });
                 }
             }
         }
@@ -799,6 +826,10 @@ QtObject {
                         login = "login";
 
                         if (callback) callback(true);
+                        
+                        // After successful login, sync sessions
+                        fetchCloudSessions(user.email);
+
                     } catch (e) {
                         console.error("Error parsing login response:", e);
                         if (rootWindow) rootWindow.showToastMessage("Error processing login response");
@@ -895,6 +926,12 @@ QtObject {
             QGroundControl.saveBoolGlobalSetting("login", true)
             modeBtn1.visible = false
 
+            // Sync sessions on startup if logged in
+            var userEmail = QGroundControl.loadGlobalSetting("email", "");
+            if (userEmail !== "") {
+                fetchCloudSessions(userEmail);
+            }
+
         } else {
             console.log("profile method MapGLobals inside the Else")
             //loginLoader.visible = true;
@@ -965,4 +1002,107 @@ QtObject {
     }
 
 
+    // Cloud Plan Synchronization
+    function savePlanToCloud(planName, planContent, callback) {
+        var email = QGroundControl.loadGlobalSetting("email", "");
+        var username = QGroundControl.loadGlobalSetting("username", "Guest");
+        
+        if (email === "") {
+            console.error("Cannot save to cloud: User not logged in");
+            if (callback) callback(false);
+            return;
+        }
+
+        console.log("MapGlobals.savePlanToCloud() - Plan:", planName);
+
+        var data = {
+            "username": username,
+            "email": email,
+            "plan_name": planName,
+            "plan_data": planContent
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/plans");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    console.log("Plan synced to cloud successfully");
+                    if (callback) callback(true);
+                } else {
+                    console.error("Failed to sync plan to cloud:", xhr.responseText);
+                    if (callback) callback(false);
+                }
+            }
+        }
+        xhr.send(JSON.stringify(data));
+    }
+
+    function fetchCloudPlans(email, callback) {
+        if (email === "") {
+            console.error("Cannot fetch from cloud: No email provided");
+            if (callback) callback([]);
+            return;
+        }
+
+        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", email);
+
+        var xhr = new XMLHttpRequest();
+        // Assuming GET endpoint with email query param
+        xhr.open("GET", backendUrl + "/plans?email=" + encodeURIComponent(email));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        var plans = response.plans || [];
+                        console.log("Found", plans.length, "plans in cloud");
+                        if (callback) callback(plans);
+                    } catch (e) {
+                        console.error("Error parsing cloud plans response:", e);
+                        if (callback) callback([]);
+                    }
+                } else {
+                    console.error("Failed to fetch cloud plans:", xhr.responseText);
+                    if (callback) callback([]);
+                }
+            }
+        }
+        xhr.send();
+    }
+    function fetchCloudSessions(email) {
+        console.log("MapGlobals.fetchCloudSessions() for:", email);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", backendUrl + "/sessions?email=" + encodeURIComponent(email));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    try {
+                        var sessions = JSON.parse(xhr.responseText);
+                        console.log("Fetched", sessions.length, "sessions from cloud");
+                        
+                        var db = getDatabase();
+                        db.transaction(function(tx) {
+                            for (var i = 0; i < sessions.length; i++) {
+                                var s = sessions[i];
+                                // Check if session already exists by date/time to avoid duplicates
+                                tx.executeSql(
+                                    "INSERT INTO drone_sessions (date, start_time, end_time, duration) " +
+                                    "SELECT ?, ?, ?, ? WHERE NOT EXISTS (" +
+                                    "SELECT 1 FROM drone_sessions WHERE date = ? AND start_time = ? AND end_time = ?" +
+                                    ")",
+                                    [s.date, s.start_time, s.end_time, s.duration, s.date, s.start_time, s.end_time]
+                                );
+                            }
+                        });
+                        newSessionAdded(); // Refresh UI
+                    } catch (e) {
+                        console.error("Error parsing cloud sessions:", e);
+                    }
+                }
+            }
+        }
+        xhr.send();
+    }
 }

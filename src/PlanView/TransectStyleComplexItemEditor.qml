@@ -57,6 +57,13 @@ Rectangle {
         MapGlobals.acres = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
     }
 
+    Binding {
+        target:     missionItem
+        property:   "mapPolygon"
+        value:      mapPolygonvisuals.mapPolygon
+        when:       missionItem && missionItem.mapPolygon !== undefined
+    }
+
     function polygonCaptureStarted() {
         _missionItem.clearPolygon()
     }

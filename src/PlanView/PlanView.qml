@@ -99,6 +99,12 @@ Item {
     property real iconSize: baseSize * 0.8   // icon inside the circle
     property var _currentVIIndex: _missionController.currentPlanViewVIIndex
     property var _currentItem:   (_currentVIIndex >= 0 && _currentVIIndex < _missionController.visualItems.count) ? _missionController.visualItems.get(_currentVIIndex) : null
+
+    on_CurrentItemChanged: {
+        if (_currentItem && _currentItem.mapPolygon !== undefined) {
+             _currentItem.mapPolygon = mapPolygonvisuals.mapPolygon
+        }
+    }
     property var activePolygon:  (_currentItem && _currentItem.surveyAreaPolygon) ? _currentItem.surveyAreaPolygon : mapPolygonvisuals.mapPolygon
 
     property bool gridLines : MapGlobals.gridLines
@@ -211,6 +217,18 @@ Item {
 
     // Left Top Back Arrow Navigation explicitly removed as requested by user
 
+    function syncCloud() {
+        if (QGroundControl.loadBoolGlobalSetting("login", false)) {
+            var planName = _planMasterController.currentPlanFile ? _planMasterController.currentPlanFile.split('/').pop().split('\\').pop() : "Untitled.plan"
+            var planContent = JSON.parse(_planMasterController.saveToText())
+            MapGlobals.savePlanToCloud(planName, planContent, function(success) {
+                if (success) {
+                    mainWindow.showToastMessage("Plan synced to cloud");
+                }
+            })
+        }
+    }
+
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -271,8 +289,11 @@ Item {
                 onClicked: {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
+                        syncCloud()
                     } else {
                         _planMasterController.saveToSelectedFile1()
+                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
+                        // but for now let's just add it to the fileDialog accepted handler too.
                     }
                 }
             }
@@ -625,6 +646,7 @@ Item {
                                        _planMasterController.saveToFile(file)
                                        mainWindow.showMapping()
                                    }
+                                   syncCloud()
                                } else {
                                    _planMasterController.saveToKml(file)
                                }
