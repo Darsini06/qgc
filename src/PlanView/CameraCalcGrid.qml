@@ -72,9 +72,9 @@ Column {
                     hoverEnabled: true
                     enabled:      parent.parent.enabled
                     onClicked: {
-                        if (parent.parent.parent.fact) {
-                            var step = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 1
-                            parent.parent.parent.fact.value -= step
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1
+                            parent.parent.fact.value -= step
                         }
                     }
                 }
@@ -159,9 +159,9 @@ Column {
                     hoverEnabled: true
                     enabled:      parent.parent.enabled
                     onClicked: {
-                        if (parent.parent.parent.fact) {
-                            var step = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 1
-                            parent.parent.parent.fact.value += step
+                        if (parent.parent.fact) {
+                            var step = parent.parent.fact.increment ? parent.parent.fact.increment : 1
+                            parent.parent.fact.value += step
                         }
                     }
                 }
