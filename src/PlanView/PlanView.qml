@@ -362,7 +362,8 @@ Item {
                     Layout.fillWidth:   true
                     height:             dp(8)
                     radius:             12
-                    color:              keepMA.pressed ? Qt.darker("#471880", 1.2) : (keepMA.containsMouse ? Qt.lighter("#471880", 1.1) : "#471880")
+                    color:              keepMA.pressed ? Qt.darker("#000000", 1.2) : (keepMA.containsMouse ? Qt.lighter("#000000", 1.1) : "#000000")
+                    border.color: "#000000"
 
                     Text {
                         anchors.centerIn: parent
@@ -1229,9 +1230,9 @@ Item {
                     id:         layerTabBar1
                     width:      parent.width
                     height:     42
-                    color:      "#2d1c42"  // Dark purple background
+                    color:      "#000000"  // Black background
                     radius:     21
-                    border.color: "#4a2c6d"
+                    border.color: "#3e3e4a"
                     border.width: 1
                     visible:    false //QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
@@ -1252,7 +1253,7 @@ Item {
 
                             GradientStop { position: 0.0; color: "#6a4c8d" }
 
-                            GradientStop { position: 1.0; color: "#4a2c6d" }
+                            GradientStop { position: 1.0; color: "#000000" }
                         }
                         radius: height / 2
                         border.color: "#8a6cad"

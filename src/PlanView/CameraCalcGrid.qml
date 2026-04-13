@@ -33,7 +33,7 @@ Column {
     readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#301934"
+    readonly property color _colorAccent:        "#000000"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"
 
@@ -52,7 +52,7 @@ Column {
             Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
-                radius:       15
+                radius:       4
                 color:        minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
                 border.color: minusArea.containsMouse ? _colorAccent : _colorBorder
                 border.width: 1
@@ -80,58 +80,24 @@ Column {
                 }
             }
 
-            // Slider
-            Slider {
-                id: factSlider
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                enabled: parent.enabled
-
-                from: {
-                    if (!parent.fact) return 0
-                    if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0
-                    return parent.fact.min
-                }
-                to: {
-                    if (!parent.fact) return 100
-                    if (isNaN(parent.fact.max) || parent.fact.max > 10000) return (from + 500)
-                    return parent.fact.max
-                }
-                value:    parent.fact ? parent.fact.value : 0
-                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 1) : 1
-
+            // Value box (no placeholder text)
+            FactTextField {
+                id: factField
+                Layout.fillWidth:       true
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.alignment:       Qt.AlignVCenter
+                fact:                   parent.fact
+                showUnits:              true
+                enabled:                parent.enabled
+                color:                  _colorTextPrimary
+                placeholderText:        ""
+                horizontalAlignment:    Qt.AlignHCenter
                 background: Rectangle {
-                    x: factSlider.leftPadding
-                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 100; implicitHeight: 6
-                    width: factSlider.availableWidth; height: implicitHeight
-                    radius: 3
-                    color: _colorBgTertiary
-                    opacity: factSlider.enabled ? 1.0 : 0.4
-
-                    Rectangle {
-                        width:  factSlider.visualPosition * parent.width
-                        height: parent.height
-                        color:  _colorAccent
-                        radius: 3
-                    }
-                }
-
-                handle: Rectangle {
-                    x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
-                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 18; implicitHeight: 18
-                    radius: 9
-                    color:  _colorTextPrimary
-                    opacity: factSlider.enabled ? 1.0 : 0.4
-                    border.color: _colorAccent
-                    border.width: factSlider.pressed ? 4 : 2
-
-                    Behavior on border.width { NumberAnimation { duration: 150 } }
-                }
-
-                onMoved: {
-                    if (parent.fact) parent.fact.value = value
+                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
+                    border.width: factField.activeFocus ? 2 : 1
+                    radius:       4
+                    opacity:      factField.enabled ? 1.0 : 0.4
                 }
             }
 
@@ -139,7 +105,7 @@ Column {
             Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
-                radius:       15
+                radius:       4
                 color:        plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
                 border.color: plusArea.containsMouse ? _colorAccent : _colorBorder
                 border.width: 1
@@ -164,27 +130,6 @@ Column {
                             parent.parent.fact.value += step
                         }
                     }
-                }
-            }
-
-            // Value box (no placeholder text)
-            FactTextField {
-                id: factField
-                Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 7
-                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                Layout.alignment:       Qt.AlignVCenter
-                fact:                   parent.fact
-                showUnits:              true
-                enabled:                parent.enabled
-                color:                  _colorTextPrimary
-                placeholderText:        ""
-                horizontalAlignment:    Qt.AlignHCenter
-                background: Rectangle {
-                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
-                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
-                    border.width: factField.activeFocus ? 2 : 1
-                    radius:       15
-                    opacity:      factField.enabled ? 1.0 : 0.4
                 }
             }
         }
@@ -232,7 +177,7 @@ Column {
                     color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
                     border.color: parent.activeFocus ? _colorAccent : _colorBorder
                     border.width: parent.activeFocus ? 2 : 1
-                    radius: 15
+                    radius:       4
                 }
             }
             FactTextField {
@@ -244,7 +189,7 @@ Column {
                     color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
                     border.color: parent.activeFocus ? _colorAccent : _colorBorder
                     border.width: parent.activeFocus ? 2 : 1
-                    radius: 15
+                    radius:       4
                 }
             }
         }
@@ -282,7 +227,7 @@ Column {
                     color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
                     border.color: parent.activeFocus ? _colorAccent : _colorBorder
                     border.width: parent.activeFocus ? 2 : 1
-                    radius: 15
+                    radius:       4
                     opacity: parent.enabled ? 1.0 : 0.4
                 }
             }
@@ -305,7 +250,7 @@ Column {
                     color:        parent.activeFocus ? _colorBgTertiary : _colorBgSecondary
                     border.color: parent.activeFocus ? _colorAccent : _colorBorder
                     border.width: parent.activeFocus ? 2 : 1
-                    radius: 15
+                    radius:       4
                     opacity: parent.enabled ? 1.0 : 0.4
                 }
             }

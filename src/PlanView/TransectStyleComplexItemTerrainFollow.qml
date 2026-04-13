@@ -18,7 +18,7 @@ ColumnLayout {
     readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#301934"
+    readonly property color _colorAccent:        "#000000"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"
 
@@ -35,7 +35,7 @@ ColumnLayout {
             Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
-                radius:       15
+                radius:       4
                 color:        _mA.pressed ? _colorAccent : (_mA.containsMouse ? _colorBgTertiary : _colorBgSecondary)
                 border.color: _mA.containsMouse ? _colorAccent : _colorBorder
                 border.width: 1
@@ -45,58 +45,14 @@ ColumnLayout {
 
                 MouseArea {
                     id: _mA; anchors.fill: parent; hoverEnabled: true; enabled: parent.parent.enabled
-                    onClicked: { if (parent.parent.parent.fact) { var s = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 0.1; parent.parent.parent.fact.value -= s } }
-                }
-            }
-
-            // Slider
-            Slider {
-                id: _sl; Layout.fillWidth: true; Layout.alignment: Qt.AlignVCenter; enabled: parent.enabled
-
-                from: { if (!parent.fact) return 0; if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0; return parent.fact.min }
-                to:   { if (!parent.fact) return 100; if (isNaN(parent.fact.max) || parent.fact.max > 10000) return (from + 50); return parent.fact.max }
-                value: parent.fact ? parent.fact.value : 0
-                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 0.1) : 0.1
-
-                background: Rectangle {
-                    x: _sl.leftPadding; y: _sl.topPadding + _sl.availableHeight / 2 - height / 2
-                    implicitWidth: 100; implicitHeight: 6; width: _sl.availableWidth; height: implicitHeight; radius: 3
-                    color: _colorBgTertiary; opacity: _sl.enabled ? 1 : 0.4
-                    Rectangle { width: _sl.visualPosition * parent.width; height: parent.height; color: _colorAccent; radius: 3 }
-                }
-                handle: Rectangle {
-                    x: _sl.leftPadding + _sl.visualPosition * (_sl.availableWidth - width)
-                    y: _sl.topPadding + _sl.availableHeight / 2 - height / 2
-                    implicitWidth: 18; implicitHeight: 18; radius: 9
-                    color: _colorTextPrimary; opacity: _sl.enabled ? 1 : 0.4
-                    border.color: _colorAccent; border.width: _sl.pressed ? 4 : 2
-                    Behavior on border.width { NumberAnimation { duration: 150 } }
-                }
-                onMoved: { if (parent.fact) parent.fact.value = value }
-            }
-
-            // + button
-            Rectangle {
-                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                Layout.preferredWidth:  Layout.preferredHeight
-                radius:       15
-                color:        _pA.pressed ? _colorAccent : (_pA.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                border.color: _pA.containsMouse ? _colorAccent : _colorBorder
-                border.width: 1
-                opacity:      parent.enabled ? 1.0 : 0.4
-
-                Text { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-
-                MouseArea {
-                    id: _pA; anchors.fill: parent; hoverEnabled: true; enabled: parent.parent.enabled
-                    onClicked: { if (parent.parent.parent.fact) { var s = parent.parent.parent.fact.increment ? parent.parent.parent.fact.increment : 0.1; parent.parent.parent.fact.value += s } }
+                    onClicked: { if (parent.parent.fact) { var s = parent.parent.fact.increment ? parent.parent.fact.increment : 0.1; parent.parent.fact.value -= s } }
                 }
             }
 
             // Value box
             FactTextField {
                 id: _ftf
-                Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 7
+                Layout.fillWidth:       true
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.alignment:       Qt.AlignVCenter
                 fact:                   parent.fact
@@ -109,8 +65,26 @@ ColumnLayout {
                     color:        _ftf.activeFocus ? _colorBgTertiary : _colorBgSecondary
                     border.color: _ftf.activeFocus ? _colorAccent : _colorBorder
                     border.width: _ftf.activeFocus ? 2 : 1
-                    radius:       15
+                    radius:       4
                     opacity:      _ftf.enabled ? 1 : 0.4
+                }
+            }
+
+            // + button
+            Rectangle {
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.preferredWidth:  Layout.preferredHeight
+                radius:       4
+                color:        _pA.pressed ? _colorAccent : (_pA.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                border.color: _pA.containsMouse ? _colorAccent : _colorBorder
+                border.width: 1
+                opacity:      parent.enabled ? 1.0 : 0.4
+
+                Text { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+
+                MouseArea {
+                    id: _pA; anchors.fill: parent; hoverEnabled: true; enabled: parent.parent.enabled
+                    onClicked: { if (parent.parent.fact) { var s = parent.parent.fact.increment ? parent.parent.fact.increment : 0.1; parent.parent.fact.value += s } }
                 }
             }
         }

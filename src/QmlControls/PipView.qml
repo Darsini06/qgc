@@ -269,7 +269,7 @@ Item {
 
     Image {
         id:             hidePIP
-        source:         "/qmlimages/pipHide.svg"
+        source:         "/qmlimages/MapType.svg"
         mipmap:         true
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
@@ -298,7 +298,7 @@ Item {
             width:              parent.width  * 0.75
             height:             parent.height * 0.75
             sourceSize.height:  height
-            source:             "/res/buttonRight.svg"
+            source:             "/qmlimages/MapType.svg"
             mipmap:             true
             fillMode:           Image.PreserveAspectFit
             anchors.verticalCenter:     parent.verticalCenter

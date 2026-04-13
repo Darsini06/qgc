@@ -16,8 +16,8 @@ Item {
 
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"
-    readonly property color _colorAccent:        "#471880"
-    readonly property color _colorBgTertiary:    "#32323b"
+    readonly property color _colorAccent:        "#000000"
+    readonly property color _colorBgTertiary:    "#1a1a1a"
 
     property string _application: QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
@@ -26,38 +26,45 @@ Item {
         anchors.fill:   parent
         spacing:        ScreenTools.defaultFontPixelHeight * 0.75
 
-        // --- TOP ROW: Area and Photo Count ---
+        // --- Area Card: Full Width at Top ---
+        Rectangle {
+            Layout.fillWidth: true
+            height:           72
+            radius:           12
+            color:            _colorBgTertiary
+            border.color:     Qt.rgba(255,255,255,0.05)
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: 2
+                QGCLabel {
+                    text: _application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
+                    font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                    font.bold: true
+                    color: _colorTextSecondary
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                QGCLabel {
+                    text: missionItem.coveredArea.toLocaleString(Qt.locale(), "f", 1)
+                    font.pointSize: ScreenTools.largeFontPointSize
+                    font.bold: true
+                    color: _colorTextPrimary
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                QGCLabel {
+                    text: "m²"
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold: true
+                    color: _colorTextSecondary
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+        }
+
+        // --- Middle Row: Photos and Interval ---
         RowLayout {
             Layout.fillWidth: true
             spacing:          ScreenTools.defaultFontPixelWidth
-
-            // Area Card
-            Rectangle {
-                Layout.fillWidth: true
-                height:           64
-                radius:           12
-                color:            _colorBgTertiary
-                border.color:     Qt.rgba(255,255,255,0.05)
-                
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 2
-                    QGCLabel {
-                        text: _application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
-                        font.pixelSize: ScreenTools.smallFontPointSize * 0.8
-                        font.bold: true
-                        color: _colorTextSecondary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    QGCLabel {
-                        text: QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(1) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                        color: _colorTextPrimary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
 
             // Photos Card
             Rectangle {
@@ -82,17 +89,11 @@ Item {
                         text: missionItem.cameraShots
                         font.pointSize: ScreenTools.mediumFontPointSize
                         font.bold: true
-                        color: _colorAccent
+                        color: _colorTextPrimary
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
             }
-        }
-
-        // --- BOTTOM ROW: Interval and Estimated Time ---
-        RowLayout {
-            Layout.fillWidth: true
-            spacing:          ScreenTools.defaultFontPixelWidth
 
             // Interval Card
             Rectangle {
@@ -122,32 +123,32 @@ Item {
                     }
                 }
             }
+        }
 
-            // Time Card
-            Rectangle {
-                Layout.fillWidth: true
-                height:           64
-                radius:           12
-                color:            _colorBgTertiary
-                border.color:     Qt.rgba(255,255,255,0.05)
-                
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 2
-                    QGCLabel {
-                        text: qsTr("EST. TIME")
-                        font.pixelSize: ScreenTools.smallFontPointSize * 0.8
-                        font.bold: true
-                        color: _colorTextSecondary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    QGCLabel {
-                        text: MapGlobals.time
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                        color: "#2ECC71" // Emerald Green for success/time
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+        // --- Bottom Row: Estimated Time (Full Width) ---
+        Rectangle {
+            Layout.fillWidth: true
+            height:           64
+            radius:           12
+            color:            _colorBgTertiary
+            border.color:     Qt.rgba(255,255,255,0.05)
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: 2
+                QGCLabel {
+                    text: qsTr("ESTIMATED FLIGHT TIME")
+                    font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                    font.bold: true
+                    color: _colorTextSecondary
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                QGCLabel {
+                    text: MapGlobals.time
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold: true
+                    color: "#2ECC71" // Emerald Green for success/time
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
         }

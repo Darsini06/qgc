@@ -62,7 +62,7 @@ ColumnLayout {
             
             background: Rectangle {
                 radius: 10
-                color: "#301934"
+                color: "#000000"
                 border.color: "#3d3a50"
                 border.width: 1
             }

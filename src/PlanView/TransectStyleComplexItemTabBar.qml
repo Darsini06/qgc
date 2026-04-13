@@ -22,9 +22,9 @@ Rectangle {
         height: tabBar.height - 8
         y: 4
         x: 4 + (tabBar.currentIndex * width)
-        color: "#471880"
+        color: "#000000"
         radius: 7
-        border.color: "#6d3da0"
+        border.color: "#1a1a1a"
         border.width: 1
 
         // Inner glow
