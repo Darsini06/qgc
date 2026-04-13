@@ -1,38 +1,31 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Layouts
-import QtQuick.LocalStorage 2.0
+import QtQuick.Dialogs
+import QtQuick.LocalStorage
 import QtQuick.Effects
-
-import QtWebView 1.1
+import QtWebView
 
 import Qt.labs.lottieqt 1.0
+import Qt.labs.settings 1.0
 
-import QGroundControl
-import QGroundControl.Controls
-import QGroundControl.Controllers
-import QGroundControl.FactControls
-import QGroundControl.ScreenTools
-import QGroundControl.Palette
-import MapGlobals 1.0
+import QGroundControl 1.0
+import QGroundControl.Controls 1.0
+import QGroundControl.Controllers 1.0
+import QGroundControl.FactControls 1.0
+import QGroundControl.FactSystem 1.0
+import QGroundControl.ScreenTools 1.0
+import QGroundControl.Palette 1.0
+import QGroundControl.FlightMap 1.0
+import QGroundControl.FlightDisplay 1.0
+import QGroundControl.ShapeFileHelper 1.0
+import QGroundControl.UTMSP 1.0
 
-//=============================
-import QGroundControl.FlightMap
-
+import MapGlobals
 import QtLocation
 import QtPositioning
 import QtQuick.Window
-import Qt.labs.settings 1.0
 
-import QGroundControl.FactSystem
-
-import QGroundControl.ShapeFileHelper
-import QGroundControl.FlightDisplay
-import QGroundControl.UTMSP
 //================================
 
 Item {

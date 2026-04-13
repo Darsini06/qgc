@@ -22,7 +22,7 @@ Rectangle {
     radius:             _radius
 
     property real   _panelRadius:   8
-    property real   _fieldRadius:   15
+    property real   _fieldRadius:   4
     property color  _panelColor:    "#282830"
     property color  _panelBorder:   "#3e3e4a"
     property color  _fieldColor:    "#32323b"
@@ -31,7 +31,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#471880"
+    property color  _colorAccent:   "#000000"
 
     property var    _masterControler:               masterController
     property var    _missionController:             _masterControler.missionController
@@ -74,22 +74,6 @@ Rectangle {
                     property bool showPlusButton: true
 
 
-                    FactTextField {
-                        id: factField
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                        fact: rootCol.fact
-                        showUnits: true
-                        color: _valueColor
-                        horizontalAlignment: Qt.AlignHCenter
-                        background: Rectangle {
-                            color: factField.activeFocus ? _fieldColor : _panelColor
-                            border.color: factField.activeFocus ? _colorAccent : _panelBorder
-                            border.width: factField.activeFocus ? 2 : 1
-                            radius: 15
-                        }
-                    }
-
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: ScreenTools.defaultFontPixelWidth * 0.7
@@ -98,7 +82,7 @@ Rectangle {
                             visible: rootCol.showMinusButton
                             Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                             Layout.preferredWidth: Layout.preferredHeight
-                            radius: 15
+                            radius: 4
                             color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _fieldColor : _panelColor)
                             border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
                             border.width: 1
@@ -124,57 +108,19 @@ Rectangle {
                             }
                         }
 
-                        Slider {
-                            id: factSlider
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-
-                            from: {
-                                if (!rootCol.fact) return 0;
-                                if (isNaN(rootCol.fact.min) || rootCol.fact.min < -1000) return 0;
-                                return rootCol.fact.min;
-                            }
-                            to: {
-                                if (!rootCol.fact) return 100;
-                                if (isNaN(rootCol.fact.max) || rootCol.fact.max > 1000) return (from + 200);
-                                return rootCol.fact.max;
-                            }
-                            value: rootCol.fact ? rootCol.fact.value : 0
-                            stepSize: rootCol.fact ? (rootCol.fact.increment ? rootCol.fact.increment : 1) : 1
-
+                        FactTextField {
+                            id: factField
+                            Layout.fillWidth:       true
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            fact:                   rootCol.fact
+                            showUnits:              true
+                            color:                  _valueColor
+                            horizontalAlignment:    Qt.AlignHCenter
                             background: Rectangle {
-                                x: factSlider.leftPadding
-                                y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                                implicitWidth: 100
-                                implicitHeight: 6
-                                width: factSlider.availableWidth
-                                height: implicitHeight
-                                radius: 3
-                                color: _fieldColor
-
-                                Rectangle {
-                                    width: factSlider.visualPosition * parent.width
-                                    height: parent.height
-                                    color: rootCol.trackFillColor
-                                    radius: 3
-                                }
-                            }
-
-                            handle: Rectangle {
-                                x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
-                                y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                                implicitWidth: 18
-                                implicitHeight: 18
-                                radius: 9
-                                color: _valueColor
-                                border.color: _colorAccent
-                                border.width: factSlider.pressed ? 4 : 2
-
-                                Behavior on border.width { NumberAnimation { duration: 150 } }
-                            }
-
-                            onMoved: {
-                                if (rootCol.fact) rootCol.fact.value = value;
+                                color:        factField.activeFocus ? _fieldColor : _panelColor
+                                border.color: factField.activeFocus ? _colorAccent : _panelBorder
+                                border.width: factField.activeFocus ? 2 : 1
+                                radius:       4
                             }
                         }
 
@@ -182,7 +128,7 @@ Rectangle {
                             visible: rootCol.showPlusButton
                             Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                             Layout.preferredWidth: Layout.preferredHeight
-                            radius: 15
+                            radius: 4
                             color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _fieldColor : _panelColor)
                             border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
                             border.width: 1

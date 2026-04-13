@@ -1,4 +1,6 @@
+# Force reconfig
 find_package(Qt6 REQUIRED COMPONENTS Core Qml)
+
 
 qt_add_library(PlanView STATIC)
 

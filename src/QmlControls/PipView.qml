@@ -269,7 +269,7 @@ Item {
 
     Image {
         id:             hidePIP
-        source:         "/qmlimages/pipHide.svg"
+        source:         "/qmlimages/MapType.svg"
         mipmap:         true
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
@@ -292,13 +292,13 @@ Item {
         width:                  ScreenTools.defaultFontPixelHeight * 2
         radius:                 ScreenTools.defaultFontPixelHeight / 3
         visible:                !_isExpanded
-        color:                  _fullItem.pipState.isDark ? Qt.rgba(0,0,0,0.75) : Qt.rgba(0,0,0,0.5)
+        color:                  Qt.rgba(0, 0, 0, 0.40)
 
         Image {
             width:              parent.width  * 0.75
             height:             parent.height * 0.75
             sourceSize.height:  height
-            source:             "/res/buttonRight.svg"
+            source:             "/qmlimages/MapType.svg"
             mipmap:             true
             fillMode:           Image.PreserveAspectFit
             anchors.verticalCenter:     parent.verticalCenter

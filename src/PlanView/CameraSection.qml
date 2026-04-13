@@ -67,7 +67,7 @@ Column {
             
             background: Rectangle {
                 radius: 10
-                color: "#301934"
+                color: "#1a1a1a"
                 border.color: "#3d3a50"
                 border.width: 1
             }
@@ -169,7 +169,7 @@ Column {
 
                 background: Rectangle {
                     radius: 10
-                    color: "#301934"
+                    color: "#1a1a1a"
                     border.color: "#3d3a50"
                     border.width: 1
                 }

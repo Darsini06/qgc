@@ -1,12 +1,12 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Dialogs
-import QGroundControl
-import QGroundControl.Controls
-import QGroundControl.ScreenTools
-import QGroundControl.Palette
-import MapGlobals 1.0
+import QGroundControl 1.0
+import QGroundControl.Controls 1.0
+import QGroundControl.ScreenTools 1.0
+import QGroundControl.Palette 1.0
+import MapGlobals
 
 Item {
     id: profilescreen
@@ -25,7 +25,7 @@ Item {
     property int totalMinutes: 0
     property int missionsCompleted: 0
     property string totalDurationFormatted: "0h 0m"
-    property color app_color: "#1A1A1A"
+    property color app_color: "#262626"
 
     // Load logic
     function loadSessions() {

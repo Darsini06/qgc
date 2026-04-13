@@ -110,13 +110,29 @@ QtObject {
             "session_type": sessionType
         };
 
+        // --- Local Persistence ---
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                tx.executeSql(
+                    "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
+                    [date, startTime, endTime, duration]
+                );
+                console.log("Session saved locally to SQLite");
+                newSessionAdded(); // Notify listeners (like LogFiles.qml) to refresh
+            } catch (error) {
+                console.error("Error saving session locally:", error);
+            }
+        });
+
+        // --- Remote Persistence ---
         var xhr = new XMLHttpRequest();
         xhr.open("POST", backendUrl + "/sessions");
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200 || xhr.status === 201) {
-                    console.log("Session saved to cloud successfully:", xhr.responseText);
+                    console.log("Session saved successfully to backend:", xhr.responseText);
                     
                     // Also save to local DB
                     var db = getDatabase();
@@ -132,10 +148,12 @@ QtObject {
                         }
                     });
 
-                    sessionSaved = true;
+                    if (rootWindow) {
+                        rootWindow.sessionSaved = true;
+                    }
                     newSessionAdded();
                 } else {
-                    console.error("Error saving session to cloud:", xhr.responseText);
+                    console.error("Error saving session to backend:", xhr.responseText);
                     // Still save to local DB even if cloud fails? 
                     // Let's do it to ensure local visibility.
                     var db = getDatabase();

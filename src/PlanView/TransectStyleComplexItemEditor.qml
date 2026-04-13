@@ -39,11 +39,11 @@ Rectangle {
 
     // --- Theme Colors (matching GeoFence / MissionStart) ---
     readonly property color _colorBgPrimary:     "transparent"
-    readonly property color _colorBgSecondary:   "#282830"
-    readonly property color _colorBgTertiary:    "#32323b"
+    readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
+    readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#471880"
-    readonly property color _colorAccentLight:   "#6d3da0"
+    readonly property color _colorAccent:        "#000000"
+    readonly property color _colorAccentLight:   "#1a1a1a"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#8e8e93"
     readonly property color _colorDanger:        "#FF453A"
@@ -54,7 +54,7 @@ Rectangle {
 
 
     Component.onCompleted: {
-        MapGlobals.acres = QGroundControl.unitsConversion.squareMetersToAppSettingsAreaUnits(missionItem.coveredArea).toFixed(2) + " " + QGroundControl.unitsConversion.appSettingsAreaUnitsString
+        MapGlobals.acres = missionItem.coveredArea.toFixed(2) + " m²"
     }
 
     Binding {
@@ -90,12 +90,12 @@ Rectangle {
         RowLayout {
             spacing: ScreenTools.defaultFontPixelWidth / 1.5
             property var fact: null
-
+            // − button
             Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
-                radius: 15
-                color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                radius:       4
+                color:        minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
                 border.color: minusArea.containsMouse ? _colorAccent : _colorBorder
                 border.width: 1
 
@@ -120,65 +120,32 @@ Rectangle {
                 }
             }
 
-            Slider {
-                id: factSlider
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-
-                from: {
-                    if (!parent.fact) return 0
-                    if (isNaN(parent.fact.min) || parent.fact.min < -1000) return 0
-                    return parent.fact.min
-                }
-                to: {
-                    if (!parent.fact) return 100
-                    if (isNaN(parent.fact.max) || parent.fact.max > 1000) return (from + 200)
-                    return parent.fact.max
-                }
-                value:    parent.fact ? parent.fact.value : 0
-                stepSize: parent.fact ? (parent.fact.increment ? parent.fact.increment : 1) : 1
+            // Value box (no placeholder text)
+            FactTextField {
+                id:                  factField
+                Layout.fillWidth:    true
+                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                Layout.alignment:    Qt.AlignVCenter
+                fact:                parent.fact
+                showUnits:           true
+                color:               _colorTextPrimary
+                placeholderText:     ""
+                horizontalAlignment: Qt.AlignHCenter
 
                 background: Rectangle {
-                    x: factSlider.leftPadding
-                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                    implicitWidth:  100
-                    implicitHeight: 6
-                    width:  factSlider.availableWidth
-                    height: implicitHeight
-                    radius: 3
-                    color:  _colorBgTertiary
-
-                    Rectangle {
-                        width:  factSlider.visualPosition * parent.width
-                        height: parent.height
-                        color:  _colorAccent
-                        radius: 3
-                    }
-                }
-
-                handle: Rectangle {
-                    x: factSlider.leftPadding + factSlider.visualPosition * (factSlider.availableWidth - width)
-                    y: factSlider.topPadding + factSlider.availableHeight / 2 - height / 2
-                    implicitWidth:  18
-                    implicitHeight: 18
-                    radius: 9
-                    color:  _colorTextPrimary
-                    border.color: _colorAccent
-                    border.width: factSlider.pressed ? 4 : 2
-
-                    Behavior on border.width { NumberAnimation { duration: 150 } }
-                }
-
-                onMoved: {
-                    if (parent.fact) parent.fact.value = value
+                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
+                    border.width: factField.activeFocus ? 2 : 1
+                    radius:       4
                 }
             }
 
+            // + button
             Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
-                radius: 15
-                color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                radius:       4
+                color:        plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
                 border.color: plusArea.containsMouse ? _colorAccent : _colorBorder
                 border.width: 1
 
@@ -203,23 +170,6 @@ Rectangle {
                 }
             }
 
-            FactTextField {
-                id: factField
-                Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 8
-                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                Layout.alignment: Qt.AlignVCenter
-                fact: parent.fact
-                showUnits: true
-                color: _colorTextPrimary
-                placeholderText: ""
-                horizontalAlignment: Qt.AlignHCenter
-                background: Rectangle {
-                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
-                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
-                    border.width: factField.activeFocus ? 2 : 1
-                    radius: 15
-                }
-            }
         }
     }
 
@@ -236,7 +186,7 @@ Rectangle {
             wrapMode:               Text.WordWrap
             horizontalAlignment:    Text.AlignHCenter
             text:                   transectAreaDefinitionHelp
-            color:                  _colorTextSecondary
+            color:                  _colorTextPrimary
             visible:                !transectAreaDefinitionComplete || _missionItem.wizardMode
         }
 
@@ -288,26 +238,13 @@ Rectangle {
                     }
                 }
 
-                // Transect Values Section
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           transectSectionHeader.height
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-
-                    SectionHeader {
-                        id:    transectSectionHeader
-                        width: parent.width
-                        text:  transectValuesHeaderName
-                        color: _colorTextPrimary
-
-                        background: Rectangle {
-                            color:        "transparent"
-                            radius:       _radius
-                        }
-                    }
+                // Transect Values Section Header (Static)
+                QGCLabel {
+                    text:           transectValuesHeaderName
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                    Layout.leftMargin: _margin
                 }
 
                 Rectangle {
@@ -317,7 +254,7 @@ Rectangle {
                     radius:           _radius
                     border.color:     _colorBorder
                     border.width:     1
-                    visible:          transectSectionHeader.checked
+                    visible:          true
 
                     Loader {
                         id:           transectValuesLoader
@@ -336,7 +273,7 @@ Rectangle {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
                     height:           36
-                    visible:          transectSectionHeader.checked
+                    visible:          true
 
                     background: Rectangle {
                         radius: _radius
@@ -374,22 +311,13 @@ Rectangle {
                     onClicked: _missionItem.rotateEntryPoint()
                 }
 
-                // Statistics Section
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           statsSectionHeader.height
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-
-                    SectionHeader {
-                        id:    statsSectionHeader
-                        width: parent.width
-                        text:  qsTr("Statistics")
-                        color: _colorTextPrimary
-                        background: Rectangle { color: "transparent"; radius: _radius }
-                    }
+                // Statistics Section Header (Static)
+                QGCLabel {
+                    text:           qsTr("Statistics")
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                    Layout.leftMargin: _margin
                 }
 
                 Rectangle {
@@ -399,7 +327,7 @@ Rectangle {
                     radius:           _radius
                     border.color:     _colorBorder
                     border.width:     1
-                    visible:          statsSectionHeader.checked
+                    visible:          true
 
                     TransectStyleComplexItemStats {
                         id:              statsContent
@@ -579,23 +507,14 @@ Rectangle {
                     onClicked: savePresetDialog.createObject(mainWindow).open()
                 }
 
-                // Presets Transect Values
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           presetsTransectHeader.height
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-                    visible:          !!presetsTransectValuesComponent
-
-                    SectionHeader {
-                        id:    presetsTransectHeader
-                        width: parent.width
-                        text:  transectValuesHeaderName
-                        color: _colorTextPrimary
-                        background: Rectangle { color: "transparent"; radius: _radius }
-                    }
+                // Presets Transect Values Header (Static)
+                QGCLabel {
+                    text:           transectValuesHeaderName
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                    Layout.leftMargin: _margin
+                    visible:        !!presetsTransectValuesComponent
                 }
 
                 Rectangle {
@@ -605,7 +524,7 @@ Rectangle {
                     radius:           _radius
                     border.color:     _colorBorder
                     border.width:     1
-                    visible:          presetsTransectHeader.checked && !!presetsTransectValuesComponent
+                    visible:          !!presetsTransectValuesComponent
 
                     Loader {
                         id:              presetsTransectLoader
@@ -619,22 +538,13 @@ Rectangle {
                     }
                 }
 
-                // Stats section in presets tab
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           presetsStatsHeader.height
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-
-                    SectionHeader {
-                        id:    presetsStatsHeader
-                        width: parent.width
-                        text:  qsTr("Statistics")
-                        color: _colorTextPrimary
-                        background: Rectangle { color: "transparent"; radius: _radius }
-                    }
+                // Presets Stats Header (Static)
+                QGCLabel {
+                    text:           qsTr("Statistics")
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                    Layout.leftMargin: _margin
                 }
 
                 Rectangle {
@@ -644,7 +554,7 @@ Rectangle {
                     radius:           _radius
                     border.color:     _colorBorder
                     border.width:     1
-                    visible:          presetsStatsHeader.checked
+                    visible:          true
 
                     TransectStyleComplexItemStats {
                         id:              presetsStats
