@@ -54,6 +54,7 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
+    property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
     property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use loc      alhost
 
 
@@ -80,7 +81,6 @@ QtObject {
 
                 // Users table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, displayname TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, mobile_number TEXT, rpc_completed INTEGER DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
-
 
                 // Drone sessions table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS drone_sessions(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, start_time TEXT NOT NULL, end_time TEXT NOT NULL, duration INTEGER)");
@@ -127,34 +127,36 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
-    function saveMissionLog(missionName, visualItems) {
-        console.log("MapGlobals.saveMissionLog() -", missionName)
+    function saveMissionLog(missionName, planData, controller) {
+        console.log("MapGlobals.saveMissionLog()", missionName);
+        var currentUserName = QGroundControl.loadGlobalSetting("username", "Guest");
+        if (currentUserName === "Guest" || !currentUserName) {
+            console.error("No user logged in, mission logged as Guest or omitted");
+        }
+
+        if (!controller) {
+            console.error("No controller provided to saveMissionLog");
+            return;
+        }
+
+        var visualItems = controller.missionController.visualItems;
         var coords = [];
         for (var i = 0; i < visualItems.count; i++) {
             var item = visualItems.get(i);
             if (item.coordinate && item.coordinate.latitude !== undefined && item.coordinate.latitude !== 0) {
-                // Check if it's a valid coordinate for the line
                 coords.push([item.coordinate.longitude, item.coordinate.latitude]);
             }
         }
 
-        if (coords.length < 1) {
-            console.log("Mission too short or invalid to log geometry");
-            return;
-        }
-
-        // Extract filename from path if needed
-        var name = missionName.toString().split('/').pop().split('\\').pop() || "Unnamed Mission";
-
         var data = {
-            "username": QGroundControl.loadGlobalSetting("username", "Guest"),
-            "mission_name": name,
-            "plan_data": { "itemCount": visualItems.count }, // Basic metadata
+            "username": currentUserName,
+            "mission_name": missionName.toString().split('/').pop().split('\\').pop(),
+            "plan_data": typeof planData === 'string' ? JSON.parse(planData) : planData,
             "geometry": {
-                "type": coords.length === 1 ? "Point" : "LineString",
-                "coordinates": coords.length === 1 ? coords[0] : coords
+                "type": coords.length === 1 ? "Point" : (coords.length > 1 ? "LineString" : "Point"),
+                "coordinates": coords.length === 1 ? coords[0] : (coords.length > 1 ? coords : [0,0])
             },
-            "date": new Date().toLocaleDateString(Qt.locale(), "dd-MM-yyyy")
+            "date": new Date().toISOString()
         };
 
         var xhr = new XMLHttpRequest();
@@ -162,10 +164,24 @@ QtObject {
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("Mission log save response:", xhr.status);
+                console.log("Mission log save response:", xhr.status, xhr.responseText);
             }
         };
         xhr.send(JSON.stringify(data));
+    }
+
+    function deleteMissionLog(missionName) {
+        console.log("MapGlobals.deleteMissionLog()", missionName);
+        var name = missionName.toString().split('/').pop().split('\\').pop();
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(name));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log delete response:", xhr.status, xhr.responseText);
+            }
+        };
+        xhr.send();
     }
 
     function insertFeedback(username, mobile_number, email, comments, callback) {
@@ -780,6 +796,7 @@ QtObject {
                         QGroundControl.saveGlobalSetting("email", user.email);
                         QGroundControl.saveGlobalSetting("name", user.displayname);
                         QGroundControl.saveBoolGlobalSetting("login", true);
+                        userName = user.username;
 
                         // Sync to local SQLite
                         var db = getDatabase();
@@ -964,5 +981,9 @@ QtObject {
         });
     }
 
+    Component.onCompleted: {
+        userName = QGroundControl.loadGlobalSetting("username", "Guest")
+        console.log("MapGlobals initialized. Current user:", userName)
+    }
 
 }

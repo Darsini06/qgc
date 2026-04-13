@@ -107,8 +107,9 @@ public:
 
     void        setFlyView(bool flyView) { _flyView = flyView; }
 
-    QJsonDocument saveToJson    ();
-    QJsonDocument saveToJson1    ();
+    Q_INVOKABLE QJsonDocument saveToJson    ();
+    Q_INVOKABLE QJsonDocument saveToJson1    ();
+    Q_INVOKABLE QString       saveToJsonString () { return saveToJson().toJson(); }
 
     Vehicle* controllerVehicle(void) { return _controllerVehicle; }
     Vehicle* managerVehicle(void) { return _managerVehicle; }
@@ -126,6 +127,7 @@ signals:
     void offlineChanged                     (bool offlineEditing);
     void currentPlanFileChanged             (void);
     void planCreatorsChanged                (QmlObjectListModel* planCreators);
+    void planSaved                          (QString filename);
     void managerVehicleChanged              (Vehicle* managerVehicle);
     void promptForPlanUsageOnVehicleChange  (void);
 

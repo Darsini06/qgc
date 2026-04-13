@@ -487,6 +487,7 @@ void PlanMasterController::saveToFile(const QString& filename)
             _currentPlanFile = planFilename;
             emit currentPlanFileChanged();
         }
+        emit planSaved(planFilename);
     }
 
     // Only clear dirty bit if we are offline
@@ -519,6 +520,7 @@ void PlanMasterController::saveToFile1(const QString& filename)
             _currentPlanFile = planFilename;
             emit currentPlanFileChanged();
         }
+        emit planSaved(planFilename);
     }
 
     // Only clear dirty bit if we are offline

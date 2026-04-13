@@ -738,8 +738,21 @@ Item {
                                         onAboutToHide: parent.highlight = false
 
                                         QGCMenuItem {
+                                            text: qsTr("Sync to Cloud")
+                                            onTriggered: {
+                                                console.log("Syncing to cloud:", fileHamburgerMenu.fileToDelete)
+                                                // We need to load it first to get visualItems, but for now we'll just log
+                                                // Actually mainWindow.fileload(fileHamburgerMenu.fileToDelete) would open it
+                                                // and since we have Connections in PlanView, it will sync if saved.
+                                                // To sync directly from here, we'd need to parse JSON.
+                                                mainWindow.showToastMessage("Open and Save the plan to sync with cloud")
+                                            }
+                                        }
+
+                                        QGCMenuItem {
                                             text: qsTr("Delete")
                                             onTriggered: {
+                                                MapGlobals.deleteMissionLog(fileHamburgerMenu.fileToDelete)
                                                 controller.deleteFile(fileHamburgerMenu.fileToDelete)
                                                 // Refresh file list after deletion
                                                 var root = fileRepeater.parent

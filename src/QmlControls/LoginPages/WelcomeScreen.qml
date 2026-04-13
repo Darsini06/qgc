@@ -1121,7 +1121,7 @@ Item {
                                                         MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
                                                             if (result) {
                                                                 mainWindow.showToastMessage("Account created successfully!");
-                                                                
+
                                                                 // Use response data if available, otherwise fallback to form fields
                                                                 var user = (response && response.user) ? response.user : {
                                                                     "username": regUser.text,
@@ -1564,4 +1564,3 @@ Item {
         }
     }
 }
-
