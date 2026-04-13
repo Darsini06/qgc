@@ -30,8 +30,8 @@ Column {
     readonly property int _gridTypeCamera:       2
 
     // ── Shared theme colors ───────────────────────────────────────────────
-    readonly property color _colorBgSecondary:   "#282830"
-    readonly property color _colorBgTertiary:    "#32323b"
+    readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
+    readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
     readonly property color _colorBorder:        "#3e3e4a"
     readonly property color _colorAccent:        "#301934"
     readonly property color _colorTextPrimary:   "#ffffff"

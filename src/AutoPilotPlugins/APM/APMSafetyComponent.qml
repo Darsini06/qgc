@@ -84,7 +84,7 @@ property bool   showBorder:         true
                         rowSpacing:     _margins
                         columns:        2
                         QGCLabel { text: qsTr("Low action:")
-                        color: "black"}
+                        color: "white"}
                         FactComboBox {
                             fact:               failsafeBattLowAct
                             indexModel:         false
@@ -92,7 +92,7 @@ property bool   showBorder:         true
                         }
 
                         QGCLabel { text: qsTr("Critical action:")
-                        color: "black"}
+                        color: "white"}
                         FactComboBox {
                             fact:               failsafeBattCritAct
                             indexModel:         false
@@ -100,7 +100,7 @@ property bool   showBorder:         true
                         }
 
                         QGCLabel { text: qsTr("Low voltage threshold:")
-                        color: "black"}
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattLowVoltage
                             showUnits:          true
@@ -109,7 +109,7 @@ property bool   showBorder:         true
 
 
                         QGCLabel { text: qsTr("Critical voltage threshold:")
-                        color: "black"}
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattCritVoltage
                             showUnits:          true
@@ -117,7 +117,7 @@ property bool   showBorder:         true
                         }
 
                         QGCLabel { text: qsTr("Low mAh threshold:")
-                        color: "black"}
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattLowMah
                             showUnits:          true
@@ -125,7 +125,7 @@ property bool   showBorder:         true
                         }
 
                         QGCLabel { text: qsTr("Critical mAh threshold:")
-                        color: "black"}
+                        color: "white"}
                         FactTextField {
                             fact:               failsafeBattCritMah
                             showUnits:          true
@@ -167,7 +167,7 @@ property bool   showBorder:         true
                 Rectangle {
                     width:  battery1FailsafeLoader.x + battery1FailsafeLoader.width + _margins
                     height: battery1FailsafeLoader.y + battery1FailsafeLoader.height + _margins
-                    color:              "white"
+                    color:              Qt.rgba(0, 0, 0, 0.40)
                     border.color:       QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -208,7 +208,7 @@ property bool   showBorder:         true
                     anchors.horizontalCenter: parent.horizontalCenter
                     width:  battery2FailsafeLoader.x + battery2FailsafeLoader.width + _margins
                     height: battery2FailsafeLoader.y + battery2FailsafeLoader.height + _margins
-                    color:              "white"
+                    color:              Qt.rgba(0, 0, 0, 0.40)
                     border.color:       QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -253,7 +253,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:  fsColumn.x + fsColumn.width + _margins
                         height: fsColumn.y + fsColumn.height + _margins
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -314,14 +314,14 @@ property bool   showBorder:         true
                         font.bold:   true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                        color: "black"
+                        color: "white"
                     }
 
                     Rectangle {
                         id:     failsafeSettings
                         width:  parent.width//fsGrid.x + fsGrid.width + _margins
                         height: fsGrid.y + fsGrid.height + _margins
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -335,7 +335,7 @@ property bool   showBorder:         true
                             columns:            2
 
                             QGCLabel { text: qsTr("Ground Station failsafe:")
-                            color: "black"}
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeGCSEnable
@@ -343,7 +343,7 @@ property bool   showBorder:         true
                             }
 
                             QGCLabel { text: qsTr("Throttle failsafe:")
-                            color: "black"}
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeThrEnable
@@ -351,14 +351,14 @@ property bool   showBorder:         true
                             }
 
                             QGCLabel { text: qsTr("PWM threshold:")
-                            color: "black"}
+                            color: "white"}
                             FactTextField {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeThrValue
                             }
 
                             QGCLabel { text: qsTr("Failsafe Crash Check:")
-                            color: "black"}
+                            color: "white"}
                             FactComboBox {
                                 Layout.fillWidth:   true
                                 fact:               _failsafeCrashCheck
@@ -400,7 +400,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:  parent.width//generalFailsafeColumn.x + generalFailsafeColumn.width + _margins
                         height: generalFailsafeColumn.y + generalFailsafeColumn.height + _margins
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -419,7 +419,7 @@ property bool   showBorder:         true
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 QGCLabel { text: qsTr("Ground Station failsafe:")
-                                color: "black"}
+                                color: "white"}
                                 FactComboBox {
                                     fact:               _failsafeGCSEnable
                                     indexModel:         false
@@ -427,7 +427,7 @@ property bool   showBorder:         true
                                 }
 
                                 QGCLabel { text: qsTr("Throttle failsafe:")
-                                color: "black"}
+                                color: "white"}
                                 QGCComboBox {
                                     model:              [qsTr("Disabled"), qsTr("Always RTL"),
                                         qsTr("Continue with Mission in Auto Mode"), qsTr("Always Land")]
@@ -438,7 +438,7 @@ property bool   showBorder:         true
                                 }
 
                                 QGCLabel { text: qsTr("PWM threshold:")
-                                color: "black"}
+                                color: "white"}
                                 FactTextField {
                                     fact:               _failsafeThrValue
                                     showUnits:          true
@@ -485,7 +485,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:  parent.width//mainLayout.width + (_margins * 2)
                         height: mainLayout.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -572,7 +572,7 @@ property bool   showBorder:         true
 
                                 QGCLabel {
                                     text: qsTr("Breach action")
-                                    color: "black"
+                                    color: "white"
                                 }
 
                                 FactComboBox {
@@ -582,7 +582,7 @@ property bool   showBorder:         true
 
                                 QGCLabel {
                                     text: qsTr("Fence margin")
-                                    color: "black"
+                                    color: "white"
                                 }
 
                                 FactTextField {
@@ -625,7 +625,7 @@ property bool   showBorder:         true
                         id:     rtlSettings
                         width:  parent.width//landSpeedField.x + landSpeedField.width + _margins
                         height: landSpeedField.y + landSpeedField.height + _margins
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -764,7 +764,7 @@ property bool   showBorder:         true
                     Rectangle {
                         width:  parent.width//rltAltField.x + rltAltField.width + _margins
                         height: rltAltField.y + rltAltField.height + _margins
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.40)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2

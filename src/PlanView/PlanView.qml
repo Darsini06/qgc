@@ -225,7 +225,7 @@ Item {
             height: baseSize
             radius: width / 2
             color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             border.width: 0
             opacity: 0.95
             visible: true
@@ -253,7 +253,7 @@ Item {
             height: baseSize
             radius: width / 2
             color:  Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             border.width: 0
             opacity: 0.95
             visible: true
@@ -1054,7 +1054,7 @@ Item {
                         background: Rectangle {
                             color: Qt.rgba(0, 0, 0, 0.60)  // Darker for button action
                             radius: 20
-                            border.color: "transparent"
+                            border.color: Qt.rgba(0, 0, 0, 0.40)
                             border.width: 0
                         }
                         contentItem: Text {
@@ -1801,7 +1801,7 @@ Item {
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: "transparent"
+                        border.color: Qt.rgba(0, 0, 0, 0.40)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -1844,7 +1844,7 @@ Item {
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: "transparent"
+                        border.color: Qt.rgba(0, 0, 0, 0.40)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -1920,7 +1920,7 @@ Item {
                                 background: Rectangle {
                                     radius: 20
                                     color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black dialog button
-                                    border.color: "transparent"
+                                    border.color: Qt.rgba(0, 0, 0, 0.40)
                                     border.width: 0
                                 }
                                 contentItem: Text {
@@ -2350,7 +2350,7 @@ Item {
     //     }
 
     //     background: Rectangle {
-    //         color: "transparent"
+    //         color: Qt.rgba(0, 0, 0, 0.40)
     //     }
 
     //     contentItem: RowLayout {
@@ -2372,7 +2372,7 @@ Item {
     //                 Layout.fillHeight: true
     //                 radius: 12
     //                 color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black popup item
-    //                 border.color: "transparent"
+    //                 border.color: Qt.rgba(0, 0, 0, 0.40)
     //                 border.width: 0
 
     //                 Text {
@@ -2480,9 +2480,9 @@ Item {
             id:         layerTabBar
             width:      parent.width
             height:     42
-            color:      Qt.rgba(0, 0, 0, 0.40)  // Transparent black tab bar
+            color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black tab bar
             radius:     10
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             border.width: 0
             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
@@ -2498,7 +2498,7 @@ Item {
                 x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
                 color: Qt.rgba(0, 0, 0, 0.40)  // Selected tab indicator transparency
                 radius: 10
-                border.color: "transparent"
+                border.color: Qt.rgba(0, 0, 0, 0.40)
                 border.width: 0
                 Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
             }
@@ -2570,9 +2570,9 @@ Item {
             width:        baseSize
             height:       baseSize
             radius:       width / 2
-            color:        Qt.rgba(0, 0, 0, 0.40)
+            color:        "transparent"
             border.width: 0
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             clip:         true
 
             MouseArea {
