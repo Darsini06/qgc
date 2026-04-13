@@ -55,7 +55,7 @@ QtObject {
 
     property string login: ""
     property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
-    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use loc      alhost
+    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
 
     function recenterMap() {

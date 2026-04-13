@@ -26,7 +26,7 @@ Rectangle {
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
     property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#471880"
+    property color  _colorAccent:   "#3d3a41ff"
 
     property bool _specifiesAltitude:       missionItem.specifiesAltitude
     property real _margin:                  ScreenTools.defaultFontPixelHeight / 2

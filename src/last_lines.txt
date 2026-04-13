@@ -1,0 +1,50 @@
+﻿        planMasterController:   _planMasterController
+        z:                      100
+        //plantypes:planType
+    }
+
+    // Compass icon â€” placed as direct child of _root so anchor to planToolBar.bottom works correctly
+    Item {
+        id:                 compassNorth
+        width:              baseSize
+        height:             baseSize
+        anchors.top:        planToolBar.bottom
+        anchors.left:       parent.left
+        anchors.topMargin:  2
+        anchors.leftMargin: 20
+        z:                  QGroundControl.zOrderWidgets + 1
+
+        Rectangle {
+            width:        baseSize
+            height:       baseSize
+            radius:       width / 2
+            color:        Qt.rgba(0, 0, 0, 0.40)
+            border.width: 0
+            border.color: "transparent"
+            clip:         true
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    MapGlobals.mapRotation = 0
+                }
+            }
+
+            QGCColoredImage {
+                id:               compassArrow
+                source:           "/qmlimages/NewImages/cardinal_point.svg"
+                anchors.centerIn: parent
+                width:            iconSize
+                height:           iconSize
+                fillMode:         Image.PreserveAspectFit
+                transform: Rotation {
+                    origin.x: compassArrow.width  / 2
+                    origin.y: compassArrow.height / 2
+                    angle:    -MapGlobals.mapRotation
+                }
+                color: "white"
+            }
+        }
+    }
+
+}

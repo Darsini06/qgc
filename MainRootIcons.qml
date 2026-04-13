@@ -66,9 +66,8 @@ Item {
         // ROW OF ACTION ICONS
         RowLayout {
             id: icons_row
-            spacing: 15
-            layoutDirection: Qt.RightToLeft
-            anchors.right: parent.right
+            spacing: 12
+            //layoutDirection: Qt.RightToLeft
 
             // ========== COMPASS ARROW ==========
             Rectangle {
@@ -438,52 +437,20 @@ Item {
                 }
             }
 
-
             QGCCompassWidget {
                 id:                     compass
-                Layout.preferredHeight: baseSize * 1.5
+                //anchors.centerIn: parent
+                size:                   _innerRadius * 2.5
+
+                                        Layout.preferredHeight: baseSize * 1.5
                 Layout.preferredWidth:  baseSize * 1.5
                 Layout.alignment:       Qt.AlignVCenter
-                size:                   baseSize * 1.5
                 vehicle:                _activeVehicle
                 visible :               _activeVehicle
             }
 
         }
 
-        // --- SPRAY_PUMP_RATE Seekbar Loader ---
-        // We wait for parametersReady so that getParameter() calls will succeed.
-        Loader {
-            id: sliderLoader
-            anchors.right: parent.right
-            active: _activeVehicle && _activeVehicle.parameterManager.parametersReady
-            visible: active
-            sourceComponent: sliderComponent
-        }
-    }
-
-    Component {
-        id: sliderComponent
-        Rectangle {
-            id: sliderContainer
-            width: ScreenTools.defaultFontPixelWidth * 30
-            height: sliderColumn.height + 20
-            color: Qt.rgba(0, 0, 0, 0.40)
-            radius: 8
-
-            FactPanelController { id: controller }
-
-            Column {
-                id: sliderColumn
-                anchors.centerIn: parent; spacing: 8; width: parent.width - 20
-                Text { text: qsTr("Spray Pump Rate"); color: "white"; font.bold: true; font.pixelSize: ScreenTools.defaultFontPointSize }
-                FactSlider {
-                    id:     pumpSlider
-                    fact:   controller.getParameterFact(-1, "SPRAY_PUMP_RATE")
-                    width:  parent.width
-                }
-            }
-        }
     }
 
     // Import dialog component (kept for reference)

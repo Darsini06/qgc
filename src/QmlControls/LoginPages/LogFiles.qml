@@ -103,6 +103,12 @@ Item {
             userName = QGroundControl.loadGlobalSetting("username", "")
             loadUserDataFromMain();
         }
+        if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+            nameFilters = _planMasterController.loadNameFilters1
+        }else{
+            nameFilters = _planMasterController.loadNameFilters
+        }
+
 
         _planMasterController._updateMobileShortPath()
         _planMasterController._setupFileExtensions()
@@ -252,19 +258,29 @@ Item {
         id:      planMasterController
         flyView: false
 
-        function loadFromSelectedFile() {
-            _updateMobileShortPath()
-            _setupFileExtensions()
-            nameFilters = _planMasterController.loadNameFilters1
-            openForLoad()
-        }
+        // function loadFromSelectedFile() {
+        //     _updateMobileShortPath()
+        //     _setupFileExtensions()
+        //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+        //         nameFilters = _planMasterController.loadNameFilters1
+        //     }else{
+        //         nameFilters = _planMasterController.loadNameFilters
+        //     }
 
-        function loadFromSelectedFile1() {
-            fileDialog.title       = qsTr("Select Plan File")
-            fileDialog.planFiles   = true
-            fileDialog.nameFilters = _planMasterController.loadNameFilters
-            fileDialog.openForLoad()
-        }
+
+        //     openForLoad()
+        // }
+
+        // function loadFromSelectedFile1() {
+        //     fileDialog.title       = qsTr("Select Plan File")
+        //     fileDialog.planFiles   = true
+        //     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+        //         nameFilters = _planMasterController.loadNameFilters1
+        //     }else{
+        //         nameFilters = _planMasterController.loadNameFilters
+        //     }
+        //     fileDialog.openForLoad()
+        // }
 
         function saveToSelectedFile() {
             if (!checkReadyForSaveUpload(true)) { return }
@@ -351,6 +367,8 @@ Item {
                 for (var j = 0; j < rgFilters.length; j++) {
                     if (!_mobileDlg || (rgFilters[j] !== "*" && rgFilters[j] !== "*.*")) {
                         _rgExtensions.push(rgFilters[j])
+
+                        console.log("extensions",_rgExtensions)
                     }
                 }
             }
@@ -634,8 +652,16 @@ Item {
                                             } else if (model.screen === "fileList") {
                                                 // Setup paths/extensions, then show inline
                                                 _planMasterController._updateMobileShortPath()
+                                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+                                                    nameFilters = _planMasterController.loadNameFilters1
+                                                }else{
+                                                    nameFilters = _planMasterController.loadNameFilters
+                                                }
                                                 _planMasterController._setupFileExtensions()
                                                 inlineLoader.sourceComponent = fileListComponent
+                                                console.log("gridlines True")
+                                                MapGlobals.setGridLines(true)
+
                                             } else {
                                                 if (model.screen === "privacy_policy") {
                                                     privacyLoading = true
@@ -673,6 +699,7 @@ Item {
 
                     function refreshFiles() {
                         fileList = controller.getFiles(folder, _rgExtensions)
+                        console.log("filename",fileList)
                     }
 
 

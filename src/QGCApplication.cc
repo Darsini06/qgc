@@ -229,6 +229,7 @@ QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting)
             }
         }
     }
+
     settings.setValue(_settingsVersionKey, QGC_SETTINGS_VERSION);
 
     if (fClearCache) {

@@ -47,7 +47,6 @@ Item {
             if(MapGlobals.save==="save1"){
                 //savefiledialog.createObject(mainWindow).open()
                 savefiledialog.createObject(mainWindow, {
-
                                                 userName: _appSettings.username
                                             }).open()
 
@@ -178,9 +177,6 @@ Item {
 
             onShowAllFilesChanged: refreshFiles()
             Component.onCompleted: refreshFiles()
-
-
-
 
             Column {
                 id:         fileOpenColumn

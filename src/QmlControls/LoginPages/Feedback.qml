@@ -14,9 +14,9 @@ Item {
     anchors.fill: parent
 
     property string userName: QGroundControl.loadGlobalSetting("username", "")
-    property color app_color: "#262626"
-    property color accent_color: "#262626"
-    property color sidebar_color: "#262626"
+    property color app_color: "#1A1A1A"
+    property color accent_color: "#1A1A1A"
+    property color sidebar_color: "#1A1A1A"
     property color bg_color: "#FFFFFF"
     property color input_bg: "#F9FAFB"
     property color border_color: "#E5E7EB"

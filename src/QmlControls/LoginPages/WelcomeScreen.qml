@@ -24,7 +24,7 @@ import Qt.labs.lottieqt 1.0
 Item {
     id: root
     anchors.fill: parent
-
+    property var rootWindow: MapGlobals.rootWindow
     property string currentView: "signin"   // signin // signup
     property bool otpSent: false
     property bool isOtpVerified: false
@@ -36,6 +36,7 @@ Item {
     property color textSecondary: "#64748b"
 
     property color borderColor: "#e2e8f0"
+
     property color errorColor: "#ef4444"
     property color successColor: "#10b981"
 
@@ -47,6 +48,11 @@ Item {
     property real screenHeight: parent.height
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
+    property real adaptiveScale: 1.0
+       property string pipResizeIcon: ""
+       property string pipState: "shrunk"
+       property var instrumentPanel: null
+       property string _controllerSyncInProgressA: ""
 
 
 
@@ -56,7 +62,11 @@ Item {
         return value * baseUnit;
     }
 
-
+    Component.onCompleted: {
+        // Set your deployed backend URL
+        // MapGlobals.backendUrl = "http://192.168.137.1:5000";
+        console.log("Backend server address set to: " + MapGlobals.backendUrl)
+    }
     /* ========= BACKGROUND IMAGE ========= */
     /* ========= BACKGROUND IMAGE ========= */
     Image {
@@ -67,7 +77,6 @@ Item {
         z: 0
     }
 
-    /* ========= Card ========= */
     Rectangle {
         id: authCard
         width: parent.width * 0.85
@@ -75,74 +84,26 @@ Item {
         radius: 12
         anchors.centerIn: parent
         color: surfaceColor
-        z : 1
+        z: 1
 
-
+        // Shadow rectangle (keep as is)
         Rectangle {
             id: shadowSource
-            anchors.fill: parent
-            radius: dp(4)
-            color: "white"
-            visible: false
+            // ...
         }
 
         MultiEffect {
-            anchors.fill: shadowSource
-            source: shadowSource
-
-            shadowEnabled: true
-            shadowBlur: 0.9
-            shadowHorizontalOffset: 0
-            shadowVerticalOffset: dp(1)
-            shadowColor: "#40000000"   // soft black
+            // ...
         }
 
-        // === BASE FORM LAYER ===
-        Item {
-            anchors.fill: parent
-
-            Row {
-                anchors.fill: parent
-
-                // LEFT FORM
-                Item {
-                    width: parent.width / 2
-                    height: parent.height
-
-                    Loader {
-                        anchors.fill: parent
-                        // sourceComponent: currentView === "signin"
-                        //                  ? signInComponent
-                        //                  : signUpComponent
-
-                        sourceComponent : signInComponent
-                    }
-                }
-
-                // RIGHT EMPTY SPACE (under overlay)
-                Item {
-                    width: parent.width / 2
-                    height: parent.height
-
-                    Loader {
-                        anchors.fill: parent
-                        // sourceComponent: currentView === "signin"
-                        //                  ? signInComponent
-                        //                  : signUpComponent
-
-                        sourceComponent : rightSide === "reset" ? resetpwdComponent : signUpComponent
-                    }
-                }
-            }
-        }
-
-        // === SLIDING OVERLAY PANEL ===
-        Rectangle  {
+        // === SLIDING OVERLAY PANEL - MOVE THIS BEFORE THE FORMS ===
+        Rectangle {
             id: overlayPanel
             width: parent.width / 2
             height: parent.height
             radius: 12
-            clip: true          // IMPORTANT for rounded corners
+            clip: true
+            z: 2  // Add z-index to ensure it's above background but below forms? Actually no
 
             x: currentView === "signin" ? parent.width/2 : 0
 
@@ -153,27 +114,53 @@ Item {
                 }
             }
 
-            // Background Image
             Image {
                 anchors.fill: parent
                 source: "qrc:/qmlimages/NewImages/background_login_premium.png"
                 fillMode: Image.PreserveAspectCrop
                 smooth: true
 
-                // Dynamic gradient overlay to make it look futuristic
                 Rectangle {
                     anchors.fill: parent
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Qt.rgba(48/255, 25/255, 52/255, 0.4) } // Theme Purple
+                        GradientStop { position: 0.0; color: Qt.rgba(48/255, 25/255, 52/255, 0.4) }
                         GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.6) }
                     }
                 }
             }
-
         }
 
-    }
+        // === BASE FORM LAYER - This should be AFTER overlayPanel? No, overlayPanel should be on top? ===
+        // Actually, the overlayPanel should be a SLIDING panel that covers the right side
+        // Your forms should be visible on the left
 
+        Item {
+            anchors.fill: parent
+            z: 1  // Make sure forms are below overlay? This is complex
+
+            Row {
+                anchors.fill: parent
+
+                Item {
+                    width: parent.width / 2
+                    height: parent.height
+                    Loader {
+                        anchors.fill: parent
+                        sourceComponent: signInComponent
+                    }
+                }
+
+                Item {
+                    width: parent.width / 2
+                    height: parent.height
+                    Loader {
+                        anchors.fill: parent
+                        sourceComponent: rightSide === "reset" ? resetpwdComponent : signUpComponent
+                    }
+                }
+            }
+        }
+    }
     // === COMPONENTS ===
 
     Component {
@@ -241,7 +228,7 @@ Item {
                                 spacing: dp(1)
 
                                 Text {
-                                    text: "Username or Email"
+                                    text: "Email"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
@@ -384,23 +371,51 @@ Item {
                                     }
                                 }
                             }
-
                             onClicked: {
                                 if (loginUser.text.trim() === "" || loginPass.text === "") {
-                                    mainWindow.showToastMessage("Please fill all fields")
+                                    rootWindow.showToastMessage("Please fill all fields")
                                     return
                                 }
 
-                                MapGlobals.loginUserFunc(
-                                            loginUser.text.trim(),
-                                            loginPass.text,
-                                            function(result) {
-                                                if (result) {
-                                                    loginUser.text = ""
-                                                    loginPass.text = ""
-                                                }
+                                // Direct login with correct API endpoint
+                                var xhr = new XMLHttpRequest();
+                                var url = MapGlobals.backendUrl +'/login';
+                                xhr.open('POST', url, true);
+                                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                                xhr.onreadystatechange = function() {
+                                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                                        if (xhr.status === 200) {
+                                            var response = JSON.parse(xhr.responseText);
+                                            if (response.success) {
+                                                rootWindow.showToastMessage("Login successful!");
+                                                // Save user data
+                                                QGroundControl.saveGlobalSetting("username", response.user.username);
+                                                QGroundControl.saveGlobalSetting("name", response.user.displayname);
+                                                QGroundControl.saveGlobalSetting("email", response.user.email);
+                                                QGroundControl.saveBoolGlobalSetting("login", true);
+                                                // Clear fields
+                                                loginUser.text = "";
+                                                loginPass.text = "";
+                                                // Go to homescreen
+                                                MapGlobals.rootWindow.homescreen();
+                                            } else {
+                                                rootWindow.showToastMessage(response.message || "Login failed");
                                             }
-                                            )
+                                        } else {
+                                            rootWindow.showToastMessage("Login failed. Server error: " + xhr.status);
+                                        }
+                                    }
+                                };
+
+                                xhr.onerror = function() {
+                                    rootWindow.showToastMessage("Network error. Check your connection.");
+                                };
+
+                                xhr.send(JSON.stringify({
+                                    userInput: loginUser.text.trim(),
+                                    password: loginPass.text
+                                }));
                             }
                         }
 
@@ -779,11 +794,41 @@ Item {
                                     }
                                     onClicked: {
                                         if (!MapGlobals.validateEmail(regEmail.text, regEmail)) return;
-                                        MapGlobals.sendOTP(regEmail.text, function(success) {
-                                            if (success) {
-                                                otpSent = true;
+
+                                        // Direct XHR call instead of MapGlobals.sendOTP
+                                        var xhr = new XMLHttpRequest();
+                                        var url = MapGlobals.backendUrl + '/send-otp';
+                                        xhr.open('POST', url, true);
+                                        xhr.setRequestHeader('Content-Type', 'application/json');
+
+                                        xhr.onreadystatechange = function() {
+                                            if (xhr.readyState === XMLHttpRequest.DONE) {
+                                                if (xhr.status === 200) {
+                                                    var response = JSON.parse(xhr.responseText);
+                                                    if (response.success) {
+                                                        otpSent = true;
+                                                        rootWindow.showToastMessage("OTP sent successfully!");
+                                                    } else {
+                                                        rootWindow.showToastMessage(response.message || "Failed to send OTP");
+                                                    }
+                                                } else {
+                                                    rootWindow.showToastMessage("Failed to send OTP. Please try again.");
+                                                    console.error("HTTP Error:", xhr.status);
+                                                }
                                             }
+                                        };
+
+                                        xhr.onerror = function() {
+                                            rootWindow.showToastMessage("Network error. Check your connection.");
+                                            console.error("Network error occurred");
+                                        };
+
+                                        var data = JSON.stringify({
+                                            email: regEmail.text,
+                                            type: "registration"
                                         });
+
+                                        xhr.send(data);
                                     }
                                 }
                             }
@@ -807,7 +852,6 @@ Item {
                                 Text {
                                     text: "*"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 0.8
-                                    font.weight: Font.Medium
                                     color: "red"
                                     visible: !isOtpVerified
                                 }
@@ -819,7 +863,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 Rectangle {
-                                    width: isOtpVerified ? parent.width : (parent.width - verifyOtpBtn.width - parent.spacing)
+                                    width: isOtpVerified ? parent.width : (parent.width - 100 - parent.spacing)
                                     height: dp(10)
                                     radius: dp(1)
                                     color: surfaceColor
@@ -831,18 +875,16 @@ Item {
                                         anchors.fill: parent
                                         placeholderText: "Enter 6-digit OTP"
                                         font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.family: "Arial"
                                         color: "black"
                                         enabled: !isOtpVerified
                                         background: null
-                                        selectByMouse: true
                                         inputMethodHints: Qt.ImhDigitsOnly
                                     }
                                 }
 
                                 Button {
                                     id: verifyOtpBtn
-                                    width: dp(20)
+                                    width: 100
                                     height: dp(10)
                                     text: "Verify"
                                     visible: !isOtpVerified
@@ -855,25 +897,46 @@ Item {
                                         color: "white"
                                         font.pointSize: ScreenTools.smallFontPointSize
                                         font.bold: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
                                     }
                                     onClicked: {
                                         if (regOtp.text.length < 6) {
-                                            mainWindow.showToastMessage("Please enter a valid 6-digit OTP");
+                                            rootWindow.showToastMessage("Please enter a valid 6-digit OTP");
                                             return;
                                         }
-                                        MapGlobals.verifyOTP(regEmail.text, regOtp.text, function(success) {
-                                            if (success) {
-                                                isOtpVerified = true;
-                                                mainWindow.showToastMessage("OTP verified! Please set your password.");
+
+                                        // Direct XHR call for verification
+                                        var xhr = new XMLHttpRequest();
+                                        var url = MapGlobals.backendUrl + '/verify-otp';
+                                        xhr.open('POST', url, true);
+                                        xhr.setRequestHeader('Content-Type', 'application/json');
+
+                                        xhr.onreadystatechange = function() {
+                                            if (xhr.readyState === XMLHttpRequest.DONE) {
+                                                if (xhr.status === 200) {
+                                                    var response = JSON.parse(xhr.responseText);
+                                                    if (response.success) {
+                                                        isOtpVerified = true;
+                                                        rootWindow.showToastMessage("OTP verified! Please set your password.");
+                                                    } else {
+                                                        rootWindow.showToastMessage(response.message || "OTP verification failed");
+                                                    }
+                                                } else {
+                                                    rootWindow.showToastMessage("Failed to verify OTP. Please try again.");
+                                                }
                                             }
+                                        };
+
+                                        var data = JSON.stringify({
+                                            email: regEmail.text,
+                                            otp: regOtp.text,
+                                            type: "registration"
                                         });
+
+                                        xhr.send(data);
                                     }
                                 }
                             }
                         }
-
                         // Password
                         Column {
                             width: parent.width
@@ -1120,8 +1183,8 @@ Item {
 
                                                         MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
                                                             if (result) {
-                                                                mainWindow.showToastMessage("Account created successfully!");
-
+                                                                rootWindow.showToastMessage("Account created successfully!");
+                                                                
                                                                 // Use response data if available, otherwise fallback to form fields
                                                                 var user = (response && response.user) ? response.user : {
                                                                     "username": regUser.text,
@@ -1189,54 +1252,69 @@ Item {
     }
 
     Component {
-        id : resetpwdComponent
+        id: resetpwdComponent
 
         Item {
-
+            id: resetRoot
             width: parent.width * 0.6
             height: parent.height
 
-            // Rectangle {
-            //     id: backButton_reset
-            //     width: dp(10)
-            //     height: dp(10)
-            //     color: "transparent"
-            //     z: 10
+            // State management - moved to root of Item
+            property bool otpSent: false
+            property bool isOtpVerified: false
+            property string resetEmail: ""
 
-            //     anchors {
-            //         top: parent.top
-            //         left: parent.left
-            //         topMargin: dp(2)
-            //         leftMargin: dp(2)
-            //     }
+            function sendResetOTP() {
+                var userInput = resetUserInput.text.trim();
+                if (userInput === "") {
+                    if (typeof rootWindow !== 'undefined' && rootWindow.showToastMessage) {
+                        rootWindow.showToastMessage("Please enter username or email");
+                    } else {
+                        console.log("Please enter username or email");
+                    }
+                    return;
+                }
 
-            //     MouseArea {
-            //         anchors.fill: parent
-            //         cursorShape: Qt.PointingHandCursor
+                // Use XMLHttpRequest directly instead of MapGlobals.loadUserData
+                var xhr = new XMLHttpRequest();
+                var url = MapGlobals.backendUrl + '/send-otp';
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
 
-            //         onClicked: {
-            //             console.log("BACK CLICKED");
-            //             currentView = "welcome"
-            //         }
-            //     }
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                resetRoot.otpSent = true;
+                                resetRoot.resetEmail = userInput; // Store email for later
+                                if (typeof rootWindow !== 'undefined' && rootWindow.showToastMessage) {
+                                    rootWindow.showToastMessage("OTP sent to " + userInput);
+                                }
+                            } else {
+                                if (typeof rootWindow !== 'undefined' && rootWindow.showToastMessage) {
+                                    rootWindow.showToastMessage(response.message || "Failed to send OTP");
+                                }
+                            }
+                        } else {
+                            if (typeof rootWindow !== 'undefined' && rootWindow.showToastMessage) {
+                                rootWindow.showToastMessage("Failed to send OTP. Server error.");
+                            }
+                        }
+                    }
+                };
 
-            //     QGCColoredImage {
-            //         anchors.centerIn: parent
-            //         source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
-            //         width: dp(6)
-            //         height: dp(6)
-            //         color: textPrimary
-            //     }
-            // }
+                var data = JSON.stringify({
+                    email: userInput,
+                    type: "forgotPassword"
+                });
 
-
+                xhr.send(data);
+            }
             ScrollView {
                 anchors.fill: parent
-                z: 1
-                //clip: true
                 ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
-                // Container to ensure proper centering
                 Item {
                     width: parent.width
                     height: Math.max(resetColumn.implicitHeight, parent.height)
@@ -1244,24 +1322,20 @@ Item {
                     Column {
                         id: resetColumn
                         width: parent.width * 0.85
-                        spacing: dp(4)
-                        anchors.centerIn: parent
-
+                        spacing: 32 // dp(4) - using pixels directly to avoid potential issues
                         anchors {
                             top: parent.top
                             horizontalCenter: parent.horizontalCenter
-                            topMargin: dp(2)
+                            topMargin: 16
                         }
 
                         // Header
                         Column {
                             width: parent.width
-                            spacing: dp(1.5)
-                            //anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: 8
 
                             Text {
                                 text: "Reset Password"
-                                //font.pixelSize: dp(6)
                                 font.pointSize: ScreenTools.mediumFontPointSize
                                 font.weight: Font.Bold
                                 color: app_color
@@ -1269,8 +1343,7 @@ Item {
                             }
 
                             Text {
-                                text: "Enter your username and new password"
-                                //font.pixelSize: dp(3)
+                                text: resetRoot.isOtpVerified ? "Set your new password" : (resetRoot.otpSent ? "Enter the OTP sent to your email" : "Enter your username or email to receive OTP")
                                 font.pointSize: ScreenTools.smallFontPointSize
                                 color: textSecondary
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1280,56 +1353,52 @@ Item {
                             }
                         }
 
-                        // Form
+                        // Form - Dynamic based on state
                         Column {
                             width: parent.width
-                            spacing: dp(4)
+                            spacing: 32
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            // Username Field
+                            // Username/Email Field (Step 1)
                             Column {
                                 width: parent.width
-                                spacing: dp(2)
+                                spacing: 16
+                                visible: !resetRoot.otpSent
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 Row {
-                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.05
-                                    spacing: dp(1)
+                                    spacing: 8
 
                                     Text {
-                                        text: "Username"
-                                        //font.pixelSize: dp(4)
+                                        text: "Username or Email"
                                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                         font.weight: Font.Bold
                                         color: app_color
-                                        //x: parent.width * 0.25
                                     }
 
-                                    QGCColoredImage {
-                                        source: "/qmlimages/NewImages/userProfile_icon.svg"
-                                        fillMode: Image.PreserveAspectFit
-                                        width: 12
-                                        height: 12
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: app_color
+                                    Text {
+                                        text: "*"
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.8
+                                        font.weight: Font.Medium
+                                        color: "red"
                                     }
                                 }
 
                                 Rectangle {
                                     width: parent.width * 0.9
-                                    height: dp(10)
-                                    radius: dp(1)
+                                    height: 45 // dp(10)
+                                    radius: 8
                                     color: surfaceColor
-                                    border.width: resetUser.activeFocus ? 2 : 1
-                                    border.color: resetUser.activeFocus ? app_color : borderColor
+                                    border.width: resetUserInput.activeFocus ? 2 : 1
+                                    border.color: resetUserInput.activeFocus ? app_color : borderColor
                                     anchors.horizontalCenter: parent.horizontalCenter
 
                                     TextField {
-                                        id: resetUser
+                                        id: resetUserInput
                                         anchors.fill: parent
-                                        placeholderText: "Enter your username"
-                                        //font.pixelSize: dp(4)
+                                        anchors.margins: 8
+                                        placeholderText: "Enter your username or email"
                                         font.pointSize: ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"
@@ -1339,228 +1408,420 @@ Item {
                                 }
                             }
 
+                            // OTP Field (Step 2)
+                            Column {
+                                width: parent.width
+                                spacing: 16
+                                visible: resetRoot.otpSent && !resetRoot.isOtpVerified
+
+                                Row {
+                                    x: parent.width * 0.05
+                                    spacing: 8
+
+                                    Text {
+                                        text: "OTP Verification"
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                        font.weight: Font.Bold
+                                        color: app_color
+                                    }
+
+                                    Text {
+                                        text: "*"
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.8
+                                        font.weight: Font.Medium
+                                        color: "red"
+                                    }
+                                }
+
+                                // OTP Input Row
+                                Row {
+                                    width: parent.width * 0.9
+                                    spacing: 16
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Rectangle {
+                                        width: parent.width - verifyResetOtpBtn2.width - parent.spacing
+                                        height: 45
+                                        radius: 8
+                                        color: surfaceColor
+                                        border.width: resetOtpField.activeFocus ? 2 : 1
+                                        border.color: resetOtpField.activeFocus ? app_color : borderColor
+
+                                        TextField {
+                                            id: resetOtpField
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            placeholderText: "Enter 6-digit OTP"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.family: "Arial"
+                                            color: "black"
+                                            background: null
+                                            selectByMouse: true
+                                            inputMethodHints: Qt.ImhDigitsOnly
+                                            verticalAlignment: TextInput.AlignVCenter
+                                        }
+                                    }
+                                    Button {
+                                        id: verifyResetOtpBtn2
+                                        width: 130
+                                        height: 45
+                                        text: "Verify OTP"
+                                        background: Rectangle {
+                                            radius: 8
+                                            color: verifyResetOtpBtn2.pressed ? primaryHover : app_color
+                                        }
+                                        contentItem: Text {
+                                            text: "Verify OTP"
+                                            color: "white"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                        onClicked: {
+                                            if (resetOtpField.text.length < 6) {
+                                                rootWindow.showToastMessage("Please enter a valid 6-digit OTP");
+                                                return;
+                                            }
+                                            var xhr = new XMLHttpRequest();
+                                            var url = MapGlobals.backendUrl + '/verify-otp';  // FIXED: Added /api/
+                                            xhr.open('POST', url, true);
+                                            xhr.setRequestHeader('Content-Type', 'application/json');
+                                            xhr.onreadystatechange = function() {
+                                                if (xhr.readyState === XMLHttpRequest.DONE) {
+                                                    if (xhr.status === 200) {
+                                                        var response = JSON.parse(xhr.responseText);
+                                                        if (response.success) {
+                                                            resetRoot.isOtpVerified = true;
+                                                            rootWindow.showToastMessage("OTP verified! Please set your new password.");
+                                                        } else {
+                                                            rootWindow.showToastMessage(response.message || "OTP verification failed");
+                                                        }
+                                                    } else {
+                                                        rootWindow.showToastMessage("Failed to verify OTP");
+                                                    }
+                                                }
+                                            };
+                                            var data = JSON.stringify({
+                                                email: resetRoot.resetEmail,
+                                                otp: resetOtpField.text,
+                                                type: "forgotPassword"
+                                            });
+                                            xhr.send(data);
+                                        }
+                                    }
+                                }
+
+                                // Resend OTP option
+                                Row {
+                                    spacing: 8
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Text {
+                                        text: "Didn't receive OTP?"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        color: textSecondary
+                                    }
+
+                                    Text {
+                                        text: "Resend"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.weight: Font.Medium
+                                        color: app_color
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                resetRoot.sendResetOTP();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             // New Password Field
                             Column {
                                 width: parent.width
-                                spacing: dp(2)
-                                anchors.horizontalCenter: parent.horizontalCenter
-
+                                spacing: 16
+                                visible: resetRoot.isOtpVerified
 
                                 Row {
-                                    //anchors.horizontalCenter: parent.horizontalCenter
                                     x: parent.width * 0.05
-                                    spacing: dp(1)
-
+                                    spacing: 8
                                     Text {
                                         text: "New Password"
-                                        //font.pixelSize: dp(4)
-                                        font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                         font.weight: Font.Bold
                                         color: app_color
-                                        //x: parent.width * 0.25
                                     }
-
-                                    QGCColoredImage {
-                                        source: "/qmlimages/NewImages/password.svg"
-                                        fillMode: Image.PreserveAspectFit
-                                        width: 12
-                                        height: 12
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        color: app_color
-                                    }
+                                    Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "red" }
                                 }
 
                                 Rectangle {
                                     width: parent.width * 0.9
-                                    height: dp(10)
-                                    radius: dp(1)
+                                    height: 40
+                                    radius: 8
                                     color: surfaceColor
-                                    border.width: newPassword.activeFocus ? 2 : 1
-                                    border.color: newPassword.activeFocus ? app_color : borderColor
+                                    border.width: newPasswordField.activeFocus ? 2 : 1
+                                    border.color: newPasswordField.activeFocus ? app_color : borderColor
                                     anchors.horizontalCenter: parent.horizontalCenter
 
-                                    TextField {
-                                        id: newPassword
-                                        anchors {
-                                            left: parent.left
-                                            right: newPasswors_resetbtn.left
-                                            top: parent.top
-                                            bottom: parent.bottom
-                                            //margins: dp(2)
+                                    Row {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 8
+                                        TextField {
+                                            id: newPasswordField
+                                            width: parent.width - 48 - parent.spacing
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            placeholderText: "Enter your new password (min 8 characters)"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            color: "black"
+                                            echoMode: showNewPasswordBtn.checked ? TextInput.Normal : TextInput.Password
+                                            background: null
                                         }
-                                        placeholderText: "Enter your new password"
-                                        //font.pixelSize: dp(4)
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.family: "Arial"
-                                        color: "black"
-                                        echoMode: newPasswors_resetbtn.checked ? TextInput.Normal : TextInput.Password
-                                        background: null
-                                        selectByMouse: true
-                                    }
-
-
-                                    Button {
-                                        id: newPasswors_resetbtn
-                                        width: dp(6) // Adjusted size
-                                        height: dp(6)
-                                        anchors {
-                                            right: parent.right
-                                            verticalCenter: parent.verticalCenter
-                                            margins: dp(1)
-                                        }
-                                        checkable: true
-
-                                        background: Rectangle {
-                                            radius: dp(0.75) // 6/8=0.75
-                                            color: parent.pressed ? Qt.rgba(0, 0, 0, 0.1) : "transparent"
-                                        }
-
-                                        contentItem: QGCColoredImage {
-                                            anchors.fill: parent
-                                            anchors.margins: dp(1)
-                                            fillMode: Image.PreserveAspectFit
-                                            source: parent.checked
-                                                    ? "/qmlimages/NewImages/password_visible.svg"
-                                                    : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: app_color
+                                        Button {
+                                            id: showNewPasswordBtn
+                                            width: 40; height: 40
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            checkable: true
+                                            background: Rectangle { radius: 6; color: parent.pressed ? Qt.rgba(0,0,0,0.1) : "transparent" }
+                                            contentItem: QGCColoredImage {
+                                                anchors.fill: parent; anchors.margins: 8
+                                                fillMode: Image.PreserveAspectFit
+                                                source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+                                                color: app_color
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        // Action Buttons
-
-                        Button {
-                            id: resetBtn
-                            text: "Reset Password"
-                            width: parent.width * 0.9
-                            height: dp(10)
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            background: Rectangle {
-                                radius: dp(1)
-                                color: resetBtn.pressed ? primaryHover : app_color
-                            }
-
-                            // contentItem: Text {
-                            //     text: parent.text
-                            //     //font.pixelSize: dp(4)
-                            //     font.pointSize: ScreenTools.defaultFontPointSize
-                            //     font.weight: Font.Medium
-                            //     color: "white"
-                            //     horizontalAlignment: Text.AlignHCenter
-                            //     verticalAlignment: Text.AlignVCenter
-                            // }
-
-                            contentItem: Item {
-                                anchors.fill: parent
-                                // clip: true
+                            // Confirm Password Field
+                            Column {
+                                width: parent.width
+                                spacing: 16
+                                visible: resetRoot.isOtpVerified
 
                                 Row {
-                                    anchors.centerIn: parent      // now centers correctly
-                                    spacing: dp(2)
-
+                                    x: parent.width * 0.05
+                                    spacing: 8
                                     Text {
-                                        text: resetBtn.text
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.weight: Font.Medium
-                                        color: "white"
-                                        verticalAlignment: Text.AlignVCenter
+                                        text: "Confirm Password"
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                        font.weight: Font.Bold
+                                        color: app_color
                                     }
+                                    Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "red" }
+                                }
 
-                                    QGCColoredImage {
-                                        source: "/qmlimages/NewImages/reset_password.svg"
-                                        fillMode: Image.PreserveAspectFit
-                                        width: 20
-                                        height: 20
+                                Rectangle {
+                                    width: parent.width * 0.9
+                                    height: 40
+                                    radius: 8
+                                    color: surfaceColor
+                                    border.width: confirmPasswordField.activeFocus ? 2 : 1
+                                    border.color: confirmPasswordField.activeFocus ? app_color : borderColor
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    Row {
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        spacing: 8
+                                        TextField {
+                                            id: confirmPasswordField
+                                            width: parent.width - 48 - parent.spacing
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            placeholderText: "Confirm your new password"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            color: "black"
+                                            echoMode: showConfirmPasswordBtn.checked ? TextInput.Normal : TextInput.Password
+                                            background: null
+                                        }
+                                        Button {
+                                            id: showConfirmPasswordBtn
+                                            width: 40; height: 40
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            checkable: true
+                                            background: Rectangle { radius: 6; color: parent.pressed ? Qt.rgba(0,0,0,0.1) : "transparent" }
+                                            contentItem: QGCColoredImage {
+                                                anchors.fill: parent; anchors.margins: 8
+                                                fillMode: Image.PreserveAspectFit
+                                                source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+                                                color: app_color
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            Button {
+                                id: resetPasswordFinalBtn
+                                text: "Reset Password"
+                                visible: resetRoot.isOtpVerified
+                                width: parent.width * 0.9
+                                height: 45
+                                anchors.horizontalCenter: parent.horizontalCenter
 
-                            onClicked: {
-                                // Basic validation
-                                if (resetUser.text.trim() === "" || newPassword.text === "") {
-                                    mainWindow.showToastMessage("Please fill all fields");
-                                    return;
+                                background: Rectangle {
+                                    radius: 8
+                                    color: parent.pressed ? primaryHover : app_color
                                 }
 
-                                if (newPassword.text.length < 8) {
-                                    mainWindow.showToastMessage("Password must be at least 8 characters");
-                                    newPassword.focus = true;
-                                    return;
-                                }
-
-                                // Disable button during operation
-                                resetBtn.enabled = false;
-                                resetBtn.text = "Resetting...";
-
-                                // Call the resetPassword function with a callback
-                                MapGlobals.resetPassword(resetUser.text, newPassword.text, function(result) {
-                                    if (result.success) {
-                                        mainWindow.showToastMessage(result.message);
-                                        currentView = "signin";
-                                        resetUser.text = "";
-                                        newPassword.text = "";
-                                    } else {
-                                        mainWindow.showToastMessage(result.message);
-                                        resetUser.focus = true;
-                                    }
-
-                                    // Re-enable button
-                                    resetBtn.enabled = true;
-                                    resetBtn.text = "Reset Password";
-                                });
-                            }
-                        }
-
-                        Item {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            height: dp(8)
-                            width: backRow.width
-
-                            Row {
-                                id: backRow
-                                spacing: dp(2)
-                                anchors.centerIn: parent
-
-                                QGCColoredImage {
-                                    source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
-                                    width: dp(4)
-                                    height: dp(4)
-                                    color: app_color
-
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Text {
-                                    text: "Back"
+                                contentItem: Text {
+                                    text: resetPasswordFinalBtn.text
+                                    color: "white"
                                     font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.underline: true
-                                    font.weight: Font.Bold
-                                    color: app_color
-
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    font.weight: Font.Medium
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
 
                                 onClicked: {
-                                    console.log("BACK CLICKED")
-                                    currentView = "signin"
+                                    // Validate passwords
+                                    if (!MapGlobals.validatePassword(newPasswordField.text, newPasswordField)) return;
+                                    if (!MapGlobals.validateConfirmPassword(newPasswordField.text, confirmPasswordField.text, confirmPasswordField)) return;
+
+                                    // Call reset password API
+                                    var xhr = new XMLHttpRequest();
+                                    var url = MapGlobals.backendUrl + '/forgot-password';  // FIXED: Added /api/
+                                    xhr.open('POST', url, true);
+                                    xhr.setRequestHeader('Content-Type', 'application/json');
+
+                                    xhr.onreadystatechange = function() {
+                                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                                            if (xhr.status === 200) {
+                                                var response = JSON.parse(xhr.responseText);
+                                                if (response.success) {
+                                                    rootWindow.showToastMessage("Password reset successfully! Please login.");
+                                                    // Reset all fields and go back to sign in
+                                                    resetUserInput.text = "";
+                                                    resetOtpField.text = "";
+                                                    newPasswordField.text = "";
+                                                    confirmPasswordField.text = "";
+                                                    resetRoot.otpSent = false;
+                                                    resetRoot.isOtpVerified = false;
+                                                    resetRoot.resetEmail = "";
+                                                    currentView = "signin";
+                                                } else {
+                                                    rootWindow.showToastMessage(response.message || "Failed to reset password");
+                                                }
+                                            } else {
+                                                rootWindow.showToastMessage("Failed to reset password. Server error.");
+                                            }
+                                        }
+                                    };
+
+                                    xhr.send(JSON.stringify({
+                                        email: resetRoot.resetEmail,
+                                        otp: resetOtpField.text,
+                                        newPassword: newPasswordField.text
+                                    }));
+                                }
+                            }
+
+                            // Action Buttons
+                        Column {
+                            width: parent.width
+                            spacing: 24
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            // Send OTP Button (Step 1)
+                            Button {
+                                id: sendResetOtpBtn
+                                text: "Send OTP"
+                                visible: !resetRoot.otpSent
+                                width: parent.width * 0.5
+                                height: 45
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                background: Rectangle {
+                                    radius: 8
+                                    color: sendResetOtpBtn.pressed ? primaryHover : app_color
+                                }
+
+                                contentItem: Item {
+                                    anchors.fill: parent
+
+                                    Row {
+                                        anchors.centerIn: parent
+                                        spacing: 10
+
+                                        Text {
+                                            text: sendResetOtpBtn.text
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.weight: Font.Medium
+                                            color: "white"
+                                            verticalAlignment: Text.AlignVCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        QGCColoredImage {
+                                            source: "/qmlimages/NewImages/send_mail.svg"
+                                            fillMode: Image.PreserveAspectFit
+                                            width: 18
+                                            height: 18
+                                            color: "white"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+                                }
+
+                                onClicked: {
+                                    resetRoot.sendResetOTP();
+                                }
+                            }
+
+                            // Back to Sign In link
+                            Item {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                height: 48
+                                width: backRow.width
+
+                                Row {
+                                    id: backRow
+                                    spacing: 16
+                                    anchors.centerIn: parent
+
+                                    QGCColoredImage {
+                                        source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
+                                        width: 20
+                                        height: 20
+                                        color: app_color
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        text: "Back to Sign In"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        font.underline: true
+                                        font.weight: Font.Bold
+                                        color: app_color
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        // Reset all states
+                                        resetUserInput.text = "";
+                                        resetOtpField.text = "";
+                                        newPasswordField.text = "";
+                                        confirmPasswordField.text = "";
+                                        resetRoot.otpSent = false;
+                                        resetRoot.isOtpVerified = false;
+                                        resetRoot.resetEmail = "";
+                                        currentView = "signin";
+                                    }
                                 }
                             }
                         }
 
-
-
-                    }
+                        }
                 }
             }
-
         }
     }
 }
+
