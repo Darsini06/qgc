@@ -97,7 +97,9 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            mainWindow.showIndicatorDrawer(batteryPopup, control);
+            if (_activeVehicle) {
+                mainWindow.showIndicatorDrawer(batteryPopup, control);
+            }
         }
     }
 
@@ -254,7 +256,7 @@ Item {
                 const threshold1 = 100;
                 const threshold2 = 40;
                 if (!_activeVehicle) {
-                    return "qrc:/qmlimages/BatteryCritical.svg";
+                    return "qrc:/qmlimages/Battery.svg";
                 }
                 if (!isNaN(battery.voltage.rawValue)) {
                     const voltage = battery.voltage.rawValue;
@@ -313,7 +315,6 @@ Item {
             // }
 
             function getBatteryPercentageFromVoltage(voltage) {
-                console.log("get batter percentage..................... line 317");
                 const minVoltage = 9.6;
                 const maxVoltage = 12.6;
                 if (voltage < minVoltage) {
@@ -360,10 +361,6 @@ Item {
             // }
 
             function getBatteryPercentageText() {
-                console.log("get batter percentage..................... line 364");
-                if (!_activeVehicle) {
-                    return "0%";
-                }
                 if (!isNaN(battery.voltage.rawValue)) {
                     const voltage = battery.voltage.rawValue;
                     const percentage = getBatteryPercentageFromVoltage(voltage);
