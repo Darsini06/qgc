@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <https://www.qgroundcontrol.org>
+ * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
  * QGroundControl is licensed according to the terms in the file
  * COPYING.md in the root of the source code directory.
@@ -447,7 +447,6 @@ Item {
 
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
-                MapGlobals.saveMissionLog(_planMasterController.currentPlanFile || "New Mission", _missionController.visualItems)
                 sendToVehicle()
                 console.log("upload_clicked1")
                 break
@@ -481,12 +480,13 @@ Item {
         }
 
         function saveToSelectedFile() {
+            console.log("mapping saved")
             if (!checkReadyForSaveUpload(true /* save */)) {
                 return
             }
             fileDialog.title =          qsTr("Save Plan")
             fileDialog.planFiles =      true
-            fileDialog.nameFilters =    _planMasterController.saveNameFilters
+            fileDialog.nameFilters =    _planMasterController.saveNameFilters1
             fileDialog.openForSave()
         }
 
@@ -524,6 +524,7 @@ Item {
         }
 
         function saveToSelectedFile1() {
+            console.log("agri saved")
             if (!checkReadyForSaveUpload(true /* save */)) {
                 return
             }
@@ -703,7 +704,7 @@ Item {
                                   case _layerMission:
                                   if (addWaypointRallyPointAction.checked) {
 
-                                      if(waypointMark){
+                                      if(QGroundControl.loadGlobalSetting("waypointMark","true")==="true"){
                                           insertSimpleItemAfterCurrent(coordinate)
                                       }
 
@@ -1082,7 +1083,7 @@ Item {
                 _addROIOnClick =        false
 
 
-                if(waypointMark===true){
+                if(QGroundControl.loadGlobalSetting("waypointMark","true")==="true"){
                     console.log("waypointMark",waypointMark)
                     addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
                 }
@@ -1208,11 +1209,10 @@ Item {
 
                                     console.log("_appSettings.screen", _appSettings.screen)
 
-                                    if (_appSettings.screen==="Start") {
+                                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
                                         console.log("_appSettings.screen", _appSettings.screen)
                                         _planMasterController.saveToSelectedFile1()
                                         mainWindow.planmap()
-                                        mainWindow.showMapping()
                                     } else {
                                         console.log("_appSettings.screen", _appSettings.screen)
                                         _planMasterController.saveToSelectedFile()

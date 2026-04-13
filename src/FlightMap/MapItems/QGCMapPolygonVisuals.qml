@@ -452,8 +452,8 @@ Item {
         y: 60
         z: 1000
         radius: 8
-        color: "white"
-        border.color: "#000000"
+        color: Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.75)
+        border.color: qgcPal.text
         border.width: 1
         opacity: 0
 
@@ -470,12 +470,39 @@ Item {
         function popupVertex(curIndex) {
             vertexMenu._editingVertexIndex = curIndex
             vertexMenu._showRemove = (mapPolygon.count > 3 && curIndex >= 0)
+
+            var coordinate = mapPolygon.vertexCoordinate(curIndex)
+            if (coordinate && coordinate.isValid) {
+                var point = mapControl.fromCoordinate(coordinate, false)
+                var centerPoint = mapControl.fromCoordinate(mapPolygon.center, false)
+                var menuX = (point.x < centerPoint.x) ? (point.x - vertexMenu.width - 20) : (point.x + 20)
+                var menuY = (point.y < centerPoint.y) ? (point.y - vertexMenu.height - 20) : (point.y + 20)
+                vertexMenu.x = Math.max(10, Math.min(menuX, mapControl.width - vertexMenu.width - 10))
+                vertexMenu.y = Math.max(10, Math.min(menuY, mapControl.height - vertexMenu.height - 10))
+            } else {
+                vertexMenu.x = 30
+                vertexMenu.y = 60
+            }
+
             openAnimation.start()
         }
 
         function popupCenter() {
             vertexMenu._editingVertexIndex = -1
             vertexMenu._showRemove = false
+
+            var coordinate = mapPolygon.center
+            if (coordinate && coordinate.isValid) {
+                var point = mapControl.fromCoordinate(coordinate, false)
+                var menuX = point.x + 20
+                var menuY = point.y - (vertexMenu.height / 2)
+                vertexMenu.x = Math.max(10, Math.min(menuX, mapControl.width - vertexMenu.width - 10))
+                vertexMenu.y = Math.max(10, Math.min(menuY, mapControl.height - vertexMenu.height - 10))
+            } else {
+                vertexMenu.x = 30
+                vertexMenu.y = 60
+            }
+
             openAnimation.start()
         }
 
@@ -483,33 +510,31 @@ Item {
             closeAnimation.start()
         }
 
-        // Slide-in from left animation
+        // Fade in animation
         NumberAnimation {
             id: openAnimation
             target: vertexMenu
-            property: "x"
-            from: -vertexMenu.width
-            to: 30
-            duration: 280
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 200
             easing.type: Easing.OutCubic
             onStarted: {
                 vertexMenu.visible = true
-                vertexMenu.opacity = 1
             }
         }
 
-        // Slide-out to right animation
+        // Fade out animation
         NumberAnimation {
             id: closeAnimation
             target: vertexMenu
-            property: "x"
-            from: 30
-            to: vertexMenu.width + 20
-            duration: 220
+            property: "opacity"
+            from: 1
+            to: 0
+            duration: 200
             easing.type: Easing.InCubic
             onFinished: {
                 vertexMenu.visible = false
-                vertexMenu.x = 30
             }
         }
 
@@ -558,8 +583,8 @@ Item {
                     }
 
                     Text {
-                        text:               qsTr("Remove vertex...")
-                        color:              "#000000"
+                        text:               qsTr("Delete")
+                        color:              qgcPal.text
                         font.pointSize:     ScreenTools.defaultFontPointSize
                         font.weight:        Font.Medium
                         anchors.verticalCenter: parent.verticalCenter
@@ -584,7 +609,8 @@ Item {
                 visible: vertexMenu._showRemove
                 width:  menuColumn.implicitWidth
                 height: 1
-                color: "#DDDDDD"
+                color: qgcPal.text
+                opacity: 0.2
                 //anchors.horizontalCenter: parent.horizontalCenter
             }
 
@@ -617,8 +643,8 @@ Item {
                     }
 
                     Text {
-                        text: qsTr("Edit position...")
-                        color: "#000000"
+                        text: qsTr("Edit")
+                        color: qgcPal.text
                         font.pointSize: ScreenTools.defaultFontPointSize
                         font.weight: Font.Medium
                         anchors.verticalCenter: parent.verticalCenter
@@ -1051,7 +1077,7 @@ Item {
                         // arrowDrawer.open()
                         // // Emit the markerClicked signal if further handling is needed
                         // mapQuickItem.markerClicked(mapQuickItem)
-                        menu.popupVertex(polygonVertex)
+                        vertexMenu.popupVertex(polygonVertex)
                     }
                 }
             }
@@ -1120,10 +1146,10 @@ Item {
         id: editVertexPositionDialog
 
         EditPositionDialog {
-            title:      qsTr("Edit Vertex Position")
-            coordinate: mapPolygon.vertexCoordinate(menu._editingVertexIndex)
+            title:      qsTr("Edit Boundary Point")
+            coordinate: mapPolygon.vertexCoordinate(vertexMenu._editingVertexIndex)
             onCoordinateChanged: {
-                mapPolygon.adjustVertex(menu._editingVertexIndex, coordinate)
+                mapPolygon.adjustVertex(vertexMenu._editingVertexIndex, coordinate)
                 mapPolygon.verifyClockwiseWinding()
             }
         }
@@ -1275,8 +1301,8 @@ Item {
                 y: 60
                 z: 1000
                 radius: 8
-                color: "white"
-                border.color: "#000000"
+                color: Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.75)
+                border.color: qgcPal.text
                 border.width: 1
                 opacity: 0
 
@@ -1292,12 +1318,39 @@ Item {
                 function popupVertex(curIndex) {
                     vertexMenu._editingVertexIndex = curIndex
                     vertexMenu._showRemove = (mapPolygon.count > 3 && curIndex >= 0)
+
+                    var coordinate = mapPolygon.vertexCoordinate(curIndex)
+                    if (coordinate && coordinate.isValid) {
+                        var point = mapControl.fromCoordinate(coordinate, false)
+                        var centerPoint = mapControl.fromCoordinate(mapPolygon.center, false)
+                        var menuX = (point.x < centerPoint.x) ? (point.x - vertexMenu.width - 20) : (point.x + 20)
+                        var menuY = (point.y < centerPoint.y) ? (point.y - vertexMenu.height - 20) : (point.y + 20)
+                        vertexMenu.x = Math.max(10, Math.min(menuX, mapControl.width - vertexMenu.width - 10))
+                        vertexMenu.y = Math.max(10, Math.min(menuY, mapControl.height - vertexMenu.height - 10))
+                    } else {
+                        vertexMenu.x = 30
+                        vertexMenu.y = 60
+                    }
+
                     openAnimation.start()
                 }
 
                 function popupCenter() {
                     vertexMenu._editingVertexIndex = -1
                     vertexMenu._showRemove = false
+
+                    var coordinate = mapPolygon.center
+                    if (coordinate && coordinate.isValid) {
+                        var point = mapControl.fromCoordinate(coordinate, false)
+                        var menuX = point.x + 20
+                        var menuY = point.y - (vertexMenu.height / 2)
+                        vertexMenu.x = Math.max(10, Math.min(menuX, mapControl.width - vertexMenu.width - 10))
+                        vertexMenu.y = Math.max(10, Math.min(menuY, mapControl.height - vertexMenu.height - 10))
+                    } else {
+                        vertexMenu.x = 30
+                        vertexMenu.y = 60
+                    }
+
                     openAnimation.start()
                 }
 
@@ -1305,33 +1358,31 @@ Item {
                     closeAnimation.start()
                 }
 
-                // Slide-in from left animation
+                // Fade in animation
                 NumberAnimation {
                     id: openAnimation
                     target: vertexMenu
-                    property: "x"
-                    from: -vertexMenu.width
-                    to: 30
-                    duration: 280
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 200
                     easing.type: Easing.OutCubic
                     onStarted: {
                         vertexMenu.visible = true
-                        vertexMenu.opacity = 1
                     }
                 }
 
-                // Slide-out to right animation
+                // Fade out animation
                 NumberAnimation {
                     id: closeAnimation
                     target: vertexMenu
-                    property: "x"
-                    from: 30
-                    to: vertexMenu.width + 20
-                    duration: 220
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                    duration: 200
                     easing.type: Easing.InCubic
                     onFinished: {
                         vertexMenu.visible = false
-                        vertexMenu.x = 30
                     }
                 }
 
@@ -1375,8 +1426,8 @@ Item {
                             }
 
                             Text {
-                                text:               qsTr("Remove vertex...")
-                                color:              "#000000"
+                                text:               qsTr("Delete")
+                                color:              qgcPal.text
                                 font.pointSize:     ScreenTools.defaultFontPointSize
                                 font.weight:        Font.Medium
                                 anchors.verticalCenter: parent.verticalCenter
@@ -1401,7 +1452,8 @@ Item {
                         visible: vertexMenu._showRemove
                         width:  menuColumn.implicitWidth
                         height: 1
-                        color: "#DDDDDD"
+                        color: qgcPal.text
+                        opacity: 0.2
                     }
 
                     // "Edit position..." item
@@ -1435,8 +1487,8 @@ Item {
                             }
 
                             Text {
-                                text: qsTr("Edit position...")
-                                color: "#000000"
+                                text: qsTr("Edit")
+                                color: qgcPal.text
                                 font.pointSize: ScreenTools.defaultFontPointSize
                                 font.weight: Font.Medium
                                 anchors.verticalCenter: parent.verticalCenter

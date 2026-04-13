@@ -374,7 +374,7 @@ double TransectStyleComplexItem::coveredArea(void) const
 
 bool TransectStyleComplexItem::_hasTurnaround(void) const
 {
-    return _turnAroundDistance() > 0;
+    return _turnAroundDistance() != 0;
 }
 
 double TransectStyleComplexItem::_turnAroundDistance(void) const

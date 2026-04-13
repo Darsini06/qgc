@@ -54,7 +54,7 @@ QtObject {
     property var modeBtn1
 
     property string login: ""
-    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use loc      alhost
+    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api"
 
 
     function recenterMap() {

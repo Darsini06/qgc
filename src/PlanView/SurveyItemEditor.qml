@@ -32,6 +32,33 @@ TransectStyleComplexItemEditor {
     readonly property color _colorTextSecondary: "#8e8e93"
     // Placeholder text color — muted grey, NOT white
     readonly property color _colorPlaceholder:   "#5a5a6a"
+    readonly property color _colorSuccess:       "#2ECC71"
+    readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+
+    function _smartOptimize() {
+        if (missionItem.surveyAreaPolygon.count < 3) return
+        
+        var maxDist = 0
+        var bestAngle = 0
+        
+        // Find the longest edge to align the grid for minimum turns
+        for (var i = 0; i < missionItem.surveyAreaPolygon.count; i++) {
+            var c1 = missionItem.surveyAreaPolygon.path[i]
+            var c2 = missionItem.surveyAreaPolygon.path[(i + 1) % missionItem.surveyAreaPolygon.count]
+            var d = c1.distanceTo(c2)
+            if (d > maxDist) {
+                maxDist = d
+                bestAngle = c1.azimuthTo(c2)
+            }
+        }
+        
+        // Normalize angle to 0-180 (survey grids are symmetric)
+        bestAngle = Math.round(bestAngle) % 180
+        if (bestAngle < 0) bestAngle += 180
+        
+        missionItem.gridAngle.value = bestAngle
+        if (angleSlider) angleSlider.value = bestAngle
+    }
 
     Component {
         id: _transectValuesComponent
@@ -178,34 +205,61 @@ TransectStyleComplexItemEditor {
                     }
                 }
 
-            }
-
-            // Divider
-            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5 }
-
-            // ─── Turnaround Distance (volume slider) ──────────────────────
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing:          _margin * 0.5
-                visible:          !forPresets
-
-                QGCLabel {
-                    text:           qsTr("Turnaround dist")
-                    color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.smallFontPointSize
+                // --- Optimized Alignment Button ---
+                Button {
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: 32
+                    visible:                !_isAgri
+                    
+                    background: Rectangle {
+                        radius: 8
+                        color:  parent.pressed ? "#1E1E24" : (parent.hovered ? _colorBgTertiary : _colorBgSecondary)
+                        border.color: parent.hovered ? _colorSuccess : _colorBorder
+                        border.width: 1
+                    }
+                    
+                    contentItem: RowLayout {
+                        spacing: 8
+                        anchors.centerIn: parent
+                        QGCColoredImage {
+                            source: "/resources/InstrumentValueIcons/check.svg"
+                            width:  14; height: 14
+                            color:  _colorSuccess
+                        }
+                        QGCLabel {
+                            text: qsTr("Smart Path Optimization")
+                            font.pixelSize: ScreenTools.smallFontPointSize
+                            font.bold: true
+                            color: _colorTextPrimary
+                        }
+                    }
+                    onClicked: _smartOptimize()
                 }
 
-                Loader {
+                // --- Indentation / Turnaround Section ---
+                ColumnLayout {
                     Layout.fillWidth: true
-                    sourceComponent:  _volumeSlider
-                    property var targetFact: missionItem.turnAroundDistance
-                    onTargetFactChanged: if (item) item.fact = targetFact
-                    onLoaded:            if (item) item.fact = targetFact
+                    spacing:          _margin * 0.5
+                    
+                    QGCLabel {
+                        text:           qsTr("Indentation / Turnaround dist")
+                        color:          _colorTextSecondary
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        font.bold:      true
+                    }
+
+                    Loader {
+                        Layout.fillWidth: true
+                        sourceComponent:  _volumeSlider
+                        property var targetFact: missionItem.turnAroundDistance
+                        onTargetFactChanged: if (item) item.fact = targetFact
+                        onLoaded:            if (item) item.fact = targetFact
+                    }
                 }
             }
 
             // Divider
-            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets }
+            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets && !_isAgri }
 
             // ─── Options ComboBox ─────────────────────────────────────────
             // Styled wrapper so the combobox background matches dark theme
@@ -216,7 +270,7 @@ TransectStyleComplexItemEditor {
                 radius:           8
                 border.color:     _colorBorder
                 border.width:     1
-                visible:          !forPresets
+                visible:          !forPresets && !_isAgri
 
                 QGCOptionsComboBox {
                     id:               optionsCombo
