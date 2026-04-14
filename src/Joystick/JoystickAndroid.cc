@@ -289,7 +289,7 @@ bool JoystickAndroid::init(JoystickManager *manager) {
     return true;
 }
 
-static const char kJniClassName[] {"org/mavlink/qgroundcontrol/QGCActivity"};
+static const char kJniClassName[] {"org/mavlink/DCGCS/QGCActivity"};
 
 static void jniUpdateAvailableJoysticks(JNIEnv *envA, jobject thizA)
 {

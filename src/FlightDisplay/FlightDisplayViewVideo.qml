@@ -62,28 +62,28 @@ Item {
 
                 // Tech corners - now responsive
                 Item {
-                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    width: 30 * containerBox.adaptiveScale; height: 30 * containerBox.adaptiveScale
                     anchors.top: parent.top; anchors.left: parent.left; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * containerBox.adaptiveScale); color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * containerBox.adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
-                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    width: 30 * containerBox.adaptiveScale; height: 30 * containerBox.adaptiveScale
                     anchors.top: parent.top; anchors.right: parent.right; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * containerBox.adaptiveScale); color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * containerBox.adaptiveScale); height: parent.height; color: "white"; anchors.top: parent.top; anchors.right: parent.right; radius: 1 }
                 }
                 Item {
-                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    width: 30 * containerBox.adaptiveScale; height: 30 * containerBox.adaptiveScale
                     anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * containerBox.adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * containerBox.adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.left: parent.left; radius: 1 }
                 }
                 Item {
-                    width: 30 * adaptiveScale; height: 30 * adaptiveScale
+                    width: 30 * containerBox.adaptiveScale; height: 30 * containerBox.adaptiveScale
                     anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: parent.width * 0.05
-                    Rectangle { width: parent.width; height: Math.max(1, 2 * adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
-                    Rectangle { width: Math.max(1, 2 * adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: parent.width; height: Math.max(1, 2 * containerBox.adaptiveScale); color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
+                    Rectangle { width: Math.max(1, 2 * containerBox.adaptiveScale); height: parent.height; color: "white"; anchors.bottom: parent.bottom; anchors.right: parent.right; radius: 1 }
                 }
 
                 Column {
@@ -103,7 +103,7 @@ Item {
                             anchors.fill: parent
                             color: "transparent"
                             border.color: "white"
-                            border.width: Math.max(1, 2 * adaptiveScale)
+                            border.width: Math.max(1, 2 * containerBox.adaptiveScale)
                             radius: width / 2
                             opacity: 0.4
                         }

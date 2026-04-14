@@ -113,6 +113,7 @@ Item {
         MapPolyline {
             line.color: _gridColor
             line.width: 5
+            z:          QGroundControl.zOrderMapItems
             path:       _transectPoints
             visible:    gridLines ? _currentItem : false
             opacity:    _root.opacity

@@ -137,13 +137,12 @@ Item {
             anchors.fill: parent
             visible: (droneType !== "loadpage")
             source: {
-                if (droneType === "Camera")
-                    return "qrc:/qmlimages/NewImages/camera_bg_image.png";
-                if (droneType === "Mapping")
-                    return "qrc:/qmlimages/NewImages/mapping_bg_image.png";
-                if (droneType === "Agri")
-                    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png";
-                return "qrc:/qmlimages/NewImages/nature_background.png"; // Fallback
+
+                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
+                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
+                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
+                if (droneType === "AI")      return "qrc:/qmlimages/NewImages/ai_bg_image.png"
+                return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -607,9 +606,9 @@ Item {
         Column {
             id: heroSection
             // Conditional positioning: Center for the main tagline, Left for operational modes
-            anchors.horizontalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? undefined : parent.horizontalCenter
-            anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? parent.left : undefined
-            anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
+            anchors.horizontalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? undefined : parent.horizontalCenter
+            anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? parent.left : undefined
+            anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
 
             // Vertically centered alignment
             anchors.verticalCenter: parent.verticalCenter
@@ -630,16 +629,16 @@ Item {
                 id: heroTitle
                 width: parent.width
                 wrapMode: Text.WordWrap
-                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
+                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
                 visible: droneType !== "loadpage" // Avoid duplicate "DRONE COMMANDER" on homescreen
                 text: {
-                    if (droneType === "Camera")
-                        return "CAMERA OPERATIONS";
-                    if (droneType === "Mapping")
-                        return "MAPPING & SURVEY";
-                    if (droneType === "Agri")
-                        return "AGRICULTURAL PRECISION";
-                    return "";
+
+                    if (droneType === "Camera")  return "CAMERA OPERATIONS"
+                    if (droneType === "Mapping") return "MAPPING & SURVEY"
+                    if (droneType === "Agri")    return "AGRICULTURAL PRECISION"
+                    if (droneType === "AI")      return "AI MISSION ASSISTANT"
+                    return ""
+
                 }
                 color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                 // Massive size for Drone Commander, slightly larger for others
@@ -682,16 +681,15 @@ Item {
                 visible: !isSmallScreen // Hide on small screens to give room for the Flight Zone widget
                 width: parent.width
                 wrapMode: Text.WordWrap
-                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
+                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
                 text: {
-                    if (droneType === "Camera")
-                        return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance.";
-                    if (droneType === "Mapping")
-                        return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps.";
-                    if (droneType === "Agri")
-                        return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring.";
-                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS";
+                    if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
+                    if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
+                    if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+                    if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
+                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
                 }
+
                 color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
                     var baseSize = ScreenTools.defaultFontPointSize;
@@ -717,6 +715,7 @@ Item {
                     shadowVerticalOffset: 1
                 }
             }
+
 
             // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
 
@@ -907,6 +906,218 @@ Item {
                     isClearToFly = true;
                     // Replace above two lines with your real API call:
                     // airspaceMapApi.checkLocation(gpsLat, gpsLon)
+                }
+            }
+        }
+
+        // ---- COMING SOON RIGHT SIDE PANEL (AI MODE) ----
+        Item {
+            id: comingSoonPanel
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(4) : 60
+            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : dp(75)
+            height: Math.min(parent.height * 0.65, dp(85))
+            visible: droneType === "AI"
+            z: 100
+
+            // Entrance animation
+            opacity: 0
+            transform: Translate { id: panelSlide; x: 40 }
+            Component.onCompleted: {
+                if (droneType === "AI") panelEntryAnim.start()
+            }
+            onVisibleChanged: {
+                if (visible) panelEntryAnim.start()
+            }
+
+            SequentialAnimation {
+                id: panelEntryAnim
+                PauseAnimation { duration: 300 }
+                ParallelAnimation {
+                    NumberAnimation { target: comingSoonPanel; property: "opacity"; from: 0; to: 1; duration: 1200; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: panelSlide; property: "x"; from: 40; to: 0; duration: 1200; easing.type: Easing.OutBack }
+                }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: 28
+                color: Qt.rgba(0, 0, 0, 0.7) // Increased opacity for better legibility without blur
+                border.color: Qt.rgba(255, 255, 255, 0.15)
+                border.width: 1
+
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: Qt.rgba(0,0,0,0.6)
+                    shadowBlur: 1.0
+                    shadowVerticalOffset: 12
+                    blurEnabled: false
+                }
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: dp(3.5)
+                    spacing: dp(2.5)
+
+                    // Header decoration
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: dp(1.8)
+
+                        Rectangle {
+                            width: dp(5.5)
+                            height: dp(5.5)
+                            radius: 12
+                            color: accent_color
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/select_drone_type_color.svg"
+                                width: parent.width * 0.6
+                                height: width
+                                anchors.centerIn: parent
+                                color: "white"
+                            }
+                        }
+
+                        ColumnLayout {
+                            spacing: -2
+                            Label {
+                                text: "NEXT GENERATION"
+                                color: accent_color
+                                font.family: "Outfit"
+                                font.bold: true
+                                font.pointSize: ScreenTools.smallFontPointSize * 0.75
+                                font.letterSpacing: 2.5
+                            }
+                            Label {
+                                text: "MISSION HUB"
+                                color: "white"
+                                font.family: "Outfit"
+                                font.bold: true
+                                font.pointSize: ScreenTools.largeFontPointSize * 0.9
+                            }
+                        }
+                    }
+
+                    // Divider
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        opacity: 0.15
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0.0; color: "transparent" }
+                            GradientStop { position: 0.5; color: "white" }
+                            GradientStop { position: 1.0; color: "transparent" }
+                        }
+                    }
+
+                    Label {
+                        Layout.fillWidth: true
+                        text: "Autonomous intelligence that thinks ahead. Deploy neural-link drone coordination and real-time tactical analysis."
+                        color: "white"
+                        opacity: 0.7
+                        wrapMode: Text.WordWrap
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.95
+                        lineHeight: 1.3
+                    }
+
+                    // Feature Grid
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: dp(2)
+
+                        Repeater {
+                            model: [
+                                { icon: "qrc:/qmlimages/NewImages/camera_Application.svg", title: "Autonomous Swarming", desc: "Multi-drone coordination" },
+                                { icon: "qrc:/qmlimages/NewImages/mapping_Application.svg", title: "Neural Terrain AI", desc: "Real-time environment analysis" },
+                                { icon: "qrc:/qmlimages/NewImages/agri_Application.svg", title: "Predictive Ops", desc: "Data-driven mission optimization" }
+                            ]
+
+                            delegate: RowLayout {
+                                Layout.fillWidth: true
+                                spacing: dp(1.8)
+
+                                Rectangle {
+                                    width: dp(4)
+                                    height: dp(4)
+                                    radius: 8
+                                    color: Qt.rgba(255, 255, 255, 0.06)
+                                    border.color: Qt.rgba(255, 255, 255, 0.05)
+                                    QGCColoredImage {
+                                        source: modelData.icon
+                                        width: parent.width * 0.6
+                                        height: width
+                                        anchors.centerIn: parent
+                                        color: accent_color
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    spacing: 0
+                                    Label {
+                                        text: modelData.title
+                                        color: "white"
+                                        font.family: "Outfit"
+                                        font.bold: true
+                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                                    }
+                                    Label {
+                                        text: modelData.desc
+                                        color: "white"
+                                        opacity: 0.5
+                                        font.family: "Outfit"
+                                        font.pointSize: ScreenTools.smallFontPointSize * 0.8
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Item { Layout.fillHeight: true }
+
+                    // Status Badge
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: dp(6.5)
+                        radius: 14
+                        color: Qt.rgba(249/255, 115/255, 22/255, 0.12)
+                        border.color: Qt.rgba(249/255, 115/255, 22/255, 0.25)
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: dp(1.2)
+
+                            Rectangle {
+                                width: dp(1.2)
+                                height: dp(1.2)
+                                radius: width / 2
+                                color: accent_color
+                                SequentialAnimation on opacity {
+                                    loops: Animation.Infinite
+                                    NumberAnimation { from: 0.2; to: 1.0; duration: 1000; easing.type: Easing.InOutSine }
+                                    NumberAnimation { from: 1.0; to: 0.2; duration: 1000; easing.type: Easing.InOutSine }
+                                }
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: true
+                                    shadowColor: accent_color
+                                    shadowBlur: 0.8
+                                }
+                            }
+
+                            Label {
+                                text: "IN DEVELOPMENT: PHASE 2"
+                                color: accent_color
+                                font.family: "Outfit"
+                                font.bold: true
+                                font.pointSize: ScreenTools.smallFontPointSize * 0.85
+                                font.letterSpacing: 1.5
+                            }
+                        }
+                    }
                 }
             }
         }

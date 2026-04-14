@@ -38,6 +38,7 @@ SettingsPage {
     property bool   _videoAutoStreamConfig:     _videoManager.autoStreamConfigured
     property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 30
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
+
     //Telemetry Settings ------------------------------------------------------------------------------------
     property bool   _disableAllDataPersistence: _appSettings.disableAllPersistence.rawValue
     property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
@@ -45,15 +46,13 @@ SettingsPage {
     property bool   _isAPM:                     _activeVehicle ? _activeVehicle.apmFirmware : true
     property bool   _showAPMStreamRates:        QGroundControl.apmFirmwareSupported && _settingsManager.apmMavlinkStreamRateSettings.visible && _isAPM
     property var    _apmStartMavlinkStreams:   _appSettings.apmStartMavlinkStreams
+
     //Drone Settings ------------------------------------------------------------------------------------
     property var    _linkManager:               QGroundControl.linkManager
     property var    _autoConnectSettings:       QGroundControl.settingsManager.autoConnectSettings
     property bool   _isNarrow:                  root.width < ScreenTools.defaultFontPixelWidth * 80
     property real   _innerMargin:               ScreenTools.defaultFontPixelWidth * 2
     property real   _contentWidth:              Math.min(root.width - (_innerMargin * 3), ScreenTools.defaultFontPixelWidth * 100)
-
-
-
 
 
     ColumnLayout {

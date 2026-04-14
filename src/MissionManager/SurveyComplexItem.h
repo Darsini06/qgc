@@ -32,6 +32,11 @@ public:
     Q_PROPERTY(Fact*            flyAlternateTransects  READ flyAlternateTransects  CONSTANT)
     Q_PROPERTY(Fact*            splitConcavePolygons   READ splitConcavePolygons   CONSTANT)
     Q_PROPERTY(QGeoCoordinate   centerCoordinate       READ centerCoordinate       WRITE setCenterCoordinate)
+    Q_PROPERTY(double           entryIndentation       READ entryIndentation       WRITE setEntryIndentation       NOTIFY entryIndentationChanged)
+    Q_PROPERTY(double           exitIndentation        READ exitIndentation        WRITE setExitIndentation        NOTIFY exitIndentationChanged)
+    Q_PROPERTY(int              adjustmentMode         READ adjustmentMode         WRITE setAdjustmentMode         NOTIFY adjustmentModeChanged)
+    Q_PROPERTY(bool             hoverAndCaptureAllowed      READ hoverAndCaptureAllowed                             NOTIFY hoverAndCaptureAllowedChanged)
+    Q_PROPERTY(QGCMapPolygon*   mapPolygon                  READ mapPolygon             WRITE setMapPolygon         NOTIFY mapPolygonChanged)
 
     Fact* gridAngle             (void) { return &_gridAngleFact; }
     Fact* flyAlternateTransects (void) { return &_flyAlternateTransectsFact; }
@@ -61,6 +66,14 @@ public:
     QString             abbreviation        (void) const final { return tr("S"); }
     ReadyForSaveState   readyForSaveState    (void) const final;
     double              additionalTimeDelay (void) const final;
+    double              entryIndentation    (void) const { return _entryIndentation; }
+    double              exitIndentation     (void) const { return _exitIndentation; }
+    int                 adjustmentMode      (void) const { return _adjustmentMode; }
+    void                setEntryIndentation (double val);
+    void                setExitIndentation  (double val);
+    void                setAdjustmentMode   (int mode);
+    QGCMapPolygon*      mapPolygon          (void) { return _mapPolygon; }
+    void                setMapPolygon       (QGCMapPolygon* mapPolygon);
 
     // Must match json spec for GridEntryLocation
     enum EntryLocation {
@@ -85,6 +98,15 @@ public:
 
 signals:
     void refly90DegreesChanged(bool refly90Degrees);
+    void entryIndentationChanged(double val);
+    void exitIndentationChanged(double val);
+    void adjustmentModeChanged(int mode);
+    void gridAngleChanged                       (qreal gridAngle);
+    void gridAngleRelativeChanged               (bool gridAngleRelative);
+    void flyAlternateTransectsChanged           (bool flyAlternateTransects);
+    void hoverAndCaptureChanged                 (bool hoverAndCapture);
+    void hoverAndCaptureAllowedChanged          (bool hoverAndCaptureAllowed);
+    void mapPolygonChanged                      (void);
 
 private slots:
     void _updateWizardMode              (void);
@@ -148,6 +170,11 @@ private:
     SettingsFact    _flyAlternateTransectsFact;
     SettingsFact    _splitConcavePolygonsFact;
     int             _entryPoint;
+    double          _entryIndentation = 0;
+    double          _exitIndentation = 0;
+    int             _adjustmentMode = 0; // 0: Both, 1: Entry, 2: Exit
+
+    QGCMapPolygon*  _mapPolygon = nullptr;
 
     static constexpr const char* _jsonGridAngleKey =          "angle";
     static constexpr const char* _jsonEntryPointKey =         "entryLocation";

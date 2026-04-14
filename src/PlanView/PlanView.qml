@@ -87,11 +87,9 @@ Item {
     property real compassBottomY: compassNorth.y + compassNorth.height + 10
     property real compassNorthX:   compassNorth.x
 
-    property var _airspaceValidator: {
-        if (QGroundControl.airspaceManager) {
-            return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)
-        }
-        return null
+    AirspaceRestrictionValidator {
+        id: _airspaceValidator
+        airspaceManager: QGroundControl.airspaceManager
     }
 
     // Shared responsive base
@@ -99,6 +97,12 @@ Item {
     property real iconSize: baseSize * 0.8   // icon inside the circle
     property var _currentVIIndex: _missionController.currentPlanViewVIIndex
     property var _currentItem:   (_currentVIIndex >= 0 && _currentVIIndex < _missionController.visualItems.count) ? _missionController.visualItems.get(_currentVIIndex) : null
+
+    on_CurrentItemChanged: {
+        if (_currentItem && _currentItem.mapPolygon !== undefined) {
+             _currentItem.mapPolygon = mapPolygonvisuals.mapPolygon
+        }
+    }
     property var activePolygon:  (_currentItem && _currentItem.surveyAreaPolygon) ? _currentItem.surveyAreaPolygon : mapPolygonvisuals.mapPolygon
 
     property bool gridLines : MapGlobals.gridLines
@@ -211,6 +215,18 @@ Item {
 
     // Left Top Back Arrow Navigation explicitly removed as requested by user
 
+    function syncCloud() {
+        if (QGroundControl.loadBoolGlobalSetting("login", false)) {
+            var planName = _planMasterController.currentPlanFile ? _planMasterController.currentPlanFile.split('/').pop().split('\\').pop() : "Untitled.plan"
+            var planContent = JSON.parse(_planMasterController.saveToText())
+            MapGlobals.savePlanToCloud(planName, planContent, function(success) {
+                if (success) {
+                    mainWindow.showToastMessage("Plan synced to cloud");
+                }
+            })
+        }
+    }
+
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -225,7 +241,7 @@ Item {
             height: baseSize
             radius: width / 2
             color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             border.width: 0
             opacity: 0.95
             visible: true
@@ -253,7 +269,7 @@ Item {
             height: baseSize
             radius: width / 2
             color:  Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             border.width: 0
             opacity: 0.95
             visible: true
@@ -271,8 +287,11 @@ Item {
                 onClicked: {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
+                        syncCloud()
                     } else {
                         _planMasterController.saveToSelectedFile1()
+                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
+                        // but for now let's just add it to the fileDialog accepted handler too.
                     }
                 }
             }
@@ -362,7 +381,8 @@ Item {
                     Layout.fillWidth:   true
                     height:             dp(8)
                     radius:             12
-                    color:              keepMA.pressed ? Qt.darker("#471880", 1.2) : (keepMA.containsMouse ? Qt.lighter("#471880", 1.1) : "#471880")
+                    color:              keepMA.pressed ? Qt.darker("#000000", 1.2) : (keepMA.containsMouse ? Qt.lighter("#000000", 1.1) : "#000000")
+                    border.color: "#000000"
 
                     Text {
                         anchors.centerIn: parent
@@ -625,6 +645,7 @@ Item {
                                        _planMasterController.saveToFile(file)
                                        mainWindow.showMapping()
                                    }
+                                   syncCloud()
                                } else {
                                    _planMasterController.saveToKml(file)
                                }
@@ -645,7 +666,10 @@ Item {
     }
 
     AirspaceRestrictionDialog {
-        id: _airspaceRestrictionDialog
+        id:         _airspaceRestrictionDialog
+        validator:  _airspaceValidator
+        isBlocked:  _airspaceValidator ? _airspaceValidator.blockMissionUpload : false
+        message:    _airspaceValidator ? _airspaceValidator.restrictionMessage : ""
     }
 
     Item {
@@ -1055,7 +1079,7 @@ Item {
                         background: Rectangle {
                             color: Qt.rgba(0, 0, 0, 0.60)  // Darker for button action
                             radius: 20
-                            border.color: "transparent"
+                            border.color: Qt.rgba(0, 0, 0, 0.40)
                             border.width: 0
                         }
                         contentItem: Text {
@@ -1229,9 +1253,9 @@ Item {
                     id:         layerTabBar1
                     width:      parent.width
                     height:     42
-                    color:      "#2d1c42"  // Dark purple background
+                    color:      "#000000"  // Black background
                     radius:     21
-                    border.color: "#4a2c6d"
+                    border.color: "#3e3e4a"
                     border.width: 1
                     visible:    false //QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
@@ -1252,7 +1276,7 @@ Item {
 
                             GradientStop { position: 0.0; color: "#6a4c8d" }
 
-                            GradientStop { position: 1.0; color: "#4a2c6d" }
+                            GradientStop { position: 1.0; color: "#000000" }
                         }
                         radius: height / 2
                         border.color: "#8a6cad"
@@ -1801,7 +1825,7 @@ Item {
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: "transparent"
+                        border.color: Qt.rgba(0, 0, 0, 0.40)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -1844,7 +1868,7 @@ Item {
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: "transparent"
+                        border.color: Qt.rgba(0, 0, 0, 0.40)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -1920,7 +1944,7 @@ Item {
                                 background: Rectangle {
                                     radius: 20
                                     color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black dialog button
-                                    border.color: "transparent"
+                                    border.color: Qt.rgba(0, 0, 0, 0.40)
                                     border.width: 0
                                 }
                                 contentItem: Text {
@@ -2350,7 +2374,7 @@ Item {
     //     }
 
     //     background: Rectangle {
-    //         color: "transparent"
+    //         color: Qt.rgba(0, 0, 0, 0.40)
     //     }
 
     //     contentItem: RowLayout {
@@ -2372,7 +2396,7 @@ Item {
     //                 Layout.fillHeight: true
     //                 radius: 12
     //                 color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black popup item
-    //                 border.color: "transparent"
+    //                 border.color: Qt.rgba(0, 0, 0, 0.40)
     //                 border.width: 0
 
     //                 Text {
@@ -2469,79 +2493,71 @@ Item {
         id: bottomCenterContainer
         anchors.bottom:             parent.bottom
         anchors.horizontalCenter:   parent.horizontalCenter
-        anchors.bottomMargin:       10
+        anchors.bottomMargin:       25
         spacing:                    10
-        width:                      ScreenTools.defaultFontPixelWidth * 45
+        width:                      childrenRect.width // Prevent stretching
         z:                          QGroundControl.zOrderWidgets + 100
         visible:                    _editingLayer == _layerMission || _editingLayer == _layerGeoFence
 
-        // --- Row 3: Tab Selector ---
-        Rectangle {
+        // --- Row 3: Tab Selector (Styled Translucent Pills) ---
+        RowLayout {
             id:         layerTabBar
-            width:      parent.width
-            height:     42
-            color:      Qt.rgba(0, 0, 0, 0.40)  // Transparent black tab bar
-            radius:     10
-            border.color: "transparent"
-            border.width: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing:    15
             visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
             property int currentIndex: 0
             property bool fenceVisible: _geoFenceController.supported
-            property int _visibleTabCount: fenceVisible ? 2 : 1
 
             Rectangle {
-                id: sliderHighlight
-                width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                height: layerTabBar.height - 6
-                y: 3
-                x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                color: Qt.rgba(0, 0, 0, 0.40)  // Selected tab indicator transparency
-                radius: 10
-                border.color: "transparent"
-                border.width: 0
-                Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-            }
-
-            Row {
-                anchors.fill: parent
-                anchors.margins: 3
-                spacing: 0
-
+                Layout.preferredWidth:   missionText.contentWidth + 40
+                Layout.preferredHeight:  38
+                radius:                  0
+                color:                   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.40)
+                border.width:            0
+                
+                Text {
+                    id: missionText
+                    text: qsTr("Mission")
+                    color: "white"
+                    font.bold: layerTabBar.currentIndex === 0
+                    font.pointSize: 11
+                    anchors.centerIn: parent
+                }
+                
                 MouseArea {
-                    width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                    height: parent.height
+                    anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         layerTabBar.currentIndex = 0
                         _editingLayer = _layerMission
                     }
-                    Text {
-                        text: qsTr("Mission")
-                        anchors.centerIn: parent
-                        font.pointSize: 11
-                        font.bold: layerTabBar.currentIndex === 0
-                        color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
-                    }
                 }
+            }
 
+            Rectangle {
+                visible:                 layerTabBar.fenceVisible
+                Layout.preferredWidth:   fenceText.contentWidth + 40
+                Layout.preferredHeight:  38
+                radius:                  0
+                color:                   layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.40)
+                border.width:            0
+                
+                Text {
+                    id: fenceText
+                    text: qsTr("Fence")
+                    color: "white"
+                    font.bold: layerTabBar.currentIndex === 1
+                    font.pointSize: 11
+                    anchors.centerIn: parent
+                }
+                
                 MouseArea {
-                    width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                    height: parent.height
-                    visible: layerTabBar.fenceVisible
+                    anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-
                     onClicked: {
                         layerTabBar.currentIndex = 1
                         _editingLayer = _layerGeoFence
-                    }
-
-                    Text {
-                        text: qsTr("Fence")
-                        anchors.centerIn: parent
-                        font.pointSize: 11
-                        font.bold: layerTabBar.currentIndex === 1
-                        color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
                     }
                 }
             }
@@ -2570,9 +2586,9 @@ Item {
             width:        baseSize
             height:       baseSize
             radius:       width / 2
-            color:        Qt.rgba(0, 0, 0, 0.40)
+            color:        "transparent"
             border.width: 0
-            border.color: "transparent"
+            border.color: Qt.rgba(0, 0, 0, 0.40)
             clip:         true
 
             MouseArea {

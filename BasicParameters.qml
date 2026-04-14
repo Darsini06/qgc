@@ -66,6 +66,7 @@ Item {
             z: -10
             color: "white"
         }
+
         // ---- Curved Gradient Background ----
         // Canvas {
         //     anchors.fill: parent
@@ -109,8 +110,6 @@ Item {
         //         GradientStop { position: 1.0; color: "#6A85FB" } // Blue gradient
         //     }
         // }
-
-
 
         QGCFlickable {
             id: mainFlickable

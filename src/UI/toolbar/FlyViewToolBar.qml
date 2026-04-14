@@ -278,6 +278,7 @@ Rectangle {
     // }
 
     RowLayout {
+
         id: rightToolsRow
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
@@ -285,6 +286,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         spacing: 10
+
 
         WeatherIndicator {
             id: weatherIndicator
@@ -294,10 +296,11 @@ Rectangle {
 
         // ── Thin vertical divider ──
         Rectangle {
-            width: 1
-            height: parent.height * 0.55
-            color: Qt.rgba(1, 1, 1, 0.25)
+
+            width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 8; Layout.rightMargin: 8
+
         }
 
         BatteryIndicator {
@@ -310,13 +313,15 @@ Rectangle {
         }
 
         // ── Thin vertical divider ──
-        Rectangle {
-            width: 1
-            height: parent.height * 0.55
-            color: Qt.rgba(1, 1, 1, 0.25)
+
+        Rectangle { 
+            width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
-            visible: _activeVehicle ? true : false
+            Layout.leftMargin: 8; Layout.rightMargin: 8
+            visible: _activeVehicle ? true : false 
+
         }
+
         // Satellite / GPS Icon
         Row {
             spacing: 5
@@ -344,6 +349,7 @@ Rectangle {
             height: parent.height * 0.55
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 8; Layout.rightMargin: 8
             visible: _activeVehicle && !_communicationLost
         }
 
@@ -360,6 +366,7 @@ Rectangle {
             height: parent.height * 0.55
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 8; Layout.rightMargin: 8
             visible: _isAgri && _activeVehicle
         }
 
@@ -399,6 +406,7 @@ Rectangle {
             height: parent.height * 0.55
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 8; Layout.rightMargin: 8
             visible: _isAgri && _activeVehicle && !_communicationLost
         }
 
@@ -461,6 +469,7 @@ Rectangle {
             height: parent.height * 0.55
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
+            Layout.leftMargin: 8; Layout.rightMargin: 8
         }
 
         // ── Settings ──

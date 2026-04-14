@@ -7,7 +7,7 @@ import QGroundControl.Controls
 Rectangle {
     id: tabBar
     height: 42
-    color: "#282830"
+    color: Qt.rgba(0, 0, 0, 0.40)
     radius: 10
     border.color: "#3e3e4a"
     border.width: 1
@@ -22,9 +22,9 @@ Rectangle {
         height: tabBar.height - 8
         y: 4
         x: 4 + (tabBar.currentIndex * width)
-        color: "#471880"
+        color: "#000000"
         radius: 7
-        border.color: "#6d3da0"
+        border.color: "#1a1a1a"
         border.width: 1
 
         // Inner glow

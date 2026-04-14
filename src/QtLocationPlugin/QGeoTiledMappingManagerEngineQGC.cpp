@@ -95,7 +95,7 @@ QGeoTiledMappingManagerEngineQGC::QGeoTiledMappingManagerEngineQGC(const QVarian
         // m_networkManager->setAutoDeleteReplies(true);
         QNetworkDiskCache *const diskCache = new QNetworkDiskCache(this);
         diskCache->setCacheDirectory(fileTileCache->getCachePath() + "/Downloads");
-        const qint64 maxCacheSize = (200 * pow(1024, 2)); // 200MB HTTP disk cache
+        const qint64 maxCacheSize = (1024 * pow(1024, 2)); // 1GB HTTP disk cache
         diskCache->setMaximumCacheSize(maxCacheSize);
         m_networkManager->setCache(diskCache);
     }

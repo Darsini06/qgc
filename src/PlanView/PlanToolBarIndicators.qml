@@ -226,7 +226,7 @@ property var    _appSettings:                       QGroundControl.settingsManag
         QGCButton {
             id:          uploadButton
             text:        _controllerDirty ? qsTr("Upload Required") : qsTr("Upload")
-            enabled:     _utmspEnabled ? !_controllerSyncInProgress && UTMSPStateStorage.enableMissionUploadButton : !_controllerSyncInProgressA
+            enabled:     _utmspEnabled ? !_controllerSyncInProgress && UTMSPStateStorage.enableMissionUploadButton : !_controllerSyncInProgress
             visible:     false//!_controllerOffline && !_controllerSyncInProgress
             primary:     _controllerDirty
             onClicked: {

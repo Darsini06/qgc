@@ -930,7 +930,7 @@ Rectangle {
                         anchors.top:                selfIDGrid.bottom
                         anchors.horizontalCenter:   parent.horizontalCenter
                         anchors.bottomMargin:       _margins * 2
-                        text:                       qsTr("Note: Even if this box is unset, QGroundControl will send self ID message " +
+                        text:                       qsTr("Note: Even if this box is unset, DCGCS will send self ID message " +
                                                          "if an emergency is set, or after it has been cleared. \
                                                          The message for each kind of selfID is saved and preserves reboots. Select " +
                                                          "each type on the Self ID type dropdown to configure the message to be sent")

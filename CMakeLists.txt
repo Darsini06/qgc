@@ -26,11 +26,12 @@ endif()
 include(Git)
 
 project(QGroundControl
-    VERSION ${QGC_APP_VERSION}
+    VERSION 1.0.0
     DESCRIPTION ${QGC_APP_DESCRIPTION}
     HOMEPAGE_URL "https://qgroundcontrol.com/"
     LANGUAGES C CXX
 )
+set(QGC_APP_VERSION_STR "Screwy")
 
 if(UNIX AND NOT APPLE AND NOT ANDROID)
     set(LINUX TRUE)
@@ -396,7 +397,7 @@ elseif(IOS)
     set_target_properties(${PROJECT_NAME}
         PROPERTIES
             QT_IOS_LAUNCH_SCREEN ${CMAKE_SOURCE_DIR}/deploy/ios/QGCLaunchScreen.xib
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.mavlink.qgroundcontrol"
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.mavlink.DCGCS"
             XCODE_ATTRIBUTE_PRODUCT_NAME ${CMAKE_PROJECT_NAME}
             XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION ${CMAKE_PROJECT_VERSION}
             XCODE_ATTRIBUTE_MARKETING_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -426,7 +427,8 @@ elseif(ANDROID)
     elseif(${ANDROID_ABI} STREQUAL "x86_64")
         set(ANDROID_PLATFORM_ARCHITECTURE_CODE "164")
     endif()
-    set(ANDROID_VERSION_CODE "${ANDROID_PLATFORM_ARCHITECTURE_CODE}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}")
+    set(ANDROID_VERSION_CODE "1")
+    set(CMAKE_PROJECT_VERSION "Screwy")
 
     set_target_properties(${PROJECT_NAME}
         PROPERTIES
@@ -445,7 +447,7 @@ elseif(LINUX)
 endif()
 
 add_compile_definitions(
-    QGC_APP_NAME="${CMAKE_PROJECT_NAME}"
+    QGC_APP_NAME="Drone Commander"
     QGC_ORG_NAME="${QGC_ORG_NAME}"
     QGC_ORG_DOMAIN="${QGC_ORG_DOMAIN}"
     QGC_APP_VERSION_STR="${QGC_APP_VERSION_STR}"
@@ -506,12 +508,12 @@ install(SCRIPT ${deploy_script})
 
 if(LINUX)
     configure_file(
-        ${CMAKE_SOURCE_DIR}/deploy/linux/org.mavlink.qgroundcontrol.desktop.in
-        ${CMAKE_BINARY_DIR}/org.mavlink.qgroundcontrol.desktop
+        ${CMAKE_SOURCE_DIR}/deploy/linux/org.mavlink.DCGCS.desktop.in
+        ${CMAKE_BINARY_DIR}/org.mavlink.DCGCS.desktop
         @ONLY
     )
     install(
-        FILES ${CMAKE_BINARY_DIR}/org.mavlink.qgroundcontrol.desktop
+        FILES ${CMAKE_BINARY_DIR}/org.mavlink.DCGCS.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
     )
     if(QGC_CUSTOM_BUILD)

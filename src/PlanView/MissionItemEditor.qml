@@ -34,7 +34,7 @@ Rectangle {
     property var    _masterController:          masterController
     property var    _missionController:         _masterController.missionController
     property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey")
-    property color  _outerTextColor:            "#d8d4ec"
+    property color  _outerTextColor:            "#ffffff"
     property bool   _noMissionItemsAdded:       ListView.view.model.count === 1
     property real   _sectionSpacer:             ScreenTools.defaultFontPixelWidth / 2  // spacing between section headings
     property bool   _singleComplexItem:         _missionController.complexMissionItemNames.length === 1
@@ -147,7 +147,7 @@ Rectangle {
 
                 QGCLabel {
                     text: missionItem.commandName
-                    color: "#d8d4ec"
+                    color: "#ffffff"
                     font.bold: true
                 }
 

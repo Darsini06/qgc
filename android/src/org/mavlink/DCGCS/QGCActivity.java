@@ -1,4 +1,4 @@
-package org.mavlink.qgroundcontrol;
+package org.mavlink.DCGCS;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -51,7 +51,7 @@ public class QGCActivity extends QtActivity
     private static Context m_context;
 
     private static final int BAD_DEVICE_ID = 0;
-    private static final String ACTION_USB_PERMISSION = "org.mavlink.qgroundcontrol.action.USB_PERMISSION";
+    private static final String ACTION_USB_PERMISSION = "org.mavlink.DCGCS.action.USB_PERMISSION";
     private static PendingIntent m_usbPermissionIntent = null;
     private static UsbManager m_usbManager = null;
     private static List<UsbSerialDriver> m_drivers;
