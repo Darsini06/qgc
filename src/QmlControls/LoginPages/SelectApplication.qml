@@ -38,7 +38,8 @@ Item {
     readonly property var appModel: [
         { label: "Camera",  desc: "Aerial photography & video",    image: "qrc:/qmlimages/NewImages/camerabg.png", color: "#F39C12" },
         { label: "Agri",    desc: "Precision agriculture & spray", image: "qrc:/qmlimages/NewImages/agribg.png",   color: "#79AE6F" },
-        { label: "Mapping", desc: "3-D mapping & surveying",       image: "qrc:/qmlimages/NewImages/mapbg.png",    color: "#4F9DDF" }
+        { label: "Mapping", desc: "3-D mapping & surveying",       image: "qrc:/qmlimages/NewImages/mapbg.png",    color: "#4F9DDF" },
+        { label: "AI",      desc: "Intelligent autonomous missions",image: "qrc:/qmlimages/NewImages/ai_bg_image.png",color: "#8E44AD" }
     ]
 
     Component.onCompleted: {
@@ -216,6 +217,24 @@ Item {
                                     height: width
                                     color: "white"
                                     anchors.centerIn: parent
+                                }
+                            }
+
+                            // ── Coming Soon Badge (AI only) ───────
+                            Rectangle {
+                                visible: modelData.label === "AI"
+                                anchors { top: parent.top; left: parent.left; margins: 10 }
+                                width: Math.max(80, card.width * 0.45)
+                                height: 22
+                                radius: 4
+                                color: "#8E44AD"
+                                z: 10
+                                opacity: 0.9
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "COMING SOON"
+                                    color: "white"
+                                    font { family: "Outfit"; pointSize: ScreenTools.smallFontPointSize * 0.75; bold: true }
                                 }
                             }
                         }

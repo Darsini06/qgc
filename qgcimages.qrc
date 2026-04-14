@@ -170,6 +170,7 @@
         <file alias="NewImages/report_gif.gif">src/NewImages/report_gif.gif</file>
         <file alias="NewImages/background_home.png">src/NewImages/background_home.png</file>
         <file alias="NewImages/background_home_premium.png">src/NewImages/background_home_premium.png</file>
+        <file alias="NewImages/ai_bg_image.png">src/NewImages/ai_bg_image.png</file>
         <file alias="NewImages/background_login_premium.png">src/NewImages/background_login_premium.png</file>
         <file alias="NewImages/spray_parameter.svg">src/NewImages/spray_parameter.svg</file>
         <file alias="NewImages/all_parameter.svg">src/NewImages/all_parameter.svg</file>

@@ -16,6 +16,8 @@ SettingsPage {
     //General Settings ------------------------------------------------------------------------------------
     property var    _settingsManager:           QGroundControl.settingsManager
     property var    _appSettings:               _settingsManager.appSettings
+    property Fact   _virtualJoystick:           _appSettings.virtualJoystick
+    property Fact   _virtualJoystickAutoCenterThrottle: _appSettings.virtualJoystickAutoCenterThrottle
     property var    _brandImageSettings:        _settingsManager.brandImageSettings
     property Fact   _appFontPointSize:          _appSettings.appFontPointSize
     property Fact   _userBrandImageIndoor:      _brandImageSettings.userBrandImageIndoor
@@ -763,7 +765,90 @@ SettingsPage {
         //     visible:            fact.visible   &&  !_disableAllDataPersistence
         //     property Fact _saveCsvTelemetry: _appSettings.saveCsvTelemetry
         // }
+        // --- Virtual Joystick Section ---
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#E0E0E0"
+            Layout.topMargin: ScreenTools.defaultFontPixelHeight
+            visible: _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
+        }
 
+        Text {
+            Layout.fillWidth: true
+            text:             qsTr("Virtual Joystick")
+            font.pixelSize:   ScreenTools.isMobile ? 18 : 22
+            color:            "black"
+            font.bold:        true
+            horizontalAlignment: Text.AlignLeft
+            visible:          _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
+        }
+
+        ColumnLayout {
+            spacing: 12
+            Layout.fillWidth: true
+            visible: _virtualJoystick.visible || _virtualJoystickAutoCenterThrottle.visible
+
+            Repeater {
+                model: [
+                    { t: qsTr("Enabled"), f: _virtualJoystick, v: _virtualJoystick.visible, e: true },
+                    { t: qsTr("Auto-Center Throttle"), f: _virtualJoystickAutoCenterThrottle, v: _virtualJoystickAutoCenterThrottle.visible, e: _virtualJoystick.rawValue },
+                ]
+                delegate: ColumnLayout {
+                    spacing:            _isNarrow ? 5 : 15
+                    visible:            modelData.v
+                    opacity:            modelData.e ? 1 : 0.5
+                    Layout.fillWidth:   true
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        QGCLabel {
+                            text:                   modelData.t
+                            color:                  "black"
+                            font.bold:              true
+                            Layout.fillWidth:       _isNarrow
+                            Layout.preferredWidth:  _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                        }
+
+                        Item { Layout.fillWidth: true; visible: !_isNarrow }
+
+                        Item {
+                            Layout.preferredWidth:  _isNarrow ? 26 : _urlFieldWidth
+                            Layout.preferredHeight: 26
+                            Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
+
+                            Rectangle {
+                                anchors.right:  _isNarrow ? undefined : parent.right
+                                anchors.left:   _isNarrow ? parent.left : undefined
+                                width:          26
+                                height:         26
+                                border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                                border.width:   2
+                                radius:         4
+                                color:          "white"
+
+                                QGCColoredImage {
+                                    anchors.centerIn: parent
+                                    width:            18
+                                    height:           18
+                                    source:           "/qmlimages/checkbox-check.svg"
+                                    color:            "black"
+                                    visible:          modelData.f.value != 0
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    enabled:      modelData.e
+                                    onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         //Link Settings
         LinkSettings {
             Layout.fillWidth: true
