@@ -20,25 +20,28 @@ Item {
     // minimumWidth: ScreenTools.isMobile ? ScreenTools.screenWidth : Math.min(ScreenTools.defaultFontPixelWidth * 100, Screen.width)
     // minimumHeight: ScreenTools.isMobile ? ScreenTools.screenHeight : Math.min(ScreenTools.defaultFontPixelWidth * 50, Screen.height)
     // visible: true
-    property var    item1:                  null    // Required
-    property var    item2:                  null    // Optional, may come and go
-    property var    _fullItem
-    property var    _pipOrWindowItem
+    property var item1: null    // Required
+    property var item2: null    // Optional, may come and go
+    property var _fullItem
+    property var _pipOrWindowItem
 
-    property string droneType: QGroundControl.loadGlobalSetting("loadpage","loadpage");
+    property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
     property color app_color: "#262626"
     property color secondary_color: "#262626"
     property color accent_color: "#f97316" // The Orange accent
 
     // Airspace Recommendation Properties
     property bool isCheckingAirspace: true
+    property bool _airspaceChecked: false
     property bool isClearToFly: true
 
     property real screenWidth: parent.width
     property real screenHeight: parent.height
     // Use ScreenTools for consistent scaling across devices, falling back to a ratio-based approach if needed
     property real baseUnit: ScreenTools.defaultFontPixelWidth * 0.8
-    function dp(value) { return value * baseUnit; }
+    function dp(value) {
+        return value * baseUnit;
+    }
 
     property bool isMobile: ScreenTools.isMobile
     property bool isTablet: ScreenTools.isMobile && !ScreenTools.isTinyScreen
@@ -49,38 +52,37 @@ Item {
     property var _appSettings: QGroundControl.settingsManager.appSettings
     property var _linkManager: QGroundControl.linkManager
 
-    property bool connecting_drone : false
-
-    property var  activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
+    property bool connecting_drone: false
+    property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
 
     // DYNAMIC SCALING: Professional responsive multiplier
     property real dynamicScaleFactor: {
-        var baseWidth = 1200
-        var scale = parent.width / baseWidth
-        if (isSmallScreen) return Math.max(0.7, scale * 1.2)
-        if (isTablet)      return Math.max(0.9, scale * 1.1)
-        return Math.max(1.0, scale)
+        var baseWidth = 1200;
+        var scale = parent.width / baseWidth;
+        if (isSmallScreen)
+            return Math.max(0.7, scale * 1.2);
+        if (isTablet)
+            return Math.max(0.9, scale * 1.1);
+        return Math.max(1.0, scale);
     }
 
-    onVisibleChanged : {
+    onVisibleChanged: {
         if (visible) {
             console.log("HomeScreen onVisibleChanged");
-            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
-            console.log("droneType",droneType);
+            droneType = QGroundControl.loadGlobalSetting("loadpage", "loadpage");
+            console.log("droneType", droneType);
         }
     }
 
-
-    function swapCamera(){
-        var videoSettings = QGroundControl.settingsManager.videoSettings
+    function swapCamera() {
+        var videoSettings = QGroundControl.settingsManager.videoSettings;
         if (videoSettings) {
-            var videoSourceFact = videoSettings.videoSource
+            var videoSourceFact = videoSettings.videoSource;
             if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                videoSourceFact.value = videoSourceFact.enumValues[1]
+                videoSourceFact.value = videoSourceFact.enumValues[1];
             }
         }
     }
-
 
     // Success path
     Connections {
@@ -88,12 +90,11 @@ Item {
 
         function onActiveVehicleChanged(vehicle) {
             if (vehicle) {
-                mainWindow.showToastMessage("Drone Connected")
+                mainWindow.showToastMessage("Drone Connected");
             } else {
-                mainWindow.showToastMessage("Drone DisConnected")
+                mainWindow.showToastMessage("Drone DisConnected");
             }
-
-            connecting_drone = false
+            connecting_drone = false;
         }
     }
 
@@ -102,15 +103,12 @@ Item {
         target: QGroundControl.linkManager
 
         function onCommunicationError(linkName, errorMessage) {
+            console.log("LinkSettings: connect failed for", linkName);
+            connecting_drone = false;     // stop loading screen
 
-            console.log("LinkSettings: connect failed for", linkName)
-
-            connecting_drone = false     // stop loading screen
-
-            mainWindow.showToastMessage("Connection failed: " + errorMessage)
+            mainWindow.showToastMessage("Connection failed: " + errorMessage);
         }
     }
-
 
     /* ========= DYNAMIC BACKGROUND ========= */
     Item {
@@ -123,8 +121,14 @@ Item {
             anchors.fill: parent
             visible: (droneType === "loadpage")
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#E0E0E0" } // Light grey top
-                GradientStop { position: 1.0; color: "#EDEEF4" } // Standard background grey bottom
+                GradientStop {
+                    position: 0.0
+                    color: "#E0E0E0"
+                } // Light grey top
+                GradientStop {
+                    position: 1.0
+                    color: "#EDEEF4"
+                } // Standard background grey bottom
             }
         }
 
@@ -133,10 +137,13 @@ Item {
             anchors.fill: parent
             visible: (droneType !== "loadpage")
             source: {
-                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
-                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
-                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
-                return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
+                if (droneType === "Camera")
+                    return "qrc:/qmlimages/NewImages/camera_bg_image.png";
+                if (droneType === "Mapping")
+                    return "qrc:/qmlimages/NewImages/mapping_bg_image.png";
+                if (droneType === "Agri")
+                    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png";
+                return "qrc:/qmlimages/NewImages/nature_background.png"; // Fallback
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -147,8 +154,18 @@ Item {
             // Subtle pulse to the background for life
             SequentialAnimation on scale {
                 loops: Animation.Infinite
-                NumberAnimation { from: 1.0; to: 1.05; duration: 20000; easing.type: Easing.InOutSine }
-                NumberAnimation { from: 1.05; to: 1.0; duration: 20000; easing.type: Easing.InOutSine }
+                NumberAnimation {
+                    from: 1.0
+                    to: 1.05
+                    duration: 20000
+                    easing.type: Easing.InOutSine
+                }
+                NumberAnimation {
+                    from: 1.05
+                    to: 1.0
+                    duration: 20000
+                    easing.type: Easing.InOutSine
+                }
             }
         }
 
@@ -158,9 +175,18 @@ Item {
             opacity: 0.6
             visible: (droneType !== "loadpage")
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "black" }
-                GradientStop { position: 0.5; color: "transparent" }
-                GradientStop { position: 1.0; color: "black" }
+                GradientStop {
+                    position: 0.0
+                    color: "black"
+                }
+                GradientStop {
+                    position: 0.5
+                    color: "transparent"
+                }
+                GradientStop {
+                    position: 1.0
+                    color: "black"
+                }
             }
         }
 
@@ -170,9 +196,18 @@ Item {
             visible: (droneType !== "loadpage")
             gradient: Gradient {
                 id: vignetteGradient
-                GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.2) }
-                GradientStop { position: 0.8; color: Qt.rgba(0,0,0,0.5) }
-                GradientStop { position: 1.0; color: Qt.rgba(0,0,0,0.7) }
+                GradientStop {
+                    position: 0.0
+                    color: Qt.rgba(0, 0, 0, 0.2)
+                }
+                GradientStop {
+                    position: 0.8
+                    color: Qt.rgba(0, 0, 0, 0.5)
+                }
+                GradientStop {
+                    position: 1.0
+                    color: Qt.rgba(0, 0, 0, 0.7)
+                }
             }
         }
 
@@ -184,9 +219,18 @@ Item {
             height: dp(35) // Deep atmospheric blend
             visible: (droneType !== "loadpage")
             gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(255/255, 255/255, 255/255, 0.45) } // Much subtler starting opacity (was 0.85)
-                GradientStop { position: 0.4; color: Qt.rgba(255/255, 255/255, 255/255, 0.15) } // Extremely soft fade
-                GradientStop { position: 1.0; color: "transparent" }
+                GradientStop {
+                    position: 0.0
+                    color: Qt.rgba(255 / 255, 255 / 255, 255 / 255, 0.45)
+                } // Much subtler starting opacity (was 0.85)
+                GradientStop {
+                    position: 0.4
+                    color: Qt.rgba(255 / 255, 255 / 255, 255 / 255, 0.15)
+                } // Extremely soft fade
+                GradientStop {
+                    position: 1.0
+                    color: "transparent"
+                }
             }
         }
 
@@ -226,7 +270,7 @@ Item {
         }
 
         Image {
-            id:cameraDrone
+            id: cameraDrone
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: (isSmallScreen || isMobile) ? -dp(8) : 0
@@ -265,7 +309,7 @@ Item {
 
     //Bluetooth Loading Screen
     Item {
-        id : drone_loading
+        id: drone_loading
         anchors.fill: parent
         visible: connecting_drone
         z: 100
@@ -289,7 +333,7 @@ Item {
         }
 
         BusyIndicator {
-            anchors.centerIn : parent
+            anchors.centerIn: parent
             running: true
         }
     }
@@ -314,7 +358,12 @@ Item {
             anchors.topMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
             z: 50
             opacity: 0
-            Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.OutCubic } }
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 800
+                    easing.type: Easing.OutCubic
+                }
+            }
             Component.onCompleted: opacity = 1
         }
 
@@ -329,9 +378,9 @@ Item {
             // Ensure space is shared between header and content
             anchors.topMargin: {
                 if (droneType === "loadpage") {
-                    return Math.max(dp(20), parent.height * 0.3)
+                    return Math.max(dp(20), parent.height * 0.3);
                 } else {
-                    return dp(16) // Moved down for more style
+                    return dp(16); // Moved down for more style
                 }
             }
             color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
@@ -340,36 +389,60 @@ Item {
             font.letterSpacing: isTablet || isDesktop ? 8 : 4
             // Use ScreenTools.largeFontPointSize for better resolution independence
             font.pointSize: {
-                var baseSize = ScreenTools.largeFontPointSize
-                var scaleMultiplier = dynamicScaleFactor
-
+                var baseSize = ScreenTools.largeFontPointSize;
+                var scaleMultiplier = dynamicScaleFactor;
                 if (droneType === "loadpage") {
-                    if (isDesktop) return baseSize * 4.0 * scaleMultiplier
-                    if (isTablet)  return baseSize * 3.5 * scaleMultiplier
-                    return baseSize * 1.8 // Mobile stays clean
+                    if (isDesktop)
+                        return baseSize * 4.0 * scaleMultiplier;
+                    if (isTablet)
+                        return baseSize * 3.5 * scaleMultiplier;
+                    return baseSize * 1.8; // Mobile stays clean
                 } else {
-                    if (isDesktop) return baseSize * 2.8 * scaleMultiplier
-                    if (isTablet)  return baseSize * 2.4 * scaleMultiplier
-                    return baseSize * 1.3
+                    if (isDesktop)
+                        return baseSize * 2.8 * scaleMultiplier;
+                    if (isTablet)
+                        return baseSize * 2.4 * scaleMultiplier;
+                    return baseSize * 1.3;
                 }
             }
             opacity: 0
             z: 5
 
             // Position and Size Animations
-            Behavior on anchors.topMargin { NumberAnimation { duration: 800; easing.type: Easing.OutBack } }
-            Behavior on font.pointSize { NumberAnimation { duration: 600 } }
-            Behavior on font.letterSpacing { NumberAnimation { duration: 600 } }
-
+            Behavior on anchors.topMargin {
+                NumberAnimation {
+                    duration: 800
+                    easing.type: Easing.OutBack
+                }
+            }
+            Behavior on font.pointSize {
+                NumberAnimation {
+                    duration: 600
+                }
+            }
+            Behavior on font.letterSpacing {
+                NumberAnimation {
+                    duration: 600
+                }
+            }
 
             Component.onCompleted: {
-                topTextEntry.start()
+                topTextEntry.start();
             }
 
             SequentialAnimation {
                 id: topTextEntry
-                PauseAnimation { duration: 200 }
-                NumberAnimation { target: topBrandText; property: "opacity"; from: 0; to: 0.95; duration: 1200; easing.type: Easing.OutCubic }
+                PauseAnimation {
+                    duration: 200
+                }
+                NumberAnimation {
+                    target: topBrandText
+                    property: "opacity"
+                    from: 0
+                    to: 0.95
+                    duration: 1200
+                    easing.type: Easing.OutCubic
+                }
             }
         }
 
@@ -393,7 +466,11 @@ Item {
                     color: profileMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)
                     border.color: profileMouse.containsMouse ? accent_color : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 200 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
                 }
 
                 RowLayout {
@@ -421,7 +498,10 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: { MapGlobals.currentView_profile = "profile"; mainWindow.openProfileScreen() }
+                    onClicked: {
+                        MapGlobals.currentView_profile = "profile";
+                        mainWindow.openProfileScreen();
+                    }
                 }
             }
 
@@ -436,7 +516,11 @@ Item {
                     color: appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)
                     border.color: appMouse.containsMouse ? accent_color : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 200 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
                 }
 
                 RowLayout {
@@ -463,7 +547,10 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: { MapGlobals.currentView_profile = "drone"; mainWindow.openProfileScreen() }
+                    onClicked: {
+                        MapGlobals.currentView_profile = "drone";
+                        mainWindow.openProfileScreen();
+                    }
                 }
             }
 
@@ -478,7 +565,11 @@ Item {
                     color: logoutMouse.containsMouse ? Qt.rgba(255, 107, 107, 0.2) : Qt.rgba(0, 0, 0, 0.05)
                     border.color: logoutMouse.containsMouse ? "#FF6B6B" : Qt.rgba(0, 0, 0, 0.1)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 200 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
                 }
 
                 RowLayout {
@@ -505,12 +596,12 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: { logoutdialog.createObject(mainWindow).open() }
+                    onClicked: {
+                        logoutdialog.createObject(mainWindow).open();
+                    }
                 }
             }
         }
-
-
 
         // ---- HERO SECTION ----
         Column {
@@ -525,8 +616,9 @@ Item {
             anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(5) : 0
 
             width: {
-                if (isSmallScreen || isMobile) return parent.width * 0.75 // Wider on mobile to prevent excessive wrapping
-                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140)) // Reduced width to prevent overlap with background drone
+                if (isSmallScreen || isMobile)
+                    return parent.width * 0.75; // Wider on mobile to prevent excessive wrapping
+                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140)); // Reduced width to prevent overlap with background drone
             }
             // Reduced basic spacing between elements
             spacing: isSmallScreen ? dp(0.5) : dp(1.5)
@@ -541,25 +633,31 @@ Item {
                 horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
                 visible: droneType !== "loadpage" // Avoid duplicate "DRONE COMMANDER" on homescreen
                 text: {
-                    if (droneType === "Camera")  return "CAMERA OPERATIONS"
-                    if (droneType === "Mapping") return "MAPPING & SURVEY"
-                    if (droneType === "Agri")    return "AGRICULTURAL PRECISION"
-                    return ""
+                    if (droneType === "Camera")
+                        return "CAMERA OPERATIONS";
+                    if (droneType === "Mapping")
+                        return "MAPPING & SURVEY";
+                    if (droneType === "Agri")
+                        return "AGRICULTURAL PRECISION";
+                    return "";
                 }
                 color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
                 // Massive size for Drone Commander, slightly larger for others
                 font.pointSize: {
-                    var baseSize = ScreenTools.largeFontPointSize
-                    var scaleMultiplier = dynamicScaleFactor
-
+                    var baseSize = ScreenTools.largeFontPointSize;
+                    var scaleMultiplier = dynamicScaleFactor;
                     if (droneType === "loadpage") {
-                        if (isDesktop) return baseSize * 3.5 * scaleMultiplier
-                        if (isTablet)  return baseSize * 3.0 * scaleMultiplier
-                        return baseSize * 1.5
+                        if (isDesktop)
+                            return baseSize * 3.5 * scaleMultiplier;
+                        if (isTablet)
+                            return baseSize * 3.0 * scaleMultiplier;
+                        return baseSize * 1.5;
                     } else {
-                        if (isDesktop) return baseSize * 1.5 * scaleMultiplier // Slightly reduced to save vertical space
-                        if (isTablet)  return baseSize * 1.4 * scaleMultiplier
-                        return baseSize * 0.85
+                        if (isDesktop)
+                            return baseSize * 1.5 * scaleMultiplier; // Slightly reduced to save vertical space
+                        if (isTablet)
+                            return baseSize * 1.4 * scaleMultiplier;
+                        return baseSize * 0.85;
                     }
                 }
                 font.bold: true
@@ -571,7 +669,7 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.2) : Qt.rgba(0,0,0,0.8)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(0, 0, 0, 0.8)
                     shadowBlur: 0.3
                     shadowHorizontalOffset: 2
                     shadowVerticalOffset: 2
@@ -586,19 +684,23 @@ Item {
                 wrapMode: Text.WordWrap
                 horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri") ? Text.AlignLeft : Text.AlignHCenter
                 text: {
-                    if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
-                    if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
-                    if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
-                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
+                    if (droneType === "Camera")
+                        return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance.";
+                    if (droneType === "Mapping")
+                        return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps.";
+                    if (droneType === "Agri")
+                        return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring.";
+                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS";
                 }
                 color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
-                    var baseSize = ScreenTools.defaultFontPointSize
-                    var scaleMultiplier = dynamicScaleFactor
-
-                    if (isDesktop) return baseSize * 1.2 * scaleMultiplier
-                    if (isTablet)  return baseSize * 1.1 * scaleMultiplier
-                    return baseSize * 0.8 // Mobile
+                    var baseSize = ScreenTools.defaultFontPointSize;
+                    var scaleMultiplier = dynamicScaleFactor;
+                    if (isDesktop)
+                        return baseSize * 1.2 * scaleMultiplier;
+                    if (isTablet)
+                        return baseSize * 1.1 * scaleMultiplier;
+                    return baseSize * 0.8; // Mobile
                 }
                 font.family: "Outfit"
                 font.italic: droneType === "loadpage"
@@ -610,7 +712,7 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0,0,0,0.1) : Qt.rgba(0,0,0,0.6)
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
                     shadowBlur: 0.2
                     shadowVerticalOffset: 1
                 }
@@ -626,35 +728,57 @@ Item {
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
                 implicitHeight: widgetContent.height + dp(3.5)
                 radius: 12
-                color: Qt.rgba(15/255, 15/255, 20/255, 0.75) // Dark cinematic glass theme
-                border.color: isCheckingAirspace ? Qt.rgba(250/255, 204/255, 21/255, 0.4) : (isClearToFly ? Qt.rgba(74/255, 222/255, 128/255, 0.4) : Qt.rgba(248/255, 113/255, 113/255, 0.4))
+                color: Qt.rgba(15 / 255, 15 / 255, 20 / 255, 0.75) // Dark cinematic glass theme
+                border.color: isCheckingAirspace ? Qt.rgba(250 / 255, 204 / 255, 21 / 255, 0.4) : (isClearToFly ? Qt.rgba(74 / 255, 222 / 255, 128 / 255, 0.4) : Qt.rgba(248 / 255, 113 / 255, 113 / 255, 0.4))
                 border.width: 1
                 z: 90
 
                 // Add some top margin for clean spacing after title/subtitle
-                Item { height: isSmallScreen ? dp(2) : dp(3); width: 1 }
+                Item {
+                    height: isSmallScreen ? dp(2) : dp(3)
+                    width: 1
+                }
 
                 // Slide-in animation for a premium feel
                 opacity: 0
-                transform: Translate { id: widgetSlide; y: -20 }
-
-                Component.onCompleted: {
-                    widgetEntryAnim.start()
+                transform: Translate {
+                    id: widgetSlide
+                    y: -20
                 }
+
+                // Component.onCompleted: {
+                //     widgetEntryAnim.start()
+                // }
 
                 SequentialAnimation {
                     id: widgetEntryAnim
-                    PauseAnimation { duration: 500 }
+                    PauseAnimation {
+                        duration: 500
+                    }
                     ParallelAnimation {
-                        NumberAnimation { target: airspaceWidget; property: "opacity"; from: 0; to: 1; duration: 800; easing.type: Easing.OutCubic }
-                        NumberAnimation { target: widgetSlide; property: "y"; from: -20; to: 0; duration: 800; easing.type: Easing.OutBack }
+                        NumberAnimation {
+                            target: airspaceWidget
+                            property: "opacity"
+                            from: 0
+                            to: 1
+                            duration: 800
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: widgetSlide
+                            property: "y"
+                            from: -20
+                            to: 0
+                            duration: 800
+                            easing.type: Easing.OutBack
+                        }
                     }
                 }
 
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.6)
+                    shadowColor: Qt.rgba(0, 0, 0, 0.6)
                     shadowBlur: 1.0
                     shadowVerticalOffset: 4
                     // Professional glass effect blur for modern aesthetic
@@ -663,15 +787,14 @@ Item {
                     blurMax: 32
                 }
 
-                // Simulate airspace check on load
-                Timer {
-                    id: airspaceTimer
-                    interval: 1000 // Reduced check time for better UX
-                    running: true
-                    repeat: false
-                    onTriggered: {
-                        isCheckingAirspace = false;
-                        isClearToFly = true;
+                Component.onCompleted: {
+                    widgetEntryAnim.start();                 // ← animation
+
+                    if (!_airspaceChecked) {
+                        // ← guard check (property is on mainWindow1)
+                        _airspaceChecked = true;
+                        isCheckingAirspace = true;
+                        singleShotTimer.start();            // ← manually trigger once
                     }
                 }
 
@@ -700,8 +823,16 @@ Item {
                             SequentialAnimation on opacity {
                                 running: isCheckingAirspace
                                 loops: Animation.Infinite
-                                NumberAnimation { from: 0.1; to: 1.0; duration: 500 }
-                                NumberAnimation { from: 1.0; to: 0.1; duration: 500 }
+                                NumberAnimation {
+                                    from: 0.1
+                                    to: 1.0
+                                    duration: 500
+                                }
+                                NumberAnimation {
+                                    from: 1.0
+                                    to: 0.1
+                                    duration: 500
+                                }
                             }
 
                             layer.enabled: !isCheckingAirspace
@@ -727,28 +858,34 @@ Item {
 
                     Label {
                         Layout.fillWidth: true
-                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") :
-                                                   (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
+                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") : (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
                         color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
                         font.family: "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize * 1.05
                         font.bold: true
 
-                        Behavior on color { ColorAnimation { duration: 400 } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 400
+                            }
+                        }
                     }
 
                     Label {
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
-                        text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
-                                                   (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") : (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
                         font.pointSize: ScreenTools.smallFontPointSize * 0.85
                         lineHeight: 1.2
 
-                        Behavior on opacity { NumberAnimation { duration: 400 } }
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 400
+                            }
+                        }
                     }
                 }
 
@@ -757,8 +894,19 @@ Item {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        Qt.openUrlExternally("https://airspacemap.in/")
+                        Qt.openUrlExternally("https://airspacemap.in/");
                     }
+                }
+            }
+            Timer {
+                id: singleShotTimer
+                running: false        // ← NOT auto-running
+                repeat: false         // ← fires exactly once
+                onTriggered: {
+                    isCheckingAirspace = false;
+                    isClearToFly = true;
+                    // Replace above two lines with your real API call:
+                    // airspaceMapApi.checkLocation(gpsLat, gpsLon)
                 }
             }
         }
@@ -792,7 +940,11 @@ Item {
                     color: connectMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: connectMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
+                        }
+                    }
 
                     RowLayout {
                         anchors.fill: parent
@@ -831,15 +983,18 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        var editingConfig = _linkManager.createConfiguration(
-                                    ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, ""
-                                    );
-                        typeSelectionDialogComponent.createObject(mainWindow1, { editingConfig: editingConfig, originalConfig: null }).open();
+                        var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "");
+                        typeSelectionDialogComponent.createObject(mainWindow1, {
+                            editingConfig: editingConfig,
+                            originalConfig: null
+                        }).open();
                     }
                 }
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             // Click to Camera
             Item {
@@ -857,7 +1012,11 @@ Item {
                     color: cameraMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: cameraMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
+                        }
+                    }
 
                     RowLayout {
                         anchors.fill: parent
@@ -897,15 +1056,15 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.updateAppTheme("Camera")
-                        MapGlobals.comefrom = "Camera"
-                        mainWindow.cameraView()
-                        QGroundControl.saveGlobalSetting("waypoint","waypoint")
-                        var videoSettings = QGroundControl.settingsManager.videoSettings
+                        mainWindow.updateAppTheme("Camera");
+                        MapGlobals.comefrom = "Camera";
+                        mainWindow.cameraView();
+                        QGroundControl.saveGlobalSetting("waypoint", "waypoint");
+                        var videoSettings = QGroundControl.settingsManager.videoSettings;
                         if (videoSettings) {
-                            var videoSourceFact = videoSettings.videoSource
+                            var videoSourceFact = videoSettings.videoSource;
                             if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                videoSourceFact.value = videoSourceFact.enumValues[0]
+                                videoSourceFact.value = videoSourceFact.enumValues[0];
                             }
                         }
                         swapCamera();
@@ -929,7 +1088,11 @@ Item {
                     color: agriMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: agriMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
+                        }
+                    }
 
                     RowLayout {
                         anchors.fill: parent
@@ -969,68 +1132,57 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-
-                        var frameType = QGroundControl.loadBoolGlobalSetting("frametypeDialog", false)
-                        var videoSettings = QGroundControl.settingsManager.videoSettings
-                        var videoSourceFact = videoSettings.videoSource
-
+                        var frameType = QGroundControl.loadBoolGlobalSetting("frametypeDialog", false);
+                        var videoSettings = QGroundControl.settingsManager.videoSettings;
+                        var videoSourceFact = videoSettings.videoSource;
                         if (activeVehicle) {
-
-                            console.log("Inside the active Vehicle",frameType)
-
-                            if (!activeVehicle.parameterManager.parametersReady){
-                                mainWindow.showToastMessage("Plese Wait Vehicle parameters are still loading...")
-                                return
+                            console.log("Inside the active Vehicle", frameType);
+                            if (!activeVehicle.parameterManager.parametersReady) {
+                                mainWindow.showToastMessage("Plese Wait Vehicle parameters are still loading...");
+                                return;
                             }
-
                             if (!frameType) {
-                                console.log("Frame Dialog Open",frameType)
-                                QGroundControl.saveBoolGlobalSetting("frametypeDialog", true)
-                                showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type")
-
+                                console.log("Frame Dialog Open", frameType);
+                                QGroundControl.saveBoolGlobalSetting("frametypeDialog", true);
+                                showDynamicCalibrationDialog("qrc:/qml/APMAirframeComponent.qml", "Frame Type");
                             } else {
-                                console.log("Frame Dialog not open",frameType)
-                                QGroundControl.saveGlobalSetting("loadpage", "Agri")
-                                mainWindow.updateAppTheme("Agri")
-
-                                mainWindow.showFlyView()
-                                MapGlobals.comefrom="Plan"
-                                console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-                                _appSettings.screen = "Plan"
+                                console.log("Frame Dialog not open", frameType);
+                                QGroundControl.saveGlobalSetting("loadpage", "Agri");
+                                mainWindow.updateAppTheme("Agri");
+                                mainWindow.showFlyView();
+                                MapGlobals.comefrom = "Plan";
+                                console.log("MapGlobals.comefrom", MapGlobals.comefrom);
+                                _appSettings.screen = "Plan";
 
                                 //var videoSettings = QGroundControl.settingsManager.videoSettings
 
                                 if (videoSettings) {
                                     //var videoSourceFact = videoSettings.videoSource
                                     if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                        videoSourceFact.value = videoSourceFact.enumValues[0]
+                                        videoSourceFact.value = videoSourceFact.enumValues[0];
                                     }
                                 }
-
                                 swapCamera();
                             }
-
                         } else {
-                            mainWindow.updateAppTheme("Agri")
-                            mainWindow.showFlyView()
-                            MapGlobals.comefrom="Plan"
-                            console.log("MapGlobals.comefrom",MapGlobals.comefrom)
-                            _appSettings.screen = "Plan"
+                            mainWindow.updateAppTheme("Agri");
+                            mainWindow.showFlyView();
+                            MapGlobals.comefrom = "Plan";
+                            console.log("MapGlobals.comefrom", MapGlobals.comefrom);
+                            _appSettings.screen = "Plan";
 
                             //var videoSettings = QGroundControl.settingsManager.videoSettings
 
                             if (videoSettings) {
                                 //var videoSourceFact = videoSettings.videoSource
                                 if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                    videoSourceFact.value = videoSourceFact.enumValues[0]
+                                    videoSourceFact.value = videoSourceFact.enumValues[0];
                                 }
                             }
-
                             swapCamera();
                         }
                     }
                 }
-
             }
 
             // Click to Mapping
@@ -1049,7 +1201,11 @@ Item {
                     color: mappingMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: mappingMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
+                        }
+                    }
 
                     RowLayout {
                         anchors.fill: parent
@@ -1089,15 +1245,15 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.updateAppTheme("Mapping")
-                        mainWindow.showMapping()
-                        MapGlobals.comefrom = "Start"
-                        _appSettings.screen = "Start"
-                        var videoSettings = QGroundControl.settingsManager.videoSettings
+                        mainWindow.updateAppTheme("Mapping");
+                        mainWindow.showMapping();
+                        MapGlobals.comefrom = "Start";
+                        _appSettings.screen = "Start";
+                        var videoSettings = QGroundControl.settingsManager.videoSettings;
                         if (videoSettings) {
-                            var videoSourceFact = videoSettings.videoSource
+                            var videoSourceFact = videoSettings.videoSource;
                             if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                videoSourceFact.value = videoSourceFact.enumValues[0]
+                                videoSourceFact.value = videoSourceFact.enumValues[0];
                             }
                         }
                         swapCamera();
@@ -1107,10 +1263,10 @@ Item {
         }
     }
 
-    function showDynamicCalibrationDialog(qmlFile,title) {
-        dynamicCalDialog.dialogTitleText = title
-        dialogLoader.source = qmlFile
-        dynamicCalDialog.open()
+    function showDynamicCalibrationDialog(qmlFile, title) {
+        dynamicCalDialog.dialogTitleText = title;
+        dialogLoader.source = qmlFile;
+        dynamicCalDialog.open();
     }
 
     // Logout Dialog Component
@@ -1124,14 +1280,14 @@ Item {
             buttons: Dialog.Yes | Dialog.No
 
             onAccepted: {
-                QGroundControl.saveBoolGlobalSetting("login", false)
-                QGroundControl.saveGlobalSetting("loadpage", "loadpage")
-                popup.visible = false
-                MapGlobals.profile()
+                QGroundControl.saveBoolGlobalSetting("login", false);
+                QGroundControl.saveGlobalSetting("loadpage", "loadpage");
+                popup.visible = false;
+                MapGlobals.profile();
             }
 
             onRejected: {
-                popup.visible = false
+                popup.visible = false;
             }
 
             ColumnLayout {
@@ -1191,8 +1347,16 @@ Item {
                         border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
                         border.width: 1
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
-                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 150
+                            }
+                        }
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: 150
+                            }
+                        }
 
                         RowLayout {
                             anchors.fill: parent
@@ -1249,14 +1413,14 @@ Item {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                typeDialog.selectedType = index
-                                typeDialog.close()
-                                var editingConfig = _linkManager.createConfiguration(index, "")
+                                typeDialog.selectedType = index;
+                                typeDialog.close();
+                                var editingConfig = _linkManager.createConfiguration(index, "");
                                 linkConfigDialogComponent.createObject(mainWindow, {
-                                                                           editingConfig: editingConfig,
-                                                                           originalConfig: null,
-                                                                           selectedType: index
-                                                                       }).open()
+                                    editingConfig: editingConfig,
+                                    originalConfig: null,
+                                    selectedType: index
+                                }).open();
                             }
                         }
                     }
@@ -1270,12 +1434,10 @@ Item {
         id: linkConfigDialogComponent
 
         QGCPopupDialog {
-            id :linkConfigDialog
-            title:          selectedType === 0 ? "Bluetooth Devices"
-                                               : originalConfig ? qsTr("Edit Link")
-                                                                : qsTr("Add New Link")
-            buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== ""
+            id: linkConfigDialog
+            title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
+            buttons: Dialog.Save | Dialog.Cancel
+            acceptAllowed: nameField.text !== ""
 
             property var originalConfig
             property var editingConfig
@@ -1289,49 +1451,41 @@ Item {
                 enabled: linkConfigDialog.editingConfig !== null
 
                 function onShowToast(message) {
-                    mainWindow.showToastMessage(message)
+                    mainWindow.showToastMessage(message);
                 }
             }
 
             onAccepted: {
-                console.log("Click Save")
-
-                if ( _connectionInitiated ) {
-                    console.log("linkConfigDialog: ignoring duplicate accept")
-                    return
+                console.log("Click Save");
+                if (_connectionInitiated) {
+                    console.log("linkConfigDialog: ignoring duplicate accept");
+                    return;
                 }
-
-                linkSettingsLoader.item.saveSettings()
-                editingConfig.devName = nameField.text
-                editingConfig.name    = editingConfig.devName
+                linkSettingsLoader.item.saveSettings();
+                editingConfig.devName = nameField.text;
+                editingConfig.name = editingConfig.devName;
 
                 //connecting_drone = true
 
                 if (originalConfig) {
-
-                    _linkManager.endConfigurationEditing(originalConfig, editingConfig)
-
+                    _linkManager.endConfigurationEditing(originalConfig, editingConfig);
                 } else {
-                    editingConfig.dynamic = false
-                    _linkManager.endCreateConfiguration(editingConfig)
-
+                    editingConfig.dynamic = false;
+                    _linkManager.endCreateConfiguration(editingConfig);
                     if (activeVehicle) {
-                        mainWindow.showToastMessage(
-                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
-                        return
+                        mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
+                        return;
                     }
-
-                    _connectionInitiated = true         // mark as initiated
-                    connecting_drone = true  // only set true once
-                    _linkManager.createConnectedLink(editingConfig)
+                    _connectionInitiated = true;         // mark as initiated
+                    connecting_drone = true;  // only set true once
+                    _linkManager.createConnectedLink(editingConfig);
                 }
             }
 
             onRejected: {
-                console.log("Click Cancel")
-                _connectionInitiated = false  //reset on cancel
-                _linkManager.cancelConfigurationEditing(editingConfig)
-
+                console.log("Click Cancel");
+                _connectionInitiated = false;  //reset on cancel
+                _linkManager.cancelConfigurationEditing(editingConfig);
             }
 
             // ---------- MAIN LAYOUT ----------
@@ -1355,10 +1509,10 @@ Item {
                     }
 
                     TextField {
-                        id:               nameField
+                        id: nameField
                         Layout.fillWidth: true
-                        text:             editingConfig.devName
-                        placeholderText:  qsTr("e.g. My Custom Drone Connection")
+                        text: editingConfig.devName
+                        placeholderText: qsTr("e.g. My Custom Drone Connection")
 
                         font.pointSize: ScreenTools.defaultFontPointSize
                         color: "black"
@@ -1371,7 +1525,11 @@ Item {
                             border.color: nameField.activeFocus ? (linkConfigDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
                             border.width: nameField.activeFocus ? 2 : 1
                             implicitHeight: 44
-                            Behavior on border.color { ColorAnimation { duration: 200 } }
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: 200
+                                }
+                            }
                         }
                     }
                 }
@@ -1390,14 +1548,13 @@ Item {
                     Layout.fillWidth: true
                     source: subEditConfig.settingsURL
 
-                    property var subEditConfig:         linkConfigDialog.editingConfig
-                    property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12
-                    property int _secondColumnWidth:    ScreenTools.defaultFontPixelWidth * 30
-                    property int _rowSpacing:           ScreenTools.defaultFontPixelHeight / 2
-                    property int _colSpacing:           ScreenTools.defaultFontPixelWidth / 2
+                    property var subEditConfig: linkConfigDialog.editingConfig
+                    property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12
+                    property int _secondColumnWidth: ScreenTools.defaultFontPixelWidth * 30
+                    property int _rowSpacing: ScreenTools.defaultFontPixelHeight / 2
+                    property int _colSpacing: ScreenTools.defaultFontPixelWidth / 2
                 }
             }
         }
     }
-
 }

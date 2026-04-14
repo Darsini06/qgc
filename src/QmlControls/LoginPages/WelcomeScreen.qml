@@ -49,10 +49,10 @@ Item {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
     property real adaptiveScale: 1.0
-       property string pipResizeIcon: ""
-       property string pipState: "shrunk"
-       property var instrumentPanel: null
-       property string _controllerSyncInProgressA: ""
+    property string pipResizeIcon: ""
+    property string pipState: "shrunk"
+    property var instrumentPanel: null
+    property string _controllerSyncInProgressA: ""
 
 
 
@@ -67,7 +67,7 @@ Item {
         // MapGlobals.backendUrl = "http://192.168.137.1:5000";
         console.log("Backend server address set to: " + MapGlobals.backendUrl)
     }
-    /* ========= BACKGROUND IMAGE ========= */
+
     /* ========= BACKGROUND IMAGE ========= */
     Image {
         id: bgImage
@@ -228,7 +228,7 @@ Item {
                                 spacing: dp(1)
 
                                 Text {
-                                    text: "Email"
+                                    text: "Username or Email"
                                     font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Bold
                                     color: app_color
@@ -413,9 +413,9 @@ Item {
                                 };
 
                                 xhr.send(JSON.stringify({
-                                    userInput: loginUser.text.trim(),
-                                    password: loginPass.text
-                                }));
+                                                            userInput: loginUser.text.trim(),
+                                                            password: loginPass.text
+                                                        }));
                             }
                         }
 
@@ -636,7 +636,7 @@ Item {
                                 TextField {
                                     id: regDisplay
                                     anchors.fill: parent
-                                    placeholderText: "Ex: Dharun"
+                                    placeholderText: "Ex: John Doe"
                                     //font.pixelSize: dp(4)
                                     font.pointSize: ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
@@ -687,7 +687,7 @@ Item {
                                 }
 
                                 Text {
-                                    text: "(Used for login, must be unique)"
+                                    text: "(used for login, must be unique)"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize * 0.9
                                     font.weight: Font.Medium
@@ -707,7 +707,7 @@ Item {
                                 TextField {
                                     id: regUser
                                     anchors.fill: parent
-                                    placeholderText: "Ex: dharun_sure_5522"
+                                    placeholderText: "Ex: john_doe_1504"
                                     //font.pixelSize: dp(4)
                                     font.pointSize:     ScreenTools.defaultFontPointSize
                                     font.family: "Arial"
@@ -824,9 +824,9 @@ Item {
                                         };
 
                                         var data = JSON.stringify({
-                                            email: regEmail.text,
-                                            type: "registration"
-                                        });
+                                                                      email: regEmail.text,
+                                                                      type: "registration"
+                                                                  });
 
                                         xhr.send(data);
                                     }
@@ -927,10 +927,10 @@ Item {
                                         };
 
                                         var data = JSON.stringify({
-                                            email: regEmail.text,
-                                            otp: regOtp.text,
-                                            type: "registration"
-                                        });
+                                                                      email: regEmail.text,
+                                                                      otp: regOtp.text,
+                                                                      type: "registration"
+                                                                  });
 
                                         xhr.send(data);
                                     }
@@ -1181,36 +1181,36 @@ Item {
                                     if (!MapGlobals.validatePassword(regPass.text,regPass)) return;
                                     if (!MapGlobals.validateConfirmPassword(regPass.text, regConfirm.text,regConfirm)) return;
 
-                                                        MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
-                                                            if (result) {
-                                                                rootWindow.showToastMessage("Account created successfully!");
+                                    MapGlobals.registerUser(regUser.text, regDisplay.text, regEmail.text, regPass.text, regConfirm.text, regOtp.text, function(result, response) {
+                                        if (result) {
+                                            rootWindow.showToastMessage("Account created successfully!");
 
-                                                                // Use response data if available, otherwise fallback to form fields
-                                                                var user = (response && response.user) ? response.user : {
-                                                                    "username": regUser.text,
-                                                                    "displayname": regDisplay.text,
-                                                                    "email": regEmail.text
-                                                                };
+                                            // Use response data if available, otherwise fallback to form fields
+                                            var user = (response && response.user) ? response.user : {
+                                                                                         "username": regUser.text,
+                                                                                         "displayname": regDisplay.text,
+                                                                                         "email": regEmail.text
+                                                                                     };
 
-                                                                QGroundControl.saveGlobalSetting("username", user.username);
-                                                                QGroundControl.saveGlobalSetting("name", user.displayname);
-                                                                QGroundControl.saveGlobalSetting("email", user.email);
-                                                                QGroundControl.saveBoolGlobalSetting("login", true);
+                                            QGroundControl.saveGlobalSetting("username", user.username);
+                                            QGroundControl.saveGlobalSetting("name", user.displayname);
+                                            QGroundControl.saveGlobalSetting("email", user.email);
+                                            QGroundControl.saveBoolGlobalSetting("login", true);
 
-                                                                // Clear fields
-                                                                regUser.text = "";
-                                                                regDisplay.text = "";
-                                                                regEmail.text = "";
-                                                                regOtp.text = "";
-                                                                regPass.text = "";
-                                                                regConfirm.text = "";
-                                                                otpSent = false;
-                                                                isOtpVerified = false;
+                                            // Clear fields
+                                            regUser.text = "";
+                                            regDisplay.text = "";
+                                            regEmail.text = "";
+                                            regOtp.text = "";
+                                            regPass.text = "";
+                                            regConfirm.text = "";
+                                            otpSent = false;
+                                            isOtpVerified = false;
 
-                                                                // Go into the app!
-                                                                MapGlobals.rootWindow.homescreen();
-                                                            }
-                                                        });
+                                            // Go into the app!
+                                            MapGlobals.rootWindow.homescreen();
+                                        }
+                                    });
 
                                 }
                             }
@@ -1305,12 +1305,13 @@ Item {
                 };
 
                 var data = JSON.stringify({
-                    email: userInput,
-                    type: "forgotPassword"
-                });
+                                              email: userInput,
+                                              type: "forgotPassword"
+                                          });
 
                 xhr.send(data);
             }
+
             ScrollView {
                 anchors.fill: parent
                 ScrollBar.vertical.policy: ScrollBar.AsNeeded
@@ -1371,7 +1372,7 @@ Item {
                                     spacing: 8
 
                                     Text {
-                                        text: "Username or Email"
+                                        text: "Email"
                                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
                                         font.weight: Font.Bold
                                         color: app_color
@@ -1398,7 +1399,7 @@ Item {
                                         id: resetUserInput
                                         anchors.fill: parent
                                         anchors.margins: 8
-                                        placeholderText: "Enter your username or email"
+                                        placeholderText: "your.email@example.com"
                                         font.pointSize: ScreenTools.defaultFontPointSize
                                         font.family: "Arial"
                                         color: "black"
@@ -1503,10 +1504,10 @@ Item {
                                                 }
                                             };
                                             var data = JSON.stringify({
-                                                email: resetRoot.resetEmail,
-                                                otp: resetOtpField.text,
-                                                type: "forgotPassword"
-                                            });
+                                                                          email: resetRoot.resetEmail,
+                                                                          otp: resetOtpField.text,
+                                                                          type: "forgotPassword"
+                                                                      });
                                             xhr.send(data);
                                         }
                                     }
@@ -1539,6 +1540,7 @@ Item {
                                     }
                                 }
                             }
+
                             // New Password Field
                             Column {
                                 width: parent.width
@@ -1654,6 +1656,7 @@ Item {
                                     }
                                 }
                             }
+
                             Button {
                                 id: resetPasswordFinalBtn
                                 text: "Reset Password"
@@ -1712,116 +1715,116 @@ Item {
                                     };
 
                                     xhr.send(JSON.stringify({
-                                        email: resetRoot.resetEmail,
-                                        otp: resetOtpField.text,
-                                        newPassword: newPasswordField.text
-                                    }));
+                                                                email: resetRoot.resetEmail,
+                                                                otp: resetOtpField.text,
+                                                                newPassword: newPasswordField.text
+                                                            }));
                                 }
                             }
 
                             // Action Buttons
-                        Column {
-                            width: parent.width
-                            spacing: 24
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            // Send OTP Button (Step 1)
-                            Button {
-                                id: sendResetOtpBtn
-                                text: "Send OTP"
-                                visible: !resetRoot.otpSent
-                                width: parent.width * 0.5
-                                height: 45
+                            Column {
+                                width: parent.width
+                                spacing: 24
                                 anchors.horizontalCenter: parent.horizontalCenter
 
-                                background: Rectangle {
-                                    radius: 8
-                                    color: sendResetOtpBtn.pressed ? primaryHover : app_color
+                                // Send OTP Button (Step 1)
+                                Button {
+                                    id: sendResetOtpBtn
+                                    text: "Send OTP"
+                                    visible: !resetRoot.otpSent
+                                    width: parent.width * 0.5
+                                    height: 45
+                                    anchors.horizontalCenter: parent.horizontalCenter
+
+                                    background: Rectangle {
+                                        radius: 8
+                                        color: sendResetOtpBtn.pressed ? primaryHover : app_color
+                                    }
+
+                                    contentItem: Item {
+                                        anchors.fill: parent
+
+                                        Row {
+                                            anchors.centerIn: parent
+                                            spacing: 10
+
+                                            Text {
+                                                text: sendResetOtpBtn.text
+                                                font.pointSize: ScreenTools.defaultFontPointSize
+                                                font.weight: Font.Medium
+                                                color: "white"
+                                                verticalAlignment: Text.AlignVCenter
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+
+                                            QGCColoredImage {
+                                                source: "/qmlimages/NewImages/send_mail.svg"
+                                                fillMode: Image.PreserveAspectFit
+                                                width: 18
+                                                height: 18
+                                                color: "white"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+                                    }
+
+                                    onClicked: {
+                                        resetRoot.sendResetOTP();
+                                    }
                                 }
 
-                                contentItem: Item {
-                                    anchors.fill: parent
+                                // Back to Sign In link
+                                Item {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    height: 48
+                                    width: backRow.width
 
                                     Row {
+                                        id: backRow
+                                        spacing: 16
                                         anchors.centerIn: parent
-                                        spacing: 10
-
-                                        Text {
-                                            text: sendResetOtpBtn.text
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            font.weight: Font.Medium
-                                            color: "white"
-                                            verticalAlignment: Text.AlignVCenter
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
 
                                         QGCColoredImage {
-                                            source: "/qmlimages/NewImages/send_mail.svg"
-                                            fillMode: Image.PreserveAspectFit
-                                            width: 18
-                                            height: 18
-                                            color: "white"
+                                            source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
+                                            width: 20
+                                            height: 20
+                                            color: app_color
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Text {
+                                            text: "Back to Sign In"
+                                            font.pointSize: ScreenTools.defaultFontPointSize
+                                            font.underline: true
+                                            font.weight: Font.Bold
+                                            color: app_color
                                             anchors.verticalCenter: parent.verticalCenter
                                         }
                                     }
-                                }
 
-                                onClicked: {
-                                    resetRoot.sendResetOTP();
-                                }
-                            }
-
-                            // Back to Sign In link
-                            Item {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                height: 48
-                                width: backRow.width
-
-                                Row {
-                                    id: backRow
-                                    spacing: 16
-                                    anchors.centerIn: parent
-
-                                    QGCColoredImage {
-                                        source: "qrc:/InstrumentValueIcons/arrow-simple-left.svg"
-                                        width: 20
-                                        height: 20
-                                        color: app_color
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-
-                                    Text {
-                                        text: "Back to Sign In"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.underline: true
-                                        font.weight: Font.Bold
-                                        color: app_color
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        // Reset all states
-                                        resetUserInput.text = "";
-                                        resetOtpField.text = "";
-                                        newPasswordField.text = "";
-                                        confirmPasswordField.text = "";
-                                        resetRoot.otpSent = false;
-                                        resetRoot.isOtpVerified = false;
-                                        resetRoot.resetEmail = "";
-                                        currentView = "signin";
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            // Reset all states
+                                            resetUserInput.text = "";
+                                            resetOtpField.text = "";
+                                            newPasswordField.text = "";
+                                            confirmPasswordField.text = "";
+                                            resetRoot.otpSent = false;
+                                            resetRoot.isOtpVerified = false;
+                                            resetRoot.resetEmail = "";
+                                            currentView = "signin";
+                                        }
                                     }
                                 }
                             }
-                        }
 
                         }
+                    }
                 }
             }
         }
-    }
     }
 }
