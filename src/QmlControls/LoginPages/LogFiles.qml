@@ -701,7 +701,7 @@ Item {
 
                     function fetchCloudFiles() {
                         cloudPlansLoading = true
-                        MapGlobals.fetchCloudPlans(userEmail, function(plans) {
+                        MapGlobals.fetchCloudPlans(userName, function(plans) {
                             cloudPlansModel.clear()
                             for (var i = 0; i < plans.length; i++) {
                                 cloudPlansModel.append(plans[i])

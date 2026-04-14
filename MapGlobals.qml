@@ -201,6 +201,35 @@ QtObject {
         xhr.send();
     }
 
+    function getMissionsFromCloud(username, callback) {
+        console.log("MapGlobals.getMissionsFromCloud() for:", username);
+        if (!username || username === "Guest") {
+            if (callback) callback([]);
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", backendUrl + "/missions?username=" + encodeURIComponent(username));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    try {
+                        var missions = JSON.parse(xhr.responseText);
+                        console.log("Found", missions.length, "missions in cloud");
+                        if (callback) callback(missions);
+                    } catch (e) {
+                        console.error("Error parsing cloud missions:", e);
+                        if (callback) callback([]);
+                    }
+                } else {
+                    console.error("Error fetching cloud missions:", xhr.status, xhr.responseText);
+                    if (callback) callback([]);
+                }
+            }
+        };
+        xhr.send();
+    }
+
     function insertFeedback(username, mobile_number, email, comments, callback) {
         console.log("MapGlobals.insertFeedback()")
         var data = {
@@ -1050,32 +1079,38 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
-    function fetchCloudPlans(email, callback) {
-        if (email === "") {
-            console.error("Cannot fetch from cloud: No email provided");
+    function fetchCloudPlans(username, callback) {
+        if (!username || username === "" || username === "Guest") {
+            console.error("Cannot fetch from cloud: No valid username provided");
             if (callback) callback([]);
             return;
         }
 
-        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", email);
+        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", username);
 
         var xhr = new XMLHttpRequest();
-        // Assuming GET endpoint with email query param
-        xhr.open("GET", backendUrl + "/plans?email=" + encodeURIComponent(email));
+        // Updated to use the correct API endpoint and username filter
+        xhr.open("GET", backendUrl + "/missions?username=" + encodeURIComponent(username));
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     try {
-                        var response = JSON.parse(xhr.responseText);
-                        var plans = response.plans || [];
-                        console.log("Found", plans.length, "plans in cloud");
+                        var missions = JSON.parse(xhr.responseText);
+                        console.log("Found", missions.length, "missions in cloud");
+                        // Compatibility fix: the component expects objects with plan_name and plan_data
+                        var plans = missions.map(function(m) {
+                            return {
+                                plan_name: m.mission_name,
+                                plan_data: m.plan_data
+                            };
+                        });
                         if (callback) callback(plans);
                     } catch (e) {
-                        console.error("Error parsing cloud plans response:", e);
+                        console.error("Error parsing cloud missions response:", e);
                         if (callback) callback([]);
                     }
                 } else {
-                    console.error("Failed to fetch cloud plans:", xhr.responseText);
+                    console.error("Failed to fetch cloud missions:", xhr.responseText);
                     if (callback) callback([]);
                 }
             }
