@@ -1820,7 +1820,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: 60
-            anchors.leftMargin: 20
+            anchors.leftMargin: 4
 
             Row {
                 spacing: 10    // space between the two buttons
@@ -2588,7 +2588,7 @@ Item {
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
         anchors.topMargin:  2
-        anchors.leftMargin: 20
+        anchors.leftMargin: 4
         z:                  QGroundControl.zOrderWidgets + 1
 
         Rectangle {

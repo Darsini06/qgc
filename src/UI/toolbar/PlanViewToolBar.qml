@@ -46,7 +46,7 @@ Rectangle {
     RowLayout {
         id:                     viewButtonRow
         anchors.left:           parent.left
-        anchors.leftMargin:     20
+        //anchors.leftMargin:     20
         anchors.bottomMargin:   1
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom

@@ -900,7 +900,7 @@ ApplicationWindow {
             ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
             ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
+            //ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
             ListElement { image: "/qmlimages/FirmwareUpgradeIcon.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
