@@ -701,7 +701,7 @@ Item {
 
                     function fetchCloudFiles() {
                         cloudPlansLoading = true
-                        MapGlobals.fetchCloudPlans(userEmail, function(plans) {
+                        MapGlobals.fetchCloudPlans(userName, function(plans) {
                             cloudPlansModel.clear()
                             for (var i = 0; i < plans.length; i++) {
                                 cloudPlansModel.append(plans[i])
@@ -810,8 +810,15 @@ Item {
                                                 property string fileToDelete
                                                 onAboutToHide: parent.highlight = false
                                                 QGCMenuItem {
+                                                    text: qsTr("Sync to Cloud")
+                                                    onTriggered: {
+                                                        mainWindow.showToastMessage("Open and Save the plan to sync with cloud")
+                                                    }
+                                                }
+                                                QGCMenuItem {
                                                     text: qsTr("Delete")
                                                     onTriggered: {
+                                                        MapGlobals.deleteMissionLog(fileHamburgerMenu.fileToDelete)
                                                         controller.deleteFile(fileHamburgerMenu.fileToDelete)
                                                         refreshFiles()
                                                     }

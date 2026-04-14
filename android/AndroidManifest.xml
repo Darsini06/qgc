@@ -26,7 +26,8 @@
 
         <!-- <meta-data android:name="android.app.system_libs_prefix" android:value="/system/lib/" /> -->
 
-        <activity android:name="org.mavlink.DCGCS.QGCActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:label="Drone Commander" android:launchMode="singleTop" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan" android:exported="true">
+
+        <activity android:name="org.mavlink.-.QGCActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:label="Drone Commander" android:launchMode="singleTop" android:screenOrientation="landscape" android:windowSoftInputMode="adjustPan" android:exported="true">
 
 
             <intent-filter>

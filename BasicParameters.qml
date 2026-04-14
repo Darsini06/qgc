@@ -135,7 +135,7 @@ Item {
                     font.pixelSize: ScreenTools.defaultFontPixelSize * 1.5
                     font.weight: Font.DemiBold
                     bottomPadding: 20
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"?true:false
+                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"? true : false
                 }
 
                 // Grid layout for gimbal models

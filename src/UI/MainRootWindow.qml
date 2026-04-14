@@ -1966,7 +1966,7 @@ ApplicationWindow {
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/basic_marking.svg"
+                                source: "qrc:/qmlimages/NewImages/basic_marking.svg";
                                 width: parent.width * 0.55; height: width
                                 color: "white"; anchors.centerIn: parent
                                 fillMode: Image.PreserveAspectFit

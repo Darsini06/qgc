@@ -314,12 +314,11 @@ Rectangle {
 
         // ── Thin vertical divider ──
 
-        Rectangle { 
+        Rectangle {
             width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             Layout.leftMargin: 8; Layout.rightMargin: 8
-            visible: _activeVehicle ? true : false 
-
+            visible: _activeVehicle ? true : false
         }
 
         // Satellite / GPS Icon

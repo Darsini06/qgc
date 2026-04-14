@@ -105,6 +105,14 @@ Item {
     }
     property var activePolygon:  (_currentItem && _currentItem.surveyAreaPolygon) ? _currentItem.surveyAreaPolygon : mapPolygonvisuals.mapPolygon
 
+    Connections {
+        target: _planMasterController
+        onPlanSaved: (filename) => {
+            console.log("Plan saved, updating DB:", filename)
+            MapGlobals.saveMissionLog(filename, _planMasterController.saveToJsonString(), _planMasterController)
+        }
+    }
+
     property bool gridLines : MapGlobals.gridLines
 
     Component.onCompleted: {
@@ -442,10 +450,10 @@ Item {
         }
 
         function checkReadyForSaveUpload(save) {
-            if (readyForSaveState() == VisualMissionItem.NotReadyForSaveData) {
+            if (readyForSaveState() === VisualMissionItem.NotReadyForSaveData) {
                 waitingOnIncompleteDataMessage(save)
                 return false
-            } else if (readyForSaveState() == VisualMissionItem.NotReadyForSaveTerrain) {
+            } else if (readyForSaveState() === VisualMissionItem.NotReadyForSaveTerrain) {
                 waitingOnTerrainDataMessage(save)
                 return false
             }
@@ -467,6 +475,7 @@ Item {
 
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
+                MapGlobals.saveMissionLog(_planMasterController.currentPlanFile || "New Mission", _planMasterController.saveToJsonString(), _planMasterController)
                 sendToVehicle()
                 console.log("upload_clicked1")
                 break
