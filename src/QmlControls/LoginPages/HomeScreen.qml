@@ -118,10 +118,10 @@ Item {
         anchors.fill: parent
         z: 0
 
-        // Grey Gradient background specifically for the startup/loadpage state
+        // Grey Gradient background removed in favor of professional_landing_bg.png
         Rectangle {
             anchors.fill: parent
-            visible: (droneType === "loadpage")
+            visible: false
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "#E0E0E0" } // Light grey top
                 GradientStop { position: 1.0; color: "#EDEEF4" } // Standard background grey bottom
@@ -131,13 +131,13 @@ Item {
         Image {
             id: bgImage
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            visible: true
             source: {
                 if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
                 if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
                 if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
                 if (droneType === "AI")      return "qrc:/qmlimages/NewImages/ai_bg_image.png"
-                return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
+                return "qrc:/qmlimages/NewImages/nature_bg_rice_fields.jpg" // Nature rice fields background
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -157,7 +157,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: 0.6
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }
                 GradientStop { position: 0.5; color: "transparent" }
@@ -168,7 +168,7 @@ Item {
         // Darkening overlay for cinematic look and text readability - with vignette
         Rectangle {
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 id: vignetteGradient
                 GradientStop { position: 0.0; color: Qt.rgba(0,0,0,0.2) }
@@ -183,7 +183,7 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
             height: dp(35) // Deep atmospheric blend
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 GradientStop { position: 0.0; color: Qt.rgba(255/255, 255/255, 255/255, 0.45) } // Much subtler starting opacity (was 0.85)
                 GradientStop { position: 0.4; color: Qt.rgba(255/255, 255/255, 255/255, 0.15) } // Extremely soft fade
@@ -253,7 +253,7 @@ Item {
             height: width
             source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
             fillMode: Image.PreserveAspectFit
-            visible: (droneType === "loadpage")
+            visible: false // Removed drone per user request to focus on central content
             opacity: 0.85
             asynchronous: true
             cache: true
@@ -625,6 +625,7 @@ Item {
             Rectangle {
                 id: airspaceWidget
                 visible: true // Always show or adapt as needed
+                anchors.horizontalCenter: (droneType === "loadpage") ? parent.horizontalCenter : undefined
 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
