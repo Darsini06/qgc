@@ -884,6 +884,7 @@ ApplicationWindow {
             ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
             ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
+            ListElement { image: "/qmlimages/FirmwareUpgradeIcon.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
@@ -1725,6 +1726,7 @@ ApplicationWindow {
     }
 
     function executeAction2() {
+
         console.log("Button long-pressed! Action executed.1")
         if(activeVehicle){
             var homeDistance = QGroundControl.loadGlobalSetting("home", "home")
@@ -1738,8 +1740,6 @@ ApplicationWindow {
             takeoffbtn.visible=true
 
         }
-
-
 
         myDialog.close()
     }
@@ -1942,10 +1942,12 @@ ApplicationWindow {
                         anchors.centerIn: parent
                         spacing: parent.height * 0.08
                         width: parent.width * 0.85
+
                         Rectangle {
                             width: parent.width * 0.55; height: width; radius: width / 2
                             color: ma1.containsMouse ? app_color : "#252525"
                             anchors.horizontalCenter: parent.horizontalCenter
+
                             QGCColoredImage {
                                 source: "qrc:/qmlimages/NewImages/basic_marking.svg"
                                 width: parent.width * 0.55; height: width
@@ -1953,6 +1955,7 @@ ApplicationWindow {
                                 fillMode: Image.PreserveAspectFit
                             }
                         }
+
                         Text {
                             text: "Basic"; color: "white"
                             font.pointSize: ScreenTools.defaultFontPointSize
@@ -1960,6 +1963,7 @@ ApplicationWindow {
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
+
                     MouseArea {
                         id: ma1
                         anchors.fill: parent
