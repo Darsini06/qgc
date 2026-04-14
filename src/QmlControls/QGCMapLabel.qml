@@ -9,7 +9,7 @@ QGCLabel {
     property var map
 
     QGCMapPalette {
-        id: mapPal; lightColors: map.isSatelliteMap
+        id: mapPal; lightColors: map ? map.isSatelliteMap : false
     }
 
     color:      mapPal.text

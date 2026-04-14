@@ -83,6 +83,9 @@ public:
     Q_INVOKABLE void saveToFile(const QString& filename);
     Q_INVOKABLE void saveToFile1(const QString& filename);
     Q_INVOKABLE void saveToKml(const QString& filename);
+    Q_INVOKABLE void loadFromJson(const QJsonObject& json);
+    Q_INVOKABLE QString saveToText();
+    Q_INVOKABLE QString saveToText1();
     Q_INVOKABLE void removeAll(void);                       ///< Removes all from controller only, synce required to remove from vehicle
     Q_INVOKABLE void removeAllFromVehicle(void);            ///< Removes all from vehicle and controller
 
@@ -121,7 +124,8 @@ public:
     static constexpr const char* kJsonRallyPointsObjectKey =   "rallyPoints";
 
 signals:
-    void containsItemsChanged               (bool containsItems);
+    void containsItemsChanged                       (bool containsItems);
+    void fileSaved                                  (QString filePath);
     void syncInProgressChanged              (void);
     void dirtyChanged                       (bool dirty);
     void offlineChanged                     (bool offlineEditing);

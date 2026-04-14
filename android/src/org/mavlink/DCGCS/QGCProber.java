@@ -1,6 +1,6 @@
-package org.mavlink.qgroundcontrol;
+package org.mavlink.DCGCS;
 
-import org.mavlink.qgroundcontrol.QGCUsbId;
+import org.mavlink.DCGCS.QGCUsbId;
 
 import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialProber;

@@ -455,6 +455,53 @@ QJsonDocument PlanMasterController::saveToJson()
     return QJsonDocument(planJson);
 }
 
+QString PlanMasterController::saveToText()
+{
+    return saveToJson().toJson();
+}
+
+QString PlanMasterController::saveToText1()
+{
+    return saveToJson1().toJson();
+}
+
+void PlanMasterController::loadFromJson(const QJsonObject& json)
+{
+    QString errorString;
+    QString errorMessage = tr("Error loading cloud plan: %1");
+
+    //-- Allow plugins to pre process the load
+    qgcApp()->toolbox()->corePlugin()->preLoadFromJson(this, const_cast<QJsonObject&>(json));
+
+    int version;
+    if (!JsonHelper::validateExternalQGCJsonFile(const_cast<QJsonObject&>(json), kPlanFileType, kPlanFileVersion, kPlanFileVersion, version, errorString)) {
+        qgcApp()->showAppMessage(errorMessage.arg(errorString));
+        return;
+    }
+
+    QList<JsonHelper::KeyValidateInfo> rgKeyInfo = {
+                                                    { kJsonMissionObjectKey,        QJsonValue::Object, true },
+                                                    { kJsonGeoFenceObjectKey,       QJsonValue::Object, true },
+                                                    { kJsonRallyPointsObjectKey,    QJsonValue::Object, true },
+                                                    };
+    if (!JsonHelper::validateKeys(json, rgKeyInfo, errorString)) {
+        qgcApp()->showAppMessage(errorMessage.arg(errorString));
+        return;
+    }
+
+    if (!_missionController.load(json[kJsonMissionObjectKey].toObject(), errorString) ||
+        !_geoFenceController.load(json[kJsonGeoFenceObjectKey].toObject(), errorString) ||
+        !_rallyPointController.load(json[kJsonRallyPointsObjectKey].toObject(), errorString)) {
+        qgcApp()->showAppMessage(errorMessage.arg(errorString));
+    } else {
+        //-- Allow plugins to post process the load
+        qgcApp()->toolbox()->corePlugin()->postLoadFromJson(this, const_cast<QJsonObject&>(json));
+        _currentPlanFile.clear();
+        emit currentPlanFileChanged();
+        setDirty(true);
+    }
+}
+
 void
 PlanMasterController::saveToCurrent()
 {

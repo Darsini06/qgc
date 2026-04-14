@@ -16,18 +16,38 @@
 
 #include <QDebug>
 
+AirspaceRestrictionValidator::AirspaceRestrictionValidator(QObject* parent)
+    : QObject(parent)
+    , _airspaceManager(nullptr)
+    , _hasRestrictions(false)
+    , _blockMissionUpload(false)
+{
+}
+
 AirspaceRestrictionValidator::AirspaceRestrictionValidator(AirspaceManager* airspaceManager, QObject* parent)
     : QObject(parent)
     , _airspaceManager(airspaceManager)
     , _hasRestrictions(false)
     , _blockMissionUpload(false)
 {
-    Q_ASSERT(airspaceManager);
+}
+
+void AirspaceRestrictionValidator::setAirspaceManager(AirspaceManager* manager)
+{
+    if (_airspaceManager != manager) {
+        _airspaceManager = manager;
+        emit airspaceManagerChanged();
+    }
 }
 
 bool AirspaceRestrictionValidator::validateMission(QObject* missionControllerObj)
 {
     clearValidation();
+
+    if (!_airspaceManager) {
+        qWarning() << "AirspaceRestrictionValidator: No airspace manager set";
+        return true;
+    }
 
     if (!missionControllerObj) {
         qWarning() << "AirspaceRestrictionValidator: Null mission controller";
@@ -93,6 +113,10 @@ bool AirspaceRestrictionValidator::validateMission(QObject* missionControllerObj
 
 bool AirspaceRestrictionValidator::validateWaypoint(double latitude, double longitude, double altitude)
 {
+    if (!_airspaceManager) {
+        return true;
+    }
+
     QVariantList restrictions = _airspaceManager->getRestrictionsAtCoordinate(latitude, longitude, altitude);
 
     if (restrictions.isEmpty()) {
@@ -127,6 +151,9 @@ bool AirspaceRestrictionValidator::validateWaypoint(double latitude, double long
 
 QVariantList AirspaceRestrictionValidator::getRestrictionsAt(double latitude, double longitude, double altitude)
 {
+    if (!_airspaceManager) {
+        return QVariantList();
+    }
     return _airspaceManager->getRestrictionsAtCoordinate(latitude, longitude, altitude);
 }
 

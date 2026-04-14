@@ -23,21 +23,18 @@ SetupPage {
     id:             safetyPage
     pageComponent:  safetyPageComponent
 
+    property bool   showBorder:         true
 
-property bool   showBorder:         true
     Component {
         id: safetyPageComponent
 
         ColumnLayout {
             id:         flowLayout
             width:      availableWidth
-            //width:  flowLayout.width *0.8
-            //spacing:    _margins
             Layout.fillWidth:   true
             anchors.horizontalCenter: parent.horizontalCenter
 
-
-            FactPanelController { id: controller; }
+             FactPanelController { id: controller; }
 
             QGCPalette { id: ggcPal; colorGroupEnabled: true }
 
@@ -67,7 +64,7 @@ property bool   showBorder:         true
             property real _margins:         ScreenTools.defaultFontPixelHeight
             property real _innerMargin:     _margins / 2
             property bool _showIcon:        !ScreenTools.isTinyScreen
-            property bool _roverFirmware:   controller.parameterExists(-1, "MODE1") // This catches all usage of ArduRover firmware vehicle types: Rover, Boat...
+            property bool _roverFirmware:   controller.parameterExists(-1, "MODE1")
 
             property bool _isNarrow:        flowLayout.width < ScreenTools.defaultFontPixelWidth * 60
             property real _urlFieldWidth:   ScreenTools.defaultFontPixelWidth * 30
@@ -87,9 +84,9 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Low action:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactComboBox {
                         fact:           failsafeBattLowAct
@@ -100,9 +97,9 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Critical action:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactComboBox {
                         fact:           failsafeBattCritAct
@@ -113,9 +110,9 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Low voltage threshold:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactTextField {
                         fact:           failsafeBattLowVoltage
@@ -126,9 +123,9 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Critical voltage threshold:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactTextField {
                         fact:           failsafeBattCritVoltage
@@ -139,9 +136,9 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Low mAh threshold:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactTextField {
                         fact:           failsafeBattLowMah
@@ -152,16 +149,16 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("Critical mAh threshold:")
                         font.bold:      true
-                        color:          "black"
+                        color:          "white"
                         Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                        Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
                     FactTextField {
                         fact:           failsafeBattCritMah
                         showUnits:      true
                         Layout.fillWidth: true
                     }
-                } // ColumnLayout
+                }
             }
 
             Component {
@@ -196,7 +193,7 @@ property bool   showBorder:         true
                 Rectangle {
                     width:              mainGrid.implicitWidth + (_margins * 2)
                     height:             mainGrid.implicitHeight + (_margins * 2)
-                    color:              "white"
+                    color:              Qt.rgba(0, 0, 0, 0.4)
                     border.color:       QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -216,8 +213,8 @@ property bool   showBorder:         true
                         property Fact failsafeBattLowVoltage:   _failsafeBatt1LowVoltage
                         property Fact failsafeBattCritVoltage:  _failsafeBatt1CritVoltage
                     }
-                } // Rectangle
-            } // Column - Battery Failsafe Settings
+                }
+            }
 
 
             Column {
@@ -235,7 +232,7 @@ property bool   showBorder:         true
                     anchors.horizontalCenter: parent.horizontalCenter
                     width:              mainGrid.implicitWidth + (_margins * 2)
                     height:             mainGrid.implicitHeight + (_margins * 2)
-                    color:              "white"
+                    color:              Qt.rgba(0, 0, 0, 0.4)
                     border.color:       QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -254,8 +251,8 @@ property bool   showBorder:         true
                         property Fact failsafeBattLowVoltage:   _failsafeBatt2LowVoltage
                         property Fact failsafeBattCritVoltage:  _failsafeBatt2CritVoltage
                     }
-                } // Rectangle
-            } // Column - Battery Failsafe Settings
+                }
+            }
 
             Component {
                 id: planeGeneralFS
@@ -278,7 +275,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             fsColumn.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -311,11 +308,11 @@ property bool   showBorder:         true
                                 text:           qsTr("GCS failsafe")
                                 checked:        _failsafeGCSEnable.value != 0
                                 Layout.columnSpan: _isNarrow ? 1 : 2
-                                onClicked:      _failsafeGCSEnable.value = checked ? 1 : 0
+                                onClicked:      _failsafeGCSEnable.value = (checked ? 1 : 0)
                             }
                         }
-                    } // Rectangle - Failsafe trigger settings
-                } // Column - Failsafe trigger settings
+                    }
+                }
             }
 
             Loader {
@@ -342,7 +339,7 @@ property bool   showBorder:         true
                         font.bold:   true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                        color: "black"
+                        color: "white"
                     }
 
                     Rectangle {
@@ -350,7 +347,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             fsGrid.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -366,10 +363,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Ground Station failsafe:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactComboBox {
                                 fact:           _failsafeGCSEnable
@@ -379,10 +376,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Throttle failsafe:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactComboBox {
                                 fact:           _failsafeThrEnable
@@ -392,10 +389,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("PWM threshold:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactTextField {
                                 fact:           _failsafeThrValue
@@ -404,10 +401,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Failsafe Crash Check:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactComboBox {
                                 fact:           _failsafeCrashCheck
@@ -415,8 +412,8 @@ property bool   showBorder:         true
                                 Layout.fillWidth: true
                             }
                         }
-                    } // Rectangle - Failsafe Settings
-                } // Column - Failsafe Settings
+                    }
+                }
             }
 
             Loader {
@@ -441,7 +438,7 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:       qsTr("General Failsafe Triggers")
                         font.pixelSize: 20
-                                        color: "white"
+                        color: "white"
                         font.bold:   true
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -450,7 +447,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             generalFailsafeGrid.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -466,10 +463,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Ground Station failsafe:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactComboBox {
                                 fact:           _failsafeGCSEnable
@@ -479,10 +476,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Throttle failsafe:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             QGCComboBox {
                                 model:          [qsTr("Disabled"), qsTr("Always RTL"), qsTr("Continue with Mission in Auto Mode"), qsTr("Always Land")]
@@ -493,19 +490,19 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("PWM threshold:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactTextField {
                                 fact:           _failsafeThrValue
                                 showUnits:      true
                                 Layout.fillWidth: true
                             }
-                        } // ColumnLayout
-                    } // Rectangle - Failsafe Settings
-                } // Column - General Failsafe Settings
+                        }
+                    }
+                }
             }
 
             Loader {
@@ -534,7 +531,7 @@ property bool   showBorder:         true
                     QGCLabel {
                         text:           qsTr("GeoFence")
                         font.pixelSize: 20
-                                        color: "black"
+                        color:          "white"
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -543,7 +540,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             mainLayout.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -569,12 +566,12 @@ property bool   showBorder:         true
                                 checked:        _fenceType.rawValue & _maxAltitudeFenceBitMask
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 30)
                                 onClicked: {
                                     if (checked) {
                                         _fenceType.rawValue |= _maxAltitudeFenceBitMask
                                     } else {
-                                        _fenceType.value &= ~_maxAltitudeFenceBitMask
+                                        _fenceType.rawValue &= ~_maxAltitudeFenceBitMask
                                     }
                                 }
                             }
@@ -589,12 +586,12 @@ property bool   showBorder:         true
                                 checked:        _fenceType.rawValue & _circleFenceBitMask
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 30)
                                 onClicked: {
                                     if (checked) {
                                         _fenceType.rawValue |= _circleFenceBitMask
                                     } else {
-                                        _fenceType.value &= ~_circleFenceBitMask
+                                        _fenceType.rawValue &= ~_circleFenceBitMask
                                     }
                                 }
                             }
@@ -610,12 +607,12 @@ property bool   showBorder:         true
                                 checked:        _fenceType.rawValue & _polygonFenceBitMask
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 30)
                                 onClicked: {
                                     if (checked) {
                                         _fenceType.rawValue |= _polygonFenceBitMask
                                     } else {
-                                        _fenceType.value &= ~_polygonFenceBitMask
+                                        _fenceType.rawValue &= ~_polygonFenceBitMask
                                     }
                                 }
                             }
@@ -623,11 +620,11 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Breach action")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 30)
                             }
                             FactComboBox {
                                 fact:           _fenceAction
@@ -638,11 +635,11 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Fence margin")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 30
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 30)
                             }
                             FactTextField {
                                 fact:           _fenceMargin
@@ -650,8 +647,8 @@ property bool   showBorder:         true
                                 Layout.fillWidth: true
                             }
                         }
-                    } // Rectangle - GeoFence Settings
-                } // Column - GeoFence Settings
+                    }
+                }
             }
 
             Loader {
@@ -666,7 +663,6 @@ property bool   showBorder:         true
                     spacing: _margins
                     Layout.fillWidth:   true
 
-
                     property Fact _landSpeedFact:   controller.getParameterFact(-1, "LAND_SPEED")
                     property Fact _rtlAltFact:      controller.getParameterFact(-1, "RTL_ALT")
                     property Fact _rtlLoitTimeFact: controller.getParameterFact(-1, "RTL_LOIT_TIME")
@@ -678,7 +674,7 @@ property bool   showBorder:         true
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                                        color: "white"
+                        color: "white"
                     }
 
                     Rectangle {
@@ -686,7 +682,7 @@ property bool   showBorder:         true
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             rtlGrid.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -697,8 +693,8 @@ property bool   showBorder:         true
                             anchors.margins:    _margins
                             anchors.left:       parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                            height:             ScreenTools.defaultFontPixelWidth * 15
-                            width:              ScreenTools.defaultFontPixelWidth * 15
+                            height:             (ScreenTools.defaultFontPixelWidth * 15)
+                            width:              (ScreenTools.defaultFontPixelWidth * 15)
                             color:              ggcPal.text
                             sourceSize.width:   width
                             mipmap:             true
@@ -728,7 +724,7 @@ property bool   showBorder:         true
                                 text:           qsTr("Return at specified altitude:")
                                 checked:        _rtlAltFact.value != 0
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                                 onClicked:      { _rtlAltFact.value = 3000; rltAltField.forceActiveFocus() }
                             }
                             FactTextField {
@@ -744,7 +740,7 @@ property bool   showBorder:         true
                                 checked:        _rtlLoitTimeFact.value > 0
                                 text:           qsTr("Loiter above Home for:")
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                                 onClicked:      _rtlLoitTimeFact.value = (checked ? 60 : 0)
                             }
                             FactTextField {
@@ -757,10 +753,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Final land stage altitude:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactTextField {
                                 id:             rltAltFinalField
@@ -771,10 +767,10 @@ property bool   showBorder:         true
 
                             QGCLabel {
                                 text:           qsTr("Final land stage descent speed:")
-                                color:          "black"
+                                color:          "white"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                             }
                             FactTextField {
                                 id:             landSpeedField
@@ -783,8 +779,8 @@ property bool   showBorder:         true
                                 Layout.fillWidth: true
                             }
                         }
-                    } // Rectangle - RTL Settings
-                } // Column - RTL Settings
+                    }
+                }
             }
 
             Loader {
@@ -812,14 +808,14 @@ property bool   showBorder:         true
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                                        color: "white"
+                        color: "white"
                     }
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             planeRtlGrid.height + (_margins * 2)
-                        color:              "white"
+                        color:              Qt.rgba(0, 0, 0, 0.4)
                         border.color:       QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -846,7 +842,7 @@ property bool   showBorder:         true
                                 text:           qsTr("Return at specified altitude:")
                                 checked:        _rtlAltFact.value >= 0
                                 Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: _isNarrow ? -1 : ScreenTools.defaultFontPixelWidth * 25
+                                Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                                 onClicked:      { _rtlAltFact.value = 10000; rltAltField.forceActiveFocus() }
                             }
                             FactTextField {
@@ -857,8 +853,8 @@ property bool   showBorder:         true
                                 Layout.fillWidth: true
                             }
                         }
-                    } // Rectangle - RTL Settings
-                } // Column - RTL Settings
+                    }
+                }
             }
 
             Loader {
@@ -875,15 +871,13 @@ property bool   showBorder:         true
                     font.bold:      true
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 20
-                                    color: "white"
+                    color: "white"
                 }
 
-
-
                 Rectangle {
-                    width:  parent.width//flowLayout.width *0.8
+                    width:  parent.width
                     height: armingCheckInnerColumn.height + (_margins * 2)
-                    color:              "white"
+                    color:              Qt.rgba(0, 0, 0, 0.4)
                     border.color:       QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
@@ -914,9 +908,8 @@ property bool   showBorder:         true
                             visible:        _armingCheck.value != 1
                         }
                     }
-                } // Rectangle - Arming checks
-            } // Column - Arming Checks
-        } // Flow
-    } // Component - safetyPageComponent
-
-} // SetupView
+                }
+            }
+        }
+    }
+}

@@ -185,6 +185,16 @@ Item {
         onClicked:      _swapPip()
     }
 
+    // Resize handle placeholder (replaces the commented-out pipResizeIcon Image)
+    Item {
+        id:             pipResizeIcon
+        anchors.right:  parent.right
+        anchors.top:    parent.top
+        width:          ScreenTools.defaultFontPixelHeight * 2.5
+        height:         ScreenTools.defaultFontPixelHeight * 2.5
+        visible:        _isExpanded
+    }
+
     // MouseArea to drag in order to resize the PiP area
     MouseArea {
         id:                 pipResize
@@ -216,19 +226,7 @@ Item {
                            }
     }
 
-    // Resize icon
-    // Image {
-    //     id:             pipResizeIcon
-    //     source:         "/qmlimages/pipResize.svg"
-    //     fillMode:       Image.PreserveAspectFit
-    //     mipmap:         true
-    //     anchors.right:  parent.right
-    //     anchors.top:    parent.top
-    //     visible:        isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
-    //     height:         ScreenTools.defaultFontPixelHeight * 2.5
-    //     width:          ScreenTools.defaultFontPixelHeight * 2.5
-    //     sourceSize.height:  height
-    // }
+    // Resize icon (commented out - placeholder Item above handles id reference)
 
     // Check min/max constraints on pip size when when parent is resized
     Connections {
@@ -269,7 +267,7 @@ Item {
 
     Image {
         id:             hidePIP
-        source:         "/qmlimages/pipHide.svg"
+        source:         "/qmlimages/MapType.svg"
         mipmap:         true
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
@@ -292,13 +290,13 @@ Item {
         width:                  ScreenTools.defaultFontPixelHeight * 2
         radius:                 ScreenTools.defaultFontPixelHeight / 3
         visible:                !_isExpanded
-        color:                  _fullItem.pipState.isDark ? Qt.rgba(0,0,0,0.75) : Qt.rgba(0,0,0,0.5)
+        color:                  Qt.rgba(0, 0, 0, 0.40)
 
         Image {
             width:              parent.width  * 0.75
             height:             parent.height * 0.75
             sourceSize.height:  height
-            source:             "/res/buttonRight.svg"
+            source:             "/qmlimages/MapType.svg"
             mipmap:             true
             fillMode:           Image.PreserveAspectFit
             anchors.verticalCenter:     parent.verticalCenter

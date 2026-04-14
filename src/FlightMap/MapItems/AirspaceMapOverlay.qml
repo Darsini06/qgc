@@ -228,7 +228,7 @@ Item {
             id: _zoneInfoColumn
             anchors.centerIn: parent
             spacing: ScreenTools.defaultFontPixelHeight * 0.25
-            width: parent.width - ScreenTools.defaultFontPixelWidth * 2
+            width: ScreenTools.defaultFontPixelWidth * 18
 
             QGCLabel {
                 text: {

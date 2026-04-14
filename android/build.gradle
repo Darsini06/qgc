@@ -89,7 +89,7 @@ android {
         targetSdkVersion qtTargetSdkVersion
         ndk.abiFilters = qtTargetAbiList.split(",")
 
-        namespace "org.mavlink.qgroundcontrol"
+        namespace "org.mavlink.DCGCS"
         // versionName "5.0"
         // versionCode timestampInt
 

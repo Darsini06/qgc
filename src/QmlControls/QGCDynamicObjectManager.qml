@@ -14,6 +14,10 @@ Item {
     Component.onDestruction: destroyObjects()
 
     function createObject(sourceComponent, parentObject, addMapItem) {
+        if (!parentObject) {
+            console.warn("QGCDynamicObjectManager: createObject called with undefined parentObject")
+            return null
+        }
         var obj = sourceComponent.createObject(parentObject)
         if (obj.status === Component.Error) {
             console.log(obj.errorString())
@@ -22,7 +26,7 @@ Item {
         if (arguments.length < 3) {
             addMapItem = false
         }
-        if (addMapItem) {
+        if (addMapItem && parentObject.addMapItem) {
             parentObject.addMapItem(obj)
         }
         return obj
@@ -37,10 +41,10 @@ Item {
         }
     }
 
-    /// Adds the object to the list. If mapControl is specified it will aso be added to the map.
+    /// Adds the object to the list. If mapControl is specified it will also be added to the map.
     function addObject(object, mapControl) {
         rgDynamicObjects.push(object)
-        if (arguments.length == 2) {
+        if (arguments.length == 2 && mapControl && mapControl.addMapItem) {
             mapControl.addMapItem(object)
         }
         return object

@@ -29,6 +29,9 @@ Map {
 
     plugin:             Plugin { name: "QGroundControl" }
     opacity:            1.0
+    smooth:             true
+    antialiasing:       true
+    copyrightsVisible:  false
 
     // Behind map to avoid white flashes
     Rectangle {
@@ -38,8 +41,28 @@ Map {
     }
 
     Behavior on zoomLevel {
+        enabled:         !pinch.active && !dragHandler.active && !wheelHandler.active
+        NumberAnimation {
+            duration:   500
+            easing.type: Easing.InOutQuad
+        }
+    }
+
+    Behavior on center {
         enabled:         !pinch.active && !dragHandler.active
-        NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+        CoordinateAnimation {
+            duration:   500
+            easing.type: Easing.InOutQuad
+        }
+    }
+
+    WheelHandler {
+        id: wheelHandler
+        // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
+        acceptedDevices:    Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland" ?
+                                PointerDevice.Mouse | PointerDevice.TouchPad : PointerDevice.Mouse
+        rotationScale:      1 / 120
+        property:           "zoomLevel"
     }
 
     bearing: MapGlobals.mapRotation
@@ -102,25 +125,6 @@ Map {
         specifyMapPositionDialog.createObject(mainWindow).open()
     }
 
-    // // FlightMap.qml
-    // function centerOnTransmitter() {
-    //     if (gcsPosition.isValid) {
-    //         console.log("Centering map on transmitter");
-
-    //         // Bypass one-time center flags
-    //         allowGCSLocationCenter = true;
-    //         firstGCSPositionReceived = false;
-
-    //         // Force immediate center update
-    //         center = gcsPosition;
-    //         zoomLevel = 15;
-
-    //         // Workaround for Qt map refresh bug
-    //         visibleRegion = QtPositioning.rectangle(QtPositioning.coordinate(0,0), QtPositioning.coordinate(0,0));
-    //         visibleRegion = QtPositioning.rectangle(center, center);
-    //     }
-    // }
-
     Component {
         id: specifyMapPositionDialog
         EditPositionDialog {
@@ -156,20 +160,6 @@ Map {
             }
         }
     }
-
-    // function centerOnTransmitter() {
-    //     if (gcsPosition.isValid) {
-    //         console.log("Centering map on transmitter");
-    //         console.log("gcsPosition latitude:", gcsPosition.latitude, "longitude:", gcsPosition.longitude);
-    //         allowGCSLocationCenter = true; // Override one-time center flag
-    //         firstGCSPositionReceived = false; // Reset to allow re-centering
-    //         _map.center = gcsPosition;  // Center the map on the transmitter
-    //         _map.zoomLevel = 15;  // Set zoom level as needed
-    //         console.log("Map centered on transmitter:", _map.center);
-    //     } else {
-    //         console.log("Transmitter position is not valid");
-    //     }
-    // }
 
     on_ActiveVehicleCoordinateChanged: _possiblyCenterToVehiclePosition()
 
@@ -219,15 +209,11 @@ Map {
     }
 
 
+    /*
     WheelHandler {
-        // workaround for QTBUG-87646 / QTBUG-112394 / QTBUG-112432:
-        // Magic Mouse pretends to be a trackpad but doesn't work with PinchHandler
-        // and we don't yet distinguish mice and trackpads on Wayland either
-        acceptedDevices:    Qt.platform.pluginName === "cocoa" || Qt.platform.pluginName === "wayland" ?
-                                PointerDevice.Mouse | PointerDevice.TouchPad : PointerDevice.Mouse
-        rotationScale:      1 / 120
-        property:           "zoomLevel"
+        // moved up for behavior reference
     }
+    */
 
     DragHandler {
         id:             dragHandler
@@ -273,7 +259,25 @@ Map {
                 }
             }
 
-            // White circular background removed per user request
+            // Pulse Effect
+            Rectangle {
+                anchors.centerIn: parent
+                width:            parent.width * 1.5
+                height:           width
+                radius:           width / 2
+                color:            mapItemImage.color
+                opacity:          0
+                z:                -1
+                
+                SequentialAnimation on scale {
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 0.5; to: 2.0; duration: 2000; easing.type: Easing.OutQuart }
+                }
+                SequentialAnimation on opacity {
+                    loops: Animation.Infinite
+                    NumberAnimation { from: 0.6; to: 0.0; duration: 2000; easing.type: Easing.OutQuart }
+                }
+            }
 
             QGCColoredImage {
                 id:             mapItemImage
