@@ -668,15 +668,38 @@ Item {
                     blurMax: 32
                 }
 
-                // Simulate airspace check on load
+                property bool _airspaceDataAvailable: false
+
                 Timer {
-                    id: airspaceTimer
-                    interval: 1000 // Reduced check time for better UX
+                    id: airspaceCheckTimer
+                    interval: 2000
                     running: true
-                    repeat: false
+                    repeat: true
                     onTriggered: {
-                        isCheckingAirspace = false;
-                        isClearToFly = true;
+                        // Safe access to global managers
+                        var manager = QGroundControl.airspaceManager
+                        var posManager = QGroundControl.qgcPositionManager
+                        
+                        if (!manager || !posManager) return
+
+                        var pos = posManager.gcsPosition
+                        if (pos && pos.isValid && (pos.latitude !== 0 || pos.longitude !== 0)) {
+                            // Fetch data once for the area if not already done
+                            if (!_airspaceDataAvailable) {
+                                var range = 0.1 // ~11km range
+                                manager.fetchAirspaceData(
+                                    pos.latitude - range, pos.longitude - range,
+                                    pos.latitude + range, pos.longitude + range
+                                )
+                                _airspaceDataAvailable = true
+                            }
+                            
+                            // Update UI properties safely
+                            isCheckingAirspace = manager.isLoading
+                            isClearToFly = !manager.isCoordinateInRedZone(pos)
+                        } else {
+                            isCheckingAirspace = true // Keep analyzing state until GPS is found
+                        }
                     }
                 }
 
@@ -732,9 +755,16 @@ Item {
 
                     Label {
                         Layout.fillWidth: true
-                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") :
-                                                   (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
-                        color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                        text: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return qsTr("Waiting for GPS...")
+                            return isCheckingAirspace ? qsTr("Analyzing Airspace...") : (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
+                        }
+                        color: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return "#64748b"
+                            return isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                        }
                         font.family: "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize * 1.05
                         font.bold: true
@@ -745,8 +775,12 @@ Item {
                     Label {
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
-                        text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
-                                                   (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        text: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return qsTr("Acquiring current location to verify flight regulations in your area.")
+                            return isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
+                                                       (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        }
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
