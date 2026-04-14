@@ -27,7 +27,7 @@ RowLayout {
     TelemetryValuesBar {
         id: telemetryBar
         Layout.alignment:   Qt.AlignBottom
-        extraWidth:         instrumentPanel.extraValuesWidth
+        extraWidth:         0
         pipExpanded:        bottomRightLayout.pipExpanded
     }
 

@@ -12,6 +12,7 @@ import QGroundControl.MultiVehicleManager
 import QGroundControl.Palette
 
 SettingsPage {
+    id: root
 
     //General Settings ------------------------------------------------------------------------------------
     property var    _settingsManager:           QGroundControl.settingsManager

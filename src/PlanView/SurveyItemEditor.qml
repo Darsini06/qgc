@@ -163,29 +163,32 @@ TransectStyleComplexItemEditor {
                 // --- Optimized Alignment Button ---
                 Button {
                     Layout.fillWidth:       true
-                    Layout.preferredHeight: 32
+                    Layout.preferredHeight: implicitHeight
+                    padding:                8
                     visible:                !_isAgri
-                    
+
                     background: Rectangle {
                         radius: 8
                         color:  parent.pressed ? "#1E1E24" : (parent.hovered ? _colorBgTertiary : _colorBgSecondary)
                         border.color: parent.hovered ? _colorSuccess : _colorBorder
                         border.width: 1
                     }
-                    
+
                     contentItem: RowLayout {
                         spacing: 8
-                        anchors.centerIn: parent
                         QGCColoredImage {
                             source: "/resources/InstrumentValueIcons/check.svg"
                             width:  14; height: 14
                             color:  _colorSuccess
+                            Layout.alignment: Qt.AlignVCenter
                         }
                         QGCLabel {
                             text: qsTr("Smart Path Optimization")
                             font.pixelSize: ScreenTools.smallFontPointSize
                             font.bold: true
                             color: _colorTextPrimary
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap     // Full words, no truncation
                         }
                     }
                     onClicked: _smartOptimize()

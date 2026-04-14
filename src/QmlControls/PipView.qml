@@ -217,18 +217,18 @@ Item {
     }
 
     // Resize icon
-    // Image {
-    //     id:             pipResizeIcon
-    //     source:         "/qmlimages/pipResize.svg"
-    //     fillMode:       Image.PreserveAspectFit
-    //     mipmap:         true
-    //     anchors.right:  parent.right
-    //     anchors.top:    parent.top
-    //     visible:        isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
-    //     height:         ScreenTools.defaultFontPixelHeight * 2.5
-    //     width:          ScreenTools.defaultFontPixelHeight * 2.5
-    //     sourceSize.height:  height
-    // }
+    Image {
+        id:             pipResizeIcon
+        source:         "/qmlimages/pipResize.svg"
+        fillMode:       Image.PreserveAspectFit
+        mipmap:         true
+        anchors.right:  parent.right
+        anchors.top:    parent.top
+        visible:        isExpanded && (ScreenTools.isMobile || pipMouseArea.containsMouse)
+        height:         ScreenTools.defaultFontPixelHeight * 2.5
+        width:          ScreenTools.defaultFontPixelHeight * 2.5
+        sourceSize.height:  height
+    }
 
     // Check min/max constraints on pip size when when parent is resized
     Connections {

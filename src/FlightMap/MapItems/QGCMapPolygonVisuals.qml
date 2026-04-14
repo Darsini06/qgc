@@ -34,7 +34,7 @@ Item {
     property var    mapControl                                  ///< Map control to place item in
     property var    mapPolygon                                  ///< QGCMapPolygon object
 
-    property bool   interactive:        mapPolygon.interactive
+    property bool            interactive:        mapPolygon ? mapPolygon.interactive : false
     property color  interiorColor:      "transparent"
     property color  altColor:           "transparent"
     property real   interiorOpacity:    1
@@ -151,13 +151,11 @@ Item {
             }else if (MapGlobals.edit==="edit2"){
                 _saveCurrentVertices()
                 _circleMode = false
-                mapPolygon.traceMode = true
-                console.log("MapGlobals.edit1")
+                if (mapPolygon) mapPolygon.traceMode = true
             }else{
                 _saveCurrentVertices()
                 _circleMode = false
-                mapPolygon.traceMode = true
-                console.log("MapGlobals.edit2")
+                if (mapPolygon) mapPolygon.traceMode = true
             }
         }
     }
@@ -299,15 +297,12 @@ Item {
     }
 
     function _saveCurrentVertices() {
-        console.log("_saveCurrentVertices")
+        if (!mapPolygon) return
         _savedVertices = [ ]
         _savedCircleMode = _circleMode
-        console.log("_savedCircleMode",MapGlobals.mapPolygon)
-        console.log("_savedCircleMode",MapGlobals.mapPolygon.count)
         for (var i=0; i<mapPolygon.count; i++) {
             _savedVertices.push(mapPolygon.vertexCoordinate(i))
         }
-        console.log("_savedCircleMode",_savedCircleMode)
     }
 
     function edit() {
@@ -315,6 +310,7 @@ Item {
     }
 
     function _restorePreviousVertices() {
+        if (!mapPolygon) return
         mapPolygon.beginReset()
         mapPolygon.clear()
         for (var i=0; i<_savedVertices.length; i++) {
@@ -335,11 +331,12 @@ Item {
     }
 
     Connections {
-        target: mapPolygon
+        target: mapPolygon || null
+        ignoreUnknownSignals: true
         function onTraceModeChanged() {
-            if (mapPolygon.traceMode) {
-                _instructionText = _traceText
-                // _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
+            if (mapPolygon && mapPolygon.traceMode) {
+                _instructionText = _fenceText
+                _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
             } else {
                 _instructionText = _polygonToolsText
                 _objMgrTraceVisuals.destroyObjects()
@@ -352,7 +349,10 @@ Item {
         addCommonVisuals()
         _handleInteractiveChanged()
     }
-    Component.onDestruction: mapPolygon.traceMode = true
+    Component.onDestruction: {
+        // Do not set property values during destruction as it can trigger signal loops
+        // and access partially destroyed objects, leading to crashes.
+    }
 
     QGCDynamicObjectManager { id: _objMgrCommonVisuals }
     QGCDynamicObjectManager { id: _objMgrToolVisuals }
@@ -436,10 +436,10 @@ Item {
         // Cover the full map area. _root has no size so we bind to mapControl's dimensions.
         x:      0
         y:      0
-        width:  mapControl.width
-        height: mapControl.height
+        width:  mapControl ? mapControl.width : 0
+        height: mapControl ? mapControl.height : 0
         z:              vertexMenu.z - 1
-        visible:        vertexMenu.visible
+        visible:        vertexMenu.visible && mapControl
         preventStealing: true
         onClicked:      vertexMenu.closeMenu()
     }
@@ -788,11 +788,11 @@ Item {
         id: polygonComponent
 
         MapPolygon {
-            color:          mapPolygon.showAltColor ? altColor : interiorColor
+            color:          (mapPolygon && mapPolygon.showAltColor) ? altColor : interiorColor
             opacity:        interiorOpacity
             border.color:   borderColor
             border.width:   borderWidth
-            path:           mapPolygon.path
+            path:           mapPolygon ? mapPolygon.path : []
 
             // Modern subtle pulsing fill effect for an active mission coverage area
             SequentialAnimation on opacity {
@@ -1051,8 +1051,8 @@ Item {
                 width: ScreenTools.defaultFontPixelHeight * 1.5
                 height: width
                 radius: width / 2
-                color: "white"  // Blue background
-                border.color: "black"//Qt.rgba(1, 1, 1, 1)  // White border
+                color: "#fcfcfc"  // 1% darker than white
+                border.color: "black"
                 border.width: 2
 
                 Text {
@@ -1091,7 +1091,7 @@ Item {
         id: dragHandlesComponent
 
         Repeater {
-            model: mapPolygon.pathModel
+            model: mapPolygon ? mapPolygon.pathModel : null
 
             delegate: Item {
                 property var _visuals: [ ]
@@ -1131,13 +1131,13 @@ Item {
 
         EditPositionDialog {
             title:      qsTr("Edit Center Position")
-            coordinate: mapPolygon.center
+            coordinate: mapPolygon ? mapPolygon.center : QtPositioning.coordinate()
             onCoordinateChanged: {
-                // Prevent spamming signals on vertex changes by setting centerDrag = true when changing center position.
-                // This also fixes a bug where Qt gets confused by all the signalling and draws a bad visual.
-                mapPolygon.centerDrag = true
-                mapPolygon.center = coordinate
-                mapPolygon.centerDrag = false
+                if (mapPolygon) {
+                    mapPolygon.centerDrag = true
+                    mapPolygon.center = coordinate
+                    mapPolygon.centerDrag = false
+                }
             }
         }
     }
@@ -1276,7 +1276,7 @@ Item {
                     anchors.centerIn: parent
                     width: 32
                     height: 32
-                    visible: mapPolygon.traceMode && MapGlobals.mark_with === "Mark_With_Manual" || mapping
+                    visible: (mapPolygon ? mapPolygon.traceMode : false) && MapGlobals.mark_with === "Mark_With_Manual" || mapping
                 }
             }
 
@@ -1513,6 +1513,7 @@ Item {
 
     // Function to move the selected marker by dx/dy meters
     function moveSelectedMarker(dxMeters, dyMeters) {
+        if (!mapPolygon) return
         if (_root.selectedVertexIndex === -1 ||
                 _root.selectedVertexIndex >= mapPolygon.count) return
 
@@ -1526,7 +1527,9 @@ Item {
         var newLat = coord.latitude + (dyMeters / earthRadius) * (180/Math.PI)
         var newLon = coord.longitude + (dxMeters / (earthRadius * Math.cos(coord.latitude * Math.PI/180))) * (180/Math.PI)
 
-        mapPolygon.adjustVertex(_root.selectedVertexIndex, QtPositioning.coordinate(newLat, newLon))
+        if (mapPolygon) {
+            mapPolygon.adjustVertex(_root.selectedVertexIndex, QtPositioning.coordinate(newLat, newLon))
+        }
     }
 
 
@@ -1583,8 +1586,10 @@ Item {
                 _saveCurrentVertices()
 
                 _circleMode = false
-                mapPolygon.traceMode = true
-                mapPolygon.clear();
+                if (mapPolygon) {
+                    mapPolygon.traceMode = true
+                    mapPolygon.clear();
+                }
             }
 
             onRejected: mainWindow.showFlyView()

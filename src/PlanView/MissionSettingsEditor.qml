@@ -18,8 +18,12 @@ Rectangle {
     height:             valuesColumn.implicitHeight + (_margin * 2)
     implicitHeight:     height
     color:              "transparent"
-    visible:            missionItem.isCurrentItem
+    visible:            missionItem !== null && missionItem !== undefined
     radius:             _radius
+
+    property var    missionItem:                    null
+    property real   availableWidth:                 0
+    property real   _radius:                        0
 
     property real   _panelRadius:   8
     property real   _fieldRadius:   4
@@ -33,12 +37,13 @@ Rectangle {
     property color  _unitColor:     "#8e8e93"
     property color  _colorAccent:   "#000000"
 
-    property var    _masterControler:               masterController
-    property var    _missionController:             _masterControler.missionController
-    property var    _controllerVehicle:             _masterControler.controllerVehicle
-    property bool   _vehicleHasHomePosition:        _controllerVehicle.homePosition.isValid
-    property bool   _showCruiseSpeed:               !_controllerVehicle.multiRotor
-    property bool   _showHoverSpeed:                _controllerVehicle.multiRotor || _controllerVehicle.vtol
+    property var    masterController:               null
+    property var    _masterController:              masterController
+    property var    _missionController:             _masterController ? _masterController.missionController : null
+    property var    _controllerVehicle:             _masterController ? _masterController.controllerVehicle : null
+    property bool   _vehicleHasHomePosition:        _controllerVehicle ? _controllerVehicle.homePosition.isValid : false
+    property bool   _showCruiseSpeed:               _controllerVehicle ? !_controllerVehicle.multiRotor : false
+    property bool   _showHoverSpeed:                _controllerVehicle ? (_controllerVehicle.multiRotor || _controllerVehicle.vtol) : false
     property bool   _multipleFirmware:              !QGroundControl.singleFirmwareSupport
     property bool   _multipleVehicleTypes:          !QGroundControl.singleVehicleSupport
     property real   _fieldWidth:                    ScreenTools.defaultFontPixelWidth * 16
@@ -50,6 +55,7 @@ Rectangle {
     property bool   _showCameraSection:             true // Always show per user request: "should not miss any content"
     property bool   _simpleMissionStart:            QGroundControl.corePlugin.options.showSimpleMissionStart
     property bool   _showFlightSpeed:               true // Always show
+    property bool   _noMissionItemsAdded:           _missionController ? _missionController.visualItems.count <= 1 : true
     property bool   _allowFWVehicleTypeSelection:   _noMissionItemsAdded && !globals.activeVehicle
 
     readonly property string _firmwareLabel:    qsTr("Firmware")
@@ -313,7 +319,7 @@ Rectangle {
                 Loader {
                     Layout.fillWidth:   true
                     sourceComponent:    volumeSliderComponent
-                    property var targetFact: missionItem.speedSection.flightSpeed
+                    property var targetFact: missionItem ? missionItem.speedSection.flightSpeed : null
                     onTargetFactChanged: if (item) item.fact = targetFact
                     onLoaded: {
                         if (item) {
@@ -347,7 +353,7 @@ Rectangle {
 
                 CameraSection {
                     id:         cameraSection
-                    checked:    !_waypointsOnlyMode && missionItem.cameraSection.settingsSpecified
+                    checked:    !_waypointsOnlyMode && missionItem && missionItem.cameraSection && missionItem.cameraSection.settingsSpecified
                     Layout.fillWidth: true
                 }
 
@@ -528,7 +534,7 @@ Rectangle {
                     Loader {
                         Layout.fillWidth:   true
                         sourceComponent:    volumeSliderComponent
-                        property var targetFact: missionItem.plannedHomePositionAltitude
+                        property var targetFact: missionItem ? missionItem.plannedHomePositionAltitude : null
                         onTargetFactChanged: if (item) item.fact = targetFact
                         onLoaded: {
                             if (item) {
@@ -551,7 +557,7 @@ Rectangle {
 
                     QGCButton {
                         text:                       qsTr("Set To Map Center")
-                        onClicked:                  missionItem.coordinate = map.center
+                        onClicked:                  if (missionItem) missionItem.coordinate = map.center
                         Layout.alignment:           Qt.AlignHCenter
                     }
                 } // inner ColumnLayout

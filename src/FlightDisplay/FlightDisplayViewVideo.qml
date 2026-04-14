@@ -103,7 +103,7 @@ Item {
                             anchors.fill: parent
                             color: "transparent"
                             border.color: "white"
-                            border.width: Math.max(1, 2 * adaptiveScale)
+                            border.width: Math.max(1, 2 * containerBox.adaptiveScale)
                             radius: width / 2
                             opacity: 0.4
                         }
