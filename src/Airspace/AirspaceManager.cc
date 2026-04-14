@@ -653,7 +653,11 @@ AirspaceZone* AirspaceManager::_parseGeoJsonFeature(const QJsonObject& feature)
 
     // Allow Point type for circle generation
     if (geometryType != "Polygon" && geometryType != "MultiPolygon" && geometryType != "Point") {
-        qDebug() << "AirspaceManager: Skipping unsupported geometry:" << geometryType;
+        // Only warn for non-empty unexpected types; silently skip null/empty geometry
+        // (backend returns many facilities without drawable geometry, e.g. POI markers)
+        if (!geometryType.isEmpty()) {
+            qWarning() << "AirspaceManager: Skipping unsupported geometry type:" << geometryType;
+        }
         return nullptr;
     }
 

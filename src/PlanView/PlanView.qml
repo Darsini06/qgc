@@ -87,11 +87,9 @@ Item {
     property real compassBottomY: compassNorth.y + compassNorth.height + 10
     property real compassNorthX:   compassNorth.x
 
-    property var _airspaceValidator: {
-        if (QGroundControl.airspaceManager) {
-            return new AirspaceRestrictionValidator(QGroundControl.airspaceManager)
-        }
-        return null
+    AirspaceRestrictionValidator {
+        id: _airspaceValidator
+        airspaceManager: QGroundControl.airspaceManager
     }
 
     // Shared responsive base
@@ -668,7 +666,10 @@ Item {
     }
 
     AirspaceRestrictionDialog {
-        id: _airspaceRestrictionDialog
+        id:         _airspaceRestrictionDialog
+        validator:  _airspaceValidator
+        isBlocked:  _airspaceValidator ? _airspaceValidator.blockMissionUpload : false
+        message:    _airspaceValidator ? _airspaceValidator.restrictionMessage : ""
     }
 
     Item {

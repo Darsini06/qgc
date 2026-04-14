@@ -176,23 +176,21 @@ QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting)
     if (_runningUnitTests) {
         // We don't want unit tests to use the same QSettings space as the normal app. So we tweak the app
         // name. Also we want to run unit tests with clean settings every time.
-        applicationName = QStringLiteral("%1_unittest").arg("AviatricksGCS");
+        applicationName = QStringLiteral("%1_unittest").arg("Drone Commander");
     } else {
 #ifdef DAILY_BUILD
         // This gives daily builds their own separate settings space. Allowing you to use daily and stable builds
         // side by side without daily screwing up your stable settings.
-        applicationName = QStringLiteral("%1").arg("AviatricksGCS");
+        applicationName = QStringLiteral("%1").arg("Drone Commander");
 #else
-        applicationName = QStringLiteral("%1").arg("AviatricksGCS");
+        applicationName = QStringLiteral("%1").arg("Drone Commander");
 #endif
     }
     setApplicationName(applicationName);
     setOrganizationName(QGC_ORG_NAME);
     setOrganizationDomain(QGC_ORG_DOMAIN);
     setApplicationVersion(QString(QGC_APP_VERSION_STR));
-    #ifdef Q_OS_LINUX
-        setWindowIcon(QIcon(":/res/qgroundcontrol.ico"));
-    #endif
+    setWindowIcon(QIcon(":/qmlimages/NewImages/dronecommanderlogo.svg"));
 
     // Set settings format
     QSettings::setDefaultFormat(QSettings::IniFormat);

@@ -375,6 +375,8 @@
         <file alias="VibrationPageIcon">src/AnalyzeView/VibrationPageIcon.png</file>
         <file alias="wifi.svg">src/AutoPilotPlugins/Common/Images/wifi.svg</file>
         <file alias="Yield.svg">src/UI/toolbar/Images/Yield.svg</file>
+        <file alias="Warning.svg">src/UI/toolbar/Images/Yield.svg</file>
+        <file alias="Stop.svg">resources/Stop.svg</file>
         <file alias="ZoomMinus.svg">src/FlightMap/Images/ZoomMinus.svg</file>
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>
         <file alias="Viewer3D/City3DMapIcon.svg">src/Viewer3D/Images/city_3d_map_icon.svg</file>

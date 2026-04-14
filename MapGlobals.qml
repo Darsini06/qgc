@@ -133,39 +133,11 @@ QtObject {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200 || xhr.status === 201) {
                     console.log("Session saved successfully to backend:", xhr.responseText);
-                    
-                    // Also save to local DB
-                    var db = getDatabase();
-                    db.transaction(function(tx) {
-                        try {
-                            tx.executeSql(
-                                "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
-                                [date, startTime, endTime, duration]
-                            );
-                            console.log("Session saved to local DB successfully");
-                        } catch (e) {
-                            console.error("Error saving session to local DB:", e);
-                        }
-                    });
-
                     if (rootWindow) {
                         rootWindow.sessionSaved = true;
                     }
-                    newSessionAdded();
                 } else {
                     console.error("Error saving session to backend:", xhr.responseText);
-                    // Still save to local DB even if cloud fails? 
-                    // Let's do it to ensure local visibility.
-                    var db = getDatabase();
-                    db.transaction(function(tx) {
-                        try {
-                            tx.executeSql(
-                                "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
-                                [date, startTime, endTime, duration]
-                            );
-                            newSessionAdded();
-                        } catch (e) {}
-                    });
                 }
             }
         }

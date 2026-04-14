@@ -11,6 +11,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
+import QtQuick.Effects
 
 import QGroundControl
 import QGroundControl.FactSystem
@@ -182,7 +183,14 @@ Item {
 
                         // Subtle compact shadow
                         layer.enabled: true
-                        layer.effect: Qt.createQmlObject("import QtQuick; import QtQuick.Effects; MultiEffect { shadowEnabled: true; shadowBlur: 0.8; shadowColor: \"#A0000000\"; shadowVerticalOffset: 3 }", mapTypePopup)
+                        layer.effect: Component {
+                            MultiEffect {
+                                shadowEnabled:          true
+                                shadowBlur:             0.8
+                                shadowColor:            "#A0000000"
+                                shadowVerticalOffset:   3
+                            }
+                        }
                     }
 
                     contentItem: ColumnLayout {

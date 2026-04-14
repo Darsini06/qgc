@@ -436,8 +436,8 @@ Item {
         // Cover the full map area. _root has no size so we bind to mapControl's dimensions.
         x:      0
         y:      0
-        width:  mapControl.width
-        height: mapControl.height
+        width:  mapControl ? mapControl.width : 0
+        height: mapControl ? mapControl.height : 0
         z:              vertexMenu.z - 1
         visible:        vertexMenu.visible
         preventStealing: true

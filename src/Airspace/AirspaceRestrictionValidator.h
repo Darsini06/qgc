@@ -31,10 +31,15 @@ class AirspaceRestrictionValidator : public QObject
     Q_PROPERTY(bool hasRestrictions READ hasRestrictions NOTIFY hasRestrictionsChanged)
     Q_PROPERTY(QString restrictionMessage READ restrictionMessage NOTIFY restrictionMessageChanged)
     Q_PROPERTY(bool blockMissionUpload READ blockMissionUpload NOTIFY blockMissionUploadChanged)
+    Q_PROPERTY(AirspaceManager* airspaceManager READ airspaceManager WRITE setAirspaceManager NOTIFY airspaceManagerChanged)
 
 public:
-    explicit AirspaceRestrictionValidator(AirspaceManager* airspaceManager, QObject* parent = nullptr);
+    explicit AirspaceRestrictionValidator(QObject* parent = nullptr);
+    AirspaceRestrictionValidator(AirspaceManager* airspaceManager, QObject* parent = nullptr);
     ~AirspaceRestrictionValidator() override = default;
+
+    AirspaceManager* airspaceManager() const { return _airspaceManager; }
+    void setAirspaceManager(AirspaceManager* manager);
 
     bool hasRestrictions() const { return _hasRestrictions; }
     QString restrictionMessage() const { return _restrictionMessage; }
@@ -74,6 +79,7 @@ signals:
     void hasRestrictionsChanged();
     void restrictionMessageChanged();
     void blockMissionUploadChanged();
+    void airspaceManagerChanged();
     void validationComplete(bool allowed, QString message);
     void waypointRestrictionDetected(int waypointIndex, QString zoneName, QString zoneType);
 

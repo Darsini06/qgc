@@ -279,7 +279,6 @@ Rectangle {
 
     RowLayout {
         id:                      rightToolsRow
-        anchors.verticalCenter:  parent.verticalCenter
         anchors.right:           parent.right
         anchors.rightMargin:     12
         anchors.top:             parent.top
