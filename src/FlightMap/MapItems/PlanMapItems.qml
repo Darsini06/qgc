@@ -42,7 +42,7 @@ Item {
         delegate: MissionItemMapVisual {
             map:        _map
             vehicle:    _vehicle
-            visible:    !object.isPlannedHomePosition && (object.commandName !== "Mission Start") && (object.abbreviation !== "L")
+            visible:    true
             onClicked:  _guidedController.confirmAction(_guidedController.actionSetWaypoint, Math.max(object.sequenceNumber, 1))
         }
     }

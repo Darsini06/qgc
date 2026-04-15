@@ -804,22 +804,22 @@ Item {
                         var pos = posManager.gcsPosition
                         if (pos && pos.isValid && (pos.latitude !== 0 || pos.longitude !== 0)) {
                             // Fetch data once for the area if not already done
-                            if (!_airspaceDataAvailable) {
+                            if (!airspaceWidget._airspaceDataAvailable) {
                                 var range = 0.1 // ~11km range
                                 manager.fetchAirspaceData(
                                             pos.latitude - range, pos.longitude - range,
                                             pos.latitude + range, pos.longitude + range
                                             )
-                                _airspaceDataAvailable = true
+                                airspaceWidget._airspaceDataAvailable = true
                             }
                             
                             // Update UI properties safely
                             isCheckingAirspace = manager.isLoading
                             isClearToFly = !manager.isCoordinateInRedZone(pos)
+
                         } else {
                             isCheckingAirspace = true // Keep analyzing state until GPS is found
                         }
-
                     }
                 }
 
@@ -1329,6 +1329,7 @@ Item {
                     color: agriMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: agriMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+
                     Behavior on color {
                         ColorAnimation {
                             duration: 150

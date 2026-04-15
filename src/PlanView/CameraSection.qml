@@ -16,7 +16,8 @@ Column {
     property alias showSpacer:      cameraSectionHeader.showSpacer
     property alias checked:         cameraSectionHeader.checked
 
-    property var    _camera:        missionItem.cameraSection
+    property var    missionItem:    null
+    property var    _camera:        missionItem ? missionItem.cameraSection : null
     property real   _fieldWidth:    ScreenTools.defaultFontPixelWidth * 16
     property real   _margin:        ScreenTools.defaultFontPixelWidth / 2
 
@@ -39,7 +40,7 @@ Column {
             id:             cameraActionCombo
             anchors.left:   parent.left
             anchors.right:  parent.right
-            fact:           _camera.cameraAction
+            fact:           _camera ? _camera.cameraAction : null
             indexModel:     false
             
             contentItem: Text {
@@ -77,7 +78,7 @@ Column {
             anchors.left:   parent.left
             anchors.right:  parent.right
             spacing:        ScreenTools.defaultFontPixelWidth
-            visible:        _camera.cameraAction.rawValue === 1
+            visible:        _camera && _camera.cameraAction.rawValue === 1
 
             QGCLabel {
                 text:               qsTr("Time")
@@ -85,7 +86,7 @@ Column {
                 Layout.fillWidth:   true
             }
             FactTextField {
-                fact:                   _camera.cameraPhotoIntervalTime
+                fact:                   _camera ? _camera.cameraPhotoIntervalTime : null
                 Layout.preferredWidth:  _fieldWidth
                 Layout.preferredHeight: 32
                 color:                  "#ffffff"
@@ -102,7 +103,7 @@ Column {
             anchors.left:   parent.left
             anchors.right:  parent.right
             spacing:        ScreenTools.defaultFontPixelWidth
-            visible:        _camera.cameraAction.rawValue === 2
+            visible:        _camera && _camera.cameraAction.rawValue === 2
 
             QGCLabel {
                 text:               qsTr("Distance")
@@ -110,7 +111,7 @@ Column {
                 Layout.fillWidth:   true
             }
             FactTextField {
-                fact:                   _camera.cameraPhotoIntervalDistance
+                fact:                   _camera ? _camera.cameraPhotoIntervalDistance : null
                 Layout.preferredWidth:  _fieldWidth
                 Layout.preferredHeight: 32
                 color:                  "#ffffff"
@@ -133,12 +134,12 @@ Column {
                 id:                 modeCheckBox
                 text:               qsTr("Mode")
                 textColor:          "#c8c4dc"
-                checked:            _camera.specifyCameraMode
-                onClicked:          _camera.specifyCameraMode = checked
+                checked:            _camera && _camera.specifyCameraMode
+                onClicked:          if (_camera) _camera.specifyCameraMode = checked
             }
             FactComboBox {
                 id:                 cameraModeCombo
-                fact:               _camera.cameraMode
+                fact:               _camera ? _camera.cameraMode : null
                 indexModel:         false
                 enabled:            modeCheckBox.checked
                 Layout.fillWidth:   true
@@ -193,8 +194,8 @@ Column {
                 }
                 QGCCheckBox {
                     id:                 gimbalCheckBox
-                    checked:            _camera.specifyGimbal
-                    onClicked:          _camera.specifyGimbal = checked
+                    checked:            _camera && _camera.specifyGimbal
+                    onClicked:          if (_camera) _camera.specifyGimbal = checked
                     textColor:          "#c8c4dc"
                     Layout.alignment:   Qt.AlignHCenter
                 }
@@ -210,7 +211,7 @@ Column {
                     Layout.alignment:   Qt.AlignHCenter
                 }
                 FactTextField {
-                    fact:                   _camera.gimbalPitch
+                    fact:                   _camera ? _camera.gimbalPitch : null
                     Layout.fillWidth:       true
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * (ScreenTools.isMobile ? 8 : 12)
                     Layout.preferredHeight: ScreenTools.isMobile ? 28 : 32
@@ -237,7 +238,7 @@ Column {
                     Layout.alignment:   Qt.AlignHCenter
                 }
                 FactTextField {
-                    fact:                   _camera.gimbalYaw
+                    fact:                   _camera ? _camera.gimbalYaw : null
                     Layout.fillWidth:       true
                     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * (ScreenTools.isMobile ? 8 : 12)
                     Layout.preferredHeight: ScreenTools.isMobile ? 28 : 32

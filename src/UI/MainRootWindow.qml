@@ -772,9 +772,7 @@ ApplicationWindow {
         color: QGroundControl.globalPalette.window
     }
 
-    QGCMapPolygonVisuals {
-        id:filename
-    }
+
 
     FlyView {
         id:                     flyView

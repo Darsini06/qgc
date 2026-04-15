@@ -13,6 +13,9 @@ QGCFlickable {
     id:             root
     contentHeight:  geoFenceEditorRect.height
     clip:           true
+    interactive:    true
+    flickableDirection: Flickable.VerticalFlick
+    boundsBehavior: Flickable.StopAtBounds
 
     property var    myGeoFenceController
     property var    flightMap
@@ -139,7 +142,7 @@ QGCFlickable {
             anchors.margins:    _margin
             anchors.left:       parent.left
             anchors.top:        parent.top
-            text:               qsTr("GeoFence Settings")
+            text:               qsTr("Obstacles Settings")
             color:              _colorTextPrimary
             font.bold:          true
             font.pointSize:     ScreenTools.mediumFontPointSize
@@ -182,8 +185,8 @@ QGCFlickable {
                     color:              _colorTextSecondary
                     font.pointSize:     myGeoFenceController.supported ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
                     text:               myGeoFenceController.supported ?
-                                            qsTr("GeoFencing allows you to set a virtual fence around the area you want to fly in.") :
-                                            qsTr("This vehicle does not support GeoFence.")
+                                            qsTr("Obstacles allow you to set a virtual boundary around the area you want to fly in.") :
+                                            qsTr("This vehicle does not support Obstacles.")
                 }
 
                 Column {
@@ -233,7 +236,8 @@ QGCFlickable {
                         }
                     }
 
-                    // --- INSERT GEOFENCE SECTION ---
+                    // --- INSERT OBSTACLE SECTION ---
+                    // Header label
                     Rectangle {
                         id:             insertSection
                         anchors.left:   parent.left
@@ -243,37 +247,42 @@ QGCFlickable {
                         radius:         _radius
                         border.color:   _colorBorder
                         border.width:   1
-                        
+
                         Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Add New GeoFence")
-                            color: _colorTextPrimary
-                            font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            anchors.fill:           parent
+                            anchors.leftMargin:     _margin
+                            anchors.rightMargin:    _margin
+                            verticalAlignment:      Text.AlignVCenter
+                            horizontalAlignment:    Text.AlignHCenter
+                            text:                   qsTr("Add New Obstacle")
+                            color:                  _colorTextPrimary
+                            font.bold:              true
+                            font.pointSize:         9
+                            wrapMode:               Text.NoWrap
                         }
                     }
 
-                    RowLayout {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: _margin
+                    // Vertical list of type buttons
+                    Column {
+                        anchors.left:   parent.left
+                        anchors.right:  parent.right
+                        spacing:        _margin
 
                         Button {
-                            Layout.fillWidth:   true
+                            width:  parent.width
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
                             }
                             contentItem: Text {
                                 text: qsTr("Inclusion Poly")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 10
+                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                wrapMode: Text.WordWrap
                             }
                             onClicked: {
                                 var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
@@ -284,19 +293,20 @@ QGCFlickable {
                         }
 
                         Button {
-                            Layout.fillWidth:   true
+                            width:  parent.width
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
                             }
                             contentItem: Text {
                                 text: qsTr("Obstacle Poly")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 10
+                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                wrapMode: Text.WordWrap
                             }
                             onClicked: {
                                 var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
@@ -305,27 +315,22 @@ QGCFlickable {
                                 myGeoFenceController.addExclusionPolygon(topLeftCoord, bottomRightCoord)
                             }
                         }
-                    }
-
-                    RowLayout {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: _margin
 
                         Button {
-                            Layout.fillWidth:   true
+                            width:  parent.width
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
                             }
                             contentItem: Text {
                                 text: qsTr("Inclusion Circle")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 10
+                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                wrapMode: Text.WordWrap
                             }
                             onClicked: {
                                 var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
@@ -336,19 +341,20 @@ QGCFlickable {
                         }
 
                         Button {
-                            Layout.fillWidth:   true
+                            width:  parent.width
                             height: 40
                             background: Rectangle {
                                 radius: _radius
-                                color: parent.pressed ? (isAgri ? Qt.darker(_agriGreen, 1.2) : _colorAccentDark) : (parent.hovered ? (isAgri ? Qt.lighter(_agriGreen, 1.1) : Qt.lighter(_colorAccent, 1.1)) : (isAgri ? _agriGreen : _colorAccent))
+                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
                             }
                             contentItem: Text {
                                 text: qsTr("Obstacle Circle")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 10
+                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                wrapMode: Text.WordWrap
                             }
                             onClicked: {
                                 var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
@@ -358,6 +364,7 @@ QGCFlickable {
                             }
                         }
                     }
+
 
                     // --- POLYGON SECTION ---
                     Rectangle {
@@ -381,7 +388,7 @@ QGCFlickable {
                             anchors.left: parent.left
                             anchors.leftMargin: _margin
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Polygon Fences")
+                            text: qsTr("Polygon Obstacles")
                             color: _colorTextPrimary
                             font.bold: true
                         }
@@ -397,7 +404,7 @@ QGCFlickable {
                     }
 
                     QGCLabel {
-                        text:       qsTr("No polygon fences added.")
+                        text:       qsTr("No polygon obstacles added.")
                         color:      _colorTextSecondary
                         font.italic: true
                         visible:    polygonSection.checked && myGeoFenceController.polygons.count === 0
@@ -494,7 +501,7 @@ QGCFlickable {
                             anchors.left: parent.left
                             anchors.leftMargin: _margin
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Circular Fences")
+                            text: qsTr("Circular Obstacles")
                             color: _colorTextPrimary
                             font.bold: true
                         }
@@ -510,7 +517,7 @@ QGCFlickable {
                     }
 
                     QGCLabel {
-                        text:       qsTr("No circular fences added.")
+                        text:       qsTr("No circular obstacles added.")
                         color:      _colorTextSecondary
                         font.italic: true
                         visible:    circleSection.checked && myGeoFenceController.circles.count === 0

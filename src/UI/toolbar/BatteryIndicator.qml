@@ -38,22 +38,23 @@ Item {
     property bool _showVoltage: _indicatorDisplay.rawValue === 1
     property bool _showBoth: _indicatorDisplay.rawValue === 2
     property real lastPercentage: 100  // Keep it global so it's preserved
+
     // Fetch battery settings
     property var batterySettings: QGroundControl.settingsManager.batteryIndicatorSettings
 
     // Properties to hold the thresholds
-    property int threshold1: batterySettings.threshold1.rawValue
-    property int threshold2: batterySettings.threshold2.rawValue
+    property int threshold1: batterySettings && batterySettings.threshold1 ? batterySettings.threshold1.rawValue : 20
+    property int threshold2: batterySettings && batterySettings.threshold2 ? batterySettings.threshold2.rawValue : 10
 
     // Control visibility based on battery state display setting
-    property bool batteryState: batterySettings.battery_state_display.rawValue
-    property bool threshold1visible: batterySettings.threshold1visible.rawValue
-    property bool threshold2visible: batterySettings.threshold2visible.rawValue
+    property bool batteryState: batterySettings && batterySettings.battery_state_display ? batterySettings.battery_state_display.rawValue : false
+    property bool threshold1visible: batterySettings && batterySettings.threshold1visible ? batterySettings.threshold1visible.rawValue : false
+    property bool threshold2visible: batterySettings && batterySettings.threshold2visible ? batterySettings.threshold2visible.rawValue : false
 
     // In your batterySettings properties:
-    property int cellCount: batterySettings.cellCount.rawValue
-    property real fullVoltagePerCell: batterySettings.fullVoltagePerCell.rawValue
-    property real emptyVoltagePerCell: batterySettings.emptyVoltagePerCell.rawValue
+    property int cellCount: batterySettings && batterySettings.cellCount ? batterySettings.cellCount.rawValue : 3
+    property real fullVoltagePerCell: batterySettings && batterySettings.fullVoltagePerCell ? batterySettings.fullVoltagePerCell.rawValue : 4.2
+    property real emptyVoltagePerCell: batterySettings && batterySettings.emptyVoltagePerCell ? batterySettings.emptyVoltagePerCell.rawValue : 3.0
 
     Row {
         id: batteryIndicatorRow

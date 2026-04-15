@@ -12,7 +12,7 @@ import QGroundControl.Palette
 // Editor for Simple mission items
 Rectangle {
     width:  availableWidth
-    height: editorColumn.height + (_margin * 2)
+    height: editorColumn.implicitHeight + (_margin * 2)
     color:  "transparent"
     radius: _radius
 
@@ -151,7 +151,7 @@ Rectangle {
         }
     }
 
-    Column {
+    ColumnLayout {
         id:                 editorColumn
         anchors.margins:    _margin
         anchors.left:       parent.left
@@ -160,7 +160,7 @@ Rectangle {
         spacing:            _margin
 
         QGCLabel {
-            width:          parent.width
+            Layout.fillWidth: true
             wrapMode:       Text.WordWrap
             font.pointSize: ScreenTools.smallFontPointSize
             text:           missionItem.rawEdit ?
@@ -170,8 +170,7 @@ Rectangle {
         }
 
         ColumnLayout {
-            anchors.left:       parent.left
-            anchors.right:      parent.right
+            Layout.fillWidth:   true
             spacing:            _margin
             visible:            missionItem.isTakeoffItem && missionItem.wizardMode // Hack special case for takeoff item
 
@@ -213,15 +212,13 @@ Rectangle {
             }
         }
 
-        Column {
-            anchors.left:       parent.left
-            anchors.right:      parent.right
+        ColumnLayout {
+            Layout.fillWidth:   true
             spacing:            _altRectMargin
             visible:            !missionItem.wizardMode
 
             ColumnLayout {
-                anchors.left:   parent.left
-                anchors.right:  parent.right
+                Layout.fillWidth: true
                 spacing:        0
                 visible:        _specifiesAltitude
 
@@ -300,8 +297,7 @@ Rectangle {
             }
 
             ColumnLayout {
-                anchors.left:   parent.left
-                anchors.right:  parent.right
+                Layout.fillWidth: true
                 spacing:        _margin
 
                 Repeater {
@@ -329,8 +325,7 @@ Rectangle {
             }
 
             GridLayout {
-                anchors.left:   parent.left
-                anchors.right:  parent.right
+                Layout.fillWidth: true
                 flow:           GridLayout.TopToBottom
                 rows:           missionItem.textFieldFacts.count +
                                 missionItem.nanFacts.count +
@@ -414,6 +409,7 @@ Rectangle {
             }
 
             CameraSection {
+                Layout.fillWidth: true
                 checked:    missionItem.cameraSection.settingsSpecified
                 visible:    missionItem.cameraSection.available
             }
