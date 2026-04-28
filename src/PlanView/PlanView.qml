@@ -296,8 +296,10 @@ Item {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
                         syncCloud()
+                        MapGlobals.share_edit_visibility = true
                     } else {
                         _planMasterController.saveToSelectedFile1()
+                        MapGlobals.share_edit_visibility = true
                         // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
@@ -770,7 +772,7 @@ Item {
                 model: _missionController.visualItems
                 delegate: MissionItemMapVisual {
                     map:         editorMap
-                    visible:     !object.isPlannedHomePosition && (object.commandName !== "Mission Start") && (object.abbreviation !== "L")
+                    visible:     true
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
@@ -1172,7 +1174,75 @@ Item {
                 anchors.top:        parent.top
 
                 //-------------------------------------------------------
+                // 1st: Mission button | 2nd: Fence button (each on own row)
+                Column {
+                    id:         layerTabBar
+                    width:      parent.width
+                    spacing:    8
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
+                    property int currentIndex: 0
+                    property bool fenceVisible: _geoFenceController.supported
+
+                    // Row 1 — Mission
+                    Rectangle {
+                        width:   parent.width
+                        height:  45
+                        radius:  8
+                        color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                        border.width: 0
+
+                        Text {
+                            id: missionText
+                            text: qsTr("Pathway")
+                            color: "white"
+                            font.bold:          true
+                            font.pointSize:     14
+                            font.family:        "Outfit"
+                            anchors.centerIn:   parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                layerTabBar.currentIndex = 0
+                                _editingLayer = _layerMission
+                            }
+                        }
+                    }
+
+                    // Row 2 — Fence
+                    Rectangle {
+                        visible:  layerTabBar.fenceVisible
+                        width:    parent.width
+                        height:   45
+                        radius:   8
+                        color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                        border.width: 0
+
+                        Text {
+                            id: fenceText
+                            text: qsTr("Obstacles")
+                            color: "white"
+                            font.bold:          true
+                            font.pointSize:     14
+                            font.family:        "Outfit"
+                            anchors.centerIn:   parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                layerTabBar.currentIndex = 1
+                                _editingLayer = _layerGeoFence
+                            }
+                        }
+                    }
+                }
+
+                // 2nd & 3rd: Boundary Point + Save
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
@@ -1191,7 +1261,7 @@ Item {
                             padding:            10
                             background: Rectangle {
                                 radius: 8
-                                color: Qt.rgba(0, 0, 0, 0.40)
+                                color: Qt.rgba(0, 0, 0, 0.41)
                                 anchors.fill: parent
                             }
                             contentItem: Text {
@@ -1206,137 +1276,6 @@ Item {
                             onClicked: {
                                 console.log("Boundary Point clicked in PlanView")
                                 mapPolygonvisuals.appendVertexToPolygon(activePolygon)
-                            }
-                        }
-
-                        Button {
-                            id: savePlanBtn
-                            width:              parent.width
-                            height:             45
-                            padding:            10
-
-                            background: Rectangle {
-                                radius: 8
-                                color: Qt.rgba(0, 0, 0, 0.40)
-                                anchors.fill: parent
-                            }
-
-                            contentItem: Text {
-                                text:               qsTr("Save")
-                                font.bold:          true
-                                color:              "white"
-                                font.pointSize:     14
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                font.family:        "Outfit"
-                            }
-                            onClicked: {
-                                if (!activePolygon || activePolygon.count < 3) {
-                                    console.log("Save: Not enough vertices (<3), restoring previous vertices")
-                                    mapPolygonvisuals.restorePreviousVertices()
-                                } else {
-                                    if (activePolygon.traceMode) {
-                                        activePolygon.traceMode = false
-                                        console.log("Save: traceMode set to false — survey item marked complete")
-                                    }
-
-                                    console.log("_appSettings.screen", _appSettings.screen)
-
-                                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                        console.log("_appSettings.screen", _appSettings.screen)
-                                        _planMasterController.saveToSelectedFile1()
-                                        mainWindow.planmap()
-                                    } else {
-                                        console.log("_appSettings.screen", _appSettings.screen)
-                                        _planMasterController.saveToSelectedFile()
-                                        mainWindow.planmap()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Mission Controls
-                Rectangle {
-                    id:         layerTabBar1
-                    width:      parent.width
-                    height:     42
-                    color:      "#000000"  // Black background
-                    radius:     21
-                    border.color: "#3e3e4a"
-                    border.width: 1
-                    visible:    false //QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
-
-                    property int currentIndex: 0
-                    property bool fenceVisible: _geoFenceController.supported
-
-                    property int _visibleTabCount: fenceVisible ? 2 : 1
-
-                    // Active pill highlight
-                    Rectangle {
-                        id: sliderHighlight1
-                        width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                        height: layerTabBar.height - 6
-                        y: 3
-                        x: 3 + (layerTabBar.currentIndex === 0 ? 0 : width)
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-
-                            GradientStop { position: 0.0; color: "#6a4c8d" }
-
-                            GradientStop { position: 1.0; color: "#000000" }
-                        }
-                        radius: height / 2
-                        border.color: "#8a6cad"
-                        border.width: 1
-                        Behavior on x { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-                    }
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 3
-                        spacing: 0
-                        visible:false
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 0
-                                _editingLayer = _layerMission
-                            }
-
-                            Text {
-                                text: qsTr("Mission")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 0
-                                color: layerTabBar.currentIndex === 0 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
-                            }
-                        }
-
-                        MouseArea {
-                            width: (layerTabBar.width - 6) / Math.max(1, layerTabBar._visibleTabCount)
-                            height: parent.height
-                            visible: layerTabBar.fenceVisible
-                            cursorShape: Qt.PointingHandCursor
-
-                            onClicked: {
-                                layerTabBar.currentIndex = 1
-                                _editingLayer = _layerGeoFence
-                                _geoFenceController.supported
-                            }
-
-                            Text {
-                                text: qsTr("Fence")
-                                anchors.centerIn: parent
-                                font.pointSize: 11
-                                font.bold: layerTabBar.currentIndex === 1
-                                color: layerTabBar.currentIndex === 1 ? "white" : "#9878be"
-                                Behavior on color { ColorAnimation { duration: 200 } }
                             }
                         }
                     }
@@ -1450,8 +1389,8 @@ Item {
                 anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
-                visible:                _editingLayer == _layerMission && !planControlColapsed
-
+                visible:                _editingLayer == _layerMission
+ 
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -1462,7 +1401,54 @@ Item {
                     clip:               true
                     currentIndex:       _missionController.currentPlanViewSeqNum
                     highlightMoveDuration: 250
-                    visible:            _editingLayer == _layerMission && !planControlColapsed
+                    visible:            _editingLayer == _layerMission
+
+                    footer: Item {
+                        width:  missionItemEditorListView.width
+                        height: 60
+                        visible: _editingLayer == _layerMission
+
+                        Button {
+                            anchors.centerIn:       parent
+                            width:                  parent.width
+                            height:                 45
+                            text:                   qsTr("Save Plan")
+
+                            background: Rectangle {
+                                radius: 8
+                                color: "black"
+                                border.color: "white"
+                                border.width: 1
+                            }
+
+                            contentItem: Text {
+                                text:               parent.text
+                                font.bold:          true
+                                color:              "white"
+                                font.pointSize:     14
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                font.family:        "Outfit"
+                            }
+
+                            onClicked: {
+                                if (activePolygon && activePolygon.traceMode) {
+                                    if (activePolygon.count < 3) {
+                                        console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                                        mapPolygonvisuals.restorePreviousVertices()
+                                        return
+                                    }
+                                    activePolygon.traceMode = false
+                                }
+                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                                    _planMasterController.saveToSelectedFile1()
+                                } else {
+                                    _planMasterController.saveToSelectedFile()
+                                }
+                                mainWindow.planmap()
+                            }
+                        }
+                    }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
                     // Component.onCompleted:
@@ -1479,10 +1465,10 @@ Item {
                     //-- List Elements
 
                     delegate: Item {
-                        property bool _showItem : gridLines ? true : (object && object.commandName !== "Mission Start" && object.commandName !== "Return To Launch")
+                        property bool _showItem : true
                         width: missionItemEditorListView.width
-                        height: _showItem ? innerEditor.height : 0
-                        visible: _showItem
+                        visible: !MapGlobals.share_edit_visibility
+                        height: visible ? innerEditor.height : 0
 
                         MissionExpand {
                             id: innerEditor
@@ -1496,6 +1482,13 @@ Item {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
 
                                        }
+                            onEditItemClicked: (popupItem) => {
+                                itemEditPopup.popupMissionItem = popupItem
+                                itemEditPopup.open()
+                            }
+                            onDeselect: {
+                                _missionController.setCurrentPlanViewSeqNum(-1, false)
+                            }
                         }
                     }
                 }
@@ -2338,7 +2331,9 @@ Item {
         } else {
             console.log("No plan creator available")
         }
+        MapGlobals.share_edit_visibility = true
     }
+
 
     function _mapCenter() {
         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2), editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
@@ -2346,7 +2341,7 @@ Item {
     }
 
     Connections {
-        target: utmspEditor
+        target: utmspEditor.
         function onVehicleIDSent(id) {
             _vehicleID = id
         }
@@ -2497,81 +2492,6 @@ Item {
     //     }
     // }
 
-    // Central Mission Control Container - Tabs & Actions
-    Column {
-        id: bottomCenterContainer
-        anchors.bottom:             parent.bottom
-        anchors.horizontalCenter:   parent.horizontalCenter
-        anchors.bottomMargin:       25
-        spacing:                    10
-        width:                      childrenRect.width // Prevent stretching
-        z:                          QGroundControl.zOrderWidgets + 100
-        visible:                    _editingLayer == _layerMission || _editingLayer == _layerGeoFence
-
-        // --- Row 3: Tab Selector (Styled Translucent Pills) ---
-        RowLayout {
-            id:         layerTabBar
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing:    15
-            visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
-
-            property int currentIndex: 0
-            property bool fenceVisible: _geoFenceController.supported
-
-            Rectangle {
-                Layout.preferredWidth:   missionText.contentWidth + 40
-                Layout.preferredHeight:  38
-                radius:                  0
-                color:                   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.40)
-                border.width:            0
-                
-                Text {
-                    id: missionText
-                    text: qsTr("Mission")
-                    color: "white"
-                    font.bold: layerTabBar.currentIndex === 0
-                    font.pointSize: 11
-                    anchors.centerIn: parent
-                }
-                
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        layerTabBar.currentIndex = 0
-                        _editingLayer = _layerMission
-                    }
-                }
-            }
-
-            Rectangle {
-                visible:                 layerTabBar.fenceVisible
-                Layout.preferredWidth:   fenceText.contentWidth + 40
-                Layout.preferredHeight:  38
-                radius:                  0
-                color:                   layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.40)
-                border.width:            0
-                
-                Text {
-                    id: fenceText
-                    text: qsTr("Fence")
-                    color: "white"
-                    font.bold: layerTabBar.currentIndex === 1
-                    font.pointSize: 11
-                    anchors.centerIn: parent
-                }
-                
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        layerTabBar.currentIndex = 1
-                        _editingLayer = _layerGeoFence
-                    }
-                }
-            }
-        }
-    }
 
     PlanViewToolBar {
         id:                     planToolBar
@@ -2623,6 +2543,115 @@ Item {
             }
         }
     }
-    // Floating buttons overlay
 
+    // Popup for Mission Start / Survey Item Editing
+    Popup {
+        id: itemEditPopup
+        property var popupMissionItem: null
+
+        width:  Math.min(320, parent.width * 0.9)
+        height: Math.min(popupInnerCol.implicitHeight + 40, parent.height * 0.85)
+        anchors.centerIn: parent
+        modal: true
+        dim: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        parent: Overlay.overlay
+
+        background: Rectangle {
+            color: "#BF000000"
+            radius: 12
+            border.color: "white"
+            border.width: 1
+        }
+
+        contentItem: Column {
+            id: popupInnerCol
+            spacing: 12
+            width: itemEditPopup.width - 40
+            anchors.centerIn: parent
+
+            Text {
+                text: itemEditPopup.popupMissionItem ? qsTr(((itemEditPopup.popupMissionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri") ? "Plot" : itemEditPopup.popupMissionItem.commandName) + " Settings") : qsTr("Settings")
+                font.pointSize: 16
+                font.bold: true
+                color: "white"
+                font.family: "Outfit"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            ScrollView {
+                id:     popupScrollView
+                width:  parent.width
+                // Fixed viewport height - content scrolls within this window
+                height: itemEditPopup.parent ? Math.min(itemEditPopup.parent.height * 0.65, 450) : 350
+                clip: true
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                ScrollBar.vertical.policy:   ScrollBar.AsNeeded
+
+                Column {
+                    width: popupScrollView.width
+
+                    MissionSettingsEditor {
+                        id:             missionStartEditorInst
+                        width:          popupScrollView.width
+                        availableWidth: popupScrollView.width
+                        missionItem:    (itemEditPopup.popupMissionItem && itemEditPopup.popupMissionItem.commandName === "Mission Start")
+                                            ? itemEditPopup.popupMissionItem : null
+                        masterController: _planMasterController
+                        visible:        itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Mission Start"
+                    }
+
+                    Loader {
+                        id:     genericEditorLoader
+                        width:  popupScrollView.width
+                        source: (itemEditPopup.popupMissionItem && 
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                                 itemEditPopup.popupMissionItem.commandName !== "Survey")
+                                    ? itemEditPopup.popupMissionItem.editorQml : ""
+                        visible: itemEditPopup.popupMissionItem !== null && 
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                                 itemEditPopup.popupMissionItem.commandName !== "Survey"
+
+                        property var    missionItem:        itemEditPopup.popupMissionItem
+                        property var    masterController:   _planMasterController
+                        property real   availableWidth:     popupScrollView.width
+                        property var    editorRoot:         null
+                    }
+
+                    Loader {
+                        id:     surveyEditorLoader
+                        width:  popupScrollView.width
+                        source: (itemEditPopup.popupMissionItem && itemEditPopup.popupMissionItem.commandName === "Survey")
+                                    ? itemEditPopup.popupMissionItem.editorQml : ""
+                        visible: itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Survey"
+
+                        property var    missionItem:        itemEditPopup.popupMissionItem
+                        property var    masterController:   _planMasterController
+                        property real   availableWidth:     popupScrollView.width
+                        property var    editorRoot:         null
+                    }
+                }
+            }
+
+            Button {
+                text: qsTr("Done")
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 150
+                height: 40
+                onClicked: itemEditPopup.close()
+
+                background: Rectangle {
+                    color: "white"
+                    radius: 20
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "black"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
 }

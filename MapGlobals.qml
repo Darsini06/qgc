@@ -19,7 +19,7 @@ QtObject {
     property string comefrom: "Plan"
     property string edit: "edit1"
     property string save: "save1"
-    property real altitude: 0
+    property real altitude: 30.5
     property string mapPolygon:" "
 
     property string time: "00:00:00"
@@ -62,7 +62,7 @@ QtObject {
         console.log("MapGlobals.recenterMap()")
         if (activeFlightMap && gcsPosition.isValid) {
             activeFlightMap.center = gcsPosition
-            activeFlightMap.zoomLevel = 15
+            activeFlightMap.zoomLevel = 19
         }else {
             rootWindow.showToastMessage("GPS Not Set");
         }

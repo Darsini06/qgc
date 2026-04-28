@@ -26,7 +26,7 @@ Item {
 
     property var    mapControl                  ///< Map control to place item in
     property var    mapPolyline                 ///< QGCMapPolyline object
-    property bool   interactive:    mapPolyline.interactive
+    property bool   interactive:    mapPolyline ? mapPolyline.interactive : false
     property int    lineWidth:      3
     property color  lineColor:      "#be781c"
 
@@ -63,6 +63,7 @@ Item {
 
     /// Reset polyline back to initial default
     function _resetPolyline() {
+        if (!mapPolyline) return
         mapPolyline.beginReset()
         mapPolyline.clear()
         var initialVertices = _defaultPolylineVertices()
@@ -72,6 +73,7 @@ Item {
     }
 
     function _saveCurrentVertices() {
+        if (!mapPolyline) return
         _savedVertices = [ ]
         for (var i=0; i<mapPolyline.count; i++) {
             _savedVertices.push(mapPolyline.vertexCoordinate(i))
@@ -79,6 +81,7 @@ Item {
     }
 
     function _restorePreviousVertices() {
+        if (!mapPolyline) return
         mapPolyline.beginReset()
         mapPolyline.clear()
         for (var i=0; i<_savedVertices.length; i++) {
@@ -96,9 +99,10 @@ Item {
     }
 
     Connections {
-        target: mapPolyline
+        target: mapPolyline || null
+        ignoreUnknownSignals: true
         onTraceModeChanged: {
-            if (mapPolyline.traceMode) {
+            if (mapPolyline && mapPolyline.traceMode) {
                 _instructionText = _traceText
                 _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
             } else {
@@ -114,7 +118,10 @@ Item {
             _addInteractiveVisuals()
         }
     }
-    Component.onDestruction: mapPolyline.traceMode = false
+    Component.onDestruction: {
+        // Do not set property values during destruction as it can trigger signal loops
+        // and access partially destroyed objects, leading to crashes.
+    }
 
     QGCDynamicObjectManager { id: _objMgrCommonVisuals }
     QGCDynamicObjectManager { id: _objMgrInteractiveVisuals }
@@ -170,7 +177,7 @@ Item {
         MapPolyline {
             line.width: lineWidth
             line.color: lineColor
-            path:       mapPolyline.path
+            path:       mapPolyline ? mapPolyline.path : []
             visible:    _root.visible
             opacity:    _root.opacity
         }
@@ -198,7 +205,7 @@ Item {
         id: splitHandlesComponent
 
         Repeater {
-            model: mapPolyline.path
+            model: mapPolyline ? mapPolyline.path : []
 
             delegate: Item {
                 property var _splitHandle
@@ -248,7 +255,7 @@ Item {
             Component.onCompleted: _creationComplete = true
 
             onItemCoordinateChanged: {
-                if (_creationComplete) {
+                if (_creationComplete && mapPolyline) {
                     // During component creation some bad coordinate values got through which screws up draw
                     mapPolyline.adjustVertex(polylineVertex, itemCoordinate)
                 }
@@ -290,7 +297,7 @@ Item {
         id: dragHandlesComponent
 
         Repeater {
-            model: mapPolyline.pathModel
+            model: mapPolyline ? mapPolyline.pathModel : null
 
             delegate: Item {
                 property var _visuals: [ ]

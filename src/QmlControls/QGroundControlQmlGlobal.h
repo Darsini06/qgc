@@ -261,7 +261,7 @@ signals:
     void skipSetupPageChanged           ();
 
 private:
-    double                  _flightMapInitialZoom   = 17.0;
+    double                  _flightMapInitialZoom   = 19.0;
     LinkManager*            _linkManager            = nullptr;
     MultiVehicleManager*    _multiVehicleManager    = nullptr;
     QGCMapEngineManager*    _mapEngineManager       = nullptr;

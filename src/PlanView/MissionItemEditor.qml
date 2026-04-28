@@ -174,7 +174,7 @@ Rectangle {
                 id: commandDialog
 
                 MissionCommandDialog {
-                    vehicle:                    masterController.controllerVehicle
+                    vehicle:                    masterController ? masterController.controllerVehicle : null
                     missionItem:                _root.missionItem
                     map:                        _root.map
                     // FIXME: Disabling fly through commands doesn't work since you may need to change from an RTL to something else
