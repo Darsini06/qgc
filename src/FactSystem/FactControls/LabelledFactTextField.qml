@@ -14,6 +14,7 @@ import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.FactSystem
 import QGroundControl.FactControls
+import QGroundControl.Palette
 
 RowLayout {
     property string label:                   fact.shortDescription
@@ -25,10 +26,12 @@ RowLayout {
 
     spacing: ScreenTools.defaultFontPixelWidth * 2
 
+    QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
+
     QGCLabel {
         Layout.fillWidth:   true
         text:               label
-        color:"#1a237e"
+        color:              qgcPal.text
     }
 
     FactTextField {

@@ -26,7 +26,7 @@ Item {
     property var             mapControl
     property var             mapPolygon
     property var             missionItems
-    property bool            interactive         : mapPolygon.interactive
+    property bool            interactive         : mapPolygon ? mapPolygon.interactive : false
     property color           interiorColor       : "transparent"
     property color           altColor            : "transparent"
     property real            interiorOpacity     : 1
@@ -47,7 +47,7 @@ Item {
 
     //Create Geofence Polygon Visuals
     function addCommonVisuals() {
-        if (_objMgrCommonVisuals.empty) {
+        if (_objMgrCommonVisuals.empty && mapControl) {
             _objMgrCommonVisuals.createObject(polygonComponent, mapControl, true)
         }
     }
@@ -59,7 +59,7 @@ Item {
 
     //Create Editing tools for Polygon Visuals
     function addEditingVisuals() {
-        if (_objMgrEditingVisuals.empty) {
+        if (_objMgrEditingVisuals.empty && mapControl) {
             _objMgrEditingVisuals.createObjects([ dragHandlesComponent, splitHandlesComponent, centerDragHandleComponent ], mapControl, false /* addToMap */)
         }
     }
@@ -71,9 +71,9 @@ Item {
 
     // Create a Toolbar for Polygon Visuals
     function addToolbarVisuals() {
-        if (_objMgrToolVisuals.empty) {
+        if (_objMgrToolVisuals.empty && mapControl) {
             var toolbar = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
-            toolbar.z = QGroundControl.zOrderWidgets
+            if (toolbar) toolbar.z = QGroundControl.zOrderWidgets
         }
     }
 
@@ -290,6 +290,7 @@ Item {
 
     /// Reset polygon back to initial default
     function _resetPolygon() {
+        if (!mapPolygon) return
         mapPolygon.beginReset()
         mapPolygon.clear()
         mapPolygon.appendVertices(optimalPolygonVertices())
@@ -301,13 +302,14 @@ Item {
             addEditingVisuals()
             addToolbarVisuals()
         } else {
-            mapPolygon.traceMode = false
+            if (mapPolygon) mapPolygon.traceMode = false
             removeEditingVisuals()
             removeToolVisuals()
         }
     }
 
     function _saveCurrentVertices() {
+        if (!mapPolygon) return
         _StoreCoordinates = [ ]
         for (var i=0; i<mapPolygon.count; i++) {
             _StoreCoordinates.push(mapPolygon.vertexCoordinate(i))
@@ -315,6 +317,7 @@ Item {
     }
 
     function _restorePreviousVertices() {
+        if (!mapPolygon) return
         mapPolygon.beginReset()
         mapPolygon.clear()
         for (var i=0; i<_StoreCoordinates.length; i++) {
@@ -327,9 +330,10 @@ Item {
 
 
     Connections {
-        target: mapPolygon
-        onTraceModeChanged: {
-            if (mapPolygon.traceMode) {
+        target: mapPolygon || null
+        ignoreUnknownSignals: true
+        function onTraceModeChanged() {
+            if (mapPolygon && mapPolygon.traceMode) {
                 _instructionText = _fenceText
                 _objMgrTraceVisuals.createObject(traceMouseAreaComponent, mapControl, false)
             } else {
@@ -343,7 +347,10 @@ Item {
         addCommonVisuals()
         _handleInteractiveChanged()
     }
-    Component.onDestruction: mapPolygon.traceMode = false
+    Component.onDestruction: {
+        // Do not set property values during destruction as it can trigger signal loops
+        // and access partially destroyed objects, leading to crashes.
+    }
 
     QGCDynamicObjectManager { id: _objMgrCommonVisuals }
     QGCDynamicObjectManager { id: _objMgrToolVisuals }
@@ -398,11 +405,11 @@ Item {
         id: polygonComponent
 
         MapPolygon {
-            color:          mapPolygon.showAltColor ? altColor : interiorColor
+            color:          (mapPolygon && mapPolygon.showAltColor) ? altColor : interiorColor
             opacity:        interiorOpacity
             border.color:   borderColor
             border.width:   borderWidth
-            path:           mapPolygon.path
+            path:           mapPolygon ? mapPolygon.path : []
         }
     }
 
@@ -426,7 +433,7 @@ Item {
         id: splitHandlesComponent
 
         Repeater {
-            model: mapPolygon.path
+            model: mapPolygon ? mapPolygon.path : []
 
             delegate: Item {
                 property var _splitHandle
@@ -543,7 +550,7 @@ Item {
         id: dragHandlesComponent
 
         Repeater {
-            model: mapPolygon.pathModel
+            model: mapPolygon ? mapPolygon.pathModel : null
 
             delegate: Item {
                 property var _visuals: [ ]
@@ -574,13 +581,15 @@ Item {
 
         EditPositionDialog {
             title:      qsTr("Edit Center Position")
-            coordinate: mapPolygon.center
+            coordinate: mapPolygon ? mapPolygon.center : QtPositioning.coordinate()
             onCoordinateChanged: {
-                // Prevent spamming signals on vertex changes by setting centerDrag = true when changing center position.
-                // This also fixes a bug where Qt gets confused by all the signalling and draws a bad visual.
-                mapPolygon.centerDrag = true
-                mapPolygon.center = coordinate
-                mapPolygon.centerDrag = false
+                if (mapPolygon) {
+                    // Prevent spamming signals on vertex changes by setting centerDrag = true when changing center position.
+                    // This also fixes a bug where Qt gets confused by all the signalling and draws a bad visual.
+                    mapPolygon.centerDrag = true
+                    mapPolygon.center = coordinate
+                    mapPolygon.centerDrag = false
+                }
             }
         }
     }

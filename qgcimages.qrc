@@ -212,6 +212,12 @@
         <file alias="NewImages/camera_bg_image.png">src/NewImages/camera_bg_image.png</file>
         <file alias="NewImages/nature_bg_rice_fields.jpg">src/NewImages/nature_bg_rice_fields.jpg</file>
         <file alias="NewImages/mapping_bg_image.png">src/NewImages/mapping_bg_image.png</file>
+        <file alias="NewImages/professional_landing_bg.png">src/NewImages/professional_landing_bg.png</file>
+        <file alias="NewImages/premium_drone_landing_bg.png">src/NewImages/premium_drone_landing_bg.png</file>
+        <file alias="NewImages/agri_premium_bg.png">resources/agri_premium_bg.png</file>
+        <file alias="NewImages/camera_premium_bg.png">resources/camera_premium_bg.png</file>
+        <file alias="NewImages/mapping_premium_bg.png">resources/mapping_premium_bg.png</file>
+        <file alias="NewImages/drone_commander_home_bg.jpg">resources/drone_commander_home_bg.jpg</file>
         <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
         <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>
         <file alias="NewImages/camerabg.png">src/NewImages/camerabg.png</file>

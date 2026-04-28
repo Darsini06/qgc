@@ -33,6 +33,7 @@ Item {
 
         Item {
             anchors.top: header.bottom; anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+
             WebView {
                 id: webView
                 anchors.fill: parent
@@ -42,6 +43,7 @@ Item {
                     else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) privacyRoot.loading = false
                 }
             }
+
             Rectangle {
                 anchors.fill: parent; color: "#00000020"; visible: privacyRoot.loading
                 BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }

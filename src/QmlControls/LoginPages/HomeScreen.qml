@@ -116,10 +116,10 @@ Item {
         anchors.fill: parent
         z: 0
 
-        // Grey Gradient background specifically for the startup/loadpage state
+        // Grey Gradient background removed in favor of professional_landing_bg.png
         Rectangle {
             anchors.fill: parent
-            visible: (droneType === "loadpage")
+            visible: false
             gradient: Gradient {
                 GradientStop {
                     position: 0.0
@@ -135,14 +135,14 @@ Item {
         Image {
             id: bgImage
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            visible: true
             source: {
 
                 if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
                 if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
                 if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
                 if (droneType === "AI")      return "qrc:/qmlimages/NewImages/ai_bg_image.png"
-                return "qrc:/qmlimages/NewImages/nature_background.png" // Fallback
+                return "qrc:/qmlimages/NewImages/nature_bg_rice_fields.jpg" // Nature rice fields background
             }
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -172,7 +172,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             opacity: 0.6
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 GradientStop {
                     position: 0.0
@@ -192,7 +192,7 @@ Item {
         // Darkening overlay for cinematic look and text readability - with vignette
         Rectangle {
             anchors.fill: parent
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 id: vignetteGradient
                 GradientStop {
@@ -216,7 +216,7 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
             height: dp(35) // Deep atmospheric blend
-            visible: (droneType !== "loadpage")
+            visible: true
             gradient: Gradient {
                 GradientStop {
                     position: 0.0
@@ -295,7 +295,7 @@ Item {
             height: width
             source: "qrc:/qmlimages/NewImages/agri_AIImage_transparent.png"
             fillMode: Image.PreserveAspectFit
-            visible: (droneType === "loadpage")
+            visible: false // Removed drone per user request to focus on central content
             opacity: 0.85
             asynchronous: true
             cache: true
@@ -722,6 +722,7 @@ Item {
             Rectangle {
                 id: airspaceWidget
                 visible: true // Always show or adapt as needed
+                anchors.horizontalCenter: (droneType === "loadpage") ? parent.horizontalCenter : undefined
 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
@@ -745,9 +746,9 @@ Item {
                     y: -20
                 }
 
-                // Component.onCompleted: {
-                //     widgetEntryAnim.start()
-                // }
+                Component.onCompleted: {
+                    widgetEntryAnim.start()
+                }
 
                 SequentialAnimation {
                     id: widgetEntryAnim
@@ -786,14 +787,39 @@ Item {
                     blurMax: 32
                 }
 
-                Component.onCompleted: {
-                    widgetEntryAnim.start();                 // ← animation
+                property bool _airspaceDataAvailable: false
 
-                    if (!_airspaceChecked) {
-                        // ← guard check (property is on mainWindow1)
-                        _airspaceChecked = true;
-                        isCheckingAirspace = true;
-                        singleShotTimer.start();            // ← manually trigger once
+                Timer {
+                    id: airspaceCheckTimer
+                    interval: 2000
+                    running: true
+                    repeat: true
+                    onTriggered: {
+                        // Safe access to global managers
+                        var manager = QGroundControl.airspaceManager
+                        var posManager = QGroundControl.qgcPositionManager
+                        
+                        if (!manager || !posManager) return
+
+                        var pos = posManager.gcsPosition
+                        if (pos && pos.isValid && (pos.latitude !== 0 || pos.longitude !== 0)) {
+                            // Fetch data once for the area if not already done
+                            if (!airspaceWidget._airspaceDataAvailable) {
+                                var range = 0.1 // ~11km range
+                                manager.fetchAirspaceData(
+                                            pos.latitude - range, pos.longitude - range,
+                                            pos.latitude + range, pos.longitude + range
+                                            )
+                                airspaceWidget._airspaceDataAvailable = true
+                            }
+                            
+                            // Update UI properties safely
+                            isCheckingAirspace = manager.isLoading
+                            isClearToFly = !manager.isCoordinateInRedZone(pos)
+
+                        } else {
+                            isCheckingAirspace = true // Keep analyzing state until GPS is found
+                        }
                     }
                 }
 
@@ -857,8 +883,17 @@ Item {
 
                     Label {
                         Layout.fillWidth: true
-                        text: isCheckingAirspace ? qsTr("Analyzing Airspace...") : (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
-                        color: isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                        text: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return qsTr("Waiting for GPS...")
+                            return isCheckingAirspace ? qsTr("Analyzing Airspace...") : (isClearToFly ? qsTr("Clear to Fly") : qsTr("Restricted Airspace"))
+                        }
+                        color: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return "#64748b"
+                            return isCheckingAirspace ? "#facc15" : (isClearToFly ? "#4ade80" : "#f87171")
+                        }
+
                         font.family: "Outfit"
                         font.pointSize: ScreenTools.defaultFontPointSize * 1.05
                         font.bold: true
@@ -873,7 +908,13 @@ Item {
                     Label {
                         Layout.fillWidth: true
                         wrapMode: Text.WordWrap
-                        text: isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") : (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        text: {
+                            var pos = QGroundControl.qgcPositionManager.gcsPosition
+                            if (!pos || !pos.isValid || (pos.latitude === 0 && pos.longitude === 0)) return qsTr("Acquiring current location to verify flight regulations in your area.")
+                            return isCheckingAirspace ? qsTr("Fetching GPS coordinates and checking local drone flight regulations.") :
+                                                        (isClearToFly ? qsTr("Class G Airspace. No active flight restrictions detected in your current location. Ensure standard safety protocols.") : qsTr("Authorization required to fly in this zone. Please check with local aviation authorities before takeoff."))
+                        }
+
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
@@ -895,17 +936,6 @@ Item {
                     onClicked: {
                         Qt.openUrlExternally("https://airspacemap.in/");
                     }
-                }
-            }
-            Timer {
-                id: singleShotTimer
-                running: false        // ← NOT auto-running
-                repeat: false         // ← fires exactly once
-                onTriggered: {
-                    isCheckingAirspace = false;
-                    isClearToFly = true;
-                    // Replace above two lines with your real API call:
-                    // airspaceMapApi.checkLocation(gpsLat, gpsLon)
                 }
             }
         }
@@ -1196,9 +1226,9 @@ Item {
                     onClicked: {
                         var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "");
                         typeSelectionDialogComponent.createObject(mainWindow1, {
-                            editingConfig: editingConfig,
-                            originalConfig: null
-                        }).open();
+                                                                      editingConfig: editingConfig,
+                                                                      originalConfig: null
+                                                                  }).open();
                     }
                 }
             }
@@ -1299,6 +1329,7 @@ Item {
                     color: agriMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
                     border.color: agriMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
+
                     Behavior on color {
                         ColorAnimation {
                             duration: 150
@@ -1628,10 +1659,10 @@ Item {
                                 typeDialog.close();
                                 var editingConfig = _linkManager.createConfiguration(index, "");
                                 linkConfigDialogComponent.createObject(mainWindow, {
-                                    editingConfig: editingConfig,
-                                    originalConfig: null,
-                                    selectedType: index
-                                }).open();
+                                                                           editingConfig: editingConfig,
+                                                                           originalConfig: null,
+                                                                           selectedType: index
+                                                                       }).open();
                             }
                         }
                     }

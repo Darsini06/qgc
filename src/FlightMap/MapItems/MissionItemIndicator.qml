@@ -22,7 +22,7 @@ MapQuickItem {
     property var missionItem
     property int sequenceNumber
 
-    visible: missionItem ? (!missionItem.isPlannedHomePosition && (missionItem.commandName !== "Mission Start") && (missionItem.abbreviation !== "L")) : true
+    visible: true
 
     signal clicked
 

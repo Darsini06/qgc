@@ -12,6 +12,7 @@ import QtQuick.Layouts
 
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
+import QGroundControl.Palette
 
 RowLayout {
     property alias label:                   label.text
@@ -25,10 +26,12 @@ RowLayout {
 
     signal activated(int index)
 
+    QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
+
     QGCLabel {
         id:                 label  
         Layout.fillWidth:   true
-        color:"white"
+        color:              qgcPal.text
     }
 
     QGCComboBox {
