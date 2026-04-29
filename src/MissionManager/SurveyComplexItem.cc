@@ -158,6 +158,24 @@ void SurveyComplexItem::_saveCommon(QJsonObject &saveObject) {
       _splitConcavePolygonsFact.rawValue().toBool();
   saveObject[_jsonEntryPointKey] = _entryPoint;
 
+  // Save local obstacles
+  if (!_localExclusionPolygons.isEmpty()) {
+    QJsonArray obsArray;
+    for (const QPolygonF &poly : _localExclusionPolygons) {
+      QJsonObject obsObj;
+      obsObj[_jsonLocalObstacleTypeKey] = _jsonLocalObstaclePolygonValue;
+      QJsonArray pts;
+      for (int i = 0; i < poly.count() - 1; i++) { // Don't save closed point
+        QJsonArray pt;
+        pt << poly[i].x() << poly[i].y();
+        pts.append(pt);
+      }
+      obsObj[QGCMapPolygon::jsonPolygonKey] = pts;
+      obsArray.append(obsObj);
+    }
+    saveObject[_jsonLocalObstaclesKey] = obsArray;
+  }
+
   // Polygon shape
   _surveyAreaPolygon.saveToJson(saveObject);
 }
@@ -335,6 +353,36 @@ bool SurveyComplexItem::_loadV4V5(const QJsonObject &complexObject,
   }
 
   _entryPoint = complexObject[_jsonEntryPointKey].toInt();
+
+  // Load local obstacles
+  _localExclusionPolygons.clear();
+  if (complexObject.contains(_jsonLocalObstaclesKey)) {
+    QJsonArray obsArray = complexObject[_jsonLocalObstaclesKey].toArray();
+    for (int i = 0; i < obsArray.count(); i++) {
+      QJsonObject obsObj = obsArray[i].toObject();
+      QString type = obsObj[_jsonLocalObstacleTypeKey].toString();
+      QPolygonF poly;
+      if (type == _jsonLocalObstaclePolygonValue) {
+        QJsonArray pts = obsObj[QGCMapPolygon::jsonPolygonKey].toArray();
+        for (int j = 0; j < pts.count(); j++) {
+          QJsonArray pt = pts[j].toArray();
+          poly << QPointF(pt[0].toDouble(), pt[1].toDouble());
+        }
+      } else if (type == _jsonLocalObstacleCircleValue) {
+        QPointF center(obsObj["x"].toDouble(), obsObj["y"].toDouble());
+        double radius = obsObj["radius"].toDouble();
+        for (int j = 0; j < 36; j++) {
+          double angle = (360.0 / 36.0) * j * M_PI / 180.0;
+          poly << center + QPointF(cos(angle) * radius, sin(angle) * radius);
+        }
+      }
+      if (poly.count() >= 3) {
+        if (poly.front() != poly.back())
+          poly << poly.front();
+        _localExclusionPolygons.append(poly);
+      }
+    }
+  }
 
   _ignoreRecalc = false;
 
@@ -707,10 +755,117 @@ void SurveyComplexItem::_intersectLinesWithRect(const QList<QLineF> &lineList,
   }
 }
 
+double SurveyComplexItem::_distanceToSegment(const QPointF &p, const QLineF &line) {
+  double l2 = line.length() * line.length();
+  if (l2 == 0.0)
+    return QLineF(p, line.p1()).length();
+  double t = qMax(
+      0.0, qMin(1.0, QPointF::dotProduct(p - line.p1(), line.p2() - line.p1()) /
+                        l2));
+  QPointF projection = line.p1() + t * (line.p2() - line.p1());
+  return QLineF(p, projection).length();
+}
+
+QList<QPointF> SurveyComplexItem::_getBoundaryPath(const QPolygonF &poly,
+                                                   const QPointF &p1,
+                                                   const QPointF &p2) {
+  if (poly.count() < 3)
+    return {p1, p2};
+
+  int i1 = -1, i2 = -1;
+  double minD1 = 1e9, minD2 = 1e9;
+  for (int i = 0; i < poly.count() - 1; ++i) {
+    double d1 = _distanceToSegment(p1, QLineF(poly[i], poly[i + 1]));
+    if (d1 < minD1) {
+      minD1 = d1;
+      i1 = i;
+    }
+    double d2 = _distanceToSegment(p2, QLineF(poly[i], poly[i + 1]));
+    if (d2 < minD2) {
+      minD2 = d2;
+      i2 = i;
+    }
+  }
+
+  // If points are on the same edge, detour is not needed unless it's deep inside
+  if (i1 == i2 && minD1 < 0.1 && minD2 < 0.1) {
+      return {p1, p2};
+  }
+
+  if (i1 == -1 || i2 == -1)
+    return {p1, p2};
+
+  auto getPath = [&](bool forward) {
+    QList<QPointF> path;
+    path << p1;
+    int curr = i1;
+    if (forward) {
+      int next = (curr + 1) % (poly.count() - 1);
+      while (curr != i2) {
+        QPointF vertex = poly[next];
+        // Apply a small outward buffer (0.5m)
+        QPointF prevPt = poly[curr];
+        int nextNext = (next + 1) % (poly.count() - 1);
+        QPointF nextPt = poly[nextNext];
+        
+        QLineF l1(prevPt, vertex);
+        QLineF l2(vertex, nextPt);
+        QPointF normal = (l1.normalVector().unitVector().p2() - l1.normalVector().unitVector().p1()) +
+                         (l2.normalVector().unitVector().p2() - l2.normalVector().unitVector().p1());
+        // Note: sum of normals might need normalization and scale
+        double normLen = sqrt(normal.x()*normal.x() + normal.y()*normal.y());
+        if (normLen > 0.1) {
+            vertex += (normal / normLen) * 0.5; // 0.5 meter buffer
+        }
+
+        path << vertex;
+        curr = next;
+        next = nextNext;
+      }
+    } else {
+      while (curr != i2) {
+        QPointF vertex = poly[curr];
+        // Apply a small outward buffer (0.5m)
+        int prev = (curr + 1) % (poly.count() - 1);
+        int nextIdx = (curr - 1 + poly.count() - 1) % (poly.count() - 1);
+        QPointF prevPt = poly[prev];
+        QPointF nextPt = poly[nextIdx];
+        
+        QLineF l1(prevPt, vertex);
+        QLineF l2(vertex, nextPt);
+        QPointF normal = (l1.normalVector().unitVector().p2() - l1.normalVector().unitVector().p1()) +
+                         (l2.normalVector().unitVector().p2() - l2.normalVector().unitVector().p1());
+        double normLen = sqrt(normal.x()*normal.x() + normal.y()*normal.y());
+        if (normLen > 0.1) {
+            vertex += (normal / normLen) * 0.5; // 0.5 meter buffer
+        }
+
+        path << vertex;
+        curr = nextIdx;
+      }
+    }
+    path << p2;
+    return path;
+  };
+
+  QList<QPointF> pathF = getPath(true);
+  QList<QPointF> pathB = getPath(false);
+
+  auto pathLen = [](const QList<QPointF> &p) {
+    double len = 0;
+    for (int i = 0; i < p.count() - 1; ++i)
+      len += QLineF(p[i], p[i + 1]).length();
+    return len;
+  };
+
+  return (pathLen(pathF) < pathLen(pathB)) ? pathF : pathB;
+}
+
 void SurveyComplexItem::_intersectLinesWithPolygon(
     const QList<QLineF> &lineList, const QPolygonF &polygon,
-    const QList<QPolygonF> &exclusionPolygons, QList<QLineF> &resultLines) {
-  resultLines.clear();
+    const QList<QPolygonF> &exclusionPolygons,
+    QList<QList<QPointF>> &resultPolylines) {
+  resultPolylines.clear();
 
   for (int i = 0; i < lineList.count(); i++) {
     const QLineF &line = lineList[i];
@@ -749,57 +904,88 @@ void SurveyComplexItem::_intersectLinesWithPolygon(
                        QLineF(line.p1(), b).length();
               });
 
+    QList<QPointF> currentPolyline;
     // Check each segment between consecutive intersection points
     for (int j = 0; j < intersections.count() - 1; j++) {
       QPointF p1 = intersections[j];
       QPointF p2 = intersections[j + 1];
+      
+      // Use multiple points to check for exclusion to be more robust
       QPointF mid = (p1 + p2) / 2.0;
+      QPointF p1_eps = p1 + (p2 - p1) * 0.01;
+      QPointF p2_eps = p2 + (p1 - p2) * 0.01;
 
       // Segment is valid if midpoint is inside main polygon...
-      bool insideMain = polygon.containsPoint(mid, Qt::WindingFill);
-      if (!insideMain)
-        continue;
+      bool insideMain = polygon.containsPoint(mid, Qt::WindingFill) || 
+                        polygon.containsPoint(p1_eps, Qt::WindingFill) ||
+                        polygon.containsPoint(p2_eps, Qt::WindingFill);
+      
+      if (insideMain) {
+        // ...and NOT inside any exclusion polygon
+        bool insideExclusion = false;
+        const QPolygonF *targetExcl = nullptr;
+        for (const QPolygonF &excl : exclusionPolygons) {
+          if (excl.containsPoint(mid, Qt::WindingFill) ||
+              excl.containsPoint(p1_eps, Qt::WindingFill) ||
+              excl.containsPoint(p2_eps, Qt::WindingFill)) {
+            insideExclusion = true;
+            targetExcl = &excl;
+            break;
+          }
+        }
 
-      // ...and NOT inside any exclusion polygon
-      bool insideExclusion = false;
-      for (const QPolygonF &excl : exclusionPolygons) {
-        if (excl.containsPoint(mid, Qt::WindingFill)) {
-          insideExclusion = true;
-          break;
+        if (!insideExclusion) {
+          if (currentPolyline.isEmpty())
+            currentPolyline << p1;
+          currentPolyline << p2;
+        } else {
+          // Inside exclusion, follow boundary
+          QList<QPointF> boundary = _getBoundaryPath(*targetExcl, p1, p2);
+          if (currentPolyline.isEmpty())
+            currentPolyline << boundary.first();
+          for (int k = 1; k < boundary.count(); k++) {
+            if (!currentPolyline.contains(boundary[k]))
+              currentPolyline << boundary[k];
+          }
+        }
+      } else {
+        // Outside main polygon, finish current polyline
+        if (!currentPolyline.isEmpty()) {
+          if (currentPolyline.count() >= 2)
+            resultPolylines.append(currentPolyline);
+          currentPolyline.clear();
         }
       }
-
-      if (!insideExclusion) {
-        // Ensure the segment has significant length to avoid noise
-        if (QLineF(p1, p2).length() > 0.01) {
-          resultLines.append(QLineF(p1, p2));
-        }
-      }
+    }
+    if (!currentPolyline.isEmpty() && currentPolyline.count() >= 2) {
+      resultPolylines.append(currentPolyline);
     }
   }
 }
 
 /// Adjust the line segments such that they are all going the same direction
 /// with respect to going from P1->P2
-void SurveyComplexItem::_adjustLineDirection(const QList<QLineF> &lineList,
-                                             QList<QLineF> &resultLines) {
+void SurveyComplexItem::_adjustLineDirection(
+    const QList<QList<QPointF>> &lineList, QList<QList<QPointF>> &resultLines) {
   qreal firstAngle = 0;
   for (int i = 0; i < lineList.count(); i++) {
-    const QLineF &line = lineList[i];
-    QLineF adjustedLine;
+    const QList<QPointF> &polyline = lineList[i];
+    if (polyline.count() < 2)
+      continue;
 
+    QLineF overallLine(polyline.first(), polyline.last());
     if (i == 0) {
-      firstAngle = line.angle();
+      firstAngle = overallLine.angle();
     }
 
-    if (qAbs(line.angle() - firstAngle) > 1.0) {
-      adjustedLine.setP1(line.p2());
-      adjustedLine.setP2(line.p1());
+    if (qAbs(overallLine.angle() - firstAngle) > 1.0) {
+      QList<QPointF> reversed;
+      for (int j = polyline.count() - 1; j >= 0; j--)
+        reversed << polyline[j];
+      resultLines.append(reversed);
     } else {
-      adjustedLine = line;
+      resultLines.append(polyline);
     }
-
-    resultLines += adjustedLine;
   }
 }
 
@@ -956,7 +1142,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
     for (int i = 0; i < fenceController->polygons()->count(); i++) {
       QGCFencePolygon *fencePolygon =
           fenceController->polygons()->value<QGCFencePolygon *>(i);
-      if (fencePolygon && !fencePolygon->inclusion()) {
+      if (fencePolygon) {
         QPolygonF exclusionPolygon;
         for (int j = 0; j < fencePolygon->count(); j++) {
           double north, east, down;
@@ -974,7 +1160,7 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
     for (int i = 0; i < fenceController->circles()->count(); i++) {
       QGCFenceCircle *fenceCircle =
           fenceController->circles()->value<QGCFenceCircle *>(i);
-      if (fenceCircle && !fenceCircle->inclusion()) {
+      if (fenceCircle) {
         QPolygonF exclusionPolygon;
         QGeoCoordinate center = fenceCircle->center();
         double radius = fenceCircle->radius()->rawValue().toDouble();
@@ -994,41 +1180,57 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
   }
 
   if (_mapPolygon && _mapPolygon->count() >= 3) {
-    QPolygonF exclusionPolygon;
-    qCDebug(SurveyComplexItemLog)
-        << "Processing _mapPolygon exclusion. Vertices:"
-        << _mapPolygon->count();
-    for (int i = 0; i < _mapPolygon->count(); i++) {
-      double north, east, down;
-      QGeoCoordinate coord = _mapPolygon->vertexCoordinate(i);
-      QGCGeo::convertGeoToNed(coord, tangentOrigin, north, east, down);
-      exclusionPolygon << QPointF(east, north);
-      qCDebug(SurveyComplexItemLog)
-          << "  Vertex" << i << coord << "-> NED:" << east << north;
+    // Check if it's the same as survey area to avoid self-exclusion
+    bool sameAsSurvey = (_mapPolygon == &_surveyAreaPolygon);
+    if (!sameAsSurvey && _mapPolygon->count() == _surveyAreaPolygon.count()) {
+        sameAsSurvey = true;
+        for (int i = 0; i < _mapPolygon->count(); i++) {
+            if (_mapPolygon->vertexCoordinate(i).distanceTo(_surveyAreaPolygon.vertexCoordinate(i)) > 0.1) {
+                sameAsSurvey = false;
+                break;
+            }
+        }
     }
-    if (exclusionPolygon.count() > 0) {
-      exclusionPolygon << exclusionPolygon.front(); // Close it
 
-      // Verify winding for WindingFill consistency
-      double sum = 0;
-      for (int i = 0; i < exclusionPolygon.count() - 1; i++) {
-        sum += (exclusionPolygon[i + 1].x() - exclusionPolygon[i].x()) *
-               (exclusionPolygon[i + 1].y() + exclusionPolygon[i].y());
-      }
-      if (sum < 0) {
-        // Reverse for clockwise
-        QPolygonF reversed;
-        for (int i = exclusionPolygon.count() - 1; i >= 0; i--)
-          reversed << exclusionPolygon[i];
-        exclusionPolygon = reversed;
-      }
+    if (!sameAsSurvey) {
+        QPolygonF exclusionPolygon;
+        for (int i = 0; i < _mapPolygon->count(); i++) {
+          double north, east, down;
+          QGeoCoordinate coord = _mapPolygon->vertexCoordinate(i);
+          QGCGeo::convertGeoToNed(coord, tangentOrigin, north, east, down);
+          exclusionPolygon << QPointF(east, north);
+        }
+        if (exclusionPolygon.count() >= 3) {
+          if (exclusionPolygon.front() != exclusionPolygon.back()) {
+              exclusionPolygon << exclusionPolygon.front(); // Close it
+          }
 
-      exclusionPolygons.append(exclusionPolygon);
+          // Verify winding for WindingFill consistency
+          double sum = 0;
+          for (int i = 0; i < exclusionPolygon.count() - 1; i++) {
+            sum += (exclusionPolygon[i + 1].x() - exclusionPolygon[i].x()) *
+                   (exclusionPolygon[i + 1].y() + exclusionPolygon[i].y());
+          }
+          if (sum < 0) {
+            // Reverse for clockwise
+            QPolygonF reversed;
+            for (int i = exclusionPolygon.count() - 1; i >= 0; i--)
+              reversed << exclusionPolygon[i];
+            exclusionPolygon = reversed;
+          }
+
+          exclusionPolygons.append(exclusionPolygon);
+        }
     }
   }
 
+  // Add local obstacles from JSON
+  for (const QPolygonF &obs : _localExclusionPolygons) {
+    exclusionPolygons.append(obs);
+  }
+
   // Now intersect the lines with the polygon
-  QList<QLineF> intersectLines;
+  QList<QList<QPointF>> intersectPolylines;
   qCDebug(SurveyComplexItemLog)
       << "Rebuilding transects. Main polygon vertices:" << polygon.count()
       << "Exclusion polygons:" << exclusionPolygons.count();
@@ -1044,16 +1246,18 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
 
 #if 1
   _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons,
-                             intersectLines);
+                             intersectPolylines);
 #else
   // This is handy for debugging grid problems, not for release
-  intersectLines = lineList;
+  for (const QLineF &line : lineList) {
+    intersectPolylines.append({line.p1(), line.p2()});
+  }
 #endif
 
   // Less than two transects intersected with the polygon:
   //      Create a single transect which goes through the center of the polygon
   //      Intersect it with the polygon
-  if (intersectLines.count() < 2) {
+  if (intersectPolylines.count() < 2) {
     _surveyAreaPolygon.center();
     QLineF firstLine = lineList.first();
     QPointF lineCenter = firstLine.pointAt(0.5);
@@ -1061,30 +1265,25 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
     firstLine.translate(centerOffset);
     lineList.clear();
     lineList.append(firstLine);
-    intersectLines = lineList;
     _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons,
-                               intersectLines);
+                               intersectPolylines);
   }
 
   // Make sure all lines are going the same direction. Polygon intersection
   // leads to lines which can be in varied directions depending on the order of
   // the intesecting sides.
-  QList<QLineF> resultLines;
-  _adjustLineDirection(intersectLines, resultLines);
+  QList<QList<QPointF>> resultPolylines;
+  _adjustLineDirection(intersectPolylines, resultPolylines);
 
   // Convert from NED to Geo
   QList<QList<QGeoCoordinate>> transects;
-  for (const QLineF &line : resultLines) {
-    QGeoCoordinate coord;
+  for (const QList<QPointF> &polyline : resultPolylines) {
     QList<QGeoCoordinate> transect;
-
-    QGCGeo::convertNedToGeo(line.p1().y(), line.p1().x(), 0, tangentOrigin,
-                            coord);
-    transect.append(coord);
-    QGCGeo::convertNedToGeo(line.p2().y(), line.p2().x(), 0, tangentOrigin,
-                            coord);
-    transect.append(coord);
-
+    for (const QPointF &pt : polyline) {
+      QGeoCoordinate coord;
+      QGCGeo::convertNedToGeo(pt.y(), pt.x(), 0, tangentOrigin, coord);
+      transect.append(coord);
+    }
     transects.append(transect);
   }
 
@@ -1131,13 +1330,12 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
 
   // Convert to CoordInfo transects and append to _transects
   for (const QList<QGeoCoordinate> &transect : transects) {
-    QGeoCoordinate coord;
     QList<TransectStyleComplexItem::CoordInfo_t> coordInfoTransect;
     TransectStyleComplexItem::CoordInfo_t coordInfo;
 
     // Handle Entry/Exit points (with optional indentation)
-    QGeoCoordinate entryCoord = transect[0];
-    QGeoCoordinate exitCoord = transect[1];
+    QGeoCoordinate entryCoord = transect.first();
+    QGeoCoordinate exitCoord = transect.last();
     double entryDist = _entryIndentation;
     double exitDist = _exitIndentation;
 
@@ -1151,13 +1349,25 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
       exitCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
     }
 
-    coordInfo = {entryCoord, CoordTypeSurveyEntry};
-    coordInfoTransect.append(coordInfo);
-    coordInfo = {exitCoord, CoordTypeSurveyExit};
-    coordInfoTransect.append(coordInfo);
+    // Add all points of the transect
+    for (int i = 0; i < transect.count(); i++) {
+      CoordType type = CoordTypeInterior;
+      QGeoCoordinate c = transect[i];
+      if (i == 0) {
+        type = CoordTypeSurveyEntry;
+        c = entryCoord;
+      } else if (i == transect.count() - 1) {
+        type = CoordTypeSurveyExit;
+        c = exitCoord;
+      }
+      coordInfo = {c, type};
+      coordInfoTransect.append(coordInfo);
+    }
 
     // For hover and capture we need points for each camera location within the
-    // transect
+    // transect. Note: This currently assumes straight lines between entry and
+    // exit for trigger placement, which might need refinement for complex
+    // avoidance paths.
     if (triggerCamera() && hoverAndCaptureEnabled()) {
       double transectLength = entryCoord.distanceTo(exitCoord);
       double transectAzimuth = entryCoord.azimuthTo(exitCoord);
@@ -1488,7 +1698,7 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
     for (int i = 0; i < fenceController->polygons()->count(); i++) {
       QGCFencePolygon *fencePolygon =
           fenceController->polygons()->value<QGCFencePolygon *>(i);
-      if (fencePolygon && !fencePolygon->inclusion()) {
+      if (fencePolygon) {
         QPolygonF exclusionPolygon;
         for (int j = 0; j < fencePolygon->count(); j++) {
           double north, east, down;
@@ -1506,7 +1716,7 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
     for (int i = 0; i < fenceController->circles()->count(); i++) {
       QGCFenceCircle *fenceCircle =
           fenceController->circles()->value<QGCFenceCircle *>(i);
-      if (fenceCircle && !fenceCircle->inclusion()) {
+      if (fenceCircle) {
         QPolygonF exclusionPolygon;
         QGeoCoordinate center = fenceCircle->center();
         double radius = fenceCircle->radius()->rawValue().toDouble();
@@ -1525,19 +1735,22 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
     }
   }
 
-  QList<QLineF> intersectLines;
+  // Now intersect the lines with the polygon
+  QList<QList<QPointF>> intersectPolylines;
 #if 1
   _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons,
-                             intersectLines);
+                             intersectPolylines);
 #else
   // This is handy for debugging grid problems, not for release
-  intersectLines = lineList;
+  for (const QLineF &line : lineList) {
+    intersectPolylines.append({line.p1(), line.p2()});
+  }
 #endif
 
   // Less than two transects intersected with the polygon:
   //      Create a single transect which goes through the center of the polygon
   //      Intersect it with the polygon
-  if (intersectLines.count() < 2) {
+  if (intersectPolylines.count() < 2) {
     _surveyAreaPolygon.center();
     QLineF firstLine = lineList.first();
     QPointF lineCenter = firstLine.pointAt(0.5);
@@ -1545,16 +1758,15 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
     firstLine.translate(centerOffset);
     lineList.clear();
     lineList.append(firstLine);
-    intersectLines = lineList;
     _intersectLinesWithPolygon(lineList, polygon, exclusionPolygons,
-                               intersectLines);
+                               intersectPolylines);
   }
 
   // Make sure all lines are going the same direction. Polygon intersection
   // leads to lines which can be in varied directions depending on the order of
   // the intesecting sides.
-  QList<QLineF> resultLines;
-  _adjustLineDirection(intersectLines, resultLines);
+  QList<QList<QPointF>> resultPolylines;
+  _adjustLineDirection(intersectPolylines, resultPolylines);
 
   // Convert from NED to Geo
   QList<QList<QGeoCoordinate>> transects;
@@ -1569,17 +1781,13 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
     transects.append(transect);
   }
 
-  for (const QLineF &line : resultLines) {
+  for (const QList<QPointF> &polyline : resultPolylines) {
     QList<QGeoCoordinate> transect;
-    QGeoCoordinate coord;
-
-    QGCGeo::convertNedToGeo(line.p1().y(), line.p1().x(), 0, tangentOrigin,
-                            coord);
-    transect.append(coord);
-    QGCGeo::convertNedToGeo(line.p2().y(), line.p2().x(), 0, tangentOrigin,
-                            coord);
-    transect.append(coord);
-
+    for (const QPointF &pt : polyline) {
+      QGeoCoordinate coord;
+      QGCGeo::convertNedToGeo(pt.y(), pt.x(), 0, tangentOrigin, coord);
+      transect.append(coord);
+    }
     transects.append(transect);
   }
 
@@ -1626,13 +1834,12 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
 
   // Convert to CoordInfo transects and append to _transects
   for (const QList<QGeoCoordinate> &transect : transects) {
-    QGeoCoordinate coord;
     QList<TransectStyleComplexItem::CoordInfo_t> coordInfoTransect;
     TransectStyleComplexItem::CoordInfo_t coordInfo;
 
     // Handle Entry/Exit points (with optional indentation)
-    QGeoCoordinate entryCoord = transect[0];
-    QGeoCoordinate exitCoord = transect[1];
+    QGeoCoordinate entryCoord = transect.first();
+    QGeoCoordinate exitCoord = transect.last();
     double entryDist = _entryIndentation;
     double exitDist = _exitIndentation;
 
@@ -1646,10 +1853,20 @@ void SurveyComplexItem::_rebuildTransectsFromPolygon(
       exitCoord = transect.last().atDistanceAndAzimuth(-exitDist, azimuth);
     }
 
-    coordInfo = {entryCoord, CoordTypeSurveyEntry};
-    coordInfoTransect.append(coordInfo);
-    coordInfo = {exitCoord, CoordTypeSurveyExit};
-    coordInfoTransect.append(coordInfo);
+    // Add all points of the transect
+    for (int i = 0; i < transect.count(); i++) {
+      CoordType type = CoordTypeInterior;
+      QGeoCoordinate c = transect[i];
+      if (i == 0) {
+        type = CoordTypeSurveyEntry;
+        c = entryCoord;
+      } else if (i == transect.count() - 1) {
+        type = CoordTypeSurveyExit;
+        c = exitCoord;
+      }
+      coordInfo = {c, type};
+      coordInfoTransect.append(coordInfo);
+    }
 
     // For hover and capture we need points for each camera location within the
     // transect

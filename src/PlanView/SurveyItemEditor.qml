@@ -399,14 +399,4 @@ TransectStyleComplexItemEditor {
         }
     }
 }
-    KMLOrSHPFileDialog {
-        id:    kmlOrSHPLoadDialog
-        title: qsTr("Select Polygon File")
 
-        onAcceptedForLoad: (file) => {
-            missionItem.surveyAreaPolygon.loadKMLOrSHPFile(file)
-            missionItem.resetState = false
-            close()
-        }
-    }
-}

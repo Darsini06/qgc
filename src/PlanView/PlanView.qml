@@ -2341,7 +2341,7 @@ Item {
     }
 
     Connections {
-        target: utmspEditor.
+        target: utmspEditor
         function onVehicleIDSent(id) {
             _vehicleID = id
         }

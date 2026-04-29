@@ -149,9 +149,11 @@ private:
   void _intersectLinesWithPolygon(const QList<QLineF> &lineList,
                                   const QPolygonF &polygon,
                                   const QList<QPolygonF> &exclusionPolygons,
-                                  QList<QLineF> &resultLines);
-  void _adjustLineDirection(const QList<QLineF> &lineList,
-                            QList<QLineF> &resultLines);
+                                  QList<QList<QPointF>> &resultPolylines);
+  void _adjustLineDirection(const QList<QList<QPointF>> &lineList,
+                            QList<QList<QPointF>> &resultLines);
+  double _distanceToSegment(const QPointF &p, const QLineF &line);
+  QList<QPointF> _getBoundaryPath(const QPolygonF &poly, const QPointF &p1, const QPointF &p2);
   bool _nextTransectCoord(const QList<QGeoCoordinate> &transectPoints,
                           int pointIndex, QGeoCoordinate &coord);
   bool _appendMissionItemsWorker(QList<MissionItem *> &items,
@@ -210,6 +212,7 @@ private:
   int _adjustmentMode = 0; // 0: Both, 1: Entry, 2: Exit
 
   QGCMapPolygon *_mapPolygon = nullptr;
+  QList<QPolygonF> _localExclusionPolygons;
 
   static constexpr const char *_jsonGridAngleKey = "angle";
   static constexpr const char *_jsonEntryPointKey = "entryLocation";
@@ -261,5 +264,3 @@ static constexpr const char *_jsonLocalObstacleCircleValue = "circle";
 static constexpr const char *_jsonSplitConcavePolygonsKey =
     "splitConcavePolygons";
 static constexpr const char *_jsonFlyPerimeterKey = "flyPerimeter";
-}
-;
