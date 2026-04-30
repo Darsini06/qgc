@@ -519,24 +519,30 @@ QGCFlickable {
                                                                                                                                         }
                                                                     }
 
-                                                                    ColumnLayout {
+                                                                    RowLayout {
                                                                         Layout.fillWidth: true
-                                                                        spacing: 5
+                                                                        spacing: 10
 
                                                                         QGCLabel {
                                                                             text: qsTr("Radius:")
                                                                             color: _colorTextPrimary
                                                                             font.bold: true
+                                                                            Layout.alignment: Qt.AlignVCenter
+                                                                            Layout.preferredWidth: 80   // keeps all labels aligned
                                                                         }
+
                                                                         Loader {
                                                                             Layout.fillWidth: true
                                                                             sourceComponent: volumeSliderComponent
+
                                                                             property var targetFact: object.radius
                                                                             onTargetFactChanged: if (item) item.fact = targetFact
                                                                             onLoaded: if (item) item.fact = targetFact
+
+                                                                            Layout.alignment: Qt.AlignVCenter
                                                                         }
                                                                     }
-                                                                }
+                                }
 
                             }
                         }

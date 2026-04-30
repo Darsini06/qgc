@@ -116,6 +116,7 @@ Item {
     property bool gridLines : MapGlobals.gridLines
 
     Component.onCompleted: {
+        MapGlobals.share_edit_visibility = false
         QGroundControl.saveGlobalSetting("waypointvisible", "");  // reset when entering PlanView
         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
         _editingLayer = _layerMission
@@ -124,6 +125,7 @@ Item {
     onVisibleChanged: {
 
         if(visible) {
+            MapGlobals.share_edit_visibility = false
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
             editorMap.zoomLevel = QGroundControl.flightMapZoom
             editorMap.center    = QGroundControl.flightMapPosition
@@ -669,6 +671,7 @@ Item {
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
+                               MapGlobals.share_edit_visibility = true
                                close()
 
 
@@ -1585,6 +1588,7 @@ Item {
                                 } else {
                                     _planMasterController.saveToSelectedFile()
                                 }
+                                MapGlobals.share_edit_visibility = true
                                 mainWindow.planmap()
                             }
                         }
@@ -1953,7 +1957,7 @@ Item {
                     id: fileUploadbtn
                     width: baseSize
                     height: baseSize
-
+                    visible: MapGlobals.share_edit_visibility
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
