@@ -64,6 +64,9 @@ Popup {
     property bool   preventClose:           false
     property bool   closeOnClickOutside:    false  // NEW: Control close on outside click
     property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    property bool   useCenterAnchor:        true
+    property real   dialogX:                0
+    property real   dialogY:                0
 
     readonly property real headerMinWidth: titleLable.implicitWidth + rejectButton.width + acceptButton.width + titleLable.spacing * 2
 
@@ -259,7 +262,9 @@ Popup {
         radius: 20
         border.width: 1
         border.color: Qt.rgba(0, 0, 0, 0.1)
-        anchors.centerIn: parent
+        anchors.centerIn: useCenterAnchor ? parent : undefined
+        x:                !useCenterAnchor ? dialogX : 0
+        y:                !useCenterAnchor ? dialogY : 0
 
         ColumnLayout {
             id: mainLayout
