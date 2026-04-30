@@ -36,12 +36,14 @@ QtObject {
     property string currentView_profile: "profile"
 
     property bool share_edit_visibility : false
+    property bool isReviewMode: false
+    property bool showMissionItems: false
 
     signal newSessionAdded()
-    
+
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
-    
+
     function setGridLines(value) {
         gridLines = value
         QGroundControl.saveBoolGlobalSetting("gridLines", value)
@@ -190,7 +192,7 @@ QtObject {
     function deleteMissionLog(missionName) {
         console.log("MapGlobals.deleteMissionLog()", missionName);
         var name = missionName.toString().split('/').pop().split('\\').pop();
-        
+
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(name));
         xhr.onreadystatechange = function() {
@@ -409,9 +411,9 @@ QtObject {
             } catch (e) {
                 // Ignore invalid state errors during intermediate ready states
             }
-            
+
             console.log("XHR State Change:", xhr.readyState, "Status:", statusString);
-            
+
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var currentStatus = 0;
                 try {
@@ -514,7 +516,7 @@ QtObject {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     console.log("Password reset on backend successfully");
-                    
+
                     // Now update local DB if user exists
                     var db = getDatabase();
                     db.transaction(function(tx) {
@@ -824,9 +826,9 @@ QtObject {
             try {
                 if (xhr.readyState >= 2) statusString = xhr.status;
             } catch (e) { }
-            
+
             console.log("XHR State Change (Login):", xhr.readyState, "Status:", statusString);
-            
+
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var currentStatus = 0;
                 try { currentStatus = xhr.status; } catch (e) { }
@@ -862,7 +864,7 @@ QtObject {
                         login = "login";
 
                         if (callback) callback(true);
-                        
+
                         // After successful login, sync sessions
                         fetchCloudSessions(user.email);
 
@@ -1046,7 +1048,7 @@ QtObject {
     function savePlanToCloud(planName, planContent, callback) {
         var email = QGroundControl.loadGlobalSetting("email", "");
         var username = QGroundControl.loadGlobalSetting("username", "Guest");
-        
+
         if (email === "") {
             console.error("Cannot save to cloud: User not logged in");
             if (callback) callback(false);
@@ -1127,7 +1129,7 @@ QtObject {
                     try {
                         var sessions = JSON.parse(xhr.responseText);
                         console.log("Fetched", sessions.length, "sessions from cloud");
-                        
+
                         var db = getDatabase();
                         db.transaction(function(tx) {
                             for (var i = 0; i < sessions.length; i++) {

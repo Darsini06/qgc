@@ -23,15 +23,14 @@ TransectStyleComplexItemEditor {
     property var    _missionItem:   missionItem
 
     // Theme palette
-    readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
-    readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
-    readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#000000"
-    readonly property color _colorAccentLight:   "#1a1a1a"
+    readonly property color _colorBgSecondary:   "#444444"
+    readonly property color _colorBgTertiary:    "#333333"
+    readonly property color _colorBorder:        "#555555"
+    readonly property color _colorAccent:        "#666666"
+    readonly property color _colorAccentLight:   "#777777"
     readonly property color _colorTextPrimary:   "#ffffff"
-    readonly property color _colorTextSecondary: "#8e8e93"
-    // Placeholder text color — muted grey, NOT white
-    readonly property color _colorPlaceholder:   "#5a5a6a"
+    readonly property color _colorTextSecondary: "#ffffff"
+    readonly property color _colorPlaceholder:   "#ffffff"
     readonly property color _colorSuccess:       "#2ECC71"
     readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 

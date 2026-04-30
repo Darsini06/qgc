@@ -39,13 +39,13 @@ Rectangle {
 
     // --- Theme Colors (matching GeoFence / MissionStart) ---
     readonly property color _colorBgPrimary:     "transparent"
-    readonly property color _colorBgSecondary:   Qt.rgba(0, 0, 0, 0.40)
-    readonly property color _colorBgTertiary:    Qt.rgba(0, 0, 0, 0.40)
-    readonly property color _colorBorder:        "#3e3e4a"
-    readonly property color _colorAccent:        "#000000"
-    readonly property color _colorAccentLight:   "#1a1a1a"
+    readonly property color _colorBgSecondary:   "#444444"
+    readonly property color _colorBgTertiary:    "#333333"
+    readonly property color _colorBorder:        "#555555"
+    readonly property color _colorAccent:        "#666666"
+    readonly property color _colorAccentLight:   "#777777"
     readonly property color _colorTextPrimary:   "#ffffff"
-    readonly property color _colorTextSecondary: "#8e8e93"
+    readonly property color _colorTextSecondary: "#ffffff"
     readonly property color _colorDanger:        "#FF453A"
     readonly property color _colorDangerDark:    "#C42B2B"
     readonly property real  _radius:             8

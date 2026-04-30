@@ -116,7 +116,6 @@ Item {
     property bool gridLines : MapGlobals.gridLines
 
     Component.onCompleted: {
-        MapGlobals.share_edit_visibility = false
         QGroundControl.saveGlobalSetting("waypointvisible", "");  // reset when entering PlanView
         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
         _editingLayer = _layerMission
@@ -125,7 +124,6 @@ Item {
     onVisibleChanged: {
 
         if(visible) {
-            MapGlobals.share_edit_visibility = false
             droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
             editorMap.zoomLevel = QGroundControl.flightMapZoom
             editorMap.center    = QGroundControl.flightMapPosition
@@ -187,6 +185,8 @@ Item {
         _planMasterController.loadFromSelectedFile()
         fileUploadbtn.visible=true
         MapGlobals.share_edit_visibility = true
+        MapGlobals.isReviewMode = true
+        MapGlobals.showMissionItems = false
     }
 
     function loaddata1() {
@@ -298,10 +298,10 @@ Item {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
                         syncCloud()
-                        MapGlobals.share_edit_visibility = true
+                        MapGlobals.share_edit_visibility = false
                     } else {
                         _planMasterController.saveToSelectedFile1()
-                        MapGlobals.share_edit_visibility = true
+                        MapGlobals.share_edit_visibility = false
                         // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
@@ -671,7 +671,6 @@ Item {
                                _planMasterController.loadFromFile(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
-                               MapGlobals.share_edit_visibility = true
                                close()
 
 
@@ -1178,8 +1177,8 @@ Item {
 
 
 
-                // 2nd & 3rd: Boundary Point + Save
 
+                // 1st: Boundary Point + Save
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
@@ -1217,8 +1216,8 @@ Item {
                         }
                     }
                 }
-                //-------------------------------------------------------
-                // 1st: Mission button | 2nd: Fence button (each on own row)
+
+                // 2nd: Obstacles button
                 Column {
                     id:         layerTabBar
                     width:      parent.width
@@ -1228,34 +1227,6 @@ Item {
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
 
-                    // // Row 1 — Mission/Pathway
-                    // Rectangle {
-                    //     width:   parent.width
-                    //     height:  45
-                    //     radius:  8
-                    //     color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                    //     border.width: 0
-
-                    //     Text {
-                    //         id: missionTabText
-                    //         text: qsTr("Pathway")
-                    //         color: "white"
-                    //         font.bold:          true
-                    //         font.pointSize:     14
-                    //         font.family:        "Outfit"
-                    //         anchors.centerIn:   parent
-                    //     }
-
-                    //     MouseArea {
-                    //         anchors.fill: parent
-                    //         cursorShape: Qt.PointingHandCursor
-                    //         onClicked: {
-                    //             layerTabBar.currentIndex = 0
-                    //             _editingLayer = _layerMission
-                    //             editorMap.update()
-                    //         }
-                    //     }
-                    // }
 
                     // Row 2 — Fence/Obstacles (only one definition!)
                     Rectangle {
@@ -1280,19 +1251,13 @@ Item {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                if (layerTabBar.currentIndex === 1) {
-                                    // If already on Obstacles, go back to Pathway
-                                    layerTabBar.currentIndex = 0
+                                if (_editingLayer === _layerGeoFence) {
                                     _editingLayer = _layerMission
+                                    layerTabBar.currentIndex = 0
                                 } else {
-                                    // Switch to Obstacles
-                                    layerTabBar.currentIndex = 1
                                     _editingLayer = _layerGeoFence
-                                    if (_geoFenceController && _geoFenceController.polygon && _geoFenceController.polygon.path.length > 0) {
-                                        fitMapViewportToGeoFence()
-                                    }
+                                    layerTabBar.currentIndex = 1
                                 }
-                                editorMap.update()
                             }
                         }
                     }
@@ -1397,120 +1362,6 @@ Item {
 
             }
 
-            // //-------------------------------------------------------
-            // // Mission Item Editor
-            // Item {
-            //     id:                     missionItemEditor
-            //     anchors.left:           parent.left
-            //     anchors.right:          parent.right
-            //     anchors.top:            rightControls.bottom
-            //     anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.5
-            //     anchors.bottom:         parent.bottom
-            //     anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
-            //     visible:                _editingLayer == _layerMission
-
-            //     QGCListView {
-            //         id:                 missionItemEditorListView
-            //         anchors.fill:       parent
-            //         spacing:            ScreenTools.defaultFontPixelHeight / 4
-            //         orientation:        ListView.Vertical
-            //         model:              _missionController.visualItems
-            //         cacheBuffer:        Math.max(height * 2, 0)
-            //         clip:               true
-            //         currentIndex:       _missionController.currentPlanViewSeqNum
-            //         highlightMoveDuration: 250
-            //         visible:            _editingLayer == _layerMission
-
-            //         footer: Item {
-            //             width:  missionItemEditorListView.width
-            //             height: 60
-            //             visible: _editingLayer == _layerMission
-
-            //             Button {
-            //                 anchors.centerIn:       parent
-            //                 width:                  parent.width
-            //                 height:                 45
-            //                 text:                   qsTr("Save Plan")
-
-            //                 background: Rectangle {
-            //                     radius: 8
-            //                     color: "black"
-            //                     border.color: "white"
-            //                     border.width: 1
-            //                 }
-
-            //                 contentItem: Text {
-            //                     text:               parent.text
-            //                     font.bold:          true
-            //                     color:              "white"
-            //                     font.pointSize:     14
-            //                     horizontalAlignment: Text.AlignHCenter
-            //                     verticalAlignment:   Text.AlignVCenter
-            //                     font.family:        "Outfit"
-            //                 }
-
-            //                 onClicked: {
-            //                     if (activePolygon && activePolygon.traceMode) {
-            //                         if (activePolygon.count < 3) {
-            //                             console.log("Save: Not enough vertices (<3), restoring previous vertices")
-            //                             mapPolygonvisuals.restorePreviousVertices()
-            //                             return
-            //                         }
-            //                         activePolygon.traceMode = false
-            //                     }
-            //                     if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-            //                         _planMasterController.saveToSelectedFile1()
-            //                     } else {
-            //                         _planMasterController.saveToSelectedFile()
-            //                     }
-            //                     mainWindow.planmap()
-            //                 }
-            //             }
-            //         }
-
-            //         // // Remove items with commandName "Takeoff" when the component is completed.
-            //         // Component.onCompleted:
-            //         // {
-            //         //     // Loop backwards to avoid index shifting.
-            //         //     for (var i = _missionController.visualItems.count - 1; i >= 0; i--) {
-            //         //         var item = _missionController.visualItems.get(i);
-            //         //         if (item.commandName === "Takeoff") {
-            //         //             _missionController.visualItems.remove(i);
-            //         //         }
-            //         //     }
-            //         // }
-
-            //         //-- List Elements
-
-            //         delegate: Item {
-            //             property bool _showItem : true
-            //             width: missionItemEditorListView.width
-            //             visible: !MapGlobals.share_edit_visibility
-            //             height: visible ? innerEditor.height : 0
-
-            //             MissionExpand {
-            //                 id: innerEditor
-            //                 map: editorMap
-            //                 masterController:  _planMasterController
-            //                 missionItem:    object
-            //                 width:          parent.width
-            //                 readOnly:       false
-            //                 onClicked: (sequenceNumber) => {
-
-            //                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-
-            //                            }
-            //                 onEditItemClicked: (popupItem) => {
-            //                     itemEditPopup.popupMissionItem = popupItem
-            //                     itemEditPopup.open()
-            //                 }
-            //                 onDeselect: {
-            //                     _missionController.setCurrentPlanViewSeqNum(-1, false)
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
 
             GeoFenceEditor {
                 anchors.top:            rightControls.bottom
@@ -1548,51 +1399,8 @@ Item {
 
                     footer: Item {
                         width:  missionItemEditorListView.width
-                        height: 60
+                        height: 20
                         visible: _editingLayer == _layerMission
-
-                        Button {
-                            anchors.centerIn:       parent
-                            width:                  parent.width
-                            height:                 45
-                            text:                   qsTr("Save Plan")
-
-                            background: Rectangle {
-                                radius: 8
-                                color: "black"
-                                border.color: "white"
-                                border.width: 1
-                            }
-
-                            contentItem: Text {
-                                text:               parent.text
-                                font.bold:          true
-                                color:              "white"
-                                font.pointSize:     14
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                font.family:        "Outfit"
-                            }
-
-                            onClicked: {
-                                if (activePolygon && activePolygon.traceMode) {
-                                    if (activePolygon.count < 3) {
-                                        console.log("Save: Not enough vertices (<3), restoring previous vertices")
-                                        mapPolygonvisuals.restorePreviousVertices()
-                                        return
-                                    }
-                                    activePolygon.traceMode = false
-                                }
-                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                    _planMasterController.saveToSelectedFile1()
-                                } else {
-                                    _planMasterController.saveToSelectedFile()
-                                }
-                                MapGlobals.share_edit_visibility = true
-                                mainWindow.planmap()
-                            }
-                        }
-
                     }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
@@ -1612,7 +1420,7 @@ Item {
                     delegate: Item {
                         property bool _showItem : true
                         width: missionItemEditorListView.width
-                        visible: !MapGlobals.share_edit_visibility
+                        visible: MapGlobals.showMissionItems
                         height: visible ? innerEditor.height : 0
 
                         MissionExpand {
@@ -1623,10 +1431,8 @@ Item {
                             width:          parent.width
                             readOnly:       false
                             onClicked: (sequenceNumber) => {
-
-                                           _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-
-                                       }
+                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                            }
                             onEditItemClicked: (popupItem) => {
                                 itemEditPopup.popupMissionItem = popupItem
                                 itemEditPopup.open()
@@ -1677,6 +1483,51 @@ Item {
                 resetRegisterFlightPlan: _resetRegisterFlightPlan
             }
 
+            // 3rd: Save Plan at the bottom
+            Button {
+                id:                     savePlanBtn
+                anchors.bottom:         parent.bottom
+                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                height:                 45
+                text:                   qsTr("Save Plan")
+                visible:                _editingLayer == _layerMission
+
+                background: Rectangle {
+                    radius: 8
+                    color: "black"
+                    border.color: "white"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text:               savePlanBtn.text
+                    font.bold:          true
+                    color:              "white"
+                    font.pointSize:     14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment:   Text.AlignVCenter
+                    font.family:        "Outfit"
+                }
+
+                onClicked: {
+                    if (activePolygon && activePolygon.traceMode) {
+                        if (activePolygon.count < 3) {
+                            console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                            mapPolygonvisuals.restorePreviousVertices()
+                            return
+                        }
+                        activePolygon.traceMode = false
+                    }
+                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                        _planMasterController.saveToSelectedFile1()
+                    } else {
+                        _planMasterController.saveToSelectedFile()
+                    }
+                    mainWindow.planmap()
+                }
+            }
         }
 
         QGCLabel {
@@ -1957,7 +1808,7 @@ Item {
                     id: fileUploadbtn
                     width: baseSize
                     height: baseSize
-                    visible: MapGlobals.share_edit_visibility
+
                     background: Rectangle {
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
@@ -2465,7 +2316,9 @@ Item {
         } else {
             console.log("No plan creator available")
         }
-        MapGlobals.share_edit_visibility = true
+        MapGlobals.share_edit_visibility = false
+        MapGlobals.isReviewMode = false
+        MapGlobals.showMissionItems = false
     }
 
 
@@ -2685,14 +2538,15 @@ Item {
 
         width:  Math.min(320, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, parent.height * 0.85)
-        anchors.centerIn: parent
+        x: 20
+        y: parent.height - height - 20
         modal: true
         dim: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: "#BF000000"
+            color: "#E6333333"
             radius: 12
             border.color: "white"
             border.width: 1

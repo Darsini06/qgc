@@ -113,6 +113,12 @@ ApplicationWindow {
         console.log("App Theme Updated to:", newMode)
     }
 
+    function _collapsePIP() {
+        if (flyView && flyView.pipView) {
+            flyView.pipView._setPipIsExpanded(false)
+        }
+    }
+
     property bool connecting_drone : false
 
 
@@ -301,6 +307,7 @@ ApplicationWindow {
     }
 
     function homescreen() {
+        _collapsePIP()
 
         planbtn.visible =false
         listbtn.visible = false
@@ -318,6 +325,7 @@ ApplicationWindow {
     }
 
     function showPlanView() {
+        _collapsePIP()
         planbtn.visible =false
         listbtn.visible = false
         takeoffbtn.visible = false
@@ -333,6 +341,7 @@ ApplicationWindow {
     }
 
     function cameraView() {
+        _collapsePIP()
         planbtn.visible = false
         listbtn.visible = false
         rtlbtn.visible = false
@@ -349,6 +358,7 @@ ApplicationWindow {
     }
 
     function showFlyView() {
+        _collapsePIP()
         waypointbtn.visible = false
         camerabtn.visible = false
         MapGlobals.save = "save1"
@@ -374,6 +384,7 @@ ApplicationWindow {
     }
 
     function showMapping() {
+        _collapsePIP()
         waypointbtn.visible = true
         camerabtn.visible = false
         //photoVideoControl.visible = false
@@ -405,6 +416,7 @@ ApplicationWindow {
     }
 
     function showFlyView1() {
+        _collapsePIP()
         MapGlobals.save = "save1"
         planbtn.visible = true
         listbtn.visible = true
@@ -970,7 +982,7 @@ ApplicationWindow {
                     Layout.preferredWidth: ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 20 : ScreenTools.defaultFontPixelWidth * 28
                     Layout.fillHeight: true
                     color: "#f8f9fa" // Light aesthetic sidebar
-                    
+
                     // Sidebar Right Border
                     Rectangle {
                         anchors.right: parent.right
@@ -987,20 +999,20 @@ ApplicationWindow {
                         clip: true
                         topMargin: 20
                         spacing: 2
-                        
+
                         // Fake TabBar for index tracking and logic preservation
                         TabBar { id: tabBarDummy; visible: false; currentIndex: 0 }
 
                         delegate: Item {
                             width: parent.width
                             height: 60
-                            
+
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 4
                                 radius: 8
                                 color: sidebarList.currentIndex === index ? Qt.rgba(38, 38, 38, 0.1) : "transparent"
-                                
+
                                 Behavior on color { ColorAnimation { duration: 200 } }
 
                                 RowLayout {
@@ -1022,7 +1034,7 @@ ApplicationWindow {
                                         font.bold: sidebarList.currentIndex === index
                                         color: sidebarList.currentIndex === index ? app_color : "#444444"
                                     }
-                                    
+
                                     // Selection Indicator (vertical line)
                                     Rectangle {
                                         width: 4
@@ -1572,7 +1584,7 @@ ApplicationWindow {
                     color: Qt.rgba(1, 1, 1, 0.15)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Text {
                         text: "-"
                         color: "white"
@@ -1643,7 +1655,7 @@ ApplicationWindow {
                     color: Qt.rgba(0, 0, 0, 0.4)
                     border.width: 1
                     border.color: "white"
-                    
+
                     Canvas {
                         id: progressCircle
                         anchors.fill: parent
@@ -1858,7 +1870,9 @@ ApplicationWindow {
                     MapGlobals.kmlPath             = localPath
                     MapGlobals.mark_with           = "KML_File"
                     MapGlobals.edit                = "edit"
-                    MapGlobals.share_edit_visibility = true
+                    MapGlobals.share_edit_visibility = false
+                    MapGlobals.isReviewMode = false
+                    MapGlobals.showMissionItems = false
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
@@ -1990,7 +2004,9 @@ ApplicationWindow {
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"
                             MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2043,7 +2059,9 @@ ApplicationWindow {
                             QGroundControl.saveGlobalSetting("mapping", "circle")
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2092,7 +2110,9 @@ ApplicationWindow {
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2153,7 +2173,9 @@ ApplicationWindow {
                                 dialog.visible = false
                                 mainWindow.showToastMessage("Drone Not Connected")
                             }
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
                         }
                     }
                 }
@@ -2199,7 +2221,9 @@ ApplicationWindow {
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_GPS"
                             MapGlobals.edit = "edit"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)

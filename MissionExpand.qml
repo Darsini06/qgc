@@ -184,8 +184,8 @@ Rectangle {
                 height:                 30
                 width:                  60
                 text:                   qsTr("Edit")
-                visible:                missionItem.commandName === "Mission Start" ||
-                                        missionItem.commandName === "Survey"
+                visible:                (missionItem.commandName === "Mission Start" ||
+                                         missionItem.commandName === "Survey") && MapGlobals.isReviewMode
                 onClicked:              editItemClicked(missionItem)
 
                 background: Rectangle {

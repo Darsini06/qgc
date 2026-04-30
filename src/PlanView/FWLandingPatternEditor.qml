@@ -25,7 +25,7 @@ Rectangle {
     id:         _root
     height:     visible ? ((editorColumn.visible ? editorColumn.height : editorColumnNeedLandingPoint.height) + (_margin * 2)) : 0
     width:      availableWidth
-    color:      qgcPal.windowShadeDark
+    color:      "#333333"
     radius:     _radius
 
     // The following properties must be available up the hierarchy chain
