@@ -1184,34 +1184,6 @@ Item {
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
 
-                    // Row 1 — Mission
-                    Rectangle {
-                        width:   parent.width
-                        height:  45
-                        radius:  8
-                        color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                        border.width: 0
-
-                        Text {
-                            id: missionText
-                            text: qsTr("Pathway")
-                            color: "white"
-                            font.bold:          true
-                            font.pointSize:     14
-                            font.family:        "Outfit"
-                            anchors.centerIn:   parent
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 0
-                                _editingLayer = _layerMission
-                            }
-                        }
-                    }
-
                     // Row 2 — Fence
                     Rectangle {
                         visible:  layerTabBar.fenceVisible
@@ -1235,8 +1207,13 @@ Item {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                layerTabBar.currentIndex = 1
-                                _editingLayer = _layerGeoFence
+                                if (_editingLayer === _layerGeoFence) {
+                                    _editingLayer = _layerMission
+                                    layerTabBar.currentIndex = 0
+                                } else {
+                                    _editingLayer = _layerGeoFence
+                                    layerTabBar.currentIndex = 1
+                                }
                             }
                         }
                     }
@@ -2551,14 +2528,15 @@ Item {
 
         width:  Math.min(320, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, parent.height * 0.85)
-        anchors.centerIn: parent
+        x: 20
+        y: parent.height - height - 20
         modal: true
         dim: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: "#BF000000"
+            color: "#E6333333"
             radius: 12
             border.color: "white"
             border.width: 1

@@ -27,15 +27,15 @@ Rectangle {
 
     property real   _panelRadius:   8
     property real   _fieldRadius:   4
-    property color  _panelColor:    "#282830"
-    property color  _panelBorder:   "#3e3e4a"
-    property color  _fieldColor:    "#32323b"
-    property color  _fieldBorder:   "#3e3e4a"
+    property color  _panelColor:    "#333333"
+    property color  _panelBorder:   "#444444"
+    property color  _fieldColor:    "#444444"
+    property color  _fieldBorder:   "#555555"
     property color  _headingColor:  "#ffffff"
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
-    property color  _unitColor:     "#8e8e93"
-    property color  _colorAccent:   "#000000"
+    property color  _unitColor:     "#ffffff"
+    property color  _colorAccent:   "#666666"
 
     property var    masterController:               null
     property var    _masterController:              masterController

@@ -26,13 +26,13 @@ QGCFlickable {
 
     // UI Colors - Modern Glassmorphic Dark Theme
     readonly property color _colorBgPrimary:    "transparent"
-    readonly property color _colorBgSecondary:  "#282830"
-    readonly property color _colorBgTertiary:   "#32323b"
-    readonly property color _colorBorder:       "#3e3e4a"
-    readonly property color _colorAccent:       "#000000" // Modern Black Accent
-    readonly property color _colorAccentDark:   "#000000"
+    readonly property color _colorBgSecondary:  "#444444"
+    readonly property color _colorBgTertiary:   "#333333"
+    readonly property color _colorBorder:       "#555555"
+    readonly property color _colorAccent:       "#666666"
+    readonly property color _colorAccentDark:   "#555555"
     readonly property color _colorTextPrimary:  "#ffffff"
-    readonly property color _colorTextSecondary:"#8e8e93"
+    readonly property color _colorTextSecondary:"#ffffff"
     readonly property color _colorDanger:       "#FF453A"
     readonly property color _colorDangerDark:   "#C42B2B"
     readonly property bool  isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
@@ -131,9 +131,9 @@ QGCFlickable {
         anchors.right:  parent.right
         height:         geoFenceItems.y + geoFenceItems.height + _margin
 
-            color:        "#BF000000" // Dark Transparent Black 75% alpha
+            color:        "#E6333333"
             radius:       4
-            border.color: "#3a3750"
+            border.color: "#555555"
             border.width: 1
 
 

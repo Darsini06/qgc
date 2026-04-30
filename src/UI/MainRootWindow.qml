@@ -113,6 +113,12 @@ ApplicationWindow {
         console.log("App Theme Updated to:", newMode)
     }
 
+    function _collapsePIP() {
+        if (flyView && flyView.pipView) {
+            flyView.pipView._setPipIsExpanded(false)
+        }
+    }
+
     property bool connecting_drone : false
 
 
@@ -301,6 +307,7 @@ ApplicationWindow {
     }
 
     function homescreen() {
+        _collapsePIP()
 
         planbtn.visible =false
         listbtn.visible = false
@@ -318,6 +325,7 @@ ApplicationWindow {
     }
 
     function showPlanView() {
+        _collapsePIP()
         planbtn.visible =false
         listbtn.visible = false
         takeoffbtn.visible = false
@@ -333,6 +341,7 @@ ApplicationWindow {
     }
 
     function cameraView() {
+        _collapsePIP()
         planbtn.visible = false
         listbtn.visible = false
         rtlbtn.visible = false
@@ -349,6 +358,7 @@ ApplicationWindow {
     }
 
     function showFlyView() {
+        _collapsePIP()
         waypointbtn.visible = false
         camerabtn.visible = false
         MapGlobals.save = "save1"
@@ -374,6 +384,7 @@ ApplicationWindow {
     }
 
     function showMapping() {
+        _collapsePIP()
         waypointbtn.visible = true
         camerabtn.visible = false
         //photoVideoControl.visible = false
@@ -405,6 +416,7 @@ ApplicationWindow {
     }
 
     function showFlyView1() {
+        _collapsePIP()
         MapGlobals.save = "save1"
         planbtn.visible = true
         listbtn.visible = true
