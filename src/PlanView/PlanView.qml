@@ -1183,7 +1183,7 @@ Item {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active
+                    visible:            active && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
 
                     sourceComponent: Column {
                         spacing:            12
@@ -1222,7 +1222,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    8
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1492,7 +1492,7 @@ Item {
                 anchors.right:          parent.right
                 height:                 45
                 text:                   qsTr("Save Plan")
-                visible:                _editingLayer == _layerMission
+                visible:                _editingLayer == _layerMission && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
 
                 background: Rectangle {
                     radius: 8

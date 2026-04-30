@@ -11,6 +11,7 @@
 
 #include "SettingsFact.h"
 #include "TransectStyleComplexItem.h"
+#include <QtGui/QPolygonF>
 
 
 #include <QtCore/QLoggingCategory>
@@ -46,6 +47,10 @@ public:
                  hoverAndCaptureAllowedChanged)
   Q_PROPERTY(QGCMapPolygon *mapPolygon READ mapPolygon WRITE setMapPolygon
                  NOTIFY mapPolygonChanged)
+  Q_PROPERTY(double obstacleIndentation READ obstacleIndentation WRITE
+                 setObstacleIndentation NOTIFY obstacleIndentationChanged)
+  Q_PROPERTY(double boundaryIndentation READ boundaryIndentation WRITE
+                 setBoundaryIndentation NOTIFY boundaryIndentationChanged)
 
   Fact *gridAngle(void) { return &_gridAngleFact; }
   Fact *flyAlternateTransects(void) { return &_flyAlternateTransectsFact; }
@@ -82,14 +87,19 @@ public:
   QString abbreviation(void) const final { return tr("S"); }
   ReadyForSaveState readyForSaveState(void) const final;
   double additionalTimeDelay(void) const final;
-  double entryIndentation(void) const { return _entryIndentation; }
-  double exitIndentation(void) const { return _exitIndentation; }
-  int adjustmentMode(void) const { return _adjustmentMode; }
+  double entryIndentation() const { return _entryIndentation; }
+  double exitIndentation() const { return _exitIndentation; }
+  int adjustmentMode() const { return _adjustmentMode; }
   void setEntryIndentation(double val);
   void setExitIndentation(double val);
   void setAdjustmentMode(int mode);
-  QGCMapPolygon *mapPolygon(void) { return _mapPolygon; }
+  QGCMapPolygon *mapPolygon() { return _mapPolygon; }
   void setMapPolygon(QGCMapPolygon *mapPolygon);
+  double obstacleIndentation() const;
+  void setObstacleIndentation(double val);
+
+  double boundaryIndentation() const;
+  void setBoundaryIndentation(double val);
 
   // Must match json spec for GridEntryLocation
   enum EntryLocation {
@@ -125,6 +135,8 @@ signals:
   void hoverAndCaptureChanged(bool hoverAndCapture);
   void hoverAndCaptureAllowedChanged(bool hoverAndCaptureAllowed);
   void mapPolygonChanged(void);
+  void obstacleIndentationChanged(double val);
+  void boundaryIndentationChanged(double val);
 
 private slots:
   void _updateWizardMode(void);
@@ -134,6 +146,7 @@ private slots:
   void _recalcCameraShots(void) final;
 
 private:
+  QPolygonF _offsetPolygon(const QPolygonF &polygon, double distance);
   enum CameraTriggerCode {
     CameraTriggerNone,
     CameraTriggerOn,
@@ -213,6 +226,8 @@ private:
 
   QGCMapPolygon *_mapPolygon = nullptr;
   QList<QPolygonF> _localExclusionPolygons;
+  double _obstacleIndentation = 0;
+  double _boundaryIndentation = 0;
 
   static constexpr const char *_jsonGridAngleKey = "angle";
   static constexpr const char *_jsonEntryPointKey = "entryLocation";

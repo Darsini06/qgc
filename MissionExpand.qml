@@ -126,6 +126,11 @@ Rectangle {
                         horizontalAlignment:    Text.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:    commandDialog.createObject(mainWindow).open()
+                        }
                     }
 
                     QGCColoredImage {
@@ -136,15 +141,21 @@ Rectangle {
                         antialiasing:       true
                         color:              "white"
                         source:             "/qmlimages/arrow-down.png"
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (missionItem.isCurrentItem) {
+                                    _root.deselect()
+                                } else {
+                                    commandDialog.createObject(mainWindow).open()
+                                }
+                            }
+                        }
                     }
                 }
 
-                QGCMouseArea {
-                    fillItem:   parent
-                    onClicked:  {
-                        commandDialog.createObject(mainWindow).open()
-                    }
-                }
+
             }
 
             Component {

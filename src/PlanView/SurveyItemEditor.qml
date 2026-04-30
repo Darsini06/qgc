@@ -249,12 +249,311 @@ TransectStyleComplexItemEditor {
                         onTargetFactChanged: if (item) item.fact = targetFact
                         onLoaded:            if (item) item.fact = targetFact
                     }
+                    
+                    // --- Boundary Indentation (Margin) ---
+                    QGCLabel {
+                        text:           qsTr("Indentation")
+                        color:          _colorTextSecondary
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        font.bold:      true
+                    }
 
+                    RowLayout {
+                        spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                        
+                        Rectangle {
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredWidth:  Layout.preferredHeight
+                            radius:       4
+                            color:        _indMinusArea.pressed ? _colorAccent : (_indMinusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                            border.color: _indMinusArea.containsMouse ? _colorAccent : _colorBorder
+                            border.width: 1
+                            QGCLabel { anchors.centerIn: parent; text: "−"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                            MouseArea {
+                                id: _indMinusArea; anchors.fill: parent; hoverEnabled: true
+                                onClicked: missionItem.boundaryIndentation = Math.max(0, missionItem.boundaryIndentation - 1)
+                            }
+                        }
+
+                        QGCTextField {
+                            id:                  indIndentField
+                            Layout.fillWidth:    true
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            text:                missionItem.boundaryIndentation.toFixed(1) + "m"
+                            color:               _colorTextPrimary
+                            horizontalAlignment: Qt.AlignHCenter
+                            onEditingFinished:   missionItem.boundaryIndentation = parseFloat(text)
+                            background: Rectangle {
+                                color:        indIndentField.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                                border.color: indIndentField.activeFocus ? _colorAccent : _colorBorder
+                                border.width: indIndentField.activeFocus ? 2 : 1
+                                radius:       4
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredWidth:  Layout.preferredHeight
+                            radius:       4
+                            color:        _indPlusArea.pressed ? _colorAccent : (_indPlusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                            border.color: _indPlusArea.containsMouse ? _colorAccent : _colorBorder
+                            border.width: 1
+                            QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                            MouseArea {
+                                id: _indPlusArea; anchors.fill: parent; hoverEnabled: true
+                                onClicked: missionItem.boundaryIndentation = missionItem.boundaryIndentation + 1
+                            }
+                        }
+                    }
+
+                    // --- Obstacle Clearance (Indent) ---
+                    QGCLabel {
+                        text:           qsTr("Obstacle Clearance")
+                        color:          _colorTextSecondary
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        font.bold:      true
+                    }
+
+                    RowLayout {
+                        spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                        
+                        Rectangle {
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredWidth:  Layout.preferredHeight
+                            radius:       4
+                            color:        _obsMinusArea.pressed ? _colorAccent : (_obsMinusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                            border.color: _obsMinusArea.containsMouse ? _colorAccent : _colorBorder
+                            border.width: 1
+                            QGCLabel { anchors.centerIn: parent; text: "−"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                            MouseArea {
+                                id: _obsMinusArea; anchors.fill: parent; hoverEnabled: true
+                                onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 1)
+                            }
+                        }
+
+                        QGCTextField {
+                            id:                  obsIndentField
+                            Layout.fillWidth:    true
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            text:                missionItem.obstacleIndentation.toFixed(1)
+                            color:               _colorTextPrimary
+                            horizontalAlignment: Qt.AlignHCenter
+                            onEditingFinished:   missionItem.obstacleIndentation = parseFloat(text)
+                            background: Rectangle {
+                                color:        obsIndentField.activeFocus ? _colorBgTertiary : _colorBgSecondary
+                                border.color: obsIndentField.activeFocus ? _colorAccent : _colorBorder
+                                border.width: obsIndentField.activeFocus ? 2 : 1
+                                radius:       4
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredWidth:  Layout.preferredHeight
+                            radius:       4
+                            color:        _obsPlusArea.pressed ? _colorAccent : (_obsPlusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
+                            border.color: _obsPlusArea.containsMouse ? _colorAccent : _colorBorder
+                            border.width: 1
+                            QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                            MouseArea {
+                                id: _obsPlusArea; anchors.fill: parent; hoverEnabled: true
+                                onClicked: missionItem.obstacleIndentation = missionItem.obstacleIndentation + 1
+                            }
+                        }
+                    }
                 }
             }
 
             // Divider
             Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets && !_isAgri }
+
+            // ─── Grid Appearance & Layout ──────────────────────────────────
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing:          _margin * 0.8
+                visible:          !forPresets && !_isAgri
+
+                QGCLabel {
+                    text:           qsTr("Grid Appearance & Layout")
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:           gridVisualsInner.implicitHeight + (_margin * 2)
+                    color:            _colorBgSecondary
+                    radius:           8
+                    border.color:     _colorBorder
+                    border.width:     1
+
+                    ColumnLayout {
+                        id:               gridVisualsInner
+                        anchors.left:     parent.left
+                        anchors.right:    parent.right
+                        anchors.top:      parent.top
+                        anchors.margins:  _margin
+                        spacing:          _margin
+
+                        // Width & Spacing Row
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing:          _margin
+
+                            // Line Width
+                            ColumnLayout {
+                                spacing: 4
+                                QGCLabel { text: qsTr("Line Width"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                                RowLayout {
+                                    spacing: 4
+                                    Rectangle {
+                                        width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                        QGCLabel { anchors.centerIn: parent; text: "−" }
+                                        MouseArea { anchors.fill: parent; onClicked: MapGlobals.setGridLineWidth(Math.max(1, MapGlobals.gridLineWidth - 1)) }
+                                    }
+                                    QGCLabel { text: MapGlobals.gridLineWidth; font.bold: true; width: 20; horizontalAlignment: Text.AlignHCenter }
+                                    Rectangle {
+                                        width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                        QGCLabel { anchors.centerIn: parent; text: "+" }
+                                        MouseArea { anchors.fill: parent; onClicked: MapGlobals.setGridLineWidth(MapGlobals.gridLineWidth + 1) }
+                                    }
+                                }
+                            }
+
+                            // Manual Spacing (if needed)
+                            ColumnLayout {
+                                spacing: 4
+                                QGCLabel { text: qsTr("Spacing"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                                RowLayout {
+                                    spacing: 4
+                                    Rectangle {
+                                        width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                        QGCLabel { anchors.centerIn: parent; text: "−" }
+                                        MouseArea { anchors.fill: parent; onClicked: missionItem.cameraCalc.adjustedFootprintSide().setRawValue(Math.max(1, missionItem.cameraCalc.adjustedFootprintSide().rawValue().toDouble() - 1)) }
+                                    }
+                                    QGCLabel { text: missionItem.cameraCalc.adjustedFootprintSide().rawValue().toFixed(1); font.bold: true; width: 40; horizontalAlignment: Text.AlignHCenter }
+                                    Rectangle {
+                                        width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                        QGCLabel { anchors.centerIn: parent; text: "+" }
+                                        MouseArea { anchors.fill: parent; onClicked: missionItem.cameraCalc.adjustedFootprintSide().setRawValue(missionItem.cameraCalc.adjustedFootprintSide().rawValue().toDouble() + 1) }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Color Selection
+                        ColumnLayout {
+                            spacing: 4
+                            QGCLabel { text: qsTr("Grid Color"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                            RowLayout {
+                                spacing: 10
+                                Repeater {
+                                    model: ["#0D4D15", "#27AE60", "#F1C40F", "#E67E22", "#E74C3C", "#34495E"]
+                                    delegate: Rectangle {
+                                        width: 28; height: 28; radius: 14
+                                        color: modelData
+                                        border.color: MapGlobals.gridColor === color ? "white" : "transparent"
+                                        border.width: 2
+                                        MouseArea { anchors.fill: parent; onClicked: MapGlobals.setGridColor(parent.color) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ─── Obstacle Appearance ──────────────────────────────────────
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing:          _margin * 0.8
+                visible:          !forPresets && !_isAgri
+
+                QGCLabel {
+                    text:           qsTr("Obstacle Appearance")
+                    color:          _colorTextSecondary
+                    font.pointSize: ScreenTools.smallFontPointSize
+                    font.bold:      true
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height:           obsVisualsInner.implicitHeight + (_margin * 2)
+                    color:            _colorBgSecondary
+                    radius:           8
+                    border.color:     _colorBorder
+                    border.width:     1
+
+                    ColumnLayout {
+                        id:               obsVisualsInner
+                        anchors.left:     parent.left
+                        anchors.right:    parent.right
+                        anchors.top:      parent.top
+                        anchors.margins:  _margin
+                        spacing:          _margin
+
+                        // Border Width
+                        ColumnLayout {
+                            spacing: 4
+                            QGCLabel { text: qsTr("Border Width"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                            RowLayout {
+                                spacing: 4
+                                Rectangle {
+                                    width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                    QGCLabel { anchors.centerIn: parent; text: "−" }
+                                    MouseArea { anchors.fill: parent; onClicked: MapGlobals.setObstacleLineWidth(Math.max(0, MapGlobals.obstacleLineWidth - 1)) }
+                                }
+                                QGCLabel { text: MapGlobals.obstacleLineWidth; font.bold: true; width: 20; horizontalAlignment: Text.AlignHCenter }
+                                Rectangle {
+                                    width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                    QGCLabel { anchors.centerIn: parent; text: "+" }
+                                    MouseArea { anchors.fill: parent; onClicked: MapGlobals.setObstacleLineWidth(MapGlobals.obstacleLineWidth + 1) }
+                                }
+                            }
+                        }
+
+                        // Opacity Control
+                        ColumnLayout {
+                            spacing: 4
+                            QGCLabel { text: qsTr("Interior Opacity"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                            RowLayout {
+                                spacing: 4
+                                Rectangle {
+                                    width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                    QGCLabel { anchors.centerIn: parent; text: "−" }
+                                    MouseArea { anchors.fill: parent; onClicked: MapGlobals.setObstacleOpacity(Math.max(0, MapGlobals.obstacleOpacity - 0.1)) }
+                                }
+                                QGCLabel { text: Math.round(MapGlobals.obstacleOpacity * 100) + "%"; font.bold: true; width: 40; horizontalAlignment: Text.AlignHCenter }
+                                Rectangle {
+                                    width: 30; height: 30; radius: 4; color: _colorBgTertiary; border.color: _colorBorder
+                                    QGCLabel { anchors.centerIn: parent; text: "+" }
+                                    MouseArea { anchors.fill: parent; onClicked: MapGlobals.setObstacleOpacity(Math.min(1, MapGlobals.obstacleOpacity + 0.1)) }
+                                }
+                            }
+                        }
+
+                        // Color Selection
+                        ColumnLayout {
+                            spacing: 4
+                            QGCLabel { text: qsTr("Obstacle Color"); font.pointSize: ScreenTools.smallFontPointSize; color: _colorTextSecondary }
+                            RowLayout {
+                                spacing: 10
+                                Repeater {
+                                    model: ["#F1C40F", "#F39C12", "#E67E22", "#E74C3C", "#C0392B", "#95A5A6"]
+                                    delegate: Rectangle {
+                                        width: 28; height: 28; radius: 14
+                                        color: modelData
+                                        border.color: MapGlobals.obstacleColor === color ? "white" : "transparent"
+                                        border.width: 2
+                                        MouseArea { anchors.fill: parent; onClicked: MapGlobals.setObstacleColor(parent.color) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // ─── Options ComboBox ─────────────────────────────────────────
             // Styled wrapper so the combobox background matches dark theme

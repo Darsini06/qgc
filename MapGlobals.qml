@@ -43,11 +43,46 @@ QtObject {
 
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
+    property real gridLineWidth: parseFloat(QGroundControl.loadGlobalSetting("gridLineWidth", "5"))
+    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#0D4D15")
+    property color obstacleColor: QGroundControl.loadGlobalSetting("obstacleColor", "#F1C40F")
+    property real obstacleLineWidth: parseFloat(QGroundControl.loadGlobalSetting("obstacleLineWidth", "2"))
+    property real obstacleOpacity: parseFloat(QGroundControl.loadGlobalSetting("obstacleOpacity", "0.2"))
 
     function setGridLines(value) {
         gridLines = value
         QGroundControl.saveBoolGlobalSetting("gridLines", value)
         console.log("gridLines" , value)
+    }
+
+    function setGridLineWidth(value) {
+        gridLineWidth = value
+        QGroundControl.saveGlobalSetting("gridLineWidth", value.toString())
+        console.log("gridLineWidth", value)
+    }
+
+    function setGridColor(value) {
+        gridColor = value
+        QGroundControl.saveGlobalSetting("gridColor", value.toString())
+        console.log("gridColor", value)
+    }
+
+    function setObstacleColor(value) {
+        obstacleColor = value
+        QGroundControl.saveGlobalSetting("obstacleColor", value.toString())
+        console.log("obstacleColor", value)
+    }
+
+    function setObstacleLineWidth(value) {
+        obstacleLineWidth = value
+        QGroundControl.saveGlobalSetting("obstacleLineWidth", value.toString())
+        console.log("obstacleLineWidth", value)
+    }
+
+    function setObstacleOpacity(value) {
+        obstacleOpacity = value
+        QGroundControl.saveGlobalSetting("obstacleOpacity", value.toString())
+        console.log("obstacleOpacity", value)
     }
 
     //MainRootWindow reference variables.

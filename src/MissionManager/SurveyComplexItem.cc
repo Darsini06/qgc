@@ -178,6 +178,8 @@ void SurveyComplexItem::_saveCommon(QJsonObject &saveObject) {
 
   // Polygon shape
   _surveyAreaPolygon.saveToJson(saveObject);
+  saveObject["obstacleIndentation"] = _obstacleIndentation;
+  saveObject["boundaryIndentation"] = _boundaryIndentation;
 }
 
 void SurveyComplexItem::setEntryIndentation(double val) {
@@ -203,6 +205,53 @@ void SurveyComplexItem::setAdjustmentMode(int mode) {
     else if (mode == 2)
       _turnAroundDistanceFact.setRawValue(_exitIndentation);
   }
+}
+
+double SurveyComplexItem::obstacleIndentation() const { return _obstacleIndentation; }
+
+void SurveyComplexItem::setObstacleIndentation(double val) {
+  if (!QGC::fuzzyCompare(_obstacleIndentation, val)) {
+    _obstacleIndentation = val;
+    emit obstacleIndentationChanged(val);
+    _rebuildTransects();
+  }
+}
+
+double SurveyComplexItem::boundaryIndentation() const { return _boundaryIndentation; }
+
+void SurveyComplexItem::setBoundaryIndentation(double val) {
+  if (!QGC::fuzzyCompare(_boundaryIndentation, val)) {
+    _boundaryIndentation = val;
+    emit boundaryIndentationChanged(val);
+    _rebuildTransects();
+  }
+}
+
+QPolygonF SurveyComplexItem::_offsetPolygon(const QPolygonF &polygon, double distance) {
+    if (distance == 0 || polygon.count() < 3) return polygon;
+    
+    QList<QLineF> offsetEdges;
+    for (int i = 0; i < polygon.count() - 1; i++) {
+        QLineF edge(polygon[i], polygon[i + 1]);
+        QLineF offsetEdge = edge;
+        QLineF normal = edge.normalVector();
+        normal.setLength(distance);
+        offsetEdge.translate(normal.dx(), normal.dy());
+        offsetEdges.append(offsetEdge);
+    }
+    
+    QPolygonF result;
+    for (int i = 0; i < offsetEdges.count(); i++) {
+        int prev = (i == 0) ? offsetEdges.count() - 1 : i - 1;
+        QPointF intersect;
+        if (offsetEdges[prev].intersects(offsetEdges[i], &intersect) != QLineF::NoIntersection) {
+            result << intersect;
+        } else {
+            result << offsetEdges[i].p1();
+        }
+    }
+    if (!result.isEmpty()) result << result.first();
+    return result;
 }
 
 void SurveyComplexItem::loadPreset(const QString &name) {
@@ -385,6 +434,9 @@ bool SurveyComplexItem::_loadV4V5(const QJsonObject &complexObject,
   }
 
   _ignoreRecalc = false;
+  _obstacleIndentation = complexObject["obstacleIndentation"].toDouble(0);
+  _boundaryIndentation = complexObject["boundaryIndentation"].toDouble(0);
+
 
   return true;
 }
@@ -1101,6 +1153,22 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
     polygon << polygonPoints[i];
   }
   polygon << polygonPoints[0];
+
+  // Ensure CW winding for consistent offset direction
+  double sum = 0;
+  for (int i = 0; i < polygon.count() - 1; i++) {
+    sum += (polygon[i + 1].x() - polygon[i].x()) * (polygon[i + 1].y() + polygon[i].y());
+  }
+  if (sum < 0) { // CCW
+    QPolygonF reversed;
+    for (int i = polygon.count() - 1; i >= 0; i--) reversed << polygon[i];
+    polygon = reversed;
+  }
+
+  if (_boundaryIndentation != 0) {
+      polygon = _offsetPolygon(polygon, -_boundaryIndentation); // Negative distance to shrink
+  }
+
   QRectF boundingRect = polygon.boundingRect();
   QPointF boundingCenter = boundingRect.center();
   qCDebug(SurveyComplexItemLog)
@@ -1152,6 +1220,22 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
         }
         if (exclusionPolygon.count() > 0) {
           exclusionPolygon << exclusionPolygon.front(); // Close it
+          // Ensure CW winding
+          double sum = 0;
+          for (int j = 0; j < exclusionPolygon.count() - 1; j++) {
+            sum += (exclusionPolygon[j + 1].x() - exclusionPolygon[j].x()) *
+                   (exclusionPolygon[j + 1].y() + exclusionPolygon[j].y());
+          }
+          if (sum < 0) { // CCW
+            QPolygonF reversed;
+            for (int j = exclusionPolygon.count() - 1; j >= 0; j--)
+              reversed << exclusionPolygon[j];
+            exclusionPolygon = reversed;
+          }
+
+          if (_obstacleIndentation != 0) {
+              exclusionPolygon = _offsetPolygon(exclusionPolygon, _obstacleIndentation);
+          }
           exclusionPolygons.append(exclusionPolygon);
         }
       }
@@ -1173,6 +1257,22 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
         }
         if (exclusionPolygon.count() > 0) {
           exclusionPolygon << exclusionPolygon.front(); // Close it
+          // Ensure CW winding
+          double sum = 0;
+          for (int j = 0; j < exclusionPolygon.count() - 1; j++) {
+            sum += (exclusionPolygon[j + 1].x() - exclusionPolygon[j].x()) *
+                   (exclusionPolygon[j + 1].y() + exclusionPolygon[j].y());
+          }
+          if (sum < 0) { // CCW
+            QPolygonF reversed;
+            for (int j = exclusionPolygon.count() - 1; j >= 0; j--)
+              reversed << exclusionPolygon[j];
+            exclusionPolygon = reversed;
+          }
+
+          if (_obstacleIndentation != 0) {
+              exclusionPolygon = _offsetPolygon(exclusionPolygon, _obstacleIndentation);
+          }
           exclusionPolygons.append(exclusionPolygon);
         }
       }
@@ -1211,22 +1311,43 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
             sum += (exclusionPolygon[i + 1].x() - exclusionPolygon[i].x()) *
                    (exclusionPolygon[i + 1].y() + exclusionPolygon[i].y());
           }
-          if (sum < 0) {
-            // Reverse for clockwise
+          if (sum < 0) { // CCW in this coordinate system (X=East, Y=North)
+            // Reverse for CW
             QPolygonF reversed;
             for (int i = exclusionPolygon.count() - 1; i >= 0; i--)
               reversed << exclusionPolygon[i];
             exclusionPolygon = reversed;
           }
 
+
+          if (_obstacleIndentation != 0) {
+              exclusionPolygon = _offsetPolygon(exclusionPolygon, _obstacleIndentation);
+          }
           exclusionPolygons.append(exclusionPolygon);
         }
     }
   }
 
-  // Add local obstacles from JSON
   for (const QPolygonF &obs : _localExclusionPolygons) {
-    exclusionPolygons.append(obs);
+    QPolygonF exclusionPolygon = obs;
+    // Ensure CW winding
+    double sum = 0;
+    for (int j = 0; j < exclusionPolygon.count() - 1; j++) {
+      sum += (exclusionPolygon[j + 1].x() - exclusionPolygon[j].x()) *
+             (exclusionPolygon[j + 1].y() + exclusionPolygon[j].y());
+    }
+    if (sum < 0) { // CCW
+      QPolygonF reversed;
+      for (int j = exclusionPolygon.count() - 1; j >= 0; j--)
+        reversed << exclusionPolygon[j];
+      exclusionPolygon = reversed;
+    }
+
+    if (_obstacleIndentation != 0) {
+        exclusionPolygons.append(_offsetPolygon(exclusionPolygon, _obstacleIndentation));
+    } else {
+        exclusionPolygons.append(exclusionPolygon);
+    }
   }
 
   // Now intersect the lines with the polygon
