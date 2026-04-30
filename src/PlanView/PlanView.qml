@@ -300,7 +300,7 @@ Item {
                     } else {
                         _planMasterController.saveToSelectedFile1()
                         MapGlobals.share_edit_visibility = true
-                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
+                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
                 }
@@ -1173,6 +1173,8 @@ Item {
 
                 anchors.top:        parent.top
 
+
+
                 //-------------------------------------------------------
                 // 1st: Mission button | 2nd: Fence button (each on own row)
                 Column {
@@ -1184,7 +1186,8 @@ Item {
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
 
-                    // Row 2 — Fence
+
+                    // Row 2 — Fence/Obstacles (only one definition!)
                     Rectangle {
                         visible:  layerTabBar.fenceVisible
                         width:    parent.width
@@ -1194,7 +1197,7 @@ Item {
                         border.width: 0
 
                         Text {
-                            id: fenceText
+                            id: fenceTabText
                             text: qsTr("Obstacles")
                             color: "white"
                             font.bold:          true
@@ -1354,8 +1357,20 @@ Item {
                         }
                     }
                 }
+
             }
 
+
+            GeoFenceEditor {
+                anchors.top:            rightControls.bottom
+                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+                anchors.bottom:         parent.bottom
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                myGeoFenceController:   _geoFenceController
+                flightMap:              editorMap
+                visible:                _editingLayer == _layerGeoFence
+            }
             //-------------------------------------------------------
             // Mission Item Editor
             Item {
@@ -1367,7 +1382,7 @@ Item {
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
- 
+
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -1425,6 +1440,7 @@ Item {
                                 mainWindow.planmap()
                             }
                         }
+
                     }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
@@ -1469,17 +1485,6 @@ Item {
                         }
                     }
                 }
-            }
-
-            GeoFenceEditor {
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
             }
 
             // Rally Point Editor
@@ -2582,12 +2587,12 @@ Item {
                     Loader {
                         id:     genericEditorLoader
                         width:  popupScrollView.width
-                        source: (itemEditPopup.popupMissionItem && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        source: (itemEditPopup.popupMissionItem &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey")
                                     ? itemEditPopup.popupMissionItem.editorQml : ""
-                        visible: itemEditPopup.popupMissionItem !== null && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        visible: itemEditPopup.popupMissionItem !== null &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey"
 
                         property var    missionItem:        itemEditPopup.popupMissionItem

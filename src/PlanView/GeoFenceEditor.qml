@@ -19,6 +19,7 @@ QGCFlickable {
 
     property var    myGeoFenceController
     property var    flightMap
+    property string activeEditType: ""
 
     readonly property real  _editFieldWidth:    Math.min(width - _margin * 2, ScreenTools.defaultFontPixelWidth * 15)
     readonly property real  _margin:            ScreenTools.defaultFontPixelWidth * 1.5
@@ -137,17 +138,17 @@ QGCFlickable {
             border.width: 1
 
 
-        QGCLabel {
-            id:                 geoFenceLabel
-            anchors.margins:    _margin
-            anchors.left:       parent.left
-            anchors.top:        parent.top
-            text:               qsTr("Obstacles Settings")
-            color:              _colorTextPrimary
-            font.bold:          true
-            font.pointSize:     ScreenTools.mediumFontPointSize
-            anchors.leftMargin: _margin
-        }
+        // QGCLabel {
+        //     id:                 geoFenceLabel
+        //     anchors.margins:    _margin
+        //     anchors.left:       parent.left
+        //     anchors.top:        parent.top
+        //     text:               qsTr("Obstacles Settings")
+        //     color:              _colorTextPrimary
+        //     font.bold:          true
+        //     font.pointSize:     ScreenTools.mediumFontPointSize
+        //     anchors.leftMargin: _margin
+        // }
 
         Rectangle {
             anchors.left:       parent.left
@@ -178,16 +179,16 @@ QGCFlickable {
                 anchors.right:      parent.right
                 spacing:            _margin * 1.2
 
-                QGCLabel {
-                    anchors.left:       parent.left
-                    anchors.right:      parent.right
-                    wrapMode:           Text.WordWrap
-                    color:              _colorTextSecondary
-                    font.pointSize:     myGeoFenceController.supported ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                    text:               myGeoFenceController.supported ?
-                                            qsTr("Obstacles allow you to set a virtual boundary around the area you want to fly in.") :
-                                            qsTr("This vehicle does not support Obstacles.")
-                }
+                // QGCLabel {
+                //     anchors.left:       parent.left
+                //     anchors.right:      parent.right
+                //     wrapMode:           Text.WordWrap
+                //     color:              _colorTextSecondary
+                //     font.pointSize:     myGeoFenceController.supported ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                //     text:               myGeoFenceController.supported ?
+                //                             qsTr("Obstacles allow you to set a virtual boundary around the area you want to fly in.") :
+                //                             qsTr("This vehicle does not support Obstacles.")
+                // }
 
                 Column {
                     anchors.left:       parent.left
@@ -236,190 +237,120 @@ QGCFlickable {
                         }
                     }
 
-                    // --- INSERT OBSTACLE SECTION ---
-                    // Header label
-                    Rectangle {
-                        id:             insertSection
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        height:         40
-                        color:          _colorBgSecondary
-                        radius:         _radius
-                        border.color:   _colorBorder
-                        border.width:   1
 
-                        Text {
-                            anchors.fill:           parent
-                            anchors.leftMargin:     _margin
-                            anchors.rightMargin:    _margin
-                            verticalAlignment:      Text.AlignVCenter
-                            horizontalAlignment:    Text.AlignHCenter
-                            text:                   qsTr("Add New Obstacle")
-                            color:                  _colorTextPrimary
-                            font.bold:              true
-                            font.pointSize:         9
-                            wrapMode:               Text.NoWrap
-                        }
-                    }
-
-                    // Vertical list of type buttons
                     Column {
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        spacing:        _margin
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        spacing: _margin
 
                         Button {
-                            width:  parent.width
+                            width: parent.width
                             height: 40
-                            background: Rectangle {
-                                radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
-                            }
+
                             contentItem: Text {
-                                text: qsTr("Inclusion Poly")
+                                text: qsTr("Square")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                wrapMode: Text.WordWrap
+                                verticalAlignment: Text.AlignVCenter
                             }
+
+                            background: Rectangle {
+                                radius: _radius
+                                color: parent.pressed ? _colorAccentDark :
+                                       (parent.hovered ? Qt.lighter(_colorAccent,1.1) : _colorAccent)
+                            }
+
                             onClicked: {
-                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
+                                var rect = Qt.rect(
+                                    flightMap.centerViewport.x,
+                                    flightMap.centerViewport.y,
+                                    flightMap.centerViewport.width,
+                                    flightMap.centerViewport.height)
+
                                 var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                var bottomRightCoord = flightMap.toCoordinate(
+                                            Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+
                                 myGeoFenceController.addInclusionPolygon(topLeftCoord, bottomRightCoord)
+
+                                // Clear all existing interactive states
+                                myGeoFenceController.clearAllInteractive()
+
+                                // Set active type
+                                root.activeEditType = "polygon"
+
+                                // Set the newly created polygon to interactive mode
+                                if (myGeoFenceController.polygons.count > 0) {
+                                    var lastPolygon = myGeoFenceController.polygons.get(myGeoFenceController.polygons.count - 1)
+                                    lastPolygon.interactive = true
+                                }
                             }
                         }
 
                         Button {
-                            width:  parent.width
+                            width: parent.width
                             height: 40
-                            background: Rectangle {
-                                radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
-                            }
-                            contentItem: Text {
-                                text: qsTr("Obstacle Poly")
-                                color: "white"
-                                font.bold: true
-                                font.pointSize: 9
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                wrapMode: Text.WordWrap
-                            }
-                            onClicked: {
-                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
-                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
-                                myGeoFenceController.addExclusionPolygon(topLeftCoord, bottomRightCoord)
-                            }
-                        }
 
-                        Button {
-                            width:  parent.width
-                            height: 40
-                            background: Rectangle {
-                                radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
-                            }
                             contentItem: Text {
-                                text: qsTr("Inclusion Circle")
+                                text: qsTr("Circle")
                                 color: "white"
                                 font.bold: true
-                                font.pointSize: 9
                                 horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                wrapMode: Text.WordWrap
+                                verticalAlignment: Text.AlignVCenter
                             }
+
+                            background: Rectangle {
+                                radius: _radius
+                                color: parent.pressed ? _colorAccentDark :
+                                       (parent.hovered ? Qt.lighter(_colorAccent,1.1) : _colorAccent)
+                            }
+
                             onClicked: {
-                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
+                                var rect = Qt.rect(
+                                    flightMap.centerViewport.x,
+                                    flightMap.centerViewport.y,
+                                    flightMap.centerViewport.width,
+                                    flightMap.centerViewport.height)
+
                                 var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                var bottomRightCoord = flightMap.toCoordinate(
+                                            Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+
                                 myGeoFenceController.addInclusionCircle(topLeftCoord, bottomRightCoord)
-                            }
-                        }
 
-                        Button {
-                            width:  parent.width
-                            height: 40
-                            background: Rectangle {
-                                radius: _radius
-                                color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
-                            }
-                            contentItem: Text {
-                                text: qsTr("Obstacle Circle")
-                                color: "white"
-                                font.bold: true
-                                font.pointSize: 9
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                wrapMode: Text.WordWrap
-                            }
-                            onClicked: {
-                                var rect = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y, flightMap.centerViewport.width, flightMap.centerViewport.height)
-                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(Qt.point(rect.x + rect.width, rect.y + rect.height), false)
-                                myGeoFenceController.addExclusionCircle(topLeftCoord, bottomRightCoord)
+                                // Clear all existing interactive states
+                                myGeoFenceController.clearAllInteractive()
+
+                                // Set active type
+                                root.activeEditType = "circle"
+
+                                // Set the newly created circle to interactive mode
+                                if (myGeoFenceController.circles.count > 0) {
+                                    var lastCircle = myGeoFenceController.circles.get(myGeoFenceController.circles.count - 1)
+                                    lastCircle.interactive = true
+                                }
                             }
                         }
                     }
 
-
-                    // --- POLYGON SECTION ---
-                    Rectangle {
-                        id:             polygonSection
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        height:         40
-                        color:          _colorBgSecondary
-                        radius:         _radius
-                        border.color:   _colorBorder
-                        border.width:   1
-                        
-                        property bool checked: true
-                        
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: parent.checked = !parent.checked
-                        }
-                        
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Polygon Obstacles")
-                            color: _colorTextPrimary
-                            font.bold: true
-                        }
-                        
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: parent.checked ? "▼" : "▶"
-                            color: _colorTextSecondary
-                            font.pointSize: 10
-                        }
-                    }
-
-                    QGCLabel {
-                        text:       qsTr("No polygon obstacles added.")
-                        color:      _colorTextSecondary
-                        font.italic: true
-                        visible:    polygonSection.checked && myGeoFenceController.polygons.count === 0
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                    // QGCLabel {
+                    //     text:       qsTr("No polygon obstacles added.")
+                    //     color:      _colorTextSecondary
+                    //     font.italic: true
+                    //     visible:    polygonSection.checked && myGeoFenceController.polygons.count === 0
+                    //     anchors.horizontalCenter: parent.horizontalCenter
+                    // }
 
                     ColumnLayout {
                         anchors.left:       parent.left
                         anchors.right:      parent.right
                         spacing:            8
-                        visible:            polygonSection.checked && myGeoFenceController.polygons.count > 0
+                        visible:            myGeoFenceController.polygons.count > 0
 
                         Repeater {
                             model: myGeoFenceController.polygons
-                            
+
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: polyCol.height + (_margin * 2)
@@ -427,7 +358,7 @@ QGCFlickable {
                                 radius: _radius
                                 border.color: _colorBorder
                                 border.width: 1
-                                
+
                                 ColumnLayout {
                                                                     id: polyCol
                                                                     anchors.left: parent.left
@@ -439,100 +370,100 @@ QGCFlickable {
                                                                     ColumnLayout {
                                                                         Layout.fillWidth: true
                                                                         spacing: 10
-
                                                                         QGCCheckBox {
-                                                                            text: qsTr("Include")
-                                                                            checked: object.inclusion
-                                                                            onClicked: object.inclusion = checked
-                                                                        }
+                                                                                                                                                text: qsTr("Include")
+                                                                                                                                                checked: object.inclusion
+                                                                                                                                                onClicked: object.inclusion = checked
+                                                                                                                                            }
 
-                                                                        QGCRadioButton {
-                                                                            text: qsTr("Edit Mode")
-                                                                            checked: object.interactive
-                                                                            onClicked: {
-                                                                                myGeoFenceController.clearAllInteractive()
-                                                                                object.interactive = checked
-                                                                            }
-                                                                        }
+                                                                                                                                            QGCRadioButton {
+                                                                                                                                                text: qsTr("Edit Mode")
+                                                                                                                                                checked: object.interactive
+                                                                                                                                                onClicked: {
+                                                                                                                                                    myGeoFenceController.clearAllInteractive()
+                                                                                                                                                    object.interactive = checked
+                                                                                                                                                }
+                                                                                                                                            }
 
-                                                                        Button {
-                                                                            height: 30
-                                                                            Layout.fillWidth: true
-                                                                            background: Rectangle {
-                                                                                radius: 4
-                                                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
-                                                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                                                border.width: 1
-                                                                            }
-                                                                            contentItem: Text {
-                                                                                text: qsTr("Delete")
-                                                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                                                font.bold: true
-                                                                                horizontalAlignment: Text.AlignHCenter
-                                                                                verticalAlignment: Text.AlignVCenter
-                                                                            }
-                                                                            onClicked: myGeoFenceController.deletePolygon(index)
-                                                                        }
+                                                                                                                                            Button {
+                                                                                                                                                height: 30
+                                                                                                                                                Layout.fillWidth: true
+                                                                                                                                                background: Rectangle {
+                                                                                                                                                    radius: 4
+                                                                                                                                                    color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
+                                                                                                                                                    border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                                                                                    border.width: 1
+                                                                                                                                                }
+                                                                                                                                                contentItem: Text {
+                                                                                                                                                    text: qsTr("Delete")
+                                                                                                                                                    color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                                                                                    font.bold: true
+                                                                                                                                                    horizontalAlignment: Text.AlignHCenter
+                                                                                                                                                    verticalAlignment: Text.AlignVCenter
+                                                                                                                                                }
+                                                                                                                                                onClicked: myGeoFenceController.deletePolygon(index)
+                                                                                                                                            }
+                                                                                                                                        }
                                                                     }
-                                                                }
+
                             }
                         }
                     }
 
-                    // --- CIRCULAR FENCE SECTION ---
-                    Rectangle {
-                        id:             circleSection
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        height:         40
-                        color:          _colorBgSecondary
-                        radius:         _radius
-                        border.color:   _colorBorder
-                        border.width:   1
-                        
-                        property bool checked: true
-                        
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: parent.checked = !parent.checked
-                        }
-                        
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Circular Obstacles")
-                            color: _colorTextPrimary
-                            font.bold: true
-                        }
-                        
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: parent.checked ? "▼" : "▶"
-                            color: _colorTextSecondary
-                            font.pointSize: 10
-                        }
-                    }
+                    // // --- CIRCULAR FENCE SECTION ---
+                    // Rectangle {
+                    //     id:             circleSection
+                    //     anchors.left:   parent.left
+                    //     anchors.right:  parent.right
+                    //     height:         40
+                    //     color:          _colorBgSecondary
+                    //     radius:         _radius
+                    //     border.color:   _colorBorder
+                    //     border.width:   1
 
-                    QGCLabel {
-                        text:       qsTr("No circular obstacles added.")
-                        color:      _colorTextSecondary
-                        font.italic: true
-                        visible:    circleSection.checked && myGeoFenceController.circles.count === 0
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                    //     property bool checked: true
+
+                    //     MouseArea {
+                    //         anchors.fill: parent
+                    //         onClicked: parent.checked = !parent.checked
+                    //     }
+
+                    //     Text {
+                    //         anchors.left: parent.left
+                    //         anchors.leftMargin: _margin
+                    //         anchors.verticalCenter: parent.verticalCenter
+                    //         text: qsTr("Circular Obstacles")
+                    //         color: _colorTextPrimary
+                    //         font.bold: true
+                    //     }
+
+                    //     Text {
+                    //         anchors.right: parent.right
+                    //         anchors.rightMargin: _margin
+                    //         anchors.verticalCenter: parent.verticalCenter
+                    //         text: parent.checked ? "▼" : "▶"
+                    //         color: _colorTextSecondary
+                    //         font.pointSize: 10
+                    //     }
+                    // }
+
+                    // QGCLabel {
+                    //     text:       qsTr("No circular obstacles added.")
+                    //     color:      _colorTextSecondary
+                    //     font.italic: true
+                    //     visible:    circleSection.checked && myGeoFenceController.circles.count === 0
+                    //     anchors.horizontalCenter: parent.horizontalCenter
+                    // }
 
                     ColumnLayout {
                         anchors.left:       parent.left
                         anchors.right:      parent.right
                         spacing:            12
-                        visible:            circleSection.checked && myGeoFenceController.circles.count > 0
+                        visible:            myGeoFenceController.circles.count > 0
 
                         Repeater {
                             model: myGeoFenceController.circles
-                            
+
                             Rectangle {
                                 Layout.fillWidth: true
                                 height: circleCol.height + (_margin * 2)
@@ -540,7 +471,7 @@ QGCFlickable {
                                 radius: _radius
                                 border.color: _colorBorder
                                 border.width: 1
-                                
+
                                 ColumnLayout {
                                                                     id: circleCol
                                                                     anchors.left: parent.left
@@ -554,38 +485,38 @@ QGCFlickable {
                                                                         spacing: 10
 
                                                                         QGCCheckBox {
-                                                                            text: qsTr("Include")
-                                                                            checked: object.inclusion
-                                                                            onClicked: object.inclusion = checked
-                                                                        }
+                                                                                                                                            text: qsTr("Include")
+                                                                                                                                            checked: object.inclusion
+                                                                                                                                            onClicked: object.inclusion = checked
+                                                                                                                                        }
 
-                                                                        QGCRadioButton {
-                                                                            text: qsTr("Edit Mode")
-                                                                            checked: object.interactive
-                                                                            onClicked: {
-                                                                                myGeoFenceController.clearAllInteractive()
-                                                                                object.interactive = checked
-                                                                            }
-                                                                        }
+                                                                                                                                        QGCRadioButton {
+                                                                                                                                            text: qsTr("Edit Mode")
+                                                                                                                                            checked: object.interactive
+                                                                                                                                            onClicked: {
+                                                                                                                                                myGeoFenceController.clearAllInteractive()
+                                                                                                                                                object.interactive = checked
+                                                                                                                                            }
+                                                                                                                                        }
 
-                                                                        Button {
-                                                                            height: 30
-                                                                            Layout.fillWidth: true
-                                                                            background: Rectangle {
-                                                                                radius: 4
-                                                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
-                                                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                                                border.width: 1
-                                                                            }
-                                                                            contentItem: Text {
-                                                                                text: qsTr("Delete")
-                                                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
-                                                                                font.bold: true
-                                                                                horizontalAlignment: Text.AlignHCenter
-                                                                                verticalAlignment: Text.AlignVCenter
-                                                                            }
-                                                                            onClicked: myGeoFenceController.deleteCircle(index)
-                                                                        }
+                                                                                                                                        Button {
+                                                                                                                                            height: 30
+                                                                                                                                            Layout.fillWidth: true
+                                                                                                                                            background: Rectangle {
+                                                                                                                                                radius: 4
+                                                                                                                                                color: parent.pressed ? Qt.rgba(255, 69, 58, 0.2) : "transparent"
+                                                                                                                                                border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                                                                                border.width: 1
+                                                                                                                                            }
+                                                                                                                                            contentItem: Text {
+                                                                                                                                                text: qsTr("Delete")
+                                                                                                                                                color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextSecondary)
+                                                                                                                                                font.bold: true
+                                                                                                                                                horizontalAlignment: Text.AlignHCenter
+                                                                                                                                                verticalAlignment: Text.AlignVCenter
+                                                                                                                                            }
+                                                                                                                                            onClicked: myGeoFenceController.deleteCircle(index)
+                                                                                                                                        }
                                                                     }
 
                                                                     ColumnLayout {
@@ -606,111 +537,113 @@ QGCFlickable {
                                                                         }
                                                                     }
                                                                 }
+
                             }
                         }
                     }
 
-                    // --- BREACH RETURN SECTION ---
-                    Rectangle {
-                        id:             breachReturnSection
-                        anchors.left:   parent.left
-                        anchors.right:  parent.right
-                        height:         40
-                        color:          _colorBgSecondary
-                        radius:         _radius
-                        border.color:   _colorBorder
-                        border.width:   1
-                        
-                        property bool checked: true
-                        
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: parent.checked = !parent.checked
-                        }
-                        
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Breach Return Point")
-                            color: _colorTextPrimary
-                            font.bold: true
-                        }
-                        
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: _margin
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: parent.checked ? "▼" : "▶"
-                            color: _colorTextSecondary
-                            font.pointSize: 10
-                        }
-                    }
+                //     // --- BREACH RETURN SECTION ---
+                //     Rectangle {
+                //         id:             breachReturnSection
+                //         anchors.left:   parent.left
+                //         anchors.right:  parent.right
+                //         height:         40
+                //         color:          _colorBgSecondary
+                //         radius:         _radius
+                //         border.color:   _colorBorder
+                //         border.width:   1
 
-                    Button {
-                        height: 40
-                        background: Rectangle {
-                            radius: _radius
-                            color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
-                        }
-                        contentItem: Text {
-                            text: qsTr("Add Breach Return Point")
-                            color: "white"
-                            font.bold: true
-                            font.pointSize: 11
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        visible:            breachReturnSection.checked && !myGeoFenceController.breachReturnPoint.isValid
-                        anchors.left:       parent.left
-                        anchors.right:      parent.right
+                //         property bool checked: true
 
-                        onClicked: myGeoFenceController.breachReturnPoint = flightMap.center
-                    }
+                //         MouseArea {
+                //             anchors.fill: parent
+                //             onClicked: parent.checked = !parent.checked
+                //         }
 
-                    Button {
-                        height: 40
-                        background: Rectangle {
-                            radius: _radius
-                            color: "transparent"
-                            border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorBorder)
-                            border.width: 1
-                        }
-                        contentItem: Text {
-                            text: qsTr("Remove Breach Return Point")
-                            color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextPrimary)
-                            font.bold: true
-                            font.pointSize: 11
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        visible:            breachReturnSection.checked && myGeoFenceController.breachReturnPoint.isValid
-                        anchors.left:       parent.left
-                        anchors.right:      parent.right
+                //         Text {
+                //             anchors.left: parent.left
+                //             anchors.leftMargin: _margin
+                //             anchors.verticalCenter: parent.verticalCenter
+                //             text: qsTr("Breach Return Point")
+                //             color: _colorTextPrimary
+                //             font.bold: true
+                //         }
 
-                        onClicked: myGeoFenceController.breachReturnPoint = QtPositioning.coordinate()
-                    }
+                //         Text {
+                //             anchors.right: parent.right
+                //             anchors.rightMargin: _margin
+                //             anchors.verticalCenter: parent.verticalCenter
+                //             text: parent.checked ? "▼" : "▶"
+                //             color: _colorTextSecondary
+                //             font.pointSize: 10
+                //         }
+                //     }
 
-                    ColumnLayout {
-                        anchors.left:       parent.left
-                        anchors.right:      parent.right
-                        spacing:            _margin
-                        visible:            breachReturnSection.checked && myGeoFenceController.breachReturnPoint.isValid
+                //     Button {
+                //         height: 40
+                //         background: Rectangle {
+                //             radius: _radius
+                //             color: parent.pressed ? _colorAccentDark : (parent.hovered ? Qt.lighter(_colorAccent, 1.1) : _colorAccent)
+                //         }
+                //         contentItem: Text {
+                //             text: qsTr("Add Breach Return Point")
+                //             color: "white"
+                //             font.bold: true
+                //             font.pointSize: 11
+                //             horizontalAlignment: Text.AlignHCenter
+                //             verticalAlignment: Text.AlignVCenter
+                //         }
+                //         visible:            breachReturnSection.checked && !myGeoFenceController.breachReturnPoint.isValid
+                //         anchors.left:       parent.left
+                //         anchors.right:      parent.right
 
-                        QGCLabel {
-                            text: qsTr("Altitude:")
-                            color: _colorTextPrimary
-                            font.bold: true
-                        }
+                //         onClicked: myGeoFenceController.breachReturnPoint = flightMap.center
+                //     }
 
-                        Loader {
-                            Layout.fillWidth:   true
-                            sourceComponent:    volumeSliderComponent
-                            property var targetFact: myGeoFenceController.breachReturnAltitude
-                            onTargetFactChanged: if (item) item.fact = targetFact
-                            onLoaded: if (item) item.fact = targetFact
-                        }
-                    }
+                //     Button {
+                //         height: 40
+                //         background: Rectangle {
+                //             radius: _radius
+                //             color: "transparent"
+                //             border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorBorder)
+                //             border.width: 1
+                //         }
+                //         contentItem: Text {
+                //             text: qsTr("Remove Breach Return Point")
+                //             color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextPrimary)
+                //             font.bold: true
+                //             font.pointSize: 11
+                //             horizontalAlignment: Text.AlignHCenter
+                //             verticalAlignment: Text.AlignVCenter
+                //         }
+                //         visible:            breachReturnSection.checked && myGeoFenceController.breachReturnPoint.isValid
+                //         anchors.left:       parent.left
+                //         anchors.right:      parent.right
+
+                //         onClicked: myGeoFenceController.breachReturnPoint = QtPositioning.coordinate()
+                //     }
+
+                //     ColumnLayout {
+                //         anchors.left:       parent.left
+                //         anchors.right:      parent.right
+                //         spacing:            _margin
+                //         visible:            breachReturnSection.checked && myGeoFenceController.breachReturnPoint.isValid
+
+                //         QGCLabel {
+                //             text: qsTr("Altitude:")
+                //             color: _colorTextPrimary
+                //             font.bold: true
+                //         }
+
+                //         Loader {
+                //             Layout.fillWidth:   true
+                //             sourceComponent:    volumeSliderComponent
+                //             property var targetFact: myGeoFenceController.breachReturnAltitude
+                //             onTargetFactChanged: if (item) item.fact = targetFact
+                //             onLoaded: if (item) item.fact = targetFact
+                //         }
+                //     }
+
                 }
             }
         }
