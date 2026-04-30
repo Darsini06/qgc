@@ -328,6 +328,7 @@ Item {
                 if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
 
                 MapGlobals.share_edit_visibility = false
+                MapGlobals.showMissionItems = true
             }
         }
     }

@@ -36,6 +36,8 @@ QtObject {
     property string currentView_profile: "profile"
 
     property bool share_edit_visibility : false
+    property bool isReviewMode: false
+    property bool showMissionItems: false
 
     signal newSessionAdded()
     

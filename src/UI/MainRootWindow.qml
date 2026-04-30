@@ -1870,7 +1870,9 @@ ApplicationWindow {
                     MapGlobals.kmlPath             = localPath
                     MapGlobals.mark_with           = "KML_File"
                     MapGlobals.edit                = "edit"
-                    MapGlobals.share_edit_visibility = true
+                    MapGlobals.share_edit_visibility = false
+                    MapGlobals.isReviewMode = false
+                    MapGlobals.showMissionItems = false
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
@@ -2002,7 +2004,9 @@ ApplicationWindow {
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"
                             MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2055,7 +2059,9 @@ ApplicationWindow {
                             QGroundControl.saveGlobalSetting("mapping", "circle")
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2104,7 +2110,9 @@ ApplicationWindow {
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2165,7 +2173,9 @@ ApplicationWindow {
                                 dialog.visible = false
                                 mainWindow.showToastMessage("Drone Not Connected")
                             }
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
                         }
                     }
                 }
@@ -2211,7 +2221,9 @@ ApplicationWindow {
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_GPS"
                             MapGlobals.edit = "edit"
-                            MapGlobals.share_edit_visibility = true
+                            MapGlobals.share_edit_visibility = false
+                            MapGlobals.isReviewMode = false
+                            MapGlobals.showMissionItems = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)

@@ -185,6 +185,8 @@ Item {
         _planMasterController.loadFromSelectedFile()
         fileUploadbtn.visible=true
         MapGlobals.share_edit_visibility = true
+        MapGlobals.isReviewMode = true
+        MapGlobals.showMissionItems = false
     }
 
     function loaddata1() {
@@ -296,10 +298,10 @@ Item {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
                         syncCloud()
-                        MapGlobals.share_edit_visibility = true
+                        MapGlobals.share_edit_visibility = false
                     } else {
                         _planMasterController.saveToSelectedFile1()
-                        MapGlobals.share_edit_visibility = true
+                        MapGlobals.share_edit_visibility = false
                         // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
@@ -1175,8 +1177,47 @@ Item {
 
 
 
-                //-------------------------------------------------------
-                // 1st: Mission button | 2nd: Fence button (each on own row)
+
+                // 1st: Boundary Point + Save
+                Loader {
+                    id:                 boundaryButtonsLoader
+                    width:              parent.width
+                    active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
+                    visible:            active
+
+                    sourceComponent: Column {
+                        spacing:            12
+                        width:              boundaryButtonsLoader.width
+                        topPadding:         10
+
+                        Button {
+                            id: boundaryPointBtn
+                            width:              parent.width
+                            height:             45
+                            padding:            10
+                            background: Rectangle {
+                                radius: 8
+                                color: Qt.rgba(0, 0, 0, 0.41)
+                                anchors.fill: parent
+                            }
+                            contentItem: Text {
+                                text:               qsTr("Boundary Point")
+                                font.bold:          true
+                                color:              "white"
+                                font.pointSize:     14
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment:   Text.AlignVCenter
+                                font.family:        "Outfit"
+                            }
+                            onClicked: {
+                                console.log("Boundary Point clicked in PlanView")
+                                mapPolygonvisuals.appendVertexToPolygon(activePolygon)
+                            }
+                        }
+                    }
+                }
+
+                // 2nd: Obstacles button
                 Column {
                     id:         layerTabBar
                     width:      parent.width
@@ -1217,45 +1258,6 @@ Item {
                                     _editingLayer = _layerGeoFence
                                     layerTabBar.currentIndex = 1
                                 }
-                            }
-                        }
-                    }
-                }
-
-                // 2nd & 3rd: Boundary Point + Save
-                Loader {
-                    id:                 boundaryButtonsLoader
-                    width:              parent.width
-                    active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active
-
-                    sourceComponent: Column {
-                        spacing:            12
-                        width:              boundaryButtonsLoader.width
-                        topPadding:         10
-
-                        Button {
-                            id: boundaryPointBtn
-                            width:              parent.width
-                            height:             45
-                            padding:            10
-                            background: Rectangle {
-                                radius: 8
-                                color: Qt.rgba(0, 0, 0, 0.41)
-                                anchors.fill: parent
-                            }
-                            contentItem: Text {
-                                text:               qsTr("Boundary Point")
-                                font.bold:          true
-                                color:              "white"
-                                font.pointSize:     14
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                font.family:        "Outfit"
-                            }
-                            onClicked: {
-                                console.log("Boundary Point clicked in PlanView")
-                                mapPolygonvisuals.appendVertexToPolygon(activePolygon)
                             }
                         }
                     }
@@ -1397,50 +1399,8 @@ Item {
 
                     footer: Item {
                         width:  missionItemEditorListView.width
-                        height: 60
+                        height: 20
                         visible: _editingLayer == _layerMission
-
-                        Button {
-                            anchors.centerIn:       parent
-                            width:                  parent.width
-                            height:                 45
-                            text:                   qsTr("Save Plan")
-
-                            background: Rectangle {
-                                radius: 8
-                                color: "black"
-                                border.color: "white"
-                                border.width: 1
-                            }
-
-                            contentItem: Text {
-                                text:               parent.text
-                                font.bold:          true
-                                color:              "white"
-                                font.pointSize:     14
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                font.family:        "Outfit"
-                            }
-
-                            onClicked: {
-                                if (activePolygon && activePolygon.traceMode) {
-                                    if (activePolygon.count < 3) {
-                                        console.log("Save: Not enough vertices (<3), restoring previous vertices")
-                                        mapPolygonvisuals.restorePreviousVertices()
-                                        return
-                                    }
-                                    activePolygon.traceMode = false
-                                }
-                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                    _planMasterController.saveToSelectedFile1()
-                                } else {
-                                    _planMasterController.saveToSelectedFile()
-                                }
-                                mainWindow.planmap()
-                            }
-                        }
-
                     }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
@@ -1460,7 +1420,7 @@ Item {
                     delegate: Item {
                         property bool _showItem : true
                         width: missionItemEditorListView.width
-                        visible: !MapGlobals.share_edit_visibility
+                        visible: MapGlobals.showMissionItems
                         height: visible ? innerEditor.height : 0
 
                         MissionExpand {
@@ -1471,10 +1431,8 @@ Item {
                             width:          parent.width
                             readOnly:       false
                             onClicked: (sequenceNumber) => {
-
-                                           _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-
-                                       }
+                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                            }
                             onEditItemClicked: (popupItem) => {
                                 itemEditPopup.popupMissionItem = popupItem
                                 itemEditPopup.open()
@@ -1525,6 +1483,51 @@ Item {
                 resetRegisterFlightPlan: _resetRegisterFlightPlan
             }
 
+            // 3rd: Save Plan at the bottom
+            Button {
+                id:                     savePlanBtn
+                anchors.bottom:         parent.bottom
+                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                height:                 45
+                text:                   qsTr("Save Plan")
+                visible:                _editingLayer == _layerMission
+
+                background: Rectangle {
+                    radius: 8
+                    color: "black"
+                    border.color: "white"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text:               savePlanBtn.text
+                    font.bold:          true
+                    color:              "white"
+                    font.pointSize:     14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment:   Text.AlignVCenter
+                    font.family:        "Outfit"
+                }
+
+                onClicked: {
+                    if (activePolygon && activePolygon.traceMode) {
+                        if (activePolygon.count < 3) {
+                            console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                            mapPolygonvisuals.restorePreviousVertices()
+                            return
+                        }
+                        activePolygon.traceMode = false
+                    }
+                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                        _planMasterController.saveToSelectedFile1()
+                    } else {
+                        _planMasterController.saveToSelectedFile()
+                    }
+                    mainWindow.planmap()
+                }
+            }
         }
 
         QGCLabel {
@@ -2313,7 +2316,9 @@ Item {
         } else {
             console.log("No plan creator available")
         }
-        MapGlobals.share_edit_visibility = true
+        MapGlobals.share_edit_visibility = false
+        MapGlobals.isReviewMode = false
+        MapGlobals.showMissionItems = false
     }
 
 
