@@ -300,7 +300,7 @@ Item {
                     } else {
                         _planMasterController.saveToSelectedFile1()
                         MapGlobals.share_edit_visibility = true
-                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
+                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
                 }
@@ -1173,76 +1173,10 @@ Item {
 
                 anchors.top:        parent.top
 
-                //-------------------------------------------------------
-                // 1st: Mission button | 2nd: Fence button (each on own row)
-                Column {
-                    id:         layerTabBar
-                    width:      parent.width
-                    spacing:    8
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
-                    property int currentIndex: 0
-                    property bool fenceVisible: _geoFenceController.supported
-
-                    // Row 1 — Mission
-                    Rectangle {
-                        width:   parent.width
-                        height:  45
-                        radius:  8
-                        color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                        border.width: 0
-
-                        Text {
-                            id: missionText
-                            text: qsTr("Pathway")
-                            color: "white"
-                            font.bold:          true
-                            font.pointSize:     14
-                            font.family:        "Outfit"
-                            anchors.centerIn:   parent
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 0
-                                _editingLayer = _layerMission
-                            }
-                        }
-                    }
-
-                    // Row 2 — Fence
-                    Rectangle {
-                        visible:  layerTabBar.fenceVisible
-                        width:    parent.width
-                        height:   45
-                        radius:   8
-                        color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                        border.width: 0
-
-                        Text {
-                            id: fenceText
-                            text: qsTr("Obstacles")
-                            color: "white"
-                            font.bold:          true
-                            font.pointSize:     14
-                            font.family:        "Outfit"
-                            anchors.centerIn:   parent
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 1
-                                _editingLayer = _layerGeoFence
-                            }
-                        }
-                    }
-                }
 
                 // 2nd & 3rd: Boundary Point + Save
+
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
@@ -1276,6 +1210,86 @@ Item {
                             onClicked: {
                                 console.log("Boundary Point clicked in PlanView")
                                 mapPolygonvisuals.appendVertexToPolygon(activePolygon)
+                            }
+                        }
+                    }
+                }
+                //-------------------------------------------------------
+                // 1st: Mission button | 2nd: Fence button (each on own row)
+                Column {
+                    id:         layerTabBar
+                    width:      parent.width
+                    spacing:    8
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
+
+                    property int currentIndex: 0
+                    property bool fenceVisible: _geoFenceController.supported
+
+                    // // Row 1 — Mission/Pathway
+                    // Rectangle {
+                    //     width:   parent.width
+                    //     height:  45
+                    //     radius:  8
+                    //     color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                    //     border.width: 0
+
+                    //     Text {
+                    //         id: missionTabText
+                    //         text: qsTr("Pathway")
+                    //         color: "white"
+                    //         font.bold:          true
+                    //         font.pointSize:     14
+                    //         font.family:        "Outfit"
+                    //         anchors.centerIn:   parent
+                    //     }
+
+                    //     MouseArea {
+                    //         anchors.fill: parent
+                    //         cursorShape: Qt.PointingHandCursor
+                    //         onClicked: {
+                    //             layerTabBar.currentIndex = 0
+                    //             _editingLayer = _layerMission
+                    //             editorMap.update()
+                    //         }
+                    //     }
+                    // }
+
+                    // Row 2 — Fence/Obstacles (only one definition!)
+                    Rectangle {
+                        visible:  layerTabBar.fenceVisible
+                        width:    parent.width
+                        height:   45
+                        radius:   8
+                        color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                        border.width: 0
+
+                        Text {
+                            id: fenceTabText
+                            text: qsTr("Obstacles")
+                            color: "white"
+                            font.bold:          true
+                            font.pointSize:     14
+                            font.family:        "Outfit"
+                            anchors.centerIn:   parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (layerTabBar.currentIndex === 1) {
+                                    // If already on Obstacles, go back to Pathway
+                                    layerTabBar.currentIndex = 0
+                                    _editingLayer = _layerMission
+                                } else {
+                                    // Switch to Obstacles
+                                    layerTabBar.currentIndex = 1
+                                    _editingLayer = _layerGeoFence
+                                    if (_geoFenceController && _geoFenceController.polygon && _geoFenceController.polygon.path.length > 0) {
+                                        fitMapViewportToGeoFence()
+                                    }
+                                }
+                                editorMap.update()
                             }
                         }
                     }
@@ -1377,8 +1391,134 @@ Item {
                         }
                     }
                 }
+
             }
 
+            // //-------------------------------------------------------
+            // // Mission Item Editor
+            // Item {
+            //     id:                     missionItemEditor
+            //     anchors.left:           parent.left
+            //     anchors.right:          parent.right
+            //     anchors.top:            rightControls.bottom
+            //     anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.5
+            //     anchors.bottom:         parent.bottom
+            //     anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
+            //     visible:                _editingLayer == _layerMission
+
+            //     QGCListView {
+            //         id:                 missionItemEditorListView
+            //         anchors.fill:       parent
+            //         spacing:            ScreenTools.defaultFontPixelHeight / 4
+            //         orientation:        ListView.Vertical
+            //         model:              _missionController.visualItems
+            //         cacheBuffer:        Math.max(height * 2, 0)
+            //         clip:               true
+            //         currentIndex:       _missionController.currentPlanViewSeqNum
+            //         highlightMoveDuration: 250
+            //         visible:            _editingLayer == _layerMission
+
+            //         footer: Item {
+            //             width:  missionItemEditorListView.width
+            //             height: 60
+            //             visible: _editingLayer == _layerMission
+
+            //             Button {
+            //                 anchors.centerIn:       parent
+            //                 width:                  parent.width
+            //                 height:                 45
+            //                 text:                   qsTr("Save Plan")
+
+            //                 background: Rectangle {
+            //                     radius: 8
+            //                     color: "black"
+            //                     border.color: "white"
+            //                     border.width: 1
+            //                 }
+
+            //                 contentItem: Text {
+            //                     text:               parent.text
+            //                     font.bold:          true
+            //                     color:              "white"
+            //                     font.pointSize:     14
+            //                     horizontalAlignment: Text.AlignHCenter
+            //                     verticalAlignment:   Text.AlignVCenter
+            //                     font.family:        "Outfit"
+            //                 }
+
+            //                 onClicked: {
+            //                     if (activePolygon && activePolygon.traceMode) {
+            //                         if (activePolygon.count < 3) {
+            //                             console.log("Save: Not enough vertices (<3), restoring previous vertices")
+            //                             mapPolygonvisuals.restorePreviousVertices()
+            //                             return
+            //                         }
+            //                         activePolygon.traceMode = false
+            //                     }
+            //                     if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+            //                         _planMasterController.saveToSelectedFile1()
+            //                     } else {
+            //                         _planMasterController.saveToSelectedFile()
+            //                     }
+            //                     mainWindow.planmap()
+            //                 }
+            //             }
+            //         }
+
+            //         // // Remove items with commandName "Takeoff" when the component is completed.
+            //         // Component.onCompleted:
+            //         // {
+            //         //     // Loop backwards to avoid index shifting.
+            //         //     for (var i = _missionController.visualItems.count - 1; i >= 0; i--) {
+            //         //         var item = _missionController.visualItems.get(i);
+            //         //         if (item.commandName === "Takeoff") {
+            //         //             _missionController.visualItems.remove(i);
+            //         //         }
+            //         //     }
+            //         // }
+
+            //         //-- List Elements
+
+            //         delegate: Item {
+            //             property bool _showItem : true
+            //             width: missionItemEditorListView.width
+            //             visible: !MapGlobals.share_edit_visibility
+            //             height: visible ? innerEditor.height : 0
+
+            //             MissionExpand {
+            //                 id: innerEditor
+            //                 map: editorMap
+            //                 masterController:  _planMasterController
+            //                 missionItem:    object
+            //                 width:          parent.width
+            //                 readOnly:       false
+            //                 onClicked: (sequenceNumber) => {
+
+            //                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+
+            //                            }
+            //                 onEditItemClicked: (popupItem) => {
+            //                     itemEditPopup.popupMissionItem = popupItem
+            //                     itemEditPopup.open()
+            //                 }
+            //                 onDeselect: {
+            //                     _missionController.setCurrentPlanViewSeqNum(-1, false)
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+
+            GeoFenceEditor {
+                anchors.top:            rightControls.bottom
+                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+                anchors.bottom:         parent.bottom
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                myGeoFenceController:   _geoFenceController
+                flightMap:              editorMap
+                visible:                _editingLayer == _layerGeoFence
+            }
             //-------------------------------------------------------
             // Mission Item Editor
             Item {
@@ -1390,7 +1530,7 @@ Item {
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
- 
+
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -1448,6 +1588,7 @@ Item {
                                 mainWindow.planmap()
                             }
                         }
+
                     }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
@@ -1492,17 +1633,6 @@ Item {
                         }
                     }
                 }
-            }
-
-            GeoFenceEditor {
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
             }
 
             // Rally Point Editor
@@ -2604,12 +2734,12 @@ Item {
                     Loader {
                         id:     genericEditorLoader
                         width:  popupScrollView.width
-                        source: (itemEditPopup.popupMissionItem && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        source: (itemEditPopup.popupMissionItem &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey")
                                     ? itemEditPopup.popupMissionItem.editorQml : ""
-                        visible: itemEditPopup.popupMissionItem !== null && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        visible: itemEditPopup.popupMissionItem !== null &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey"
 
                         property var    missionItem:        itemEditPopup.popupMissionItem
