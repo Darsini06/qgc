@@ -941,7 +941,7 @@ void SurveyComplexItem::_intersectLinesWithPolygon(
 
     // Intersect with main polygon
     addIntersections(polygon);
-    // Intersect with exclusion polygons
+    // Intersect with exclusion polygons (inflated for clipping)
     for (const QPolygonF &excl : exclusionPolygons) {
       addIntersections(excl);
     }
@@ -1003,13 +1003,12 @@ void SurveyComplexItem::_intersectLinesWithPolygon(
       } else {
         // Outside main polygon, finish current polyline
         if (!currentPolyline.isEmpty()) {
-          if (currentPolyline.count() >= 2)
-            resultPolylines.append(currentPolyline);
+          resultPolylines.append(currentPolyline);
           currentPolyline.clear();
         }
       }
     }
-    if (!currentPolyline.isEmpty() && currentPolyline.count() >= 2) {
+    if (!currentPolyline.isEmpty()) {
       resultPolylines.append(currentPolyline);
     }
   }
@@ -1318,7 +1317,6 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
               reversed << exclusionPolygon[i];
             exclusionPolygon = reversed;
           }
-
 
           if (_obstacleIndentation != 0) {
               exclusionPolygon = _offsetPolygon(exclusionPolygon, _obstacleIndentation);

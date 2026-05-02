@@ -251,116 +251,143 @@ TransectStyleComplexItemEditor {
                     }
                     
                     // --- Boundary Indentation (Margin) ---
-                    QGCLabel {
-                        text:           qsTr("Indentation")
-                        color:          _colorTextSecondary
-                        font.pointSize: ScreenTools.smallFontPointSize
-                        font.bold:      true
-                    }
-
                     RowLayout {
-                        spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                        Layout.fillWidth: true
+                        spacing:          _margin
                         
-                        Rectangle {
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth:  Layout.preferredHeight
-                            radius:       4
-                            color:        _indMinusArea.pressed ? _colorAccent : (_indMinusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                            border.color: _indMinusArea.containsMouse ? _colorAccent : _colorBorder
-                            border.width: 1
-                            QGCLabel { anchors.centerIn: parent; text: "−"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                            MouseArea {
-                                id: _indMinusArea; anchors.fill: parent; hoverEnabled: true
-                                onClicked: missionItem.boundaryIndentation = Math.max(0, missionItem.boundaryIndentation - 1)
-                            }
+                        QGCLabel {
+                            text:           qsTr("Boundary Indentation")
+                            color:          _colorTextSecondary
+                            font.pointSize: ScreenTools.smallFontPointSize
+                            font.bold:      true
+                            Layout.fillWidth: true
                         }
 
-                        QGCTextField {
-                            id:                  indIndentField
-                            Layout.fillWidth:    true
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            text:                missionItem.boundaryIndentation.toFixed(1) + "m"
-                            color:               _colorTextPrimary
-                            horizontalAlignment: Qt.AlignHCenter
-                            onEditingFinished:   missionItem.boundaryIndentation = parseFloat(text)
-                            background: Rectangle {
-                                color:        indIndentField.activeFocus ? _colorBgTertiary : _colorBgSecondary
-                                border.color: indIndentField.activeFocus ? _colorAccent : _colorBorder
-                                border.width: indIndentField.activeFocus ? 2 : 1
-                                radius:       4
-                            }
-                        }
+                        RowLayout {
+                            spacing: 0
+                            
+                            // Pill-style control
+                            Rectangle {
+                                width:  160
+                                height: 36
+                                radius: 18
+                                color:  _colorBgTertiary
+                                border.color: _colorBorder
+                                border.width: 1
 
-                        Rectangle {
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth:  Layout.preferredHeight
-                            radius:       4
-                            color:        _indPlusArea.pressed ? _colorAccent : (_indPlusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                            border.color: _indPlusArea.containsMouse ? _colorAccent : _colorBorder
-                            border.width: 1
-                            QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                            MouseArea {
-                                id: _indPlusArea; anchors.fill: parent; hoverEnabled: true
-                                onClicked: missionItem.boundaryIndentation = missionItem.boundaryIndentation + 1
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 2
+                                    spacing: 0
+
+                                    // Minus Button
+                                    Rectangle {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: 32
+                                        radius: 16
+                                        color: _indMinusArea.pressed ? _colorAccent : "transparent"
+                                        QGCLabel { anchors.centerIn: parent; text: "−"; font.bold: true; color: _colorTextPrimary }
+                                        MouseArea {
+                                            id: _indMinusArea; anchors.fill: parent
+                                            onClicked: missionItem.boundaryIndentation = missionItem.boundaryIndentation - 0.5
+                                        }
+                                    }
+
+                                    // Value Display
+                                    QGCLabel {
+                                        Layout.fillWidth: true
+                                        text:             missionItem.boundaryIndentation.toFixed(1) + "m"
+                                        color:            _colorTextPrimary
+                                        font.bold:        true
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+
+                                    // Plus Button
+                                    Rectangle {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: 32
+                                        radius: 16
+                                        color: _indPlusArea.pressed ? _colorAccent : "transparent"
+                                        QGCLabel { anchors.centerIn: parent; text: "+"; font.bold: true; color: _colorTextPrimary }
+                                        MouseArea {
+                                            id: _indPlusArea; anchors.fill: parent
+                                            onClicked: missionItem.boundaryIndentation = missionItem.boundaryIndentation + 0.5
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
 
                     // --- Obstacle Clearance (Indent) ---
-                    QGCLabel {
-                        text:           qsTr("Obstacle Clearance")
-                        color:          _colorTextSecondary
-                        font.pointSize: ScreenTools.smallFontPointSize
-                        font.bold:      true
-                    }
-
                     RowLayout {
-                        spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                        Layout.fillWidth: true
+                        spacing:          _margin
                         
-                        Rectangle {
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth:  Layout.preferredHeight
-                            radius:       4
-                            color:        _obsMinusArea.pressed ? _colorAccent : (_obsMinusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                            border.color: _obsMinusArea.containsMouse ? _colorAccent : _colorBorder
-                            border.width: 1
-                            QGCLabel { anchors.centerIn: parent; text: "−"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                            MouseArea {
-                                id: _obsMinusArea; anchors.fill: parent; hoverEnabled: true
-                                onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 1)
-                            }
+                        QGCLabel {
+                            text:           qsTr("Obstacle Margin")
+                            color:          _colorTextSecondary
+                            font.pointSize: ScreenTools.smallFontPointSize
+                            font.bold:      true
+                            Layout.fillWidth: true
                         }
 
-                        QGCTextField {
-                            id:                  obsIndentField
-                            Layout.fillWidth:    true
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            text:                missionItem.obstacleIndentation.toFixed(1)
-                            color:               _colorTextPrimary
-                            horizontalAlignment: Qt.AlignHCenter
-                            onEditingFinished:   missionItem.obstacleIndentation = parseFloat(text)
-                            background: Rectangle {
-                                color:        obsIndentField.activeFocus ? _colorBgTertiary : _colorBgSecondary
-                                border.color: obsIndentField.activeFocus ? _colorAccent : _colorBorder
-                                border.width: obsIndentField.activeFocus ? 2 : 1
-                                radius:       4
-                            }
-                        }
+                        RowLayout {
+                            spacing: 0
+                            
+                            // Pill-style control
+                            Rectangle {
+                                width:  160
+                                height: 36
+                                radius: 18
+                                color:  _colorBgTertiary
+                                border.color: _colorBorder
+                                border.width: 1
 
-                        Rectangle {
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                            Layout.preferredWidth:  Layout.preferredHeight
-                            radius:       4
-                            color:        _obsPlusArea.pressed ? _colorAccent : (_obsPlusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                            border.color: _obsPlusArea.containsMouse ? _colorAccent : _colorBorder
-                            border.width: 1
-                            QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                            MouseArea {
-                                id: _obsPlusArea; anchors.fill: parent; hoverEnabled: true
-                                onClicked: missionItem.obstacleIndentation = missionItem.obstacleIndentation + 1
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 2
+                                    spacing: 0
+
+                                    // Minus Button
+                                    Rectangle {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: 32
+                                        radius: 16
+                                        color: _obsMinusArea.pressed ? _colorAccent : "transparent"
+                                        QGCLabel { anchors.centerIn: parent; text: "−"; font.bold: true; color: _colorTextPrimary }
+                                        MouseArea {
+                                            id: _obsMinusArea; anchors.fill: parent
+                                            onClicked: missionItem.obstacleIndentation = missionItem.obstacleIndentation - 0.5
+                                        }
+                                    }
+
+                                    // Value Display
+                                    QGCLabel {
+                                        Layout.fillWidth: true
+                                        text:             missionItem.obstacleIndentation.toFixed(1) + "m"
+                                        color:            _colorTextPrimary
+                                        font.bold:        true
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+
+                                    // Plus Button
+                                    Rectangle {
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: 32
+                                        radius: 16
+                                        color: _obsPlusArea.pressed ? _colorAccent : "transparent"
+                                        QGCLabel { anchors.centerIn: parent; text: "+"; font.bold: true; color: _colorTextPrimary }
+                                        MouseArea {
+                                            id: _obsPlusArea; anchors.fill: parent
+                                            onClicked: missionItem.obstacleIndentation = missionItem.obstacleIndentation + 0.5
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
+
                 }
             }
 
