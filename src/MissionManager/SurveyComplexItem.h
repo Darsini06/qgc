@@ -51,6 +51,11 @@ public:
                  setObstacleIndentation NOTIFY obstacleIndentationChanged)
   Q_PROPERTY(double boundaryIndentation READ boundaryIndentation WRITE
                  setBoundaryIndentation NOTIFY boundaryIndentationChanged)
+  Q_PROPERTY(bool enableDirectionalIndentation READ enableDirectionalIndentation WRITE setEnableDirectionalIndentation NOTIFY enableDirectionalIndentationChanged)
+  Q_PROPERTY(double boundaryIndentationTop READ boundaryIndentationTop WRITE setBoundaryIndentationTop NOTIFY boundaryIndentationTopChanged)
+  Q_PROPERTY(double boundaryIndentationBottom READ boundaryIndentationBottom WRITE setBoundaryIndentationBottom NOTIFY boundaryIndentationBottomChanged)
+  Q_PROPERTY(double boundaryIndentationLeft READ boundaryIndentationLeft WRITE setBoundaryIndentationLeft NOTIFY boundaryIndentationLeftChanged)
+  Q_PROPERTY(double boundaryIndentationRight READ boundaryIndentationRight WRITE setBoundaryIndentationRight NOTIFY boundaryIndentationRightChanged)
 
   Fact *gridAngle(void) { return &_gridAngleFact; }
   Fact *flyAlternateTransects(void) { return &_flyAlternateTransectsFact; }
@@ -97,9 +102,19 @@ public:
   void setMapPolygon(QGCMapPolygon *mapPolygon);
   double obstacleIndentation() const;
   void setObstacleIndentation(double val);
-
   double boundaryIndentation() const;
   void setBoundaryIndentation(double val);
+  bool enableDirectionalIndentation() const { return _enableDirectionalIndentation; }
+  double boundaryIndentationTop() const { return _boundaryIndentationTop; }
+  double boundaryIndentationBottom() const { return _boundaryIndentationBottom; }
+  double boundaryIndentationLeft() const { return _boundaryIndentationLeft; }
+  double boundaryIndentationRight() const { return _boundaryIndentationRight; }
+
+  void setEnableDirectionalIndentation(bool enable);
+  void setBoundaryIndentationTop(double val);
+  void setBoundaryIndentationBottom(double val);
+  void setBoundaryIndentationLeft(double val);
+  void setBoundaryIndentationRight(double val);
 
   // Must match json spec for GridEntryLocation
   enum EntryLocation {
@@ -125,6 +140,11 @@ public:
       "SplitConcavePolygons";
 
 signals:
+  void enableDirectionalIndentationChanged();
+  void boundaryIndentationTopChanged();
+  void boundaryIndentationBottomChanged();
+  void boundaryIndentationLeftChanged();
+  void boundaryIndentationRightChanged();
   void refly90DegreesChanged(bool refly90Degrees);
   void entryIndentationChanged(double val);
   void exitIndentationChanged(double val);
@@ -228,6 +248,11 @@ private:
   QList<QPolygonF> _localExclusionPolygons;
   double _obstacleIndentation = 0;
   double _boundaryIndentation = 0;
+  bool _enableDirectionalIndentation = false;
+  double _boundaryIndentationTop = 0;
+  double _boundaryIndentationBottom = 0;
+  double _boundaryIndentationLeft = 0;
+  double _boundaryIndentationRight = 0;
 
   static constexpr const char *_jsonGridAngleKey = "angle";
   static constexpr const char *_jsonEntryPointKey = "entryLocation";

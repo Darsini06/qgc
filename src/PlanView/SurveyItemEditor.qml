@@ -32,6 +32,8 @@ TransectStyleComplexItemEditor {
     readonly property color _colorTextSecondary: "#ffffff"
     readonly property color _colorPlaceholder:   "#ffffff"
     readonly property color _colorSuccess:       "#2ECC71"
+    property bool   _linkIndentation: true
+    property int    _indentSideIndex: 0 // 0:Top, 1:Right, 2:Bottom, 3:Left
     readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 
     function _smartOptimize() {
@@ -251,21 +253,37 @@ TransectStyleComplexItemEditor {
                     }
                     
                     // --- Boundary Indentation (Margin) ---
-                    RowLayout {
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        spacing:          _margin
+                        spacing:          _margin * 0.5
                         
-                        QGCLabel {
-                            text:           qsTr("Boundary Indentation")
-                            color:          _colorTextSecondary
-                            font.pointSize: ScreenTools.smallFontPointSize
-                            font.bold:      true
+                        RowLayout {
                             Layout.fillWidth: true
+                            spacing:          _margin
+                            
+                            QGCLabel {
+                                text:           qsTr("Boundary Indensation")
+                                color:          _colorTextSecondary
+                                font.pointSize: ScreenTools.smallFontPointSize
+                                font.bold:      true
+                                Layout.fillWidth: true
+                            }
+
+                            QGCCheckBox {
+                                id: directionalCheck
+                                text:           qsTr("Directional")
+                                checked:        missionItem.enableDirectionalIndentation
+                                onClicked:      missionItem.enableDirectionalIndentation = checked
+                            }
                         }
 
+                        // Master Control (when directional is disabled)
                         RowLayout {
-                            spacing: 0
+                            Layout.fillWidth: true
+                            visible:          !missionItem.enableDirectionalIndentation
                             
+                            Item { Layout.fillWidth: true }
+
                             // Pill-style control
                             Rectangle {
                                 width:  160
@@ -289,7 +307,7 @@ TransectStyleComplexItemEditor {
                                         QGCLabel { anchors.centerIn: parent; text: "−"; font.bold: true; color: _colorTextPrimary }
                                         MouseArea {
                                             id: _indMinusArea; anchors.fill: parent
-                                            onClicked: missionItem.boundaryIndentation = missionItem.boundaryIndentation - 0.5
+                                            onClicked: missionItem.boundaryIndentation = Math.max(0, missionItem.boundaryIndentation - 0.5)
                                         }
                                     }
 
@@ -317,7 +335,168 @@ TransectStyleComplexItemEditor {
                                 }
                             }
                         }
+
+                        // Visual Indentation Editor (Refined UI)
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            visible:          missionItem.enableDirectionalIndentation
+                            spacing:          ScreenTools.defaultFontPixelHeight
+
+                            // Choose All Checkbox
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing:          ScreenTools.defaultFontPixelWidth
+                                Rectangle {
+                                    width: 20; height: 20; radius: 10
+                                    color: "transparent"; border.color: _colorSuccess; border.width: 1.5
+                                    Rectangle {
+                                        anchors.centerIn: parent; width: 12; height: 12; radius: 6
+                                        color: _linkIndentation ? _colorSuccess : "transparent"
+                                    }
+                                    MouseArea { anchors.fill: parent; onClicked: _linkIndentation = !_linkIndentation }
+                                }
+                                QGCLabel { 
+                                    text: qsTr("Choose all")
+                                    color: _colorSuccess
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                }
+                            }
+
+                            // Field Graphic
+                            Rectangle {
+                                Layout.alignment: Qt.AlignHCenter
+                                width:            160
+                                height:           100
+                                color:            "#1a1a1a"
+                                border.color:     "#444444"
+                                border.width:     1
+                                radius:           4
+
+                                // Grid line simulation
+                                Row {
+                                    anchors.centerIn: parent
+                                    spacing: 8
+                                    Repeater {
+                                        model: 10
+                                        Rectangle { width: 1; height: 60; color: "#444444" }
+                                    }
+                                }
+
+                                // Highlighting sides
+                                // Top
+                                Rectangle {
+                                    anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
+                                    height: 3; color: (_linkIndentation || _indentSideIndex === 0) ? _colorSuccess : "transparent"
+                                }
+                                // Right
+                                Rectangle {
+                                    anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom
+                                    width: 3; color: (_linkIndentation || _indentSideIndex === 1) ? _colorSuccess : "transparent"
+                                }
+                                // Bottom
+                                Rectangle {
+                                    anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
+                                    height: 3; color: (_linkIndentation || _indentSideIndex === 2) ? _colorSuccess : "transparent"
+                                }
+                                // Left
+                                Rectangle {
+                                    anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+                                    width: 3; color: (_linkIndentation || _indentSideIndex === 3) ? _colorSuccess : "transparent"
+                                }
+
+                                // corner dots (blue in image)
+                                property var corners: [
+                                    { t: 0, l: 0 }, { t: 0, r: 0 }, { b: 0, l: 0 }, { b: 0, r: 0 }
+                                ]
+                                Repeater {
+                                    model: 4
+                                    Rectangle {
+                                        width: 6; height: 6; radius: 3; color: "#3498db"
+                                        x: (index % 2 === 0) ? -3 : parent.width - 3
+                                        y: (index < 2) ? -3 : parent.height - 3
+                                    }
+                                }
+                            }
+
+                            // Value Display
+                            QGCLabel {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: {
+                                    var props = ["boundaryIndentationTop", "boundaryIndentationRight", "boundaryIndentationBottom", "boundaryIndentationLeft"]
+                                    var val = missionItem[props[_indentSideIndex]]
+                                    return qsTr("Indentation ") + val.toFixed(1) + "m"
+                                }
+                                font.pointSize: ScreenTools.mediumFontPointSize
+                                color: "white"
+                            }
+
+                            // Big +/- Buttons in white container
+                            Rectangle {
+                                Layout.alignment: Qt.AlignHCenter
+                                width:  200; height: 48; radius: 24
+                                color:  "white"
+                                RowLayout {
+                                    anchors.fill: parent; spacing: 0
+                                    Item {
+                                        Layout.fillWidth: true; Layout.fillHeight: true
+                                        QGCLabel { anchors.centerIn: parent; text: "−"; color: "black"; font.pointSize: 24 }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                var props = ["boundaryIndentationTop", "boundaryIndentationRight", "boundaryIndentationBottom", "boundaryIndentationLeft"]
+                                                if (_linkIndentation) {
+                                                    missionItem.boundaryIndentationTop = Math.max(0, missionItem.boundaryIndentationTop - 0.5)
+                                                    missionItem.boundaryIndentationBottom = Math.max(0, missionItem.boundaryIndentationBottom - 0.5)
+                                                    missionItem.boundaryIndentationLeft = Math.max(0, missionItem.boundaryIndentationLeft - 0.5)
+                                                    missionItem.boundaryIndentationRight = Math.max(0, missionItem.boundaryIndentationRight - 0.5)
+                                                } else {
+                                                    missionItem[props[_indentSideIndex]] = Math.max(0, missionItem[props[_indentSideIndex]] - 0.5)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Rectangle { width: 1; height: 30; color: "#cccccc" }
+                                    Item {
+                                        Layout.fillWidth: true; Layout.fillHeight: true
+                                        QGCLabel { anchors.centerIn: parent; text: "+"; color: "black"; font.pointSize: 24 }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                var props = ["boundaryIndentationTop", "boundaryIndentationRight", "boundaryIndentationBottom", "boundaryIndentationLeft"]
+                                                if (_linkIndentation) {
+                                                    missionItem.boundaryIndentationTop += 0.5
+                                                    missionItem.boundaryIndentationBottom += 0.5
+                                                    missionItem.boundaryIndentationLeft += 0.5
+                                                    missionItem.boundaryIndentationRight += 0.5
+                                                } else {
+                                                    missionItem[props[_indentSideIndex]] += 0.5
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Previous / Next Buttons
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing:          ScreenTools.defaultFontPixelWidth
+                                visible:          !_linkIndentation
+
+                                QGCButton {
+                                    Layout.fillWidth: true
+                                    text: qsTr("Previous")
+                                    onClicked: _indentSideIndex = (_indentSideIndex + 3) % 4
+                                }
+                                QGCButton {
+                                    Layout.fillWidth: true
+                                    text: qsTr("Next")
+                                    onClicked: _indentSideIndex = (_indentSideIndex + 1) % 4
+                                }
+                            }
+                        }
                     }
+
 
                     // --- Obstacle Clearance (Indent) ---
                     RowLayout {

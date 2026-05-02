@@ -94,6 +94,13 @@ SurveyComplexItem::SurveyComplexItem(PlanMasterController *masterController,
     _surveyAreaPolygon.setDirty(false);
   }
 
+  // Initialize directional indentation
+  _enableDirectionalIndentation = false;
+  _boundaryIndentationTop = 0;
+  _boundaryIndentationBottom = 0;
+  _boundaryIndentationLeft = 0;
+  _boundaryIndentationRight = 0;
+
   // Sync initial indentation values
   _entryIndentation = _turnAroundDistance();
   _exitIndentation = _turnAroundDistance();
@@ -180,6 +187,11 @@ void SurveyComplexItem::_saveCommon(QJsonObject &saveObject) {
   _surveyAreaPolygon.saveToJson(saveObject);
   saveObject["obstacleIndentation"] = _obstacleIndentation;
   saveObject["boundaryIndentation"] = _boundaryIndentation;
+  saveObject["enableDirectionalIndentation"] = _enableDirectionalIndentation;
+  saveObject["boundaryIndentationTop"] = _boundaryIndentationTop;
+  saveObject["boundaryIndentationBottom"] = _boundaryIndentationBottom;
+  saveObject["boundaryIndentationLeft"] = _boundaryIndentationLeft;
+  saveObject["boundaryIndentationRight"] = _boundaryIndentationRight;
 }
 
 void SurveyComplexItem::setEntryIndentation(double val) {
@@ -265,6 +277,46 @@ void SurveyComplexItem::loadPreset(const QString &name) {
             .arg(errorString));
   }
   _rebuildTransects();
+}
+
+void SurveyComplexItem::setEnableDirectionalIndentation(bool enable) {
+  if (_enableDirectionalIndentation != enable) {
+    _enableDirectionalIndentation = enable;
+    emit enableDirectionalIndentationChanged();
+    _rebuildTransects();
+  }
+}
+
+void SurveyComplexItem::setBoundaryIndentationTop(double val) {
+  if (!QGC::fuzzyCompare(_boundaryIndentationTop, val)) {
+    _boundaryIndentationTop = val;
+    emit boundaryIndentationTopChanged();
+    _rebuildTransects();
+  }
+}
+
+void SurveyComplexItem::setBoundaryIndentationBottom(double val) {
+  if (!QGC::fuzzyCompare(_boundaryIndentationBottom, val)) {
+    _boundaryIndentationBottom = val;
+    emit boundaryIndentationBottomChanged();
+    _rebuildTransects();
+  }
+}
+
+void SurveyComplexItem::setBoundaryIndentationLeft(double val) {
+  if (!QGC::fuzzyCompare(_boundaryIndentationLeft, val)) {
+    _boundaryIndentationLeft = val;
+    emit boundaryIndentationLeftChanged();
+    _rebuildTransects();
+  }
+}
+
+void SurveyComplexItem::setBoundaryIndentationRight(double val) {
+  if (!QGC::fuzzyCompare(_boundaryIndentationRight, val)) {
+    _boundaryIndentationRight = val;
+    emit boundaryIndentationRightChanged();
+    _rebuildTransects();
+  }
 }
 
 void SurveyComplexItem::setMapPolygon(QGCMapPolygon *mapPolygon) {
@@ -436,6 +488,11 @@ bool SurveyComplexItem::_loadV4V5(const QJsonObject &complexObject,
   _ignoreRecalc = false;
   _obstacleIndentation = complexObject["obstacleIndentation"].toDouble(0);
   _boundaryIndentation = complexObject["boundaryIndentation"].toDouble(0);
+  _enableDirectionalIndentation = complexObject["enableDirectionalIndentation"].toBool(false);
+  _boundaryIndentationTop = complexObject["boundaryIndentationTop"].toDouble(0);
+  _boundaryIndentationBottom = complexObject["boundaryIndentationBottom"].toDouble(0);
+  _boundaryIndentationLeft = complexObject["boundaryIndentationLeft"].toDouble(0);
+  _boundaryIndentationRight = complexObject["boundaryIndentationRight"].toDouble(0);
 
 
   return true;
@@ -1164,7 +1221,40 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
     polygon = reversed;
   }
 
-  if (_boundaryIndentation != 0) {
+  if (_enableDirectionalIndentation) {
+      double gridAngle = _gridAngleFact.rawValue().toDouble();
+      // Rotate polygon back by gridAngle so we can apply cardinal offsets
+      QPointF center = polygon.boundingRect().center();
+      QPolygonF rotatedPoly;
+      for (const QPointF& p : polygon) {
+          rotatedPoly << _rotatePoint(p, center, -gridAngle);
+      }
+      
+      QRectF rect = rotatedPoly.boundingRect();
+      // Apply offsets to the bounding box of the rotated polygon
+      // In QGC NED: Top is North (+Y), Bottom is South (-Y), Right is East (+X), Left is West (-X)
+      // BUT for QRectF: top() is min Y, bottom() is max Y. 
+      // If we want to shrink: 
+      // Top (North) moves South: increase top() or decrease bottom()? 
+      // Actually, let's use a more intuitive cardinal mapping:
+      // Top = North (+Y), Bottom = South (-Y), Left = West (-X), Right = East (+X)
+      
+      double left = rect.left() + _boundaryIndentationLeft;
+      double right = rect.right() - _boundaryIndentationRight;
+      double top = rect.top() + _boundaryIndentationBottom; // QRectF top is min Y (South)
+      double bottom = rect.bottom() - _boundaryIndentationTop; // QRectF bottom is max Y (North)
+
+      if (left < right && top < bottom) {
+          QRectF indentedRect(left, top, right - left, bottom - top);
+          QPolygonF indentedPoly = QPolygonF(indentedRect);
+          // Rotate back to original grid orientation
+          polygon.clear();
+          for (const QPointF& p : indentedPoly) {
+              polygon << _rotatePoint(p, center, gridAngle);
+          }
+          polygon << polygon.front(); // Close
+      }
+  } else if (_boundaryIndentation != 0) {
       polygon = _offsetPolygon(polygon, -_boundaryIndentation); // Negative distance to shrink
   }
 
