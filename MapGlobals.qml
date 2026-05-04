@@ -19,7 +19,7 @@ QtObject {
     property string comefrom: "Plan"
     property string edit: "edit1"
     property string save: "save1"
-    property real altitude: 0
+    property real altitude: 30.5
     property string mapPolygon:" "
 
     property string time: "00:00:00"
@@ -36,16 +36,53 @@ QtObject {
     property string currentView_profile: "profile"
 
     property bool share_edit_visibility : false
+    property bool isReviewMode: false
+    property bool showMissionItems: false
 
     signal newSessionAdded()
-    
+
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
-    
+    property real gridLineWidth: parseFloat(QGroundControl.loadGlobalSetting("gridLineWidth", "5"))
+    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#0D4D15")
+    property color obstacleColor: QGroundControl.loadGlobalSetting("obstacleColor", "#F1C40F")
+    property real obstacleLineWidth: parseFloat(QGroundControl.loadGlobalSetting("obstacleLineWidth", "2"))
+    property real obstacleOpacity: parseFloat(QGroundControl.loadGlobalSetting("obstacleOpacity", "0.2"))
+
     function setGridLines(value) {
         gridLines = value
         QGroundControl.saveBoolGlobalSetting("gridLines", value)
         console.log("gridLines" , value)
+    }
+
+    function setGridLineWidth(value) {
+        gridLineWidth = value
+        QGroundControl.saveGlobalSetting("gridLineWidth", value.toString())
+        console.log("gridLineWidth", value)
+    }
+
+    function setGridColor(value) {
+        gridColor = value
+        QGroundControl.saveGlobalSetting("gridColor", value.toString())
+        console.log("gridColor", value)
+    }
+
+    function setObstacleColor(value) {
+        obstacleColor = value
+        QGroundControl.saveGlobalSetting("obstacleColor", value.toString())
+        console.log("obstacleColor", value)
+    }
+
+    function setObstacleLineWidth(value) {
+        obstacleLineWidth = value
+        QGroundControl.saveGlobalSetting("obstacleLineWidth", value.toString())
+        console.log("obstacleLineWidth", value)
+    }
+
+    function setObstacleOpacity(value) {
+        obstacleOpacity = value
+        QGroundControl.saveGlobalSetting("obstacleOpacity", value.toString())
+        console.log("obstacleOpacity", value)
     }
 
     //MainRootWindow reference variables.
@@ -62,7 +99,7 @@ QtObject {
         console.log("MapGlobals.recenterMap()")
         if (activeFlightMap && gcsPosition.isValid) {
             activeFlightMap.center = gcsPosition
-            activeFlightMap.zoomLevel = 15
+            activeFlightMap.zoomLevel = 19
         }else {
             rootWindow.showToastMessage("GPS Not Set");
         }
@@ -190,7 +227,7 @@ QtObject {
     function deleteMissionLog(missionName) {
         console.log("MapGlobals.deleteMissionLog()", missionName);
         var name = missionName.toString().split('/').pop().split('\\').pop();
-        
+
         var xhr = new XMLHttpRequest();
         xhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(name));
         xhr.onreadystatechange = function() {
@@ -409,9 +446,9 @@ QtObject {
             } catch (e) {
                 // Ignore invalid state errors during intermediate ready states
             }
-            
+
             console.log("XHR State Change:", xhr.readyState, "Status:", statusString);
-            
+
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var currentStatus = 0;
                 try {
@@ -514,7 +551,7 @@ QtObject {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     console.log("Password reset on backend successfully");
-                    
+
                     // Now update local DB if user exists
                     var db = getDatabase();
                     db.transaction(function(tx) {
@@ -824,9 +861,9 @@ QtObject {
             try {
                 if (xhr.readyState >= 2) statusString = xhr.status;
             } catch (e) { }
-            
+
             console.log("XHR State Change (Login):", xhr.readyState, "Status:", statusString);
-            
+
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 var currentStatus = 0;
                 try { currentStatus = xhr.status; } catch (e) { }
@@ -862,7 +899,7 @@ QtObject {
                         login = "login";
 
                         if (callback) callback(true);
-                        
+
                         // After successful login, sync sessions
                         fetchCloudSessions(user.email);
 
@@ -1046,7 +1083,7 @@ QtObject {
     function savePlanToCloud(planName, planContent, callback) {
         var email = QGroundControl.loadGlobalSetting("email", "");
         var username = QGroundControl.loadGlobalSetting("username", "Guest");
-        
+
         if (email === "") {
             console.error("Cannot save to cloud: User not logged in");
             if (callback) callback(false);
@@ -1127,7 +1164,7 @@ QtObject {
                     try {
                         var sessions = JSON.parse(xhr.responseText);
                         console.log("Fetched", sessions.length, "sessions from cloud");
-                        
+
                         var db = getDatabase();
                         db.transaction(function(tx) {
                             for (var i = 0; i < sessions.length; i++) {

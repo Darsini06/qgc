@@ -82,7 +82,7 @@ Rectangle {
 
         QGCToolBarButton {
             id: currentButton1
-            Layout.preferredHeight: viewButtonRow.height
+            Layout.preferredHeight: viewButtonRow.height 
             icon.source: "qrc:/InstrumentValueIcons/home.svg"
             logo: true
             onClicked: {

@@ -22,6 +22,9 @@ QGCPopupDialog {
     id:         root
     title:      qsTr("Select Mission Command")
     buttons:    Dialog.Cancel
+    useCenterAnchor: false
+    dialogX: 20
+    dialogY: 100
 
     property var    vehicle
     property var    missionItem

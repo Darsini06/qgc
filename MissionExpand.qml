@@ -41,7 +41,7 @@ Rectangle {
 
     property var    _masterController:          masterController
     property var    _missionController:         _masterController.missionController
-    property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey")
+    property bool   _currentItem:               missionItem.isCurrentItem || (missionItem.commandName === "Survey") || (missionItem.commandName === "Mission Start")
     property color  _outerTextColor:            "white"//_currentItem ? qgcPal.primaryButtonText : qgcPal.text
     property bool   _noMissionItemsAdded:       ListView.view.model.count === 1
     property real   _sectionSpacer:             ScreenTools.defaultFontPixelWidth / 2  // spacing between section headings
@@ -126,6 +126,12 @@ Rectangle {
                         horizontalAlignment:    Text.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:    commandDialog.createObject(mainWindow).open()
+                        }
+
                     }
 
                     QGCColoredImage {
@@ -136,13 +142,17 @@ Rectangle {
                         antialiasing:       true
                         color:              "white"
                         source:             "/qmlimages/arrow-down.png"
-                    }
-                }
 
-                QGCMouseArea {
-                    fillItem:   parent
-                    onClicked:  {
-                        commandDialog.createObject(mainWindow).open()
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (missionItem.isCurrentItem) {
+                                    _root.deselect()
+                                } else {
+                                    commandDialog.createObject(mainWindow).open()
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -184,8 +194,10 @@ Rectangle {
                 height:                 30
                 width:                  60
                 text:                   qsTr("Edit")
-                visible:                missionItem.commandName === "Mission Start" ||
-                                        missionItem.commandName === "Survey"
+
+                visible:                (missionItem.commandName === "Mission Start" ||
+                                         missionItem.commandName === "Survey") && MapGlobals.isReviewMode
+
                 onClicked:              editItemClicked(missionItem)
 
                 background: Rectangle {

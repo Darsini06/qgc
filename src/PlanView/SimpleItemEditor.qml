@@ -205,7 +205,7 @@ Rectangle {
                 id:                 initialClickLabel
                 text:               missionItem.launchTakeoffAtSameLocation ?
                                         qsTr("Click in map to set planned Takeoff location.") :
-                                        qsTr("Click in map to set planned Launch location.")
+                                        qsTr("Click in map to set planned Home location.")
                 Layout.fillWidth:   true
                 wrapMode:           Text.WordWrap
                 visible:            missionItem.isTakeoffItem && !missionItem.launchCoordinate.isValid

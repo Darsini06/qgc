@@ -185,6 +185,8 @@ Item {
         _planMasterController.loadFromSelectedFile()
         fileUploadbtn.visible=true
         MapGlobals.share_edit_visibility = true
+        MapGlobals.isReviewMode = true
+        MapGlobals.showMissionItems = false
     }
 
     function loaddata1() {
@@ -296,9 +298,11 @@ Item {
                     if (_planMasterController.currentPlanFile !== "") {
                         _planMasterController.saveToCurrent()
                         syncCloud()
+                        MapGlobals.share_edit_visibility = false
                     } else {
                         _planMasterController.saveToSelectedFile1()
-                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it, 
+                        MapGlobals.share_edit_visibility = false
+                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
                         // but for now let's just add it to the fileDialog accepted handler too.
                     }
                 }
@@ -1171,81 +1175,15 @@ Item {
 
                 anchors.top:        parent.top
 
-                //-------------------------------------------------------
-                // 1st: Mission button | 2nd: Fence button (each on own row)
-                Column {
-                    id:         layerTabBar
-                    width:      parent.width
-                    spacing:    8
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled
 
-                    property int currentIndex: 0
-                    property bool fenceVisible: _geoFenceController.supported
 
-                    // Row 1 — Mission
-                    Rectangle {
-                        width:   parent.width
-                        height:  45
-                        radius:  8
-                        color:   layerTabBar.currentIndex === 0 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                        border.width: 0
 
-                        Text {
-                            id: missionText
-                            text: qsTr("Pathway")
-                            color: "white"
-                            font.bold:          true
-                            font.pointSize:     14
-                            font.family:        "Outfit"
-                            anchors.centerIn:   parent
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 0
-                                _editingLayer = _layerMission
-                            }
-                        }
-                    }
-
-                    // Row 2 — Fence
-                    Rectangle {
-                        visible:  layerTabBar.fenceVisible
-                        width:    parent.width
-                        height:   45
-                        radius:   8
-                        color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
-                        border.width: 0
-
-                        Text {
-                            id: fenceText
-                            text: qsTr("Obstacles")
-                            color: "white"
-                            font.bold:          true
-                            font.pointSize:     14
-                            font.family:        "Outfit"
-                            anchors.centerIn:   parent
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                layerTabBar.currentIndex = 1
-                                _editingLayer = _layerGeoFence
-                            }
-                        }
-                    }
-                }
-
-                // 2nd & 3rd: Boundary Point + Save
+                // 1st: Boundary Point + Save
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active
+                    visible:            active && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
 
                     sourceComponent: Column {
                         spacing:            12
@@ -1274,6 +1212,52 @@ Item {
                             onClicked: {
                                 console.log("Boundary Point clicked in PlanView")
                                 mapPolygonvisuals.appendVertexToPolygon(activePolygon)
+                            }
+                        }
+                    }
+                }
+
+                // 2nd: Obstacles button
+                Column {
+                    id:         layerTabBar
+                    width:      parent.width
+                    spacing:    8
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+
+                    property int currentIndex: 0
+                    property bool fenceVisible: _geoFenceController.supported
+
+
+                    // Row 2 — Fence/Obstacles (only one definition!)
+                    Rectangle {
+                        visible:  layerTabBar.fenceVisible
+                        width:    parent.width
+                        height:   45
+                        radius:   8
+                        color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                        border.width: 0
+
+                        Text {
+                            id: fenceTabText
+                            text: qsTr("Obstacles")
+                            color: "white"
+                            font.bold:          true
+                            font.pointSize:     14
+                            font.family:        "Outfit"
+                            anchors.centerIn:   parent
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (_editingLayer === _layerGeoFence) {
+                                    _editingLayer = _layerMission
+                                    layerTabBar.currentIndex = 0
+                                } else {
+                                    _editingLayer = _layerGeoFence
+                                    layerTabBar.currentIndex = 1
+                                }
                             }
                         }
                     }
@@ -1375,8 +1359,20 @@ Item {
                         }
                     }
                 }
+
             }
 
+
+            GeoFenceEditor {
+                anchors.top:            rightControls.bottom
+                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
+                anchors.bottom:         parent.bottom
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                myGeoFenceController:   _geoFenceController
+                flightMap:              editorMap
+                visible:                _editingLayer == _layerGeoFence
+            }
             //-------------------------------------------------------
             // Mission Item Editor
             Item {
@@ -1388,7 +1384,7 @@ Item {
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
- 
+
                 QGCListView {
                     id:                 missionItemEditorListView
                     anchors.fill:       parent
@@ -1403,49 +1399,8 @@ Item {
 
                     footer: Item {
                         width:  missionItemEditorListView.width
-                        height: 60
+                        height: 20
                         visible: _editingLayer == _layerMission
-
-                        Button {
-                            anchors.centerIn:       parent
-                            width:                  parent.width
-                            height:                 45
-                            text:                   qsTr("Save Plan")
-
-                            background: Rectangle {
-                                radius: 8
-                                color: "black"
-                                border.color: "white"
-                                border.width: 1
-                            }
-
-                            contentItem: Text {
-                                text:               parent.text
-                                font.bold:          true
-                                color:              "white"
-                                font.pointSize:     14
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment:   Text.AlignVCenter
-                                font.family:        "Outfit"
-                            }
-
-                            onClicked: {
-                                if (activePolygon && activePolygon.traceMode) {
-                                    if (activePolygon.count < 3) {
-                                        console.log("Save: Not enough vertices (<3), restoring previous vertices")
-                                        mapPolygonvisuals.restorePreviousVertices()
-                                        return
-                                    }
-                                    activePolygon.traceMode = false
-                                }
-                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                    _planMasterController.saveToSelectedFile1()
-                                } else {
-                                    _planMasterController.saveToSelectedFile()
-                                }
-                                mainWindow.planmap()
-                            }
-                        }
                     }
 
                     // // Remove items with commandName "Takeoff" when the component is completed.
@@ -1465,8 +1420,8 @@ Item {
                     delegate: Item {
                         property bool _showItem : true
                         width: missionItemEditorListView.width
-                        height: innerEditor.height
-                        visible: true
+                        visible: MapGlobals.showMissionItems
+                        height: visible ? innerEditor.height : 0
 
                         MissionExpand {
                             id: innerEditor
@@ -1476,10 +1431,8 @@ Item {
                             width:          parent.width
                             readOnly:       false
                             onClicked: (sequenceNumber) => {
-
-                                           _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-
-                                       }
+                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                            }
                             onEditItemClicked: (popupItem) => {
                                 itemEditPopup.popupMissionItem = popupItem
                                 itemEditPopup.open()
@@ -1490,17 +1443,6 @@ Item {
                         }
                     }
                 }
-            }
-
-            GeoFenceEditor {
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                myGeoFenceController:   _geoFenceController
-                flightMap:              editorMap
-                visible:                _editingLayer == _layerGeoFence
             }
 
             // Rally Point Editor
@@ -1541,6 +1483,51 @@ Item {
                 resetRegisterFlightPlan: _resetRegisterFlightPlan
             }
 
+            // 3rd: Save Plan at the bottom
+            Button {
+                id:                     savePlanBtn
+                anchors.bottom:         parent.bottom
+                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.left:           parent.left
+                anchors.right:          parent.right
+                height:                 45
+                text:                   qsTr("Save Plan")
+                visible:                _editingLayer == _layerMission && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+
+                background: Rectangle {
+                    radius: 8
+                    color: "black"
+                    border.color: "white"
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text:               savePlanBtn.text
+                    font.bold:          true
+                    color:              "white"
+                    font.pointSize:     14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment:   Text.AlignVCenter
+                    font.family:        "Outfit"
+                }
+
+                onClicked: {
+                    if (activePolygon && activePolygon.traceMode) {
+                        if (activePolygon.count < 3) {
+                            console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                            mapPolygonvisuals.restorePreviousVertices()
+                            return
+                        }
+                        activePolygon.traceMode = false
+                    }
+                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                        _planMasterController.saveToSelectedFile1()
+                    } else {
+                        _planMasterController.saveToSelectedFile()
+                    }
+                    mainWindow.planmap()
+                }
+            }
         }
 
         QGCLabel {
@@ -2329,7 +2316,11 @@ Item {
         } else {
             console.log("No plan creator available")
         }
+        MapGlobals.share_edit_visibility = false
+        MapGlobals.isReviewMode = false
+        MapGlobals.showMissionItems = false
     }
+
 
     function _mapCenter() {
         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2), editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
@@ -2547,14 +2538,15 @@ Item {
 
         width:  Math.min(320, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, parent.height * 0.85)
-        anchors.centerIn: parent
+        x: 20
+        y: parent.height - height - 20
         modal: true
         dim: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: "#BF000000"
+            color: "#E6333333"
             radius: 12
             border.color: "white"
             border.width: 1
@@ -2600,12 +2592,12 @@ Item {
                     Loader {
                         id:     genericEditorLoader
                         width:  popupScrollView.width
-                        source: (itemEditPopup.popupMissionItem && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        source: (itemEditPopup.popupMissionItem &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey")
                                     ? itemEditPopup.popupMissionItem.editorQml : ""
-                        visible: itemEditPopup.popupMissionItem !== null && 
-                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" && 
+                        visible: itemEditPopup.popupMissionItem !== null &&
+                                 itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey"
 
                         property var    missionItem:        itemEditPopup.popupMissionItem
@@ -2646,6 +2638,173 @@ Item {
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+
+    // --- Survey Adjustment Overlay (Agri Mode) ---
+    // --- Survey Adjustment Overlay (Agri Mode) ---
+    Rectangle {
+        id: surveyAdjustmentOverlay
+        anchors.bottom:             parent.bottom
+        anchors.horizontalCenter:   parent.horizontalCenter
+        anchors.bottomMargin:       20
+        width:                      Math.min(1100, parent.width * 0.98)
+        height:                     70
+        radius:                     35
+        color:                      "#FFFFFF"
+        border.color:               "#E0E0E0"
+        border.width:               1
+        visible:                    MapGlobals.isReviewMode && _isSurveySelected && droneType === "Agri"
+        z:                          1000
+
+        property var currentSurveyItem: (_missionController && _missionController.currentPlanViewSeqNum !== -1) ? _missionController.visualItems.get(_missionController.currentPlanViewSeqNum) : null
+        readonly property bool _isSurveySelected: currentSurveyItem && currentSurveyItem.commandName === "Survey"
+
+        RowLayout {
+            anchors.fill:       parent
+            anchors.margins:    15
+            spacing:            30
+
+            // Indentation Control
+            RowLayout {
+                spacing: 12
+                Rectangle {
+                    width:          40
+                    height:         40
+                    radius:         20
+                    color:          "#F5F5F5"
+                    border.color:   "#DDD"
+                    border.width:   1
+                    QGCLabel {
+                        anchors.centerIn:   parent
+                        text:               "−"
+                        color:              "black"
+                        font.bold:          true
+                        font.pointSize:     18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation - 0.5
+                    }
+                }
+                Rectangle {
+                    width:          40
+                    height:         40
+                    radius:         20
+                    color:          "#F5F5F5"
+                    border.color:   "#DDD"
+                    border.width:   1
+                    QGCLabel {
+                        anchors.centerIn:   parent
+                        text:               "+"
+                        color:              "black"
+                        font.bold:          true
+                        font.pointSize:     18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation + 0.5
+                    }
+                }
+                QGCLabel {
+                    text:           qsTr("Indentation ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation.toFixed(1) : "0.0") + "m"
+                    color:          "black"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold:      true
+                }
+            }
+
+            // Obstacle Margin Control
+            RowLayout {
+                spacing: 12
+                Rectangle {
+                    width:          40
+                    height:         40
+                    radius:         20
+                    color:          "#F5F5F5"
+                    border.color:   "#DDD"
+                    border.width:   1
+                    QGCLabel {
+                        anchors.centerIn:   parent
+                        text:               "−"
+                        color:              "black"
+                        font.bold:          true
+                        font.pointSize:     18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation - 0.5
+                    }
+                }
+                Rectangle {
+                    width:          40
+                    height:         40
+                    radius:         20
+                    color:          "#F5F5F5"
+                    border.color:   "#DDD"
+                    border.width:   1
+                    QGCLabel {
+                        anchors.centerIn:   parent
+                        text:               "+"
+                        color:              "black"
+                        font.bold:          true
+                        font.pointSize:     18
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation + 0.5
+                    }
+                }
+                QGCLabel {
+                    text:           qsTr("Obstacle Margin ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation.toFixed(1) : "0.0") + "m"
+                    color:          "black"
+                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.bold:      true
+                }
+            }
+
+            // Choose All
+            QGCCheckBox {
+                text:           qsTr("Choose all")
+                font.pointSize: ScreenTools.smallFontPointSize
+            }
+
+            Item { Layout.fillWidth: true }
+
+            // Navigation
+            RowLayout {
+                spacing: 15
+                QGCButton {
+                    text: qsTr("Previous")
+                    onClicked: {
+                        var count = _missionController.visualItems.count
+                        var start = _missionController.currentPlanViewSeqNum
+                        for (var i = 1; i <= count; i++) {
+                            var idx = (start - i + count) % count
+                            var item = _missionController.visualItems.get(idx)
+                            if (item.commandName === "Survey") {
+                                _missionController.setCurrentPlanViewSeqNum(idx, true)
+                                return
+                            }
+                        }
+                    }
+                }
+                QGCButton {
+                    text: qsTr("Next")
+                    onClicked: {
+                        var count = _missionController.visualItems.count
+                        var start = _missionController.currentPlanViewSeqNum
+                        for (var i = 1; i <= count; i++) {
+                            var idx = (start + i) % count
+                            var item = _missionController.visualItems.get(idx)
+                            if (item.commandName === "Survey") {
+                                _missionController.setCurrentPlanViewSeqNum(idx, true)
+                                return
+                            }
+                        }
+                    }
                 }
             }
         }

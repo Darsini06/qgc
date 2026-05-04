@@ -143,7 +143,7 @@ Map {
             // if(QGroundControl.settingsManager.flyViewSettings.keepMapCenteredOnVehicle.rawValue || !_activeVehicleCoordinate.isValid)
             // Set current location and zoom
             center = gcsPosition
-            zoomLevel = 15
+            zoomLevel = 19
 
             console.log("GCS Position Updated:", gcsPosition)
         }

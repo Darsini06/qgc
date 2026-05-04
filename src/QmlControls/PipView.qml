@@ -34,10 +34,10 @@ Item {
     property alias  _windowContentItem: window.contentItem
     property alias  _pipContentItem:    pipContent
 
-    property bool _isExpanded: true
+    property bool _isExpanded: false
     property bool isExpanded: _isExpanded
 
-    property bool globalPipExpanded: true
+    property bool globalPipExpanded: false
 
     signal pipExpandedChanged(bool isExpanded)
 
@@ -103,7 +103,7 @@ Item {
             _pipOrWindowItem = null
         }
 
-        _setPipIsExpanded(QGroundControl.loadBoolGlobalSetting(_pipExpandedSettingsKey, true))
+        _setPipIsExpanded(QGroundControl.loadBoolGlobalSetting(_pipExpandedSettingsKey, false))
 
 
     }

@@ -12,6 +12,7 @@ import QtQuick.Layouts
 
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
+import QGroundControl.Palette
 
 RowLayout {
     property alias label:                   _label.text
@@ -22,11 +23,12 @@ RowLayout {
 
     id:         _root
     spacing:    ScreenTools.defaultFontPixelWidth * 2
+    QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     QGCLabel { 
         id:                 _label
         Layout.fillWidth:   true 
-        color: "white"
+        color:              qgcPal.text
     }
 
     QGCButton {

@@ -36,6 +36,7 @@ Item {
     // These should only be used by MainRootWindow
     property var planController:    _planController
     property var guidedController:  _guidedController
+    property var pipView:           _pipView
 
     // Properties of UTM adapter
     property bool utmspSendActTrigger: false
@@ -69,6 +70,12 @@ Item {
 
     Component.onCompleted: {
         console.log("PlanView received planType:", planType);
+    }
+
+    onVisibleChanged: {
+        if (!visible) {
+            _pipView._setPipIsExpanded(false)
+        }
     }
 
     function _calcCenterViewPort() {

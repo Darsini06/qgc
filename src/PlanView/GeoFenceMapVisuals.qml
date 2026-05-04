@@ -17,6 +17,7 @@ import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import QGroundControl.Controls
 import QGroundControl.FlightMap
+import MapGlobals
 
 /// GeoFence map visuals
 Item {
@@ -34,12 +35,12 @@ Item {
     property var    _paramCircleFenceComponent
     property var    _polygons:                  myGeoFenceController.polygons
     property var    _circles:                   myGeoFenceController.circles
-    property color  _borderColor:               "orange"
+    property color  _borderColor:               MapGlobals.obstacleColor
     property int    _borderWidthInclusion:      2
-    property int    _borderWidthExclusion:      0
-    property color  _interiorColorExclusion:    "orange"
+    property int    _borderWidthExclusion:      MapGlobals.obstacleLineWidth
+    property color  _interiorColorExclusion:    MapGlobals.obstacleColor
     property color  _interiorColorInclusion:    "transparent"
-    property real   _interiorOpacityExclusion:  0.2 * opacity
+    property real   _interiorOpacityExclusion:  MapGlobals.obstacleOpacity * opacity
     property real   _interiorOpacityInclusion:  1 * opacity
 
     function addPolygon(inclusionPolygon) {
