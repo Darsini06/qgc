@@ -2536,19 +2536,24 @@ Item {
         id: itemEditPopup
         property var popupMissionItem: null
 
+        // Reserve space: planToolBar height + 10px bottom gap
+        readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - 10) : 500
+        // title (~40) + spacing(12) + doneBtn(40) + spacing(12) + padding(20)
+        readonly property real _reservedHeight: 124
+
         width:  Math.min(320, parent.width * 0.9)
-        height: Math.min(popupInnerCol.implicitHeight + 40, parent.height * 0.85)
+        height: Math.min(popupInnerCol.implicitHeight + 40, _maxPopupHeight)
         x: 20
-        y: parent.height - height - 20
+        y: parent.height - height - 10
         modal: true
-        dim: true
+        dim: false
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: "#E6333333"
+            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
             radius: 12
-            border.color: "white"
+            border.color: Qt.rgba(1, 1, 1, 0.30)
             border.width: 1
         }
 
@@ -2570,8 +2575,8 @@ Item {
             ScrollView {
                 id:     popupScrollView
                 width:  parent.width
-                // Fixed viewport height - content scrolls within this window
-                height: itemEditPopup.parent ? Math.min(itemEditPopup.parent.height * 0.65, 450) : 350
+                // Height = total popup minus space for title, done button, spacings and padding
+                height: Math.max(100, itemEditPopup._maxPopupHeight - itemEditPopup._reservedHeight)
                 clip: true
                 ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                 ScrollBar.vertical.policy:   ScrollBar.AsNeeded

@@ -166,7 +166,7 @@ private slots:
   void _recalcCameraShots(void) final;
 
 private:
-  QPolygonF _offsetPolygon(const QPolygonF &polygon, double distance);
+  QPolygonF _offsetPolygon(const QPolygonF &polygon, double distance, bool inflate);
   enum CameraTriggerCode {
     CameraTriggerNone,
     CameraTriggerOn,

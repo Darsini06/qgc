@@ -72,19 +72,24 @@ Item {
                     color: _colorTextSecondary
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
-                QGCLabel {
-                    text: missionItem.coveredArea.toLocaleString(Qt.locale(), "f", 1)
-                    font.pointSize: ScreenTools.largeFontPointSize
-                    font.bold: true
-                    color: _colorTextPrimary
-                    horizontalAlignment: Text.AlignHCenter
-                }
-                QGCLabel {
-                    text: "m²"
-                    font.pointSize: ScreenTools.smallFontPointSize
-                    font.bold: true
-                    color: _colorTextSecondary
+                RowLayout {
                     anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 4
+                    QGCLabel {
+                        text: missionItem.coveredArea.toLocaleString(Qt.locale(), "f", 1)
+                        font.pointSize: ScreenTools.largeFontPointSize
+                        font.bold: true
+                        color: _colorTextPrimary
+                        Layout.alignment: Qt.AlignBottom
+                    }
+                    QGCLabel {
+                        text: "m²"
+                        font.pointSize: ScreenTools.smallFontPointSize
+                        font.bold: true
+                        color: _colorTextSecondary
+                        Layout.alignment: Qt.AlignBottom
+                        Layout.bottomMargin: 2
+                    }
                 }
             }
         }
