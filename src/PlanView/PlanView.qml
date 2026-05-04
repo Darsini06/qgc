@@ -2791,6 +2791,7 @@ Item {
                         }
                     }
                 }
+                
                 QGCButton {
                     text: qsTr("Next")
                     onClicked: {
