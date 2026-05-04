@@ -36,7 +36,7 @@ Item {
             WebView {
                 id: webView
                 anchors.fill: parent
-                url: "https://www.nithra.mobi/privacy.php" // Update URL if available
+                url: "https://aviatricks.in/terms-and-conditions?embed=true" // Update URL if available
                 onLoadingChanged: function(loadRequest) {
                     if (loadRequest.status === WebView.LoadStartedStatus) termsRoot.loading = true
                     else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) termsRoot.loading = false

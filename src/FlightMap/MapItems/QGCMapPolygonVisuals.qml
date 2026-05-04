@@ -349,6 +349,7 @@ Item {
         addCommonVisuals()
         _handleInteractiveChanged()
     }
+
     Component.onDestruction: {
         // Do not set property values during destruction as it can trigger signal loops
         // and access partially destroyed objects, leading to crashes.

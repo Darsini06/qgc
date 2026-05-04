@@ -24,6 +24,7 @@ Item {
 
     signal menuItemSelected(string screenName)
     signal backClicked()
+
     onMenuItemSelected: {
         if (screenName === "changePassword") {
             changePasswordDialog.open()

@@ -37,7 +37,7 @@ Item {
             WebView {
                 id: webView
                 anchors.fill: parent
-                url: "https://www.nithra.mobi/privacy.php"
+                url: "https://aviatricks.in/privacy-policy?embed=true"
                 onLoadingChanged: function(loadRequest) {
                     if (loadRequest.status === WebView.LoadStartedStatus) privacyRoot.loading = true
                     else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) privacyRoot.loading = false
