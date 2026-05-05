@@ -39,10 +39,10 @@ Rectangle {
 
     // --- Theme Colors (matching GeoFence / MissionStart) ---
     readonly property color _colorBgPrimary:     "transparent"
-    readonly property color _colorBgSecondary:   "#444444"
-    readonly property color _colorBgTertiary:    "#333333"
-    readonly property color _colorBorder:        "#555555"
-    readonly property color _colorAccent:        "#666666"
+    readonly property color _colorBgSecondary:   Qt.rgba(1, 1, 1, 0.08)
+    readonly property color _colorBgTertiary:    Qt.rgba(1, 1, 1, 0.14)
+    readonly property color _colorBorder:        Qt.rgba(1, 1, 1, 0.28)
+    readonly property color _colorAccent:        Qt.rgba(1, 1, 1, 0.25)
     readonly property color _colorAccentLight:   "#777777"
     readonly property color _colorTextPrimary:   "#ffffff"
     readonly property color _colorTextSecondary: "#ffffff"
@@ -95,8 +95,8 @@ Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
                 radius:       4
-                color:        minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                border.color: minusArea.containsMouse ? _colorAccent : _colorBorder
+                color:        minusArea.pressed ? Qt.rgba(1,1,1,0.25) : (minusArea.containsMouse ? Qt.rgba(1,1,1,0.15) : Qt.rgba(1,1,1,0.08))
+                border.color: minusArea.containsMouse ? _colorAccent : Qt.rgba(1,1,1,0.30)
                 border.width: 1
 
                 QGCLabel {
@@ -133,8 +133,8 @@ Rectangle {
                 horizontalAlignment: Qt.AlignHCenter
 
                 background: Rectangle {
-                    color:        factField.activeFocus ? _colorBgTertiary : _colorBgSecondary
-                    border.color: factField.activeFocus ? _colorAccent : _colorBorder
+                    color:        factField.activeFocus ? Qt.rgba(1,1,1,0.20) : Qt.rgba(1,1,1,0.08)
+                    border.color: factField.activeFocus ? _colorAccent : Qt.rgba(1,1,1,0.30)
                     border.width: factField.activeFocus ? 2 : 1
                     radius:       4
                 }
@@ -145,8 +145,8 @@ Rectangle {
                 Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                 Layout.preferredWidth:  Layout.preferredHeight
                 radius:       4
-                color:        plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _colorBgTertiary : _colorBgSecondary)
-                border.color: plusArea.containsMouse ? _colorAccent : _colorBorder
+                color:        plusArea.pressed ? Qt.rgba(1,1,1,0.25) : (plusArea.containsMouse ? Qt.rgba(1,1,1,0.15) : Qt.rgba(1,1,1,0.08))
+                border.color: plusArea.containsMouse ? _colorAccent : Qt.rgba(1,1,1,0.30)
                 border.width: 1
 
                 QGCLabel {
@@ -179,6 +179,11 @@ Rectangle {
         anchors.top:        parent.top
         anchors.left:       parent.left
         anchors.right:      parent.right
+        anchors.topMargin:  _margin + 15
+        anchors.leftMargin: _margin + 15
+        anchors.rightMargin: _margin - 15
+
+
 
         QGCLabel {
             id:                     transectAreaDefinitionCompleteLabel
@@ -249,7 +254,7 @@ Rectangle {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    height:           transectValuesLoader.implicitHeight + (_margin * 2)
+                    implicitHeight:   transectValuesLoader.implicitHeight + (_margin * 2)
                     color:            _colorBgSecondary
                     radius:           _radius
                     border.color:     _colorBorder
@@ -519,7 +524,7 @@ Rectangle {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    height:           presetsTransectLoader.implicitHeight + (_margin * 2)
+                    implicitHeight:   presetsTransectLoader.implicitHeight + (_margin * 2)
                     color:            _colorBgSecondary
                     radius:           _radius
                     border.color:     _colorBorder
