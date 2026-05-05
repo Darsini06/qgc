@@ -15,9 +15,9 @@ Item {
     implicitWidth:  parent.width
 
     readonly property color _colorTextPrimary:   "#ffffff"
-    readonly property color _colorTextSecondary: "#8e8e93"
+    readonly property color _colorTextSecondary: "#e0e0e0"
     readonly property color _colorAccent:        "#000000"
-    readonly property color _colorBgTertiary:    "#1a1a1a"
+    readonly property color _colorBgTertiary:    "transparent"
 
 
     property real currentArea: missionItem.surveyAreaPolygon.area
@@ -67,7 +67,7 @@ Item {
                 spacing: 2
                 QGCLabel {
                     text: _application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
-                    font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold: true
                     color: _colorTextSecondary
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -98,6 +98,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing:          ScreenTools.defaultFontPixelWidth
+            visible:          _application !== "Agri"
 
             // Photos Card
             Rectangle {
@@ -113,7 +114,7 @@ Item {
                     spacing: 2
                     QGCLabel {
                         text: qsTr("TOTAL PHOTOS")
-                        font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                        font.pointSize: ScreenTools.defaultFontPointSize
                         font.bold: true
                         color: _colorTextSecondary
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -142,7 +143,7 @@ Item {
                     spacing: 2
                     QGCLabel {
                         text: qsTr("INTERVAL")
-                        font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                        font.pointSize: ScreenTools.defaultFontPointSize
                         font.bold: true
                         color: _colorTextSecondary
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -171,7 +172,7 @@ Item {
                 spacing: 2
                 QGCLabel {
                     text: qsTr("ESTIMATED FLIGHT TIME")
-                    font.pixelSize: ScreenTools.smallFontPointSize * 0.8
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold: true
                     color: _colorTextSecondary
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -180,7 +181,7 @@ Item {
                     text: MapGlobals.time
                     font.pointSize: ScreenTools.mediumFontPointSize
                     font.bold: true
-                    color: "#2ECC71" // Emerald Green for success/time
+                    color: _colorTextPrimary
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }

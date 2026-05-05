@@ -179,9 +179,9 @@ Rectangle {
         anchors.top:        parent.top
         anchors.left:       parent.left
         anchors.right:      parent.right
-        anchors.topMargin:  _margin + 15
-        anchors.leftMargin: _margin + 15
-        anchors.rightMargin: _margin - 15
+        anchors.topMargin:  _margin
+        anchors.leftMargin: _margin
+        anchors.rightMargin: _margin
 
 
 
