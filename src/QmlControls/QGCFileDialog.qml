@@ -24,6 +24,7 @@ Item {
 
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
+    signal acceptedCloudPlan(var planData)
     signal rejected
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
 
@@ -165,10 +166,31 @@ Item {
             property var  displayList: []
 
 
-            function refreshFiles() {
-                fullFileList = controller.getFiles(folder, _rgExtensions)
-                //fullFileList.reverse()    // 🔥 LIFO
+            property var  cloudPlansList: []
 
+            function refreshFiles() {
+                var localFiles = controller.getFiles(folder, _rgExtensions)
+
+                if (_root.hasOwnProperty("planFiles") && _root.planFiles) {
+                    var userName = QGroundControl.loadGlobalSetting("username", "Guest")
+                    if (userName !== "Guest" && userName !== "") {
+                        MapGlobals.fetchCloudPlans(userName, function(plans) {
+                            cloudPlansList = plans || []
+                            var allNames = localFiles.slice()
+                            for (var i = 0; i < cloudPlansList.length; i++) {
+                                allNames.push(cloudPlansList[i].plan_name + " (Cloud)")
+                            }
+                            fullFileList = allNames
+                            
+                            if (showAllFiles)
+                                displayList = fullFileList
+                            else
+                                displayList = fullFileList.slice(0, 3)
+                        })
+                    }
+                }
+
+                fullFileList = localFiles
                 if (showAllFiles)
                     displayList = fullFileList
                 else
@@ -220,12 +242,29 @@ Item {
                                     radius:         0
 
                                     onClicked: {
-                                        var strippedFileName = modelData.split(".")[0]
-                                        _appSettings.username=strippedFileName;
-                                        console.log("strippedFileName",strippedFileName)
-
                                         mobileFileOpenDialog.close()
-                                        _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
+                                        var isCloud = modelData.endsWith(" (Cloud)")
+                                        var strippedFileName = modelData.split(".")[0]
+                                        
+                                        if (isCloud) {
+                                            strippedFileName = modelData.substring(0, modelData.length - 8)
+                                            _appSettings.username = strippedFileName
+                                            
+                                            var planData = null
+                                            for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
+                                                if (mobileFileOpenDialog.cloudPlansList[i].plan_name === strippedFileName) {
+                                                    planData = mobileFileOpenDialog.cloudPlansList[i].plan_data
+                                                    break
+                                                }
+                                            }
+                                            
+                                            if (planData) {
+                                                _root.acceptedCloudPlan(planData)
+                                            }
+                                        } else {
+                                            _appSettings.username = strippedFileName
+                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
+                                        }
                                     }
 
                                     onHamburgerClicked: {

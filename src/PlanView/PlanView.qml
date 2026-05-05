@@ -676,6 +676,17 @@ Item {
 
                                mainWindow.showPlanView()
                            }
+
+        onAcceptedCloudPlan: (planData) => {
+                               console.log("Clicked Cloud File at onAcceptedCloudPlan")
+                               MapGlobals.setGridLines(true)
+                               _planMasterController.loadFromJson(planData)
+                               _planMasterController.fitViewportToItems()
+                               _missionController.setCurrentPlanViewSeqNum(0, true)
+                               close()
+
+                               mainWindow.showPlanView()
+                           }
     }
 
     AirspaceRestrictionDialog {
