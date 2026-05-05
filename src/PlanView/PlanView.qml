@@ -1183,7 +1183,7 @@ Item {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+                    visible:            false // HIDDEN per user request: "not need boundary point and obstacles"
 
                     sourceComponent: Column {
                         spacing:            12
@@ -1222,7 +1222,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    8
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && !_utmspEnabled && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+                    visible:    false // HIDDEN per user request
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -2541,7 +2541,7 @@ Item {
         // title (~40) + spacing(12) + doneBtn(40) + spacing(12) + padding(20)
         readonly property real _reservedHeight: 124
 
-        width:  Math.min(260, parent.width * 0.9)
+        width:  Math.min(240, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, _maxPopupHeight)
         x: 0
         y: parent.height - height

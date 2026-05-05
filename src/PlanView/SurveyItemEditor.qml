@@ -154,9 +154,10 @@ TransectStyleComplexItemEditor {
                         QGCLabel {
                             text:           qsTr("Boundary Indentation")
                             color:          _colorTextSecondary
-                            font.pointSize: ScreenTools.mediumFontPointSize
+                            font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold:      true
                             Layout.fillWidth: true
+                            wrapMode:       Text.WordWrap
                         }
                         QGCCheckBox {
                             id: directionalCheck
@@ -186,31 +187,40 @@ TransectStyleComplexItemEditor {
                             Layout.fillWidth: true
                             spacing: ScreenTools.defaultFontPixelWidth
                             Rectangle {
-                                width: 20; height: 20; radius: 10
-                                color: "transparent"; border.color: "black"; border.width: 1.5
-                                Rectangle { anchors.centerIn: parent; width: 12; height: 12; radius: 6; color: _linkIndentation ? "black" : "transparent" }
+                                width: 30; height: 30; radius: 4
+                                color: "transparent"; border.color: "black"; border.width: 2
+                                Rectangle { anchors.centerIn: parent; width: 18; height: 18; radius: 2; color: _linkIndentation ? "black" : "transparent" }
                                 MouseArea { anchors.fill: parent; onClicked: _linkIndentation = !_linkIndentation }
                             }
-                            QGCLabel { text: qsTr("Choose all"); color: "black"; font.pointSize: ScreenTools.defaultFontPointSize }
+                            QGCLabel { text: qsTr("Choose all"); color: "black"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true }
                         }
 
-                        // Field graphic
+                        // Field graphic (Square image)
                         Rectangle {
                             Layout.alignment: Qt.AlignHCenter
-                            width: 160; height: 100; color: "#1a1a1a"; border.color: "#444444"; border.width: 1; radius: 4
-                            Row { anchors.centerIn: parent; spacing: 8; Repeater { model: 10; Rectangle { width: 1; height: 60; color: "#444444" } } }
+                            width: 120; height: 120; color: "#1a1a1a"; border.color: "#444444"; border.width: 1; radius: 8
+                            clip: true
+                            Row { anchors.centerIn: parent; spacing: 10; Repeater { model: 8; Rectangle { width: 1; height: 100; color: "#444444" } } }
                             Rectangle { anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; height: 3; color: (_linkIndentation || _indentSideIndex === 0) ? _colorSuccess : "transparent" }
                             Rectangle { anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 3; color: (_linkIndentation || _indentSideIndex === 1) ? _colorSuccess : "transparent" }
                             Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right; height: 3; color: (_linkIndentation || _indentSideIndex === 2) ? _colorSuccess : "transparent" }
                             Rectangle { anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 3; color: (_linkIndentation || _indentSideIndex === 3) ? _colorSuccess : "transparent" }
-                            Repeater { model: 4; Rectangle { width: 6; height: 6; radius: 3; color: "#3498db"; x: (index % 2 === 0) ? -3 : parent.width - 3; y: (index < 2) ? -3 : parent.height - 3 } }
+                        }
+
+                        // Previous / Next
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing:          ScreenTools.defaultFontPixelWidth
+                            visible:          !_linkIndentation
+                            QGCButton { Layout.fillWidth: true; text: qsTr("Previous"); onClicked: _indentSideIndex = (_indentSideIndex + 3) % 4 }
+                            QGCButton { Layout.fillWidth: true; text: qsTr("Next");     onClicked: _indentSideIndex = (_indentSideIndex + 1) % 4 }
                         }
 
                         // Altitude-style +/- for Boundary Indentation
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 4
-                            QGCLabel { text: qsTr("Boundary Indentation"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                            QGCLabel { text: qsTr("Boundary Indentation"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                             RowLayout {
                                 Layout.fillWidth: true
                                 spacing: ScreenTools.defaultFontPixelWidth / 1.5
@@ -222,7 +232,7 @@ TransectStyleComplexItemEditor {
                                     color:  _indBMinus.pressed ? "#000000" : (_indBMinus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
                                     border.color: _indBMinus.containsMouse ? "#000000" : "#3e3e4a"
                                     border.width: 1
-                                    QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                    QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
                                     MouseArea {
                                         id: _indBMinus; anchors.fill: parent; hoverEnabled: true
                                         onClicked: {
@@ -264,7 +274,7 @@ TransectStyleComplexItemEditor {
                                     color:  _indBPlus.pressed ? "#000000" : (_indBPlus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
                                     border.color: _indBPlus.containsMouse ? "#000000" : "#3e3e4a"
                                     border.width: 1
-                                    QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                    QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
                                     MouseArea {
                                         id: _indBPlus; anchors.fill: parent; hoverEnabled: true
                                         onClicked: {
@@ -283,55 +293,48 @@ TransectStyleComplexItemEditor {
                             }
                         }
 
-                        // Previous / Next
-                        RowLayout {
+                        // Obstacle Margin - altitude-style
+                        ColumnLayout {
                             Layout.fillWidth: true
-                            spacing:          ScreenTools.defaultFontPixelWidth
-                            visible:          !_linkIndentation
-                            QGCButton { Layout.fillWidth: true; text: qsTr("Previous"); onClicked: _indentSideIndex = (_indentSideIndex + 3) % 4 }
-                            QGCButton { Layout.fillWidth: true; text: qsTr("Next");     onClicked: _indentSideIndex = (_indentSideIndex + 1) % 4 }
+                            spacing: 4
+                            QGCLabel { text: qsTr("Obstacle Margin"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                                Rectangle {
+                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                    Layout.preferredWidth:  Layout.preferredHeight
+                                    radius: 4
+                                    color:  _obsMinus.pressed ? "#000000" : (_obsMinus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
+                                    border.color: _obsMinus.containsMouse ? "#000000" : "#3e3e4a"
+                                    border.width: 1
+                                    QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                    MouseArea { id: _obsMinus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 0.5) }
+                                }
+                                Rectangle {
+                                    Layout.fillWidth:       true
+                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                    radius: 4
+                                    color:  Qt.rgba(0,0,0,0.40)
+                                    border.color: "#3e3e4a"
+                                    border.width: 1
+                                    QGCLabel { anchors.centerIn: parent; text: missionItem.obstacleIndentation.toFixed(1); color: _colorTextPrimary; font.bold: true; horizontalAlignment: Text.AlignHCenter }
+                                }
+                                Rectangle {
+                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                    Layout.preferredWidth:  Layout.preferredHeight
+                                    radius: 4
+                                    color:  _obsPlus.pressed ? "#000000" : (_obsPlus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
+                                    border.color: _obsPlus.containsMouse ? "#000000" : "#3e3e4a"
+                                    border.width: 1
+                                    QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                    MouseArea { id: _obsPlus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.min(50.0, missionItem.obstacleIndentation + 0.5) }
+                                }
+                            }
                         }
                     }
 
-                    // Obstacle Margin - altitude-style
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 4
-                        QGCLabel { text: qsTr("Obstacle Margin"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: ScreenTools.defaultFontPixelWidth / 1.5
-                            Rectangle {
-                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                Layout.preferredWidth:  Layout.preferredHeight
-                                radius: 4
-                                color:  _obsMinus.pressed ? "#000000" : (_obsMinus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
-                                border.color: _obsMinus.containsMouse ? "#000000" : "#3e3e4a"
-                                border.width: 1
-                                QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                                MouseArea { id: _obsMinus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 0.5) }
-                            }
-                            Rectangle {
-                                Layout.fillWidth:       true
-                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                radius: 4
-                                color:  Qt.rgba(0,0,0,0.40)
-                                border.color: "#3e3e4a"
-                                border.width: 1
-                                QGCLabel { anchors.centerIn: parent; text: missionItem.obstacleIndentation.toFixed(1); color: _colorTextPrimary; font.bold: true; horizontalAlignment: Text.AlignHCenter }
-                            }
-                            Rectangle {
-                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                Layout.preferredWidth:  Layout.preferredHeight
-                                radius: 4
-                                color:  _obsPlus.pressed ? "#000000" : (_obsPlus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
-                                border.color: _obsPlus.containsMouse ? "#000000" : "#3e3e4a"
-                                border.width: 1
-                                QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: _colorTextPrimary }
-                                MouseArea { id: _obsPlus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.min(50.0, missionItem.obstacleIndentation + 0.5) }
-                            }
-                        }
-                    }
+
                 }
             }
 
@@ -347,7 +350,7 @@ TransectStyleComplexItemEditor {
                 QGCLabel {
                     text:           qsTr("Grid Appearance & Layout")
                     color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold:      true
                 }
 
@@ -375,7 +378,7 @@ TransectStyleComplexItemEditor {
                             // Line Width
                             ColumnLayout {
                                 spacing: 4
-                                QGCLabel { text: qsTr("Line Width"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                                QGCLabel { text: qsTr("Line Width"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                                 RowLayout {
                                     spacing: 4
                                     Rectangle {
@@ -395,7 +398,7 @@ TransectStyleComplexItemEditor {
                             // Manual Spacing (if needed)
                             ColumnLayout {
                                 spacing: 4
-                                QGCLabel { text: qsTr("Spacing"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                                QGCLabel { text: qsTr("Spacing"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                                 RowLayout {
                                     spacing: 4
                                     Rectangle {
@@ -416,7 +419,7 @@ TransectStyleComplexItemEditor {
                         // Color Selection
                         ColumnLayout {
                             spacing: 4
-                            QGCLabel { text: qsTr("Grid Color"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                            QGCLabel { text: qsTr("Grid Color"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                             RowLayout {
                                 spacing: 10
                                 Repeater {
@@ -444,7 +447,7 @@ TransectStyleComplexItemEditor {
                 QGCLabel {
                     text:           qsTr("Obstacle Appearance")
                     color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold:      true
                 }
 
@@ -467,7 +470,7 @@ TransectStyleComplexItemEditor {
                         // Border Width
                         ColumnLayout {
                             spacing: 4
-                            QGCLabel { text: qsTr("Border Width"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                            QGCLabel { text: qsTr("Border Width"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                             RowLayout {
                                 spacing: 4
                                 Rectangle {
@@ -487,7 +490,7 @@ TransectStyleComplexItemEditor {
                         // Opacity Control
                         ColumnLayout {
                             spacing: 4
-                            QGCLabel { text: qsTr("Interior Opacity"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                            QGCLabel { text: qsTr("Interior Opacity"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                             RowLayout {
                                 spacing: 4
                                 Rectangle {
@@ -507,7 +510,7 @@ TransectStyleComplexItemEditor {
                         // Color Selection
                         ColumnLayout {
                             spacing: 4
-                            QGCLabel { text: qsTr("Obstacle Color"); font.pointSize: ScreenTools.mediumFontPointSize; color: _colorTextSecondary }
+                            QGCLabel { text: qsTr("Obstacle Color"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
                             RowLayout {
                                 spacing: 10
                                 Repeater {

@@ -295,21 +295,32 @@ Rectangle {
 
                         QGCColoredImage {
                             source:  "/resources/InstrumentValueIcons/refresh.svg"
-                            height:  ScreenTools.defaultFontPixelHeight * 1.1
+                            height:  ScreenTools.defaultFontPixelHeight * 1.5
                             width:   height
-                            color:   _colorTextPrimary
+                            color:   "black"
                             mipmap:  true
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
                             visible: true
                         }
 
-                        Text {
-                            text: qsTr("Rotate Entry Point")
-                            color: _colorTextPrimary
-                            font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            verticalAlignment: Text.AlignVCenter
+                        Row {
+                            spacing: 4
+                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                text: qsTr("Rotate Entry Point")
+                                color: _colorTextPrimary
+                                font.bold: true
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            Text {
+                                text: "➤➤"
+                                color: "black"
+                                font.bold: true
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                verticalAlignment: Text.AlignVCenter
+                            }
                         }
                     }
 

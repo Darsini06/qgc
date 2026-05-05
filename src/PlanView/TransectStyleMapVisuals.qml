@@ -177,6 +177,7 @@ Item {
         id: entryArrow1Component
 
         MapLineArrow {
+            arrowColor:     "black"
             fromCoord:      _transectPoints[_firstTrueTransectIndex]
             toCoord:        _transectPoints[_firstTrueTransectIndex + 1]
             arrowPosition:  1
@@ -189,6 +190,7 @@ Item {
         id: entryArrow2Component
 
         MapLineArrow {
+            arrowColor:     "black"
             fromCoord:      _transectPoints[nextTrueTransectIndex]
             toCoord:        _transectPoints[nextTrueTransectIndex + 1]
             arrowPosition:  1
@@ -203,6 +205,7 @@ Item {
         id: exitArrow1Component
 
         MapLineArrow {
+            arrowColor:     "black"
             fromCoord:      _transectPoints[_lastTrueTransectIndex - 1]
             toCoord:        _transectPoints[_lastTrueTransectIndex]
             arrowPosition:  3
@@ -215,6 +218,7 @@ Item {
         id: exitArrow2Component
 
         MapLineArrow {
+            arrowColor:     "black"
             fromCoord:      _transectPoints[prevTrueTransectIndex - 1]
             toCoord:        _transectPoints[prevTrueTransectIndex]
             arrowPosition:  13
