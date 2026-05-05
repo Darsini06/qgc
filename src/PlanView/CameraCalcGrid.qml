@@ -35,7 +35,7 @@ Column {
     readonly property color _colorBorder:        "#3e3e4a"
     readonly property color _colorAccent:        "#000000"
     readonly property color _colorTextPrimary:   "#ffffff"
-    readonly property color _colorTextSecondary: "#8e8e93"
+    readonly property color _colorTextSecondary: "#ffffff"
 
     QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
@@ -272,7 +272,7 @@ Column {
             QGCLabel {
                 text:  distanceToSurfaceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.smallFontPointSize
+                font.pointSize: ScreenTools.mediumFontPointSize
             }
 
             Loader {
@@ -300,7 +300,7 @@ Column {
             QGCLabel {
                 text:  frontalDistanceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.smallFontPointSize
+                font.pointSize: ScreenTools.mediumFontPointSize
             }
 
             Loader {
@@ -328,7 +328,7 @@ Column {
             QGCLabel {
                 text:  sideDistanceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.smallFontPointSize
+                font.pointSize: ScreenTools.mediumFontPointSize
             }
 
             Loader {

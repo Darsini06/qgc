@@ -2541,10 +2541,10 @@ Item {
         // title (~40) + spacing(12) + doneBtn(40) + spacing(12) + padding(20)
         readonly property real _reservedHeight: 124
 
-        width:  Math.min(320, parent.width * 0.9)
+        width:  Math.min(260, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, _maxPopupHeight)
-        x: 20
-        y: parent.height - height - 10
+        x: 0
+        y: parent.height - height
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
