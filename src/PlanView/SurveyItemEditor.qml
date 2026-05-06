@@ -292,44 +292,44 @@ TransectStyleComplexItemEditor {
                                 }
                             }
                         }
+                    } // end enableDirectionalIndentation block
 
-                        // Obstacle Margin - altitude-style
-                        ColumnLayout {
+                    // ── Obstacle Margin (always visible, no Enable gate) ──────────
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
+                        QGCLabel { text: qsTr("Obstacle Margin"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
+                        RowLayout {
                             Layout.fillWidth: true
-                            spacing: 4
-                            QGCLabel { text: qsTr("Obstacle Margin"); font.pointSize: ScreenTools.defaultFontPointSize; color: _colorTextSecondary }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: ScreenTools.defaultFontPixelWidth / 1.5
-                                Rectangle {
-                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                    Layout.preferredWidth:  Layout.preferredHeight
-                                    radius: 4
-                                    color:  _obsMinus.pressed ? "#000000" : (_obsMinus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
-                                    border.color: _obsMinus.containsMouse ? "#000000" : "#3e3e4a"
-                                    border.width: 1
-                                    QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
-                                    MouseArea { id: _obsMinus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 0.5) }
-                                }
-                                Rectangle {
-                                    Layout.fillWidth:       true
-                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                    radius: 4
-                                    color:  Qt.rgba(0,0,0,0.40)
-                                    border.color: "#3e3e4a"
-                                    border.width: 1
-                                    QGCLabel { anchors.centerIn: parent; text: missionItem.obstacleIndentation.toFixed(1); color: _colorTextPrimary; font.bold: true; horizontalAlignment: Text.AlignHCenter }
-                                }
-                                Rectangle {
-                                    Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
-                                    Layout.preferredWidth:  Layout.preferredHeight
-                                    radius: 4
-                                    color:  _obsPlus.pressed ? "#000000" : (_obsPlus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
-                                    border.color: _obsPlus.containsMouse ? "#000000" : "#3e3e4a"
-                                    border.width: 1
-                                    QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
-                                    MouseArea { id: _obsPlus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.min(50.0, missionItem.obstacleIndentation + 0.5) }
-                                }
+                            spacing: ScreenTools.defaultFontPixelWidth / 1.5
+                            Rectangle {
+                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                Layout.preferredWidth:  Layout.preferredHeight
+                                radius: 4
+                                color:  _obsMinus.pressed ? "#000000" : (_obsMinus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
+                                border.color: _obsMinus.containsMouse ? "#000000" : "#3e3e4a"
+                                border.width: 1
+                                QGCLabel { anchors.centerIn: parent; text: "\u2212"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                MouseArea { id: _obsMinus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.max(0, missionItem.obstacleIndentation - 0.5) }
+                            }
+                            Rectangle {
+                                Layout.fillWidth:       true
+                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                radius: 4
+                                color:  Qt.rgba(0,0,0,0.40)
+                                border.color: "#3e3e4a"
+                                border.width: 1
+                                QGCLabel { anchors.centerIn: parent; text: missionItem.obstacleIndentation.toFixed(1); color: _colorTextPrimary; font.bold: true; horizontalAlignment: Text.AlignHCenter }
+                            }
+                            Rectangle {
+                                Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                                Layout.preferredWidth:  Layout.preferredHeight
+                                radius: 4
+                                color:  _obsPlus.pressed ? "#000000" : (_obsPlus.containsMouse ? Qt.rgba(0,0,0,0.40) : Qt.rgba(0,0,0,0.40))
+                                border.color: _obsPlus.containsMouse ? "#000000" : "#3e3e4a"
+                                border.width: 1
+                                QGCLabel { anchors.centerIn: parent; text: "+"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: _colorTextPrimary }
+                                MouseArea { id: _obsPlus; anchors.fill: parent; hoverEnabled: true; onClicked: missionItem.obstacleIndentation = Math.min(50.0, missionItem.obstacleIndentation + 0.5) }
                             }
                         }
                     }

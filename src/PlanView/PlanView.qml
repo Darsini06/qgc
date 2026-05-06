@@ -1186,15 +1186,12 @@ Item {
 
                 anchors.top:        parent.top
 
-
-
-
-                // 1st: Boundary Point + Save
+                // 1st: Boundary Point
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            false // HIDDEN per user request: "not need boundary point and obstacles"
+                    visible:            active && !MapGlobals.isReviewMode
 
                     sourceComponent: Column {
                         spacing:            12
@@ -1233,7 +1230,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    8
-                    visible:    false // HIDDEN per user request
+                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1282,7 +1279,7 @@ Item {
                     radius:     8
                     border.color: "#e2e8f0"
                     border.width: 1
-                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled
+                    visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled && !MapGlobals.isReviewMode
 
                     property int currentIndex: 0
                     property bool rallyVisible: _rallyPointController.supported
@@ -1390,8 +1387,8 @@ Item {
                 id:                     missionItemEditor
                 anchors.left:           parent.left
                 anchors.right:          parent.right
-                anchors.top:            rightControls.bottom
-                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.top:            MapGlobals.isReviewMode ? parent.top : rightControls.bottom
+                anchors.topMargin:      MapGlobals.isReviewMode ? 0 : ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
@@ -2659,171 +2656,174 @@ Item {
         }
     }
 
-    // --- Survey Adjustment Overlay (Agri Mode) ---
-    // --- Survey Adjustment Overlay (Agri Mode) ---
-    Rectangle {
-        id: surveyAdjustmentOverlay
-        anchors.bottom:             parent.bottom
-        anchors.horizontalCenter:   parent.horizontalCenter
-        anchors.bottomMargin:       20
-        width:                      Math.min(1100, parent.width * 0.98)
-        height:                     70
-        radius:                     35
-        color:                      "#FFFFFF"
-        border.color:               "#E0E0E0"
-        border.width:               1
-        visible:                    MapGlobals.isReviewMode && _isSurveySelected && droneType === "Agri"
-        z:                          1000
+//     // --- Survey Adjustment Overlay (Agri Mode) ---
+//     // --- Survey Adjustment Overlay (Agri Mode) ---
+//     Rectangle {
+//         id: surveyAdjustmentOverlay
+//         anchors.bottom:             parent.bottom
+//         anchors.horizontalCenter:   parent.horizontalCenter
+//         anchors.bottomMargin:       20
+//         width:                      Math.min(1100, parent.width * 0.98)
+//         height:                     70
+//         radius:                     35
+//         color:                      "#FFFFFF"
+//         border.color:               "#E0E0E0"
+//         border.width:               1
+//         visible:                    true//MapGlobals.isReviewMode && _isSurveySelected && droneType === "Agri"
+//         z:                          1000
 
-        property var currentSurveyItem: (_missionController && _missionController.currentPlanViewSeqNum !== -1) ? _missionController.visualItems.get(_missionController.currentPlanViewSeqNum) : null
-        readonly property bool _isSurveySelected: currentSurveyItem && currentSurveyItem.commandName === "Survey"
+//         property var currentSurveyItem: (_missionController && _missionController.currentPlanViewSeqNum !== -1) ? _missionController.visualItems.get(_missionController.currentPlanViewSeqNum) : null
+//         readonly property bool _isSurveySelected: currentSurveyItem && currentSurveyItem.commandName === "Survey"
 
-        RowLayout {
-            anchors.fill:       parent
-            anchors.margins:    15
-            spacing:            30
+//         RowLayout {
+//             anchors.fill:       parent
+//             anchors.margins:    15
+//             spacing:            30
 
-            // Indentation Control
-            RowLayout {
-                spacing: 12
-                Rectangle {
-                    width:          40
-                    height:         40
-                    radius:         20
-                    color:          "#F5F5F5"
-                    border.color:   "#DDD"
-                    border.width:   1
-                    QGCLabel {
-                        anchors.centerIn:   parent
-                        text:               "−"
-                        color:              "black"
-                        font.bold:          true
-                        font.pointSize:     18
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation - 0.5
-                    }
-                }
-                Rectangle {
-                    width:          40
-                    height:         40
-                    radius:         20
-                    color:          "#F5F5F5"
-                    border.color:   "#DDD"
-                    border.width:   1
-                    QGCLabel {
-                        anchors.centerIn:   parent
-                        text:               "+"
-                        color:              "black"
-                        font.bold:          true
-                        font.pointSize:     18
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation + 0.5
-                    }
-                }
-                QGCLabel {
-                    text:           qsTr("Indentation ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation.toFixed(1) : "0.0") + "m"
-                    color:          "black"
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.bold:      true
-                }
-            }
+//             // Indentation Control
+//             RowLayout {
+//                 spacing: 12
+//                 Rectangle {
+//                     width:          40
+//                     height:         40
+//                     radius:         20
+//                     color:          "#F5F5F5"
+//                     border.color:   "#DDD"
+//                     border.width:   1
+//                     QGCLabel {
+//                         anchors.centerIn:   parent
+//                         text:               "−"
+//                         color:              "black"
+//                         font.bold:          true
+//                         font.pointSize:     18
+//                     }
+//                     MouseArea {
+//                         anchors.fill: parent
+//                         onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation - 0.5
+//                     }
+//                 }
+//                 Rectangle {
+//                     width:          40
+//                     height:         40
+//                     radius:         20
+//                     color:          "#F5F5F5"
+//                     border.color:   "#DDD"
+//                     border.width:   1
+//                     QGCLabel {
+//                         anchors.centerIn:   parent
+//                         text:               "+"
+//                         color:              "black"
+//                         font.bold:          true
+//                         font.pointSize:     18
+//                     }
+//                     MouseArea {
+//                         anchors.fill: parent
+//                         onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation = surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation + 0.5
+//                     }
+//                 }
+//                 QGCLabel {
+//                     text:           qsTr("Indentation ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.boundaryIndentation.toFixed(1) : "0.0") + "m"
+//                     color:          "black"
+//                     font.pointSize: ScreenTools.mediumFontPointSize
+//                     font.bold:      true
+//                 }
+//             }
 
-            // Obstacle Margin Control
-            RowLayout {
-                spacing: 12
-                Rectangle {
-                    width:          40
-                    height:         40
-                    radius:         20
-                    color:          "#F5F5F5"
-                    border.color:   "#DDD"
-                    border.width:   1
-                    QGCLabel {
-                        anchors.centerIn:   parent
-                        text:               "−"
-                        color:              "black"
-                        font.bold:          true
-                        font.pointSize:     18
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation - 0.5
-                    }
-                }
-                Rectangle {
-                    width:          40
-                    height:         40
-                    radius:         20
-                    color:          "#F5F5F5"
-                    border.color:   "#DDD"
-                    border.width:   1
-                    QGCLabel {
-                        anchors.centerIn:   parent
-                        text:               "+"
-                        color:              "black"
-                        font.bold:          true
-                        font.pointSize:     18
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation + 0.5
-                    }
-                }
-                QGCLabel {
-                    text:           qsTr("Obstacle Margin ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation.toFixed(1) : "0.0") + "m"
-                    color:          "black"
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.bold:      true
-                }
-            }
+//             // Obstacle Margin Control
+//             RowLayout {
+//                 spacing: 12
+//                 Rectangle {
+//                     width:          40
+//                     height:         40
+//                     radius:         20
+//                     color:          "#F5F5F5"
+//                     border.color:   "#DDD"
+//                     border.width:   1
+//                     QGCLabel {
+//                         anchors.centerIn:   parent
+//                         text:               "−"
+//                         color:              "black"
+//                         font.bold:          true
+//                         font.pointSize:     18
+//                     }
+//                     MouseArea {
+//                         anchors.fill: parent
+//                         onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation - 0.5
+//                     }
+//                 }
+//                 Rectangle {
+//                     width:          40
+//                     height:         40
+//                     radius:         20
+//                     color:          "#F5F5F5"
+//                     border.color:   "#DDD"
+//                     border.width:   1
+//                     QGCLabel {
+//                         anchors.centerIn:   parent
+//                         text:               "+"
+//                         color:              "black"
+//                         font.bold:          true
+//                         font.pointSize:     18
+//                     }
+//                     MouseArea {
+//                         anchors.fill: parent
+//                         onClicked: if (surveyAdjustmentOverlay.currentSurveyItem) surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation = surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation + 0.5
+//                     }
+//                 }
+//                 QGCLabel {
+//                     text:           qsTr("Obstacle Margin ") + (surveyAdjustmentOverlay.currentSurveyItem ? surveyAdjustmentOverlay.currentSurveyItem.obstacleIndentation.toFixed(1) : "0.0") + "m"
+//                     color:          "black"
+//                     font.pointSize: ScreenTools.mediumFontPointSize
+//                     font.bold:      true
+//                 }
+//             }
 
-            // Choose All
-            QGCCheckBox {
-                text:           qsTr("Choose all")
-                font.pointSize: ScreenTools.smallFontPointSize
-            }
+//             // Choose All
+//             QGCCheckBox {
+//                 text:           qsTr("Choose all")
+//                 font.pointSize: ScreenTools.smallFontPointSize
+//             }
 
-            Item { Layout.fillWidth: true }
+//             Item { Layout.fillWidth: true }
 
-            // Navigation
-            RowLayout {
-                spacing: 15
-                QGCButton {
-                    text: qsTr("Previous")
-                    onClicked: {
-                        var count = _missionController.visualItems.count
-                        var start = _missionController.currentPlanViewSeqNum
-                        for (var i = 1; i <= count; i++) {
-                            var idx = (start - i + count) % count
-                            var item = _missionController.visualItems.get(idx)
-                            if (item.commandName === "Survey") {
-                                _missionController.setCurrentPlanViewSeqNum(idx, true)
-                                return
-                            }
-                        }
-                    }
-                }
-                QGCButton {
-                    text: qsTr("Next")
-                    onClicked: {
-                        var count = _missionController.visualItems.count
-                        var start = _missionController.currentPlanViewSeqNum
-                        for (var i = 1; i <= count; i++) {
-                            var idx = (start + i) % count
-                            var item = _missionController.visualItems.get(idx)
-                            if (item.commandName === "Survey") {
-                                _missionController.setCurrentPlanViewSeqNum(idx, true)
-                                return
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//             // Navigation
+//             RowLayout {
+//                 spacing: 15
+//                 QGCButton {
+//                     text: qsTr("Previous")
+//                     onClicked: {
+//                         var count = _missionController.visualItems.count
+//                         var start = _missionController.currentPlanViewSeqNum
+//                         for (var i = 1; i <= count; i++) {
+//                             var idx = (start - i + count) % count
+//                             var item = _missionController.visualItems.get(idx)
+//                             if (item.commandName === "Survey") {
+//                                 _missionController.setCurrentPlanViewSeqNum(idx, true)
+//                                 return
+//                             }
+//                         }
+//                     }
+//                 }
+//                 QGCButton {
+//                     text: qsTr("Next")
+//                     onClicked: {
+//                         var count = _missionController.visualItems.count
+//                         var start = _missionController.currentPlanViewSeqNum
+//                         for (var i = 1; i <= count; i++) {
+//                             var idx = (start + i) % count
+//                             var item = _missionController.visualItems.get(idx)
+//                             if (item.commandName === "Survey") {
+//                                 _missionController.setCurrentPlanViewSeqNum(idx, true)
+//                                 return
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+// }
+
+} // root Item
 

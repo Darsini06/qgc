@@ -57,6 +57,10 @@ Rectangle {
         MapGlobals.acres = missionItem.coveredArea.toFixed(2) + " m²"
     }
 
+    Component.onDestruction: {
+        MapGlobals.showEntryArrows = false
+    }
+
     Binding {
         target:     missionItem
         property:   "mapPolygon"
@@ -275,6 +279,7 @@ Rectangle {
 
                 // Rotate Entry Point Button
                 Button {
+                    id:               rotateEntryPointBtn
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
                     height:           36
@@ -304,27 +309,24 @@ Rectangle {
                             visible: true
                         }
 
-                        Row {
-                            spacing: 4
-                            anchors.verticalCenter: parent.verticalCenter
-                            Text {
-                                text: qsTr("Rotate Entry Point")
-                                color: _colorTextPrimary
-                                font.bold: true
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            Text {
-                                text: "➤➤"
-                                color: "black"
-                                font.bold: true
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                verticalAlignment: Text.AlignVCenter
-                            }
+                        Text {
+                            text: qsTr("Rotate Entry Point")
+                            color: _colorTextPrimary
+                            font.bold: true
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            verticalAlignment: Text.AlignVCenter
                         }
                     }
 
-                    onClicked: _missionItem.rotateEntryPoint()
+                    onClicked: {
+                        _missionItem.rotateEntryPoint()
+                    }
+
+                    Binding {
+                        target:   MapGlobals
+                        property: "showEntryArrows"
+                        value:    rotateEntryPointBtn.pressed
+                    }
                 }
 
                 // Statistics Section Header (Static)

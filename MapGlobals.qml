@@ -38,6 +38,7 @@ QtObject {
     property bool share_edit_visibility : false
     property bool isReviewMode: false
     property bool showMissionItems: false
+    property bool showEntryArrows: false   // true only while Rotate Entry Point is active
 
     signal newSessionAdded()
 

@@ -181,7 +181,7 @@ Item {
             fromCoord:      _transectPoints[_firstTrueTransectIndex]
             toCoord:        _transectPoints[_firstTrueTransectIndex + 1]
             arrowPosition:  1
-            visible:        gridLines
+            visible:        gridLines && MapGlobals.showEntryArrows
             opacity:        _root.opacity
         }
     }
@@ -194,7 +194,7 @@ Item {
             fromCoord:      _transectPoints[nextTrueTransectIndex]
             toCoord:        _transectPoints[nextTrueTransectIndex + 1]
             arrowPosition:  1
-            visible:         gridLines && _transectCount > 3
+            visible:         gridLines && _transectCount > 3 && MapGlobals.showEntryArrows
             opacity:        _root.opacity
 
             property int nextTrueTransectIndex: _firstTrueTransectIndex + (_hasTurnaround ? 4 : 2)
@@ -209,7 +209,7 @@ Item {
             fromCoord:      _transectPoints[_lastTrueTransectIndex - 1]
             toCoord:        _transectPoints[_lastTrueTransectIndex]
             arrowPosition:  3
-            visible:        gridLines
+            visible:        gridLines && MapGlobals.showEntryArrows
             opacity:        _root.opacity
         }
     }
@@ -221,8 +221,8 @@ Item {
             arrowColor:     "black"
             fromCoord:      _transectPoints[prevTrueTransectIndex - 1]
             toCoord:        _transectPoints[prevTrueTransectIndex]
-            arrowPosition:  13
-            visible:        gridLines && _transectCount > 3
+            arrowPosition:  3
+            visible:        gridLines && _transectCount > 3 && MapGlobals.showEntryArrows
             opacity:        _root.opacity
 
             property int prevTrueTransectIndex: _lastTrueTransectIndex - (_hasTurnaround ? 4 : 2)
