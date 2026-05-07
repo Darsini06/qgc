@@ -56,6 +56,7 @@ Item {
     property int missionsCompleted: 0
     property string totalDurationFormatted: "0h 0m"
     property color app_color: "#4a2c6d"
+    property bool isCloudView: true
 
     property bool privacyLoading: true
 
@@ -110,7 +111,7 @@ Item {
     onVisibleChanged: {
         if (visible) {
             console.log("onVisibleChanged");
-            loadSessions();
+            triggerLoad();
 
             displayName = QGroundControl.loadGlobalSetting("name", "")
             userName    = QGroundControl.loadGlobalSetting("username", "")
@@ -132,10 +133,15 @@ Item {
 
         if (currentView === "reports") {
             console.log("Switched to Reports view")
-            loadSessions()
+            triggerLoad()
         } else if (currentView === "privacy_policy") {
             privacyLoader.active = true
         }
+    }
+
+    function triggerLoad() {
+        loadSessions()
+        fetchCloudFiles()
     }
 
     function loadSessions() {
@@ -717,51 +723,17 @@ Item {
                         anchors.fill: parent
                         spacing: 10
 
-                        // View Toggle
-                        RowLayout {
+                        // Header Label
+                        QGCLabel {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 40
-                            spacing: 10
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 36
-                                radius: 18
-                                color: !isCloudView ? app_color : "#f0f0f0"
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Local Files"
-                                    color: !isCloudView ? "white" : "#666666"
-                                    font.bold: !isCloudView
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: isCloudView = false
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 36
-                                radius: 18
-                                color: isCloudView ? app_color : "#f0f0f0"
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Cloud Plans"
-                                    color: isCloudView ? "white" : "#666666"
-                                    font.bold: isCloudView
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        isCloudView = true
-                                        fetchCloudFiles()
-                                    }
-                                }
-                            }
+                            text: qsTr("Plan Files")
+                            font.pointSize: 16
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "black"
                         }
 
-                        // Scrollable list content
+                        // Plan Files List
                         ScrollView {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -770,112 +742,47 @@ Item {
 
                             Column {
                                 width: parent.width
-                                spacing: 8
-                                padding: 4
+                                spacing: 12
+                                padding: 10
 
-                                // Local View
-                                Column {
-                                    width: parent.width
-                                    visible: !isCloudView
-                                    spacing: 8
-
-                                    QGCLabel {
-                                        text: qsTr("Path: %1").arg(_mobileShortPath)
-                                        font.pointSize: 10
-                                        color: "#888888"
-                                    }
-
-                                    Repeater {
-                                        model: fileList
-                                        FileButton {
-                                            width: parent ? parent.width : 0
-                                            text: modelData
-                                            onClicked: {
-                                                mainWindow.openHomeScreen()
-                                                mainWindow.showFlyView()
-                                                mainWindow.showPlanView()
-                                                _appSettings.username = modelData.split(".")[0]
-                                                MapGlobals.comefrom = "Plan"
-                                                _appSettings.screen = "Plan"
-                                                swapCamera()
-                                                mainWindow.fileload(folder + "/" + modelData)
-                                            }
-                                            onHamburgerClicked: {
-                                                highlight = true
-                                                fileHamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                                                fileHamburgerMenu.popup()
-                                            }
-                                            QGCMenu {
-                                                id: fileHamburgerMenu
-                                                property string fileToDelete
-                                                onAboutToHide: parent.highlight = false
-                                                QGCMenuItem {
-                                                    text: qsTr("Sync to Cloud")
-                                                    onTriggered: {
-                                                        mainWindow.showToastMessage("Open and Save the plan to sync with cloud")
-                                                    }
-                                                }
-                                                QGCMenuItem {
-                                                    text: qsTr("Delete")
-                                                    onTriggered: {
-                                                        MapGlobals.deleteMissionLog(fileHamburgerMenu.fileToDelete)
-                                                        controller.deleteFile(fileHamburgerMenu.fileToDelete)
-                                                        refreshFiles()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    QGCLabel {
-                                        text: qsTr("No local files found")
-                                        visible: fileList.length === 0
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
+                                QGCLabel {
+                                    text: qsTr("Synced plans associated with %1").arg(userEmail)
+                                    font.pointSize: 10
+                                    color: "#888888"
+                                    visible: cloudPlansModel.count > 0
+                                    anchors.horizontalCenter: parent.horizontalCenter
                                 }
 
-                                // Cloud View
-                                Column {
-                                    width: parent.width
-                                    visible: isCloudView
-                                    spacing: 8
+                                BusyIndicator {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    visible: cloudPlansLoading
+                                }
 
-                                    QGCLabel {
-                                        text: qsTr("Cloud-synced plans associated with %1").arg(userEmail)
-                                        font.pointSize: 10
-                                        color: "#888888"
-                                    }
-
-                                    BusyIndicator {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        visible: cloudPlansLoading
-                                    }
-
-                                    Repeater {
-                                        model: cloudPlansModel
-                                        FileButton {
-                                            width: parent ? parent.width : 0
-                                            text: model.plan_name + " (Cloud)"
-                                            onClicked: {
-                                                mainWindow.showMessageDialog(qsTr("Download Plan"),
-                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
-                                                    Dialog.Yes | Dialog.Cancel,
-                                                    function() {
-                                                        mainWindow.openHomeScreen()
-                                                        mainWindow.showFlyView()
-                                                        mainWindow.showPlanView()
-                                                        // Load the plan data directly into the controller
-                                                        _planMasterController.loadFromJson(model.plan_data)
-                                                        mainWindow.showToastMessage("Cloud plan loaded")
-                                                    }
-                                                )
-                                            }
+                                Repeater {
+                                    model: cloudPlansModel
+                                    FileButton {
+                                        width: parent ? parent.width : 0
+                                        text: model.plan_name
+                                        onClicked: {
+                                            mainWindow.showMessageDialog(qsTr("Download Plan"),
+                                                qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                Dialog.Yes | Dialog.Cancel,
+                                                function() {
+                                                    mainWindow.openHomeScreen()
+                                                    mainWindow.showFlyView()
+                                                    mainWindow.showPlanView()
+                                                    // Load the plan data directly into the controller
+                                                    _planMasterController.loadFromJson(model.plan_data)
+                                                    mainWindow.showToastMessage("Cloud plan loaded")
+                                                }
+                                            )
                                         }
                                     }
-                                    QGCLabel {
-                                        text: qsTr("No cloud plans found")
-                                        visible: !cloudPlansLoading && cloudPlansModel.count === 0
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
+                                }
+                                QGCLabel {
+                                    text: qsTr("No plan files found")
+                                    visible: !cloudPlansLoading && cloudPlansModel.count === 0
+                                    anchors.horizontalCenter: parent.horizontalCenter
                                 }
                             }
                         }

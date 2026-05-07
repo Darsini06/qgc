@@ -159,7 +159,7 @@ Item {
             title:      _root.title
             buttons:    Dialog.Cancel
 
-            property bool showAllFiles: false
+            property bool showAllFiles: true
 
 
             property var  fullFileList: []
@@ -170,34 +170,60 @@ Item {
 
             function refreshFiles() {
                 var localFiles = controller.getFiles(folder, _rgExtensions)
+                var combinedList = []
+                
+                for (var j = 0; j < localFiles.length; j++) {
+                    var lName = localFiles[j]
+                    var bName = lName.split(".")[0]
+                    combinedList.push({
+                        displayName: lName,
+                        baseName: bName,
+                        isLocal: true,
+                        isCloud: false
+                    })
+                }
 
                 if (_root.hasOwnProperty("planFiles") && _root.planFiles) {
                     var userName = QGroundControl.loadGlobalSetting("username", "Guest")
                     if (userName !== "Guest" && userName !== "") {
                         MapGlobals.fetchCloudPlans(userName, function(plans) {
                             cloudPlansList = plans || []
-                            var allNames = localFiles.slice()
                             for (var i = 0; i < cloudPlansList.length; i++) {
-                                allNames.push(cloudPlansList[i].plan_name + " (Cloud)")
+                                var cName = cloudPlansList[i].plan_name
+                                var dName = cName
+                                if (!dName.endsWith(".plan")) dName += ".plan"
+                                
+                                // Standardize base name for comparison (remove .plan if present)
+                                var cBaseName = cName.replace(".plan", "")
+                                
+                                var found = false
+                                for (var k = 0; k < combinedList.length; k++) {
+                                    if (combinedList[k].baseName.toLowerCase() === cBaseName.toLowerCase()) {
+                                        combinedList[k].isCloud = true
+                                        found = true
+                                        break
+                                    }
+                                }
+                                if (!found) {
+                                    combinedList.push({
+                                        displayName: dName,
+                                        baseName: cBaseName,
+                                        isLocal: false,
+                                        isCloud: true
+                                    })
+                                }
                             }
-                            fullFileList = allNames
-                            
-                            if (showAllFiles)
-                                displayList = fullFileList
-                            else
-                                displayList = fullFileList.slice(0, 3)
+                            fullFileList = combinedList
+                            displayList = fullFileList
                         })
+                        return
                     }
                 }
 
-                fullFileList = localFiles
-                if (showAllFiles)
-                    displayList = fullFileList
-                else
-                    displayList = fullFileList.slice(0, 3)
+                fullFileList = combinedList
+                displayList = fullFileList
             }
 
-            onShowAllFilesChanged: refreshFiles()
             Component.onCompleted: refreshFiles()
 
             Column {
@@ -237,19 +263,19 @@ Item {
                                 FileButton {
                                     id:             fileButton
                                     anchors.fill:   parent
-                                    text:           modelData
+                                    text:           modelData.displayName
                                     border.width:   0
                                     radius:         0
 
                                     onClicked: {
                                         mobileFileOpenDialog.close()
-                                        var isCloud = modelData.endsWith(" (Cloud)")
-                                        var strippedFileName = modelData.split(".")[0]
                                         
-                                        if (isCloud) {
-                                            strippedFileName = modelData.substring(0, modelData.length - 8)
-                                            _appSettings.username = strippedFileName
-                                            
+                                        var strippedFileName = modelData.baseName
+                                        _appSettings.username = strippedFileName
+                                        
+                                        if (modelData.isLocal) {
+                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.displayName))
+                                        } else if (modelData.isCloud) {
                                             var planData = null
                                             for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
                                                 if (mobileFileOpenDialog.cloudPlansList[i].plan_name === strippedFileName) {
@@ -257,20 +283,20 @@ Item {
                                                     break
                                                 }
                                             }
-                                            
                                             if (planData) {
                                                 _root.acceptedCloudPlan(planData)
                                             }
-                                        } else {
-                                            _appSettings.username = strippedFileName
-                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData))
                                         }
                                     }
 
                                     onHamburgerClicked: {
-                                        highlight = true
-                                        hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                                        hamburgerMenu.popup()
+                                        if (modelData.isLocal) {
+                                            highlight = true
+                                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.displayName)
+                                            hamburgerMenu.popup()
+                                        } else {
+                                            mainWindow.showToastMessage("Cloud plans cannot be deleted from here.")
+                                        }
                                     }
 
                                     QGCMenu {
@@ -284,7 +310,6 @@ Item {
                                             text:           qsTr("Delete")
                                             onTriggered: {
                                                 controller.deleteFile(hamburgerMenu.fileToDelete)
-                                                fileRepeater.model = controller.getFiles(folder, _rgExtensions)
                                                 mobileFileOpenDialog.refreshFiles()
                                             }
                                         }
@@ -315,37 +340,7 @@ Item {
 
                 }
 
-                Item {
-                    width:      parent.width
-                    height:     20
-                    visible:    !mobileFileOpenDialog.showAllFiles &&
-                                mobileFileOpenDialog.fullFileList.length > 3
-
-                    Text {
-                        anchors.right:  parent.right
-                        text:           qsTr("See More")
-                        color:          "#007AFF" // Blue link color
-                        font.bold:      true
-                        font.underline: true
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                mainWindow.homescreen()
-                                mobileFileOpenDialog.visible = false
-                                MapGlobals.currentView_profile = "dronePage"
-                                mainWindow.logfiles()
-                            }
-                        }
-                    }
-                }
-
-                Button {
-                    visible: mobileFileOpenDialog.showAllFiles
-                    text: qsTr("Show Less")
-
-                    onClicked: mobileFileOpenDialog.showAllFiles = false
-                }
+                // Removed 'See More' and 'Show Less' UI as all files are now displayed by default.
             }
         }
     }
@@ -358,41 +353,138 @@ Item {
             closeOnClickOutside: true
             property string userName: ""
 
-
-            buttons: Dialog.NoToAll | Dialog.Save
+            // Remove default buttons to use our custom ones
+            buttons: Dialog.NoButton 
 
             onAccepted: {
                 var strippedFileName1 = userName
-
-                console.log("data saved name:",strippedFileName1)
-                if (strippedFileName1 == "") {
-                    mobileFileSaveDialog.preventClose = true
-                    return
+                if (strippedFileName1 != "") {
+                    _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
+                    popup.visible = false
                 }
-                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
-                popup.visible = false
             }
-
-            // onSaveAsNewAccepted: {
-            //     customdialogedit.createObject(mainWindow).open()
-            //     popup.visible = false
-            //     }
 
             onRejected: {
                 customdialogedit.createObject(mainWindow).open()
                 popup.visible = false
             }
 
-            ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelWidth
+            Column {
+                id: saveOptionsColumn
+                spacing: 20
+                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 QGCLabel {
-                    text:               qsTr("Click “Save As” to save the file with a new name. Click “Save” to save the file with the existing name.")
-                    Layout.fillWidth:   true
+                    width: parent.width
+                    text:               qsTr("Choose how you want to save:")
                     color:              "black"
                     font.family:        "Outfit"
-                    font.pointSize:     ScreenTools.defaultFontPointSize
+                    font.pointSize:     14
+                    font.bold:          true
                     horizontalAlignment: Text.AlignHCenter
+                }
+
+                // Custom Save As Button
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width * 0.85
+                    height: 55
+                    radius: 10
+                    color: "transparent"
+                    border.color: "black"
+                    border.width: 1.5
+
+                    QGCLabel {
+                        anchors.centerIn: parent
+                        text: qsTr("Save As (New File)")
+                        color: "black"
+                        font.bold: true
+                        font.pointSize: 12
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            customdialogedit.createObject(mainWindow).open()
+                            popup.visible = false
+                        }
+                    }
+                }
+
+                // Custom Save Button
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width * 0.85
+                    height: 55
+                    radius: 10
+                    color: "transparent"
+                    border.color: "black"
+                    border.width: 1.5
+
+                    QGCLabel {
+                        anchors.centerIn: parent
+                        text: qsTr("Save (Overwrite)")
+                        color: "black"
+                        font.bold: true
+                        font.pointSize: 12
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var strippedFileName1 = userName
+                            if (strippedFileName1 != "") {
+                                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
+                                popup.visible = false
+                            }
+                        }
+                    }
+                }
+
+                // Custom Cloud Save Button
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: parent.width * 0.85
+                    height: 95
+                    radius: 10
+                    color: "transparent"
+                    border.color: "black"
+                    border.width: 1.5
+
+                    Column {
+                        anchors.centerIn: parent
+                        width: parent.width - 30
+                        spacing: 6
+                        QGCLabel {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: qsTr("Cloud Save + Local Save")
+                            color: "black"
+                            font.bold: true
+                            font.pointSize: 13
+                        }
+                        QGCLabel {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: qsTr("(save in cloud only in another phone you can see your plans)")
+                            color: "#444"
+                            font.pointSize: 10
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var strippedFileName1 = userName
+                            if (strippedFileName1 != "") {
+                                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
+                                MapGlobals.requestCloudSync()
+                                popup.visible = false
+                            }
+                        }
+                    }
                 }
             }
         }

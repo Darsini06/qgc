@@ -41,11 +41,12 @@ QtObject {
     property bool showEntryArrows: false   // true only while Rotate Entry Point is active
 
     signal newSessionAdded()
+    signal requestCloudSync()
 
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
     property real gridLineWidth: parseFloat(QGroundControl.loadGlobalSetting("gridLineWidth", "5"))
-    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#0D4D15")
+    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#011F05")
     property color obstacleColor: QGroundControl.loadGlobalSetting("obstacleColor", "#F1C40F")
     property real obstacleLineWidth: parseFloat(QGroundControl.loadGlobalSetting("obstacleLineWidth", "2"))
     property real obstacleOpacity: parseFloat(QGroundControl.loadGlobalSetting("obstacleOpacity", "0.2"))
@@ -1135,8 +1136,17 @@ QtObject {
                     try {
                         var missions = JSON.parse(xhr.responseText);
                         console.log("Found", missions.length, "missions in cloud");
+
+                        // Deduplicate by mission_name
+                        var uniqueMissions = {};
+                        for (var i = 0; i < missions.length; i++) {
+                            var m = missions[i];
+                            // Keep the latest version (assuming last in array is newest, or just replacing)
+                            uniqueMissions[m.mission_name] = m;
+                        }
+
                         // Compatibility fix: the component expects objects with plan_name and plan_data
-                        var plans = missions.map(function(m) {
+                        var plans = Object.values(uniqueMissions).map(function(m) {
                             return {
                                 plan_name: m.mission_name,
                                 plan_data: m.plan_data

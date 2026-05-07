@@ -237,6 +237,11 @@ Item {
         }
     }
 
+    Connections {
+        target: MapGlobals
+        onRequestCloudSync: syncCloud()
+    }
+
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -295,16 +300,20 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (_planMasterController.currentPlanFile !== "") {
-                        _planMasterController.saveToCurrent()
-                        syncCloud()
-                        MapGlobals.share_edit_visibility = false
-                    } else {
-                        _planMasterController.saveToSelectedFile1()
-                        MapGlobals.share_edit_visibility = false
-                        // syncCloud will be called via Connections on currentPlanFileChanged if we had it,
-                        // but for now let's just add it to the fileDialog accepted handler too.
+                    if (activePolygon && activePolygon.traceMode) {
+                        if (activePolygon.count < 3) {
+                            console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                            mapPolygonvisuals.restorePreviousVertices()
+                            return
+                        }
+                        activePolygon.traceMode = false
                     }
+                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                        _planMasterController.saveToSelectedFile1()
+                    } else {
+                        _planMasterController.saveToSelectedFile()
+                    }
+                    MapGlobals.share_edit_visibility = false
                 }
             }
         }
@@ -658,7 +667,6 @@ Item {
                                        _planMasterController.saveToFile(file)
                                        mainWindow.showMapping()
                                    }
-                                   syncCloud()
                                } else {
                                    _planMasterController.saveToKml(file)
                                }
@@ -688,6 +696,225 @@ Item {
                                mainWindow.showPlanView()
                            }
     }
+
+    Component {
+        id: saveOptionsDialogComponent
+        QGCPopupDialog {
+            id:         saveOptionsPopup
+            title:      qsTr("Save Plan Options")
+            showButtons: false
+            
+            Column {
+                width:      parent.width
+                spacing:    25
+                bottomPadding: 10
+
+                QGCLabel {
+                    width:              parent.width
+                    text:               qsTr("Choose your save preference:")
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize:     14
+                    font.bold:          true
+                    color:              "black"
+                    font.family:        "Outfit"
+                }
+
+                // Save Button (Local Overwrite)
+                Rectangle {
+                    width:          parent.width
+                    height:         70
+                    radius:         15
+                    color:          saveMouse.containsMouse ? "#f0f0f0" : "#ffffff"
+                    border.color:   "#e0e0e0"
+                    border.width:   1
+                    visible:        _planMasterController.currentPlanFile !== ""
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        spacing: 15
+
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 10
+                            color: "#E3F2FD"
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: 24
+                                height: 24
+                                source: "qrc:/res/save.svg"
+                                color: "#2196F3"
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+                            QGCLabel {
+                                text: qsTr("Save")
+                                font.bold: true
+                                font.pointSize: 13
+                                color: "black"
+                            }
+                            QGCLabel {
+                                text: qsTr("Overwrite current plan file")
+                                font.pointSize: 10
+                                color: "#666666"
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: saveMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            saveOptionsPopup.close()
+                            if (_planMasterController.currentPlanFile !== "") {
+                                _planMasterController.saveToCurrent()
+                            } else {
+                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                                    _planMasterController.saveToSelectedFile1()
+                                } else {
+                                    _planMasterController.saveToSelectedFile()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Save As Button
+                Rectangle {
+                    width:          parent.width
+                    height:         70
+                    radius:         15
+                    color:          saveAsMouse.containsMouse ? "#f0f0f0" : "#ffffff"
+                    border.color:   "#e0e0e0"
+                    border.width:   1
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        spacing: 15
+
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 10
+                            color: "#FFF3E0"
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: 24
+                                height: 24
+                                source: "qrc:/res/save.svg"
+                                color: "#FF9800"
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+                            QGCLabel {
+                                text: qsTr("Save As")
+                                font.bold: true
+                                font.pointSize: 13
+                                color: "black"
+                            }
+                            QGCLabel {
+                                text: qsTr("Save as a new plan file")
+                                font.pointSize: 10
+                                color: "#666666"
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: saveAsMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            saveOptionsPopup.close()
+                            if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                                _planMasterController.saveToSelectedFile1()
+                            } else {
+                                _planMasterController.saveToSelectedFile()
+                            }
+                        }
+                    }
+                }
+
+                // Cloud Save Button
+                Rectangle {
+                    width:          parent.width
+                    height:         110
+                    radius:         15
+                    color:          cloudSaveMouse.containsMouse ? "#E8F5E9" : "#ffffff"
+                    border.color:   "#C8E6C9"
+                    border.width:   1
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        spacing: 15
+
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 10
+                            color: "#E8F5E9"
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: 24
+                                height: 24
+                                source: "qrc:/InstrumentValueIcons/share-alt.svg"
+                                color: "#4CAF50"
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 4
+                            QGCLabel {
+                                text: qsTr("Cloud Save")
+                                font.bold: true
+                                font.pointSize: 13
+                                color: "black"
+                            }
+                            QGCLabel {
+                                text: qsTr("(save in cloud only in another phonbe you can see yur plans)")
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                                font.pointSize: 10
+                                color: "#455A64"
+                                font.italic: true
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: cloudSaveMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: {
+                            saveOptionsPopup.close()
+                            if (_planMasterController.currentPlanFile !== "") {
+                                _planMasterController.saveToCurrent()
+                            } else {
+                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                                    _planMasterController.saveToSelectedFile1()
+                                } else {
+                                    _planMasterController.saveToSelectedFile()
+                                }
+                            }
+                            syncCloud()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     AirspaceRestrictionDialog {
         id:         _airspaceRestrictionDialog
@@ -1520,18 +1747,35 @@ Item {
                 }
 
                 onClicked: {
-                    if (activePolygon && activePolygon.traceMode) {
-                        if (activePolygon.count < 3) {
-                            console.log("Save: Not enough vertices (<3), restoring previous vertices")
-                            mapPolygonvisuals.restorePreviousVertices()
-                            return
+                    var currentCommand = _currentItem ? _currentItem.commandName : "";
+                    var isMissionActionPage = (currentCommand === "Mission Start" || currentCommand === "Survey" || currentCommand === "Return To Launch");
+                    
+                    // Check if we are in Boundary or Obstacle editing mode
+                    var isBoundaryMode = (boundaryButtonsLoader && boundaryButtonsLoader.visible) || 
+                                         (layerTabBar && layerTabBar.currentIndex === 1) || 
+                                         (activePolygon && activePolygon.traceMode);
+
+                    if (isMissionActionPage && !isBoundaryMode) {
+                        MapGlobals.save = "save1"
+                        if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                            _planMasterController.saveToSelectedFile1()
+                        } else {
+                            _planMasterController.saveToSelectedFile()
                         }
-                        activePolygon.traceMode = false
-                    }
-                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                        _planMasterController.saveToSelectedFile1()
                     } else {
-                        _planMasterController.saveToSelectedFile()
+                        if (activePolygon && activePolygon.traceMode) {
+                            if (activePolygon.count < 3) {
+                                console.log("Save: Not enough vertices (<3), restoring previous vertices")
+                                mapPolygonvisuals.restorePreviousVertices()
+                                return
+                            }
+                            activePolygon.traceMode = false
+                        }
+                        if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+                            _planMasterController.saveToSelectedFile1()
+                        } else {
+                            _planMasterController.saveToSelectedFile()
+                        }
                     }
                     mainWindow.planmap()
                 }
