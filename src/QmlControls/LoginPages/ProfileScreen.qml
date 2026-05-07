@@ -159,15 +159,15 @@ Item {
     Component {
         id: logoutDialog
         QGCPopupDialog {
-            title: qsTr("Logout")
+            title: qsTr("Sign Out")
             buttons: Dialog.Yes | Dialog.No
             onAccepted: {
                 QGroundControl.saveBoolGlobalSetting("login", false)
-                QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                 MapGlobals.profile()
             }
             ColumnLayout {
-                QGCLabel { text: qsTr("Are you sure you want to logout?") }
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel { text: qsTr("Are you sure you want to sign out?") }
             }
         }
     }

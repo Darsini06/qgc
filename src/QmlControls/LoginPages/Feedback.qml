@@ -39,7 +39,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : parent.width * 0.38
+                Layout.preferredWidth: isSmallScreen ? 0 : parent.width * 0.45
                 visible: !isSmallScreen
                 color: sidebar_color
                 clip: true

@@ -40,9 +40,23 @@ Item {
             id: leftPanel
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width * 0.45
-            // Background Charcoal Color
-            color: "#1A1A1A"
+            color: app_color
             clip: true
+
+            // Background Gradient
+            Rectangle {
+                anchors.fill: parent
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: app_color }
+                    GradientStop { position: 1.0; color: "#1A1A1A" }
+                }
+            }
+
+            // Decorative Accents
+            Rectangle {
+                width: 400; height: 400; radius: 200; color: Qt.rgba(255,255,255,0.03)
+                anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
+            }
 
             // Back Arrow Navigation
             Rectangle {
