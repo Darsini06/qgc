@@ -1245,7 +1245,7 @@ Item {
                 Layout.maximumWidth: dp(30)
                 Layout.minimumWidth: dp(18)
                 Layout.preferredHeight: dp(7)
-                visible: droneType === "loadpage" || droneType === "Camera"
+                visible: droneType === "loadpage" || droneType === "Camera" || droneType === "AI"
 
                 Rectangle {
                     anchors.fill: parent
@@ -1297,7 +1297,9 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.updateAppTheme("Camera");
+                        if (droneType !== "AI") {
+                            mainWindow.updateAppTheme("Camera");
+                        }
                         MapGlobals.comefrom = "Camera";
                         mainWindow.cameraView();
                         QGroundControl.saveGlobalSetting("waypoint", "waypoint");

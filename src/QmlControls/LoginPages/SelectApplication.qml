@@ -220,23 +220,7 @@ Item {
                                 }
                             }
 
-                            // ── Coming Soon Badge (AI only) ───────
-                            Rectangle {
-                                visible: modelData.label === "AI"
-                                anchors { top: parent.top; left: parent.left; margins: 10 }
-                                width: Math.max(80, card.width * 0.45)
-                                height: 22
-                                radius: 4
-                                color: "#8E44AD"
-                                z: 10
-                                opacity: 0.9
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "COMING SOON"
-                                    color: "white"
-                                    font { family: "Outfit"; pointSize: ScreenTools.smallFontPointSize * 0.75; bold: true }
-                                }
-                            }
+
                         }
 
                         // ── Label strip at bottom ──────────────────
