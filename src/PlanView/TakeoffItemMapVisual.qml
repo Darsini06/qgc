@@ -79,7 +79,7 @@ Item {
             mapControl:     _root.map
             itemIndicator:  _takeoffIndicatorItem
             itemCoordinate: _missionItem.specifiesCoordinate ? _missionItem.coordinate : _missionItem.launchCoordinate
-            visible:        false // _root.interactive
+            visible:        _root.interactive
 
             onItemCoordinateChanged: {
                 if (_missionItem.specifiesCoordinate) {
@@ -98,7 +98,7 @@ Item {
             mapControl:     _root.map
             itemIndicator:  _launchIndicatorItem
             itemCoordinate: _missionItem.launchCoordinate
-            visible:        false//!_missionItem.launchTakeoffAtSameLocation && _root.interactive
+            visible:        !_missionItem.launchTakeoffAtSameLocation && _root.interactive
 
             onItemCoordinateChanged: _missionItem.launchCoordinate = itemCoordinate
         }
@@ -114,7 +114,7 @@ Item {
             sequenceNumber: _missionItem.sequenceNumber
             onClicked:      _root.clicked(_missionItem.sequenceNumber)
             opacity:        _root.opacity
-            visible:        false
+            //visible:        false
         }
     }
 
@@ -125,7 +125,7 @@ Item {
             coordinate:     _missionItem.launchCoordinate
             anchorPoint.x:  sourceItem.anchorPointX
             anchorPoint.y:  sourceItem.anchorPointY
-            visible:        false // !_missionItem.launchTakeoffAtSameLocation && _root.interactive
+            visible:       !_missionItem.launchTakeoffAtSameLocation && _root.interactive
 
             sourceItem:
                 MissionItemIndexLabel {
@@ -133,7 +133,7 @@ Item {
                     label:              qsTr("Launch")
                     highlightSelected:  true
                     onClicked:          _root.clicked(_missionItem.sequenceNumber)
-                    visible:            false // _root.interactive
+                    visible:             _root.interactive
                 }
         }
     }

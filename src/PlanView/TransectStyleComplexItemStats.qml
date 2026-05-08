@@ -159,7 +159,7 @@ Item {
             }
         }
 
-        // --- Bottom Row: Estimated Time (Full Width) ---
+        // --- Bottom Row: Estimated Time (Full Width)
         Rectangle {
             Layout.fillWidth: true
             height:           64
