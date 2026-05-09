@@ -1,11 +1,3 @@
-/****************************************************************************
- *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- ****************************************************************************/
 
 import QtQuick
 import QtQuick.Controls
@@ -78,7 +70,6 @@ Item {
     property var selectedPlanCreator: null
 
     property var  _activeVehicle:    QGroundControl.multiVehicleManager.activeVehicle
-    property string droneType: "loadpage"
 
     property bool showReturnWaypoint: QGroundControl.loadGlobalSetting("waypointvisible","") === "waypointvisible"
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
@@ -125,7 +116,6 @@ Item {
     onVisibleChanged: {
 
         if(visible) {
-            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
             editorMap.zoomLevel = QGroundControl.flightMapZoom
             editorMap.center    = QGroundControl.flightMapPosition
 
@@ -550,11 +540,7 @@ Item {
             } else {
                 console.log("Survey plan creator not found")
             }
-            if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-                mapPolygonvisuals._resetPolygon()
-            }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-                mapPolygonvisuals._resetCircle()
-            }
+
         }
 
         function saveToSelectedFile1() {
@@ -652,13 +638,8 @@ Item {
                                console.log("Clicke Files at onAcceptedForSave")
                                if (planFiles) {
 
-                                   if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                       _planMasterController.saveToFile1(file)
-                                       mainWindow.showFlyView()
-                                   } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                       _planMasterController.saveToFile(file)
-                                       mainWindow.showMapping()
-                                   }
+                                   _planMasterController.saveToFile1(file)
+                                   mainWindow.showFlyView()
                                    syncCloud()
                                } else {
                                    _planMasterController.saveToKml(file)
@@ -1127,7 +1108,7 @@ Item {
 
                 if(QGroundControl.loadGlobalSetting("waypointMark","true")==="true"){
                     console.log("waypointMark",waypointMark)
-                    addWaypointRallyPointAction.checked = QGroundControl.loadGlobalSetting("loadpage","loadpage")=== "Camera" || "Mapping"&& QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
+                    addWaypointRallyPointAction.checked =  QGroundControl.loadGlobalSetting("waypoint","waypoint")=== "waypoint" ? true : false
                 }
             }
 
@@ -1525,11 +1506,7 @@ Item {
                         }
                         activePolygon.traceMode = false
                     }
-                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                        _planMasterController.saveToSelectedFile1()
-                    } else {
-                        _planMasterController.saveToSelectedFile()
-                    }
+                    _planMasterController.saveToSelectedFile()
                     mainWindow.planmap()
                 }
             }
@@ -2569,7 +2546,7 @@ Item {
             anchors.centerIn: parent
 
             Text {
-                text: itemEditPopup.popupMissionItem ? qsTr(((itemEditPopup.popupMissionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri") ? "Plot" : itemEditPopup.popupMissionItem.commandName) + " Settings") : qsTr("Settings")
+                text: itemEditPopup.popupMissionItem ? qsTr(((itemEditPopup.popupMissionItem.commandName === "Survey") ? "Plot" : itemEditPopup.popupMissionItem.commandName) + " Settings") : qsTr("Settings")
                 font.pointSize: 16
                 font.bold: true
                 color: "white"
@@ -2801,7 +2778,7 @@ Item {
     //                     }
     //                 }
     //             }
-                
+
     //             QGCButton {
     //                 text: qsTr("Next")
     //                 onClicked: {

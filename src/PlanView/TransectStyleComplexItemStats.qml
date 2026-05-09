@@ -95,69 +95,69 @@ Item {
         }
 
         // --- Middle Row: Photos and Interval ---
-        RowLayout {
-            Layout.fillWidth: true
-            spacing:          ScreenTools.defaultFontPixelWidth
-            visible:          _application !== "Agri"
+        // RowLayout {
+        //     Layout.fillWidth: true
+        //     spacing:          ScreenTools.defaultFontPixelWidth
+        //     visible:          _application !== "Agri"
 
-            // Photos Card
-            Rectangle {
-                Layout.fillWidth: true
-                height:           64
-                radius:           12
-                color:            _colorBgTertiary
-                border.color:     Qt.rgba(255,255,255,0.05)
-                visible:          _application !== "Agri"
+        //     // Photos Card
+        //     Rectangle {
+        //         Layout.fillWidth: true
+        //         height:           64
+        //         radius:           12
+        //         color:            _colorBgTertiary
+        //         border.color:     Qt.rgba(255,255,255,0.05)
+        //         visible:          _application !== "Agri"
                 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 2
-                    QGCLabel {
-                        text: qsTr("TOTAL PHOTOS")
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.bold: true
-                        color: _colorTextSecondary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    QGCLabel {
-                        text: missionItem.cameraShots
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                        color: _colorTextPrimary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
+        //         Column {
+        //             anchors.centerIn: parent
+        //             spacing: 2
+        //             QGCLabel {
+        //                 text: qsTr("TOTAL PHOTOS")
+        //                 font.pointSize: ScreenTools.defaultFontPointSize
+        //                 font.bold: true
+        //                 color: _colorTextSecondary
+        //                 anchors.horizontalCenter: parent.horizontalCenter
+        //             }
+        //             QGCLabel {
+        //                 text: missionItem.cameraShots
+        //                 font.pointSize: ScreenTools.mediumFontPointSize
+        //                 font.bold: true
+        //                 color: _colorTextPrimary
+        //                 anchors.horizontalCenter: parent.horizontalCenter
+        //             }
+        //         }
+        //     }
 
-            // Interval Card
-            Rectangle {
-                Layout.fillWidth: true
-                height:           64
-                radius:           12
-                color:            _colorBgTertiary
-                border.color:     Qt.rgba(255,255,255,0.05)
-                visible:          _application !== "Agri"
+        //     // Interval Card
+        //     Rectangle {
+        //         Layout.fillWidth: true
+        //         height:           64
+        //         radius:           12
+        //         color:            _colorBgTertiary
+        //         border.color:     Qt.rgba(255,255,255,0.05)
+        //         visible:          _application !== "Agri"
                 
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 2
-                    QGCLabel {
-                        text: qsTr("INTERVAL")
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.bold: true
-                        color: _colorTextSecondary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    QGCLabel {
-                        text: missionItem.timeBetweenShots.toFixed(1) + "s"
-                        font.pointSize: ScreenTools.mediumFontPointSize
-                        font.bold: true
-                        color: _colorTextPrimary
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
-        }
+        //         Column {
+        //             anchors.centerIn: parent
+        //             spacing: 2
+        //             QGCLabel {
+        //                 text: qsTr("INTERVAL")
+        //                 font.pointSize: ScreenTools.defaultFontPointSize
+        //                 font.bold: true
+        //                 color: _colorTextSecondary
+        //                 anchors.horizontalCenter: parent.horizontalCenter
+        //             }
+        //             QGCLabel {
+        //                 text: missionItem.timeBetweenShots.toFixed(1) + "s"
+        //                 font.pointSize: ScreenTools.mediumFontPointSize
+        //                 font.bold: true
+        //                 color: _colorTextPrimary
+        //                 anchors.horizontalCenter: parent.horizontalCenter
+        //             }
+        //         }
+        //     }
+        // }
 
         // --- Bottom Row: Estimated Time (Full Width)
         Rectangle {
