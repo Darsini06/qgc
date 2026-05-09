@@ -89,9 +89,10 @@ Item {
         id: objMgr
     }
 
-    property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
-    property color _themeColor: _isAgri ? "#79AE6F" : "#808080" // Agri Green or Professional Gray
-    property color _themeBorder: _isAgri ? Qt.darker("#79AE6F", 1.2) : "black"
+    //property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+
+    property color _themeColor: "#79AE6F"  // Agri Green or Professional Gray
+    property color _themeBorder: Qt.darker("#79AE6F", 1.2)
     property color _gridColor: MapGlobals.gridColor
 
     // Area polygon

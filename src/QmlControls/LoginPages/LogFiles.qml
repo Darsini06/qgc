@@ -96,12 +96,14 @@ Item {
             userName = QGroundControl.loadGlobalSetting("username", "")
             loadUserDataFromMain();
         }
-        if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
-            nameFilters = _planMasterController.loadNameFilters1
-        }else{
-            nameFilters = _planMasterController.loadNameFilters
-        }
 
+        // if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri") {
+        //     nameFilters = _planMasterController.loadNameFilters1
+        // }else{
+        //     nameFilters = _planMasterController.loadNameFilters
+        // }
+
+        nameFilters = _planMasterController.loadNameFilters1
 
         _planMasterController._updateMobileShortPath()
         _planMasterController._setupFileExtensions()
@@ -151,13 +153,13 @@ Item {
             for (var i = 0; i < sessions.length; i++) {
                 var session = sessions[i];
                 sessionModel.append({
-                    id:         session.id,
-                    date:       session.date,
-                    start_time: session.start_time,
-                    end_time:   session.end_time,
-                    duration:   session.duration || 0,
-                    created_at: session.created_at
-                });
+                                        id:         session.id,
+                                        date:       session.date,
+                                        start_time: session.start_time,
+                                        end_time:   session.end_time,
+                                        duration:   session.duration || 0,
+                                        created_at: session.created_at
+                                    });
             }
 
             console.log("Loaded", sessions.length, "sessions into model");
@@ -165,14 +167,14 @@ Item {
             for (var j = 0; j < sessionModel.count; j++) {
                 var item = sessionModel.get(j);
                 console.log(
-                    "Session", j + 1, ":",
-                    "ID:", item.id,
-                    "Date:", item.date,
-                    "Start:", item.start_time,
-                    "End:", item.end_time,
-                    "Duration:", item.duration,
-                    "CreatedAt:", item.created_at
-                );
+                            "Session", j + 1, ":",
+                            "ID:", item.id,
+                            "Date:", item.date,
+                            "Start:", item.start_time,
+                            "End:", item.end_time,
+                            "Duration:", item.duration,
+                            "CreatedAt:", item.created_at
+                            );
             }
 
             updateSessionStats();
@@ -645,11 +647,15 @@ Item {
                                             } else if (model.screen === "fileList") {
                                                 // Setup paths/extensions, then show inline
                                                 _planMasterController._updateMobileShortPath()
-                                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
-                                                    nameFilters = _planMasterController.loadNameFilters1
-                                                }else{
-                                                    nameFilters = _planMasterController.loadNameFilters
-                                                }
+
+                                                // if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+                                                //     nameFilters = _planMasterController.loadNameFilters1
+                                                // }else{
+                                                //     nameFilters = _planMasterController.loadNameFilters
+                                                // }
+
+                                                nameFilters = _planMasterController.loadNameFilters1
+
                                                 _planMasterController._setupFileExtensions()
                                                 inlineLoader.sourceComponent = fileListComponent
                                                 console.log("gridlines True")
@@ -857,17 +863,17 @@ Item {
                                             text: model.plan_name + " (Cloud)"
                                             onClicked: {
                                                 mainWindow.showMessageDialog(qsTr("Download Plan"),
-                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
-                                                    Dialog.Yes | Dialog.Cancel,
-                                                    function() {
-                                                        mainWindow.openHomeScreen()
-                                                        mainWindow.showFlyView()
-                                                        mainWindow.showPlanView()
-                                                        // Load the plan data directly into the controller
-                                                        _planMasterController.loadFromJson(model.plan_data)
-                                                        mainWindow.showToastMessage("Cloud plan loaded")
-                                                    }
-                                                )
+                                                                             qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                                             Dialog.Yes | Dialog.Cancel,
+                                                                             function() {
+                                                                                 mainWindow.openHomeScreen()
+                                                                                 mainWindow.showFlyView()
+                                                                                 mainWindow.showPlanView()
+                                                                                 // Load the plan data directly into the controller
+                                                                                 _planMasterController.loadFromJson(model.plan_data)
+                                                                                 mainWindow.showToastMessage("Cloud plan loaded")
+                                                                             }
+                                                                             )
                                             }
                                         }
                                     }

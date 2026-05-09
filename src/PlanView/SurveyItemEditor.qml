@@ -34,7 +34,7 @@ TransectStyleComplexItemEditor {
     readonly property color _colorSuccess:       "#2ECC71"
     property bool   _linkIndentation: true
     property int    _indentSideIndex: 0 // 0:Top, 1:Right, 2:Bottom, 3:Left
-    readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    //readonly property bool  _isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 
     function _smartOptimize() {
         if (missionItem.surveyAreaPolygon.count < 3) return
@@ -113,7 +113,7 @@ TransectStyleComplexItemEditor {
                     Layout.fillWidth:       true
                     Layout.preferredHeight: implicitHeight
                     padding:                8
-                    visible:                !_isAgri
+                    visible:                false //!_isAgri
 
                     background: Rectangle {
                         radius: 8
@@ -336,13 +336,19 @@ TransectStyleComplexItemEditor {
             }
 
             // Divider
-            Rectangle { Layout.fillWidth: true; height: 1; color: _colorBorder; opacity: 0.5; visible: !forPresets && !_isAgri }
+            // Rectangle {
+            //     Layout.fillWidth: true
+            //     height: 1
+            //     color: _colorBorder
+            //     opacity: 0.5
+            //     visible: !forPresets && !_isAgri
+            // }
 
             // ─── Grid Appearance & Layout ──────────────────────────────────
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing:          _margin * 0.8
-                visible:          !forPresets && !_isAgri
+                visible:          false //!forPresets && !_isAgri
 
                 QGCLabel {
                     text:           qsTr("Grid Appearance & Layout")
@@ -439,7 +445,7 @@ TransectStyleComplexItemEditor {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing:          _margin * 0.8
-                visible:          !forPresets && !_isAgri
+                visible:          false //!forPresets && !_isAgri
 
                 QGCLabel {
                     text:           qsTr("Obstacle Appearance")
@@ -535,7 +541,7 @@ TransectStyleComplexItemEditor {
                 radius:           8
                 border.color:     _colorBorder
                 border.width:     1
-                visible:          !forPresets && !_isAgri
+                visible:          false //!forPresets && !_isAgri
 
                 QGCOptionsComboBox {
                     id:               optionsCombo

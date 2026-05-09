@@ -38,7 +38,7 @@ Rectangle {
     //property var _spraySpinner:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPINNER") : null
     // property var _spraySpeedMin:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPEED_MIN") : null
 
-    property bool _isAgri: mainWindow ? mainWindow.droneType === "Agri" : false
+    //property bool _isAgri: mainWindow ? mainWindow.droneType === "Agri" : false
 
     function dropMessageIndicatorTool() {
         toolIndicators.dropMessageIndicatorTool();
@@ -366,7 +366,7 @@ Rectangle {
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             Layout.leftMargin: 8; Layout.rightMargin: 8
-            visible: _isAgri && _activeVehicle
+            visible:  _activeVehicle
         }
 
         // ── SPRAY Button ──
@@ -374,7 +374,7 @@ Rectangle {
             id: sprayButton
             width: labelCol.width + 10
             height: parent.height * 0.8
-            visible: _isAgri && _activeVehicle && !_communicationLost
+            visible: _activeVehicle && !_communicationLost
             Layout.alignment: Qt.AlignVCenter
 
             QGCLabel {
@@ -406,7 +406,7 @@ Rectangle {
             color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             Layout.leftMargin: 8; Layout.rightMargin: 8
-            visible: _isAgri && _activeVehicle && !_communicationLost
+            visible: _activeVehicle && !_communicationLost
         }
 
         // ── Pump Rate Status ──
@@ -414,7 +414,7 @@ Rectangle {
             id: pumpRateStatus
             width: pumpRow.width + 10
             height: parent.height * 0.8
-            visible: _isAgri && _activeVehicle && !_communicationLost
+            visible: _activeVehicle && !_communicationLost
             Layout.alignment: Qt.AlignVCenter
 
             Row {

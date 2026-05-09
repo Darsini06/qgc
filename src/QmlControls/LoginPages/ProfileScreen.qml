@@ -163,7 +163,7 @@ Item {
             buttons: Dialog.Yes | Dialog.No
             onAccepted: {
                 QGroundControl.saveBoolGlobalSetting("login", false)
-                QGroundControl.saveGlobalSetting("loadpage", "loadpage")
+                //QGroundControl.saveGlobalSetting("loadpage", "loadpage")
                 MapGlobals.profile()
             }
             ColumnLayout {

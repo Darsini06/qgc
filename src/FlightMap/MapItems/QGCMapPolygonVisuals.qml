@@ -71,7 +71,7 @@ Item {
 
     property var    _toolbarItem:           null
 
-    property string droneType: "loadpage"
+    //property string droneType: "loadpage"
 
 
     // Base size relative to screen
@@ -84,14 +84,14 @@ Item {
     property real cardinalLeftScreenX:   0
     property real cardinalBottomScreenY: 0
 
-    onVisibleChanged : {
-        if (visible) {
-            droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
-            if(droneType==="Mapping"){
-                mapping = true
-            }
-        }
-    }
+    // onVisibleChanged : {
+    //     if (visible) {
+    //         droneType = QGroundControl.loadGlobalSetting("loadpage","loadpage");
+    //         if(droneType==="Mapping"){
+    //             mapping = true
+    //         }
+    //     }
+    // }
 
 
     function addCommonVisuals() {
@@ -276,8 +276,8 @@ Item {
             if (mapControl) {
                 var vp = mapControl.centerViewport
                 var centerPoint = (vp && vp.width > 0)
-                    ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
-                    : Qt.point(mapControl.width / 2, mapControl.height / 2)
+                        ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
+                        : Qt.point(mapControl.width / 2, mapControl.height / 2)
                 var centerCoord = mapControl.toCoordinate(centerPoint, false)
 
                 if (centerCoord && centerCoord.isValid) {
@@ -1890,11 +1890,7 @@ Item {
                                     QGroundControl.saveGlobalSetting("load", "load")
 
                                     customDialog.close()
-                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                        mainWindow.showFlyView()
-                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                        mainWindow.showMapping()
-                                    }
+                                    mainWindow.showFlyView()
                                     MapGlobals.editdialog = "editdialog1"
                                 }
                                 background: Rectangle {
@@ -1946,20 +1942,12 @@ Item {
                                     let concatenatedText = nameField.text.substring(0, 10)
                                     _appSettings.username = concatenatedText
 
-                                    if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
-                                        _saveCurrentVertices()
-                                        _circleMode = false
-                                        mapPolygon.traceMode = true
-                                        if(MapGlobals.mark_with !== "KML_File") {
-                                            mapPolygon.clear()
-                                        }
-                                    } else if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Mapping") {
-                                        mapping = true
-                                        if(QGroundControl.loadGlobalSetting("mapping", "mapping") === "basic") {
-                                            _resetPolygon()
-                                        } else if(QGroundControl.loadGlobalSetting("mapping", "mapping") === "circle") {
-                                            _resetCircle()
-                                        }
+                                    _saveCurrentVertices()
+                                    _circleMode = false
+                                    mapPolygon.traceMode = true
+
+                                    if(MapGlobals.mark_with !== "KML_File") {
+                                        mapPolygon.clear()
                                     }
 
                                     customDialog.close()

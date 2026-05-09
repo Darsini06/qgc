@@ -36,7 +36,7 @@ QGCFlickable {
     readonly property color _colorTextSecondary:"#ffffff"
     readonly property color _colorDanger:       "#FF453A"
     readonly property color _colorDangerDark:   "#C42B2B"
-    readonly property bool  isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    //readonly property bool  isAgri:             QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
     readonly property color _agriGreen:        "#79AE6F"
 
     Component {

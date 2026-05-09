@@ -38,8 +38,8 @@ T.ComboBox {
     property real   _popupWidth
     property bool   _onCompleted:   false
     property bool   _showBorder:    qgcPal.globalTheme === QGCPalette.Light
-    property bool   isAgri:         QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
-    property color  app_color:      isAgri ? "#79AE6F" : "#808080"
+    //property bool   isAgri:         QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    property color  app_color:    "#79AE6F"
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
@@ -99,7 +99,7 @@ T.ComboBox {
         }
 
         background: Rectangle {
-            color:                  control.currentIndex === index ? (isAgri ? "#79AE6F" : "#808080") : (highlighted ? (isAgri ? "#79AE6F" : "#808080") : "transparent")
+            color:                  control.currentIndex === index ? "#79AE6F" : (highlighted ? "#79AE6F" : "transparent")
             radius:                 0
         }
 
@@ -131,7 +131,7 @@ T.ComboBox {
 
     background: Rectangle {
         color:          "white"
-        border.color:   isAgri ? "#79AE6F" : "#808080"
+        border.color:   "#79AE6F"
         border.width:   1
         radius:         12
     }
@@ -157,7 +157,7 @@ T.ComboBox {
         background: Rectangle {
             color: "white"
             radius: 12
-            border.color: isAgri ? "#79AE6F" : "#808080"
+            border.color: "#79AE6F"
             border.width: 1
         }
     }

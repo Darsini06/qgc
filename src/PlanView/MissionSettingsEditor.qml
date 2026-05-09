@@ -62,7 +62,7 @@ Rectangle {
     readonly property string _vehicleLabel:     qsTr("Vehicle")
     readonly property real  _margin:            ScreenTools.defaultFontPixelWidth / 2
 
-    property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
+    //property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
     QGCPalette { id: qgcPal }
     QGCFileDialogController { id: fileController }
@@ -334,40 +334,40 @@ Rectangle {
         }
 
         // --- Camera Panel ---
-        Rectangle {
-            width:              parent.width
-            height:             camCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 2)
-            color:              _panelColor
-            radius:             _panelRadius
-            border.color:       _panelBorder
-            visible:            !_simpleMissionStart && _showCameraSection && _application !== "Agri"
+        // Rectangle {
+        //     width:              parent.width
+        //     height:             camCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 2)
+        //     color:              _panelColor
+        //     radius:             _panelRadius
+        //     border.color:       _panelBorder
+        //     visible:            !_simpleMissionStart && _showCameraSection && _application !== "Agri"
 
-            ColumnLayout {
-                id: camCol
-                anchors.left:   parent.left
-                anchors.right:  parent.right
-                anchors.top:    parent.top
-                anchors.margins: ScreenTools.defaultFontPixelWidth
-                anchors.topMargin: ScreenTools.defaultFontPixelHeight
-                spacing: ScreenTools.defaultFontPixelHeight * 0.5
+        //     ColumnLayout {
+        //         id: camCol
+        //         anchors.left:   parent.left
+        //         anchors.right:  parent.right
+        //         anchors.top:    parent.top
+        //         anchors.margins: ScreenTools.defaultFontPixelWidth
+        //         anchors.topMargin: ScreenTools.defaultFontPixelHeight
+        //         spacing: ScreenTools.defaultFontPixelHeight * 0.5
 
-                CameraSection {
-                    id:         cameraSection
-                    checked:    !_waypointsOnlyMode && missionItem && missionItem.cameraSection && missionItem.cameraSection.settingsSpecified
-                    Layout.fillWidth: true
-                }
+        //         CameraSection {
+        //             id:         cameraSection
+        //             checked:    !_waypointsOnlyMode && missionItem && missionItem.cameraSection && missionItem.cameraSection.settingsSpecified
+        //             Layout.fillWidth: true
+        //         }
 
-                QGCLabel {
-                    Layout.fillWidth:       true
-                    text:                   qsTr("Above camera commands will take affect immediately upon mission start.")
-                    wrapMode:               Text.WordWrap
-                    horizontalAlignment:    Text.AlignHCenter
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    color:                  _unitColor
-                    visible:                cameraSection.checked
-                }
-            }
-        }
+        //         QGCLabel {
+        //             Layout.fillWidth:       true
+        //             text:                   qsTr("Above camera commands will take affect immediately upon mission start.")
+        //             wrapMode:               Text.WordWrap
+        //             horizontalAlignment:    Text.AlignHCenter
+        //             font.pointSize:         ScreenTools.smallFontPointSize
+        //             color:                  _unitColor
+        //             visible:                cameraSection.checked
+        //         }
+        //     }
+        // }
 
         // --- Vehicle Info Panel ---
         Rectangle {

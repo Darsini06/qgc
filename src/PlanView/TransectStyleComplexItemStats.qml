@@ -46,7 +46,7 @@ Item {
     //     font.bold: true
     // }
 
-    property string _application: QGroundControl.loadGlobalSetting("loadpage","loadpage");
+    //property string _application: QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
 
     ColumnLayout {
@@ -66,7 +66,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 2
                 QGCLabel {
-                    text: _application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
+                    text: qsTr("COVERED AREA") //_application === "Agri" ? qsTr("COVERED AREA") : qsTr("SURVEY AREA")
                     font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold: true
                     color: _colorTextSecondary

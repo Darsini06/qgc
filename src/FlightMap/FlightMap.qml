@@ -252,10 +252,7 @@ Map {
                 running: true
                 repeat: true
                 onTriggered: {
-                    var page = QGroundControl.loadGlobalSetting("loadpage", "loadpage")
-                    if (page === "Agri") mapItemImage.color = "green"
-                    else if (page === "Camera") mapItemImage.color = "grey"
-                    else mapItemImage.color = "grey"
+                    mapItemImage.color = "green"
                 }
             }
 

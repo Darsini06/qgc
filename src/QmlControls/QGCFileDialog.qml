@@ -747,23 +747,14 @@ Item {
 
                                     MapGlobals.setGridLines(false)
 
-                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
-                                        if (nameField.text.length < 3 ) {
-                                            mobileFileSaveDialog.preventClose = true
-                                            return
-                                        }
-                                        let concatenatedText = nameField.text.substring(0, 10);
-                                        _appSettings.username = concatenatedText;
-                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
-                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                                        if (nameField.text.length < 3 ) {
-                                            mobileFileSaveDialog.preventClose = true
-                                            return
-                                        }
-                                        let concatenatedText = nameField.text.substring(0, 10);
-                                        _appSettings.username = concatenatedText;
-                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+                                    if (nameField.text.length < 3 ) {
+                                        mobileFileSaveDialog.preventClose = true
+                                        return
                                     }
+                                    let concatenatedText = nameField.text.substring(0, 10);
+                                    _appSettings.username = concatenatedText;
+                                    _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
+
                                     customDialog.visible = false
                                 }
                                 background: Rectangle {

@@ -118,7 +118,7 @@ Rectangle {
                     property real _padding: ScreenTools.comboBoxPadding
 
                     QGCLabel {
-                        text:                   (missionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri") ? qsTr("Plot") : missionItem.commandName
+                        text:                   (missionItem.commandName === "Survey") ? qsTr("Plot") : missionItem.commandName
                         color:                  "white"
                         font.bold:              true
                         font.pointSize:         14
@@ -177,7 +177,7 @@ Rectangle {
                 anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + 20) : 10
                 anchors.verticalCenter: parent.verticalCenter
                 visible:                (!missionItem.isCurrentItem || !missionItem.isSimpleItem || _waypointsOnlyMode || missionItem.isTakeoffItem)
-                text:                   ( missionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri" ) ? qsTr("Plot") : missionItem.commandName
+                text:                   ( missionItem.commandName === "Survey") ? qsTr("Plot") : missionItem.commandName
                 color:                  "white"
                 font.bold:              true
                 font.pointSize:         14

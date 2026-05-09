@@ -90,28 +90,18 @@ ApplicationWindow {
     property real scaleRatio: Math.min(screenWidth / 400, screenHeight / 800)
     property real baseUnit: 8 * scaleRatio
 
-    property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
+    //property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
 
     // --- Dynamic Theming ---
-    property color app_color: {
-        if (droneType === "Agri")    return "#79AE6F" // Forest Green
-        if (droneType === "Mapping") return "#4F9DDF" // Clear Blue
-        if (droneType === "Camera")  return "#F39C12" // Sunset Orange
-        return "#4A2C6D" // Professional Purple (Default)
-    }
+    property color app_color: "#79AE6F"
 
-    property color accent_color: {
-        if (droneType === "Agri")    return "#5D8A54" // Darker Green
-        if (droneType === "Mapping") return "#347DBD" // Darker Blue
-        if (droneType === "Camera")  return "#D35400" // Darker Orange
-        return "#673AB7" // Vibrant Purple
-    }
+    property color accent_color: "#5D8A54"
 
-    function updateAppTheme(newMode) {
-        droneType = newMode
-        QGroundControl.saveGlobalSetting("loadpage", newMode)
-        console.log("App Theme Updated to:", newMode)
-    }
+    // function updateAppTheme(newMode) {
+    //     droneType = newMode
+    //     QGroundControl.saveGlobalSetting("loadpage", newMode)
+    //     console.log("App Theme Updated to:", newMode)
+    // }
 
     function _collapsePIP() {
         if (flyView && flyView.pipView) {
@@ -125,7 +115,6 @@ ApplicationWindow {
     function dp(value) {
         return value * baseUnit;
     }
-
 
 
     Connections {
@@ -161,7 +150,6 @@ ApplicationWindow {
             tabModel.updateSettingsTab();
         }
     }
-
 
     Component.onCompleted: {
 
@@ -376,9 +364,6 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        //eraserbtn.visible = true
-        dialog.mappingbtn.visible= false
-        dialog.mappingcirclebtn.visible= false
         dialog.agribtn.visible= true
         dialog.agrigpsbtn.visible= true
     }
@@ -404,9 +389,6 @@ ApplicationWindow {
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
-        //eraserbtn.visible = true
-        dialog.mappingbtn.visible= true
-        dialog.mappingcirclebtn.visible= true
         dialog.agribtn.visible= false
         dialog.agrigpsbtn.visible= false
     }
@@ -1495,22 +1477,14 @@ ApplicationWindow {
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                    mainWindow.cameraView()
+                if (planType === "Plan") {
+                    mainWindow.showFlyView()
                     mainWindow.closefile()
-                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                    mainWindow.showMapping()
+                } else {
+                    mainWindow.showFlyView1()
                     mainWindow.closefile()
                 }
-                else{
-                    if (planType === "Plan") {
-                        mainWindow.showFlyView()
-                        mainWindow.closefile()
-                    } else {
-                        mainWindow.showFlyView1()
-                        mainWindow.closefile()
-                    }
-                }
+
 
             }
 
@@ -1846,9 +1820,6 @@ ApplicationWindow {
             }
         }
 
-        // Properties exposed for external visibility control (legacy callers)
-        property alias mappingbtn:      mappingbtn
-        property alias mappingcirclebtn: mappingcirclebtn
         property alias agribtn:         agribtn
         property alias agrigpsbtn:      agrigpsbtn
 
@@ -1907,10 +1878,7 @@ ApplicationWindow {
                 cursorShape:  Qt.PointingHandCursor
                 onClicked: {
                     dialog.visible = false
-                    if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri")
-                        mainWindow.showFlyView()
-                    else if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping")
-                        mainWindow.showMapping()
+                    mainWindow.showFlyView()
                 }
                 onEntered: closeBtn.color = "#cc4444"
                 onExited:  closeBtn.color = "transparent"
@@ -1955,121 +1923,6 @@ ApplicationWindow {
                 id: cardsRow
                 Layout.fillWidth: true
                 spacing: ScreenTools.defaultFontPixelWidth * 2
-
-                // Card 1: Basic Mapping
-                Rectangle {
-                    id: mappingbtn
-                    Layout.fillWidth:       true
-                    Layout.preferredHeight: width
-                    radius: 18
-                    color:         ma1.containsMouse ? "#1e1e1e" : "#161616"
-                    border.color:  ma1.containsMouse ? app_color : "#2e2e2e"
-                    border.width:  ma1.containsMouse ? 2 : 1
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping"
-
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: parent.height * 0.08
-                        width: parent.width * 0.85
-
-                        Rectangle {
-                            width: parent.width * 0.55; height: width; radius: width / 2
-                            color: ma1.containsMouse ? app_color : "#252525"
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/basic_marking.svg";
-                                width: parent.width * 0.55; height: width
-                                color: "white"; anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
-                        }
-
-                        Text {
-                            text: "Basic"; color: "white"
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.bold: true; wrapMode: Text.WordWrap
-                            width: parent.width; horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-
-                    MouseArea {
-                        id: ma1
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            planView.mapclear()
-                            QGroundControl.saveGlobalSetting("mapping", "basic")
-                            MapGlobals.mark_with = "Mark_With_Manual"
-                            MapGlobals.edit = "edit"
-                            MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = false
-                            MapGlobals.isReviewMode = false
-                            MapGlobals.showMissionItems = false
-
-                            //Grid Lines set to false
-                            MapGlobals.setGridLines(false)
-
-                            mainWindow.showPlanView()
-                            dialog.visible = false
-                            planView.data1()
-                        }
-                    }
-                }
-
-                // Card 2: Circular Mapping
-                Rectangle {
-                    id: mappingcirclebtn
-                    Layout.fillWidth:       true
-                    Layout.preferredHeight: width
-                    radius: 18
-                    color:         ma2.containsMouse ? "#1e1e1e" : "#161616"
-                    border.color:  ma2.containsMouse ? app_color : "#2e2e2e"
-                    border.width:  ma2.containsMouse ? 2 : 1
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Mapping"
-
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: parent.height * 0.08
-                        width: parent.width * 0.75
-                        Rectangle {
-                            width: parent.width * 0.55; height: width; radius: width / 2
-                            color: ma2.containsMouse ? app_color : "#252525"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/circle_marking.svg"
-                                width: parent.width * 0.6; height: width
-                                color: "white"; anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
-                        }
-                        Text {
-                            text: "Circular"; color: "white"
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                            font.bold: true; wrapMode: Text.WordWrap
-                            width: parent.width; horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-                    MouseArea {
-                        id: ma2; anchors.fill: parent; hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            planView.mapclear()
-                            QGroundControl.saveGlobalSetting("mapping", "circle")
-                            MapGlobals.mark_with = "Mark_With_Manual"
-                            MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
-                            MapGlobals.share_edit_visibility = false
-                            MapGlobals.isReviewMode = false
-                            MapGlobals.showMissionItems = false
-
-                            //Grid Lines set to false
-                            MapGlobals.setGridLines(false)
-
-                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
-                        }
-                    }
-                }
 
                 // Card 3: Map Selection  (always visible)
                 Rectangle {
@@ -2131,7 +1984,7 @@ ApplicationWindow {
                     color:         ma4.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma4.containsMouse ? app_color : "#2e2e2e"
                     border.width:  ma4.containsMouse ? 2 : 1
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
+                    //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
 
                     Column {
                         anchors.centerIn: parent
@@ -2189,7 +2042,7 @@ ApplicationWindow {
                     color:         ma5.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  ma5.containsMouse ? app_color : "#2e2e2e"
                     border.width:  ma5.containsMouse ? 2 : 1
-                    visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
+                    //visible: QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"
 
                     Column {
                         anchors.centerIn: parent

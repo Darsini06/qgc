@@ -30,6 +30,7 @@ Item {
             changePasswordDialog.open()
         }
     }
+
     readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 100
 
     RowLayout {
@@ -78,6 +79,7 @@ Item {
                 ColumnLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 20
+
                     Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         width: 100; height: 100; radius: 50 // Reduced Size
@@ -91,6 +93,7 @@ Item {
                             fillMode: Image.PreserveAspectCrop
                         }
                     }
+
                     Column {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 4
@@ -180,10 +183,10 @@ Item {
                                 { "id": "reports", "name": "Mission History", "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
                                 { "id": "logfiles","name": "Log Files", "desc": "View logs and performance of previous flights",
                                     "icon": "qrc:/qmlimages/NewImages/report_color.svg", "color": "#475569" },
-                                { "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
+                                //{ "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
                                 { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_color.svg" },
                                 { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
-                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_black.svg" },
+                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_black.svg"},
                                 { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
                                 { "id": "logout", "name": "Sign Out", "icon": "qrc:/qmlimages/NewImages/signIn.svg", "isWarning": true }
                             ]
@@ -241,6 +244,7 @@ Item {
             p = p.parent
         }
     }
+
     // Change Password Dialog
     Dialog {
         id: changePasswordDialog
@@ -717,6 +721,7 @@ Item {
         messageDialog.messageDialogText = msg
         messageDialog.open()
     }
+
     function changePasswordAPI() {
         var xhr = new XMLHttpRequest();
         // MapGlobals.backendUrl = "http://192.168.137.1:5000";

@@ -1297,7 +1297,7 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.updateAppTheme("Camera");
+                        //mainWindow.updateAppTheme("Camera");
                         MapGlobals.comefrom = "Camera";
                         mainWindow.cameraView();
                         QGroundControl.saveGlobalSetting("waypoint", "waypoint");
@@ -1390,7 +1390,7 @@ Item {
                             } else {
                                 console.log("Frame Dialog not open", frameType);
                                 QGroundControl.saveGlobalSetting("loadpage", "Agri");
-                                mainWindow.updateAppTheme("Agri");
+                                //mainWindow.updateAppTheme("Agri");
                                 mainWindow.showFlyView();
                                 MapGlobals.comefrom = "Plan";
                                 console.log("MapGlobals.comefrom", MapGlobals.comefrom);
@@ -1407,7 +1407,7 @@ Item {
                                 swapCamera();
                             }
                         } else {
-                            mainWindow.updateAppTheme("Agri");
+                            //mainWindow.updateAppTheme("Agri");
                             mainWindow.showFlyView();
                             MapGlobals.comefrom = "Plan";
                             console.log("MapGlobals.comefrom", MapGlobals.comefrom);
@@ -1487,7 +1487,7 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        mainWindow.updateAppTheme("Mapping");
+                        //mainWindow.updateAppTheme("Mapping");
                         mainWindow.showMapping();
                         MapGlobals.comefrom = "Start";
                         _appSettings.screen = "Start";

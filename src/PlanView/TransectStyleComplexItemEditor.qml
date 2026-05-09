@@ -50,7 +50,7 @@ Rectangle {
     readonly property color _colorDangerDark:    "#C42B2B"
     readonly property real  _radius:             8
 
-    property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
+    //property string _application : QGroundControl.loadGlobalSetting("loadpage","loadpage");
 
 
     Component.onCompleted: {
@@ -200,11 +200,11 @@ Rectangle {
             spacing:            _margin
             visible:            transectAreaDefinitionComplete && !_missionItem.wizardMode
 
-            TransectStyleComplexItemTabBar {
-                id:                 tabBar
-                Layout.fillWidth:   true
-                visible: _application !== "Agri"
-            }
+            // TransectStyleComplexItemTabBar {
+            //     id:                 tabBar
+            //     Layout.fillWidth:   true
+            //     visible: _application !== "Agri"
+            // }
 
             // ─── Grid tab ───────────────────────────────────────────────────
             ColumnLayout {
@@ -345,231 +345,232 @@ Rectangle {
             } // Grid Column
 
             // ─── Camera Tab ────────────────────────────────────────────────
-            Rectangle {
-                Layout.fillWidth: true
-                height:           cameraCalcCamera.implicitHeight + (_margin * 2)
-                color:            _colorBgSecondary
-                radius:           _radius
-                border.color:     _colorBorder
-                border.width:     1
-                visible:          tabBar.currentIndex === 1 && _application !== "Agri"
+            // Rectangle {
+            //     Layout.fillWidth: true
+            //     height:           cameraCalcCamera.implicitHeight + (_margin * 2)
+            //     color:            _colorBgSecondary
+            //     radius:           _radius
+            //     border.color:     _colorBorder
+            //     border.width:     1
+            //     visible:          tabBar.currentIndex === 1 && _application !== "Agri"
 
-                CameraCalcCamera {
-                    id: cameraCalcCamera
-                    anchors.left:    parent.left
-                    anchors.right:   parent.right
-                    anchors.top:     parent.top
-                    anchors.margins: _margin
-                    cameraCalc:      _missionItem.cameraCalc
-                }
-            }
+            //     CameraCalcCamera {
+            //         id: cameraCalcCamera
+            //         anchors.left:    parent.left
+            //         anchors.right:   parent.right
+            //         anchors.top:     parent.top
+            //         anchors.margins: _margin
+            //         cameraCalc:      _missionItem.cameraCalc
+            //     }
+            // }
 
             // ─── Terrain Tab ────────────────────────────────────────────────
-            Rectangle {
-                Layout.fillWidth: true
-                height:           terrainFollow.implicitHeight + (_margin * 2)
-                color:            _colorBgSecondary
-                radius:           _radius
-                border.color:     _colorBorder
-                border.width:     1
-                visible:          tabBar.currentIndex === 2 && _application !== "Agri"
+            // Rectangle {
+            //     Layout.fillWidth: true
+            //     height:           terrainFollow.implicitHeight + (_margin * 2)
+            //     color:            _colorBgSecondary
+            //     radius:           _radius
+            //     border.color:     _colorBorder
+            //     border.width:     1
+            //     visible:          tabBar.currentIndex === 2 && _application !== "Agri"
 
-                TransectStyleComplexItemTerrainFollow {
-                    id:          terrainFollow
-                    anchors.left:    parent.left
-                    anchors.right:   parent.right
-                    anchors.top:     parent.top
-                    anchors.margins: _margin
-                    spacing:     _margin
-                    missionItem: _missionItem
-                }
-            }
+            //     TransectStyleComplexItemTerrainFollow {
+            //         id:          terrainFollow
+            //         anchors.left:    parent.left
+            //         anchors.right:   parent.right
+            //         anchors.top:     parent.top
+            //         anchors.margins: _margin
+            //         spacing:     _margin
+            //         missionItem: _missionItem
+            //     }
+            // }
 
             // ─── Presets Tab ────────────────────────────────────────────────
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing:          _margin
-                visible:          tabBar.currentIndex === 3 && _application !== "Agri"
+            // ColumnLayout {
+            //     Layout.fillWidth: true
+            //     spacing:          _margin
+            //     visible:          tabBar.currentIndex === 3 && _application !== "Agri"
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           presetsInnerCol.implicitHeight + (_margin * 2)
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
+            //     Rectangle {
+            //         Layout.fillWidth: true
+            //         height:           presetsInnerCol.implicitHeight + (_margin * 2)
+            //         color:            _colorBgSecondary
+            //         radius:           _radius
+            //         border.color:     _colorBorder
+            //         border.width:     1
 
-                    ColumnLayout {
-                        id:              presetsInnerCol
-                        anchors.left:    parent.left
-                        anchors.right:   parent.right
-                        anchors.top:     parent.top
-                        anchors.margins: _margin
-                        spacing:         _margin
+            //         ColumnLayout {
+            //             id:              presetsInnerCol
+            //             anchors.left:    parent.left
+            //             anchors.right:   parent.right
+            //             anchors.top:     parent.top
+            //             anchors.margins: _margin
+            //             spacing:         _margin
 
-                        QGCLabel {
-                            Layout.fillWidth: true
-                            text:    qsTr("Presets")
-                            color:   _colorTextPrimary
-                            font.bold: true
-                            wrapMode: Text.WordWrap
-                        }
+            //             QGCLabel {
+            //                 Layout.fillWidth: true
+            //                 text:    qsTr("Presets")
+            //                 color:   _colorTextPrimary
+            //                 font.bold: true
+            //                 wrapMode: Text.WordWrap
+            //             }
 
-                        QGCComboBox {
-                            id:              presetCombo
-                            Layout.fillWidth: true
-                            model:           _missionItem.presetNames
+            //             QGCComboBox {
+            //                 id:              presetCombo
+            //                 Layout.fillWidth: true
+            //                 model:           _missionItem.presetNames
 
-                            background: Rectangle {
-                                implicitWidth:  ScreenTools.implicitComboBoxWidth
-                                implicitHeight: ScreenTools.implicitComboBoxHeight
-                                color:          _colorBgTertiary
-                                radius:         8
-                                border.color:   _colorBorder
-                                border.width:   1
-                            }
+            //                 background: Rectangle {
+            //                     implicitWidth:  ScreenTools.implicitComboBoxWidth
+            //                     implicitHeight: ScreenTools.implicitComboBoxHeight
+            //                     color:          _colorBgTertiary
+            //                     radius:         8
+            //                     border.color:   _colorBorder
+            //                     border.width:   1
+            //                 }
 
-                            contentItem: Text {
-                                leftPadding:  ScreenTools.defaultFontPixelWidth
-                                text:         presetCombo.displayText
-                                color:        _colorTextPrimary
-                                font.pointSize: ScreenTools.defaultFontPointSize
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                            }
-                        }
+            //                 contentItem: Text {
+            //                     leftPadding:  ScreenTools.defaultFontPixelWidth
+            //                     text:         presetCombo.displayText
+            //                     color:        _colorTextPrimary
+            //                     font.pointSize: ScreenTools.defaultFontPointSize
+            //                     verticalAlignment: Text.AlignVCenter
+            //                     elide: Text.ElideRight
+            //                 }
+            //             }
 
-                        RowLayout {
-                            Layout.fillWidth: true
+            //             RowLayout {
+            //                 Layout.fillWidth: true
 
-                            Button {
-                                Layout.fillWidth: true
-                                height: 36
-                                enabled: _missionItem.presetNames.length != 0
-                                background: Rectangle {
-                                    radius: _radius
-                                    color: parent.pressed ? "#3d235c" : (parent.hovered ? Qt.lighter(_colorAccent, 1.15) : _colorAccent)
-                                    border.color: _colorAccentLight; border.width: 1
-                                }
-                                contentItem: Text {
-                                    text: qsTr("Apply Preset")
-                                    color: _colorTextPrimary; font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
-                                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: _missionItem.loadPreset(presetCombo.textAt(presetCombo.currentIndex))
-                            }
+            //                 Button {
+            //                     Layout.fillWidth: true
+            //                     height: 36
+            //                     enabled: _missionItem.presetNames.length != 0
+            //                     background: Rectangle {
+            //                         radius: _radius
+            //                         color: parent.pressed ? "#3d235c" : (parent.hovered ? Qt.lighter(_colorAccent, 1.15) : _colorAccent)
+            //                         border.color: _colorAccentLight; border.width: 1
+            //                     }
+            //                     contentItem: Text {
+            //                         text: qsTr("Apply Preset")
+            //                         color: _colorTextPrimary; font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
+            //                         horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+            //                     }
+            //                     onClicked: _missionItem.loadPreset(presetCombo.textAt(presetCombo.currentIndex))
+            //                 }
 
-                            Button {
-                                Layout.fillWidth: true
-                                height: 36
-                                enabled: _missionItem.presetNames.length != 0
-                                background: Rectangle {
-                                    radius: _radius
-                                    color: "transparent"
-                                    border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorBorder)
-                                    border.width: 1
-                                }
-                                contentItem: Text {
-                                    text: qsTr("Delete Preset")
-                                    color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextPrimary)
-                                    font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
-                                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: deletePresetDialog.createObject(mainWindow, { presetName: presetCombo.textAt(presetCombo.currentIndex) }).open()
+            //                 Button {
+            //                     Layout.fillWidth: true
+            //                     height: 36
+            //                     enabled: _missionItem.presetNames.length != 0
+            //                     background: Rectangle {
+            //                         radius: _radius
+            //                         color: "transparent"
+            //                         border.color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorBorder)
+            //                         border.width: 1
+            //                     }
+            //                     contentItem: Text {
+            //                         text: qsTr("Delete Preset")
+            //                         color: parent.pressed ? _colorDangerDark : (parent.hovered ? _colorDanger : _colorTextPrimary)
+            //                         font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
+            //                         horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+            //                     }
+            //                     onClicked: deletePresetDialog.createObject(mainWindow, { presetName: presetCombo.textAt(presetCombo.currentIndex) }).open()
 
-                                Component {
-                                    id: deletePresetDialog
+            //                     Component {
+            //                         id: deletePresetDialog
 
-                                    QGCSimpleMessageDialog {
-                                        title:   qsTr("Delete Preset")
-                                        text:    qsTr("Are you sure you want to delete '%1' preset?").arg(presetName)
-                                        buttons: Dialog.Yes | Dialog.No
+            //                         QGCSimpleMessageDialog {
+            //                             title:   qsTr("Delete Preset")
+            //                             text:    qsTr("Are you sure you want to delete '%1' preset?").arg(presetName)
+            //                             buttons: Dialog.Yes | Dialog.No
 
-                                        property string presetName
+            //                             property string presetName
 
-                                        onAccepted: { _missionItem.deletePreset(presetName) }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            //                             onAccepted: { _missionItem.deletePreset(presetName) }
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
 
-                Button {
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.fillWidth: true
-                    height: 36
-                    background: Rectangle {
-                        radius: _radius
-                        color: parent.pressed ? "#3d235c" : (parent.hovered ? Qt.lighter(_colorAccent, 1.15) : _colorAccent)
-                        border.color: _colorAccentLight; border.width: 1
-                    }
-                    contentItem: Text {
-                        text: qsTr("Save Settings As New Preset")
-                        color: _colorTextPrimary; font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
-                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: savePresetDialog.createObject(mainWindow).open()
-                }
+            //     Button {
+            //         Layout.alignment: Qt.AlignCenter
+            //         Layout.fillWidth: true
+            //         height: 36
+            //         background: Rectangle {
+            //             radius: _radius
+            //             color: parent.pressed ? "#3d235c" : (parent.hovered ? Qt.lighter(_colorAccent, 1.15) : _colorAccent)
+            //             border.color: _colorAccentLight; border.width: 1
+            //         }
+            //         contentItem: Text {
+            //             text: qsTr("Save Settings As New Preset")
+            //             color: _colorTextPrimary; font.bold: true; font.pointSize: ScreenTools.defaultFontPointSize
+            //             horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+            //         }
+            //         onClicked: savePresetDialog.createObject(mainWindow).open()
+            //     }
 
-                // Presets Transect Values Header (Static)
-                QGCLabel {
-                    text:           transectValuesHeaderName
-                    color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.smallFontPointSize
-                    font.bold:      true
-                    Layout.leftMargin: _margin
-                    visible:        !!presetsTransectValuesComponent
-                }
+            //     // Presets Transect Values Header (Static)
+            //     QGCLabel {
+            //         text:           transectValuesHeaderName
+            //         color:          _colorTextSecondary
+            //         font.pointSize: ScreenTools.smallFontPointSize
+            //         font.bold:      true
+            //         Layout.leftMargin: _margin
+            //         visible:        !!presetsTransectValuesComponent
+            //     }
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight:   presetsTransectLoader.implicitHeight + (_margin * 2)
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-                    visible:          !!presetsTransectValuesComponent
+            //     Rectangle {
+            //         Layout.fillWidth: true
+            //         implicitHeight:   presetsTransectLoader.implicitHeight + (_margin * 2)
+            //         color:            _colorBgSecondary
+            //         radius:           _radius
+            //         border.color:     _colorBorder
+            //         border.width:     1
+            //         visible:          !!presetsTransectValuesComponent
 
-                    Loader {
-                        id:              presetsTransectLoader
-                        anchors.left:    parent.left
-                        anchors.right:   parent.right
-                        anchors.top:     parent.top
-                        anchors.margins: _margin
-                        sourceComponent: presetsTransectValuesComponent
+            //         Loader {
+            //             id:              presetsTransectLoader
+            //             anchors.left:    parent.left
+            //             anchors.right:   parent.right
+            //             anchors.top:     parent.top
+            //             anchors.margins: _margin
+            //             sourceComponent: presetsTransectValuesComponent
 
-                        property bool forPresets: true
-                    }
-                }
+            //             property bool forPresets: true
+            //         }
+            //     }
 
-                // Presets Stats Header (Static)
-                QGCLabel {
-                    text:           qsTr("Statistics")
-                    color:          _colorTextSecondary
-                    font.pointSize: ScreenTools.smallFontPointSize
-                    font.bold:      true
-                    Layout.leftMargin: _margin
-                }
+            //     // Presets Stats Header (Static)
+            //     QGCLabel {
+            //         text:           qsTr("Statistics")
+            //         color:          _colorTextSecondary
+            //         font.pointSize: ScreenTools.smallFontPointSize
+            //         font.bold:      true
+            //         Layout.leftMargin: _margin
+            //     }
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:           presetsStats.implicitHeight + (_margin * 2)
-                    color:            _colorBgSecondary
-                    radius:           _radius
-                    border.color:     _colorBorder
-                    border.width:     1
-                    visible:          true
+            //     Rectangle {
+            //         Layout.fillWidth: true
+            //         height:           presetsStats.implicitHeight + (_margin * 2)
+            //         color:            _colorBgSecondary
+            //         radius:           _radius
+            //         border.color:     _colorBorder
+            //         border.width:     1
+            //         visible:          true
 
-                    TransectStyleComplexItemStats {
-                        id:              presetsStats
-                        anchors.left:    parent.left
-                        anchors.right:   parent.right
-                        anchors.top:     parent.top
-                        anchors.margins: _margin
-                    }
-                }
-            } // Presets Column
+            //         TransectStyleComplexItemStats {
+            //             id:              presetsStats
+            //             anchors.left:    parent.left
+            //             anchors.right:   parent.right
+            //             anchors.top:     parent.top
+            //             anchors.margins: _margin
+            //         }
+            //     }
+            // }
+
         } // Top level Column
 
         Component {
