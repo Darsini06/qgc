@@ -1,7 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick
-import QtQuick.Controls
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import QGroundControl
@@ -10,7 +8,6 @@ import QGroundControl.FactControls
 import QGroundControl.ScreenTools
 import QGroundControl.Palette
 import MapGlobals
-import QtQuick.Layouts
 
 import QtQuick.Effects
 
@@ -25,7 +22,7 @@ Item {
     property var _fullItem
     property var _pipOrWindowItem
 
-    property string droneType: QGroundControl.loadGlobalSetting("loadpage", "loadpage")
+
     property color app_color: "#262626"
     property color secondary_color: "#262626"
     property color accent_color: "#f97316" // The Orange accent
@@ -69,8 +66,6 @@ Item {
     onVisibleChanged: {
         if (visible) {
             console.log("HomeScreen onVisibleChanged");
-            droneType = QGroundControl.loadGlobalSetting("loadpage", "loadpage");
-            console.log("droneType", droneType);
         }
     }
 
@@ -136,14 +131,7 @@ Item {
             id: bgImage
             anchors.fill: parent
             visible: true
-            source: {
-
-                if (droneType === "Camera")  return "qrc:/qmlimages/NewImages/camera_bg_image.png"
-                if (droneType === "Mapping") return "qrc:/qmlimages/NewImages/mapping_bg_image.png"
-                if (droneType === "Agri")    return "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
-                if (droneType === "AI")      return "qrc:/qmlimages/NewImages/ai_bg_image.png"
-                return "qrc:/qmlimages/NewImages/nature_bg_rice_fields.jpg" // Nature rice fields background
-            }
+            source: "qrc:/qmlimages/NewImages/agri_bg_image_pro.png"
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: true
@@ -304,6 +292,7 @@ Item {
 
             // Note: Shake/Floating animation removed per user request
         }
+
     }
 
     //Bluetooth Loading Screen
@@ -366,84 +355,6 @@ Item {
             Component.onCompleted: opacity = 1
         }
 
-        Label {
-            id: topBrandText
-            text: "DRONE COMMANDER"
-            // Hide on small mobile screens (phones), show on tablets and desktop
-            // Only show the main branding tagline on the primary home state to prevent background ghosting in operational modes
-            visible: (droneType === "loadpage") && !isSmallScreen && parent.height > 500
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            // Ensure space is shared between header and content
-            anchors.topMargin: {
-                if (droneType === "loadpage") {
-                    return Math.max(dp(20), parent.height * 0.3);
-                } else {
-                    return dp(16); // Moved down for more style
-                }
-            }
-            color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
-            font.family: "Outfit"
-            font.bold: true
-            font.letterSpacing: isTablet || isDesktop ? 8 : 4
-            // Use ScreenTools.largeFontPointSize for better resolution independence
-            font.pointSize: {
-                var baseSize = ScreenTools.largeFontPointSize;
-                var scaleMultiplier = dynamicScaleFactor;
-                if (droneType === "loadpage") {
-                    if (isDesktop)
-                        return baseSize * 4.0 * scaleMultiplier;
-                    if (isTablet)
-                        return baseSize * 3.5 * scaleMultiplier;
-                    return baseSize * 1.8; // Mobile stays clean
-                } else {
-                    if (isDesktop)
-                        return baseSize * 2.8 * scaleMultiplier;
-                    if (isTablet)
-                        return baseSize * 2.4 * scaleMultiplier;
-                    return baseSize * 1.3;
-                }
-            }
-            opacity: 0
-            z: 5
-
-            // Position and Size Animations
-            Behavior on anchors.topMargin {
-                NumberAnimation {
-                    duration: 800
-                    easing.type: Easing.OutBack
-                }
-            }
-            Behavior on font.pointSize {
-                NumberAnimation {
-                    duration: 600
-                }
-            }
-            Behavior on font.letterSpacing {
-                NumberAnimation {
-                    duration: 600
-                }
-            }
-
-            Component.onCompleted: {
-                topTextEntry.start();
-            }
-
-            SequentialAnimation {
-                id: topTextEntry
-                PauseAnimation {
-                    duration: 200
-                }
-                NumberAnimation {
-                    target: topBrandText
-                    property: "opacity"
-                    from: 0
-                    to: 0.95
-                    duration: 1200
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
 
         // ---- TOP RIGHT NAVIGATION ----
         Row {
@@ -504,54 +415,6 @@ Item {
                 }
             }
 
-            // Application
-            Item {
-                width: dp(6)
-                height: dp(6)
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 12
-                    color: appMouse.containsMouse ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.05)
-                    border.color: appMouse.containsMouse ? accent_color : Qt.rgba(0, 0, 0, 0.1)
-                    border.width: 1
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 200
-                        }
-                    }
-                }
-
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: dp(1.5)
-                    Image {
-                        Layout.preferredWidth: dp(2.8)
-                        Layout.preferredHeight: dp(2.8)
-                        source: "qrc:/qmlimages/NewImages/select_drone_type_color.svg"
-                        fillMode: Image.PreserveAspectFit
-                    }
-                    Label {
-                        text: qsTr("APPLICATION")
-                        color: "#262626"
-                        visible: false
-                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                        font.bold: true
-                        font.family: "Outfit"
-                    }
-                }
-
-                MouseArea {
-                    id: appMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        MapGlobals.currentView_profile = "drone";
-                        mainWindow.openProfileScreen();
-                    }
-                }
-            }
 
             // Logout
             Item {
@@ -606,18 +469,18 @@ Item {
         Column {
             id: heroSection
             // Conditional positioning: Center for the main tagline, Left for operational modes
-            anchors.horizontalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? undefined : parent.horizontalCenter
-            anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? parent.left : undefined
-            anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
+            anchors.horizontalCenter:  undefined
+            anchors.left:  parent.left
+            anchors.leftMargin:((isSmallScreen || isMobile) ? dp(4) : 40)
 
             // Vertically centered alignment
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(5) : 0
+            anchors.verticalCenterOffset: -dp(5)
 
             width: {
                 if (isSmallScreen || isMobile)
                     return parent.width * 0.75; // Wider on mobile to prevent excessive wrapping
-                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140)); // Reduced width to prevent overlap with background drone
+                return Math.min(parent.width * 0.45, dp(140)); // Reduced width to prevent overlap with background drone
             }
             // Reduced basic spacing between elements
             spacing: isSmallScreen ? dp(0.5) : dp(1.5)
@@ -629,46 +492,32 @@ Item {
                 id: heroTitle
                 width: parent.width
                 wrapMode: Text.WordWrap
-                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
-                visible: droneType !== "loadpage" // Avoid duplicate "DRONE COMMANDER" on homescreen
-                text: {
-
-                    if (droneType === "Camera")  return "CAMERA OPERATIONS"
-                    if (droneType === "Mapping") return "MAPPING & SURVEY"
-                    if (droneType === "Agri")    return "AGRICULTURAL PRECISION"
-                    if (droneType === "AI")      return "AI MISSION ASSISTANT"
-                    return ""
-
-                }
-                color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
+                horizontalAlignment: Text.AlignLeft
+                visible: true // Avoid duplicate "DRONE COMMANDER" on homescreen
+                text: "AGRICULTURAL PRECISION"
+                color: "#FFFFFF"
                 // Massive size for Drone Commander, slightly larger for others
                 font.pointSize: {
                     var baseSize = ScreenTools.largeFontPointSize;
                     var scaleMultiplier = dynamicScaleFactor;
-                    if (droneType === "loadpage") {
-                        if (isDesktop)
-                            return baseSize * 3.5 * scaleMultiplier;
-                        if (isTablet)
-                            return baseSize * 3.0 * scaleMultiplier;
-                        return baseSize * 1.5;
-                    } else {
+
                         if (isDesktop)
                             return baseSize * 1.5 * scaleMultiplier; // Slightly reduced to save vertical space
                         if (isTablet)
                             return baseSize * 1.4 * scaleMultiplier;
                         return baseSize * 0.85;
-                    }
+
                 }
                 font.bold: true
                 font.family: "Outfit"
-                font.letterSpacing: (droneType === "loadpage" && !isSmallScreen) ? 4 : 1.2
+                font.letterSpacing: (!isSmallScreen) ? 4 : 1.2
                 lineHeight: 0.9 // Improved from 0.82 to prevent letter clipping
 
                 // Glow/Shadow for text readability
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.2) : Qt.rgba(0, 0, 0, 0.8)
+                    shadowColor: Qt.rgba(0, 0, 0, 0.8)
                     shadowBlur: 0.3
                     shadowHorizontalOffset: 2
                     shadowVerticalOffset: 2
@@ -681,16 +530,10 @@ Item {
                 visible: !isSmallScreen // Hide on small screens to give room for the Flight Zone widget
                 width: parent.width
                 wrapMode: Text.WordWrap
-                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
-                text: {
-                    if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
-                    if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
-                    if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
-                    if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
-                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
-                }
+                horizontalAlignment: Text.AlignLeft
+                text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
 
-                color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
+                color:  Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
                     var baseSize = ScreenTools.defaultFontPointSize;
                     var scaleMultiplier = dynamicScaleFactor;
@@ -701,7 +544,6 @@ Item {
                     return baseSize * 0.8; // Mobile
                 }
                 font.family: "Outfit"
-                font.italic: droneType === "loadpage"
                 font.bold: false
                 lineHeight: 1.3
                 topPadding: dp(1) // Reduced top padding to bring description closer to heading
@@ -710,7 +552,7 @@ Item {
                 layer.enabled: true
                 layer.effect: MultiEffect {
                     shadowEnabled: true
-                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
+                    shadowColor:  Qt.rgba(0, 0, 0, 0.6)
                     shadowBlur: 0.2
                     shadowVerticalOffset: 1
                 }
@@ -722,7 +564,7 @@ Item {
             Rectangle {
                 id: airspaceWidget
                 visible: true // Always show or adapt as needed
-                anchors.horizontalCenter: (droneType === "loadpage") ? parent.horizontalCenter : undefined
+                anchors.horizontalCenter:  undefined
 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
@@ -798,7 +640,7 @@ Item {
                         // Safe access to global managers
                         var manager = QGroundControl.airspaceManager
                         var posManager = QGroundControl.qgcPositionManager
-                        
+
                         if (!manager || !posManager) return
 
                         var pos = posManager.gcsPosition
@@ -812,7 +654,7 @@ Item {
                                             )
                                 airspaceWidget._airspaceDataAvailable = true
                             }
-                            
+
                             // Update UI properties safely
                             isCheckingAirspace = manager.isLoading
                             isClearToFly = !manager.isCoordinateInRedZone(pos)
@@ -940,217 +782,6 @@ Item {
             }
         }
 
-        // ---- COMING SOON RIGHT SIDE PANEL (AI MODE) ----
-        Item {
-            id: comingSoonPanel
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(4) : 60
-            width: (isSmallScreen || isMobile) ? parent.width * 0.45 : dp(75)
-            height: Math.min(parent.height * 0.65, dp(85))
-            visible: droneType === "AI"
-            z: 100
-
-            // Entrance animation
-            opacity: 0
-            transform: Translate { id: panelSlide; x: 40 }
-            Component.onCompleted: {
-                if (droneType === "AI") panelEntryAnim.start()
-            }
-            onVisibleChanged: {
-                if (visible) panelEntryAnim.start()
-            }
-
-            SequentialAnimation {
-                id: panelEntryAnim
-                PauseAnimation { duration: 300 }
-                ParallelAnimation {
-                    NumberAnimation { target: comingSoonPanel; property: "opacity"; from: 0; to: 1; duration: 1200; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: panelSlide; property: "x"; from: 40; to: 0; duration: 1200; easing.type: Easing.OutBack }
-                }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: 28
-                color: Qt.rgba(0, 0, 0, 0.7) // Increased opacity for better legibility without blur
-                border.color: Qt.rgba(255, 255, 255, 0.15)
-                border.width: 1
-
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.rgba(0,0,0,0.6)
-                    shadowBlur: 1.0
-                    shadowVerticalOffset: 12
-                    blurEnabled: false
-                }
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: dp(3.5)
-                    spacing: dp(2.5)
-
-                    // Header decoration
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: dp(1.8)
-
-                        Rectangle {
-                            width: dp(5.5)
-                            height: dp(5.5)
-                            radius: 12
-                            color: accent_color
-                            QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/select_drone_type_color.svg"
-                                width: parent.width * 0.6
-                                height: width
-                                anchors.centerIn: parent
-                                color: "white"
-                            }
-                        }
-
-                        ColumnLayout {
-                            spacing: -2
-                            Label {
-                                text: "NEXT GENERATION"
-                                color: accent_color
-                                font.family: "Outfit"
-                                font.bold: true
-                                font.pointSize: ScreenTools.smallFontPointSize * 0.75
-                                font.letterSpacing: 2.5
-                            }
-                            Label {
-                                text: "MISSION HUB"
-                                color: "white"
-                                font.family: "Outfit"
-                                font.bold: true
-                                font.pointSize: ScreenTools.largeFontPointSize * 0.9
-                            }
-                        }
-                    }
-
-                    // Divider
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 1
-                        opacity: 0.15
-                        gradient: Gradient {
-                            orientation: Gradient.Horizontal
-                            GradientStop { position: 0.0; color: "transparent" }
-                            GradientStop { position: 0.5; color: "white" }
-                            GradientStop { position: 1.0; color: "transparent" }
-                        }
-                    }
-
-                    Label {
-                        Layout.fillWidth: true
-                        text: "Autonomous intelligence that thinks ahead. Deploy neural-link drone coordination and real-time tactical analysis."
-                        color: "white"
-                        opacity: 0.7
-                        wrapMode: Text.WordWrap
-                        font.family: "Outfit"
-                        font.pointSize: ScreenTools.defaultFontPointSize * 0.95
-                        lineHeight: 1.3
-                    }
-
-                    // Feature Grid
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: dp(2)
-
-                        Repeater {
-                            model: [
-                                { icon: "qrc:/qmlimages/NewImages/camera_Application.svg", title: "Autonomous Swarming", desc: "Multi-drone coordination" },
-                                { icon: "qrc:/qmlimages/NewImages/mapping_Application.svg", title: "Neural Terrain AI", desc: "Real-time environment analysis" },
-                                { icon: "qrc:/qmlimages/NewImages/agri_Application.svg", title: "Predictive Ops", desc: "Data-driven mission optimization" }
-                            ]
-
-                            delegate: RowLayout {
-                                Layout.fillWidth: true
-                                spacing: dp(1.8)
-
-                                Rectangle {
-                                    width: dp(4)
-                                    height: dp(4)
-                                    radius: 8
-                                    color: Qt.rgba(255, 255, 255, 0.06)
-                                    border.color: Qt.rgba(255, 255, 255, 0.05)
-                                    QGCColoredImage {
-                                        source: modelData.icon
-                                        width: parent.width * 0.6
-                                        height: width
-                                        anchors.centerIn: parent
-                                        color: accent_color
-                                    }
-                                }
-
-                                ColumnLayout {
-                                    spacing: 0
-                                    Label {
-                                        text: modelData.title
-                                        color: "white"
-                                        font.family: "Outfit"
-                                        font.bold: true
-                                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    }
-                                    Label {
-                                        text: modelData.desc
-                                        color: "white"
-                                        opacity: 0.5
-                                        font.family: "Outfit"
-                                        font.pointSize: ScreenTools.smallFontPointSize * 0.8
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    // Status Badge
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: dp(6.5)
-                        radius: 14
-                        color: Qt.rgba(249/255, 115/255, 22/255, 0.12)
-                        border.color: Qt.rgba(249/255, 115/255, 22/255, 0.25)
-
-                        RowLayout {
-                            anchors.centerIn: parent
-                            spacing: dp(1.2)
-
-                            Rectangle {
-                                width: dp(1.2)
-                                height: dp(1.2)
-                                radius: width / 2
-                                color: accent_color
-                                SequentialAnimation on opacity {
-                                    loops: Animation.Infinite
-                                    NumberAnimation { from: 0.2; to: 1.0; duration: 1000; easing.type: Easing.InOutSine }
-                                    NumberAnimation { from: 1.0; to: 0.2; duration: 1000; easing.type: Easing.InOutSine }
-                                }
-                                layer.enabled: true
-                                layer.effect: MultiEffect {
-                                    shadowEnabled: true
-                                    shadowColor: accent_color
-                                    shadowBlur: 0.8
-                                }
-                            }
-
-                            Label {
-                                text: "IN DEVELOPMENT: PHASE 2"
-                                color: accent_color
-                                font.family: "Outfit"
-                                font.bold: true
-                                font.pointSize: ScreenTools.smallFontPointSize * 0.85
-                                font.letterSpacing: 1.5
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         // ---- BOTTOM BUTTONS BAR ----
         RowLayout {
@@ -1237,81 +868,6 @@ Item {
                 Layout.fillWidth: true
             }
 
-            // Click to Camera
-            Item {
-                id: cameraClick
-                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
-                visible: droneType === "loadpage" || droneType === "Camera"
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 20
-                    color: cameraMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
-                    border.color: cameraMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
-                    border.width: 1
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 150
-                        }
-                    }
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: dp(0.8)
-                        spacing: dp(1.5)
-
-                        Rectangle {
-                            Layout.preferredWidth: parent.height - dp(1)
-                            Layout.preferredHeight: Layout.preferredWidth
-                            radius: width / 2
-                            color: "#1a1a1a" // Deep background for icon
-
-                            QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/camera_Application.svg"
-                                width: parent.width * 0.5
-                                height: width
-                                color: "white"
-                                anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
-                        }
-
-                        Label {
-                            Layout.fillWidth: true
-                            text: qsTr("CAMERA")
-                            color: "white"
-                            font.family: "Outfit"
-                            font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                        }
-                    }
-                }
-
-                MouseArea {
-                    id: cameraMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        mainWindow.updateAppTheme("Camera");
-                        MapGlobals.comefrom = "Camera";
-                        mainWindow.cameraView();
-                        QGroundControl.saveGlobalSetting("waypoint", "waypoint");
-                        var videoSettings = QGroundControl.settingsManager.videoSettings;
-                        if (videoSettings) {
-                            var videoSourceFact = videoSettings.videoSource;
-                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                videoSourceFact.value = videoSourceFact.enumValues[0];
-                            }
-                        }
-                        swapCamera();
-                    }
-                }
-            }
 
             // Click to Agri
             Item {
@@ -1321,7 +877,7 @@ Item {
                 Layout.maximumWidth: dp(30)
                 Layout.minimumWidth: dp(18)
                 Layout.preferredHeight: dp(7)
-                visible: droneType === "loadpage" || droneType === "Agri"
+                visible:  true
 
                 Rectangle {
                     anchors.fill: parent
@@ -1427,81 +983,7 @@ Item {
                 }
             }
 
-            // Click to Mapping
-            Item {
-                id: mappingClick
-                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
-                visible: droneType === "loadpage" || droneType === "Mapping"
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 20
-                    color: mappingMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
-                    border.color: mappingMouse.containsMouse ? app_color : Qt.rgba(255, 255, 255, 0.15)
-                    border.width: 1
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 150
-                        }
-                    }
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: dp(0.8)
-                        spacing: dp(1.5)
-
-                        Rectangle {
-                            Layout.preferredWidth: parent.height - dp(1)
-                            Layout.preferredHeight: Layout.preferredWidth
-                            radius: width / 2
-                            color: "#1a1a2a" // Subtle dark blue tint for mapping background
-
-                            QGCColoredImage {
-                                source: "qrc:/qmlimages/NewImages/mapping_Application.svg"
-                                width: parent.width * 0.5
-                                height: width
-                                color: "#3b82f6" // Professional vibrant blue
-                                anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
-                        }
-
-                        Label {
-                            Layout.fillWidth: true
-                            text: qsTr("MAPPING")
-                            color: "white"
-                            font.family: "Outfit"
-                            font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
-                        }
-                    }
-                }
-
-                MouseArea {
-                    id: mappingMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        mainWindow.updateAppTheme("Mapping");
-                        mainWindow.showMapping();
-                        MapGlobals.comefrom = "Start";
-                        _appSettings.screen = "Start";
-                        var videoSettings = QGroundControl.settingsManager.videoSettings;
-                        if (videoSettings) {
-                            var videoSourceFact = videoSettings.videoSource;
-                            if (videoSourceFact && videoSourceFact.enumValues.length > 1) {
-                                videoSourceFact.value = videoSourceFact.enumValues[0];
-                            }
-                        }
-                        swapCamera();
-                    }
-                }
-            }
         }
     }
 
