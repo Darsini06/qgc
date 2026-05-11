@@ -1442,7 +1442,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
-                        topPadding:         ScreenTools.defaultFontPixelHeight * 1.5
+                        topPadding:         ScreenTools.defaultFontPixelHeight * 2.5
 
                         Button {
                             id: boundaryPointBtn
