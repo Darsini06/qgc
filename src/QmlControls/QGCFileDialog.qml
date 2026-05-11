@@ -358,27 +358,18 @@ Item {
                             }
                         }
 
-                        // See More Button
+                        // See More Info Text
                         Rectangle {
                             width:  parent.width
                             height: 40
-                            color:  "#f5f5f5"
+                            color:  "transparent"
                             visible: mobileFileOpenDialog.displayList.length > 4
 
                             QGCLabel {
                                 anchors.centerIn: parent
-                                text: qsTr("See More...")
-                                color: "#4a2c6d"
-                                font.bold: true
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    mobileFileOpenDialog.close()
-                                    MapGlobals.jumpToFileList = true
-                                    mainWindow.logfiles()
-                                }
+                                text: qsTr("For more files, visit Profile > Log Files")
+                                color: "#666666"
+                                font.pointSize: ScreenTools.smallFontPointSize
                             }
                         }
                     }
