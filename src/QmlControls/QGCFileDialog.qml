@@ -359,7 +359,11 @@ Item {
                             }
                         }
 
+<<<<<<< HEAD
                         // View All Plans Text
+=======
+                        // See More Info Text
+>>>>>>> 9c52b09bfae03ea13b73534901ab9b4217c14fb2
                         Rectangle {
                             width:  parent.width
                             height: 40
@@ -368,8 +372,14 @@ Item {
 
                             QGCLabel {
                                 anchors.centerIn: parent
+<<<<<<< HEAD
                                 text: qsTr("To view all plans move to profile page log files")
                                 color: "black"
+=======
+                                text: qsTr("For more files, visit Profile > Log Files")
+                                color: "#666666"
+                                font.pointSize: ScreenTools.smallFontPointSize
+>>>>>>> 9c52b09bfae03ea13b73534901ab9b4217c14fb2
                             }
                         }
                     }
