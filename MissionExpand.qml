@@ -23,9 +23,9 @@ Rectangle {
         GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.41) }
     }
 
-    radius:         8
+    radius:         ScreenTools.defaultFontPixelHeight * 0.45
     opacity:        _currentItem ? 1.0 : 0.75
-    border.width:   _currentItem ? 1 : 1
+    border.width:   1
     border.color:   _currentItem ? "#8a6cad" : "#3d2455"
 
     property var    map                 ///< Map control
@@ -95,7 +95,7 @@ Rectangle {
         Item {
             id:                 topRowLayout
             width:              parent.width
-            height:             45
+            height:             ScreenTools.defaultFontPixelHeight * 2.5
 
 
 
@@ -103,9 +103,9 @@ Rectangle {
             Item {
                 id:                     commandPicker
                 anchors.left:           parent.left
-                anchors.leftMargin:     10
+                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.5
                 anchors.right:          parent.right
-                anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + 20) : 10
+                anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + ScreenTools.defaultFontPixelWidth) : ScreenTools.defaultFontPixelWidth * 0.5
                 anchors.verticalCenter: parent.verticalCenter
                 height:                 parent.height
                 visible:                !commandLabel.visible
@@ -121,7 +121,7 @@ Rectangle {
                         text:                   (missionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri") ? qsTr("Plot") : missionItem.commandName
                         color:                  "white"
                         font.bold:              true
-                        font.pointSize:         14
+                        font.pointSize:         ScreenTools.defaultFontPointSize
                         font.family:            "Outfit"
                         horizontalAlignment:    Text.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
@@ -173,15 +173,15 @@ Rectangle {
             QGCLabel {
                 id:                     commandLabel
                 anchors.left:           parent.left
-                anchors.leftMargin:     10
+                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.5
                 anchors.right:          parent.right
-                anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + 20) : 10
+                anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + ScreenTools.defaultFontPixelWidth) : ScreenTools.defaultFontPixelWidth * 0.5
                 anchors.verticalCenter: parent.verticalCenter
                 visible:                (!missionItem.isCurrentItem || !missionItem.isSimpleItem || _waypointsOnlyMode || missionItem.isTakeoffItem)
                 text:                   ( missionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri" ) ? qsTr("Plot") : missionItem.commandName
                 color:                  "white"
                 font.bold:              true
-                font.pointSize:         14
+                font.pointSize:         ScreenTools.defaultFontPointSize
                 font.family:            "Outfit"
                 horizontalAlignment:    Text.AlignHCenter
                 verticalAlignment:      Text.AlignVCenter
@@ -191,9 +191,9 @@ Rectangle {
                 id:                     editItemBtn
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right:          parent.right
-                anchors.rightMargin:    10
-                height:                 30
-                width:                  60
+                anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.5
+                height:                 ScreenTools.defaultFontPixelHeight * 1.5
+                width:                  ScreenTools.defaultFontPixelWidth * 6
                 text:                   qsTr("Edit")
                 visible:                (missionItem.commandName === "Mission Start" ||
                                          missionItem.commandName === "Survey") && MapGlobals.isReviewMode
@@ -201,14 +201,14 @@ Rectangle {
 
                 background: Rectangle {
                     color:  editItemBtn.pressed ? "#444" : "#222"
-                    radius: 4
+                    radius: ScreenTools.defaultFontPixelHeight * 0.2
                     border.color: "white"
                     border.width: 1
                 }
                 contentItem: Text {
                     text:                   editItemBtn.text
                     color:                  "white"
-                    font.pointSize:         12
+                    font.pointSize:         ScreenTools.smallFontPointSize
                     horizontalAlignment:    Text.AlignHCenter
                     verticalAlignment:      Text.AlignVCenter
                 }
@@ -219,7 +219,7 @@ Rectangle {
         Item {
             id:                 rtlDescRow
             width:              parent.width
-            height:             visible ? (rtlDescLabel.implicitHeight + 16) : 0
+            height:             visible ? (rtlDescLabel.implicitHeight + ScreenTools.defaultFontPixelHeight) : 0
             visible:            _currentItem && missionItem.commandName === "Return To Launch"
 
             // Top separator line
@@ -236,12 +236,12 @@ Rectangle {
                 id:                     rtlDescLabel
                 anchors.left:           parent.left
                 anchors.right:          parent.right
-                anchors.leftMargin:     12
-                anchors.rightMargin:    12
+                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.75
+                anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.75
                 anchors.verticalCenter: parent.verticalCenter
                 text:                   qsTr("Sends the vehicle back to its launch position.")
                 color:                  Qt.rgba(1, 1, 1, 0.65)
-                font.pointSize:         10
+                font.pointSize:         ScreenTools.smallFontPointSize
                 font.family:            "Outfit"
                 horizontalAlignment:    Text.AlignHCenter
                 verticalAlignment:      Text.AlignVCenter
@@ -252,7 +252,7 @@ Rectangle {
         // ── Inline editor (excludes Mission Start, Survey, Return To Launch) ──
         Loader {
             id:                 editorLoader
-            width:              _root.width > 0 ? _root.width - (_innerMargin * 2) : 200
+            width:              _root.width > 0 ? _root.width - (_innerMargin * 2) : ScreenTools.defaultFontPixelWidth * 15
             source:             (_currentItem
                                  && missionItem.commandName !== "Mission Start"
                                  && missionItem.commandName !== "Survey"
@@ -264,7 +264,7 @@ Rectangle {
                                  && missionItem.commandName !== "Return To Launch")
 
             property var    masterController:   _masterController
-            property real   availableWidth:     _root.width > 0 ? _root.width - (_innerMargin * 2) : 200
+            property real   availableWidth:     _root.width > 0 ? _root.width - (_innerMargin * 2) : ScreenTools.defaultFontPixelWidth * 15
             property var    editorRoot:         _root
         }
     } // Column

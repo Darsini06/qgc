@@ -84,7 +84,7 @@ Item {
     property bool waypointMark: QGroundControl.loadGlobalSetting("waypointMark","true")==="true"
     property bool returnWaypointEnabled: QGroundControl.loadGlobalSetting("returnWaypointEnabled", "true") === "true"
 
-    property real compassBottomY: compassNorth.y + compassNorth.height + 10
+    property real compassBottomY: compassNorth.y + compassNorth.height + (ScreenTools.defaultFontPixelHeight * 0.5)
     property real compassNorthX:   compassNorth.x
 
     AirspaceRestrictionValidator {
@@ -262,9 +262,9 @@ Item {
     ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.bottomMargin: 20
-        anchors.leftMargin: 20
-        spacing: 20
+        anchors.bottomMargin: ScreenTools.defaultFontPixelHeight * 1.1
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
+        spacing: ScreenTools.defaultFontPixelHeight * 1.1
 
         Rectangle {
             id: sharebtn
@@ -663,8 +663,8 @@ Item {
     QGCMapPolygonVisuals {
         id:                     mapPolygonvisuals
         mapControl:             editorMap
-        cardinalBottomScreenY:  planToolBar.y + planToolBar.height + 12
-        cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + 120
+        cardinalBottomScreenY:  planToolBar.y + planToolBar.height + (ScreenTools.defaultFontPixelHeight * 0.6)
+        cardinalLeftScreenX:    (ScreenTools.isMobile ? parent.width * 0.50 : 450) + (ScreenTools.defaultFontPixelWidth * 6.5)
     }
 
     QGCFileDialog {
@@ -1425,12 +1425,12 @@ Item {
 
             Column {
                 id:                 rightControls
-                spacing:            8
+                spacing:            ScreenTools.defaultFontPixelHeight * 0.4
                 anchors.left:       parent.left
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.topMargin:  -(ScreenTools.defaultFontPixelHeight * 1.5)
 
                 // 1st: Boundary Point
                 Loader {
@@ -1440,17 +1440,17 @@ Item {
                     visible:            active && !MapGlobals.isReviewMode
 
                     sourceComponent: Column {
-                        spacing:            12
+                        spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
                         topPadding:         ScreenTools.defaultFontPixelHeight * 3.0
 
                         Button {
                             id: boundaryPointBtn
                             width:              parent.width
-                            height:             45
-                            padding:            10
+                            height:             ScreenTools.defaultFontPixelHeight * 2.5
+                            padding:            ScreenTools.defaultFontPixelHeight * 0.5
                             background: Rectangle {
-                                radius: 8
+                                radius: ScreenTools.defaultFontPixelHeight * 0.45
                                 color: Qt.rgba(0, 0, 0, 0.41)
                                 anchors.fill: parent
                             }
@@ -1458,7 +1458,7 @@ Item {
                                 text:               qsTr("Boundary Point")
                                 font.bold:          true
                                 color:              "white"
-                                font.pointSize:     14
+                                font.pointSize:     ScreenTools.defaultFontPointSize
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment:   Text.AlignVCenter
                                 font.family:        "Outfit"
@@ -1486,8 +1486,8 @@ Item {
                     Rectangle {
                         visible:  layerTabBar.fenceVisible
                         width:    parent.width
-                        height:   45
-                        radius:   8
+                        height:   ScreenTools.defaultFontPixelHeight * 2.5
+                        radius:   ScreenTools.defaultFontPixelHeight * 0.45
                         color:    layerTabBar.currentIndex === 1 ? "black" : Qt.rgba(0, 0, 0, 0.41)
                         border.width: 0
 
@@ -1496,7 +1496,7 @@ Item {
                             text: qsTr("Obstacles")
                             color: "white"
                             font.bold:          true
-                            font.pointSize:     14
+                            font.pointSize:     ScreenTools.defaultFontPointSize
                             font.family:        "Outfit"
                             anchors.centerIn:   parent
                         }
@@ -1520,9 +1520,9 @@ Item {
                 Rectangle {
                     id:         layerTabBarUTMSP
                     width:      parent.width
-                    height:     40
+                    height:     ScreenTools.defaultFontPixelHeight * 2.2
                     color:      "#f1f5f9"
-                    radius:     8
+                    radius:     ScreenTools.defaultFontPixelHeight * 0.45
                     border.color: "#e2e8f0"
                     border.width: 1
                     visible:    QGroundControl.corePlugin.options.enablePlanViewSelector && _utmspEnabled && !MapGlobals.isReviewMode
@@ -1634,7 +1634,7 @@ Item {
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
-                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 0.5)
+                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 2.5)
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
@@ -1744,12 +1744,12 @@ Item {
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.left:           parent.left
                 anchors.right:          parent.right
-                height:                 45
+                height:                 ScreenTools.defaultFontPixelHeight * 2.5
                 text:                   qsTr("Save Plan")
                 visible:                _editingLayer == _layerMission && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
-
+                
                 background: Rectangle {
-                    radius: 8
+                    radius: ScreenTools.defaultFontPixelHeight * 0.45
                     color: "black"
                     border.color: "white"
                     border.width: 1
@@ -2067,7 +2067,7 @@ Item {
             id: editdata
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.bottomMargin: 60
+            anchors.bottomMargin: 100
             anchors.leftMargin: 4
 
             Row {
@@ -2233,6 +2233,7 @@ Item {
             anchors.left:       mapScale.left
             anchors.right:      rightPanel.left
             anchors.bottom:     parent.bottom
+            anchors.bottomMargin: 40
             height:             ScreenTools.defaultFontPixelHeight * 7
             missionController:  _missionController
             visible:            false//_internalVisible && _editingLayer === _layerMission && QGroundControl.corePlugin.options.showMissionStatus
@@ -2764,8 +2765,8 @@ Item {
         height:             baseSize
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
-        anchors.topMargin:  2
-        anchors.leftMargin: 4
+        anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.1
+        anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
         z:                  QGroundControl.zOrderWidgets + 1
 
         Rectangle {
@@ -2814,7 +2815,7 @@ Item {
         width:  Math.min(240, parent.width * 0.9)
         height: Math.min(popupInnerCol.implicitHeight + 40, _maxPopupHeight)
         x: 0
-        y: parent.height - height
+        y: parent.height - height - 100
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape
