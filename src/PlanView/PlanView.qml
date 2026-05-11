@@ -1430,7 +1430,7 @@ Item {
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  -(ScreenTools.defaultFontPixelHeight * 1.5)
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.25
 
                 // 1st: Boundary Point
                 Loader {
@@ -1442,7 +1442,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
-                        topPadding:         ScreenTools.defaultFontPixelHeight * 3.0
+                        topPadding:         ScreenTools.defaultFontPixelHeight * 0.25
 
                         Button {
                             id: boundaryPointBtn
@@ -1634,7 +1634,7 @@ Item {
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
-                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 2.5)
+                anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
