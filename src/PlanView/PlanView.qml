@@ -240,6 +240,23 @@ Item {
     Connections {
         target: MapGlobals
         onRequestCloudSync: syncCloud()
+        onLoadLocalPlan: (path) => {
+            console.log("PlanView: loading local plan:", path)
+            _planMasterController.loadFromFile(path)
+            MapGlobals.isReviewMode = true
+            MapGlobals.showMissionItems = false
+        }
+        onLoadCloudPlan: (data) => {
+            console.log("PlanView: loading cloud plan data")
+            try {
+                var json = (typeof data === "string") ? JSON.parse(data) : data
+                _planMasterController.loadFromJson(json)
+                MapGlobals.isReviewMode = true
+                MapGlobals.showMissionItems = false
+            } catch (e) {
+                console.error("Failed to process cloud plan data:", e)
+            }
+        }
     }
 
     ColumnLayout {
@@ -1168,7 +1185,8 @@ Item {
             id:                 toolStrip
             anchors.margins:    _toolsMargin
             anchors.left:       parent.left
-            anchors.top:        parent.top
+            anchors.top:        planToolBar.bottom
+            anchors.topMargin:  0
             z:                  QGroundControl.zOrderWidgets
             maxHeight:          parent.height - toolStrip.y
             title:              qsTr("Plan")
@@ -1386,8 +1404,8 @@ Item {
             anchors.bottom:     parent.bottom
             anchors.right:      parent.right
             anchors.rightMargin: _toolsMargin
-            anchors.top:      parent.top
-            anchors.topMargin: _toolsMargin * 5
+            anchors.top:      planToolBar.bottom
+            anchors.topMargin: 0
             visible:           _editingLayer != _layerMission
         }
 
@@ -1396,7 +1414,7 @@ Item {
 
         Item {
             anchors.fill:           rightPanel
-            anchors.topMargin:      _toolsMargin
+            anchors.topMargin:      0
             z : 0
             visible: true
 
@@ -1407,11 +1425,12 @@ Item {
 
             Column {
                 id:                 rightControls
-                spacing:            ScreenTools.defaultFontPixelHeight * 0.5
+                spacing:            8
                 anchors.left:       parent.left
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.5
 
                 // 1st: Boundary Point
                 Loader {
@@ -1423,7 +1442,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            12
                         width:              boundaryButtonsLoader.width
-                        topPadding:         10
+                        topPadding:         ScreenTools.defaultFontPixelHeight * 3.0
 
                         Button {
                             id: boundaryPointBtn
@@ -1456,7 +1475,7 @@ Item {
                 Column {
                     id:         layerTabBar
                     width:      parent.width
-                    spacing:    8
+                    spacing:    0
                     visible:    _geoFenceController.supported && !MapGlobals.isReviewMode
 
                     property int currentIndex: 0
@@ -1614,8 +1633,8 @@ Item {
                 id:                     missionItemEditor
                 anchors.left:           parent.left
                 anchors.right:          parent.right
-                anchors.top:            MapGlobals.isReviewMode ? parent.top : rightControls.bottom
-                anchors.topMargin:      MapGlobals.isReviewMode ? 0 : ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
+                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 0.5)
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
@@ -1660,21 +1679,21 @@ Item {
 
                         MissionExpand {
                             id: innerEditor
-                            map: editorMap
-                            masterController:  _planMasterController
-                            missionItem:    object
-                            width:          parent.width
-                            readOnly:       false
-                            onClicked: (sequenceNumber) => {
-                                _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
-                            }
-                            onEditItemClicked: (popupItem) => {
-                                itemEditPopup.popupMissionItem = popupItem
-                                itemEditPopup.open()
-                            }
-                            onDeselect: {
-                                _missionController.setCurrentPlanViewSeqNum(-1, false)
-                            }
+                                map: editorMap
+                                masterController:  _planMasterController
+                                missionItem:    object
+                                width:          parent.width
+                                readOnly:       false
+                                onClicked: (sequenceNumber) => {
+                                    _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
+                                }
+                                onEditItemClicked: (popupItem) => {
+                                    itemEditPopup.popupMissionItem = popupItem
+                                    itemEditPopup.open()
+                                }
+                                onDeselect: {
+                                    _missionController.setCurrentPlanViewSeqNum(-1, false)
+                                }
                         }
                     }
                 }
@@ -1777,7 +1796,6 @@ Item {
                             _planMasterController.saveToSelectedFile()
                         }
                     }
-                    mainWindow.planmap()
                 }
             }
         }
@@ -2799,7 +2817,7 @@ Item {
         y: parent.height - height
         modal: true
         dim: false
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        closePolicy: Popup.CloseOnEscape
         parent: Overlay.overlay
 
         background: Rectangle {

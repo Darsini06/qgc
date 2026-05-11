@@ -465,9 +465,9 @@ ApplicationWindow {
     //-------------------------------------------------------------------------
     //-- Global simple message dialog
 
-    function showMessageDialog(dialogTitle, dialogText, buttons = Dialog.Ok, acceptFunction = null) {
+    function showMessageDialog(dialogTitle, dialogText, buttons = Dialog.Ok, acceptFunction = null, showCloseButton = false) {
         console.log("dialogTitle : ",dialogTitle)
-        simpleMessageDialogComponent.createObject(mainWindow, { title: dialogTitle, text: dialogText, buttons: buttons, acceptFunction: acceptFunction }).open()
+        simpleMessageDialogComponent.createObject(mainWindow, { title: dialogTitle, text: dialogText, buttons: buttons, acceptFunction: acceptFunction, showCloseButton: showCloseButton }).open()
     }
 
     // This variant is only meant to be called by QGCApplication

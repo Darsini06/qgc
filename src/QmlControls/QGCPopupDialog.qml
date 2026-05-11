@@ -52,7 +52,7 @@ Popup {
     property string title
     property var    buttons:                Dialog.Ok
     property bool   acceptAllowed:          acceptButton.visible
-    property bool   rejectAllowed:          rejectButton.visible
+    property bool   rejectAllowed:          rejectButton.visible || buttons === Dialog.NoButton || buttons === 0
     property alias  acceptButtonEnabled:    acceptButton.enabled
     property alias  rejectButtonEnabled:    rejectButton.enabled
 
@@ -62,7 +62,8 @@ Popup {
     property var    dialogProperties
     property bool   destroyOnClose:         true
     property bool   preventClose:           false
-    property bool   closeOnClickOutside:    false  // NEW: Control close on outside click
+    property bool   closeOnClickOutside:    false
+    property bool   showCloseButton:        false
     property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
     property bool   useCenterAnchor:        true
     property real   dialogX:                0
@@ -312,7 +313,7 @@ Popup {
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: closeOnClickOutside
+                        visible: showCloseButton || closeOnClickOutside
 
                         Text {
                             text: "×"
@@ -328,7 +329,7 @@ Popup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: close()
+                            onClicked: _reject()
                         }
                     }
                 }

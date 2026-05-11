@@ -42,6 +42,8 @@ QtObject {
 
     signal newSessionAdded()
     signal requestCloudSync()
+    signal loadLocalPlan(string path)
+    signal loadCloudPlan(var data)
 
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
@@ -1163,6 +1165,23 @@ QtObject {
                 }
             }
         }
+        xhr.send();
+    }
+    function deleteCloudPlan(planName, callback) {
+        console.log("MapGlobals.deleteCloudPlan() - Deleting:", planName);
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(planName));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 204) {
+                    console.log("Plan deleted from cloud successfully");
+                    if (callback) callback(true);
+                } else {
+                    console.error("Failed to delete plan from cloud:", xhr.responseText);
+                    if (callback) callback(false);
+                }
+            }
+        };
         xhr.send();
     }
     function fetchCloudSessions(email) {

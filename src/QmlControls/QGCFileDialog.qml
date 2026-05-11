@@ -167,11 +167,13 @@ Item {
 
 
             property var  cloudPlansList: []
+            property bool loading: false
 
             function refreshFiles() {
+                loading = true
                 var localFiles = controller.getFiles(folder, _rgExtensions)
                 var combinedList = []
-                
+
                 for (var j = 0; j < localFiles.length; j++) {
                     var lName = localFiles[j]
                     var bName = lName.split(".")[0]
@@ -188,33 +190,42 @@ Item {
                     if (userName !== "Guest" && userName !== "") {
                         MapGlobals.fetchCloudPlans(userName, function(plans) {
                             cloudPlansList = plans || []
+                            var deduplicatedList = []
+
+                            // First, add all cloud plans
                             for (var i = 0; i < cloudPlansList.length; i++) {
                                 var cName = cloudPlansList[i].plan_name
                                 var dName = cName
                                 if (!dName.endsWith(".plan")) dName += ".plan"
-                                
-                                // Standardize base name for comparison (remove .plan if present)
+
                                 var cBaseName = cName.replace(".plan", "")
-                                
+                                deduplicatedList.push({
+                                    displayName: dName,
+                                    actualName:  cName, // Store the original name for deletion/loading
+                                    baseName:    cBaseName,
+                                    isLocal:     false,
+                                    isCloud:     true
+                                })
+                            }
+
+                            // Then, add local plans ONLY if they are not already in the cloud list
+                            for (var j = 0; j < combinedList.length; j++) {
+                                var localBase = combinedList[j].baseName.toLowerCase()
                                 var found = false
-                                for (var k = 0; k < combinedList.length; k++) {
-                                    if (combinedList[k].baseName.toLowerCase() === cBaseName.toLowerCase()) {
-                                        combinedList[k].isCloud = true
+                                for (var k = 0; k < deduplicatedList.length; k++) {
+                                    if (deduplicatedList[k].baseName.toLowerCase() === localBase) {
                                         found = true
                                         break
                                     }
                                 }
                                 if (!found) {
-                                    combinedList.push({
-                                        displayName: dName,
-                                        baseName: cBaseName,
-                                        isLocal: false,
-                                        isCloud: true
-                                    })
+                                    deduplicatedList.push(combinedList[j])
                                 }
                             }
-                            fullFileList = combinedList
+
+                            fullFileList = deduplicatedList
                             displayList = fullFileList
+                            loading = false
                         })
                         return
                     }
@@ -222,6 +233,7 @@ Item {
 
                 fullFileList = combinedList
                 displayList = fullFileList
+                loading = false
             }
 
             Component.onCompleted: refreshFiles()
@@ -229,32 +241,35 @@ Item {
             Column {
                 id:         fileOpenColumn
                 width:      parent.width
-                spacing:    20
+                spacing:    15
 
-                QGCLabel {
-                    text:   qsTr("Path: %1").arg(_mobileShortPath)
-                    color:  "black"
-                    font.pointSize: ScreenTools.smallFontPointSize
-                    font.bold: true
-                }
+                // Redundant 'Select Plan File' label removed as the popup already has a title.
+
 
                 Rectangle {
                     width:          parent.width
-                    height:         Math.max(50, fileListColumn.height)
+                    height:         Math.max(120, fileListColumn.height)
                     color:          "transparent"
-                    border.color:   Qt.rgba(255, 255, 255, 0.15)
+                    border.color:   Qt.rgba(0, 0, 0, 0.1)
                     border.width:   1
                     radius:         8
                     clip:           true
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        visible:          mobileFileOpenDialog.loading
+                    }
 
                     Column {
                         id:             fileListColumn
                         width:          parent.width
                         spacing:        0
+                        visible:        !mobileFileOpenDialog.loading
 
                         Repeater {
                             id:     fileRepeater
-                            model:  mobileFileOpenDialog.displayList
+                            // Show only first 4 files
+                            model:  mobileFileOpenDialog.displayList.slice(0, 4)
 
                             Item {
                                 width: parent.width
@@ -269,16 +284,18 @@ Item {
 
                                     onClicked: {
                                         mobileFileOpenDialog.close()
-                                        
+
                                         var strippedFileName = modelData.baseName
                                         _appSettings.username = strippedFileName
-                                        
+
                                         if (modelData.isLocal) {
                                             _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.displayName))
                                         } else if (modelData.isCloud) {
                                             var planData = null
                                             for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
-                                                if (mobileFileOpenDialog.cloudPlansList[i].plan_name === strippedFileName) {
+                                                var cName = mobileFileOpenDialog.cloudPlansList[i].plan_name
+                                                var cBaseName = cName.replace(".plan", "")
+                                                if (cBaseName === strippedFileName) {
                                                     planData = mobileFileOpenDialog.cloudPlansList[i].plan_data
                                                     break
                                                 }
@@ -295,7 +312,22 @@ Item {
                                             hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.displayName)
                                             hamburgerMenu.popup()
                                         } else {
-                                            mainWindow.showToastMessage("Cloud plans cannot be deleted from here.")
+                                            // Cloud plan deletion
+                                            mainWindow.showMessageDialog(qsTr("Delete Cloud Plan"),
+                                                qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(modelData.displayName),
+                                                Dialog.Yes | Dialog.Cancel,
+                                                function() {
+                                                    // Use modelData.actualName to ensure we match the backend's mission_name
+                                                    MapGlobals.deleteCloudPlan(modelData.actualName, function(success) {
+                                                        if (success) {
+                                                            mainWindow.showToastMessage(qsTr("Plan deleted successfully"))
+                                                            mobileFileOpenDialog.refreshFiles() // Refresh the list
+                                                        } else {
+                                                            mainWindow.showToastMessage(qsTr("Failed to delete plan from cloud"))
+                                                        }
+                                                    })
+                                                }
+                                            )
                                         }
                                     }
 
@@ -319,9 +351,33 @@ Item {
                                 Rectangle {
                                     width: parent.width
                                     height: 1
-                                    color: Qt.rgba(255, 255, 255, 0.1)
+                                    color: Qt.rgba(0, 0, 0, 0.05)
                                     anchors.bottom: parent.bottom
                                     visible: index < fileRepeater.count - 1
+                                }
+                            }
+                        }
+
+                        // See More Button
+                        Rectangle {
+                            width:  parent.width
+                            height: 40
+                            color:  "#f5f5f5"
+                            visible: mobileFileOpenDialog.displayList.length > 4
+
+                            QGCLabel {
+                                anchors.centerIn: parent
+                                text: qsTr("See More...")
+                                color: "#4a2c6d"
+                                font.bold: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    mobileFileOpenDialog.close()
+                                    MapGlobals.jumpToFileList = true
+                                    mainWindow.logfiles()
                                 }
                             }
                         }
@@ -329,15 +385,12 @@ Item {
 
                     Text {
                         anchors.centerIn: parent
-                        text:       qsTr("No files")
+                        text:       qsTr("No plans found")
                         color:      "black"
                         font.pixelSize: 14
                         font.bold: true
-                        visible:    fileRepeater.model.length === 0
+                        visible:    !mobileFileOpenDialog.loading && fileRepeater.model.length === 0
                     }
-
-
-
                 }
 
                 // Removed 'See More' and 'Show Less' UI as all files are now displayed by default.
@@ -354,7 +407,7 @@ Item {
             property string userName: ""
 
             // Remove default buttons to use our custom ones
-            buttons: Dialog.NoButton 
+            buttons: Dialog.NoButton
 
             onAccepted: {
                 var strippedFileName1 = userName
@@ -718,7 +771,7 @@ Item {
             width:          ScreenTools.defaultFontPixelWidth * 38
             height:         ScreenTools.defaultFontPixelHeight * 11
             padding:        0
-            
+
             background: Rectangle {
                 radius: 20
                 color: "white"
@@ -886,7 +939,7 @@ Item {
                                         let concatenatedText = nameField.text.substring(0, 10);
                                         _appSettings.username = concatenatedText;
                                         _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
-                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                                    } else if ((QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping" || QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Military")){
                                         if (nameField.text.length < 3 ) {
                                             mobileFileSaveDialog.preventClose = true
                                             return
@@ -923,3 +976,4 @@ Item {
         }
     }
 }
+

@@ -29,7 +29,7 @@ import QtQuick.Window
 //================================
 
 Item {
-    id: logFilesRoot
+    id: logfiles
     anchors.fill: parent
     property string currentView: MapGlobals.currentView_profile
 
@@ -55,21 +55,9 @@ Item {
     property int totalMinutes: 0
     property int missionsCompleted: 0
     property string totalDurationFormatted: "0h 0m"
-    property color app_color:       MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#262626"
-    property color sidebar_color:   app_color
-    property color bg_color:        "#F9FAFB"
-    property color border_color:    "#E5E7EB"
-    property color text_primary:    "#111827"
-    property color text_secondary:  "#6B7280"
-    property bool isCloudView:      true
-    signal backClicked()
+    property color app_color: "#4a2c6d"
 
     property bool privacyLoading: true
-    property bool pageLoading:    true
-
-    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 90
-    readonly property real outerPadding: isSmallScreen ? 20 : 60
-    readonly property real tableMaxWidth: 1100
 
     property real screenWidth: parent.width
     property real screenHeight: parent.height
@@ -117,12 +105,23 @@ Item {
 
         _planMasterController._updateMobileShortPath()
         _planMasterController._setupFileExtensions()
+
+        if (MapGlobals.jumpToFileList) {
+            MapGlobals.jumpToFileList = false
+            if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+                nameFilters = _planMasterController.loadNameFilters1
+            } else {
+                nameFilters = _planMasterController.loadNameFilters
+            }
+            _planMasterController._setupFileExtensions()
+            inlineLoader.sourceComponent = fileListComponent
+        }
     }
 
     onVisibleChanged: {
         if (visible) {
             console.log("onVisibleChanged");
-            triggerLoad();
+            loadSessions();
 
             displayName = QGroundControl.loadGlobalSetting("name", "")
             userName    = QGroundControl.loadGlobalSetting("username", "")
@@ -144,16 +143,10 @@ Item {
 
         if (currentView === "reports") {
             console.log("Switched to Reports view")
-            triggerLoad()
+            loadSessions()
         } else if (currentView === "privacy_policy") {
             privacyLoader.active = true
         }
-    }
-
-    function triggerLoad() {
-        pageLoading = true
-        loadSessions()
-        // We'll also trigger cloud fetch if needed
     }
 
     function loadSessions() {
@@ -163,7 +156,6 @@ Item {
         MapGlobals.getAllSessions(function(sessions) {
             if (sessions.length === 0) {
                 console.log("No drone sessions found");
-                pageLoading = false
                 return;
             }
 
@@ -180,8 +172,21 @@ Item {
             }
 
             console.log("Loaded", sessions.length, "sessions into model");
+
+            for (var j = 0; j < sessionModel.count; j++) {
+                var item = sessionModel.get(j);
+                console.log(
+                    "Session", j + 1, ":",
+                    "ID:", item.id,
+                    "Date:", item.date,
+                    "Start:", item.start_time,
+                    "End:", item.end_time,
+                    "Duration:", item.duration,
+                    "CreatedAt:", item.created_at
+                );
+            }
+
             updateSessionStats();
-            pageLoading = false
         });
     }
 
@@ -388,289 +393,435 @@ Item {
         }
     }
 
-    //=======================================================================================
-    // MAIN CONTENT
-    //=======================================================================================
-    Rectangle {
+    Item {
+        id: transitionRoot
         anchors.fill: parent
-        color: bg_color
 
-        RowLayout {
+        Loader {
+            id: pageLoader
             anchors.fill: parent
-            spacing: 0
+            asynchronous: true
 
-            /* ================= PREMIUM SIDEBAR (45%) ================= */
-            Rectangle {
-                id: sidebar
-                Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : parent.width * 0.45
-                visible: !isSmallScreen
-                color: sidebar_color
-                clip: true
+            property var pageCache: ({})
 
-                // Background Gradient
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: sidebar_color }
-                        GradientStop { position: 1.0; color: "#1A1A1A" }
-                    }
-                }
+            sourceComponent: {
+                pageCache[currentView] = profilePage
+                //inlineLoader.sourceComponent = fileListComponent
+            }
+        }
 
-                // Decorative Accents
-                Rectangle {
-                    width: 400; height: 400; radius: 200; color: Qt.rgba(255,255,255,0.03)
-                    anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
-                }
+        Rectangle {
+            id: fadeOverlay
+            anchors.fill: parent
+            color:   Qt.rgba(0, 0, 0, 0.18)
+            opacity: 0
+            visible: opacity > 0
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 50
-                    spacing: 0
-
-                    // Back Arrow
-                    Rectangle {
-                        width: 44; height: 44; radius: 12
-                        color: Qt.rgba(255, 255, 255, 0.08)
-                        border.color: Qt.rgba(255, 255, 255, 0.15)
-                        QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: logFilesRoot.backClicked()
-                        }
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true; spacing: 16
-                        Text {
-                            text: "Log Files"
-                            font.family: "Outfit"
-                            font.pointSize: 32
-                            font.bold: true
-                            color: "white"
-                        }
-                        Text {
-                            text: "Comprehensive collection of your mission plans and synchronized cloud records."
-                            font.family: "Outfit"
-                            font.pointSize: 12
-                            color: Qt.rgba(255, 255, 255, 0.6)
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                            lineHeight: 1.5
-                        }
-                    }
-
-                    Item { Layout.fillHeight: true }
-
-                    LottieAnimation {
-                        Layout.preferredHeight: 140; Layout.preferredWidth: 140
-                        source: "qrc:/qmlimages/NewImages/report_1.json"; autoPlay: true; loops: Animation.Infinite
-                    }
-
-                    Item { Layout.preferredHeight: 40 }
+            Behavior on opacity {
+                NumberAnimation {
+                    duration:     220
+                    easing.type:  Easing.OutCubic
                 }
             }
+        }
+    }
 
-            /* ================= DATA CONTENT AREA (55%) ================= */
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                color: "white"
+    // ─── Profile Page ────────────────────────────────────────────────────────
+    Component {
+        id: profilePage
 
-                // Mobile Navigation Bar
+        Item {
+            anchors.fill: parent
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 10
+
+                // Header
                 Rectangle {
-                    visible: isSmallScreen; width: parent.width; height: 70; color: "white"
-                    anchors.top: parent.top; z: 10
-                    Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: border_color }
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.15
+                    color: "#262626" // Sleek black header for consistent branding
+
                     RowLayout {
-                        anchors.fill: parent; anchors.margins: 20
+                        anchors.fill: parent
+                        anchors.leftMargin:  20
+                        anchors.rightMargin: 20
+                        spacing: 10
+
                         QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 24; height: 24; color: text_primary
+                            source:   "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            fillMode: Image.PreserveAspectFit
+                            width:  25
+                            height: 25
+                            color:  "white"
+
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: logFilesRoot.backClicked()
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: mainWindow.openHomeScreen()
                             }
                         }
-                        Text { text: "Log Files"; font.family: "Outfit"; font.bold: true; font.pointSize: ScreenTools.mediumFontPointSize; color: text_primary }
-                    }
-                }
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.topMargin: isSmallScreen ? 70 : 0
-                    spacing: 0
+                        Item { Layout.fillWidth: true }
 
-                    // --- Centered Content Container ---
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.leftMargin: outerPadding
-                        Layout.rightMargin: outerPadding
-                        Layout.topMargin: isSmallScreen ? 10 : 20
-                        spacing: 30
-
-                        // Inline content (Always show Plan Files)
-                        Loader {
-                            id: inlineLoader
-                            Layout.fillWidth:  true
-                            Layout.fillHeight: true
-                            sourceComponent:   fileListComponent
+                        Text {
+                            text:           "Profile"
+                            font.pointSize: ScreenTools.mediumFontPointSize
+                            color:          "white"
+                            font.bold:      true
                         }
+
+                        Item { Layout.fillWidth: true }
                     }
                 }
-            }
-        }
-    }
 
-    // --- Premium Loading Screen ---
-    Rectangle {
-        id: loadingOverlay
-        anchors.fill: parent
-        color: "white"
-        visible: pageLoading
-        z: 1000
+                // Content area
+                RowLayout {
+                    Layout.fillWidth:    true
+                    Layout.fillHeight:   true
+                    Layout.leftMargin:   20
+                    Layout.rightMargin:  20
+                    Layout.bottomMargin: 20
+                    spacing: 20
 
-        ColumnLayout {
-            anchors.centerIn: parent
-            spacing: 20
-
-            BusyIndicator {
-                Layout.alignment: Qt.AlignHCenter
-                running: pageLoading
-            }
-
-            Text {
-                text: qsTr("Synchronizing Your Flight Data...")
-                font.family: "Outfit"
-                font.pointSize: 14
-                font.bold: true
-                color: text_primary
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Text {
-                text: qsTr("Please wait while we fetch your latest mission logs.")
-                font.family: "Outfit"
-                font.pointSize: 10
-                color: text_secondary
-                Layout.alignment: Qt.AlignHCenter
-            }
-        }
-        Behavior on opacity { NumberAnimation { duration: 300 } }
-    }
-
-    // ── Inline File List Component ───────────────────────────────────
-    Component {
-        id: fileListComponent
-        Item {
-            id: fileListRoot
-            anchors.fill: parent
-            property bool isCloudView: false
-            property var fileList: controller.getFiles(folder, _rgExtensions)
-
-            function refreshFiles() {
-                if (isCloudView) { fetchCloudFiles() }
-                else { fileList = controller.getFiles(folder, _rgExtensions) }
-            }
-
-            function fetchCloudFiles() {
-                cloudPlansLoading = true
-                MapGlobals.fetchCloudPlans(userName, function(plans) {
-                    cloudPlansModel.clear()
-                    for (var i = 0; i < plans.length; i++) { cloudPlansModel.append(plans[i]) }
-                    cloudPlansLoading = false
-                })
-            }
-
-            property bool cloudPlansLoading: false
-            ListModel { id: cloudPlansModel }
-
-            Flickable {
-                anchors.fill: parent
-                contentWidth: width
-                contentHeight: contentCol.height + 100
-                clip: true
-
-                ColumnLayout {
-                    id: contentCol
-                    width: parent.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top; anchors.topMargin: isSmallScreen ? 10 : 20
-                    spacing: 24
-
-                    // Page Title (Desktop Only)
-                    ColumnLayout {
-                        visible: !isSmallScreen; Layout.fillWidth: true; spacing: 4
-                        Text { text: "Plan Files"; font.family: "Outfit"; font.pointSize: 24; font.bold: true; color: text_primary }
-                        Text { text: qsTr("Synced plans associated with %1").arg(userEmail); font.family: "Outfit"; font.pointSize: 11; color: text_secondary }
-                    }
-
-                    // THE DATA GRID CARD
+                    // ── Left Card: Profile Info & Stats ──────────────────────
                     Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: Math.max(500, filesListView.contentHeight + 40)
-                        color: "white"; radius: 16
-                        border.color: border_color; border.width: 1
-                        clip: true
-                        layer.enabled: true
-                        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: Qt.rgba(0,0,0,0.03); shadowBlur: 1.0; shadowVerticalOffset: 4 }
+                        Layout.preferredWidth: parent.width * 0.45
+                        Layout.fillHeight: true
+                        color:        "white"
+                        radius:       5
+                        border.color: "#e0e0e0"
+                        border.width: 1
 
                         ColumnLayout {
-                            anchors.fill: parent; spacing: 0
-                            BusyIndicator { Layout.alignment: Qt.AlignHCenter; Layout.topMargin: 40; visible: cloudPlansLoading }
+                            anchors.fill:    parent
+                            anchors.margins: 20
+                            spacing: 10
+                            clip:    true
+
+                            // Profile image
+                            Rectangle {
+                                Layout.alignment: Qt.AlignHCenter
+                                width:        85
+                                height:       85
+                                radius:       width / 2
+                                border.color: "#000000"
+                                border.width: 2
+                                color:        "transparent"
+                                clip:         true
+
+                                AnimatedImage {
+                                    anchors.centerIn: parent
+                                    source:   "qrc:/qmlimages/NewImages/report_gif.gif"
+                                    width:    80
+                                    height:   80
+                                    cache:    true
+                                    fillMode: Image.PreserveAspectFit
+                                }
+                            }
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text:           displayName || "Anonymous"
+                                font.pointSize: ScreenTools.mediumFontPointSize
+                                font.bold:      true
+                                color:          "#333333"
+                            }
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+                                text:           userEmail || "user@example.com"
+                                font.pointSize: ScreenTools.smallFontPointSize
+                                color:          "#666666"
+                            }
+
+                            // Stats
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 10
+
+                                RowLayout {
+                                    spacing: 10
+                                    QGCColoredImage {
+                                        source: "qrc:/InstrumentValueIcons/time.svg"
+                                        width: 20; height: 20
+                                        color: "#2c3e50"
+                                    }
+                                    Text {
+                                        text:           "Total Hours Flown"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        color:          "#666666"
+                                        Layout.fillWidth: true
+                                    }
+                                    Text {
+                                        text:           totalDurationFormatted
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.bold:      true
+                                        color:          "#2c3e50"
+                                    }
+                                }
+
+                                RowLayout {
+                                    spacing: 10
+                                    QGCColoredImage {
+                                        source: "qrc:/InstrumentValueIcons/checkmark.svg"
+                                        width: 20; height: 20
+                                        color: "#2c3e50"
+                                    }
+                                    Text {
+                                        text:           "Missions Completed"
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        color:          "#666666"
+                                        Layout.fillWidth: true
+                                    }
+                                    Text {
+                                        text:           missionsCompleted
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.bold:      true
+                                        color:          "#2c3e50"
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // ── Right Card: Menu + Inline File List ──────────────────
+                    Rectangle {
+                        Layout.fillWidth:  true
+                        Layout.fillHeight: true
+                        color:        "white"
+                        radius:       5
+                        border.color: "#e0e0e0"
+                        border.width: 1
+
+                        ColumnLayout {
+                            anchors.fill:    parent
+                            anchors.margins: 10
+                            spacing: 0
+                            clip:    true
+
+                            // Menu list — hidden when inline content is active
                             ListView {
-                                id: filesListView
-                                Layout.fillWidth: true; Layout.fillHeight: true
-                                model: cloudPlansModel; interactive: false
-                                visible: !cloudPlansLoading
+                                id: menuList
+                                Layout.fillWidth:  true
+                                Layout.fillHeight: true
+                                visible: inlineLoader.sourceComponent === null
+
+                                model: ListModel {
+                                    ListElement {
+                                        icon:   "/qmlimages/NewImages/report.svg"
+                                        name:   "Files"
+                                        screen: "fileList"
+                                    }
+                                }
+
                                 delegate: Rectangle {
-                                    width: filesListView.width; height: 72
-                                    color: index % 2 === 1 ? "#FAFAFC" : "transparent"
+                                    width:  ListView.view.width
+                                    height: 50
+                                    color:  "transparent"
+
                                     RowLayout {
-                                        anchors.fill: parent; anchors.leftMargin: 30; anchors.rightMargin: 30; spacing: 20
-                                        Rectangle {
-                                            width: 40; height: 40; radius: 10; color: Qt.rgba(0, 0, 0, 0.05)
-                                            QGCColoredImage { source: "qrc:/qmlimages/NewImages/report.svg"; width: 18; height: 18; color: app_color; anchors.centerIn: parent }
+                                        anchors.fill: parent
+                                        spacing: 15
+
+                                        QGCColoredImage {
+                                            source:   model.icon
+                                            width:    20
+                                            height:   20
+                                            color:    "transparent"
                                         }
-                                        Text { text: model.plan_name; font.family: "Outfit"; font.bold: true; color: text_primary; font.pointSize: 13; Layout.fillWidth: true }
-                                        Rectangle {
-                                            width: 80; height: 32; radius: 8; color: app_color
-                                            Text { text: "LOAD"; color: "white"; font.family: "Outfit"; font.bold: true; font.pointSize: 9; anchors.centerIn: parent }
-                                            MouseArea {
-                                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    mainWindow.showMessageDialog(qsTr("Download Plan"),
-                                                        qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
-                                                        Dialog.Yes | Dialog.Cancel,
-                                                        function() {
-                                                            mainWindow.openHomeScreen()
-                                                            mainWindow.showFlyView()
-                                                            mainWindow.showPlanView()
-                                                            _planMasterController.loadFromJson(model.plan_data)
-                                                            mainWindow.showToastMessage("Cloud plan loaded")
-                                                        }
-                                                    )
+
+                                        Text {
+                                            text:             model.name
+                                            font.pointSize:   ScreenTools.defaultFontPointSize
+                                            color:            "#333333"
+                                            Layout.fillWidth: true
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        anchors.bottom: parent.bottom
+                                        width:  parent.width
+                                        height: 1
+                                        color:  "#eeeeee"
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape:  Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (model.screen === "logout") {
+                                                logoutdialog.createObject(mainWindow).open()
+                                            } else if (model.screen === "fileList") {
+                                                // Setup paths/extensions, then show inline
+                                                _planMasterController._updateMobileShortPath()
+                                                if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+                                                    nameFilters = _planMasterController.loadNameFilters1
+                                                }else{
+                                                    nameFilters = _planMasterController.loadNameFilters
                                                 }
+                                                _planMasterController._setupFileExtensions()
+                                                inlineLoader.sourceComponent = fileListComponent
+                                                console.log("gridlines True")
+                                                MapGlobals.setGridLines(true)
+
+                                            } else {
+                                                if (model.screen === "privacy_policy") {
+                                                    privacyLoading = true
+                                                }
+                                                switchPage(model.screen)
                                             }
                                         }
                                     }
-                                    Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right; anchors.leftMargin: 30; anchors.rightMargin: 30; height: 1; color: border_color; visible: index < filesListView.count - 1 }
                                 }
-                                ColumnLayout {
-                                    anchors.centerIn: parent; visible: filesListView.count === 0 && !cloudPlansLoading; spacing: 16
-                                    QGCColoredImage { source: "qrc:/InstrumentValueIcons/info.svg"; width: 60; height: 60; color: "#D1D5DB"; Layout.alignment: Qt.AlignHCenter }
-                                    Text { text: "No Plan Files Discovered"; font.family: "Outfit"; font.bold: true; font.pointSize: 14; color: text_secondary; Layout.alignment: Qt.AlignHCenter }
+                            }
+
+                            // Inline content (replaces menu when a sub-view is loaded)
+                            Loader {
+                                id: inlineLoader
+                                Layout.fillWidth:  true
+                                Layout.fillHeight: true
+                                visible:           sourceComponent !== null
+                                sourceComponent:   fileListComponent
+                            }
+                        }
+                    }
+                    // ────────────────────────────────────────────────────────
+                }
+            }
+
+            // ── Inline File List Component ───────────────────────────────────
+            Component {
+                id: fileListComponent
+
+                Item {
+                    id: fileListRoot
+                    anchors.fill: parent
+
+                    property bool isCloudView: true
+                    property var fileList: controller.getFiles(folder, _rgExtensions)
+
+                    function refreshFiles() {
+                        if (isCloudView) {
+                            fetchCloudFiles()
+                        } else {
+                            fileList = controller.getFiles(folder, _rgExtensions)
+                        }
+                    }
+
+                    function fetchCloudFiles() {
+                        cloudPlansLoading = true
+                        MapGlobals.fetchCloudPlans(userName, function(plans) {
+                            cloudPlansModel.clear()
+                            for (var i = 0; i < plans.length; i++) {
+                                cloudPlansModel.append(plans[i])
+                            }
+                            cloudPlansLoading = false
+                        })
+                    }
+
+                    property bool cloudPlansLoading: false
+                    ListModel { id: cloudPlansModel }
+
+                    Component.onCompleted: refreshFiles()
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 10
+
+                        // Removed Toggle Buttons as only Cloud Plans are shown now
+                        QGCLabel {
+                            text: qsTr("Plan Files")
+                            font.pointSize: 14
+                            font.bold: true
+                            color: "#262626" // Matching black color for heading
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        // Scrollable list content
+                        ScrollView {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            clip: true
+                            contentWidth: width
+
+                            Column {
+                                width: parent.width
+                                spacing: 8
+                                padding: 4
+
+
+
+                                // Cloud View
+                                Column {
+                                    width: parent.width
+                                    visible: isCloudView
+                                    spacing: 8
+
+                                    QGCLabel {
+                                        text: qsTr("Cloud-synced plans associated with %1").arg(userEmail)
+                                        font.pointSize: 10
+                                        color: "#888888"
+                                    }
+
+                                    BusyIndicator {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        visible: cloudPlansLoading
+                                    }
+
+                                    Repeater {
+                                        model: cloudPlansModel
+                                        FileButton {
+                                            width: parent ? parent.width : 0
+                                            text: model.plan_name
+                                            onClicked: {
+                                                mainWindow.showMessageDialog(qsTr("Download Plan"),
+                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                    Dialog.Yes | Dialog.Cancel,
+                                                    function() {
+                                                        mainWindow.openHomeScreen()
+                                                        mainWindow.showFlyView()
+                                                        mainWindow.showPlanView()
+                                                        MapGlobals.loadCloudPlan(model.plan_data)
+                                                        mainWindow.showToastMessage("Cloud plan loaded")
+                                                    }
+                                                )
+                                            }
+                                            onHamburgerClicked: {
+                                                mainWindow.showMessageDialog(qsTr("Delete Cloud Plan"),
+                                                    qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(model.plan_name),
+                                                    Dialog.Yes | Dialog.Cancel,
+                                                    function() {
+                                                        MapGlobals.deleteCloudPlan(model.plan_name, function(success) {
+                                                            if (success) {
+                                                                mainWindow.showToastMessage(qsTr("Plan deleted successfully"))
+                                                                refreshFiles() // Refresh the list
+                                                            } else {
+                                                                mainWindow.showToastMessage(qsTr("Failed to delete plan from cloud"))
+                                                            }
+                                                        })
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+                                    QGCLabel {
+                                        text: qsTr("No cloud plans found")
+                                        visible: !cloudPlansLoading && cloudPlansModel.count === 0
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            // ────────────────────────────────────────────────────────────────
         }
     }
+    // ─────────────────────────────────────────────────────────────────────────
 
     function swapCamera() {
         var videoSettings = QGroundControl.settingsManager.videoSettings
@@ -681,7 +832,9 @@ Item {
             }
         }
     }
+
     QGCFileDialogController { id: controller }
+
     FileDialog {
         id: imageDialog
         title: "Choose Image"
@@ -695,23 +848,33 @@ Item {
             }
         }
     }
+
+    //=======================================================================================
     Component {
         id: logoutdialog
+
         QGCPopupDialog {
             id: popup
-            title: qsTr("Sign Out")
+            title: qsTr("Logout")
             buttons: Dialog.Yes | Dialog.No
+
             onAccepted: {
                 QGroundControl.saveBoolGlobalSetting("login", false)
                 popup.visible = false
                 MapGlobals.profile()
             }
-            onRejected: { popup.visible = false }
+
+            onRejected: {
+                popup.visible = false
+            }
+
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
-                QGCLabel { text: qsTr("Are you sure you want to sign out?"); Layout.fillWidth: true }
+                QGCLabel {
+                    text:             qsTr("Are you sure you want to logout?")
+                    Layout.fillWidth: true
+                }
             }
         }
     }
 }
-
