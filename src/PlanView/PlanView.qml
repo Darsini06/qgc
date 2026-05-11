@@ -690,6 +690,34 @@ Item {
                                close()
                            }
 
+        onAcceptedForOverwrite: {
+            console.log("Overwrite accepted")
+            if (_planMasterController.currentPlanFile !== "") {
+                _planMasterController.saveToCurrent()
+                if (planFiles) {
+                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                        mainWindow.showFlyView()
+                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                        mainWindow.showMapping()
+                    }
+                }
+            } else {
+                var file = controller.fullyQualifiedFilename(folder, _appSettings.username, _rgExtensions)
+                if (planFiles) {
+                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                        _planMasterController.saveToFile1(file)
+                        mainWindow.showFlyView()
+                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                        _planMasterController.saveToFile(file)
+                        mainWindow.showMapping()
+                    }
+                } else {
+                    _planMasterController.saveToKml(file)
+                }
+            }
+            close()
+        }
+
         onAcceptedForLoad: (file) => {
                                console.log("Click Files at onAcceptedForLoad")
                                MapGlobals.setGridLines(true)

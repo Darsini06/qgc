@@ -25,6 +25,7 @@ Item {
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
     signal acceptedCloudPlan(var planData)
+    signal acceptedForOverwrite()
     signal rejected
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
 
@@ -358,27 +359,17 @@ Item {
                             }
                         }
 
-                        // See More Button
+                        // View All Plans Text
                         Rectangle {
                             width:  parent.width
                             height: 40
-                            color:  "#f5f5f5"
+                            color:  "transparent"
                             visible: mobileFileOpenDialog.displayList.length > 4
 
                             QGCLabel {
                                 anchors.centerIn: parent
-                                text: qsTr("See More...")
-                                color: "#4a2c6d"
-                                font.bold: true
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    mobileFileOpenDialog.close()
-                                    MapGlobals.jumpToFileList = true
-                                    mainWindow.logfiles()
-                                }
+                                text: qsTr("To view all plans move to profile page log files")
+                                color: "black"
                             }
                         }
                     }
@@ -486,59 +477,13 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var strippedFileName1 = userName
-                            if (strippedFileName1 != "") {
-                                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
-                                popup.visible = false
-                            }
+                            _root.acceptedForOverwrite()
+                            popup.visible = false
                         }
                     }
                 }
 
-                // Custom Cloud Save Button
-                Rectangle {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width * 0.85
-                    height: 95
-                    radius: 10
-                    color: "transparent"
-                    border.color: "black"
-                    border.width: 1.5
 
-                    Column {
-                        anchors.centerIn: parent
-                        width: parent.width - 30
-                        spacing: 6
-                        QGCLabel {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: qsTr("Cloud Save + Local Save")
-                            color: "black"
-                            font.bold: true
-                            font.pointSize: 13
-                        }
-                        QGCLabel {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: qsTr("(save in cloud only in another phone you can see your plans)")
-                            color: "#444"
-                            font.pointSize: 10
-                            width: parent.width
-                            wrapMode: Text.WordWrap
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var strippedFileName1 = userName
-                            if (strippedFileName1 != "") {
-                                _root.acceptedForSave(controller.fullyQualifiedFilename(folder, strippedFileName1, _rgExtensions))
-                                MapGlobals.requestCloudSync()
-                                popup.visible = false
-                            }
-                        }
-                    }
-                }
             }
         }
     }
