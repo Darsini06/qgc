@@ -68,6 +68,7 @@ Popup {
     property bool   useCenterAnchor:        true
     property real   dialogX:                0
     property real   dialogY:                0
+    property real   maxPopupHeight:         mainWindow.height * 0.8
 
     readonly property real headerMinWidth: titleLable.implicitWidth + rejectButton.width + acceptButton.width + titleLable.spacing * 2
 
@@ -258,7 +259,7 @@ Popup {
 
     Rectangle {
         width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 50)
-        height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
+        height: Math.min(maxPopupHeight, mainLayout.implicitHeight)
         color: "white" // Deep dark background for Mission Theme
         radius: 20
         border.width: 1

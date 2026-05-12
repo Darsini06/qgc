@@ -206,9 +206,11 @@ QtObject {
             }
         }
 
+        var name = missionName.toString().split('/').pop().split('\\').pop();
+
         var data = {
             "username": currentUserName,
-            "mission_name": missionName.toString().split('/').pop().split('\\').pop(),
+            "mission_name": name,
             "plan_data": typeof planData === 'string' ? JSON.parse(planData) : planData,
             "geometry": {
                 "type": coords.length === 1 ? "Point" : (coords.length > 1 ? "LineString" : "Point"),
@@ -217,15 +219,25 @@ QtObject {
             "date": new Date().toISOString()
         };
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", backendUrl + "/missions");
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("Mission log save response:", xhr.status, xhr.responseText);
+        var postXhr = new XMLHttpRequest();
+        postXhr.open("POST", backendUrl + "/missions");
+        postXhr.setRequestHeader("Content-Type", "application/json");
+        postXhr.onreadystatechange = function() {
+            if (postXhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log save response:", postXhr.status, postXhr.responseText);
             }
         };
-        xhr.send(JSON.stringify(data));
+
+        // Send DELETE first to prevent the backend from creating a duplicate (+1)
+        var deleteXhr = new XMLHttpRequest();
+        deleteXhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(name));
+        deleteXhr.onreadystatechange = function() {
+            if (deleteXhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log pre-save delete response:", deleteXhr.status);
+                postXhr.send(JSON.stringify(data));
+            }
+        };
+        deleteXhr.send();
     }
 
     function deleteMissionLog(missionName) {

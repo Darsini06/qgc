@@ -25,7 +25,7 @@ Item {
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
     signal acceptedCloudPlan(var planData)
-    signal acceptedForOverwrite()
+    signal acceptedForOverwrite(string fallbackFile)
     signal rejected
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
 
@@ -159,6 +159,7 @@ Item {
             id:         mobileFileOpenDialog
             title:      _root.title
             buttons:    Dialog.Cancel
+            maxPopupHeight: mainWindow.height * 0.65 // Shorter height to avoid touching the top navbar
 
             property bool showAllFiles: true
 
@@ -199,7 +200,7 @@ Item {
                                 var dName = cName
                                 if (!dName.endsWith(".plan")) dName += ".plan"
 
-                                var cBaseName = cName.replace(".plan", "")
+                                var cBaseName = cName.split(".")[0]
                                 deduplicatedList.push({
                                     displayName: dName,
                                     actualName:  cName, // Store the original name for deletion/loading
@@ -295,7 +296,7 @@ Item {
                                             var planData = null
                                             for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
                                                 var cName = mobileFileOpenDialog.cloudPlansList[i].plan_name
-                                                var cBaseName = cName.replace(".plan", "")
+                                                var cBaseName = cName.split(".")[0]
                                                 if (cBaseName === strippedFileName) {
                                                     planData = mobileFileOpenDialog.cloudPlansList[i].plan_data
                                                     break
@@ -359,11 +360,7 @@ Item {
                             }
                         }
 
-<<<<<<< HEAD
                         // View All Plans Text
-=======
-                        // See More Info Text
->>>>>>> 9c52b09bfae03ea13b73534901ab9b4217c14fb2
                         Rectangle {
                             width:  parent.width
                             height: 40
@@ -372,14 +369,8 @@ Item {
 
                             QGCLabel {
                                 anchors.centerIn: parent
-<<<<<<< HEAD
                                 text: qsTr("To view all plans move to profile page log files")
                                 color: "black"
-=======
-                                text: qsTr("For more files, visit Profile > Log Files")
-                                color: "#666666"
-                                font.pointSize: ScreenTools.smallFontPointSize
->>>>>>> 9c52b09bfae03ea13b73534901ab9b4217c14fb2
                             }
                         }
                     }
@@ -419,7 +410,6 @@ Item {
             }
 
             onRejected: {
-                customdialogedit.createObject(mainWindow).open()
                 popup.visible = false
             }
 
@@ -487,7 +477,8 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            _root.acceptedForOverwrite()
+                            var fallback = controller.fullyQualifiedFilename(folder, userName !== "" ? userName : "Guest", _rgExtensions)
+                            _root.acceptedForOverwrite(fallback)
                             popup.visible = false
                         }
                     }
