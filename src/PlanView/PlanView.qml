@@ -260,7 +260,8 @@ Item {
     }
 
     ColumnLayout {
-        anchors.bottom: parent.bottom
+        id: leftActionsColumn
+        anchors.bottom: editdata.top
         anchors.left: parent.left
         anchors.bottomMargin: ScreenTools.defaultFontPixelHeight * 1.1
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
@@ -2093,10 +2094,12 @@ Item {
 
         Item {
             id: editdata
+            width: childrenRect.width
+            height: childrenRect.height
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.bottomMargin: 100
-            anchors.leftMargin: 4
+            anchors.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.5
+            anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
 
             Row {
                 spacing: 10    // space between the two buttons
@@ -2835,15 +2838,19 @@ Item {
         id: itemEditPopup
         property var popupMissionItem: null
 
-        // Reserve space: planToolBar height + 10px bottom gap
-        readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - 10) : 500
+        // Reserve space: planToolBar height + bottom margin
+        readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
         // title (~40) + spacing(12) + doneBtn(40) + spacing(12) + padding(20)
         readonly property real _reservedHeight: 124
 
-        width:  Math.min(240, parent.width * 0.9)
-        height: Math.min(popupInnerCol.implicitHeight + 40, _maxPopupHeight)
-        x: 0
-        y: parent.height - height - 100
+        // Responsive width
+        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
+        height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
+        
+        // Left side, keeping it classy and subtle
+        x: ScreenTools.defaultFontPixelWidth
+        y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
+        
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape
