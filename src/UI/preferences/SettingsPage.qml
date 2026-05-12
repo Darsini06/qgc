@@ -25,71 +25,37 @@ Item {
     id: root
 
     default property alias contentItem: mainLayout.data
-    property color backgroundColor: "white"
+    property color backgroundColor: "#F8F9FA"
+
     Rectangle {
         anchors.fill: parent
-        color: "transparent"
+        color:        backgroundColor
 
+        // --- Subtle Branding Gradient ---
         Rectangle {
             anchors.fill: parent
-            z: -10
-            color: root.backgroundColor
+            z: -1
+            opacity: 0.05
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: typeof app_color !== "undefined" ? app_color : "#4A2C6D" }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
         }
-        // ---- Curved Gradient Background ----
-        // Canvas {
-        //     anchors.fill: parent
-        //     z: -1
-        //     opacity: 0.95
-        //     onPaint: {
-        //         var ctx = getContext("2d")
-        //         ctx.reset()
-
-        //         // 🎨 Create diagonal gradient
-        //         var gradient = ctx.createLinearGradient(0, 0, width, height)
-        //         gradient.addColorStop(0, "#505050")
-        //         gradient.addColorStop(1, "#505050")
-        //         ctx.fillStyle = gradient
-
-        //         // 🌀 Create a curved path from top-left to bottom-right
-        //         ctx.beginPath()
-        //         ctx.moveTo(0, 0)
-        //         ctx.quadraticCurveTo(width * 0.4, height * 0.1, width, height * 0.9)
-        //         ctx.lineTo(width, height)
-        //         ctx.lineTo(0, height)
-        //         ctx.closePath()
-        //         ctx.fill()
-        //     }
-        // }
-
-        // Rectangle {
-        //         anchors.right: parent.right
-        //         anchors.bottom: parent.bottom
-        //         width: parent.width * 0.5
-        //         height: parent.height * 0.9
-        //         radius: width * 0.5
-        //         rotation: 30
-        //         opacity: 0.95
-        //         anchors.rightMargin: 1//-width * 0.25
-        //         anchors.bottomMargin: 1//-height * 0.2
-        //         z: -1
-
-        //         gradient: Gradient {
-        //             GradientStop { position: 0.0; color: "#301934" } // Deep purple
-        //             GradientStop { position: 1.0; color: "#301934" } // Brand purple
-        //         }
-        //     }
-
 
         QGCFlickable {
-            anchors.fill:   parent
-            contentWidth:   mainLayout.width
-            contentHeight:  mainLayout.height
-            clip:           true
+            anchors.fill:           parent
+            contentWidth:           parent.width
+            contentHeight:          mainLayout.height + (ScreenTools.defaultFontPixelHeight * 4)
+            flickableDirection:     Flickable.VerticalFlick
+            clip:                   true
 
             ColumnLayout {
-                id:         mainLayout
-                width:      parent.width - (ScreenTools.defaultFontPixelWidth * 2)
-                spacing:    ScreenTools.defaultFontPixelHeight
+                id:                 mainLayout
+                width:              parent.width - (ScreenTools.defaultFontPixelWidth * 4)
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top:        parent.top
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 2
+                spacing:            ScreenTools.defaultFontPixelHeight * 1.5
             }
         }
     }
