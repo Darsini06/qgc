@@ -262,17 +262,21 @@ QGCFlickable {
                             }
 
                             onClicked: {
-                                var rect = Qt.rect(
-                                    flightMap.centerViewport.x,
-                                    flightMap.centerViewport.y,
-                                    flightMap.centerViewport.width,
-                                    flightMap.centerViewport.height)
+                                if (isAgri) {
+                                    myGeoFenceController.addInclusionSquareAgri(flightMap.center)
+                                } else {
+                                    var rect = Qt.rect(
+                                        flightMap.centerViewport.x,
+                                        flightMap.centerViewport.y,
+                                        flightMap.centerViewport.width,
+                                        flightMap.centerViewport.height)
 
-                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(
-                                            Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                    var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
+                                    var bottomRightCoord = flightMap.toCoordinate(
+                                                Qt.point(rect.x + rect.width, rect.y + rect.height), false)
 
-                                myGeoFenceController.addInclusionPolygon(topLeftCoord, bottomRightCoord)
+                                    myGeoFenceController.addInclusionPolygon(topLeftCoord, bottomRightCoord)
+                                }
 
                                 // Clear all existing interactive states
                                 myGeoFenceController.clearAllInteractive()
@@ -307,17 +311,21 @@ QGCFlickable {
                             }
 
                             onClicked: {
-                                var rect = Qt.rect(
-                                    flightMap.centerViewport.x,
-                                    flightMap.centerViewport.y,
-                                    flightMap.centerViewport.width,
-                                    flightMap.centerViewport.height)
+                                if (isAgri) {
+                                    myGeoFenceController.addInclusionCircleAgri(flightMap.center)
+                                } else {
+                                    var rect = Qt.rect(
+                                        flightMap.centerViewport.x,
+                                        flightMap.centerViewport.y,
+                                        flightMap.centerViewport.width,
+                                        flightMap.centerViewport.height)
 
-                                var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
-                                var bottomRightCoord = flightMap.toCoordinate(
-                                            Qt.point(rect.x + rect.width, rect.y + rect.height), false)
+                                    var topLeftCoord = flightMap.toCoordinate(Qt.point(rect.x, rect.y), false)
+                                    var bottomRightCoord = flightMap.toCoordinate(
+                                                Qt.point(rect.x + rect.width, rect.y + rect.height), false)
 
-                                myGeoFenceController.addInclusionCircle(topLeftCoord, bottomRightCoord)
+                                    myGeoFenceController.addInclusionCircle(topLeftCoord, bottomRightCoord)
+                                }
 
                                 // Clear all existing interactive states
                                 myGeoFenceController.clearAllInteractive()
