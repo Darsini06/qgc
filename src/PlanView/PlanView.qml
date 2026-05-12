@@ -1462,7 +1462,7 @@ Item {
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.75
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 4.0
 
                 // 1st: Boundary Point
                 Loader {
@@ -1666,7 +1666,7 @@ Item {
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
-                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 3.5)
+                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 0.5)
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
