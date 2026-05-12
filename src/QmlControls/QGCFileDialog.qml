@@ -180,7 +180,8 @@ Item {
                     var lName = localFiles[j]
                     var bName = lName.split(".")[0]
                     combinedList.push({
-                        displayName: lName,
+                        displayName: bName + ".plan",
+                        actualName: lName,
                         baseName: bName,
                         isLocal: true,
                         isCloud: false
@@ -197,10 +198,9 @@ Item {
                             // First, add all cloud plans
                             for (var i = 0; i < cloudPlansList.length; i++) {
                                 var cName = cloudPlansList[i].plan_name
-                                var dName = cName
-                                if (!dName.endsWith(".plan")) dName += ".plan"
-
                                 var cBaseName = cName.split(".")[0]
+                                var dName = cBaseName + ".plan"
+
                                 deduplicatedList.push({
                                     displayName: dName,
                                     actualName:  cName, // Store the original name for deletion/loading
@@ -291,7 +291,7 @@ Item {
                                         _appSettings.username = strippedFileName
 
                                         if (modelData.isLocal) {
-                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.displayName))
+                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.actualName))
                                         } else if (modelData.isCloud) {
                                             var planData = null
                                             for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
@@ -311,7 +311,7 @@ Item {
                                     onHamburgerClicked: {
                                         if (modelData.isLocal) {
                                             highlight = true
-                                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.displayName)
+                                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.actualName)
                                             hamburgerMenu.popup()
                                         } else {
                                             // Cloud plan deletion
