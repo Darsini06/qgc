@@ -360,7 +360,7 @@ Item {
                             }
                         }
 
-                        // View All Plans Text
+                        // See More link
                         Rectangle {
                             width:  parent.width
                             height: 40
@@ -369,8 +369,22 @@ Item {
 
                             QGCLabel {
                                 anchors.centerIn: parent
-                                text: qsTr("To view all plans move to profile page log files")
-                                color: "black"
+                                text: qsTr("See More")
+                                color: "#007AFF" // Modern link color
+                                font.bold: true
+                                font.pixelSize: 14
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    MapGlobals.jumpToFileList = true
+                                    if (MapGlobals.rootWindow) {
+                                        MapGlobals.rootWindow.logfiles()
+                                    }
+                                    mobileFileOpenDialog.close()
+                                }
                             }
                         }
                     }

@@ -39,6 +39,7 @@ QtObject {
     property bool isReviewMode: false
     property bool showMissionItems: false
     property bool showEntryArrows: false   // true only while Rotate Entry Point is active
+    property bool jumpToFileList: false
 
     signal newSessionAdded()
     signal requestCloudSync()
