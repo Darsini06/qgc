@@ -1457,12 +1457,13 @@ Item {
 
             Column {
                 id:                 rightControls
+                z:                  1
                 spacing:            ScreenTools.defaultFontPixelHeight * 0.4
                 anchors.left:       parent.left
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 4.0
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 2.5
 
                 // 1st: Boundary Point
                 Loader {
@@ -1474,7 +1475,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
-                        topPadding:         ScreenTools.defaultFontPixelHeight * 2.5
+                        topPadding:         ScreenTools.defaultFontPixelHeight * 1.0
 
                         Button {
                             id: boundaryPointBtn
