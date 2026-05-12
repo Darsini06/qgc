@@ -381,7 +381,7 @@ Item {
                                 onClicked: {
                                     MapGlobals.jumpToFileList = true
                                     if (MapGlobals.rootWindow) {
-                                        MapGlobals.rootWindow.logfiles()
+                                        MapGlobals.rootWindow.logfiles_screen()
                                     }
                                     mobileFileOpenDialog.close()
                                 }

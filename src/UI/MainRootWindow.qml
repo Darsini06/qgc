@@ -324,6 +324,20 @@ ApplicationWindow {
 
     }
 
+    function logfiles_screen() {
+        _collapsePIP()
+        planbtn.visible = false
+        listbtn.visible = false
+        takeoffbtn.visible = false
+        rtlbtn.visible = false
+        flyView.visible = false
+        planView.visible = false
+        modebtn1.visible = false
+        mainrootIcons.visible = false
+        waypointbtn.visible = false
+        mainWindow.logfiles()
+    }
+
     function showPlanView() {
         _collapsePIP()
         planbtn.visible =false
