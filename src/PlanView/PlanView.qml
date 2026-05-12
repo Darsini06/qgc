@@ -691,19 +691,22 @@ Item {
                                close()
                            }
 
-        onAcceptedForOverwrite: {
+        onAcceptedForOverwrite: (fallbackFile) => {
             console.log("Overwrite accepted")
             if (_planMasterController.currentPlanFile !== "") {
-                _planMasterController.saveToCurrent()
-                if (planFiles) {
-                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
+                    _planMasterController.saveToFile1(_planMasterController.currentPlanFile)
+                    if (planFiles) {
                         mainWindow.showFlyView()
-                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
+                    }
+                } else {
+                    _planMasterController.saveToCurrent()
+                    if (planFiles) {
                         mainWindow.showMapping()
                     }
                 }
             } else {
-                var file = controller.fullyQualifiedFilename(folder, _appSettings.username, _rgExtensions)
+                var file = fallbackFile
                 if (planFiles) {
                     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                         _planMasterController.saveToFile1(file)

@@ -92,8 +92,12 @@ Item {
     }
 
     Component.onCompleted: {
+        loadSessions();
+        displayName = QGroundControl.loadGlobalSetting("name", "")
+        userName    = QGroundControl.loadGlobalSetting("username", "")
+        userEmail   = QGroundControl.loadGlobalSetting("email", "")
+
         if (userName !== "") {
-            userName = QGroundControl.loadGlobalSetting("username", "")
             loadUserDataFromMain();
         }
         if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
@@ -775,10 +779,10 @@ Item {
                                         model: cloudPlansModel
                                         FileButton {
                                             width: parent ? parent.width : 0
-                                            text: model.plan_name
+                                            text: model.plan_name.split(".")[0] + ".plan"
                                             onClicked: {
                                                 mainWindow.showMessageDialog(qsTr("Download Plan"),
-                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                    qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name.split(".")[0] + ".plan"),
                                                     Dialog.Yes | Dialog.Cancel,
                                                     function() {
                                                         mainWindow.openHomeScreen()
@@ -791,7 +795,7 @@ Item {
                                             }
                                             onHamburgerClicked: {
                                                 mainWindow.showMessageDialog(qsTr("Delete Cloud Plan"),
-                                                    qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(model.plan_name),
+                                                    qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(model.plan_name.split(".")[0] + ".plan"),
                                                     Dialog.Yes | Dialog.Cancel,
                                                     function() {
                                                         MapGlobals.deleteCloudPlan(model.plan_name, function(success) {

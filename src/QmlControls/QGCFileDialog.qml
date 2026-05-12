@@ -25,7 +25,7 @@ Item {
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
     signal acceptedCloudPlan(var planData)
-    signal acceptedForOverwrite()
+    signal acceptedForOverwrite(string fallbackFile)
     signal rejected
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
 
@@ -159,6 +159,7 @@ Item {
             id:         mobileFileOpenDialog
             title:      _root.title
             buttons:    Dialog.Cancel
+            maxPopupHeight: mainWindow.height * 0.65 // Shorter height to avoid touching the top navbar
 
             property bool showAllFiles: true
 
@@ -179,7 +180,8 @@ Item {
                     var lName = localFiles[j]
                     var bName = lName.split(".")[0]
                     combinedList.push({
-                        displayName: lName,
+                        displayName: bName + ".plan",
+                        actualName: lName,
                         baseName: bName,
                         isLocal: true,
                         isCloud: false
@@ -196,10 +198,9 @@ Item {
                             // First, add all cloud plans
                             for (var i = 0; i < cloudPlansList.length; i++) {
                                 var cName = cloudPlansList[i].plan_name
-                                var dName = cName
-                                if (!dName.endsWith(".plan")) dName += ".plan"
+                                var cBaseName = cName.split(".")[0]
+                                var dName = cBaseName + ".plan"
 
-                                var cBaseName = cName.replace(".plan", "")
                                 deduplicatedList.push({
                                     displayName: dName,
                                     actualName:  cName, // Store the original name for deletion/loading
@@ -290,12 +291,12 @@ Item {
                                         _appSettings.username = strippedFileName
 
                                         if (modelData.isLocal) {
-                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.displayName))
+                                            _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.actualName))
                                         } else if (modelData.isCloud) {
                                             var planData = null
                                             for (var i = 0; i < mobileFileOpenDialog.cloudPlansList.length; i++) {
                                                 var cName = mobileFileOpenDialog.cloudPlansList[i].plan_name
-                                                var cBaseName = cName.replace(".plan", "")
+                                                var cBaseName = cName.split(".")[0]
                                                 if (cBaseName === strippedFileName) {
                                                     planData = mobileFileOpenDialog.cloudPlansList[i].plan_data
                                                     break
@@ -310,7 +311,7 @@ Item {
                                     onHamburgerClicked: {
                                         if (modelData.isLocal) {
                                             highlight = true
-                                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.displayName)
+                                            hamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData.actualName)
                                             hamburgerMenu.popup()
                                         } else {
                                             // Cloud plan deletion
@@ -359,7 +360,7 @@ Item {
                             }
                         }
 
-                        // View All Plans Text
+                        // See More link
                         Rectangle {
                             width:  parent.width
                             height: 40
@@ -368,8 +369,22 @@ Item {
 
                             QGCLabel {
                                 anchors.centerIn: parent
-                                text: qsTr("To view all plans move to profile page log files")
-                                color: "black"
+                                text: qsTr("See More")
+                                color: "#007AFF" // Modern link color
+                                font.bold: true
+                                font.pixelSize: 14
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    MapGlobals.jumpToFileList = true
+                                    if (MapGlobals.rootWindow) {
+                                        MapGlobals.rootWindow.logfiles_screen()
+                                    }
+                                    mobileFileOpenDialog.close()
+                                }
                             }
                         }
                     }
@@ -409,7 +424,6 @@ Item {
             }
 
             onRejected: {
-                customdialogedit.createObject(mainWindow).open()
                 popup.visible = false
             }
 
@@ -477,7 +491,8 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            _root.acceptedForOverwrite()
+                            var fallback = controller.fullyQualifiedFilename(folder, userName !== "" ? userName : "Guest", _rgExtensions)
+                            _root.acceptedForOverwrite(fallback)
                             popup.visible = false
                         }
                     }
