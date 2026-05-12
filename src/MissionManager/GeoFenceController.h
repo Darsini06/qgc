@@ -61,6 +61,12 @@ public:
     ///     @param bottomRight: Bottom right left coordinate or map viewport
     Q_INVOKABLE void addExclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight);
 
+    /// Agri specific: Add a new inclusion square with fixed 20x20m size
+    Q_INVOKABLE void addInclusionSquareAgri(QGeoCoordinate center);
+
+    /// Agri specific: Add a new inclusion circle with fixed 10m radius
+    Q_INVOKABLE void addInclusionCircleAgri(QGeoCoordinate center);
+
     /// Deletes the specified polygon from the polygon list
     ///     @param index: Index of poygon to delete
     Q_INVOKABLE void deletePolygon(int index);
