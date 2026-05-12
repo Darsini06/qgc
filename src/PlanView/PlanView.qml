@@ -1505,7 +1505,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    0
-                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode
+                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog"
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported

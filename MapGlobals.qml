@@ -13,6 +13,7 @@ QtObject {
     property real mapRotation: 0
     property int recenterInterval: 10000 // Default 10 seconds
     property bool forceRecenter: false
+    property string editdialog: "editdialog1"
     property var activeFlightMap: null  // Add global map reference
     property var gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
 

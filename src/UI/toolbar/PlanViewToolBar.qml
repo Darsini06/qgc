@@ -189,7 +189,7 @@ Rectangle {
         height:         parent.height
         color:          Qt.rgba(0, 0, 0, 0.40)
         width:50
-
+        visible:        MapGlobals.editdialog !== "editdialog"
 
         QGCToolBarButton {
             id:                     currentButton
@@ -207,7 +207,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: largeProgressBar1.left
         anchors.rightMargin: ScreenTools.defaultFontPixelWidth * 2
-        visible: true
+        visible: MapGlobals.editdialog !== "editdialog"
     }
 
     // Large mission download progress bar
