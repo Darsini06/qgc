@@ -46,11 +46,11 @@ SettingsPage {
     //Drone Settings ------------------------------------------------------------------------------------
     property var    _linkManager:               QGroundControl.linkManager
     property var    _autoConnectSettings:       QGroundControl.settingsManager.autoConnectSettings
-    property bool   _isNarrow:                  width < ScreenTools.defaultFontPixelWidth * 70
-    property real   _innerMargin:               ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth : ScreenTools.defaultFontPixelWidth * 3
+    property bool   _isNarrow:                  width < ScreenTools.defaultFontPixelWidth * 110
+    property real   _innerMargin:               ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 2 : ScreenTools.defaultFontPixelWidth * 8
     property real   _labelWidth:                _isNarrow ? contentLayout.width : ScreenTools.defaultFontPixelWidth * 45
-    property real   _controlWidth:              _isNarrow ? contentLayout.width : ScreenTools.defaultFontPixelWidth * 45
-    property real   _maxContentWidth:           ScreenTools.defaultFontPixelWidth * 110
+    property real   _controlWidth:              _isNarrow ? contentLayout.width : ScreenTools.defaultFontPixelWidth * 35
+    property real   _maxContentWidth:           ScreenTools.defaultFontPixelWidth * 90
     property real   _contentWidth:              Math.min(width - (_innerMargin * 2), _maxContentWidth)
 
 
@@ -58,11 +58,8 @@ SettingsPage {
     ColumnLayout {
         id:                 contentLayout
         width:              _contentWidth
-        Layout.preferredWidth: _contentWidth
-        Layout.fillWidth:   _isNarrow
-        Layout.maximumWidth: _maxContentWidth
-        Layout.alignment:   Qt.AlignHCenter
-        spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight / 2 : ScreenTools.defaultFontPixelHeight
+        spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight : ScreenTools.defaultFontPixelHeight * 1.5
+        anchors.horizontalCenter: parent.horizontalCenter
 
 
         Rectangle {
@@ -106,13 +103,8 @@ SettingsPage {
         // LabelledFactComboBox {
         //     label:       qsTr("Stream GCS Position")
         //     fact:       _appSettings.followTarget
-        //     indexModel: false
-        //     visible:    _appSettings.followTarget.visible
-        // }
-
-
         GridLayout {
-            columns:            _isNarrow ? 1 : 3
+            columns:            _isNarrow ? 1 : 2
             columnSpacing:      10
             rowSpacing:         _isNarrow ? 5 : 0
             Layout.fillWidth:   true
@@ -122,19 +114,14 @@ SettingsPage {
                 text:               qsTr("Stream GCS Position")
                 color:              "black"
                 font.bold:          true
-                Layout.fillWidth:   _isNarrow
+                Layout.fillWidth:   true
+                wrapMode:           Text.WordWrap
                 Layout.preferredWidth: _labelWidth
-            }
-
-            Item { 
-                Layout.fillWidth: true
-                visible:          !_isNarrow 
             }
 
             FactComboBox {
                 id:                     followTargetCombo
                 fact:                   _appSettings.followTarget
-                indexModel:             false
                 sizeToContents:         false
                 Layout.fillWidth:       true
                 Layout.maximumWidth:    _isNarrow ? 10000 : _controlWidth
@@ -147,19 +134,25 @@ SettingsPage {
                     border.width:   1
                     radius:         4
                 }
+                onPressedChanged: {
+                    if (pressed) {
+                        popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                        popup.x = width - popup.width
+                    }
+                }
                 delegate: ItemDelegate {
                     width:          parent.width
+                    padding:        ScreenTools.defaultFontPixelHeight / 4
                     contentItem: QGCLabel {
                         text:       modelData
                         color:      (followTargetCombo.currentIndex === index || highlighted) ? "white" : "black"
                         verticalAlignment: Text.AlignVCenter
                         leftPadding: ScreenTools.defaultFontPixelWidth * 2
                         rightPadding: ScreenTools.defaultFontPixelWidth * 2
-                        wrapMode:   Text.WordWrap
                     }
                     background: Rectangle {
                         color:      (followTargetCombo.currentIndex === index || highlighted) ? "#79AE6F" : "transparent"
-                        radius:     12
+                        radius:     4
                         anchors.fill: parent
                         anchors.margins: 2
                     }
@@ -221,22 +214,6 @@ SettingsPage {
             }
         }
 
-        // FactCheckBoxSlider {
-        //     Layout.fillWidth: true
-        //     text:           qsTr("Mute all audio output")
-        //     fact:       _audioMuted
-        //     visible:    _audioMuted.visible
-        //     property Fact _audioMuted: _appSettings.audioMuted
-        // }
-
-        // FactCheckBoxSlider {
-        //     Layout.fillWidth: true
-        //     text:       qsTr("Save application data to SD Card")
-        //     fact:       _androidSaveToSDCard
-        //     visible:    _androidSaveToSDCard.visible
-        //     property Fact _androidSaveToSDCard: _appSettings.androidSaveToSDCard
-        // }
-
         //Not for Mobile
         GridLayout {
             columns:            _isNarrow ? 1 : 3
@@ -284,23 +261,6 @@ SettingsPage {
             }
         }
 
-        // Repeater {
-        //     visible:            QGroundControl.settingsManager.unitsSettings.visible
-
-        //     model: [ QGroundControl.settingsManager.unitsSettings.horizontalDistanceUnits,
-        //         QGroundControl.settingsManager.unitsSettings.verticalDistanceUnits,
-        //         QGroundControl.settingsManager.unitsSettings.areaUnits,
-        //         QGroundControl.settingsManager.unitsSettings.speedUnits,
-        //         QGroundControl.settingsManager.unitsSettings.temperatureUnits,
-        //     ]
-
-        //     LabelledFactComboBox {
-        //         label:                  modelData.shortDescription
-        //         fact:                   modelData
-        //         indexModel:             false
-        //     }
-        // }
-
         Repeater {
             visible: _settingsManager.unitsSettings.visible
 
@@ -312,8 +272,8 @@ SettingsPage {
                 _settingsManager.unitsSettings.temperatureUnits
             ]
 
-            GridLayout {
-                columns:            _isNarrow ? 1 : 3
+            delegate: GridLayout {
+                columns:            _isNarrow ? 1 : 2
                 columnSpacing:      10
                 rowSpacing:         _isNarrow ? 5 : 0
                 Layout.fillWidth:   true
@@ -323,19 +283,14 @@ SettingsPage {
                     text:                   unitFact.shortDescription
                     color:                  "black"
                     font.bold:              true
-                    Layout.fillWidth:       _isNarrow
+                    Layout.fillWidth:       true
+                    wrapMode:               Text.WordWrap
                     Layout.preferredWidth:  _labelWidth
-                }
-
-                Item { 
-                    Layout.fillWidth: true
-                    visible:          !_isNarrow 
                 }
 
                 FactComboBox {
                     id:                     unitCombo
                     fact:                   unitFact
-                    indexModel:             false
                     sizeToContents:         false
                     Layout.fillWidth:       true
                     Layout.maximumWidth:    _isNarrow ? 10000 : _controlWidth
@@ -348,19 +303,25 @@ SettingsPage {
                         border.width:   1
                         radius:         4
                     }
+                    onPressedChanged: {
+                        if (pressed) {
+                            popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                            popup.x = width - popup.width
+                        }
+                    }
                     delegate: ItemDelegate {
                         width:          parent.width
+                        padding:        ScreenTools.defaultFontPixelHeight / 4
                         contentItem: QGCLabel {
                             text:       modelData
                             color:      (unitCombo.currentIndex === index || highlighted) ? "white" : "black"
                             verticalAlignment: Text.AlignVCenter
                             leftPadding: ScreenTools.defaultFontPixelWidth * 2
                             rightPadding: ScreenTools.defaultFontPixelWidth * 2
-                            wrapMode:   Text.WordWrap
                         }
                         background: Rectangle {
                             color:      (unitCombo.currentIndex === index || highlighted) ? "#79AE6F" : "transparent"
-                            radius:     12
+                            radius:     4
                             anchors.fill: parent
                             anchors.margins: 2
                         }
@@ -504,8 +465,6 @@ SettingsPage {
             Layout.fillWidth: true
             height: 1
             color: "#E0E0E0"
-            //Layout.topMargin: ScreenTools.defaultFontPixelHeight
-            //Layout.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.5
         }
 
         Text {
@@ -519,7 +478,7 @@ SettingsPage {
         }
 
         GridLayout {
-            columns:            _isNarrow ? 1 : 3
+            columns:            _isNarrow ? 1 : 2
             columnSpacing:      10
             rowSpacing:         _isNarrow ? 5 : 0
             visible:            _videoSettings.videoSource.visible
@@ -529,19 +488,14 @@ SettingsPage {
                 text:                   qsTr("Source")
                 color:                  "black"
                 font.bold:              true
-                Layout.fillWidth:       _isNarrow
+                Layout.fillWidth:       true
+                wrapMode:               Text.WordWrap
                 Layout.preferredWidth:  _labelWidth
-            }
-
-            Item { 
-                Layout.fillWidth: true
-                visible:          !_isNarrow 
             }
 
             FactComboBox {
                 id:                     videoCombo
                 fact:                   _videoSettings.videoSource
-                indexModel:             false
                 sizeToContents:         false
                 Layout.fillWidth:       true
                 Layout.maximumWidth:    _isNarrow ? 10000 : _controlWidth
@@ -554,19 +508,25 @@ SettingsPage {
                     border.width:   1
                     radius:         4
                 }
+                onPressedChanged: {
+                    if (pressed) {
+                        popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                        popup.x = width - popup.width
+                    }
+                }
                 delegate: ItemDelegate {
                     width:          parent.width
+                    padding:        ScreenTools.defaultFontPixelHeight / 4
                     contentItem: QGCLabel {
                         text:       modelData
                         color:      (videoCombo.currentIndex === index || highlighted) ? "white" : "black"
                         verticalAlignment: Text.AlignVCenter
                         leftPadding: ScreenTools.defaultFontPixelWidth * 2
                         rightPadding: ScreenTools.defaultFontPixelWidth * 2
-                        wrapMode:   Text.WordWrap
                     }
                     background: Rectangle {
                         color:      (videoCombo.currentIndex === index || highlighted) ? "#79AE6F" : "transparent"
-                        radius:     12
+                        radius:     4
                         anchors.fill: parent
                         anchors.margins: 2
                     }
@@ -605,7 +565,6 @@ SettingsPage {
                 border.color:           "#808080"
                 border.width:           1
                 radius:                 4
-                clip:                   true
                 visible:                _isRTSP && _videoSettings.rtspUrl.visible
 
                 FactTextField {
@@ -641,7 +600,6 @@ SettingsPage {
                 border.color:           "#808080"
                 border.width:           1
                 radius:                 4
-                clip:                   true
                 visible:                _isTCP && _videoSettings.tcpUrl.visible
 
                 FactTextField {
@@ -677,7 +635,6 @@ SettingsPage {
                 border.color:           "#808080"
                 border.width:           1
                 radius:                 4
-                clip:                   true
                 visible:                _requiresUDPPort && _videoSettings.udpPort.visible
 
                 FactTextField {
@@ -763,6 +720,7 @@ SettingsPage {
                     font.bold:              true
                     Layout.fillWidth:       _isNarrow
                     Layout.preferredWidth:  _labelWidth
+                    wrapMode:               Text.WordWrap
                 }
 
                 Item { 
@@ -848,6 +806,7 @@ SettingsPage {
                     font.bold:              true
                     Layout.fillWidth:       _isNarrow
                     Layout.preferredWidth:  _labelWidth
+                    wrapMode:               Text.WordWrap
                 }
 
                 Item { 
