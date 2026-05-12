@@ -139,17 +139,17 @@ QGCFlickable {
             border.width: 1
 
 
-        // QGCLabel {
-        //     id:                 geoFenceLabel
-        //     anchors.margins:    _margin
-        //     anchors.left:       parent.left
-        //     anchors.top:        parent.top
-        //     text:               qsTr("Obstacles Settings")
-        //     color:              _colorTextPrimary
-        //     font.bold:          true
-        //     font.pointSize:     ScreenTools.mediumFontPointSize
-        //     anchors.leftMargin: _margin
-        // }
+        QGCLabel {
+            id:                 geoFenceLabel
+            anchors.margins:    _margin
+            anchors.left:       parent.left
+            anchors.top:        parent.top
+            text:               qsTr("Obstacles Settings")
+            color:              _colorTextPrimary
+            font.bold:          true
+            font.pointSize:     ScreenTools.mediumFontPointSize
+            anchors.leftMargin: _margin
+        }
 
         Rectangle {
             anchors.left:       parent.left
@@ -179,16 +179,16 @@ QGCFlickable {
                 anchors.right:      parent.right
                 spacing:            _margin * 1.2
 
-                // QGCLabel {
-                //     anchors.left:       parent.left
-                //     anchors.right:      parent.right
-                //     wrapMode:           Text.WordWrap
-                //     color:              _colorTextSecondary
-                //     font.pointSize:     myGeoFenceController.supported ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                //     text:               myGeoFenceController.supported ?
-                //                             qsTr("Obstacles allow you to set a virtual boundary around the area you want to fly in.") :
-                //                             qsTr("This vehicle does not support Obstacles.")
-                // }
+                QGCLabel {
+                    anchors.left:       parent.left
+                    anchors.right:      parent.right
+                    wrapMode:           Text.WordWrap
+                    color:              _colorTextSecondary
+                    font.pointSize:     myGeoFenceController.supported ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                    text:               myGeoFenceController.supported ?
+                                            qsTr("Obstacles allow you to set a virtual boundary around the area you want to fly in.") :
+                                            qsTr("This vehicle does not support Obstacles.")
+                }
 
                 Column {
                     anchors.left:       parent.left
@@ -198,16 +198,15 @@ QGCFlickable {
 
                     Repeater {
                         model: myGeoFenceController.params
-
                         Item {
                             width:  fenceColumn.width
-                            height: textField.height
+                            height: showCombo ? comboField.height : textField.height
 
                             property bool showCombo: modelData.enumStrings.length > 0
 
                             QGCLabel {
                                 id:                 textFieldLabel
-                                anchors.baseline:   textField.baseline
+                                anchors.baseline:   showCombo ? comboField.baseline : textField.baseline
                                 color:              _colorTextPrimary
                                 font.bold:          true
                                 text:               myGeoFenceController.paramLabels[index]
