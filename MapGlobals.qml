@@ -1138,47 +1138,59 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
-    function fetchCloudPlans(username, callback) {
+    function fetchCloudPlans(userIdentifier, callback) {
+        var username = QGroundControl.loadGlobalSetting("username", "Guest");
+        
         if (!username || username === "" || username === "Guest") {
             console.error("Cannot fetch from cloud: No valid username provided");
             if (callback) callback([]);
             return;
         }
 
-        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", username);
+        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for username:", username);
 
         var xhr = new XMLHttpRequest();
-        // Updated to use the correct API endpoint and username filter
+        // Based on DB explorer, missions are stored in the 'missions' collection
         xhr.open("GET", backendUrl + "/missions?username=" + encodeURIComponent(username));
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     try {
-                        var missions = JSON.parse(xhr.responseText);
-                        console.log("Found", missions.length, "missions in cloud");
-
-                        // Deduplicate by mission_name
-                        var uniqueMissions = {};
-                        for (var i = 0; i < missions.length; i++) {
-                            var m = missions[i];
-                            // Keep the latest version (assuming last in array is newest, or just replacing)
-                            uniqueMissions[m.mission_name] = m;
+                        var responseData = JSON.parse(xhr.responseText);
+                        var rawPlans = [];
+                        
+                        if (Array.isArray(responseData)) {
+                            rawPlans = responseData;
+                        } else if (responseData.missions && Array.isArray(responseData.missions)) {
+                            rawPlans = responseData.missions;
                         }
 
-                        // Compatibility fix: the component expects objects with plan_name and plan_data
-                        var plans = Object.values(uniqueMissions).map(function(m) {
-                            return {
-                                plan_name: m.mission_name,
-                                plan_data: m.plan_data
-                            };
-                        });
+                        console.log("Found", rawPlans.length, "raw missions in cloud");
+
+                        var uniquePlans = {};
+                        for (var i = 0; i < rawPlans.length; i++) {
+                            var p = rawPlans[i];
+                            // Database uses 'mission_name' and 'plan_data'
+                            var name = p.mission_name || p.plan_name || p.name || ("Untitled_" + i);
+                            var data = p.plan_data || p.data;
+                            
+                            if (data) {
+                                uniquePlans[name] = {
+                                    plan_name: name,
+                                    plan_data: data
+                                };
+                            }
+                        }
+
+                        var plans = Object.values(uniquePlans);
+                        console.log("Successfully processed", plans.length, "plans");
                         if (callback) callback(plans);
                     } catch (e) {
                         console.error("Error parsing cloud missions response:", e);
                         if (callback) callback([]);
                     }
                 } else {
-                    console.error("Failed to fetch cloud missions:", xhr.responseText);
+                    console.error("Failed to fetch cloud missions. Status:", xhr.status, "Response:", xhr.responseText);
                     if (callback) callback([]);
                 }
             }
