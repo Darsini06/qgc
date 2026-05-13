@@ -349,7 +349,6 @@ Item {
                                         }
                                     }
                                 }
-
                                 Rectangle {
                                     width: parent.width
                                     height: 1
@@ -359,7 +358,6 @@ Item {
                                 }
                             }
                         }
-
                         // See More link
                         Rectangle {
                             width:  parent.width

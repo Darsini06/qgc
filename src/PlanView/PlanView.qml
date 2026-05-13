@@ -1045,12 +1045,31 @@ Item {
                                   }
                                   break
 
-                                  case _layerUTMSP:
-                                  if (addWaypointRallyPointAction.checked) {
-                                      insertSimpleItemAfterCurrent(coordinate)
-                                  } else if (_addROIOnClick) {
-                                      insertROIAfterCurrent(coordinate)
-                                      _addROIOnClick = false
+                                  case _layerGeoFence:
+                                  // Ignore clicks that are too close in time to a button press (prevents accidental clicks through UI)
+                                  if (new Date().getTime() - MapGlobals.lastButtonPressTime < 500) {
+                                      console.log("Ignoring map click too close to button press")
+                                      break
+                                  }
+                                  
+                                  if (MapGlobals.circleAddMode) {
+                                      _geoFenceController.addInclusionCircleAgri(coordinate)
+                                      MapGlobals.circleAddMode = false
+                                  } else if (MapGlobals.squareCornerStep >= 0) {
+                                      var corners = MapGlobals.tempCorners
+                                      corners.push(coordinate)
+                                      MapGlobals.tempCorners = corners
+                                      MapGlobals.squareCornerStep++
+                                      if (MapGlobals.squareCornerStep === 4) {
+                                          _geoFenceController.addInclusionPolygonAgri()
+                                          var lastPoly = _geoFenceController.polygons.get(_geoFenceController.polygons.count - 1)
+                                          lastPoly.appendVertices(MapGlobals.tempCorners)
+                                          lastPoly.traceMode = false
+                                          _geoFenceController.clearAllInteractive()
+                                          lastPoly.interactive = true
+                                          MapGlobals.squareCornerStep = -1
+                                          MapGlobals.tempCorners = []
+                                      }
                                   }
                                   break
                               }
@@ -1160,6 +1179,120 @@ Item {
                     map:            editorMap
                     size:           ScreenTools.defaultFontPixelHeight * 3
                     z:              QGroundControl.zOrderMapItems - 1
+                }
+            }
+
+            // Temporary visuals for Agri Square corner picking
+            MapPolyline {
+                line.width: 2
+                line.color: "white"
+                path:       {
+                    if (MapGlobals.squareCornerStep < 2) return []
+                    var p = MapGlobals.tempCorners.slice()
+                    if (MapGlobals.squareCornerStep >= 3) {
+                        p.push(p[0]) // Close the loop visually
+                    }
+                    return p
+                }
+                visible:    MapGlobals.squareCornerStep > 1
+            }
+
+            MapItemView {
+                model: MapGlobals.squareCornerStep >= 0 ? MapGlobals.tempCorners : []
+                delegate: MapQuickItem {
+                    anchorPoint.x: sourceItem.width / 2
+                    anchorPoint.y: sourceItem.height / 2
+                    coordinate: modelData
+                    sourceItem: Rectangle {
+                        width:  24; height: 24; radius: 12
+                        color:  "#3498DB"
+                        border.color: "white"; border.width: 2
+                        QGCLabel {
+                            anchors.centerIn: parent
+                            text: (index + 1).toString()
+                            color: "white"; font.bold: true; font.pointSize: 10
+                        }
+                    }
+                }
+            }
+
+            // ── Floating overlay: Circle placement mode ─────────────
+            Item {
+                visible: MapGlobals.circleAddMode
+                anchors.fill: parent
+                z: QGroundControl.zOrderTopMost
+
+                // Pulsing ring at center
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 60; height: 60; radius: 30
+                    color: "transparent"
+                    border.color: "#3498DB"; border.width: 2
+                    SequentialAnimation on scale {
+                        running: MapGlobals.circleAddMode
+                        loops:   Animation.Infinite
+                        NumberAnimation { to: 1.5; duration: 700; easing.type: Easing.OutSine }
+                        NumberAnimation { to: 1.0; duration: 700; easing.type: Easing.InSine  }
+                    }
+                }
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 12; height: 12; radius: 6
+                    color: "#3498DB"
+                }
+
+                // Toast banner at top
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top:              parent.top
+                    anchors.topMargin:        60 // Moved further down again
+                    width:                    Math.min(parent.width - 40, 360)
+                    height:                   circleToastCol.implicitHeight + 20
+                    radius:                   12
+                    color:                    "#DD0D2137"
+                    border.width:             0 
+
+                    SequentialAnimation on opacity {
+                        running: MapGlobals.circleAddMode; loops: Animation.Infinite
+                        NumberAnimation { to: 0.75; duration: 700 }
+                        NumberAnimation { to: 1.0;  duration: 700 }
+                    }
+                    ColumnLayout {
+                        id:              circleToastCol
+                        anchors.fill:    parent
+                        anchors.margins: 12
+                        spacing:         4
+                        Text {
+                            Layout.fillWidth:    true
+                            text:                qsTr("⭕  Circle Placement Mode")
+                            color:               "#3498DB"; font.bold: true; font.pointSize: 13
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text {
+                            Layout.fillWidth:    true
+                            text:                qsTr("Tap map to place obstacle center")
+                            color:               "#CCDDEE"; font.pointSize: 11; wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+
+                    // Top-right corner minimalist cancel icon (Smaller & Broader)
+                    Text {
+                        anchors.top:          parent.top
+                        anchors.right:        parent.right
+                        anchors.topMargin:    5
+                        anchors.rightMargin:  8
+                        text:                 "✖" // Broader cross
+                        color:                "white"
+                        font.bold:            true
+                        font.pointSize:       14 // Smaller
+                        z:                    10
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:    MapGlobals.circleAddMode = false
+                        }
+                    }
                 }
             }
 

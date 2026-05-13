@@ -469,6 +469,15 @@ void GeoFenceController::addInclusionCircleAgri(QGeoCoordinate center)
     setDirty(true);
 }
 
+void GeoFenceController::addInclusionPolygonAgri(void)
+{
+    QGCFencePolygon* polygon = new QGCFencePolygon(true /* inclusion */, this);
+    polygon->setInteractive(true);
+    polygon->setTraceMode(true);
+    _polygons.append(polygon);
+    setDirty(true);
+}
+
 void GeoFenceController::addExclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
 {
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());

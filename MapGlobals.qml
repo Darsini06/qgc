@@ -41,6 +41,10 @@ QtObject {
     property bool showMissionItems: false
     property bool showEntryArrows: false   // true only while Rotate Entry Point is active
     property bool jumpToFileList: false
+    property bool circleAddMode: false
+    property int  squareCornerStep: -1
+    property var  tempCorners: []
+    property var  lastButtonPressTime: 0
 
     signal newSessionAdded()
     signal requestCloudSync()
