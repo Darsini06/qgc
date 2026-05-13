@@ -22,9 +22,8 @@ Item {
     property color text_muted:      "#64748b"
     property color border_color:    "#e2e8f0"
 
-    property string userName: QGroundControl.loadGlobalSetting("username", "")
-    property string name_from_db: ""
-    property string email_from_db: ""
+    property string userName: MapGlobals.userName
+    property string displayName: MapGlobals.displayName
     property string mobileNo_from_db: ""
     property int rpcCompletedStatus: -1
 
@@ -44,9 +43,9 @@ Item {
 
             /* ================= LEFT SIDE: PROFILE OVERVIEW ================= */
             Rectangle {
-                id: leftCard
-                Layout.preferredWidth: isSmallScreen ? parent.width * 0.4 : parent.width * 0.45
+                id: sidebar
                 Layout.fillHeight: true
+                Layout.preferredWidth: isSmallScreen ? 0 : 350
                 color: "#1A1A1A"
                 clip: true
                 visible: !isSmallScreen
@@ -106,8 +105,13 @@ Item {
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Text { 
-                            text: "@" + userName
-                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; color: Qt.rgba(255, 255, 255, 0.7); Layout.alignment: Qt.AlignHCenter 
+                            text: MapGlobals.userEmail || QGroundControl.loadGlobalSetting("email", "")
+                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; color: Qt.rgba(255, 255, 255, 0.85); Layout.alignment: Qt.AlignHCenter 
+                            elide: Text.ElideRight; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text { 
+                            text: userName ? "@" + userName : ""
+                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.9; color: Qt.rgba(255, 255, 255, 0.4); Layout.alignment: Qt.AlignHCenter 
                         }
                     }
 
@@ -194,7 +198,7 @@ Item {
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.leftMargin: 10; anchors.rightMargin: 12
-                                        text: name_from_db; background: null; selectByMouse: true; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
+                                        text: displayName; background: null; selectByMouse: true; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
                                         horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Enter Full Name")
                                     }
                                 }
@@ -237,21 +241,18 @@ Item {
                                     border.color: emailField.activeFocus ? accent_color : border_color
                                     border.width: emailField.activeFocus ? 2 : 1
                                     
-                                    QGCColoredImage {
-                                        id: emailIcon
-                                        source: "qrc:/InstrumentValueIcons/paper-plane.svg"; width: 22; height: 22
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left; anchors.leftMargin: 16
-                                        color: emailField.activeFocus ? accent_color : text_muted
-                                    }
+                                    /* Email Icon removed for more space */
+                                    Item { id: emailIcon; width: 0; height: 0 }
                                     TextField {
                                         id: emailField
-                                        anchors.left: emailIcon.right
+                                        anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 10; anchors.rightMargin: 12
-                                        text: email_from_db; background: null; selectByMouse: true; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
+                                        anchors.leftMargin: 14; anchors.rightMargin: 14
+                                        text: MapGlobals.userEmail; background: null; selectByMouse: true; color: "#1e293b"; font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+                                        clip: true; selectionColor: accent_color; selectedTextColor: "white"
                                         horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Email")
+                                        onActiveFocusChanged: if(activeFocus) cursorPosition = 0
                                     }
                                 }
                             }

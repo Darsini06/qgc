@@ -23,9 +23,13 @@ Item {
     signal backClicked()
 
     // Professional Responsiveness
-    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 90
+    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 60
     readonly property real outerPadding: isSmallScreen ? 20 : 60
     readonly property real tableMaxWidth: 900
+
+    property int totalMinutes: 0
+    property int missionsCompleted: 0
+    property string totalDurationFormatted: "0h 0m"
 
     ListModel {
         id: sessionModel
@@ -36,15 +40,25 @@ Item {
     function loadSessions() {
         sessionModel.clear();
         MapGlobals.getAllSessions(function(sessions) {
+            var total = 0;
             for (var i = 0; i < sessions.length; i++) {
                 var session = sessions[i];
                 sessionModel.append({
                     id: session.id,
                     date: session.date || "N/A",
                     start_time: session.start_time || "--:--",
-                    end_time: session.end_time || "--:--"
+                    end_time: session.end_time || "--:--",
+                    duration: session.duration || 0
                 });
+                total += Number(session.duration || 0);
             }
+            
+            totalMinutes = total;
+            missionsCompleted = sessions.length;
+            
+            var hours = Math.floor(total / 60);
+            var minutes = total % 60;
+            totalDurationFormatted = hours + "h " + minutes + "m";
         });
     }
 
@@ -60,7 +74,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : parent.width * 0.45
+                Layout.preferredWidth: isSmallScreen ? 0 : 350
                 visible: !isSmallScreen
                 color: sidebar_color
                 clip: true
@@ -103,11 +117,6 @@ Item {
                     }
 
                     Item { Layout.fillHeight: true }
-
-                    LottieAnimation {
-                        Layout.preferredHeight: 140; Layout.preferredWidth: 140
-                        source: "qrc:/qmlimages/NewImages/report_1.json"; autoPlay: true; loops: Animation.Infinite
-                    }
                     
                     Item { Layout.preferredHeight: 40 }
                 }
