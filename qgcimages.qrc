@@ -113,7 +113,10 @@
         <file alias="NewImages/commlinks.svg">src/NewImages/commlinks.svg</file>
         <file alias="NewImages/autonomous.svg">src/NewImages/autonomous.svg</file>
         <file alias="NewImages/fileupload.svg">src/NewImages/fileupload.svg</file>
-        <file alias="NewImages/gps_navigation.svg">src/NewImages/gps_navigation.svg</file>
+        <file alias="NewImages/upload_file.svg">src/NewImages/upload_file.svg</file>
+        <file alias="NewImages/upload_custom.png">src/NewImages/upload_custom.png</file>
+        <file alias="NewImages/file_upload_v2.png">src/NewImages/file_upload_v2.png</file>
+        <file alias="NewImages/upload_modern.svg">src/NewImages/upload_modern.svg</file>
         <file alias="NewImages/location_mark.svg">src/NewImages/location_mark.svg</file>
         <file alias="NewImages/privacy_policy_black.svg">src/NewImages/privacy_policy_black.svg</file>
         <file alias="NewImages/accountUpdate_black.svg">src/NewImages/accountUpdate_black.svg</file>
