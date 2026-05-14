@@ -1596,7 +1596,7 @@ Item {
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 1.5
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 4.5
 
                 // 1st: Boundary Point
                 Loader {
