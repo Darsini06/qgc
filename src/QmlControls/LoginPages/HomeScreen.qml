@@ -596,12 +596,12 @@ Item {
                 
                 // Automatic fitting logic
                 fontSizeMode: Text.HorizontalFit
-                minimumPointSize: 8
+                minimumPointSize: 6
                 font.pointSize: {
                     var baseSize = ScreenTools.largeFontPointSize;
                     if (isDesktop) return baseSize * 4.0;
                     if (isTablet) return baseSize * 3.5;
-                    return isSmallScreen ? 24 : 32; // Target sizes, will shrink to fit width
+                    return isSmallScreen ? 18 : 26; // Target sizes, reduced for mobile
                 }
                 lineHeight: 1.1
             }

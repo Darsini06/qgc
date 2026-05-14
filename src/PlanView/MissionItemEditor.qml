@@ -82,6 +82,7 @@ Rectangle {
         anchors.right:      hamburger.visible ? hamburger.left : parent.right
         anchors.top:        parent.top
         anchors.margins:    _margin
+        anchors.topMargin:  ScreenTools.isMobile ? (ScreenTools.defaultFontPixelHeight * 1.5) : _margin
         spacing:            _margin
 
         Rectangle {
