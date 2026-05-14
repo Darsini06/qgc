@@ -224,6 +224,7 @@
         <file alias="NewImages/mapbg.png">src/NewImages/mapbg.png</file>
         <file alias="NewImages/agribg.png">src/NewImages/agribg.png</file>
         <file alias="NewImages/camerabg.png">src/NewImages/camerabg.png</file>
+        <file alias="NewImages/military.png">src/NewImages/military.png</file>
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
         <file alias="arrow-down.png">src/QmlControls/arrow-down.png</file>
