@@ -137,7 +137,7 @@ QtObject {
     //saveDroneSession
     function saveDroneSession(date, startTime, endTime, sessionType = "Connection") {
         console.log("MapGlobals.saveDroneSession() - Type:", sessionType)
-        var duration = calculateDuration(startTime, endTime);
+        var duration = calculateDuration(startTime, endTime) ;
         var data = {
             "username": QGroundControl.loadGlobalSetting("username", "Guest"),
             "date": date,

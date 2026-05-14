@@ -170,6 +170,7 @@ Item {
             Column {
                 anchors.centerIn: parent
                 spacing: 2
+
                 QGCLabel {
                     text: qsTr("ESTIMATED FLIGHT TIME")
                     font.pointSize: ScreenTools.defaultFontPointSize
@@ -177,6 +178,7 @@ Item {
                     color: _colorTextSecondary
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
+
                 QGCLabel {
                     text: MapGlobals.time
                     font.pointSize: ScreenTools.mediumFontPointSize

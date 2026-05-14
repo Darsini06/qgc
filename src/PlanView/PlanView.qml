@@ -23,7 +23,6 @@ import MapGlobals
 Item {
     id: _root
 
-
     property bool planControlColapsed: false
 
     readonly property int   _decimalPlaces:             8
