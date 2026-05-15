@@ -1866,31 +1866,65 @@ ApplicationWindow {
         property alias agribtn:         agribtn
         property alias agrigpsbtn:      agrigpsbtn
 
+        // Tracks whether the KML dialog was opened from Spot Spraying card
+        property bool _kmlForSpotSpraying: false
+
         Platform.FileDialog {
             id: kmlFileDialog
-            title: "Select KML File"
-            nameFilters: ["KML files (*.kml)"]
+            title: dialog._kmlForSpotSpraying ? "Select KML File for Spot Spraying" : "Select KML / SHP File"
+            nameFilters: ["KML / SHP files (*.kml *.shp)", "KML files (*.kml)", "SHP files (*.shp)"]
             fileMode: Platform.FileDialog.OpenFile
 
             onAccepted: {
                 if (kmlFileDialog.file && kmlFileDialog.file !== "") {
+                    // kmlFileDialog.file is a QML url type, e.g. "file:///C:/path/field.kml"
+                    // Convert it directly to string - do NOT use Qt.resolvedUrl() as it
+                    // can prepend the qrc:/ base URL unexpectedly inside resource builds.
                     var fileStr   = kmlFileDialog.file.toString()
                     var localPath = ""
-                    if (fileStr.startsWith("file://"))
-                        localPath = fileStr.replace("file://", "")
-                    else if (fileStr.startsWith("content://"))
-                        localPath = fileStr
 
-                    MapGlobals.kmlPath             = localPath
-                    MapGlobals.mark_with           = "KML_File"
-                    MapGlobals.edit                = "edit"
+                    console.log("KML dialog accepted, raw file URL:", fileStr)
+
+                    if (fileStr.startsWith("file:///")) {
+                        // Strip "file:///" (8 chars):
+                        //   Windows: "file:///C:/path/f.kml" → "C:/path/f.kml"  (char[1] == ':')
+                        //   Linux:   "file:///home/u/f.kml"  → "/home/u/f.kml"  (restore leading /)
+                        var stripped = fileStr.slice(8)
+                        localPath = (stripped.charAt(1) === ":")
+                                  ? stripped
+                                  : "/" + stripped
+                    } else if (fileStr.startsWith("file://")) {
+                        localPath = fileStr.slice(7)
+                    } else if (fileStr.startsWith("content://")) {
+                        localPath = fileStr           // Android content URI – passed as-is
+                    } else {
+                        localPath = fileStr
+                    }
+
+                    // Decode any percent-encoded characters (e.g. spaces → %20)
+                    // But DO NOT decode content:// URIs as they must be passed raw to the Android ContentResolver.
+                    if (!fileStr.startsWith("content://")) {
+                        try { localPath = decodeURIComponent(localPath) } catch(e) {}
+                    }
+
+                    console.log("KML localPath passed to C++:", localPath)
+
+                    MapGlobals.kmlPath               = localPath
+                    MapGlobals.mark_with             = "KML_File"
+                    MapGlobals.appType               = dialog._kmlForSpotSpraying ? "SpotSpraying" : ""
+                    MapGlobals.edit                  = "edit"
                     MapGlobals.share_edit_visibility = false
-                    MapGlobals.isReviewMode = false
-                    MapGlobals.showMissionItems = false
+                    MapGlobals.isReviewMode          = false
+                    MapGlobals.showMissionItems      = false
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
                 }
+                dialog._kmlForSpotSpraying = false
+            }
+
+            onRejected: {
+                dialog._kmlForSpotSpraying = false
             }
         }
 
@@ -2281,7 +2315,10 @@ ApplicationWindow {
                     MouseArea {
                         id: ma6; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: kmlFileDialog.open()
+                        onClicked: {
+                            dialog._kmlForSpotSpraying = false
+                            kmlFileDialog.open()
+                        }
                     }
                 }
 
@@ -2321,7 +2358,10 @@ ApplicationWindow {
                     MouseArea {
                         id: maSpot; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: kmlFileDialog.open()
+                        onClicked: {
+                            dialog._kmlForSpotSpraying = true   // Mark that this comes from Spot Spraying
+                            kmlFileDialog.open()
+                        }
                     }
                 }
 
