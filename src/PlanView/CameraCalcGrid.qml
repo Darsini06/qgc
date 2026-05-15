@@ -61,7 +61,7 @@ Column {
                 QGCLabel {
                     anchors.centerIn: parent
                     text: "−"
-                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold: true
                     color: _colorTextPrimary
                 }
@@ -114,7 +114,7 @@ Column {
                 QGCLabel {
                     anchors.centerIn: parent
                     text: "+"
-                    font.pointSize: ScreenTools.mediumFontPointSize
+                    font.pointSize: ScreenTools.defaultFontPointSize
                     font.bold: true
                     color: _colorTextPrimary
                 }
@@ -272,7 +272,7 @@ Column {
             QGCLabel {
                 text:  distanceToSurfaceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.mediumFontPointSize
+                font.pointSize: ScreenTools.defaultFontPointSize
             }
 
             Loader {
@@ -300,7 +300,7 @@ Column {
             QGCLabel {
                 text:  frontalDistanceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.mediumFontPointSize
+                font.pointSize: ScreenTools.defaultFontPointSize
             }
 
             Loader {
@@ -328,7 +328,7 @@ Column {
             QGCLabel {
                 text:  sideDistanceLabel
                 color: _colorTextSecondary
-                font.pointSize: ScreenTools.mediumFontPointSize
+                font.pointSize: ScreenTools.defaultFontPointSize
             }
 
             Loader {

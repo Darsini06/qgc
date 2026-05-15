@@ -92,8 +92,12 @@ Item {
     }
 
     Component.onCompleted: {
+        loadSessions();
+        displayName = QGroundControl.loadGlobalSetting("name", "")
+        userName    = QGroundControl.loadGlobalSetting("username", "")
+        userEmail   = QGroundControl.loadGlobalSetting("email", "")
+
         if (userName !== "") {
-            userName = QGroundControl.loadGlobalSetting("username", "")
             loadUserDataFromMain();
         }
 
@@ -107,6 +111,17 @@ Item {
 
         _planMasterController._updateMobileShortPath()
         _planMasterController._setupFileExtensions()
+
+        if (MapGlobals.jumpToFileList) {
+            MapGlobals.jumpToFileList = false
+            if (QGroundControl.loadGlobalSetting("loadpage","loadpage") === "Agri"){
+                nameFilters = _planMasterController.loadNameFilters1
+            } else {
+                nameFilters = _planMasterController.loadNameFilters
+            }
+            _planMasterController._setupFileExtensions()
+            inlineLoader.sourceComponent = fileListComponent
+        }
     }
 
     onVisibleChanged: {
@@ -432,7 +447,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.15
-                    color: app_color
+                    color: "#262626" // Sleek black header for consistent branding
 
                     RowLayout {
                         anchors.fill: parent
@@ -694,7 +709,7 @@ Item {
                     id: fileListRoot
                     anchors.fill: parent
 
-                    property bool isCloudView: false
+                    property bool isCloudView: true
                     property var fileList: controller.getFiles(folder, _rgExtensions)
 
                     function refreshFiles() {
@@ -719,52 +734,20 @@ Item {
                     property bool cloudPlansLoading: false
                     ListModel { id: cloudPlansModel }
 
+                    Component.onCompleted: refreshFiles()
+
                     ColumnLayout {
                         anchors.fill: parent
                         spacing: 10
 
-                        // View Toggle
-                        RowLayout {
+                        // Removed Toggle Buttons as only Cloud Plans are shown now
+                        QGCLabel {
+                            text: qsTr("Plan Files")
+                            font.pointSize: 14
+                            font.bold: true
+                            color: "#262626" // Matching black color for heading
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 40
-                            spacing: 10
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 36
-                                radius: 18
-                                color: !isCloudView ? app_color : "#f0f0f0"
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Local Files"
-                                    color: !isCloudView ? "white" : "#666666"
-                                    font.bold: !isCloudView
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: isCloudView = false
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 36
-                                radius: 18
-                                color: isCloudView ? app_color : "#f0f0f0"
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Cloud Plans"
-                                    color: isCloudView ? "white" : "#666666"
-                                    font.bold: isCloudView
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        isCloudView = true
-                                        fetchCloudFiles()
-                                    }
-                                }
-                            }
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         // Scrollable list content
@@ -779,65 +762,7 @@ Item {
                                 spacing: 8
                                 padding: 4
 
-                                // Local View
-                                Column {
-                                    width: parent.width
-                                    visible: !isCloudView
-                                    spacing: 8
 
-                                    QGCLabel {
-                                        text: qsTr("Path: %1").arg(_mobileShortPath)
-                                        font.pointSize: 10
-                                        color: "#888888"
-                                    }
-
-                                    Repeater {
-                                        model: fileList
-                                        FileButton {
-                                            width: parent ? parent.width : 0
-                                            text: modelData
-                                            onClicked: {
-                                                mainWindow.openHomeScreen()
-                                                mainWindow.showFlyView()
-                                                mainWindow.showPlanView()
-                                                _appSettings.username = modelData.split(".")[0]
-                                                MapGlobals.comefrom = "Plan"
-                                                _appSettings.screen = "Plan"
-                                                swapCamera()
-                                                mainWindow.fileload(folder + "/" + modelData)
-                                            }
-                                            onHamburgerClicked: {
-                                                highlight = true
-                                                fileHamburgerMenu.fileToDelete = controller.fullyQualifiedFilename(folder, modelData)
-                                                fileHamburgerMenu.popup()
-                                            }
-                                            QGCMenu {
-                                                id: fileHamburgerMenu
-                                                property string fileToDelete
-                                                onAboutToHide: parent.highlight = false
-                                                QGCMenuItem {
-                                                    text: qsTr("Sync to Cloud")
-                                                    onTriggered: {
-                                                        mainWindow.showToastMessage("Open and Save the plan to sync with cloud")
-                                                    }
-                                                }
-                                                QGCMenuItem {
-                                                    text: qsTr("Delete")
-                                                    onTriggered: {
-                                                        MapGlobals.deleteMissionLog(fileHamburgerMenu.fileToDelete)
-                                                        controller.deleteFile(fileHamburgerMenu.fileToDelete)
-                                                        refreshFiles()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    QGCLabel {
-                                        text: qsTr("No local files found")
-                                        visible: fileList.length === 0
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                    }
-                                }
 
                                 // Cloud View
                                 Column {
@@ -860,18 +785,36 @@ Item {
                                         model: cloudPlansModel
                                         FileButton {
                                             width: parent ? parent.width : 0
-                                            text: model.plan_name + " (Cloud)"
+                                            text: model.plan_name.split(".")[0] + ".plan"
                                             onClicked: {
-                                                mainWindow.showMessageDialog(qsTr("Download Plan"),
-                                                                             qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name),
+                                                mainWindow.showMessageDialog(
+                                                                             qsTr("Download Plan"),
+                                                                             qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name.split(".")[0] + ".plan"),
                                                                              Dialog.Yes | Dialog.Cancel,
                                                                              function() {
                                                                                  mainWindow.openHomeScreen()
                                                                                  mainWindow.showFlyView()
                                                                                  mainWindow.showPlanView()
-                                                                                 // Load the plan data directly into the controller
-                                                                                 _planMasterController.loadFromJson(model.plan_data)
+                                                                                 //_planMasterController.loadFromJson(model.plan_data)
+                                                                                 MapGlobals.loadCloudPlan(model.plan_data)
                                                                                  mainWindow.showToastMessage("Cloud plan loaded")
+                                                                             }
+                                                                             )
+
+                                            }
+                                            onHamburgerClicked: {
+                                                mainWindow.showMessageDialog(qsTr("Delete Cloud Plan"),
+                                                                             qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(model.plan_name.split(".")[0] + ".plan"),
+                                                                             Dialog.Yes | Dialog.Cancel,
+                                                                             function() {
+                                                                                 MapGlobals.deleteCloudPlan(model.plan_name, function(success) {
+                                                                                     if (success) {
+                                                                                         mainWindow.showToastMessage(qsTr("Plan deleted successfully"))
+                                                                                         refreshFiles() // Refresh the list
+                                                                                     } else {
+                                                                                         mainWindow.showToastMessage(qsTr("Failed to delete plan from cloud"))
+                                                                                     }
+                                                                                 })
                                                                              }
                                                                              )
                                             }

@@ -1777,6 +1777,13 @@ Item {
             height:         ScreenTools.defaultFontPixelHeight * 11
             padding:        0
 
+            onOpened: {
+                MapGlobals.editdialog = "editdialog"
+            }
+            onClosed: {
+                MapGlobals.editdialog = "editdialog1"
+            }
+
             background: Rectangle {
                 radius: 20
                 color: "white"

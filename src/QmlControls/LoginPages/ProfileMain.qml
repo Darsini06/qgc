@@ -42,9 +42,23 @@ Item {
             id: leftPanel
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width * 0.45
-            // Background Charcoal Color
-            color: "#1A1A1A"
+            color: app_color
             clip: true
+
+            // Background Gradient
+            Rectangle {
+                anchors.fill: parent
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: app_color }
+                    GradientStop { position: 1.0; color: "#1A1A1A" }
+                }
+            }
+
+            // Decorative Accents
+            Rectangle {
+                width: 400; height: 400; radius: 200; color: Qt.rgba(255,255,255,0.03)
+                anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
+            }
 
             // Back Arrow Navigation
             Rectangle {
@@ -180,15 +194,16 @@ Item {
                         Repeater {
                             model: [
                                 { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/accountUpdate_black.svg" },
-                                { "id": "reports", "name": "Mission History", "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
-                                { "id": "logfiles","name": "Log Files", "desc": "View logs and performance of previous flights",
+                                { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
+                                { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
+                                { "id": "logfiles",      "name": "Log Files",        "desc": "View logs and performance of previous flights",
                                     "icon": "qrc:/qmlimages/NewImages/report_color.svg", "color": "#475569" },
                                 //{ "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
                                 { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_color.svg" },
                                 { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
                                 { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_black.svg"},
                                 { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
-                                { "id": "logout", "name": "Sign Out", "icon": "qrc:/qmlimages/NewImages/signIn.svg", "isWarning": true }
+                                { "id": "logout",         "name": "Sign Out",         "icon": "qrc:/qmlimages/NewImages/signIn.svg", "isWarning": true }
                             ]
 
                             Rectangle {
@@ -224,7 +239,14 @@ Item {
                                     id: mouseItem
                                     anchors.fill: parent
                                     hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                                    onClicked: profileMainRoot.menuItemSelected(modelData.id)
+                                    onClicked: {
+                                        if (modelData.id === "cloudPlans") {
+                                            MapGlobals.jumpToFileList = true
+                                            profileMainRoot.menuItemSelected("logfiles")
+                                        } else {
+                                            profileMainRoot.menuItemSelected(modelData.id)
+                                        }
+                                    }
                                 }
                             }
                         }

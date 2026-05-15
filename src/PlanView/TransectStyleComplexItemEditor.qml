@@ -57,6 +57,10 @@ Rectangle {
         MapGlobals.acres = missionItem.coveredArea.toFixed(2) + " m²"
     }
 
+    Component.onDestruction: {
+        MapGlobals.showEntryArrows = false
+    }
+
     Binding {
         target:     missionItem
         property:   "mapPolygon"
@@ -275,6 +279,7 @@ Rectangle {
 
                 // Rotate Entry Point Button
                 Button {
+                    id:               rotateEntryPointBtn
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillWidth: true
                     height:           36
@@ -295,9 +300,9 @@ Rectangle {
 
                         QGCColoredImage {
                             source:  "/resources/InstrumentValueIcons/refresh.svg"
-                            height:  ScreenTools.defaultFontPixelHeight * 1.1
+                            height:  ScreenTools.defaultFontPixelHeight * 1.5
                             width:   height
-                            color:   _colorTextPrimary
+                            color:   "black"
                             mipmap:  true
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
@@ -313,7 +318,15 @@ Rectangle {
                         }
                     }
 
-                    onClicked: _missionItem.rotateEntryPoint()
+                    onClicked: {
+                        _missionItem.rotateEntryPoint()
+                    }
+
+                    Binding {
+                        target:   MapGlobals
+                        property: "showEntryArrows"
+                        value:    rotateEntryPointBtn.pressed
+                    }
                 }
 
                 // Statistics Section Header (Static)

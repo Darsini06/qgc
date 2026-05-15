@@ -312,6 +312,20 @@ ApplicationWindow {
 
     }
 
+    function logfiles_screen() {
+        _collapsePIP()
+        planbtn.visible = false
+        listbtn.visible = false
+        takeoffbtn.visible = false
+        rtlbtn.visible = false
+        flyView.visible = false
+        planView.visible = false
+        modebtn1.visible = false
+        mainrootIcons.visible = false
+        waypointbtn.visible = false
+        mainWindow.logfiles()
+    }
+
     function showPlanView() {
         _collapsePIP()
         planbtn.visible =false
@@ -447,9 +461,9 @@ ApplicationWindow {
     //-------------------------------------------------------------------------
     //-- Global simple message dialog
 
-    function showMessageDialog(dialogTitle, dialogText, buttons = Dialog.Ok, acceptFunction = null) {
+    function showMessageDialog(dialogTitle, dialogText, buttons = Dialog.Ok, acceptFunction = null, showCloseButton = false) {
         console.log("dialogTitle : ",dialogTitle)
-        simpleMessageDialogComponent.createObject(mainWindow, { title: dialogTitle, text: dialogText, buttons: buttons, acceptFunction: acceptFunction }).open()
+        simpleMessageDialogComponent.createObject(mainWindow, { title: dialogTitle, text: dialogText, buttons: buttons, acceptFunction: acceptFunction, showCloseButton: showCloseButton }).open()
     }
 
     // This variant is only meant to be called by QGCApplication

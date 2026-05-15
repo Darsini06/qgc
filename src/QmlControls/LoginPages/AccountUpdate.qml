@@ -45,7 +45,7 @@ Item {
             /* ================= LEFT SIDE: PROFILE OVERVIEW ================= */
             Rectangle {
                 id: leftCard
-                Layout.preferredWidth: isSmallScreen ? parent.width * 0.4 : parent.width * 0.35
+                Layout.preferredWidth: isSmallScreen ? parent.width * 0.4 : parent.width * 0.45
                 Layout.fillHeight: true
                 color: "#1A1A1A"
                 clip: true

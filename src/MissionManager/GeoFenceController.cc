@@ -453,6 +453,31 @@ void GeoFenceController::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordina
     setDirty(true);
 }
 
+void GeoFenceController::addInclusionSquareAgri(QGeoCoordinate center)
+{
+    double halfSize = 10.0;
+    QGeoCoordinate topLeft = center.atDistanceAndAzimuth(halfSize, 0).atDistanceAndAzimuth(halfSize, 270);
+    QGeoCoordinate bottomRight = center.atDistanceAndAzimuth(halfSize, 180).atDistanceAndAzimuth(halfSize, 90);
+    addInclusionPolygon(topLeft, bottomRight);
+}
+
+void GeoFenceController::addInclusionCircleAgri(QGeoCoordinate center)
+{
+    double radius = 10.0;
+    QGCFenceCircle* circle = new QGCFenceCircle(center, radius, true /* inclusion */, this);
+    _circles.append(circle);
+    setDirty(true);
+}
+
+void GeoFenceController::addInclusionPolygonAgri(void)
+{
+    QGCFencePolygon* polygon = new QGCFencePolygon(true /* inclusion */, this);
+    polygon->setInteractive(true);
+    polygon->setTraceMode(true);
+    _polygons.append(polygon);
+    setDirty(true);
+}
+
 void GeoFenceController::addExclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
 {
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());

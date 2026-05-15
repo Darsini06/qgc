@@ -444,7 +444,7 @@ Item {
                         fillMode: Image.PreserveAspectFit
                     }
                     Label {
-                        text: qsTr("LOGOUT")
+                        text: qsTr("SIGN OUT")
                         color: logoutMouse.containsMouse ? "#FF6B6B" : "#262626"
                         visible: false
                         font.pointSize: ScreenTools.defaultFontPointSize * 0.9
@@ -501,11 +501,11 @@ Item {
                     var baseSize = ScreenTools.largeFontPointSize;
                     var scaleMultiplier = dynamicScaleFactor;
 
-                        if (isDesktop)
-                            return baseSize * 1.5 * scaleMultiplier; // Slightly reduced to save vertical space
-                        if (isTablet)
-                            return baseSize * 1.4 * scaleMultiplier;
-                        return baseSize * 0.85;
+                    if (isDesktop)
+                        return baseSize * 1.5 * scaleMultiplier; // Slightly reduced to save vertical space
+                    if (isTablet)
+                        return baseSize * 1.4 * scaleMultiplier;
+                    return baseSize * 0.85;
 
                 }
                 font.bold: true
@@ -868,6 +868,7 @@ Item {
                 Layout.fillWidth: true
             }
 
+
             // Click to Agri
             Item {
                 id: agriClick
@@ -982,9 +983,9 @@ Item {
                 }
             }
 
-            }
-
         }
+
+    }
 
 
     function showDynamicCalibrationDialog(qmlFile, title) {
@@ -999,7 +1000,7 @@ Item {
 
         QGCPopupDialog {
             id: popup
-            title: qsTr("Logout")
+            title: qsTr("Sign Out")
 
             buttons: Dialog.Yes | Dialog.No
 
@@ -1017,7 +1018,7 @@ Item {
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
                 QGCLabel {
-                    text: qsTr("Are you sure you want to logout?")
+                    text: qsTr("Are you sure you want to sign out?")
                     Layout.fillWidth: true
                 }
             }

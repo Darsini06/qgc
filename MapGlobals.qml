@@ -13,6 +13,7 @@ QtObject {
     property real mapRotation: 0
     property int recenterInterval: 10000 // Default 10 seconds
     property bool forceRecenter: false
+    property string editdialog: "editdialog1"
     property var activeFlightMap: null  // Add global map reference
     property var gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
 
@@ -38,13 +39,22 @@ QtObject {
     property bool share_edit_visibility : false
     property bool isReviewMode: false
     property bool showMissionItems: false
+    property bool showEntryArrows: false   // true only while Rotate Entry Point is active
+    property bool jumpToFileList: false
+    property bool circleAddMode: false
+    property int  squareCornerStep: -1
+    property var  tempCorners: []
+    property var  lastButtonPressTime: 0
 
     signal newSessionAdded()
+    signal requestCloudSync()
+    signal loadLocalPlan(string path)
+    signal loadCloudPlan(var data)
 
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
     property real gridLineWidth: parseFloat(QGroundControl.loadGlobalSetting("gridLineWidth", "5"))
-    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#0D4D15")
+    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#011F05")
     property color obstacleColor: QGroundControl.loadGlobalSetting("obstacleColor", "#F1C40F")
     property real obstacleLineWidth: parseFloat(QGroundControl.loadGlobalSetting("obstacleLineWidth", "2"))
     property real obstacleOpacity: parseFloat(QGroundControl.loadGlobalSetting("obstacleOpacity", "0.2"))
@@ -202,9 +212,11 @@ QtObject {
             }
         }
 
+        var name = missionName.toString().split('/').pop().split('\\').pop();
+
         var data = {
             "username": currentUserName,
-            "mission_name": missionName.toString().split('/').pop().split('\\').pop(),
+            "mission_name": name,
             "plan_data": typeof planData === 'string' ? JSON.parse(planData) : planData,
             "geometry": {
                 "type": coords.length === 1 ? "Point" : (coords.length > 1 ? "LineString" : "Point"),
@@ -213,15 +225,25 @@ QtObject {
             "date": new Date().toISOString()
         };
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", backendUrl + "/missions");
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("Mission log save response:", xhr.status, xhr.responseText);
+        var postXhr = new XMLHttpRequest();
+        postXhr.open("POST", backendUrl + "/missions");
+        postXhr.setRequestHeader("Content-Type", "application/json");
+        postXhr.onreadystatechange = function() {
+            if (postXhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log save response:", postXhr.status, postXhr.responseText);
             }
         };
-        xhr.send(JSON.stringify(data));
+
+        // Send DELETE first to prevent the backend from creating a duplicate (+1)
+        var deleteXhr = new XMLHttpRequest();
+        deleteXhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(name));
+        deleteXhr.onreadystatechange = function() {
+            if (deleteXhr.readyState === XMLHttpRequest.DONE) {
+                console.log("Mission log pre-save delete response:", deleteXhr.status);
+                postXhr.send(JSON.stringify(data));
+            }
+        };
+        deleteXhr.send();
     }
 
     function deleteMissionLog(missionName) {
@@ -1116,42 +1138,80 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
-    function fetchCloudPlans(username, callback) {
+    function fetchCloudPlans(userIdentifier, callback) {
+        var username = QGroundControl.loadGlobalSetting("username", "Guest");
+        
         if (!username || username === "" || username === "Guest") {
             console.error("Cannot fetch from cloud: No valid username provided");
             if (callback) callback([]);
             return;
         }
 
-        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", username);
+        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for username:", username);
 
         var xhr = new XMLHttpRequest();
-        // Updated to use the correct API endpoint and username filter
+        // Based on DB explorer, missions are stored in the 'missions' collection
         xhr.open("GET", backendUrl + "/missions?username=" + encodeURIComponent(username));
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     try {
-                        var missions = JSON.parse(xhr.responseText);
-                        console.log("Found", missions.length, "missions in cloud");
-                        // Compatibility fix: the component expects objects with plan_name and plan_data
-                        var plans = missions.map(function(m) {
-                            return {
-                                plan_name: m.mission_name,
-                                plan_data: m.plan_data
-                            };
-                        });
+                        var responseData = JSON.parse(xhr.responseText);
+                        var rawPlans = [];
+                        
+                        if (Array.isArray(responseData)) {
+                            rawPlans = responseData;
+                        } else if (responseData.missions && Array.isArray(responseData.missions)) {
+                            rawPlans = responseData.missions;
+                        }
+
+                        console.log("Found", rawPlans.length, "raw missions in cloud");
+
+                        var uniquePlans = {};
+                        for (var i = 0; i < rawPlans.length; i++) {
+                            var p = rawPlans[i];
+                            // Database uses 'mission_name' and 'plan_data'
+                            var name = p.mission_name || p.plan_name || p.name || ("Untitled_" + i);
+                            var data = p.plan_data || p.data;
+                            
+                            if (data) {
+                                uniquePlans[name] = {
+                                    plan_name: name,
+                                    plan_data: data
+                                };
+                            }
+                        }
+
+                        var plans = Object.values(uniquePlans);
+                        console.log("Successfully processed", plans.length, "plans");
                         if (callback) callback(plans);
                     } catch (e) {
                         console.error("Error parsing cloud missions response:", e);
                         if (callback) callback([]);
                     }
                 } else {
-                    console.error("Failed to fetch cloud missions:", xhr.responseText);
+                    console.error("Failed to fetch cloud missions. Status:", xhr.status, "Response:", xhr.responseText);
                     if (callback) callback([]);
                 }
             }
         }
+        xhr.send();
+    }
+    function deleteCloudPlan(planName, callback) {
+        console.log("MapGlobals.deleteCloudPlan() - Deleting:", planName);
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", backendUrl + "/missions/by-name/" + encodeURIComponent(planName));
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 204) {
+                    console.log("Plan deleted from cloud successfully");
+                    if (callback) callback(true);
+                } else {
+                    console.error("Failed to delete plan from cloud:", xhr.responseText);
+                    if (callback) callback(false);
+                }
+            }
+        };
         xhr.send();
     }
     function fetchCloudSessions(email) {

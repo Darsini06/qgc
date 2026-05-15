@@ -52,7 +52,7 @@ Popup {
     property string title
     property var    buttons:                Dialog.Ok
     property bool   acceptAllowed:          acceptButton.visible
-    property bool   rejectAllowed:          rejectButton.visible
+    property bool   rejectAllowed:          rejectButton.visible || buttons === Dialog.NoButton || buttons === 0
     property alias  acceptButtonEnabled:    acceptButton.enabled
     property alias  rejectButtonEnabled:    rejectButton.enabled
 
@@ -62,11 +62,13 @@ Popup {
     property var    dialogProperties
     property bool   destroyOnClose:         true
     property bool   preventClose:           false
-    property bool   closeOnClickOutside:    false  // NEW: Control close on outside click
+    property bool   closeOnClickOutside:    false
+    property bool   showCloseButton:        false
     property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
     property bool   useCenterAnchor:        true
     property real   dialogX:                0
     property real   dialogY:                0
+    property real   maxPopupHeight:         mainWindow.height * 0.8
 
     readonly property real headerMinWidth: titleLable.implicitWidth + rejectButton.width + acceptButton.width + titleLable.spacing * 2
 
@@ -257,7 +259,7 @@ Popup {
 
     Rectangle {
         width: popupWidth > 0 ? popupWidth : Math.min(mainWindow.width * 0.9, ScreenTools.defaultFontPixelWidth * 50)
-        height: Math.min(mainWindow.height * 0.8, mainLayout.implicitHeight)
+        height: Math.min(maxPopupHeight, mainLayout.implicitHeight)
         color: "white" // Deep dark background for Mission Theme
         radius: 20
         border.width: 1
@@ -312,7 +314,7 @@ Popup {
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: closeOnClickOutside
+                        visible: showCloseButton || closeOnClickOutside
 
                         Text {
                             text: "×"
@@ -328,7 +330,7 @@ Popup {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: close()
+                            onClicked: _reject()
                         }
                     }
                 }
