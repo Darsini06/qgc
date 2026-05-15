@@ -214,6 +214,64 @@ SettingsPage {
             }
         }
 
+        // --- Fence Option (Switch/Slider Style) ---
+        GridLayout {
+            columns:            _isNarrow ? 1 : 3
+            columnSpacing:      10
+            rowSpacing:         _isNarrow ? 5 : 0
+            Layout.fillWidth:   true
+
+            QGCLabel {
+                text:                   qsTr("Enable 60m Circular Fence")
+                color:                  "black"
+                font.bold:              true
+                Layout.fillWidth:       _isNarrow
+                Layout.preferredWidth:  _labelWidth
+                wrapMode:               Text.WordWrap
+            }
+
+            Item { 
+                Layout.fillWidth: true
+                visible:          !_isNarrow 
+            }
+
+            Item {
+                Layout.preferredWidth:  _isNarrow ? 60 : _controlWidth
+                Layout.preferredHeight: 30
+                Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
+
+                Rectangle {
+                    id: switchBg
+                    property bool enabled: QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+                    anchors.right:  _isNarrow ? undefined : parent.right
+                    anchors.left:   _isNarrow ? parent.left : undefined
+                    width:          60
+                    height:         30
+                    radius:         15
+                    color:          enabled ? "#79AE6F" : "#CCC"
+
+                    Rectangle {
+                        id: switchHandle
+                        width:  26
+                        height: 26
+                        radius: 13
+                        color:  "white"
+                        anchors.verticalCenter: parent.verticalCenter
+                        x:      switchBg.enabled ? parent.width - width - 2 : 2
+                        
+                        Behavior on x { NumberAnimation { duration: 200 } }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            switchBg.enabled = !switchBg.enabled
+                            QGroundControl.saveGlobalSetting("enableFence", switchBg.enabled ? "true" : "false")
+                        }
+                    }
+                }
+            }
+        }
         //Not for Mobile
         GridLayout {
             columns:            _isNarrow ? 1 : 3

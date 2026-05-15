@@ -67,6 +67,9 @@ public:
     /// Agri specific: Add a new inclusion circle with fixed 10m radius
     Q_INVOKABLE void addInclusionCircleAgri(QGeoCoordinate center);
 
+    /// Agri specific: Add a new inclusion polygon in trace mode
+    Q_INVOKABLE void addInclusionPolygonAgri(void);
+
     /// Deletes the specified polygon from the polygon list
     ///     @param index: Index of poygon to delete
     Q_INVOKABLE void deletePolygon(int index);

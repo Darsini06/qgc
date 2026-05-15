@@ -61,6 +61,20 @@ import MapGlobals
     property bool   _disableVehicleTracking:    false
     property bool   _keepVehicleCentered:       pipMode ? true : false
     property bool   _saveZoomLevelSetting:      true
+    property var    fenceCenter:                QtPositioning.coordinate()
+    property real   fenceRadius:                60
+
+    function updateFence() {
+        var planPath = _planMasterController.currentPlanFile
+        if (!planPath) return
+        MapGlobals.getFence(planPath, function(fenceData) {
+            if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                fenceRadius = fenceData.radius || 60
+                console.log("FlyView fence loaded:", fenceCenter, fenceRadius)
+            }
+        })
+    }
 
 
     function forceRecenterOnVehicle() {
@@ -147,6 +161,7 @@ import MapGlobals
         if (visible) {
             // Synchronize center position with Plan View
             center = QGroundControl.flightMapPosition
+            updateFence()
         }
     }
 
@@ -327,6 +342,16 @@ import MapGlobals
 
     QGCMapPalette { id: mapPal; lightColors: isSatelliteMap }
 
+    MapCircle {
+        center:         _root.fenceCenter
+        radius:         _root.fenceRadius
+        color:          "transparent"
+        border.color:   "yellow"
+        border.width:   2
+        z:              QGroundControl.zOrderMapItems + 1
+        visible:        _root.fenceCenter.isValid && QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+    }
+
     Connections {
         target:                 _missionController
         ignoreUnknownSignals:   true
@@ -337,6 +362,11 @@ import MapGlobals
                 firstVehiclePositionReceived = true
             }
         }
+    }
+
+    Connections {
+        target: _planMasterController
+        onCurrentPlanFileChanged: updateFence()
     }
 
     MapFitFunctions {

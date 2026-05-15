@@ -110,6 +110,42 @@ Item {
         onPlanSaved: (filename) => {
             console.log("Plan saved, updating DB:", filename)
             MapGlobals.saveMissionLog(filename, _planMasterController.saveToJsonString(), _planMasterController)
+            // Save fence data to DB - this IS the canonical fence save path
+            saveFenceData(filename)
+            // After saving, reload after a short delay to confirm fence is visible
+            fenceLoadTimer.planPath = filename
+            fenceLoadTimer.restart()
+        }
+        onCurrentPlanFileChanged: {
+            // This fires on both save AND load. On save, onPlanSaved will handle fence.
+            // On load (file open), we need to restore the fence from DB.
+            // Use a longer delay here to ensure it doesn't race with onPlanSaved.
+            if (_planMasterController.currentPlanFile !== "") {
+                console.log("Plan file changed, will load fence:", _planMasterController.currentPlanFile)
+                fenceLoadAfterOpenTimer.planPath = _planMasterController.currentPlanFile
+                fenceLoadAfterOpenTimer.restart()
+            }
+        }
+    }
+
+    // Short timer used by onPlanSaved - confirms fence visible after save
+    // (interval is 300ms, set in fenceLoadTimer definition below)
+
+    // Longer timer for plan file open - ensures we read AFTER any save that might have just run
+    Timer {
+        id: fenceLoadAfterOpenTimer
+        interval: 800
+        property string planPath: ""
+        onTriggered: {
+            MapGlobals.getFence(planPath, function(fenceData) {
+                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                    console.log("Fence restored after plan open for:", planPath)
+                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
+                }
+            })
         }
     }
 
@@ -140,7 +176,7 @@ Item {
             console.log("returnWaypointEnabled in PlanView : ",returnWaypointEnabled)
 
             waypointMark = QGroundControl.loadGlobalSetting("waypointMark", "true") === "true"
-
+            mapPolygonvisuals.updateFence()
         }
     }
 
@@ -212,7 +248,6 @@ Item {
 
 
     function newmapfile(file) {
-
         console.log("file data:",file)
         _planMasterController.loadFromFile(file)
         _planMasterController.fitViewportToItems()
@@ -229,9 +264,61 @@ Item {
         if (QGroundControl.loadBoolGlobalSetting("login", false)) {
             var planName = _planMasterController.currentPlanFile ? _planMasterController.currentPlanFile.split('/').pop().split('\\').pop() : "Untitled.plan"
             var planContent = JSON.parse(_planMasterController.saveToText())
+            
+            // Include fence data in cloud save
+            planContent.fenceData = {
+                "lat": mapPolygonvisuals.fenceCenter.latitude,
+                "lon": mapPolygonvisuals.fenceCenter.longitude,
+                "radius": mapPolygonvisuals.fenceRadius,
+                "enabled": QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+            }
+
             MapGlobals.savePlanToCloud(planName, planContent, function(success) {
                 if (success) {
                     mainWindow.showToastMessage("Plan synced to cloud");
+                }
+            })
+        }
+    }
+
+    function saveFenceData(planPath) {
+        if (!planPath) return
+        var lat = mapPolygonvisuals.fenceCenter.latitude
+        var lon = mapPolygonvisuals.fenceCenter.longitude
+        var rad = mapPolygonvisuals.fenceRadius
+        // Only save if we have a real non-zero coordinate (fence was actually placed)
+        if (lat === 0 && lon === 0) {
+            console.log("saveFenceData: fenceCenter is (0,0), skipping save")
+            return
+        }
+        console.log("saveFenceData: saving fence for:", planPath, "lat:", lat, "lon:", lon, "radius:", rad)
+        // Mark fence as enabled for this plan
+        QGroundControl.saveGlobalSetting("enableFence", "true")
+        MapGlobals.saveFence(planPath, lat, lon, rad)
+    }
+
+    function loadFenceData(planPath) {
+        if (!planPath) return
+        // Short delay to ensure map is initialized, then load fence
+        fenceLoadTimer.planPath = planPath
+        fenceLoadTimer.restart()
+    }
+
+    Timer {
+        id: fenceLoadTimer
+        interval: 300
+        property string planPath: ""
+        onTriggered: {
+            MapGlobals.getFence(planPath, function(fenceData) {
+                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                    console.log("Fence loaded from DB for:", planPath, "lat:", fenceData.lat, "lon:", fenceData.lon)
+                    // Always re-enable fence and apply data so it renders
+                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
+                } else {
+                    console.log("No fence in DB for:", planPath, "- keeping current display")
                 }
             })
         }
@@ -243,6 +330,7 @@ Item {
         onLoadLocalPlan: (path) => {
             console.log("PlanView: loading local plan:", path)
             _planMasterController.loadFromFile(path)
+            loadFenceData(path)
             MapGlobals.isReviewMode = true
             MapGlobals.showMissionItems = false
         }
@@ -251,6 +339,13 @@ Item {
             try {
                 var json = (typeof data === "string") ? JSON.parse(data) : data
                 _planMasterController.loadFromJson(json)
+                
+                // Restore fence from cloud data
+                if (json.fenceData) {
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = json.fenceData.radius
+                }
+
                 MapGlobals.isReviewMode = true
                 MapGlobals.showMissionItems = false
             } catch (e) {
@@ -680,9 +775,11 @@ Item {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                                        _planMasterController.saveToFile1(file)
+                                       saveFenceData(file)
                                        mainWindow.showFlyView()
                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
                                        _planMasterController.saveToFile(file)
+                                       saveFenceData(file)
                                        mainWindow.showMapping()
                                    }
                                } else {
@@ -696,11 +793,13 @@ Item {
             if (_planMasterController.currentPlanFile !== "") {
                 if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                     _planMasterController.saveToFile1(_planMasterController.currentPlanFile)
+                    saveFenceData(_planMasterController.currentPlanFile)
                     if (planFiles) {
                         mainWindow.showFlyView()
                     }
                 } else {
                     _planMasterController.saveToCurrent()
+                    saveFenceData(_planMasterController.currentPlanFile)
                     if (planFiles) {
                         mainWindow.showMapping()
                     }
@@ -710,9 +809,11 @@ Item {
                 if (planFiles) {
                     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                         _planMasterController.saveToFile1(file)
+                        saveFenceData(file)
                         mainWindow.showFlyView()
                     } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
                         _planMasterController.saveToFile(file)
+                        saveFenceData(file)
                         mainWindow.showMapping()
                     }
                 } else {
@@ -726,6 +827,7 @@ Item {
                                console.log("Click Files at onAcceptedForLoad")
                                MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
+                               loadFenceData(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
                                close()
@@ -822,6 +924,7 @@ Item {
                             saveOptionsPopup.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
                                     _planMasterController.saveToSelectedFile1()
@@ -949,6 +1052,7 @@ Item {
                             saveOptionsPopup.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
                                     _planMasterController.saveToSelectedFile1()
@@ -1045,12 +1149,31 @@ Item {
                                   }
                                   break
 
-                                  case _layerUTMSP:
-                                  if (addWaypointRallyPointAction.checked) {
-                                      insertSimpleItemAfterCurrent(coordinate)
-                                  } else if (_addROIOnClick) {
-                                      insertROIAfterCurrent(coordinate)
-                                      _addROIOnClick = false
+                                  case _layerGeoFence:
+                                  // Ignore clicks that are too close in time to a button press (prevents accidental clicks through UI)
+                                  if (new Date().getTime() - MapGlobals.lastButtonPressTime < 500) {
+                                      console.log("Ignoring map click too close to button press")
+                                      break
+                                  }
+                                  
+                                  if (MapGlobals.circleAddMode) {
+                                      _geoFenceController.addInclusionCircleAgri(coordinate)
+                                      MapGlobals.circleAddMode = false
+                                  } else if (MapGlobals.squareCornerStep >= 0) {
+                                      var corners = MapGlobals.tempCorners
+                                      corners.push(coordinate)
+                                      MapGlobals.tempCorners = corners
+                                      MapGlobals.squareCornerStep++
+                                      if (MapGlobals.squareCornerStep === 4) {
+                                          _geoFenceController.addInclusionPolygonAgri()
+                                          var lastPoly = _geoFenceController.polygons.get(_geoFenceController.polygons.count - 1)
+                                          lastPoly.appendVertices(MapGlobals.tempCorners)
+                                          lastPoly.traceMode = false
+                                          _geoFenceController.clearAllInteractive()
+                                          lastPoly.interactive = true
+                                          MapGlobals.squareCornerStep = -1
+                                          MapGlobals.tempCorners = []
+                                      }
                                   }
                                   break
                               }
@@ -1160,6 +1283,120 @@ Item {
                     map:            editorMap
                     size:           ScreenTools.defaultFontPixelHeight * 3
                     z:              QGroundControl.zOrderMapItems - 1
+                }
+            }
+
+            // Temporary visuals for Agri Square corner picking
+            MapPolyline {
+                line.width: 2
+                line.color: "white"
+                path:       {
+                    if (MapGlobals.squareCornerStep < 2) return []
+                    var p = MapGlobals.tempCorners.slice()
+                    if (MapGlobals.squareCornerStep >= 3) {
+                        p.push(p[0]) // Close the loop visually
+                    }
+                    return p
+                }
+                visible:    MapGlobals.squareCornerStep > 1
+            }
+
+            MapItemView {
+                model: MapGlobals.squareCornerStep >= 0 ? MapGlobals.tempCorners : []
+                delegate: MapQuickItem {
+                    anchorPoint.x: sourceItem.width / 2
+                    anchorPoint.y: sourceItem.height / 2
+                    coordinate: modelData
+                    sourceItem: Rectangle {
+                        width:  24; height: 24; radius: 12
+                        color:  "#3498DB"
+                        border.color: "white"; border.width: 2
+                        QGCLabel {
+                            anchors.centerIn: parent
+                            text: (index + 1).toString()
+                            color: "white"; font.bold: true; font.pointSize: 10
+                        }
+                    }
+                }
+            }
+
+            // ── Floating overlay: Circle placement mode ─────────────
+            Item {
+                visible: MapGlobals.circleAddMode
+                anchors.fill: parent
+                z: QGroundControl.zOrderTopMost
+
+                // Pulsing ring at center
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 60; height: 60; radius: 30
+                    color: "transparent"
+                    border.color: "#3498DB"; border.width: 2
+                    SequentialAnimation on scale {
+                        running: MapGlobals.circleAddMode
+                        loops:   Animation.Infinite
+                        NumberAnimation { to: 1.5; duration: 700; easing.type: Easing.OutSine }
+                        NumberAnimation { to: 1.0; duration: 700; easing.type: Easing.InSine  }
+                    }
+                }
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 12; height: 12; radius: 6
+                    color: "#3498DB"
+                }
+
+                // Toast banner at top
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top:              parent.top
+                    anchors.topMargin:        60 // Moved further down again
+                    width:                    Math.min(parent.width - 40, 360)
+                    height:                   circleToastCol.implicitHeight + 20
+                    radius:                   12
+                    color:                    "#DD0D2137"
+                    border.width:             0 
+
+                    SequentialAnimation on opacity {
+                        running: MapGlobals.circleAddMode; loops: Animation.Infinite
+                        NumberAnimation { to: 0.75; duration: 700 }
+                        NumberAnimation { to: 1.0;  duration: 700 }
+                    }
+                    ColumnLayout {
+                        id:              circleToastCol
+                        anchors.fill:    parent
+                        anchors.margins: 12
+                        spacing:         4
+                        Text {
+                            Layout.fillWidth:    true
+                            text:                qsTr("⭕  Circle Placement Mode")
+                            color:               "#3498DB"; font.bold: true; font.pointSize: 13
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text {
+                            Layout.fillWidth:    true
+                            text:                qsTr("Tap map to place obstacle center")
+                            color:               "#CCDDEE"; font.pointSize: 11; wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+
+                    // Top-right corner minimalist cancel icon (Smaller & Broader)
+                    Text {
+                        anchors.top:          parent.top
+                        anchors.right:        parent.right
+                        anchors.topMargin:    5
+                        anchors.rightMargin:  8
+                        text:                 "✖" // Broader cross
+                        color:                "white"
+                        font.bold:            true
+                        font.pointSize:       14 // Smaller
+                        z:                    10
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:    MapGlobals.circleAddMode = false
+                        }
+                    }
                 }
             }
 
@@ -1394,6 +1631,7 @@ Item {
                             dialog.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 _planMasterController.saveToSelectedFile1()
                             }
@@ -2256,6 +2494,7 @@ Item {
                                 onClicked: {
                                     if (_planMasterController.currentPlanFile !== "") {
                                         _planMasterController.saveToCurrent()
+                                        saveFenceData(_planMasterController.currentPlanFile)
                                     } else {
                                         _planMasterController.saveToSelectedFile1()
                                     }
@@ -2535,6 +2774,7 @@ Item {
                         dropPanel.hide()
                         if(_planMasterController.currentPlanFile !== "") {
                             _planMasterController.saveToCurrent()
+                            saveFenceData(_planMasterController.currentPlanFile)
                         } else {
                             _planMasterController.saveToSelectedFile1()
                         }

@@ -41,6 +41,10 @@ QtObject {
     property bool showMissionItems: false
     property bool showEntryArrows: false   // true only while Rotate Entry Point is active
     property bool jumpToFileList: false
+    property bool circleAddMode: false
+    property int  squareCornerStep: -1
+    property var  tempCorners: []
+    property var  lastButtonPressTime: 0
 
     signal newSessionAdded()
     signal requestCloudSync()
@@ -133,6 +137,9 @@ QtObject {
 
                 //feedback table
                 tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, mobile_number TEXT, email TEXT, comments TEXT)");
+
+                // Fences table
+                tx.executeSql("CREATE TABLE IF NOT EXISTS fences (plan_path TEXT PRIMARY KEY, lat REAL, lon REAL, radius REAL)");
 
                 console.log("Database and tables created successfully");
 
@@ -311,6 +318,55 @@ QtObject {
             }
         }
         xhr.send(JSON.stringify(data));
+    }
+
+    function normalizePath(path) {
+        if (!path) return ""
+        var s = path.toString()
+        // Extract just the filename and clean it of URI encoding
+        var parts = s.split(/[\/\\]/)
+        var filename = parts[parts.length - 1]
+        filename = decodeURIComponent(filename)
+        console.log("MapGlobals.normalizePath() -> Clean Filename:", filename)
+        return filename
+    }
+
+    function saveFence(planPath, lat, lon, radius) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.saveFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                tx.executeSql(
+                    "INSERT OR REPLACE INTO fences (plan_path, lat, lon, radius) VALUES (?, ?, ?, ?)",
+                    [cleanPath, lat, lon, radius]
+                );
+                console.log("Fence saved to database for:", cleanPath);
+            } catch (error) {
+                console.error("Error saving fence to database:", error);
+            }
+        });
+    }
+
+    function getFence(planPath, callback) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.getFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                var rs = tx.executeSql("SELECT * FROM fences WHERE plan_path = ?", [cleanPath]);
+                if (rs.rows.length > 0) {
+                    console.log("Fence found for:", cleanPath);
+                    callback(rs.rows.item(0));
+                } else {
+                    console.log("No fence found for:", cleanPath);
+                    callback(null);
+                }
+            } catch (error) {
+                console.error("Error retrieving fence from database:", error);
+                callback(null);
+            }
+        });
     }
 
     //calculate the duration from startsession to end session
@@ -1138,47 +1194,59 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
-    function fetchCloudPlans(username, callback) {
+    function fetchCloudPlans(userIdentifier, callback) {
+        var username = QGroundControl.loadGlobalSetting("username", "Guest");
+        
         if (!username || username === "" || username === "Guest") {
             console.error("Cannot fetch from cloud: No valid username provided");
             if (callback) callback([]);
             return;
         }
 
-        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for:", username);
+        console.log("MapGlobals.fetchCloudPlans() - Requesting plans for username:", username);
 
         var xhr = new XMLHttpRequest();
-        // Updated to use the correct API endpoint and username filter
+        // Based on DB explorer, missions are stored in the 'missions' collection
         xhr.open("GET", backendUrl + "/missions?username=" + encodeURIComponent(username));
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     try {
-                        var missions = JSON.parse(xhr.responseText);
-                        console.log("Found", missions.length, "missions in cloud");
-
-                        // Deduplicate by mission_name
-                        var uniqueMissions = {};
-                        for (var i = 0; i < missions.length; i++) {
-                            var m = missions[i];
-                            // Keep the latest version (assuming last in array is newest, or just replacing)
-                            uniqueMissions[m.mission_name] = m;
+                        var responseData = JSON.parse(xhr.responseText);
+                        var rawPlans = [];
+                        
+                        if (Array.isArray(responseData)) {
+                            rawPlans = responseData;
+                        } else if (responseData.missions && Array.isArray(responseData.missions)) {
+                            rawPlans = responseData.missions;
                         }
 
-                        // Compatibility fix: the component expects objects with plan_name and plan_data
-                        var plans = Object.values(uniqueMissions).map(function(m) {
-                            return {
-                                plan_name: m.mission_name,
-                                plan_data: m.plan_data
-                            };
-                        });
+                        console.log("Found", rawPlans.length, "raw missions in cloud");
+
+                        var uniquePlans = {};
+                        for (var i = 0; i < rawPlans.length; i++) {
+                            var p = rawPlans[i];
+                            // Database uses 'mission_name' and 'plan_data'
+                            var name = p.mission_name || p.plan_name || p.name || ("Untitled_" + i);
+                            var data = p.plan_data || p.data;
+                            
+                            if (data) {
+                                uniquePlans[name] = {
+                                    plan_name: name,
+                                    plan_data: data
+                                };
+                            }
+                        }
+
+                        var plans = Object.values(uniquePlans);
+                        console.log("Successfully processed", plans.length, "plans");
                         if (callback) callback(plans);
                     } catch (e) {
                         console.error("Error parsing cloud missions response:", e);
                         if (callback) callback([]);
                     }
                 } else {
-                    console.error("Failed to fetch cloud missions:", xhr.responseText);
+                    console.error("Failed to fetch cloud missions. Status:", xhr.status, "Response:", xhr.responseText);
                     if (callback) callback([]);
                 }
             }
