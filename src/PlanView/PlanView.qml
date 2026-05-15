@@ -93,7 +93,7 @@ Item {
     }
 
     // Shared responsive base
-    property real baseSize: parent.width * 0.045    // 6% of screen width
+    property real baseSize: Math.max(parent.width * 0.045, ScreenTools.defaultFontPixelHeight * 2.5)    // Responsive size with minimum
     property real iconSize: baseSize * 0.8   // icon inside the circle
     property var _currentVIIndex: _missionController.currentPlanViewVIIndex
     property var _currentItem:   (_currentVIIndex >= 0 && _currentVIIndex < _missionController.visualItems.count) ? _missionController.visualItems.get(_currentVIIndex) : null
@@ -1701,7 +1701,7 @@ Item {
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 4.5
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 1.5 : 0.8)
 
                 // 1st: Boundary Point
                 Loader {
@@ -1713,7 +1713,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
-                        topPadding:         ScreenTools.defaultFontPixelHeight * 1.0
+                        topPadding:         ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 1.5 : 1.0)
 
                         Button {
                             id: boundaryPointBtn
@@ -1905,7 +1905,7 @@ Item {
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
-                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 3.0)
+                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 2.7)
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
                 visible:                _editingLayer == _layerMission
@@ -1961,6 +1961,10 @@ Item {
                                 onEditItemClicked: (popupItem) => {
                                     itemEditPopup.popupMissionItem = popupItem
                                     itemEditPopup.open()
+                                }
+                                onSelectCommandClicked: (missionItem) => {
+                                    commandSelectionPopup.popupMissionItem = missionItem
+                                    commandSelectionPopup.open()
                                 }
                                 onDeselect: {
                                     _missionController.setCurrentPlanViewSeqNum(-1, false)
@@ -2344,7 +2348,7 @@ Item {
             anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
 
             Row {
-                spacing: 10    // space between the two buttons
+                spacing: ScreenTools.defaultFontPixelWidth    // space between the two buttons
 
                 // ========== Upload Button ==========
                 Button {
@@ -2363,12 +2367,15 @@ Item {
                     contentItem: Item {
                         anchors.fill: parent
                         QGCColoredImage {
-                            source: "/qmlimages/NewImages/fileupload.svg"
+                            source: "/qmlimages/NewImages/upload_modern.svg"
                             width: iconSize
                             height: iconSize
                             anchors.centerIn: parent
                             color: "white"
                         }
+
+                        ToolTip.visible: fileUploadbtn.hovered
+                        ToolTip.text: qsTr("Upload Mission to Vehicle")
                     }
 
                     onClicked: {
@@ -3182,6 +3189,173 @@ Item {
                 width: 150
                 height: 40
                 onClicked: itemEditPopup.close()
+
+                background: Rectangle {
+                    color: "white"
+                    radius: 20
+                }
+                contentItem: Text {
+                    text: parent.text
+                    color: "black"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+
+    // Popup for Mission Command Selection
+    Popup {
+        id: commandSelectionPopup
+        property var popupMissionItem: null
+
+        readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
+        readonly property real _reservedHeight: 124
+
+        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
+        height: Math.min(commandInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
+        
+        x: ScreenTools.defaultFontPixelWidth
+        y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
+        
+        modal: true
+        dim: false
+        closePolicy: Popup.CloseOnEscape
+        parent: Overlay.overlay
+
+        background: Rectangle {
+            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
+            radius: 12
+            border.color: Qt.rgba(1, 1, 1, 0.30)
+            border.width: 1
+        }
+
+        contentItem: Column {
+            id: commandInnerCol
+            spacing: 12
+            width: commandSelectionPopup.width - 40
+            anchors.centerIn: parent
+
+            Text {
+                text: qsTr("Select Command")
+                font.pointSize: 16
+                font.bold: true
+                color: "white"
+                font.family: "Outfit"
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            ScrollView {
+                id:     commandScrollView
+                width:  parent.width
+                height: Math.max(100, commandSelectionPopup._maxPopupHeight - commandSelectionPopup._reservedHeight)
+                clip: true
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                ScrollBar.vertical.policy:   ScrollBar.AsNeeded
+
+                ColumnLayout {
+                    width: commandScrollView.width
+                    spacing: 12
+
+                    RowLayout {
+                        spacing: ScreenTools.defaultFontPixelWidth
+                        Layout.alignment: Qt.AlignHCenter
+
+                        Text {
+                            text: qsTr("Category:")
+                            color: "white"
+                            font.family: "Outfit"
+                        }
+
+                        QGCComboBox {
+                            id:                     categoryCombo
+                            Layout.fillWidth:       true
+                            Layout.preferredWidth:  15 * ScreenTools.defaultFontPixelWidth
+                            model:                  commandSelectionPopup.popupMissionItem ? QGroundControl.missionCommandTree.categoriesForVehicle(_planMasterController.controllerVehicle) : []
+                            popup.x:                0
+                            popup.width:            width
+
+                            function categorySelected(category) {
+                                if (commandSelectionPopup.popupMissionItem) {
+                                    commandListModel.model = QGroundControl.missionCommandTree.getCommandsForCategory(_planMasterController.controllerVehicle, category, true)
+                                }
+                            }
+
+                            Component.onCompleted: {
+                                if (commandSelectionPopup.popupMissionItem) {
+                                    var category = commandSelectionPopup.popupMissionItem.category
+                                    currentIndex = find(category)
+                                    categorySelected(category)
+                                }
+                            }
+
+                            onActivated: (index) => { categorySelected(textAt(index)) }
+                        }
+                    }
+
+                    Column {
+                        id: commandList
+                        width: parent.width
+                        spacing: 8
+
+                        Repeater {
+                            id: commandListModel
+                            delegate: Rectangle {
+                                width:  commandList.width
+                                height: commandItemCol.implicitHeight + 20
+                                color:  Qt.rgba(1, 1, 1, 0.1)
+                                radius: 8
+                                border.color: Qt.rgba(1, 1, 1, 0.2)
+                                border.width: 1
+
+                                Column {
+                                    id: commandItemCol
+                                    anchors.centerIn: parent
+                                    width: parent.width - 20
+                                    spacing: 4
+
+                                    Text {
+                                        width: parent.width
+                                        text: modelData.friendlyName
+                                        color: "white"
+                                        font.bold: true
+                                        font.family: "Outfit"
+                                        horizontalAlignment: Text.AlignHCenter
+                                        wrapMode: Text.WordWrap
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: modelData.description
+                                        color: Qt.rgba(1, 1, 1, 0.6)
+                                        font.pointSize: ScreenTools.smallFontPointSize
+                                        font.family: "Outfit"
+                                        horizontalAlignment: Text.AlignHCenter
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        commandSelectionPopup.popupMissionItem.setMapCenterHintForCommandChange(editorMap.center)
+                                        commandSelectionPopup.popupMissionItem.command = modelData.command
+                                        commandSelectionPopup.close()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Button {
+                text: qsTr("Cancel")
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 150
+                height: 40
+                onClicked: commandSelectionPopup.close()
 
                 background: Rectangle {
                     color: "white"

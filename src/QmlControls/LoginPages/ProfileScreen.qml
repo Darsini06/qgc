@@ -13,14 +13,17 @@ Item {
     anchors.fill: parent
 
     property string currentView: MapGlobals.currentView_profile || "profile"
-    property string userName: QGroundControl.loadGlobalSetting("username", "")
-    property string displayName: QGroundControl.loadGlobalSetting("name", "")
-    property string userEmail: QGroundControl.loadGlobalSetting("email", "")
+    property string userName: MapGlobals.userName
+    property string displayName: MapGlobals.displayName
+    property string userEmail: MapGlobals.userEmail
     
-    property string name_from_db: ""
-    property string mobileNo_from_db: ""
-    property string email_from_db: ""
+    property string mobileNo_from_db: QGroundControl.loadGlobalSetting("mobile_number", "")
     property int rpcCompletedStatus: -1
+
+    onUserNameChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("userName")) pageLoader.item.userName = userName
+    onUserEmailChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("userEmail")) pageLoader.item.userEmail = userEmail
+    onMobileNo_from_dbChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("mobileNo_from_db")) pageLoader.item.mobileNo_from_db = mobileNo_from_db
+    onRpcCompletedStatusChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("rpcCompletedStatus")) pageLoader.item.rpcCompletedStatus = rpcCompletedStatus
 
     property int totalMinutes: 0
     property int missionsCompleted: 0
@@ -45,9 +48,9 @@ Item {
     function loadUserData() {
         MapGlobals.loadUserData(userName, function(userData) {
             if (userData) {
-                name_from_db = userData.displayname || "";
-                mobileNo_from_db = userData.mobile_number || "";
-                email_from_db = userData.email || "";
+                MapGlobals.displayName = userData.displayname || MapGlobals.displayName;
+                MapGlobals.userEmail = userData.email || MapGlobals.userEmail;
+                mobileNo_from_db = userData.mobile_number || mobileNo_from_db;
                 rpcCompletedStatus = (userData.rpc_completed !== undefined && userData.rpc_completed !== null) ? Number(userData.rpc_completed) : -1;
             }
         });
@@ -61,9 +64,6 @@ Item {
     onVisibleChanged: {
         if (visible) {
             loadSessions();
-            displayName = QGroundControl.loadGlobalSetting("name", "")
-            userName = QGroundControl.loadGlobalSetting("username", "")
-            userEmail = QGroundControl.loadGlobalSetting("email", "")
             if (userName !== "") loadUserData();
         }
     }
@@ -97,8 +97,6 @@ Item {
             if (item.hasOwnProperty("missionsCompleted")) item.missionsCompleted = profilescreen.missionsCompleted
             
             // For AccountUpdate
-            if (item.hasOwnProperty("name_from_db")) item.name_from_db = profilescreen.name_from_db
-            if (item.hasOwnProperty("email_from_db")) item.email_from_db = profilescreen.email_from_db
             if (item.hasOwnProperty("mobileNo_from_db")) item.mobileNo_from_db = profilescreen.mobileNo_from_db
             if (item.hasOwnProperty("rpcCompletedStatus")) item.rpcCompletedStatus = profilescreen.rpcCompletedStatus
 

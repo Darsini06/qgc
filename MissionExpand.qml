@@ -37,6 +37,7 @@ Rectangle {
     signal remove
     signal selectNextNotReadyItem
     signal editItemClicked(var popupItem)
+    signal selectCommandClicked(var missionItem)
     signal deselect
 
     property var    _masterController:          masterController
@@ -118,6 +119,7 @@ Rectangle {
                     property real _padding: ScreenTools.comboBoxPadding
 
                     QGCLabel {
+                        Layout.maximumWidth:    commandPicker.width - innerLayout._padding
                         text:                   (missionItem.commandName === "Survey" && QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri") ? qsTr("Plot") : missionItem.commandName
                         color:                  "white"
                         font.bold:              true
@@ -126,14 +128,18 @@ Rectangle {
                         horizontalAlignment:    Text.AlignHCenter
                         verticalAlignment:      Text.AlignVCenter
                         Layout.alignment:       Qt.AlignVCenter | Qt.AlignHCenter
+                        fontSizeMode:           Text.Fit
+                        minimumPointSize:       8
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked:    commandDialog.createObject(mainWindow).open()
+                            onClicked:    _root.selectCommandClicked(missionItem)
                         }
                     }
 
                     QGCColoredImage {
+                        id:                 arrowImage
+                        visible:            false
                         height:             14
                         width:              14
                         fillMode:           Image.PreserveAspectFit
@@ -148,7 +154,7 @@ Rectangle {
                                 if (missionItem.isCurrentItem) {
                                     _root.deselect()
                                 } else {
-                                    commandDialog.createObject(mainWindow).open()
+                                    _root.selectCommandClicked(missionItem)
                                 }
                             }
                         }
@@ -156,17 +162,6 @@ Rectangle {
                 }
 
 
-            }
-
-            Component {
-                id: commandDialog
-
-                MissionCommandDialog {
-                    vehicle:                    masterController.controllerVehicle
-                    missionItem:                _root.missionItem
-                    map:                        _root.map
-                    flyThroughCommandsAllowed:  true
-                }
             }
 
             // ── Standard commandLabel ────────────────────
@@ -185,6 +180,17 @@ Rectangle {
                 font.family:            "Outfit"
                 horizontalAlignment:    Text.AlignHCenter
                 verticalAlignment:      Text.AlignVCenter
+                fontSizeMode:           Text.Fit
+                minimumPointSize:       8
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled:      missionItem.commandName === "Return To Launch"
+                    onClicked: {
+                        _root.clicked()
+                        _root.selectCommandClicked(missionItem)
+                    }
+                }
             }
 
             QGCButton {
@@ -195,8 +201,7 @@ Rectangle {
                 height:                 ScreenTools.defaultFontPixelHeight * 1.5
                 width:                  ScreenTools.defaultFontPixelWidth * 6
                 text:                   qsTr("Edit")
-                visible:                (missionItem.commandName === "Mission Start" ||
-                                         missionItem.commandName === "Survey") && MapGlobals.isReviewMode
+                visible:                true // Allow editing all items via left popup
                 onClicked:              editItemClicked(missionItem)
 
                 background: Rectangle {
@@ -215,57 +220,12 @@ Rectangle {
             }
         } // topRowLayout Item
 
-        // ── RTL description row (only when RTL is current item) ───────────
+        // ── Inline editor (Moved to left sidebar popup) ──
         Item {
-            id:                 rtlDescRow
-            width:              parent.width
-            height:             visible ? (rtlDescLabel.implicitHeight + ScreenTools.defaultFontPixelHeight) : 0
-            visible:            _currentItem && missionItem.commandName === "Return To Launch"
-
-            // Top separator line
-            Rectangle {
-                width:              parent.width
-                height:             1
-                color:              Qt.rgba(1, 1, 1, 0.12)
-                anchors.top:        parent.top
-                anchors.left:       parent.left
-                anchors.right:      parent.right
-            }
-
-            QGCLabel {
-                id:                     rtlDescLabel
-                anchors.left:           parent.left
-                anchors.right:          parent.right
-                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.75
-                anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.75
-                anchors.verticalCenter: parent.verticalCenter
-                text:                   qsTr("Sends the vehicle back to its launch position.")
-                color:                  Qt.rgba(1, 1, 1, 0.65)
-                font.pointSize:         ScreenTools.smallFontPointSize
-                font.family:            "Outfit"
-                horizontalAlignment:    Text.AlignHCenter
-                verticalAlignment:      Text.AlignVCenter
-                wrapMode:               Text.Wrap
-            }
-        } // rtlDescRow
-
-        // ── Inline editor (excludes Mission Start, Survey, Return To Launch) ──
-        Loader {
-            id:                 editorLoader
-            width:              _root.width > 0 ? _root.width - (_innerMargin * 2) : ScreenTools.defaultFontPixelWidth * 15
-            source:             (_currentItem
-                                 && missionItem.commandName !== "Mission Start"
-                                 && missionItem.commandName !== "Survey"
-                                 && missionItem.commandName !== "Return To Launch")
-                                ? missionItem.editorQml : ""
-            visible:            (_currentItem
-                                 && missionItem.commandName !== "Mission Start"
-                                 && missionItem.commandName !== "Survey"
-                                 && missionItem.commandName !== "Return To Launch")
-
-            property var    masterController:   _masterController
-            property real   availableWidth:     _root.width > 0 ? _root.width - (_innerMargin * 2) : ScreenTools.defaultFontPixelWidth * 15
-            property var    editorRoot:         _root
+            id: editorLoader
+            width: 0
+            height: 0
+            visible: false
         }
     } // Column
 } // Rectangle

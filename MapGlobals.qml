@@ -102,6 +102,8 @@ QtObject {
 
     property string login: ""
     property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
+    property string userEmail: QGroundControl.loadGlobalSetting("email", "")
+    property string displayName: QGroundControl.loadGlobalSetting("name", "")
     property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
 
@@ -954,6 +956,8 @@ QtObject {
                         QGroundControl.saveGlobalSetting("name", user.displayname);
                         QGroundControl.saveBoolGlobalSetting("login", true);
                         userName = user.username;
+                        userEmail = user.email;
+                        displayName = user.displayname;
 
                         // Sync to local SQLite
                         var db = getDatabase();

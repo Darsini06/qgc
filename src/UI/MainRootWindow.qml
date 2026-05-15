@@ -2285,6 +2285,46 @@ ApplicationWindow {
                     }
                 }
 
+                // Card 6: Spot Spraying
+                Rectangle {
+                    id: spotSprayingBtn
+                    Layout.fillWidth:       true
+                    Layout.preferredHeight: width
+                    radius: 18
+                    color:         maSpot.containsMouse ? "#1e1e1e" : "#161616"
+                    border.color:  maSpot.containsMouse ? app_color : "#2e2e2e"
+                    border.width:  maSpot.containsMouse ? 2 : 1
+                    visible: true // Always visible or Agri only? User said "in select mission type", usually implying always.
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: parent.height * 0.08
+                        width: parent.width * 0.75
+                        Rectangle {
+                            width: parent.width * 0.55; height: width; radius: width / 2
+                            color: maSpot.containsMouse ? app_color : "#252525"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            QGCColoredImage {
+                                source: "qrc:/qmlimages/NewImages/spray_parameter.svg"
+                                width: parent.width * 0.6; height: width
+                                color: "white"; anchors.centerIn: parent
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
+                        Text {
+                            text: "Spot Spraying"; color: "white"
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.bold: true; wrapMode: Text.WordWrap
+                            width: parent.width; horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                    MouseArea {
+                        id: maSpot; anchors.fill: parent; hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: kmlFileDialog.open()
+                    }
+                }
+
             } // end RowLayout (cardsRow)
         } // end ColumnLayout (contentCol)
 

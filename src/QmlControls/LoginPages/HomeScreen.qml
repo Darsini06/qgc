@@ -366,84 +366,7 @@ Item {
             Component.onCompleted: opacity = 1
         }
 
-        Label {
-            id: topBrandText
-            text: "DRONE COMMANDER"
-            // Hide on small mobile screens (phones), show on tablets and desktop
-            // Only show the main branding tagline on the primary home state to prevent background ghosting in operational modes
-            visible: (droneType === "loadpage") && !isSmallScreen && parent.height > 500
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            // Ensure space is shared between header and content
-            anchors.topMargin: {
-                if (droneType === "loadpage") {
-                    return Math.max(dp(20), parent.height * 0.3);
-                } else {
-                    return dp(16); // Moved down for more style
-                }
-            }
-            color: (droneType === "loadpage") ? "#262626" : "#FFFFFF"
-            font.family: "Outfit"
-            font.bold: true
-            font.letterSpacing: isTablet || isDesktop ? 8 : 4
-            // Use ScreenTools.largeFontPointSize for better resolution independence
-            font.pointSize: {
-                var baseSize = ScreenTools.largeFontPointSize;
-                var scaleMultiplier = dynamicScaleFactor;
-                if (droneType === "loadpage") {
-                    if (isDesktop)
-                        return baseSize * 4.0 * scaleMultiplier;
-                    if (isTablet)
-                        return baseSize * 3.5 * scaleMultiplier;
-                    return baseSize * 1.8; // Mobile stays clean
-                } else {
-                    if (isDesktop)
-                        return baseSize * 2.8 * scaleMultiplier;
-                    if (isTablet)
-                        return baseSize * 2.4 * scaleMultiplier;
-                    return baseSize * 1.3;
-                }
-            }
-            opacity: 0
-            z: 5
-
-            // Position and Size Animations
-            Behavior on anchors.topMargin {
-                NumberAnimation {
-                    duration: 800
-                    easing.type: Easing.OutBack
-                }
-            }
-            Behavior on font.pointSize {
-                NumberAnimation {
-                    duration: 600
-                }
-            }
-            Behavior on font.letterSpacing {
-                NumberAnimation {
-                    duration: 600
-                }
-            }
-
-            Component.onCompleted: {
-                topTextEntry.start();
-            }
-
-            SequentialAnimation {
-                id: topTextEntry
-                PauseAnimation {
-                    duration: 200
-                }
-                NumberAnimation {
-                    target: topBrandText
-                    property: "opacity"
-                    from: 0
-                    to: 0.95
-                    duration: 1200
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
+        // topBrandText moved into heroSection Column below
 
         // ---- TOP RIGHT NAVIGATION ----
         Row {
@@ -602,29 +525,88 @@ Item {
             }
         }
 
-        // ---- HERO SECTION ----
         Column {
             id: heroSection
-            // Conditional positioning: Center for the main tagline, Left for operational modes
             anchors.horizontalCenter: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? undefined : parent.horizontalCenter
             anchors.left: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? parent.left : undefined
             anchors.leftMargin: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? ((isSmallScreen || isMobile) ? dp(4) : 40) : 0
 
-            // Vertically centered alignment
+            // Center the whole block in the available vertical space
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(5) : 0
+            anchors.verticalCenterOffset: (droneType === "loadpage") ? -dp(2) : 0
 
             width: {
                 if (isSmallScreen || isMobile)
-                    return parent.width * 0.75; // Wider on mobile to prevent excessive wrapping
-                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140)); // Reduced width to prevent overlap with background drone
+                    return parent.width * 0.92; // Maximize space on mobile
+                return droneType === "loadpage" ? parent.width * 0.9 : Math.min(parent.width * 0.45, dp(140));
             }
             // Reduced basic spacing between elements
-            spacing: isSmallScreen ? dp(0.5) : dp(1.5)
+            spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1)
             opacity: 1
             z: 10
 
-            // Main Title
+            // 1. Tagline (Moved to the top of the column for home page)
+            Label {
+                id: heroSubtitle
+                visible: (droneType === "loadpage") ? true : !isSmallScreen
+                width: parent.width
+                wrapMode: Text.WordWrap
+                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+                text: {
+                    if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
+                    if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
+                    if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+                    if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
+                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
+                }
+
+                color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
+                font.pointSize: {
+                    var baseSize = ScreenTools.defaultFontPointSize;
+                    if (isDesktop) return baseSize * 1.2;
+                    if (isTablet) return baseSize * 1.1;
+                    return isSmallScreen ? baseSize * 0.6 : baseSize * 0.7;
+                }
+                font.family: "Outfit"
+                font.italic: droneType === "loadpage"
+                font.bold: false
+                lineHeight: 1.1
+                bottomPadding: (droneType === "loadpage" && isSmallScreen) ? 0 : dp(0.5)
+
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
+                    shadowBlur: 0.2
+                    shadowVerticalOffset: 1
+                }
+            }
+
+            // 2. Main Title (Moved inside the column)
+            Text {
+                id: topBrandText
+                text: "DRONE COMMANDER"
+                width: parent.width
+                horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+                visible: (droneType === "loadpage")
+                color: "#262626"
+                font.family: "Outfit"
+                font.bold: true
+                font.letterSpacing: isSmallScreen ? 0 : (isTablet || isDesktop ? 8 : 1.2)
+                
+                // Automatic fitting logic
+                fontSizeMode: Text.HorizontalFit
+                minimumPointSize: 6
+                font.pointSize: {
+                    var baseSize = ScreenTools.largeFontPointSize;
+                    if (isDesktop) return baseSize * 4.0;
+                    if (isTablet) return baseSize * 3.5;
+                    return isSmallScreen ? 18 : 26; // Target sizes, reduced for mobile
+                }
+                lineHeight: 1.1
+            }
+
+            // 3. Mode Title (Original heroTitle, hidden on home page)
             Label {
                 id: heroTitle
                 width: parent.width
@@ -677,8 +659,8 @@ Item {
 
             // Expanded Subtitle / Description
             Label {
-                id: heroSubtitle
-                visible: !isSmallScreen // Hide on small screens to give room for the Flight Zone widget
+                id: modeDescription
+                visible: (droneType === "loadpage") ? false : !isSmallScreen // Hide on home page as tagline is now used
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: (droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
@@ -687,7 +669,7 @@ Item {
                     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
                     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
                     if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
-                    return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
+                    return ""
                 }
 
                 color: (droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
@@ -698,13 +680,13 @@ Item {
                         return baseSize * 1.2 * scaleMultiplier;
                     if (isTablet)
                         return baseSize * 1.1 * scaleMultiplier;
-                    return baseSize * 0.8; // Mobile
+                    return baseSize * 0.7; // Even smaller for mobile to save space
                 }
                 font.family: "Outfit"
                 font.italic: droneType === "loadpage"
                 font.bold: false
-                lineHeight: 1.3
-                topPadding: dp(1) // Reduced top padding to bring description closer to heading
+                lineHeight: 1.2
+                bottomPadding: dp(1) // Padding at bottom to space away from the title below
 
                 // Subtitle shadow
                 layer.enabled: true
@@ -715,31 +697,20 @@ Item {
                     shadowVerticalOffset: 1
                 }
             }
-
-
-            // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
-
+            
+            // 4. Flight Zone Status (Moved back into the column for unified centering)
             Rectangle {
                 id: airspaceWidget
-                visible: true // Always show or adapt as needed
-                anchors.horizontalCenter: (droneType === "loadpage") ? parent.horizontalCenter : undefined
-
-                // Set width carefully to fit into the column
-                width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
-                implicitHeight: widgetContent.height + dp(3.5)
+                visible: (droneType === "loadpage")
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width * 0.8, 400)
+                implicitHeight: widgetContent.height + dp(2)
                 radius: 12
-                color: Qt.rgba(15 / 255, 15 / 255, 20 / 255, 0.75) // Dark cinematic glass theme
-                border.color: isCheckingAirspace ? Qt.rgba(250 / 255, 204 / 255, 21 / 255, 0.4) : (isClearToFly ? Qt.rgba(74 / 255, 222 / 255, 128 / 255, 0.4) : Qt.rgba(248 / 255, 113 / 255, 113 / 255, 0.4))
+                color: Qt.rgba(15 / 255, 15 / 255, 20 / 255, 0.82)
+                border.color: isCheckingAirspace ? Qt.rgba(250 / 255, 204 / 255, 21 / 255, 0.5) : (isClearToFly ? Qt.rgba(74 / 255, 222 / 255, 128 / 255, 0.5) : Qt.rgba(248 / 255, 113 / 255, 113 / 255, 0.5))
                 border.width: 1
                 z: 90
 
-                // Add some top margin for clean spacing after title/subtitle
-                Item {
-                    height: isSmallScreen ? dp(2) : dp(3)
-                    width: 1
-                }
-
-                // Slide-in animation for a premium feel
                 opacity: 0
                 transform: Translate {
                     id: widgetSlide
@@ -828,11 +799,11 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.topMargin: dp(1.5)
+                    anchors.topMargin: isSmallScreen ? dp(0.5) : dp(1)
                     anchors.leftMargin: dp(2)
                     anchors.rightMargin: dp(2)
-                    anchors.bottomMargin: dp(1.5)
-                    spacing: dp(0.8)
+                    anchors.bottomMargin: isSmallScreen ? dp(0.5) : dp(1)
+                    spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1.2)
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -874,10 +845,10 @@ Item {
                             text: qsTr("FLIGHT ZONE STATUS")
                             color: "white"
                             font.family: "Outfit"
-                            font.pointSize: ScreenTools.smallFontPointSize * 0.85
+                            font.pointSize: ScreenTools.smallFontPointSize * 0.95
                             font.bold: true
-                            font.letterSpacing: 1.5
-                            opacity: 0.8
+                            font.letterSpacing: 2.0
+                            opacity: 0.9
                         }
                     }
 
@@ -895,7 +866,7 @@ Item {
                         }
 
                         font.family: "Outfit"
-                        font.pointSize: ScreenTools.defaultFontPointSize * 1.05
+                        font.pointSize: ScreenTools.defaultFontPointSize * 1.2
                         font.bold: true
 
                         Behavior on color {
@@ -918,8 +889,8 @@ Item {
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
-                        font.pointSize: ScreenTools.smallFontPointSize * 0.85
-                        lineHeight: 1.2
+                        font.pointSize: ScreenTools.smallFontPointSize * 0.95
+                        lineHeight: 1.3
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -1158,10 +1129,10 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottomMargin: dp(2)
-            anchors.leftMargin: dp(4)
-            anchors.rightMargin: dp(4)
-            spacing: Math.min(dp(2), parent.width * 0.02)
+            anchors.bottomMargin: (isSmallScreen || isMobile) ? dp(1.5) : dp(2)
+            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            spacing: (isSmallScreen || isMobile) ? dp(0.5) : dp(2)
 
             // Helpful for debugging or ensuring minimum space
             Layout.fillWidth: true
@@ -1170,10 +1141,11 @@ Item {
             Item {
                 id: connectClick
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
 
                 Rectangle {
                     anchors.fill: parent
@@ -1213,7 +1185,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }
@@ -1233,18 +1208,21 @@ Item {
                 }
             }
 
+            // Flexible spacer to push operational buttons to the right
             Item {
                 Layout.fillWidth: true
+                // Removed visibility condition to ensure right alignment even on mobile
             }
 
             // Click to Camera
             Item {
                 id: cameraClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
                 visible: droneType === "loadpage" || droneType === "Camera" || droneType === "AI"
 
                 Rectangle {
@@ -1286,7 +1264,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }
@@ -1319,10 +1300,11 @@ Item {
             Item {
                 id: agriClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
                 visible: droneType === "loadpage" || droneType === "Agri"
 
                 Rectangle {
@@ -1365,7 +1347,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }
@@ -1433,10 +1418,11 @@ Item {
             Item {
                 id: mappingClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
                 visible: droneType === "loadpage" || droneType === "Mapping"
 
                 Rectangle {
@@ -1478,7 +1464,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }

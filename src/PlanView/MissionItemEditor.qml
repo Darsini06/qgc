@@ -76,17 +76,18 @@ Rectangle {
         }
     }
 
-    Row {
-
+    RowLayout {
         id:                 topRowLayout
-        anchors.margins:    _margin
         anchors.left:       parent.left
+        anchors.right:      hamburger.visible ? hamburger.left : parent.right
         anchors.top:        parent.top
+        anchors.margins:    _margin
+        anchors.topMargin:  ScreenTools.isMobile ? (ScreenTools.defaultFontPixelHeight * 1.5) : _margin
         spacing:            _margin
 
         Rectangle {
             id:                     notReadyForSaveIndicator
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment:       Qt.AlignVCenter
             width:                  _hamburgerSize
             height:                 width
             border.width:           1
@@ -98,7 +99,6 @@ Rectangle {
             QGCLabel {
                 id:                 readyForSaveLabel
                 anchors.centerIn:   parent
-                //: Indicator in Plan view to show mission item is not ready for save/send
                 text:               qsTr("?")
                 color:              qgcPal.warningText
                 font.pointSize:     ScreenTools.smallFontPointSize
@@ -107,7 +107,7 @@ Rectangle {
 
         QGCColoredImage {
             id:                     deleteButton
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment:       Qt.AlignVCenter
             height:                 _hamburgerSize
             width:                  height
             sourceSize.height:      height
@@ -121,7 +121,6 @@ Rectangle {
             QGCMouseArea {
                 fillItem:   parent
                 onClicked:  {
-                    console.log("delete icon pressed",missionItem.commandName)
                     if(missionItem.commandName==="Takeoff"){
                         takeoffremoveddialog.createObject(mainWindow).open()
                     }else{
@@ -133,65 +132,61 @@ Rectangle {
 
         Item {
             id:                     commandPicker
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment:       Qt.AlignVCenter
+            Layout.fillWidth:       true
             height:                 ScreenTools.implicitComboBoxHeight
-            width:                  innerLayout.width
             visible:                !commandLabel.visible
 
             RowLayout {
                 id:                     innerLayout
-                anchors.verticalCenter: parent.verticalCenter
-                spacing:                _padding
-
-                property real _padding: ScreenTools.comboBoxPadding
+                anchors.fill:           parent
+                spacing:                ScreenTools.comboBoxPadding
 
                 QGCLabel {
-                    text: missionItem.commandName
-                    color: "#ffffff"
-                    font.bold: true
+                    Layout.fillWidth:   true
+                    text:               missionItem.commandName
+                    color:              "#ffffff"
+                    font.bold:          true
+                    elide:              Text.ElideRight
                 }
 
                 QGCColoredImage {
-                    height:             ScreenTools.defaultFontPixelWidth
-                    width:              height
-                    fillMode:           Image.PreserveAspectFit
-                    smooth:             true
-                    antialiasing:       true
-                    color:              "#9090b0"
-                    source:             "/qmlimages/arrow-down.png"
+                    Layout.preferredHeight: ScreenTools.defaultFontPixelWidth
+                    Layout.preferredWidth:  Layout.preferredHeight
+                    fillMode:               Image.PreserveAspectFit
+                    smooth:                 true
+                    color:                  "#9090b0"
+                    source:                 "/qmlimages/arrow-down.png"
+                    visible:                false
                 }
             }
 
             QGCMouseArea {
                 fillItem:   parent
-                onClicked:  {
-
-                    commandDialog.createObject(mainWindow).open()
-                }
+                onClicked:  commandDialog.createObject(mainWindow).open()
             }
 
             Component {
                 id: commandDialog
-
                 MissionCommandDialog {
                     vehicle:                    masterController ? masterController.controllerVehicle : null
                     missionItem:                _root.missionItem
                     map:                        _root.map
-                    // FIXME: Disabling fly through commands doesn't work since you may need to change from an RTL to something else
-                    flyThroughCommandsAllowed:  true //_missionController.flyThroughCommandsAllowed
+                    flyThroughCommandsAllowed:  true
                 }
             }
         }
 
         QGCLabel {
             id:                     commandLabel
-            anchors.verticalCenter: parent.verticalCenter
-            width:                  commandPicker.width
-            height:                 commandPicker.height
+            Layout.alignment:       Qt.AlignVCenter
+            Layout.fillWidth:       true
             visible:                !missionItem.isCurrentItem || !missionItem.isSimpleItem || _waypointsOnlyMode || missionItem.isTakeoffItem
             verticalAlignment:      Text.AlignVCenter
             text:                   missionItem.commandName
             color:                  _outerTextColor
+            elide:                  Text.ElideRight
+            font.bold:              true
         }
     }
 
