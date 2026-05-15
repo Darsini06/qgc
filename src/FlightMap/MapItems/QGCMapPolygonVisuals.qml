@@ -456,11 +456,16 @@ Item {
         var hasValidCenter = fenceCenter.isValid &&
                              fenceCenter.latitude !== 0 &&
                              fenceCenter.longitude !== 0
-        if (hasValidCenter) {
+        var isEnabled = QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+        var isDialogOpen = MapGlobals.editdialog === "editdialog"
+        
+        if (hasValidCenter && isEnabled && !isDialogOpen) {
             _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceRadiusHandleComponent, mapControl, true)
             console.log("Fence visuals created successfully at:", fenceCenter)
+        } else {
+            console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen)
         }
     }
 
@@ -2068,13 +2073,7 @@ Item {
 
                                     if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
                                         _saveCurrentVertices()
-                                        if (QGroundControl.loadGlobalSetting("enableFence", "false") === "true") {
-                                            var vp = mapControl.centerViewport
-                                            var centerPoint = (vp && vp.width > 0)
-                                                ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
-                                                : Qt.point(mapControl.width / 2, mapControl.height / 2)
-                                            _root.fenceCenter = mapControl.toCoordinate(centerPoint, false)
-                                        }
+
                                         _circleMode = false
                                         mapPolygon.traceMode = true
                                         if(MapGlobals.mark_with !== "KML_File") {

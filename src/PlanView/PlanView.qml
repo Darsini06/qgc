@@ -53,6 +53,7 @@ Item {
     property int    _editingLayer:                      _layerMission
     property bool   isMissionTab:                       _editingLayer === _layerMission
     property bool   isFenceTab:                         _editingLayer === _layerGeoFence
+    property bool   isAgriFenceMode:                    false
     property int    _toolStripBottom:                   toolStrip.height + toolStrip.y
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     property var    _planViewSettings:                  QGroundControl.settingsManager.planViewSettings
@@ -108,10 +109,33 @@ Item {
     Connections {
         target: _planMasterController
         onPlanSaved: (filename) => {
-            console.log("Plan saved, updating DB:", filename)
-            MapGlobals.saveMissionLog(filename, _planMasterController.saveToJsonString(), _planMasterController)
-            // Save fence data to DB - this IS the canonical fence save path
+            console.log("Plan saved, updating DB and Cloud Log:", filename)
+            // Inject fence and boundary data into the JSON string before saving to mission log
+            var planJson = JSON.parse(_planMasterController.saveToJsonString())
+
+            // 1. Circular Fence
+            planJson.fenceData = {
+                "lat": mapPolygonvisuals.fenceCenter.latitude,
+                "lon": mapPolygonvisuals.fenceCenter.longitude,
+                "radius": mapPolygonvisuals.fenceRadius,
+                "enabled": QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+            }
+
+            // 2. Boundary Points
+            var boundaryPoints = []
+            if (mapPolygonvisuals.mapPolygon) {
+                for (var i = 0; i < mapPolygonvisuals.mapPolygon.count; i++) {
+                    var coord = mapPolygonvisuals.mapPolygon.vertexCoordinate(i)
+                    boundaryPoints.push({ "lat": coord.latitude, "lon": coord.longitude })
+                }
+            }
+            planJson.boundaryPoints = boundaryPoints
+
+            MapGlobals.saveMissionLog(filename, planJson, _planMasterController)
+
+            // Save fence data to local SQLite DB as well
             saveFenceData(filename)
+
             // After saving, reload after a short delay to confirm fence is visible
             fenceLoadTimer.planPath = filename
             fenceLoadTimer.restart()
@@ -140,6 +164,7 @@ Item {
             MapGlobals.getFence(planPath, function(fenceData) {
                 if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
                     console.log("Fence restored after plan open for:", planPath)
+                    // If a fence exists, show it by default so the user knows it's there
                     QGroundControl.saveGlobalSetting("enableFence", "true")
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                     mapPolygonvisuals.fenceRadius = fenceData.radius || 60
@@ -264,7 +289,7 @@ Item {
         if (QGroundControl.loadBoolGlobalSetting("login", false)) {
             var planName = _planMasterController.currentPlanFile ? _planMasterController.currentPlanFile.split('/').pop().split('\\').pop() : "Untitled.plan"
             var planContent = JSON.parse(_planMasterController.saveToText())
-            
+
             // Include fence data in cloud save
             planContent.fenceData = {
                 "lat": mapPolygonvisuals.fenceCenter.latitude,
@@ -339,17 +364,31 @@ Item {
             try {
                 var json = (typeof data === "string") ? JSON.parse(data) : data
                 _planMasterController.loadFromJson(json)
-                
+
                 // Restore fence from cloud data
                 if (json.fenceData) {
+                    // Restore the enabled state as it was when saved
+                    var fenceEnabled = (json.fenceData.enabled === true || json.fenceData.enabled === "true")
+                    QGroundControl.saveGlobalSetting("enableFence", fenceEnabled ? "true" : "false")
+
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
                     mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
                     mapPolygonvisuals.updateFence()
-                    console.log("PlanView: Restored cloud fence data at", mapPolygonvisuals.fenceCenter)
+                    console.log("PlanView: Restored cloud fence data. Visible:", fenceEnabled)
                 } else {
                     // Cloud plans without fence data should clear any existing fence
+                    QGroundControl.saveGlobalSetting("enableFence", "false")
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
                     mapPolygonvisuals.updateFence()
+                }
+
+                // Restore boundary points
+                if (json.boundaryPoints && json.boundaryPoints.length > 0) {
+                    console.log("PlanView: Restoring", json.boundaryPoints.length, "boundary points")
+                    mapPolygonvisuals.mapPolygon.clear()
+                    for (var j = 0; j < json.boundaryPoints.length; j++) {
+                        mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[j].lat, json.boundaryPoints[j].lon))
+                    }
                 }
 
                 MapGlobals.isReviewMode = true
@@ -607,7 +646,29 @@ Item {
 
             switch (_missionController.sendToVehiclePreCheck()) {
             case MissionController.SendToVehiclePreCheckStateOk:
-                MapGlobals.saveMissionLog(_planMasterController.currentPlanFile || "New Mission", _planMasterController.saveToJsonString(), _planMasterController)
+                // Inject fence and boundary data before logging upload
+                var uploadJson = JSON.parse(_planMasterController.saveToJsonString())
+
+                // 1. Circular Fence
+                uploadJson.fenceData = {
+                    "lat": mapPolygonvisuals.fenceCenter.latitude,
+                    "lon": mapPolygonvisuals.fenceCenter.longitude,
+                    "radius": mapPolygonvisuals.fenceRadius,
+                    "enabled": QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+                }
+
+                // 2. Boundary Points
+                var bPoints = []
+                if (mapPolygonvisuals.mapPolygon) {
+                    for (var k = 0; k < mapPolygonvisuals.mapPolygon.count; k++) {
+                        var c = mapPolygonvisuals.mapPolygon.vertexCoordinate(k)
+                        bPoints.push({ "lat": c.latitude, "lon": c.longitude })
+                    }
+                }
+                uploadJson.boundaryPoints = bPoints
+
+                MapGlobals.saveMissionLog(_planMasterController.currentPlanFile || "New Mission", uploadJson, _planMasterController)
+                saveFenceData(_planMasterController.currentPlanFile)
                 sendToVehicle()
                 console.log("upload_clicked1")
                 break
@@ -845,7 +906,32 @@ Item {
         onAcceptedCloudPlan: (planData) => {
                                console.log("Clicked Cloud File at onAcceptedCloudPlan")
                                MapGlobals.setGridLines(true)
-                               _planMasterController.loadFromJson(planData)
+                               var json = (typeof planData === "string") ? JSON.parse(planData) : planData
+                               _planMasterController.loadFromJson(json)
+
+                               // Restore fence from cloud data
+                               if (json.fenceData) {
+                                   var fenceEnabledDialog = (json.fenceData.enabled === true || json.fenceData.enabled === "true")
+                                   QGroundControl.saveGlobalSetting("enableFence", fenceEnabledDialog ? "true" : "false")
+
+                                   mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
+                                   mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
+                                   mapPolygonvisuals.updateFence()
+                                   console.log("PlanView: Restored cloud fence from dialog. Visible:", fenceEnabledDialog)
+                               } else {
+                                   QGroundControl.saveGlobalSetting("enableFence", "false")
+                                   mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                   mapPolygonvisuals.updateFence()
+                               }
+
+                               // Restore boundary points
+                               if (json.boundaryPoints && json.boundaryPoints.length > 0) {
+                                   mapPolygonvisuals.mapPolygon.clear()
+                                   for (var m = 0; m < json.boundaryPoints.length; m++) {
+                                       mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[m].lat, json.boundaryPoints[m].lon))
+                                   }
+                               }
+
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
                                close()
@@ -860,7 +946,7 @@ Item {
             id:         saveOptionsPopup
             title:      qsTr("Save Plan Options")
             showButtons: false
-            
+
             Column {
                 width:      parent.width
                 spacing:    25
@@ -1161,7 +1247,7 @@ Item {
                                       console.log("Ignoring map click too close to button press")
                                       break
                                   }
-                                  
+
                                   if (MapGlobals.circleAddMode) {
                                       _geoFenceController.addInclusionCircleAgri(coordinate)
                                       MapGlobals.circleAddMode = false
@@ -1360,7 +1446,7 @@ Item {
                     height:                   circleToastCol.implicitHeight + 20
                     radius:                   12
                     color:                    "#DD0D2137"
-                    border.width:             0 
+                    border.width:             0
 
                     SequentialAnimation on opacity {
                         running: MapGlobals.circleAddMode; loops: Animation.Infinite
@@ -1714,7 +1800,7 @@ Item {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active && !MapGlobals.isReviewMode
+                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
 
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
@@ -1753,7 +1839,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    0
-                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog"
+                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1788,6 +1874,201 @@ Item {
                                 } else {
                                     _editingLayer = _layerGeoFence
                                     layerTabBar.currentIndex = 1
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Column {
+                    width:              parent.width
+                    spacing:            ScreenTools.defaultFontPixelHeight * 0.4
+                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode && QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" && MapGlobals.editdialog !== "editdialog"
+
+                    // Main Fence Toggle Button
+                    Button {
+                        id: circularFenceBtn
+                        width:              parent.width
+                        height:             ScreenTools.defaultFontPixelHeight * 2.5
+                        padding:            ScreenTools.defaultFontPixelHeight * 0.5
+                        background: Rectangle {
+                            radius: ScreenTools.defaultFontPixelHeight * 0.45
+                            color: isAgriFenceMode ? "black" : Qt.rgba(0, 0, 0, 0.41)
+                            anchors.fill: parent
+                        }
+                        contentItem: Text {
+                            text:               qsTr("Fence")
+                            font.bold:          true
+                            color:              "white"
+                            font.pointSize:     ScreenTools.defaultFontPointSize
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment:   Text.AlignVCenter
+                            font.family:        "Outfit"
+                        }
+                        onClicked: {
+                            isAgriFenceMode = !isAgriFenceMode
+                            if (isAgriFenceMode) {
+                                QGroundControl.saveGlobalSetting("enableFence", "true")
+                                // Initialize fence center if not set
+                                if (mapPolygonvisuals.fenceCenter.latitude === 0 || isNaN(mapPolygonvisuals.fenceCenter.latitude)) {
+                                    var vp = editorMap.centerViewport
+                                    var centerPoint = (vp && vp.width > 0)
+                                        ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
+                                        : Qt.point(editorMap.width / 2, editorMap.height / 2)
+                                    mapPolygonvisuals.fenceCenter = editorMap.toCoordinate(centerPoint, false)
+                                    mapPolygonvisuals.fenceRadius = 60
+                                }
+                            }
+                            mapPolygonvisuals.updateFence()
+                        }
+                    }
+
+                    // Sub-container for Radius and Delete (Opens when Fence is enabled)
+                    // Styled to match "Obstacles Settings" panel with a mild color
+                    Rectangle {
+                        id:                 fenceSettingsPanel
+                        width:              parent.width
+                        height:             fenceSubCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 2)
+                        visible:            isAgriFenceMode
+                        color:              "#3A3A3A" // Milder grey
+                        radius:             8
+                        border.color:       "#555555"
+                        border.width:       1
+
+                        ColumnLayout {
+                            id:                 fenceSubCol
+                            anchors.fill:       parent
+                            anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.8
+                            spacing:            ScreenTools.defaultFontPixelHeight * 0.8
+
+                            // Header like Obstacles Settings
+                            Text {
+                                text:           qsTr("Fence Settings")
+                                color:          "white"
+                                font.bold:      true
+                                font.pointSize: ScreenTools.defaultFontPointSize + 2
+                                font.family:    "Outfit"
+                            }
+
+                            // Divider
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 1; color: "#3A3A3A"
+                            }
+
+                            // Section header with blue accent
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 8
+                                Rectangle { width: 4; height: 16; radius: 2; color: "#3498DB" }
+                                Text {
+                                    text:           qsTr("FENCE RADIUS")
+                                    color:          "#3498DB"
+                                    font.bold:      true
+                                    font.pointSize: 10
+                                    font.family:    "Outfit"
+                                }
+                            }
+
+                            // 1. Radius Adjustment
+                            RowLayout {
+                                Layout.fillWidth:   true
+                                spacing:            ScreenTools.defaultFontPixelWidth * 0.5
+
+                                Button {
+                                    Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
+                                    height:                 ScreenTools.defaultFontPixelHeight * 2.2
+                                    background: Rectangle {
+                                        radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                        color:  Qt.rgba(0, 0, 0, 0.41)
+                                        border.color: "white"
+                                        border.width: 1
+                                    }
+                                    contentItem: Text {
+                                        text:               "−"
+                                        color:              "white"
+                                        font.bold:          true
+                                        font.pointSize:     ScreenTools.defaultFontPointSize + 2
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment:   Text.AlignVCenter
+                                    }
+                                    onClicked: {
+                                        mapPolygonvisuals.fenceRadius = Math.max(1, mapPolygonvisuals.fenceRadius - 5)
+                                        mapPolygonvisuals.updateFence()
+                                        saveFenceData(_planMasterController.currentPlanFile)
+                                    }
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth:   true
+                                    height:             ScreenTools.defaultFontPixelHeight * 2.2
+                                    radius:             ScreenTools.defaultFontPixelHeight * 0.45
+                                    color:              Qt.rgba(0, 0, 0, 0.6)
+                                    border.color:       "white"
+                                    border.width:       1
+                                    Text {
+                                        anchors.centerIn:   parent
+                                        text:               mapPolygonvisuals.fenceRadius.toFixed(0) + "m"
+                                        color:              "white"
+                                        font.bold:          true
+                                        font.pointSize:     ScreenTools.defaultFontPointSize
+                                        font.family:        "Outfit"
+                                    }
+                                }
+
+                                Button {
+                                    Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
+                                    height:                 ScreenTools.defaultFontPixelHeight * 2.2
+                                    background: Rectangle {
+                                        radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                        color:  Qt.rgba(0, 0, 0, 0.41)
+                                        border.color: "white"
+                                        border.width: 1
+                                    }
+                                    contentItem: Text {
+                                        text:               "+"
+                                        color:              "white"
+                                        font.bold:          true
+                                        font.pointSize:     ScreenTools.defaultFontPointSize + 2
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment:   Text.AlignVCenter
+                                    }
+                                    onClicked: {
+                                        mapPolygonvisuals.fenceRadius = mapPolygonvisuals.fenceRadius + 5
+                                        mapPolygonvisuals.updateFence()
+                                        saveFenceData(_planMasterController.currentPlanFile)
+                                    }
+                                }
+                            }
+
+                            // 2. Delete Button
+                            Button {
+                                Layout.fillWidth:       true
+                                height:                 ScreenTools.defaultFontPixelHeight * 2.0
+                                background: Rectangle {
+                                    radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                    color:  "#E74C3C"
+                                }
+                                contentItem: Text {
+                                    text:               qsTr("Delete")
+                                    color:              "white"
+                                    font.bold:          true
+                                    font.pointSize:     ScreenTools.defaultFontPointSize
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment:   Text.AlignVCenter
+                                    font.family:        "Outfit"
+                                }
+                                onClicked: {
+                                    mainWindow.showMessageDialog(qsTr("Delete Fence"),
+                                        qsTr("Are you sure you want to permanently delete the circular fence data?"),
+                                        Dialog.Yes | Dialog.No,
+                                        function() {
+                                            QGroundControl.saveGlobalSetting("enableFence", "false")
+                                            mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                            mapPolygonvisuals.updateFence()
+                                            isAgriFenceMode = false
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -2027,8 +2308,8 @@ Item {
                 anchors.right:          parent.right
                 height:                 ScreenTools.defaultFontPixelHeight * 2.5
                 text:                   qsTr("Save Plan")
-                visible:                _editingLayer == _layerMission && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
-                
+                visible:                (isMissionTab || isAgriFenceMode) && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
                     color: "black"
@@ -2049,10 +2330,10 @@ Item {
                 onClicked: {
                     var currentCommand = _currentItem ? _currentItem.commandName : "";
                     var isMissionActionPage = (currentCommand === "Mission Start" || currentCommand === "Survey" || currentCommand === "Return To Launch");
-                    
+
                     // Check if we are in Boundary or Obstacle editing mode
-                    var isBoundaryMode = (boundaryButtonsLoader && boundaryButtonsLoader.visible) || 
-                                         (layerTabBar && layerTabBar.currentIndex === 1) || 
+                    var isBoundaryMode = (boundaryButtonsLoader && boundaryButtonsLoader.visible) ||
+                                         (layerTabBar && layerTabBar.currentIndex === 1) ||
                                          (activePolygon && activePolygon.traceMode);
 
                     if (isMissionActionPage && !isBoundaryMode) {
@@ -3103,11 +3384,11 @@ Item {
         // Responsive width
         width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
         height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
-        
+
         // Left side, keeping it classy and subtle
         x: ScreenTools.defaultFontPixelWidth
         y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
-        
+
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape
@@ -3221,10 +3502,10 @@ Item {
 
         width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
         height: Math.min(commandInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
-        
+
         x: ScreenTools.defaultFontPixelWidth
         y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
-        
+
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape

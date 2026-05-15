@@ -327,7 +327,14 @@ QtObject {
         var parts = s.split(/[\/\\]/)
         var filename = parts[parts.length - 1]
         filename = decodeURIComponent(filename)
-        console.log("MapGlobals.normalizePath() -> Clean Filename:", filename)
+        
+        // Strip extension if present so "Field1" and "Field1.plan" match same DB key
+        var lastDot = filename.lastIndexOf(".")
+        if (lastDot > 0) {
+            filename = filename.substring(0, lastDot)
+        }
+        
+        console.log("MapGlobals.normalizePath() -> Clean Name:", filename)
         return filename
     }
 
