@@ -343,7 +343,13 @@ Item {
                 // Restore fence from cloud data
                 if (json.fenceData) {
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
-                    mapPolygonvisuals.fenceRadius = json.fenceData.radius
+                    mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
+                    console.log("PlanView: Restored cloud fence data at", mapPolygonvisuals.fenceCenter)
+                } else {
+                    // Cloud plans without fence data should clear any existing fence
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                    mapPolygonvisuals.updateFence()
                 }
 
                 MapGlobals.isReviewMode = true
@@ -1701,7 +1707,7 @@ Item {
                 anchors.right:      parent.right
 
                 anchors.top:        parent.top
-                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 1.5 : 0.8)
+                anchors.topMargin:  ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 3.5 : 2.5)
 
                 // 1st: Boundary Point
                 Loader {
@@ -1713,7 +1719,7 @@ Item {
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
                         width:              boundaryButtonsLoader.width
-                        topPadding:         ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 1.5 : 1.0)
+                        topPadding:         ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 2.0 : 1.5)
 
                         Button {
                             id: boundaryPointBtn

@@ -349,7 +349,7 @@ import MapGlobals
         border.color:   "yellow"
         border.width:   2
         z:              QGroundControl.zOrderMapItems + 1
-        visible:        _root.fenceCenter.isValid && QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+        visible:        _root.fenceCenter.isValid && _root.fenceCenter.latitude !== 0 && _root.fenceCenter.longitude !== 0
     }
 
     Connections {
