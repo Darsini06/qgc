@@ -58,6 +58,16 @@ Item {
 
     property var _planMasterController:              planMasterController
     property var _missionController:              planMasterController.missionController
+    property var fenceCenter:                     QtPositioning.coordinate()
+    property real fenceRadius:                    60
+
+    onFenceCenterChanged: {
+        updateFence()
+    }
+
+    onFenceRadiusChanged: {
+        updateFence()
+    }
 
 
     readonly property string _polygonToolsText: qsTr("")//("Polygon Tools")
@@ -359,6 +369,100 @@ Item {
     QGCDynamicObjectManager { id: _objMgrEditingVisuals }
     QGCDynamicObjectManager { id: _objMgrTraceVisuals }
     QGCDynamicObjectManager { id: _objMgrCircleVisuals }
+    QGCDynamicObjectManager { id: _objMgrFenceVisuals }
+
+    Component {
+        id: fenceCircleComponent
+        MapCircle {
+            center:         _root.fenceCenter
+            radius:         _root.fenceRadius
+            color:          "transparent"
+            border.color:   "yellow"
+            border.width:   2
+            z:              QGroundControl.zOrderMapItems + 1
+        }
+    }
+
+    Component {
+        id: fenceCenterHandleComponent
+        MapQuickItem {
+            coordinate:     _root.fenceCenter
+            anchorPoint:    Qt.point(sourceItem.width/2, sourceItem.height/2)
+            z:              QGroundControl.zOrderMapItems + 2
+            sourceItem:     Rectangle {
+                width:          24
+                height:         24
+                radius:         12
+                color:          "white"
+                border.color:   "black"
+                border.width:   1
+                QGCColoredImage {
+                    anchors.centerIn: parent
+                    width:          16
+                    height:         16
+                    source:         "/qmlimages/EditSideBySide.svg"
+                    color:          "black"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    property var startPoint
+                    onPressed: (mouse) => startPoint = Qt.point(mouse.x, mouse.y)
+                    onPositionChanged: (mouse) => {
+                        var currentPoint = mapControl.fromCoordinate(_root.fenceCenter)
+                        currentPoint.x += mouse.x - startPoint.x
+                        currentPoint.y += mouse.y - startPoint.y
+                        _root.fenceCenter = mapControl.toCoordinate(currentPoint)
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: fenceRadiusHandleComponent
+        MapQuickItem {
+            coordinate:     _root.fenceCenter.atDistanceAndAzimuth(_root.fenceRadius, 90)
+            anchorPoint:    Qt.point(sourceItem.width/2, sourceItem.height/2)
+            z:              QGroundControl.zOrderMapItems + 2
+            sourceItem:     Rectangle {
+                width:          16
+                height:         16
+                radius:         8
+                color:          "yellow"
+                border.color:   "black"
+                border.width:   1
+                MouseArea {
+                    anchors.fill: parent
+                    property var startPoint
+                    onPressed: (mouse) => startPoint = Qt.point(mouse.x, mouse.y)
+                    onPositionChanged: (mouse) => {
+                        var edgePoint = mapControl.fromCoordinate(_root.fenceCenter.atDistanceAndAzimuth(_root.fenceRadius, 90))
+                        edgePoint.x += mouse.x - startPoint.x
+                        edgePoint.y += mouse.y - startPoint.y
+                        var currentCoord = mapControl.toCoordinate(edgePoint)
+                        _root.fenceRadius = _root.fenceCenter.distanceTo(currentCoord)
+                    }
+                }
+            }
+        }
+    }
+
+    function updateFence() {
+        _objMgrFenceVisuals.destroyObjects()
+        console.log("QGCMapPolygonVisuals.updateFence() - Center:", fenceCenter, "Radius:", fenceRadius)
+        // Render the yellow fence circle whenever a valid non-zero coordinate is set.
+        // The enableFence flag controls new fence CREATION (via the dialog), but
+        // once a fence is saved in the DB and loaded, it should always be visible.
+        var hasValidCenter = fenceCenter.isValid &&
+                             fenceCenter.latitude !== 0 &&
+                             fenceCenter.longitude !== 0
+        if (hasValidCenter) {
+            _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
+            _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
+            _objMgrFenceVisuals.createObject(fenceRadiusHandleComponent, mapControl, true)
+            console.log("Fence visuals created successfully at:", fenceCenter)
+        }
+    }
 
     QGCPalette { id: qgcPal }
 
@@ -1584,12 +1688,22 @@ Item {
 
                 MapGlobals.setGridLines(false)
 
-                _saveCurrentVertices()
-
-                _circleMode = false
-                if (mapPolygon) {
-                    mapPolygon.traceMode = true
-                    mapPolygon.clear();
+                if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
+                    _saveCurrentVertices()
+                    if (QGroundControl.loadGlobalSetting("enableFence", "false") === "true") {
+                        var vp = mapControl.centerViewport
+                        var centerPoint = (vp && vp.width > 0)
+                            ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
+                            : Qt.point(mapControl.width / 2, mapControl.height / 2)
+                        var coord = mapControl.toCoordinate(centerPoint, false)
+                        _root.fenceCenter = coord
+                        _root.fenceRadius = 60
+                    }
+                    _circleMode = false
+                    if (mapPolygon) {
+                        mapPolygon.traceMode = true
+                        mapPolygon.clear();
+                    }
                 }
             }
 
@@ -1954,6 +2068,13 @@ Item {
 
                                     if (QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri") {
                                         _saveCurrentVertices()
+                                        if (QGroundControl.loadGlobalSetting("enableFence", "false") === "true") {
+                                            var vp = mapControl.centerViewport
+                                            var centerPoint = (vp && vp.width > 0)
+                                                ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
+                                                : Qt.point(mapControl.width / 2, mapControl.height / 2)
+                                            _root.fenceCenter = mapControl.toCoordinate(centerPoint, false)
+                                        }
                                         _circleMode = false
                                         mapPolygon.traceMode = true
                                         if(MapGlobals.mark_with !== "KML_File") {

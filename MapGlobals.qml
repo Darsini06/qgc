@@ -136,6 +136,9 @@ QtObject {
                 //feedback table
                 tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, mobile_number TEXT, email TEXT, comments TEXT)");
 
+                // Fences table
+                tx.executeSql("CREATE TABLE IF NOT EXISTS fences (plan_path TEXT PRIMARY KEY, lat REAL, lon REAL, radius REAL)");
+
                 console.log("Database and tables created successfully");
 
             } catch (error) {
@@ -313,6 +316,55 @@ QtObject {
             }
         }
         xhr.send(JSON.stringify(data));
+    }
+
+    function normalizePath(path) {
+        if (!path) return ""
+        var s = path.toString()
+        // Extract just the filename and clean it of URI encoding
+        var parts = s.split(/[\/\\]/)
+        var filename = parts[parts.length - 1]
+        filename = decodeURIComponent(filename)
+        console.log("MapGlobals.normalizePath() -> Clean Filename:", filename)
+        return filename
+    }
+
+    function saveFence(planPath, lat, lon, radius) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.saveFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                tx.executeSql(
+                    "INSERT OR REPLACE INTO fences (plan_path, lat, lon, radius) VALUES (?, ?, ?, ?)",
+                    [cleanPath, lat, lon, radius]
+                );
+                console.log("Fence saved to database for:", cleanPath);
+            } catch (error) {
+                console.error("Error saving fence to database:", error);
+            }
+        });
+    }
+
+    function getFence(planPath, callback) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.getFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                var rs = tx.executeSql("SELECT * FROM fences WHERE plan_path = ?", [cleanPath]);
+                if (rs.rows.length > 0) {
+                    console.log("Fence found for:", cleanPath);
+                    callback(rs.rows.item(0));
+                } else {
+                    console.log("No fence found for:", cleanPath);
+                    callback(null);
+                }
+            } catch (error) {
+                console.error("Error retrieving fence from database:", error);
+                callback(null);
+            }
+        });
     }
 
     //calculate the duration from startsession to end session

@@ -110,6 +110,42 @@ Item {
         onPlanSaved: (filename) => {
             console.log("Plan saved, updating DB:", filename)
             MapGlobals.saveMissionLog(filename, _planMasterController.saveToJsonString(), _planMasterController)
+            // Save fence data to DB - this IS the canonical fence save path
+            saveFenceData(filename)
+            // After saving, reload after a short delay to confirm fence is visible
+            fenceLoadTimer.planPath = filename
+            fenceLoadTimer.restart()
+        }
+        onCurrentPlanFileChanged: {
+            // This fires on both save AND load. On save, onPlanSaved will handle fence.
+            // On load (file open), we need to restore the fence from DB.
+            // Use a longer delay here to ensure it doesn't race with onPlanSaved.
+            if (_planMasterController.currentPlanFile !== "") {
+                console.log("Plan file changed, will load fence:", _planMasterController.currentPlanFile)
+                fenceLoadAfterOpenTimer.planPath = _planMasterController.currentPlanFile
+                fenceLoadAfterOpenTimer.restart()
+            }
+        }
+    }
+
+    // Short timer used by onPlanSaved - confirms fence visible after save
+    // (interval is 300ms, set in fenceLoadTimer definition below)
+
+    // Longer timer for plan file open - ensures we read AFTER any save that might have just run
+    Timer {
+        id: fenceLoadAfterOpenTimer
+        interval: 800
+        property string planPath: ""
+        onTriggered: {
+            MapGlobals.getFence(planPath, function(fenceData) {
+                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                    console.log("Fence restored after plan open for:", planPath)
+                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
+                }
+            })
         }
     }
 
@@ -140,7 +176,7 @@ Item {
             console.log("returnWaypointEnabled in PlanView : ",returnWaypointEnabled)
 
             waypointMark = QGroundControl.loadGlobalSetting("waypointMark", "true") === "true"
-
+            mapPolygonvisuals.updateFence()
         }
     }
 
@@ -212,7 +248,6 @@ Item {
 
 
     function newmapfile(file) {
-
         console.log("file data:",file)
         _planMasterController.loadFromFile(file)
         _planMasterController.fitViewportToItems()
@@ -229,9 +264,61 @@ Item {
         if (QGroundControl.loadBoolGlobalSetting("login", false)) {
             var planName = _planMasterController.currentPlanFile ? _planMasterController.currentPlanFile.split('/').pop().split('\\').pop() : "Untitled.plan"
             var planContent = JSON.parse(_planMasterController.saveToText())
+            
+            // Include fence data in cloud save
+            planContent.fenceData = {
+                "lat": mapPolygonvisuals.fenceCenter.latitude,
+                "lon": mapPolygonvisuals.fenceCenter.longitude,
+                "radius": mapPolygonvisuals.fenceRadius,
+                "enabled": QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
+            }
+
             MapGlobals.savePlanToCloud(planName, planContent, function(success) {
                 if (success) {
                     mainWindow.showToastMessage("Plan synced to cloud");
+                }
+            })
+        }
+    }
+
+    function saveFenceData(planPath) {
+        if (!planPath) return
+        var lat = mapPolygonvisuals.fenceCenter.latitude
+        var lon = mapPolygonvisuals.fenceCenter.longitude
+        var rad = mapPolygonvisuals.fenceRadius
+        // Only save if we have a real non-zero coordinate (fence was actually placed)
+        if (lat === 0 && lon === 0) {
+            console.log("saveFenceData: fenceCenter is (0,0), skipping save")
+            return
+        }
+        console.log("saveFenceData: saving fence for:", planPath, "lat:", lat, "lon:", lon, "radius:", rad)
+        // Mark fence as enabled for this plan
+        QGroundControl.saveGlobalSetting("enableFence", "true")
+        MapGlobals.saveFence(planPath, lat, lon, rad)
+    }
+
+    function loadFenceData(planPath) {
+        if (!planPath) return
+        // Short delay to ensure map is initialized, then load fence
+        fenceLoadTimer.planPath = planPath
+        fenceLoadTimer.restart()
+    }
+
+    Timer {
+        id: fenceLoadTimer
+        interval: 300
+        property string planPath: ""
+        onTriggered: {
+            MapGlobals.getFence(planPath, function(fenceData) {
+                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                    console.log("Fence loaded from DB for:", planPath, "lat:", fenceData.lat, "lon:", fenceData.lon)
+                    // Always re-enable fence and apply data so it renders
+                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
+                } else {
+                    console.log("No fence in DB for:", planPath, "- keeping current display")
                 }
             })
         }
@@ -243,6 +330,7 @@ Item {
         onLoadLocalPlan: (path) => {
             console.log("PlanView: loading local plan:", path)
             _planMasterController.loadFromFile(path)
+            loadFenceData(path)
             MapGlobals.isReviewMode = true
             MapGlobals.showMissionItems = false
         }
@@ -251,6 +339,13 @@ Item {
             try {
                 var json = (typeof data === "string") ? JSON.parse(data) : data
                 _planMasterController.loadFromJson(json)
+                
+                // Restore fence from cloud data
+                if (json.fenceData) {
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = json.fenceData.radius
+                }
+
                 MapGlobals.isReviewMode = true
                 MapGlobals.showMissionItems = false
             } catch (e) {
@@ -680,9 +775,11 @@ Item {
 
                                    if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                                        _planMasterController.saveToFile1(file)
+                                       saveFenceData(file)
                                        mainWindow.showFlyView()
                                    } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
                                        _planMasterController.saveToFile(file)
+                                       saveFenceData(file)
                                        mainWindow.showMapping()
                                    }
                                } else {
@@ -696,11 +793,13 @@ Item {
             if (_planMasterController.currentPlanFile !== "") {
                 if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                     _planMasterController.saveToFile1(_planMasterController.currentPlanFile)
+                    saveFenceData(_planMasterController.currentPlanFile)
                     if (planFiles) {
                         mainWindow.showFlyView()
                     }
                 } else {
                     _planMasterController.saveToCurrent()
+                    saveFenceData(_planMasterController.currentPlanFile)
                     if (planFiles) {
                         mainWindow.showMapping()
                     }
@@ -710,9 +809,11 @@ Item {
                 if (planFiles) {
                     if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Agri"){
                         _planMasterController.saveToFile1(file)
+                        saveFenceData(file)
                         mainWindow.showFlyView()
                     } else if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
                         _planMasterController.saveToFile(file)
+                        saveFenceData(file)
                         mainWindow.showMapping()
                     }
                 } else {
@@ -726,6 +827,7 @@ Item {
                                console.log("Click Files at onAcceptedForLoad")
                                MapGlobals.setGridLines(true)
                                _planMasterController.loadFromFile(file)
+                               loadFenceData(file)
                                _planMasterController.fitViewportToItems()
                                _missionController.setCurrentPlanViewSeqNum(0, true)
                                close()
@@ -822,6 +924,7 @@ Item {
                             saveOptionsPopup.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
                                     _planMasterController.saveToSelectedFile1()
@@ -949,6 +1052,7 @@ Item {
                             saveOptionsPopup.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
                                     _planMasterController.saveToSelectedFile1()
@@ -1527,6 +1631,7 @@ Item {
                             dialog.close()
                             if (_planMasterController.currentPlanFile !== "") {
                                 _planMasterController.saveToCurrent()
+                                saveFenceData(_planMasterController.currentPlanFile)
                             } else {
                                 _planMasterController.saveToSelectedFile1()
                             }
@@ -2382,6 +2487,7 @@ Item {
                                 onClicked: {
                                     if (_planMasterController.currentPlanFile !== "") {
                                         _planMasterController.saveToCurrent()
+                                        saveFenceData(_planMasterController.currentPlanFile)
                                     } else {
                                         _planMasterController.saveToSelectedFile1()
                                     }
@@ -2661,6 +2767,7 @@ Item {
                         dropPanel.hide()
                         if(_planMasterController.currentPlanFile !== "") {
                             _planMasterController.saveToCurrent()
+                            saveFenceData(_planMasterController.currentPlanFile)
                         } else {
                             _planMasterController.saveToSelectedFile1()
                         }
