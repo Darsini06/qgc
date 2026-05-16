@@ -2517,6 +2517,20 @@ void MissionController::setCurrentPlanViewSeqNum(int sequenceNumber, bool force)
         emit onlyInsertTakeoffValidChanged();
         emit isInsertTakeoffValidChanged();
         emit isInsertLandValidChanged();
+
+        bool isSpotSprayingActive = false;
+        for (int i=0; i<_visualItems->count(); i++) {
+            VisualMissionItem* pVI = _visualItems->value<VisualMissionItem*>(i);
+            if (pVI->commandName() == "Spot Spraying") {
+                isSpotSprayingActive = true;
+                break;
+            }
+        }
+        if (_isSpotSprayingActive != isSpotSprayingActive) {
+            _isSpotSprayingActive = isSpotSprayingActive;
+            emit isSpotSprayingActiveChanged(_isSpotSprayingActive);
+        }
+
         emit isROIActiveChanged();
         emit isROIBeginCurrentItemChanged();
         emit flyThroughCommandsAllowedChanged();
@@ -2687,4 +2701,9 @@ void MissionController::setGlobalAltitudeMode(QGroundControlQmlGlobal::AltMode a
         _globalAltMode = altMode;
         emit globalAltitudeModeChanged();
     }
+}
+
+bool MissionController::isSpotSprayingActive(void) const
+{
+    return _isSpotSprayingActive;
 }
