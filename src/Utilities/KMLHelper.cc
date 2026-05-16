@@ -28,17 +28,29 @@ QDomDocument KMLHelper::_loadFile(const QString& kmlFile, QString& errorString)
 #ifdef Q_OS_ANDROID
     if (kmlFile.startsWith("content://")) {
         usingJni = true;
-        QJniEnvironment env;
-        // Use the Activity context which is more likely to hold the URI permission
-        QJniObject activity = QJniObject::callStaticObjectMethod("org/qtproject/qt/android/QtNative", "activity", "()Landroid/app/Activity;");
+        
+        // Try QFile first (Qt 6 supports content:// natively on Android)
+        QFile qfile(kmlFile);
+        if (qfile.open(QIODevice::ReadOnly)) {
+            fileData = qfile.readAll();
+        }
+
+        if (fileData.isEmpty()) {
+            QJniEnvironment env;
+            QJniObject activity;
+            QJniObject contentResolver;
+            QJniObject uri;
+            QJniObject inputStream;
+            // Use the Activity context which is more likely to hold the URI permission
+        activity = QJniObject::callStaticObjectMethod("org/qtproject/qt/android/QtNative", "activity", "()Landroid/app/Activity;");
         if (activity.isValid()) {
-            QJniObject contentResolver = activity.callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
+            contentResolver = activity.callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
             if (contentResolver.isValid()) {
                 QJniObject uriString = QJniObject::fromString(kmlFile);
-                QJniObject uri = QJniObject::callStaticObjectMethod("android/net/Uri", "parse", "(Ljava/lang/String;)Landroid/net/Uri;", uriString.object<jstring>());
+                uri = QJniObject::callStaticObjectMethod("android/net/Uri", "parse", "(Ljava/lang/String;)Landroid/net/Uri;", uriString.object<jstring>());
                 if (uri.isValid()) {
                     // Try openInputStream first
-                    QJniObject inputStream = contentResolver.callObjectMethod("openInputStream", "(Landroid/net/Uri;)Ljava/io/InputStream;", uri.object());
+                    inputStream = contentResolver.callObjectMethod("openInputStream", "(Landroid/net/Uri;)Ljava/io/InputStream;", uri.object());
                     
                     if (!inputStream.isValid()) {
                         // Fallback to openFileDescriptor if openInputStream fails
@@ -50,23 +62,30 @@ QDomDocument KMLHelper::_loadFile(const QString& kmlFile, QString& errorString)
 
                     if (inputStream.isValid()) {
                         // Read in chunks to be safe with large files
-                        jbyteArray javaArray = env->NewByteArray(8192);
+                        jbyteArray javaArray = env.jniEnv()->NewByteArray(8192);
                         int bytesRead = 0;
                         while ((bytesRead = inputStream.callMethod<jint>("read", "([B)I", javaArray)) > 0) {
-                            jbyte* bytes = env->GetByteArrayElements(javaArray, nullptr);
+                            jbyte* bytes = env.jniEnv()->GetByteArrayElements(javaArray, nullptr);
                             fileData.append(reinterpret_cast<char*>(bytes), bytesRead);
-                            env->ReleaseByteArrayElements(javaArray, bytes, JNI_ABORT);
+                            env.jniEnv()->ReleaseByteArrayElements(javaArray, bytes, JNI_ABORT);
                         }
-                        env->DeleteLocalRef(javaArray);
+                        env.jniEnv()->DeleteLocalRef(javaArray);
                         inputStream.callMethod<void>("close");
                     }
                 }
             }
         }
         
-        if (fileData.isEmpty()) {
-            errorString = QString(_errorPrefix).arg(tr("Android Permission Denied or File Empty: %1. Please try moving the file to the QGroundControl/Missions folder if this persists.").arg(kmlFile));
-            return QDomDocument();
+            if (fileData.isEmpty()) {
+                QString diagnostic = QString("Q:%1 A:%2 R:%3 U:%4 S:%5")
+                    .arg((int)qfile.exists())
+                    .arg((int)activity.isValid())
+                    .arg((int)contentResolver.isValid())
+                    .arg((int)uri.isValid())
+                    .arg((int)inputStream.isValid());
+                errorString = QString(_errorPrefix).arg(tr("Android Permission Denied: %1 (%2)").arg(kmlFile).arg(diagnostic));
+                return QDomDocument();
+            }
         }
     }
 #endif

@@ -55,6 +55,9 @@ QObject* SpotSprayingComplexItem::createPoint(const QGeoCoordinate& coord)
 void SpotSprayingComplexItem::_updatePoints()
 {
     setDirty(true);
+    emit coordinateChanged(coordinate());
+    emit exitCoordinateChanged(exitCoordinate());
+    emit lastSequenceNumberChanged(lastSequenceNumber());
 }
 
 int SpotSprayingComplexItem::lastSequenceNumber(void) const
