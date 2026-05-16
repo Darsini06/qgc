@@ -22,6 +22,7 @@ QtObject {
     property string save: "save1"
     property real altitude: 30.5
     property string mapPolygon:" "
+    property bool isSpotSprayingActive: false
 
     property string time: "00:00:00"
 

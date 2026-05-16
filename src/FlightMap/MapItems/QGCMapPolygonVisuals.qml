@@ -899,15 +899,15 @@ Item {
         MapPolygon {
             z:              QGroundControl.zOrderMapItems + 5
             color:          (mapPolygon && mapPolygon.showAltColor) ? altColor : interiorColor
-            opacity:        interiorOpacity
+            opacity:        (MapGlobals.isSpotSprayingActive || _missionController.isSpotSprayingActive) ? 0 : interiorOpacity
             border.color:   borderColor
-            border.width:   borderWidth
+            border.width:   (MapGlobals.isSpotSprayingActive || _missionController.isSpotSprayingActive) ? 0 : borderWidth
             path:           mapPolygon ? mapPolygon.path : []
 
             // Modern subtle pulsing fill effect for an active mission coverage area
             SequentialAnimation on opacity {
                 loops: Animation.Infinite
-                running: interactive && (interiorOpacity > 0)
+                running: interactive && (interiorOpacity > 0) && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
                 NumberAnimation { to: Math.max(0.05, interiorOpacity * 0.4); duration: 1800; easing.type: Easing.InOutSine }
                 NumberAnimation { to: interiorOpacity; duration: 1800; easing.type: Easing.InOutSine }
             }
@@ -915,7 +915,7 @@ Item {
             // Glow ring expansion on the border
             SequentialAnimation on border.width {
                 loops: Animation.Infinite
-                running: interactive && (borderWidth > 0)
+                running: interactive && (borderWidth > 0) && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
                 NumberAnimation { to: borderWidth + 2; duration: 1800; easing.type: Easing.InOutSine }
                 NumberAnimation { to: borderWidth; duration: 1800; easing.type: Easing.InOutSine }
             }
@@ -929,7 +929,7 @@ Item {
             id:             mapQuickItem
             anchorPoint.x:  sourceItem.width / 2
             anchorPoint.y:  sourceItem.height / 2
-            visible:        !_circleMode
+            visible:        !_circleMode && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
 
             property int vertexIndex
             property real distance
@@ -1001,7 +1001,7 @@ Item {
             id:             mapQuickItem
             anchorPoint.x:  sourceItem.width / 2
             anchorPoint.y:  sourceItem.height / 2
-            visible:        !_circleMode
+            visible:        !_circleMode && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
 
             property int vertexIndex
 
@@ -1086,6 +1086,7 @@ Item {
             id:             mapQuickItem
             anchorPoint.x:  dragHandle.width  * 0.5
             anchorPoint.y:  dragHandle.height * 0.5
+            visible:        !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
             z:              _zorderDragHandle
             sourceItem: Rectangle {
                 id:             dragHandle

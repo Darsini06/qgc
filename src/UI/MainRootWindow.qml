@@ -2360,6 +2360,7 @@ ApplicationWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             dialog._kmlForSpotSpraying = true   // Mark that this comes from Spot Spraying
+                            MapGlobals.isSpotSprayingActive = true
                             kmlFileDialog.open()
                         }
                     }
