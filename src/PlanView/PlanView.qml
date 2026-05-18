@@ -1800,7 +1800,7 @@ Item {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
+                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
 
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
@@ -1839,7 +1839,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    0
-                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
+                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1883,7 +1883,7 @@ Item {
                 Column {
                     width:              parent.width
                     spacing:            ScreenTools.defaultFontPixelHeight * 0.4
-                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode && QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" && MapGlobals.editdialog !== "editdialog"
+                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode && QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" && MapGlobals.editdialog !== "editdialog" && !MapGlobals.isSpotSprayingActive
 
                     // Main Fence Toggle Button
                     Button {

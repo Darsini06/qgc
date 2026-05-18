@@ -458,14 +458,15 @@ Item {
                              fenceCenter.longitude !== 0
         var isEnabled = QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
         var isDialogOpen = MapGlobals.editdialog === "editdialog"
+        var isSpotSpraying = MapGlobals.isSpotSprayingActive || (_missionController && _missionController.isSpotSprayingActive)
         
-        if (hasValidCenter && isEnabled && !isDialogOpen) {
+        if (hasValidCenter && isEnabled && !isDialogOpen && !isSpotSpraying) {
             _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceRadiusHandleComponent, mapControl, true)
             console.log("Fence visuals created successfully at:", fenceCenter)
         } else {
-            console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen)
+            console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen, "isSpotSpraying=", isSpotSpraying)
         }
     }
 
