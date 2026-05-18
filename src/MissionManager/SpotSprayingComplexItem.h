@@ -19,6 +19,7 @@ public:
     Q_PROPERTY(double speed READ speed WRITE setSpeed NOTIFY speedChanged)
     Q_PROPERTY(double pwm READ pwm WRITE setPwm NOTIFY pwmChanged)
     Q_PROPERTY(double duration READ duration WRITE setDuration NOTIFY durationChanged)
+    Q_PROPERTY(bool spray READ spray WRITE setSpray NOTIFY sprayChanged)
 
     QGeoCoordinate coordinate() const { return _coordinate; }
     void setCoordinate(const QGeoCoordinate& coord) { if(_coordinate != coord) { _coordinate = coord; emit coordinateChanged(); } }
@@ -35,12 +36,16 @@ public:
     double duration() const { return _duration; }
     void setDuration(double v) { if(_duration != v) { _duration = v; emit durationChanged(); } }
 
+    bool spray() const { return _spray; }
+    void setSpray(bool v) { if(_spray != v) { _spray = v; emit sprayChanged(); } }
+
 signals:
     void coordinateChanged();
     void altitudeChanged();
     void speedChanged();
     void pwmChanged();
     void durationChanged();
+    void sprayChanged();
 
 private:
     QGeoCoordinate _coordinate;
@@ -48,6 +53,7 @@ private:
     double _speed = 5.0;
     double _pwm = 1500.0;
     double _duration = 0.1;
+    bool   _spray = true;
 };
 
 class SpotSprayingComplexItem : public ComplexMissionItem
@@ -76,7 +82,6 @@ public:
     bool                load                (const QJsonObject& complexObject, int sequenceNumber, QString& errorString) final;
     double              greatestDistanceTo  (const QGeoCoordinate &other) const final;
     QString             mapVisualQML        (void) const final { return QStringLiteral("SpotSprayingMapVisual.qml"); }
-    QString             editorQML           (void) const { return QStringLiteral("SpotSprayingEditor.qml"); }
     bool                dirty               (void) const final { return _dirty; }
     bool                isSimpleItem        (void) const final { return false; }
     bool                isStandaloneCoordinate(void) const final { return false; }
@@ -99,7 +104,7 @@ public:
     void                setDirty            (bool dirty) final;
     void                applyNewAltitude    (double newAltitude) final;
     double              additionalTimeDelay (void) const final { return 0; }
-    ReadyForSaveState   readyForSaveState   (void) const final;
+    VisualMissionItem::ReadyForSaveState readyForSaveState (void) const final;
     void                save                (QJsonArray&  missionItems) final;
 
     static const QString name;
@@ -108,6 +113,8 @@ private slots:
     void _updatePoints();
 
 private:
+    void _connectPoint(SpotSprayingPoint* p);
+
     QMap<QString, FactMetaData*> _metaDataMap;
     int _sequenceNumber;
     bool _dirty;

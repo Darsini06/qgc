@@ -19,6 +19,7 @@
 #include "VTOLLandingComplexItem.h"
 #include "StructureScanComplexItem.h"
 #include "CorridorScanComplexItem.h"
+#include "SpotSprayingComplexItem.h"
 #include "JsonHelper.h"
 #include "QGroundControlQmlGlobal.h"
 #include "SettingsManager.h"
@@ -437,6 +438,8 @@ VisualMissionItem* MissionController::insertComplexMissionItem(QString itemName,
         newItem = new StructureScanComplexItem(_masterController, _flyView, QString() /* kmlFile */);
     } else if (itemName == CorridorScanComplexItem::name) {
         newItem = new CorridorScanComplexItem(_masterController, _flyView, QString() /* kmlFile */);
+    } else if (itemName == SpotSprayingComplexItem::name) {
+        newItem = new SpotSprayingComplexItem(_masterController, _flyView);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return nullptr;
@@ -457,6 +460,8 @@ VisualMissionItem* MissionController::insertComplexMissionItemFromKMLOrSHP(QStri
         newItem = new StructureScanComplexItem(_masterController, _flyView, file);
     } else if (itemName == CorridorScanComplexItem::name) {
         newItem = new CorridorScanComplexItem(_masterController, _flyView, file);
+    } else if (itemName == SpotSprayingComplexItem::name) {
+        newItem = new SpotSprayingComplexItem(_masterController, _flyView, file);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return nullptr;
@@ -859,6 +864,15 @@ bool MissionController::_loadJsonMissionFileV2(const QJsonObject& json, QmlObjec
                 nextSequenceNumber = corridorItem->lastSequenceNumber() + 1;
                 qCDebug(MissionControllerLog) << "Corridor Scan load complete: nextSequenceNumber" << nextSequenceNumber;
                 visualItems->append(corridorItem);
+            } else if (complexItemType == SpotSprayingComplexItem::name) {
+                qCDebug(MissionControllerLog) << "Loading Spot Spraying: nextSequenceNumber" << nextSequenceNumber;
+                SpotSprayingComplexItem* sprayItem = new SpotSprayingComplexItem(_masterController, _flyView);
+                if (!sprayItem->load(itemObject, nextSequenceNumber++, errorString)) {
+                    return false;
+                }
+                nextSequenceNumber = sprayItem->lastSequenceNumber() + 1;
+                qCDebug(MissionControllerLog) << "Spot Spraying load complete: nextSequenceNumber" << nextSequenceNumber;
+                visualItems->append(sprayItem);
             } else {
                 errorString = tr("Unsupported complex item type: %1").arg(complexItemType);
             }
@@ -2219,6 +2233,18 @@ void MissionController::_scanForAdditionalSettings(QmlObjectListModel* visualIte
 
 void MissionController::_updateContainsItems(void)
 {
+    bool isSpotSpraying = false;
+    for (int i=0; i<_visualItems->count(); i++) {
+        VisualMissionItem* item = _visualItems->value<VisualMissionItem*>(i);
+        if (qobject_cast<SpotSprayingComplexItem*>(item)) {
+            isSpotSpraying = true;
+            break;
+        }
+    }
+    if (_isSpotSprayingActive != isSpotSpraying) {
+        _isSpotSprayingActive = isSpotSpraying;
+        emit isSpotSprayingActiveChanged(_isSpotSprayingActive);
+    }
     emit containsItemsChanged(containsItems());
 }
 
@@ -2247,6 +2273,7 @@ QStringList MissionController::complexMissionItemNames(void) const
     complexItems.append(CorridorScanComplexItem::name);
     if (_controllerVehicle->multiRotor() || _controllerVehicle->vtol()) {
         complexItems.append(StructureScanComplexItem::name);
+        complexItems.append(SpotSprayingComplexItem::name);
     }
 
     // Note: The landing pattern items are not added here since they have there own button which adds them

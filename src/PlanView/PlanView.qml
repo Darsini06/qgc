@@ -99,6 +99,23 @@ Item {
     property var _currentVIIndex: _missionController.currentPlanViewVIIndex
     property var _currentItem:   (_currentVIIndex >= 0 && _currentVIIndex < _missionController.visualItems.count) ? _missionController.visualItems.get(_currentVIIndex) : null
 
+    property int spotSprayingFocusedIndex: -1
+    property var spotSprayingItem: {
+        if (!_missionController) return null
+        for (var i = 0; i < _missionController.visualItems.count; i++) {
+            var item = _missionController.visualItems.get(i)
+            if (item.commandName === qsTr("Spot Spraying") || item.points !== undefined) return item
+        }
+        return null
+    }
+
+    onSpotSprayingItemChanged: {
+        if (spotSprayingItem && MapGlobals.isSpotSprayingActive) {
+            MapGlobals.setGridLines(false)
+        }
+    }
+
+
     on_CurrentItemChanged: {
         if (_currentItem && _currentItem.mapPolygon !== undefined) {
              _currentItem.mapPolygon = mapPolygonvisuals.mapPolygon
@@ -1281,16 +1298,33 @@ Item {
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
                     onClicked:   (sequenceNumber) => {
-                                     _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
-                                     for (var i = 0; i < _missionController.visualItems.count; i++) {
-                                         var item = _missionController.visualItems.get(i)
-                                         if (item.sequenceNumber === sequenceNumber) {
-                                             missionItemDialog.currentMissionItem = item
-                                             missionItemDialog.currentIndex = i
-                                             missionItemDialog.open()
-                                             missionItemDialog.visible = true
+                                     var items = _missionController.visualItems
+                                     var targetItem = null
+                                     var targetIndex = -1
+                                     for (var i = 0; i < items.count; i++) {
+                                         var it = items.get(i)
+                                         if (it.sequenceNumber === sequenceNumber) {
+                                             targetItem = it
+                                             targetIndex = i
                                              break
                                          }
+                                     }
+
+                                     if (MapGlobals.isSpotSprayingActive) {
+                                         if (targetItem && targetItem.commandName === "Spot Spraying") {
+                                             _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+                                             itemEditPopup.popupMissionItem = targetItem
+                                             itemEditPopup.open()
+                                         }
+                                         return
+                                     }
+
+                                     _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+                                     if (targetItem) {
+                                         // If missionItemDialog were available, we'd use it here. 
+                                         // Since it's commented out in the rest of the file, we'll use itemEditPopup for consistency.
+                                         itemEditPopup.popupMissionItem = targetItem
+                                         itemEditPopup.open()
                                      }
                                  }
                 }
@@ -1302,6 +1336,7 @@ Item {
                 model:                  _missionController.simpleFlightPathSegments
                 plannedHomePosition:    _missionController.plannedHomePosition
                 opacity:            _editingLayer == _layerMission ||  _editingLayer == _layerUTMSP  ? 1 : editorMap._nonInteractiveOpacity
+                visible:            !MapGlobals.isSpotSprayingActive
             }
 
             // Direction arrows in waypoint lines
@@ -1311,7 +1346,7 @@ Item {
                 delegate: MapLineArrow {
                     fromCoord:      object ? object.coordinate1 : undefined
                     toCoord:        object ? object.coordinate2 : undefined
-                    visible:        object && fromCoord && fromCoord.isValid && toCoord && toCoord.isValid && (fromCoord.distanceTo(_missionController.plannedHomePosition) > 0.5) && (toCoord.distanceTo(_missionController.plannedHomePosition) > 0.5)
+                    visible:        object && fromCoord && fromCoord.isValid && toCoord && toCoord.isValid && (fromCoord.distanceTo(_missionController.plannedHomePosition) > 0.5) && (toCoord.distanceTo(_missionController.plannedHomePosition) > 0.5) && !MapGlobals.isSpotSprayingActive
                     arrowPosition:  3
                     z:              QGroundControl.zOrderWaypointLines + 1
                 }
@@ -1608,7 +1643,7 @@ Item {
                         text:       qsTr("Takeoff")
                         iconSource: "/res/takeoff.svg"
                         enabled:    _missionController.isInsertTakeoffValid
-                        visible:    planType==="Plan"?false:(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover
+                        visible:    (planType==="Plan"?false:(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover) && !MapGlobals.isSpotSprayingActive
                         onTriggered: {
                             toolStrip.allAddClickBoolsOff()
                             insertTakeItemAfterCurrent()
@@ -1621,7 +1656,7 @@ Item {
                         text:               _editingLayer == _layerRallyPoints ? qsTr("Rally Point") : qsTr("Waypoint")
                         iconSource:         "/qmlimages/MapAddMission.svg"
                         enabled:            toolStrip._isRallyLayer ? true : _missionController.flyThroughCommandsAllowed
-                        visible:           toolStrip._isRallyLayer || toolStrip._isMissionLayer || toolStrip._isUtmspLayer
+                        visible:           (toolStrip._isRallyLayer || toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !MapGlobals.isSpotSprayingActive
                         checkable:          true
                     }
                     //     ToolStripAction {
@@ -1800,7 +1835,7 @@ Item {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
+                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
 
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
@@ -1839,7 +1874,7 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    0
-                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode
+                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1883,7 +1918,7 @@ Item {
                 Column {
                     width:              parent.width
                     spacing:            ScreenTools.defaultFontPixelHeight * 0.4
-                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode && QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" && MapGlobals.editdialog !== "editdialog"
+                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode && QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri" && MapGlobals.editdialog !== "editdialog" && !MapGlobals.isSpotSprayingActive
 
                     // Main Fence Toggle Button
                     Button {
@@ -1933,7 +1968,7 @@ Item {
                         color:              "#3A3A3A" // Milder grey
                         radius:             8
                         border.color:       "#555555"
-                        border.width:       1
+                        border.width: 1
 
                         ColumnLayout {
                             id:                 fenceSubCol
@@ -2005,7 +2040,7 @@ Item {
                                     radius:             ScreenTools.defaultFontPixelHeight * 0.45
                                     color:              Qt.rgba(0, 0, 0, 0.6)
                                     border.color:       "white"
-                                    border.width:       1
+                                    border.width: 1
                                     Text {
                                         anchors.centerIn:   parent
                                         text:               mapPolygonvisuals.fenceRadius.toFixed(0) + "m"
@@ -2207,7 +2242,7 @@ Item {
                     clip:               true
                     currentIndex:       _missionController.currentPlanViewSeqNum
                     highlightMoveDuration: 250
-                    visible:            _editingLayer == _layerMission
+                    visible:            _editingLayer == _layerMission && !MapGlobals.isSpotSprayingActive
 
                     footer: Item {
                         width:  missionItemEditorListView.width
@@ -2232,8 +2267,8 @@ Item {
                     delegate: Item {
                         property bool _showItem : true
                         width: missionItemEditorListView.width
-                        visible: MapGlobals.showMissionItems
-                        height: visible ? innerEditor.height : 0
+                        visible: MapGlobals.showMissionItems && (!MapGlobals.isSpotSprayingActive || object.commandName === "Spot Spraying")
+                        height: (MapGlobals.showMissionItems && (!MapGlobals.isSpotSprayingActive || object.commandName === "Spot Spraying")) ? innerEditor.height : 0
 
                         MissionExpand {
                             id: innerEditor
@@ -2256,6 +2291,71 @@ Item {
                                 onDeselect: {
                                     _missionController.setCurrentPlanViewSeqNum(-1, false)
                                 }
+                        }
+                    }
+                }
+
+                // -- Spot Spraying Waypoint List --
+                QGCFlickable {
+                    id:                 spotSprayingListView
+                    anchors.fill:       parent
+                    contentHeight:      spotSprayingCol.implicitHeight
+                    visible:            _editingLayer == _layerMission && MapGlobals.isSpotSprayingActive
+                    clip:               true
+
+                    Column {
+                        id:             spotSprayingCol
+                        width:          parent.width
+                        spacing:        ScreenTools.defaultFontPixelHeight / 4
+
+                        Repeater {
+                            model: spotSprayingItem ? spotSprayingItem.points : []
+                            delegate: Rectangle {
+                                width:  parent.width
+                                height: ScreenTools.defaultFontPixelHeight * 2.5
+                                radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                color:  Qt.rgba(0, 0, 0, 0.41)
+                                border.color: "#3d2455"
+                                border.width: 1
+
+                                QGCLabel {
+                                    anchors.left:           parent.left
+                                    anchors.leftMargin:     ScreenTools.defaultFontPixelWidth
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text:                   qsTr("Waypoint %1").arg(index + 1)
+                                    color:                  "white"
+                                    font.bold:              true
+                                    font.family:            "Outfit"
+                                }
+
+                                QGCButton {
+                                    anchors.right:          parent.right
+                                    anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.5
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    height:                 ScreenTools.defaultFontPixelHeight * 1.5
+                                    width:                  ScreenTools.defaultFontPixelWidth * 6
+                                    text:                   qsTr("Edit")
+                                    onClicked: {
+                                        spotSprayingFocusedIndex = index
+                                        itemEditPopup.popupMissionItem = spotSprayingItem
+                                        itemEditPopup.open()
+                                    }
+
+                                    background: Rectangle {
+                                        color:  parent.pressed ? "#444" : "#222"
+                                        radius: ScreenTools.defaultFontPixelHeight * 0.2
+                                        border.color: "white"
+                                        border.width: 1
+                                    }
+                                    contentItem: Text {
+                                        text:                   parent.text
+                                        color:                  "white"
+                                        font.pointSize:         ScreenTools.smallFontPointSize
+                                        horizontalAlignment:    Text.AlignHCenter
+                                        verticalAlignment:      Text.AlignVCenter
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -2686,7 +2786,7 @@ Item {
                     width: baseSize
                     height: baseSize
 
-                    visible: showReturnWaypoint
+                    visible: showReturnWaypoint && !MapGlobals.isSpotSprayingActive
                     enabled: returnWaypointEnabled
 
                     background: Rectangle {
@@ -3435,7 +3535,7 @@ Item {
                         missionItem:    (itemEditPopup.popupMissionItem && itemEditPopup.popupMissionItem.commandName === "Mission Start")
                                             ? itemEditPopup.popupMissionItem : null
                         masterController: _planMasterController
-                        visible:        itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Mission Start"
+                        visible:        itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Mission Start" && !MapGlobals.isSpotSprayingActive
                     }
 
                     Loader {
@@ -3447,10 +3547,12 @@ Item {
                                     ? itemEditPopup.popupMissionItem.editorQml : ""
                         visible: itemEditPopup.popupMissionItem !== null &&
                                  itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
-                                 itemEditPopup.popupMissionItem.commandName !== "Survey"
+                                 itemEditPopup.popupMissionItem.commandName !== "Survey" &&
+                                 (!MapGlobals.isSpotSprayingActive || itemEditPopup.popupMissionItem.commandName === "Spot Spraying")
 
                         property var    missionItem:        itemEditPopup.popupMissionItem
                         property var    masterController:   _planMasterController
+                        property int    focusedIndex:       MapGlobals.isSpotSprayingActive ? spotSprayingFocusedIndex : -1
                         property real   availableWidth:     popupScrollView.width
                         property var    editorRoot:         null
                     }
@@ -3460,7 +3562,7 @@ Item {
                         width:  popupScrollView.width
                         source: (itemEditPopup.popupMissionItem && itemEditPopup.popupMissionItem.commandName === "Survey")
                                     ? itemEditPopup.popupMissionItem.editorQml : ""
-                        visible: itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Survey"
+                        visible: itemEditPopup.popupMissionItem !== null && itemEditPopup.popupMissionItem.commandName === "Survey" && !MapGlobals.isSpotSprayingActive
 
                         property var    missionItem:        itemEditPopup.popupMissionItem
                         property var    masterController:   _planMasterController

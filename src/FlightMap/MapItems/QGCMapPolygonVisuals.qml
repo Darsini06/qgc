@@ -1358,7 +1358,7 @@ Item {
             height: mapControl.height
 
             Component.onCompleted: {
-                if (MapGlobals.mark_with === "KML_File" && MapGlobals.kmlPath !== "") {
+                if (MapGlobals.mark_with === "KML_File" && MapGlobals.kmlPath !== "" && MapGlobals.appType !== "SpotSpraying") {
                     console.log("Loading external KML from local storage:", MapGlobals.kmlPath)
                     mapPolygon.loadKMLOrSHPFile(MapGlobals.kmlPath)
                     mapFitFunctions.fitMapViewportToMissionItems()

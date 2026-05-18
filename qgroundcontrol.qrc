@@ -312,6 +312,8 @@
         <file alias="SimpleItemEditor.qml">src/PlanView/SimpleItemEditor.qml</file>
         <file alias="StructureScanEditor.qml">src/PlanView/StructureScanEditor.qml</file>
         <file alias="SurveyItemEditor.qml">src/PlanView/SurveyItemEditor.qml</file>
+        <file alias="SpotSprayingEditor.qml">src/PlanView/SpotSprayingEditor.qml</file>
+        <file alias="SpotSprayingMapVisual.qml">src/PlanView/SpotSprayingMapVisual.qml</file>
         <file alias="SyslinkComponent.qml">src/AutoPilotPlugins/Common/SyslinkComponent.qml</file>
         <file alias="TcpSettings.qml">src/UI/preferences/TcpSettings.qml</file>
         <file alias="TelemetrySettings.qml">src/UI/preferences/TelemetrySettings.qml</file>

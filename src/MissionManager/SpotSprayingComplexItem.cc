@@ -10,7 +10,7 @@
 #include <QJsonValue>
 #include "MissionItem.h"
 
-const QString SpotSprayingComplexItem::name = SpotSprayingComplexItem::tr("Spot Spraying");
+const QString SpotSprayingComplexItem::name(QStringLiteral("Spot Spraying"));
 
 SpotSprayingPoint::SpotSprayingPoint(const QGeoCoordinate& coord, QObject* parent)
     : QObject(parent)
@@ -23,6 +23,7 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
     , _sequenceNumber(0)
     , _dirty(false)
 {
+    _editorQml = QStringLiteral("qrc:/qml/SpotSprayingEditor.qml");
     _points.setParent(this);
     
     if (!kmlOrShpFile.isEmpty()) {
@@ -33,7 +34,9 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
         ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
         
         for (const QGeoCoordinate& coord : coords) {
-            _points.append(new SpotSprayingPoint(coord, this));
+            SpotSprayingPoint* p = new SpotSprayingPoint(coord, this);
+            _connectPoint(p);
+            _points.append(p);
         }
     }
     
@@ -45,9 +48,18 @@ SpotSprayingComplexItem::~SpotSprayingComplexItem()
     _points.clearAndDeleteContents();
 }
 
+void SpotSprayingComplexItem::_connectPoint(SpotSprayingPoint* p)
+{
+    connect(p, &SpotSprayingPoint::coordinateChanged, this, &SpotSprayingComplexItem::_updatePoints);
+    connect(p, &SpotSprayingPoint::altitudeChanged,   this, &SpotSprayingComplexItem::_updatePoints);
+    connect(p, &SpotSprayingPoint::durationChanged,   this, &SpotSprayingComplexItem::_updatePoints);
+    connect(p, &SpotSprayingPoint::sprayChanged,      this, &SpotSprayingComplexItem::_updatePoints);
+}
+
 QObject* SpotSprayingComplexItem::createPoint(const QGeoCoordinate& coord)
 {
     SpotSprayingPoint* p = new SpotSprayingPoint(coord, this);
+    _connectPoint(p);
     _points.append(p);
     return p;
 }
@@ -62,8 +74,16 @@ void SpotSprayingComplexItem::_updatePoints()
 
 int SpotSprayingComplexItem::lastSequenceNumber(void) const
 {
-    // Each point uses 4 commands: NAV_WAYPOINT, SET_SERVO, NAV_DELAY, SET_SERVO
-    return _sequenceNumber + (_points.count() * 4) - 1;
+    int count = 0;
+    for (int i = 0; i < _points.count(); i++) {
+        SpotSprayingPoint* p = const_cast<QmlObjectListModel*>(&_points)->value<SpotSprayingPoint*>(i);
+        if (p->spray()) {
+            count += 4;
+        } else {
+            count += 1;
+        }
+    }
+    return _sequenceNumber + count - 1;
 }
 
 double SpotSprayingComplexItem::greatestDistanceTo(const QGeoCoordinate &other) const
@@ -117,37 +137,39 @@ void SpotSprayingComplexItem::appendMissionItems(QList<MissionItem*>& items, QOb
                                              missionItemParent);
         items.append(item1);
         
-        // 2. Turn ON sprayer (e.g., servo 9 to pwm)
-        MissionItem* item2 = new MissionItem(seqNum++,
-                                             MAV_CMD_DO_SET_SERVO,
-                                             MAV_FRAME_MISSION,
-                                             9, // Servo number
-                                             p->pwm(), // PWM value
-                                             0, 0, 0, 0, 0,
-                                             true, false, missionItemParent);
-        items.append(item2);
-        
-        // 3. Delay (hover time)
-        MissionItem* item3 = new MissionItem(seqNum++,
-                                             MAV_CMD_NAV_DELAY,
-                                             MAV_FRAME_MISSION,
-                                             p->duration() * 60.0, // Delay in seconds (from minutes)
-                                             -1, // Hour
-                                             -1, // Minute
-                                             -1, // Second
-                                             0, 0, 0,
-                                             true, false, missionItemParent);
-        items.append(item3);
-        
-        // 4. Turn OFF sprayer (servo 9 to 1000)
-        MissionItem* item4 = new MissionItem(seqNum++,
-                                             MAV_CMD_DO_SET_SERVO,
-                                             MAV_FRAME_MISSION,
-                                             9,
-                                             1000,
-                                             0, 0, 0, 0, 0,
-                                             true, false, missionItemParent);
-        items.append(item4);
+        if (p->spray()) {
+            // 2. Turn ON sprayer (e.g., servo 9 to pwm)
+            MissionItem* item2 = new MissionItem(seqNum++,
+                                                 MAV_CMD_DO_SET_SERVO,
+                                                 MAV_FRAME_MISSION,
+                                                 9, // Servo number
+                                                 p->pwm(), // PWM value
+                                                 0, 0, 0, 0, 0,
+                                                 true, false, missionItemParent);
+            items.append(item2);
+            
+            // 3. Delay (hover time)
+            MissionItem* item3 = new MissionItem(seqNum++,
+                                                 MAV_CMD_NAV_DELAY,
+                                                 MAV_FRAME_MISSION,
+                                                 p->duration() * 60.0, // Delay in seconds (from minutes)
+                                                 -1, // Hour
+                                                 -1, // Minute
+                                                 -1, // Second
+                                                 0, 0, 0,
+                                                 true, false, missionItemParent);
+            items.append(item3);
+            
+            // 4. Turn OFF sprayer (servo 9 to 1000)
+            MissionItem* item4 = new MissionItem(seqNum++,
+                                                 MAV_CMD_DO_SET_SERVO,
+                                                 MAV_FRAME_MISSION,
+                                                 9,
+                                                 1000,
+                                                 0, 0, 0, 0, 0,
+                                                 true, false, missionItemParent);
+            items.append(item4);
+        }
     }
 }
 
@@ -176,7 +198,7 @@ void SpotSprayingComplexItem::applyNewAltitude(double newAltitude)
     }
 }
 
-ComplexMissionItem::ReadyForSaveState SpotSprayingComplexItem::readyForSaveState(void) const
+VisualMissionItem::ReadyForSaveState SpotSprayingComplexItem::readyForSaveState(void) const
 {
     return _points.count() > 0 ? ReadyForSave : NotReadyForSaveData;
 }
@@ -184,8 +206,8 @@ ComplexMissionItem::ReadyForSaveState SpotSprayingComplexItem::readyForSaveState
 void SpotSprayingComplexItem::save(QJsonArray& missionItems)
 {
     QJsonObject complexObject;
-    complexObject["version"] = 1;
-    complexObject["type"] = name;
+    complexObject[VisualMissionItem::jsonTypeKey] = VisualMissionItem::jsonTypeComplexItemValue;
+    complexObject[ComplexMissionItem::jsonComplexItemTypeKey] = name;
     
     QJsonArray pointsArray;
     for (int i=0; i<_points.count(); i++) {
@@ -198,6 +220,7 @@ void SpotSprayingComplexItem::save(QJsonArray& missionItems)
         pointObj["speed"] = p->speed();
         pointObj["pwm"] = p->pwm();
         pointObj["duration"] = p->duration();
+        pointObj["spray"] = p->spray();
         pointsArray.append(pointObj);
     }
     complexObject["points"] = pointsArray;
@@ -217,10 +240,12 @@ bool SpotSprayingComplexItem::load(const QJsonObject& complexObject, int sequenc
             QGeoCoordinate coord;
             if (pointObj.contains("coordinate") && JsonHelper::loadGeoCoordinate(pointObj["coordinate"], true, coord, errorString)) {
                 SpotSprayingPoint* p = new SpotSprayingPoint(coord, this);
+                _connectPoint(p);
                 if (pointObj.contains("altitude")) p->setAltitude(pointObj["altitude"].toDouble());
                 if (pointObj.contains("speed")) p->setSpeed(pointObj["speed"].toDouble());
                 if (pointObj.contains("pwm")) p->setPwm(pointObj["pwm"].toDouble());
                 if (pointObj.contains("duration")) p->setDuration(pointObj["duration"].toDouble());
+                if (pointObj.contains("spray")) p->setSpray(pointObj["spray"].toBool());
                 _points.append(p);
             }
         }

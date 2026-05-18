@@ -2055,6 +2055,7 @@ ApplicationWindow {
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
                             MapGlobals.showMissionItems = false
+                            MapGlobals.isSpotSprayingActive = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2110,6 +2111,7 @@ ApplicationWindow {
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
                             MapGlobals.showMissionItems = false
+                            MapGlobals.isSpotSprayingActive = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2161,6 +2163,7 @@ ApplicationWindow {
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
                             MapGlobals.showMissionItems = false
+                            MapGlobals.isSpotSprayingActive = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2224,6 +2227,7 @@ ApplicationWindow {
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
                             MapGlobals.showMissionItems = false
+                            MapGlobals.isSpotSprayingActive = false
                         }
                     }
                 }
@@ -2272,6 +2276,7 @@ ApplicationWindow {
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
                             MapGlobals.showMissionItems = false
+                            MapGlobals.isSpotSprayingActive = false
 
                             //Grid Lines set to false
                             MapGlobals.setGridLines(false)
@@ -2316,7 +2321,7 @@ ApplicationWindow {
                         id: ma6; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            dialog._kmlForSpotSpraying = false
+                            MapGlobals.isSpotSprayingActive = false
                             kmlFileDialog.open()
                         }
                     }
@@ -2361,6 +2366,7 @@ ApplicationWindow {
                         onClicked: {
                             dialog._kmlForSpotSpraying = true   // Mark that this comes from Spot Spraying
                             MapGlobals.isSpotSprayingActive = true
+                            MapGlobals.setGridLines(false)
                             kmlFileDialog.open()
                         }
                     }
