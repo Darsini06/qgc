@@ -74,42 +74,43 @@ Item {
                             }
                         }
 
-                        // 2. Read-only Coordinates
-                        QGCLabel {
-                            text:           qsTr("Lat/Lon: %1, %2")
-                                                .arg(modelData.coordinate.latitude.toFixed(6))
-                                                .arg(modelData.coordinate.longitude.toFixed(6))
-                            font.pointSize: ScreenTools.smallFontPointSize
-                            color:          qgcPal.textMuted
-                            Layout.fillWidth: true
-                        }
-
-                        // Separator line
-                        Rectangle {
-                            Layout.fillWidth:   true
-                            height:             1
-                            color:              qgcPal.windowShadeDark
-                        }
-
-                        // 3. Grid containing editable values (Hover Time, Altitude, Spray toggle)
+                        // 2. Editable Values Grid (Lat, Lon, Alt, Speed, Hover Time, Spray toggle)
                         GridLayout {
                             columns:            2
                             columnSpacing:      ScreenTools.defaultFontPixelWidth
                             rowSpacing:         ScreenTools.defaultFontPixelHeight * 0.4
                             Layout.fillWidth:   true
 
-                            // Spray Toggle
+                            // Latitude input
                             QGCLabel {
-                                text:           qsTr("Spraying")
-                                font.bold:      true
+                                text:           qsTr("Latitude")
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
-                            QGCCheckBox {
-                                text:           modelData.spray ? qsTr("ON") : qsTr("OFF")
-                                checked:        modelData.spray
-                                onClicked:      modelData.spray = checked
-                                Layout.fillWidth: true
+                            QGCTextField {
+                                text:               modelData.coordinate.latitude.toFixed(6)
+                                onEditingFinished:  {
+                                    var newLat = parseFloat(text)
+                                    var currentLon = modelData.coordinate.longitude
+                                    modelData.coordinate = QtPositioning.coordinate(newLat, currentLon)
+                                }
+                                Layout.fillWidth:   true
+                            }
+
+                            // Longitude input
+                            QGCLabel {
+                                text:           qsTr("Longitude")
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            QGCTextField {
+                                text:               modelData.coordinate.longitude.toFixed(6)
+                                onEditingFinished:  {
+                                    var newLon = parseFloat(text)
+                                    var currentLat = modelData.coordinate.latitude
+                                    modelData.coordinate = QtPositioning.coordinate(currentLat, newLon)
+                                }
+                                Layout.fillWidth:   true
                             }
 
                             // Altitude input
@@ -124,6 +125,18 @@ Item {
                                 Layout.fillWidth:   true
                             }
 
+                            // Speed input
+                            QGCLabel {
+                                text:           qsTr("Speed (m/s)")
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            QGCTextField {
+                                text:               modelData.speed.toFixed(1)
+                                onEditingFinished:  modelData.speed = parseFloat(text)
+                                Layout.fillWidth:   true
+                            }
+
                             // Hover time input (in seconds)
                             QGCLabel {
                                 text:           qsTr("Hover Time (s)")
@@ -134,6 +147,20 @@ Item {
                                 text:               (modelData.duration * 60.0).toFixed(1)
                                 onEditingFinished:  modelData.duration = parseFloat(text) / 60.0
                                 Layout.fillWidth:   true
+                            }
+
+                            // Spray Toggle
+                            QGCLabel {
+                                text:           qsTr("Spraying")
+                                font.bold:      true
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            QGCCheckBox {
+                                text:           modelData.spray ? qsTr("ON") : qsTr("OFF")
+                                checked:        modelData.spray
+                                onClicked:      modelData.spray = checked
+                                Layout.fillWidth: true
                             }
                         }
                     }

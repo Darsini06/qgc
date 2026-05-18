@@ -6,31 +6,25 @@ import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.FlightMap
 
-Item {
-    property var    map
-    property var    missionItem
+MapItemGroup {
+    id: _root
+    
+    property var map        // Provided by creator
+    property var _missionItem: object // the complex item
 
-    Component {
-        id: pointIndicator
-
-        MapQuickItem {
+    MapItemView {
+        model: _missionItem ? _missionItem.points : null
+        delegate: MapQuickItem {
+            coordinate: object ? object.coordinate : undefined
             anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-
+            z: QGroundControl.zOrderMapItems
+            
             sourceItem: MissionItemIndexLabel {
                 label:      index + 1
-                checked:    missionItem.isCurrentItem
-            }
-        }
-    }
-
-    Repeater {
-        model: missionItem.points
-        delegate: MapQuickItem {
-            coordinate: modelData.coordinate
-            anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
-            sourceItem: MissionItemIndexLabel {
-                label: index + 1
-                checked: missionItem.isCurrentItem
+                checked:    _missionItem.isCurrentItem
+                onClicked:  {
+                    // Optionally handle click
+                }
             }
         }
     }
