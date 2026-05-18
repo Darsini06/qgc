@@ -730,9 +730,11 @@ Item {
         }
 
         function data() {
-            if (MapGlobals.appType === "SpotSpraying" && MapGlobals.kmlPath !== "") {
-                console.log("Loading Spot Spraying from KML:", MapGlobals.kmlPath)
-                _missionController.insertComplexMissionItemFromKMLOrSHP("Spot Spraying", MapGlobals.kmlPath, -1, true)
+            if (MapGlobals.appType === "SpotSpraying") {
+                if (MapGlobals.kmlPath !== "") {
+                    console.log("Loading Spot Spraying from KML:", MapGlobals.kmlPath)
+                    _missionController.insertComplexMissionItemFromKMLOrSHP("Spot Spraying", MapGlobals.kmlPath, -1, true)
+                }
                 return
             }
 

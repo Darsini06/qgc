@@ -1911,7 +1911,7 @@ ApplicationWindow {
 
                     MapGlobals.kmlPath               = localPath
                     MapGlobals.mark_with             = "KML_File"
-                    MapGlobals.appType               = dialog._kmlForSpotSpraying ? "SpotSpraying" : ""
+                    MapGlobals.appType               = MapGlobals.isSpotSprayingActive ? "SpotSpraying" : ""
                     MapGlobals.edit                  = "edit"
                     MapGlobals.share_edit_visibility = false
                     MapGlobals.isReviewMode          = false
