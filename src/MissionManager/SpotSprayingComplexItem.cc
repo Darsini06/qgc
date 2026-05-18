@@ -9,6 +9,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include "MissionItem.h"
+#include <QtXml/QDomDocument>
+#include <QFile>
 
 const QString SpotSprayingComplexItem::name(QStringLiteral("Spot Spraying"));
 
