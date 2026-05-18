@@ -142,35 +142,3 @@ Item {
         }
     }
 }
-                text:           qsTr("Altitude (m)")
-                Layout.alignment: Qt.AlignVCenter
-                font.bold:      true
-            }
-
-            QGCTextField {
-                text:               activePoint ? activePoint.altitude.toFixed(1) : ""
-                onEditingFinished:  if (activePoint) activePoint.altitude = parseFloat(text)
-                Layout.fillWidth:   true
-            }
-
-            QGCLabel {
-                text:           qsTr("Hover Time (s)")
-                Layout.alignment: Qt.AlignVCenter
-                font.bold:      true
-            }
-
-            QGCTextField {
-                text:               activePoint ? (activePoint.duration * 60.0).toFixed(1) : ""
-                onEditingFinished:  if (activePoint) activePoint.duration = parseFloat(text) / 60.0
-                Layout.fillWidth:   true
-            }
-        }
-
-        QGCLabel {
-            text: qsTr("No waypoints loaded. Please load a KML file.")
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            visible:            activePoint === null
-        }
-    }
-}
