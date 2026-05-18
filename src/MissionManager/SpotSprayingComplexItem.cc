@@ -30,8 +30,30 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
         QList<QGeoCoordinate> coords;
         QString errorString;
         
-        // Use ShapeFileHelper to load the coordinates
-        ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
+        // Spot Spraying needs points, not polygons.
+        // We will read the file and manually extract the points if it's a KML.
+        if (kmlOrShpFile.endsWith(".kml", Qt::CaseInsensitive) || kmlOrShpFile.startsWith("content://")) {
+            QFile file(kmlOrShpFile);
+            if (file.open(QIODevice::ReadOnly)) {
+                QByteArray kmlData = file.readAll();
+                QDomDocument dom;
+                if (dom.setContent(kmlData)) {
+                    QDomNodeList pointNodes = dom.elementsByTagName("Point");
+                    for (int i = 0; i < pointNodes.count(); i++) {
+                        QDomNode coordsNode = pointNodes.item(i).namedItem("coordinates");
+                        if (!coordsNode.isNull()) {
+                            QString coordStr = coordsNode.toElement().text().simplified();
+                            QStringList parts = coordStr.split(",");
+                            if (parts.count() >= 2) {
+                                coords.append(QGeoCoordinate(parts[1].toDouble(), parts[0].toDouble()));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
+        }
         
         for (const QGeoCoordinate& coord : coords) {
             SpotSprayingPoint* p = new SpotSprayingPoint(coord, this);

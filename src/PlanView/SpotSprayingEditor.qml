@@ -13,8 +13,9 @@ Item {
     width:      availableWidth
     height:     editorColumn.implicitHeight
 
-    property var    missionItem
-    property real   availableWidth
+    property var    missionItem:    parent ? parent.missionItem : null
+    property real   availableWidth: parent ? parent.availableWidth : 0
+    property int    focusedIndex:   parent ? parent.focusedIndex : -1
 
     QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
@@ -37,11 +38,12 @@ Item {
             visible:        pointsHeader.checked
 
             Repeater {
-                model: missionItem.points
+                model: missionItem ? missionItem.points : []
 
                 Rectangle {
+                    visible:        focusedIndex === -1 || focusedIndex === index
                     width:          pointsContainer.width
-                    height:         cardColumn.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.5)
+                    height:         visible ? cardColumn.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.5) : 0
                     color:          qgcPal.windowShade
                     radius:         8
                     border.color:   qgcPal.windowShadeDark
