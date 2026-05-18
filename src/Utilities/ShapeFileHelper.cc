@@ -111,13 +111,3 @@ QStringList ShapeFileHelper::fileDialogKMLOrSHPFilters(void) const
 {
     return QStringList(tr("KML/SHP Files (*.%1 *.%2)").arg(AppSettings::kmlFileExtension).arg(AppSettings::shpFileExtension));
 }
-        domDocument = KMLHelper::_loadFile(file, errorString);
-        if (!errorString.isEmpty()) {
-            return false;
-        }
-    }
-
-    QDomNodeList pointNodes = domDocument.elementsByTagName("Point");
-
-    return pointNodes.count() > 0;
-}
