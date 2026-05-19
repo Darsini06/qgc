@@ -59,8 +59,10 @@ public:
     ~SpotSprayingComplexItem();
     
     Q_PROPERTY(QmlObjectListModel* points READ points CONSTANT)
+    Q_PROPERTY(QString editorQml READ editorQml CONSTANT)
 
     QmlObjectListModel* points() { return &_points; }
+     QString editorQml(void) const { return _editorQml; }
     
     Q_INVOKABLE QObject* createPoint(const QGeoCoordinate& coord);
 

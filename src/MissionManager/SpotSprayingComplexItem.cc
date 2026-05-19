@@ -5,10 +5,14 @@
 #include "QGCLoggingCategory.h"
 #include "QGCApplication.h"
 #include "ShapeFileHelper.h"
+#include "KMLHelper.h"
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
 #include "MissionItem.h"
+#include <QFile>
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomNodeList>
 
 const QString SpotSprayingComplexItem::name = SpotSprayingComplexItem::tr("Spot Spraying");
 
@@ -16,6 +20,60 @@ SpotSprayingPoint::SpotSprayingPoint(const QGeoCoordinate& coord, QObject* paren
     : QObject(parent)
     , _coordinate(coord)
 {
+    if (coord.isValid() && !qIsNaN(coord.altitude())) {
+        _altitude = coord.altitude();
+    }
+}
+
+static void findNodesByTagName(const QDomNode& parentNode, const QString& targetTagName, QList<QDomElement>& matchingElements)
+{
+    QDomNodeList children = parentNode.childNodes();
+    for (int i = 0; i < children.count(); i++) {
+        QDomNode child = children.item(i);
+        if (child.isElement()) {
+            QDomElement el = child.toElement();
+            QString tag = el.tagName();
+            int colonIndex = tag.indexOf(':');
+            if (colonIndex != -1) {
+                tag = tag.mid(colonIndex + 1);
+            }
+            if (tag.compare(targetTagName, Qt::CaseInsensitive) == 0) {
+                matchingElements.append(el);
+            }
+            findNodesByTagName(el, targetTagName, matchingElements);
+        }
+    }
+}
+
+static QDomElement findChildElement(const QDomElement& parentEl, const QString& targetTagName)
+{
+    QDomNodeList children = parentEl.childNodes();
+    for (int i = 0; i < children.count(); i++) {
+        QDomNode child = children.item(i);
+        if (child.isElement()) {
+            QDomElement el = child.toElement();
+            QString tag = el.tagName();
+            int colonIndex = tag.indexOf(':');
+            if (colonIndex != -1) {
+                tag = tag.mid(colonIndex + 1);
+            }
+            if (tag.compare(targetTagName, Qt::CaseInsensitive) == 0) {
+                return el;
+            }
+        }
+    }
+    return QDomElement();
+}
+
+static QDomElement findDescendantElement(const QDomElement& parentEl, const QStringList& path)
+{
+    if (path.isEmpty()) return QDomElement();
+    QDomElement current = findChildElement(parentEl, path[0]);
+    for (int i = 1; i < path.count(); ++i) {
+        if (current.isNull()) break;
+        current = findChildElement(current, path[i]);
+    }
+    return current;
 }
 
 SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterController, bool flyView, const QString& kmlOrShpFile, QObject* parent)
@@ -24,13 +82,95 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
     , _dirty(false)
 {
     _points.setParent(this);
+    _editorQml = "qrc:/qml/SpotSprayingEditor.qml";
     
     if (!kmlOrShpFile.isEmpty()) {
         QList<QGeoCoordinate> coords;
-        QString errorString;
         
-        // Use ShapeFileHelper to load the coordinates
-        ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
+        QString loadError;
+        QDomDocument doc = KMLHelper::_loadFile(kmlOrShpFile, loadError);
+        if (loadError.isEmpty() && !doc.isNull()) {
+            // 1. Try to load all Point coordinates
+            QList<QDomElement> pointNodes;
+            findNodesByTagName(doc, "Point", pointNodes);
+            if (pointNodes.count() > 0) {
+                for (const QDomElement& pointEl : pointNodes) {
+                    QDomElement coordinatesNode = findChildElement(pointEl, "coordinates");
+                    if (!coordinatesNode.isNull()) {
+                        QString coordStr = coordinatesNode.text().simplified();
+                        QStringList tuples = coordStr.split(" ", Qt::SkipEmptyParts);
+                        for (const QString& tuple : tuples) {
+                            QStringList parts = tuple.split(",");
+                            if (parts.count() >= 2) {
+                                QGeoCoordinate coord;
+                                coord.setLongitude(parts[0].toDouble());
+                                coord.setLatitude(parts[1].toDouble());
+                                if (parts.count() >= 3) {
+                                    coord.setAltitude(parts[2].toDouble());
+                                }
+                                coords.append(coord);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 2. If no points found, try Polygon outer boundary coordinates
+            if (coords.isEmpty()) {
+                QList<QDomElement> polyNodes;
+                findNodesByTagName(doc, "Polygon", polyNodes);
+                if (polyNodes.count() > 0) {
+                    QDomElement coordinatesNode = findDescendantElement(polyNodes[0], QStringList() << "outerBoundaryIs" << "LinearRing" << "coordinates");
+                    if (!coordinatesNode.isNull()) {
+                        QString coordinatesString = coordinatesNode.text().simplified();
+                        QStringList rgCoordinateStrings = coordinatesString.split(" ", Qt::SkipEmptyParts);
+                        for (const QString& coordinateString : rgCoordinateStrings) {
+                            QStringList rgValueStrings = coordinateString.split(",");
+                            if (rgValueStrings.count() >= 2) {
+                                QGeoCoordinate coord;
+                                coord.setLongitude(rgValueStrings[0].toDouble());
+                                coord.setLatitude(rgValueStrings[1].toDouble());
+                                if (rgValueStrings.count() >= 3) {
+                                    coord.setAltitude(rgValueStrings[2].toDouble());
+                                }
+                                coords.append(coord);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. If still empty, try LineString polyline coordinates
+            if (coords.isEmpty()) {
+                QList<QDomElement> lineNodes;
+                findNodesByTagName(doc, "LineString", lineNodes);
+                if (lineNodes.count() > 0) {
+                    QDomElement coordinatesNode = findChildElement(lineNodes[0], "coordinates");
+                    if (!coordinatesNode.isNull()) {
+                        QString coordinatesString = coordinatesNode.text().simplified();
+                        QStringList rgCoordinateStrings = coordinatesString.split(" ", Qt::SkipEmptyParts);
+                        for (const QString& coordinateString : rgCoordinateStrings) {
+                            QStringList rgValueStrings = coordinateString.split(",");
+                            if (rgValueStrings.count() >= 2) {
+                                QGeoCoordinate coord;
+                                coord.setLongitude(rgValueStrings[0].toDouble());
+                                coord.setLatitude(rgValueStrings[1].toDouble());
+                                if (rgValueStrings.count() >= 3) {
+                                    coord.setAltitude(rgValueStrings[2].toDouble());
+                                }
+                                coords.append(coord);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fallback to ShapeFileHelper if our direct XML parser didn't load any points (e.g. if it's a shapefile instead of KML)
+        if (coords.isEmpty()) {
+            QString errorString;
+            ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
+        }
         
         for (const QGeoCoordinate& coord : coords) {
             _points.append(new SpotSprayingPoint(coord, this));

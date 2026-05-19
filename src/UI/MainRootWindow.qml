@@ -2049,6 +2049,10 @@ ApplicationWindow {
                         onClicked: {
                             planView.mapclear()
                             QGroundControl.saveGlobalSetting("mapping", "basic")
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
+
                             MapGlobals.mark_with = "Mark_With_Manual"
                             MapGlobals.edit = "edit"
                             MapGlobals.editdialog = "editdialog"
@@ -2106,6 +2110,10 @@ ApplicationWindow {
                             planView.mapclear()
                             QGroundControl.saveGlobalSetting("mapping", "circle")
                             MapGlobals.mark_with = "Mark_With_Manual"
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
+
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
@@ -2157,6 +2165,10 @@ ApplicationWindow {
                             QGroundControl.saveGlobalSetting("mapping", "agri")
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_Manual"
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
+
                             MapGlobals.edit = "edit"; MapGlobals.editdialog = "editdialog"
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
@@ -2211,6 +2223,10 @@ ApplicationWindow {
                                 QGroundControl.saveGlobalSetting("mapping", "agri")
                                 planView.mapclear()
                                 MapGlobals.mark_with = "Mark_With_Drone"
+
+                                //Disable Spot Spraying Options
+                                MapGlobals.isSpotSprayingActive = false
+
                                 MapGlobals.edit = "edit"
 
                                 //Grid Lines set to false
@@ -2268,6 +2284,10 @@ ApplicationWindow {
                             QGroundControl.saveGlobalSetting("mapping", "agri")
                             planView.mapclear()
                             MapGlobals.mark_with = "Mark_With_GPS"
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
+
                             MapGlobals.edit = "edit"
                             MapGlobals.share_edit_visibility = false
                             MapGlobals.isReviewMode = false
@@ -2359,7 +2379,8 @@ ApplicationWindow {
                         id: maSpot; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            dialog._kmlForSpotSpraying = true   // Mark that this comes from Spot Spraying
+                            dialog._kmlForSpotSpraying = true
+                            //MapGlobals.mark_with = "Mark_With_SPRAY"
                             MapGlobals.isSpotSprayingActive = true
                             kmlFileDialog.open()
                         }
