@@ -1799,7 +1799,7 @@ Item {
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
-                    active:             isMissionTab && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
+                    active:             (isMissionTab || _editingLayer === _layerGeoFence) && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
                     visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
 
                     sourceComponent: Column {

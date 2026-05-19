@@ -380,6 +380,7 @@ Item {
             border.color:   "yellow"
             border.width:   2
             z:              QGroundControl.zOrderMapItems + 1
+            visible:        !MapGlobals.isSpotSprayingActive
         }
     }
 
@@ -396,6 +397,7 @@ Item {
                 color:          "white"
                 border.color:   "black"
                 border.width:   1
+                visible:        !MapGlobals.isSpotSprayingActive
                 QGCColoredImage {
                     anchors.centerIn: parent
                     width:          16
@@ -431,6 +433,7 @@ Item {
                 color:          "yellow"
                 border.color:   "black"
                 border.width:   1
+                visible:        !MapGlobals.isSpotSprayingActive
                 MouseArea {
                     anchors.fill: parent
                     property var startPoint
@@ -458,15 +461,14 @@ Item {
                              fenceCenter.longitude !== 0
         var isEnabled = QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
         var isDialogOpen = MapGlobals.editdialog === "editdialog"
-        var isSpotSpraying = MapGlobals.isSpotSprayingActive || (_missionController && _missionController.isSpotSprayingActive)
         
-        if (hasValidCenter && isEnabled && !isDialogOpen && !isSpotSpraying) {
+        if (hasValidCenter && isEnabled && !isDialogOpen) {
             _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceRadiusHandleComponent, mapControl, true)
             console.log("Fence visuals created successfully at:", fenceCenter)
         } else {
-            console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen, "isSpotSpraying=", isSpotSpraying)
+            console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen)
         }
     }
 
