@@ -134,7 +134,6 @@ Item {
         }
     }
 
-
     Component {
         id: exitTransectComponent
 
@@ -160,7 +159,8 @@ Item {
             opacity:        _root.opacity
 
             sourceItem: MissionItemIndexLabel {
-                index:      _missionItem.sequenceNumber
+                label : "S"
+                index:      0//_missionItem.sequenceNumber
                 checked:    _missionItem.isCurrentItem
                 onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
 
@@ -173,6 +173,35 @@ Item {
             }
         }
     }
+
+    // Exit point
+    Component {
+        id: exitPointComponent
+
+        MapQuickItem {
+            anchorPoint.x:  sourceItem.anchorPointX
+            anchorPoint.y:  sourceItem.anchorPointY
+            z:              QGroundControl.zOrderMapItems
+            coordinate:     _missionItem.exitCoordinate
+            visible:       gridLines ? _missionItem.exitCoordinate.isValid : false
+            opacity:        _root.opacity
+
+            sourceItem: MissionItemIndexLabel {
+                label : "F"
+                index:      0//_missionItem.lastSequenceNumber
+                checked:    _missionItem.isCurrentItem
+                onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                Component.onCompleted: {
+                    // Automatically trigger the clicked behavior if condition is true
+                    if (_root.interactive) {
+                        _root.clicked(_missionItem.sequenceNumber)
+                    }
+                }
+            }
+        }
+    }
+
 
     Component {
         id: entryArrow1Component
@@ -230,32 +259,6 @@ Item {
         }
     }
 
-    // Exit point
-    Component {
-        id: exitPointComponent
-
-        MapQuickItem {
-            anchorPoint.x:  sourceItem.anchorPointX
-            anchorPoint.y:  sourceItem.anchorPointY
-            z:              QGroundControl.zOrderMapItems
-            coordinate:     _missionItem.exitCoordinate
-            visible:       gridLines ? _missionItem.exitCoordinate.isValid : false
-            opacity:        _root.opacity
-
-            sourceItem: MissionItemIndexLabel {
-                index:      _missionItem.lastSequenceNumber
-                checked:    _missionItem.isCurrentItem
-                onClicked:  if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
-
-                Component.onCompleted: {
-                    // Automatically trigger the clicked behavior if condition is true
-                    if (_root.interactive) {
-                        _root.clicked(_missionItem.sequenceNumber)
-                    }
-                }
-            }
-        }
-    }
 
     // Button {
     //     id: editBtn

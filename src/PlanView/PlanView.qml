@@ -604,6 +604,21 @@ Item {
             }
             _missionController.setCurrentPlanViewSeqNum(0, true)
         }
+
+        function onMissionTimeChanged() {
+            var timeSec = _missionController.missionTime
+            if (!timeSec) {
+                MapGlobals.time = "00:00:00"
+                return
+            }
+            var t = new Date(2021, 0, 0, 0, 0, Number(timeSec))
+            var days = Qt.formatDateTime(t, 'dd')
+            if (days == 31 || days == "31") {
+                MapGlobals.time = Qt.formatTime(t, 'hh:mm:ss')
+            } else {
+                MapGlobals.time = days + " days " + Qt.formatTime(t, 'hh:mm:ss')
+            }
+        }
     }
 
     function insertSimpleItemAfterCurrent(coordinate) {
@@ -724,7 +739,6 @@ Item {
                                  _planMasterController.fitViewportToItems()
                                  _missionController.setCurrentPlanViewSeqNum(0, true)
                                  close()
-
                                  mainWindow.showPlanView()
                              }
     }

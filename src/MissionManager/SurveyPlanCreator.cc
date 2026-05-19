@@ -26,6 +26,16 @@ SurveyPlanCreator::SurveyPlanCreator(PlanMasterController* planMasterController,
 //     _missionController->setCurrentPlanViewSeqNum(takeoffItem->sequenceNumber(), true);
 // }
 
+
+// void SurveyPlanCreator::createPlan(const QGeoCoordinate& mapCenterCoord)
+// {
+//     _planMasterController->removeAll();
+//     VisualMissionItem* takeoffItem = _missionController->insertTakeoffItem(mapCenterCoord, -1);
+//     VisualMissionItem* surveyItem = _missionController->insertComplexMissionItem(SurveyComplexItem::name, mapCenterCoord, -1);
+//     VisualMissionItem* rtlItem = _missionController->insertLandItem(mapCenterCoord, -1);
+//     _missionController->setCurrentPlanViewSeqNum(surveyItem->sequenceNumber(), true);
+// }
+
 void SurveyPlanCreator::createPlan(const QGeoCoordinate& mapCenterCoord)
 {
     _planMasterController->removeAll();
@@ -33,3 +43,5 @@ void SurveyPlanCreator::createPlan(const QGeoCoordinate& mapCenterCoord)
     _missionController->insertLandItem(mapCenterCoord, -1);
     _missionController->setCurrentPlanViewSeqNum(surveyItem ->sequenceNumber(), true);
 }
+
+
