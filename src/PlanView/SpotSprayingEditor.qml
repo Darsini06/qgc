@@ -15,6 +15,7 @@ Item {
 
     property var    missionItem
     property real   availableWidth
+    property var masterController
 
     property int    expandedIndex: -1
 
@@ -43,8 +44,17 @@ Item {
             Repeater {
                 model: missionItem ? missionItem.points : []
 
-                Rectangle {
+               delegate: Rectangle {
                     id: cardRect
+                    Component.onCompleted: {
+                        console.log("------ POINT ------")
+                        console.log("LAT:", object.coordinate.latitude)
+                        console.log("LON:", object.coordinate.longitude)
+                        console.log("ALT:", object.altitude)
+                        console.log("SPEED:", object.speed)
+                        console.log("PWM:", object.pwm)
+                        console.log("DURATION:", object.duration)
+                    }
                     property bool isCardExpanded: true // Expand cards by default so fields are immediately visible!
 
                     width: parent.width
@@ -69,7 +79,7 @@ Item {
                                 width: 8
                                 height: 8
                                 radius: 4
-                                color: (modelData.pwm > 1200) ? "#2ECC71" : "#E74C3C"
+                                color: (object.pwm > 1200) ? "#2ECC71" : "#E74C3C"
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
@@ -100,52 +110,52 @@ Item {
 
                             QGCLabel { text: qsTr("Lat") }
                             QGCTextField {
-                                text: modelData.coordinate.latitude.toFixed(6)
+                               text: object.coordinate.latitude.toFixed(6)
                                 onEditingFinished: {
-                                    var coord = modelData.coordinate
+                                   var coord = object.coordinate
                                     coord.latitude = parseFloat(text)
-                                    modelData.coordinate = coord
+                                    object.coordinate = coord
                                 }
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Lon") }
                             QGCTextField {
-                                text: modelData.coordinate.longitude.toFixed(6)
+                                text: object.coordinate.longitude.toFixed(6)
                                 onEditingFinished: {
-                                    var coord = modelData.coordinate
+                                   var coord = object.coordinate
                                     coord.longitude = parseFloat(text)
-                                    modelData.coordinate = coord
+                                    object.coordinate = coord
                                 }
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Alt (m)") }
                             QGCTextField {
-                                text: modelData.altitude.toFixed(1)
-                                onEditingFinished: modelData.altitude = parseFloat(text)
+                               text: object.altitude.toFixed(1)
+                                onEditingFinished: object.altitude = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Speed (m/s)") }
                             QGCTextField {
-                                text: modelData.speed.toFixed(1)
-                                onEditingFinished: modelData.speed = parseFloat(text)
+                               text: object.speed.toFixed(1)
+                                onEditingFinished: object.speed = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Hover (s)") }
                             QGCTextField {
-                                text: modelData.duration.toFixed(1)
-                                onEditingFinished: modelData.duration = parseFloat(text)
+                                text: object.duration.toFixed(1)
+                                onEditingFinished: object.duration = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Spray") }
                             QGCCheckBox {
-                                text: (modelData.pwm > 1200) ? qsTr("ON") : qsTr("OFF")
-                                checked: modelData.pwm > 1200
-                                onClicked: modelData.pwm = checked ? 1500.0 : 1000.0
+                                text: (object.pwm > 1200) ? qsTr("ON") : qsTr("OFF")
+                                checked: object.pwm > 1200
+                                onClicked: object.pwm = checked ? 1500.0 : 1000.0
                                 Layout.fillWidth: true
                             }
                         }

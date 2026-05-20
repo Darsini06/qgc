@@ -16,13 +16,23 @@
 
 const QString SpotSprayingComplexItem::name = SpotSprayingComplexItem::tr("Spot Spraying");
 
-SpotSprayingPoint::SpotSprayingPoint(const QGeoCoordinate& coord, QObject* parent)
+SpotSprayingPoint::SpotSprayingPoint(
+    const QGeoCoordinate& coord,
+    QObject* parent)
     : QObject(parent)
     , _coordinate(coord)
 {
     if (coord.isValid() && !qIsNaN(coord.altitude())) {
         _altitude = coord.altitude();
     }
+
+    // Default values
+
+    _speed = 5.0;
+
+    _duration = 2.0;
+
+    _pwm = 1500.0;
 }
 
 static void findNodesByTagName(const QDomNode& parentNode, const QString& targetTagName, QList<QDomElement>& matchingElements)
@@ -83,10 +93,11 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
 {
     _points.setParent(this);
     _editorQml = "qrc:/qml/SpotSprayingEditor.qml";
-    
+
+
     if (!kmlOrShpFile.isEmpty()) {
         QList<QGeoCoordinate> coords;
-        
+
         QString loadError;
         QDomDocument doc = KMLHelper::_loadFile(kmlOrShpFile, loadError);
         if (loadError.isEmpty() && !doc.isNull()) {
@@ -114,7 +125,7 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
                     }
                 }
             }
-            
+
             // 2. If no points found, try Polygon outer boundary coordinates
             if (coords.isEmpty()) {
                 QList<QDomElement> polyNodes;
@@ -171,12 +182,26 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
             QString errorString;
             ShapeFileHelper::loadPolygonFromFile(kmlOrShpFile, coords, errorString);
         }
-        
+
         for (const QGeoCoordinate& coord : coords) {
-            _points.append(new SpotSprayingPoint(coord, this));
+
+            SpotSprayingPoint* point =
+                new SpotSprayingPoint(coord, this);
+
+            // Explicitly set all properties
+
+            point->setAltitude(coord.altitude());
+
+            point->setSpeed(5.0);
+
+            point->setDuration(2.0);
+
+            point->setPwm(1500.0);
+
+            _points.append(point);
         }
     }
-    
+
     connect(&_points, &QmlObjectListModel::countChanged, this, &SpotSprayingComplexItem::_updatePoints);
 }
 
@@ -240,7 +265,7 @@ void SpotSprayingComplexItem::appendMissionItems(QList<MissionItem*>& items, QOb
     int seqNum = _sequenceNumber;
     for (int i=0; i<_points.count(); i++) {
         SpotSprayingPoint* p = _points.value<SpotSprayingPoint*>(i);
-        
+
         // 1. Navigate to point
         MissionItem* item1 = new MissionItem(seqNum++,
                                              MAV_CMD_NAV_WAYPOINT,
@@ -256,7 +281,7 @@ void SpotSprayingComplexItem::appendMissionItems(QList<MissionItem*>& items, QOb
                                              false, // isCurrentItem
                                              missionItemParent);
         items.append(item1);
-        
+
         // 2. Turn ON sprayer (e.g., servo 9 to pwm)
         MissionItem* item2 = new MissionItem(seqNum++,
                                              MAV_CMD_DO_SET_SERVO,
@@ -266,7 +291,7 @@ void SpotSprayingComplexItem::appendMissionItems(QList<MissionItem*>& items, QOb
                                              0, 0, 0, 0, 0,
                                              true, false, missionItemParent);
         items.append(item2);
-        
+
         // 3. Delay (hover time)
         MissionItem* item3 = new MissionItem(seqNum++,
                                              MAV_CMD_NAV_DELAY,
@@ -278,7 +303,7 @@ void SpotSprayingComplexItem::appendMissionItems(QList<MissionItem*>& items, QOb
                                              0, 0, 0,
                                              true, false, missionItemParent);
         items.append(item3);
-        
+
         // 4. Turn OFF sprayer (servo 9 to 1000)
         MissionItem* item4 = new MissionItem(seqNum++,
                                              MAV_CMD_DO_SET_SERVO,
@@ -326,7 +351,7 @@ void SpotSprayingComplexItem::save(QJsonArray& missionItems)
     QJsonObject complexObject;
     complexObject["version"] = 1;
     complexObject["type"] = name;
-    
+
     QJsonArray pointsArray;
     for (int i=0; i<_points.count(); i++) {
         SpotSprayingPoint* p = const_cast<QmlObjectListModel*>(&_points)->value<SpotSprayingPoint*>(i);
@@ -341,7 +366,7 @@ void SpotSprayingComplexItem::save(QJsonArray& missionItems)
         pointsArray.append(pointObj);
     }
     complexObject["points"] = pointsArray;
-    
+
     missionItems.append(complexObject);
 }
 
@@ -349,7 +374,7 @@ bool SpotSprayingComplexItem::load(const QJsonObject& complexObject, int sequenc
 {
     _points.clearAndDeleteContents();
     setSequenceNumber(sequenceNumber);
-    
+
     if (complexObject.contains("points") && complexObject["points"].isArray()) {
         QJsonArray pointsArray = complexObject["points"].toArray();
         for (const QJsonValue& pointVal : pointsArray) {

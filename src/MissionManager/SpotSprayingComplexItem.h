@@ -57,13 +57,14 @@ class SpotSprayingComplexItem : public ComplexMissionItem
 public:
     SpotSprayingComplexItem(PlanMasterController* masterController, bool flyView, const QString& kmlOrShpFile = QString(), QObject* parent = nullptr);
     ~SpotSprayingComplexItem();
-    
+
     Q_PROPERTY(QmlObjectListModel* points READ points CONSTANT)
     Q_PROPERTY(QString editorQml READ editorQml CONSTANT)
 
     QmlObjectListModel* points() { return &_points; }
-     QString editorQml(void) const { return _editorQml; }
-    
+    QString editorQml(void) const { return _editorQml; }
+
+
     Q_INVOKABLE QObject* createPoint(const QGeoCoordinate& coord);
 
     // Overrides from ComplexMissionItem
@@ -77,8 +78,10 @@ public:
     int                 lastSequenceNumber  (void) const final;
     bool                load                (const QJsonObject& complexObject, int sequenceNumber, QString& errorString) final;
     double              greatestDistanceTo  (const QGeoCoordinate &other) const final;
-    QString             mapVisualQML        (void) const final { return QStringLiteral("SpotSprayingMapVisual.qml"); }
-    QString             editorQML           (void) const { return QStringLiteral("SpotSprayingEditor.qml"); }
+    // QString             mapVisualQML        (void) const final { return QStringLiteral("SpotSprayingMapVisual.qml"); }
+    // QString             editorQML           (void) const { return QStringLiteral("SpotSprayingEditor.qml"); }
+    QString mapVisualQML(void) const final { return QStringLiteral("qrc:/qml/SpotSprayingMapVisual.qml"); }
+    QString editorQML(void) const { return QStringLiteral("qrc:/qml/SpotSprayingEditor.qml"); }
     bool                dirty               (void) const final { return _dirty; }
     bool                isSimpleItem        (void) const final { return false; }
     bool                isStandaloneCoordinate(void) const final { return false; }
