@@ -355,7 +355,6 @@ Item {
             Component.onCompleted: opacity = 1
         }
 
-
         // ---- TOP RIGHT NAVIGATION ----
         Row {
             id: topMenu
@@ -465,15 +464,15 @@ Item {
             }
         }
 
-        // ---- HERO SECTION ----
         Column {
             id: heroSection
+
             // Conditional positioning: Center for the main tagline, Left for operational modes
             anchors.horizontalCenter:  undefined
             anchors.left:  parent.left
             anchors.leftMargin:((isSmallScreen || isMobile) ? dp(4) : 40)
 
-            // Vertically centered alignment
+            // Center the whole block in the available vertical space
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -dp(5)
 
@@ -481,13 +480,78 @@ Item {
                 if (isSmallScreen || isMobile)
                     return parent.width * 0.75; // Wider on mobile to prevent excessive wrapping
                 return Math.min(parent.width * 0.45, dp(140)); // Reduced width to prevent overlap with background drone
+
             }
+
             // Reduced basic spacing between elements
-            spacing: isSmallScreen ? dp(0.5) : dp(1.5)
+            spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1)
             opacity: 1
             z: 10
 
-            // Main Title
+            // 1. Tagline (Moved to the top of the column for home page)
+            Label {
+                id: heroSubtitle
+                visible: !isSmallScreen //(droneType === "loadpage") ? true : !isSmallScreen
+                width: parent.width
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+                // text: {
+                //     if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
+                //     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
+                //     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+                //     if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
+                //     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
+                // }
+
+                text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+
+                color: Qt.rgba(255, 255, 255, 0.9) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
+                font.pointSize: {
+                    var baseSize = ScreenTools.defaultFontPointSize;
+                    if (isDesktop) return baseSize * 1.2;
+                    if (isTablet) return baseSize * 1.1;
+                    return isSmallScreen ? baseSize * 0.6 : baseSize * 0.7;
+                }
+                font.family: "Outfit"
+                font.italic: false//droneType === "loadpage"
+                font.bold: false
+                lineHeight: 1.1
+                bottomPadding: dp(0.5) //(droneType === "loadpage" && isSmallScreen) ? 0 : dp(0.5)
+
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: Qt.rgba(0, 0, 0, 0.6) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
+                    shadowBlur: 0.2
+                    shadowVerticalOffset: 1
+                }
+            }
+
+            // 2. Main Title (Moved inside the column)
+            Text {
+                id: topBrandText
+                text: "DRONE COMMANDER"
+                width: parent.width
+                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+                visible: false //(droneType === "loadpage")
+                color: "#262626"
+                font.family: "Outfit"
+                font.bold: true
+                font.letterSpacing: isSmallScreen ? 0 : (isTablet || isDesktop ? 8 : 1.2)
+                
+                // Automatic fitting logic
+                fontSizeMode: Text.HorizontalFit
+                minimumPointSize: 6
+                font.pointSize: {
+                    var baseSize = ScreenTools.largeFontPointSize;
+                    if (isDesktop) return baseSize * 4.0;
+                    if (isTablet) return baseSize * 3.5;
+                    return isSmallScreen ? 18 : 26; // Target sizes, reduced for mobile
+                }
+                lineHeight: 1.1
+            }
+
+            // 3. Mode Title (Original heroTitle, hidden on home page)
             Label {
                 id: heroTitle
                 width: parent.width
@@ -526,12 +590,13 @@ Item {
 
             // Expanded Subtitle / Description
             Label {
-                id: heroSubtitle
-                visible: !isSmallScreen // Hide on small screens to give room for the Flight Zone widget
+                id: modeDescription
+                visible: !isSmallScreen //(droneType === "loadpage") ? false : !isSmallScreen // Hide on home page as tagline is now used
                 width: parent.width
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignLeft
                 text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+
 
                 color:  Qt.rgba(255, 255, 255, 0.9)
                 font.pointSize: {
@@ -541,12 +606,12 @@ Item {
                         return baseSize * 1.2 * scaleMultiplier;
                     if (isTablet)
                         return baseSize * 1.1 * scaleMultiplier;
-                    return baseSize * 0.8; // Mobile
+                    return baseSize * 0.7; // Even smaller for mobile to save space
                 }
                 font.family: "Outfit"
                 font.bold: false
-                lineHeight: 1.3
-                topPadding: dp(1) // Reduced top padding to bring description closer to heading
+                lineHeight: 1.2
+                bottomPadding: dp(1) // Padding at bottom to space away from the title below
 
                 // Subtitle shadow
                 layer.enabled: true
@@ -557,31 +622,24 @@ Item {
                     shadowVerticalOffset: 1
                 }
             }
-
-
-            // ---- AIRSPACE RECOMMENDATION WIDGET (INLINE HERO) ----
-
+            
+            // 4. Flight Zone Status (Moved back into the column for unified centering)
             Rectangle {
                 id: airspaceWidget
+
                 visible: true // Always show or adapt as needed
                 anchors.horizontalCenter:  undefined
 
                 // Set width carefully to fit into the column
                 width: isSmallScreen ? parent.width * 0.98 : Math.min(parent.width, 360)
                 implicitHeight: widgetContent.height + dp(3.5)
+
                 radius: 12
-                color: Qt.rgba(15 / 255, 15 / 255, 20 / 255, 0.75) // Dark cinematic glass theme
-                border.color: isCheckingAirspace ? Qt.rgba(250 / 255, 204 / 255, 21 / 255, 0.4) : (isClearToFly ? Qt.rgba(74 / 255, 222 / 255, 128 / 255, 0.4) : Qt.rgba(248 / 255, 113 / 255, 113 / 255, 0.4))
+                color: Qt.rgba(15 / 255, 15 / 255, 20 / 255, 0.82)
+                border.color: isCheckingAirspace ? Qt.rgba(250 / 255, 204 / 255, 21 / 255, 0.5) : (isClearToFly ? Qt.rgba(74 / 255, 222 / 255, 128 / 255, 0.5) : Qt.rgba(248 / 255, 113 / 255, 113 / 255, 0.5))
                 border.width: 1
                 z: 90
 
-                // Add some top margin for clean spacing after title/subtitle
-                Item {
-                    height: isSmallScreen ? dp(2) : dp(3)
-                    width: 1
-                }
-
-                // Slide-in animation for a premium feel
                 opacity: 0
                 transform: Translate {
                     id: widgetSlide
@@ -670,11 +728,11 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.topMargin: dp(1.5)
+                    anchors.topMargin: isSmallScreen ? dp(0.5) : dp(1)
                     anchors.leftMargin: dp(2)
                     anchors.rightMargin: dp(2)
-                    anchors.bottomMargin: dp(1.5)
-                    spacing: dp(0.8)
+                    anchors.bottomMargin: isSmallScreen ? dp(0.5) : dp(1)
+                    spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1.2)
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -716,10 +774,10 @@ Item {
                             text: qsTr("FLIGHT ZONE STATUS")
                             color: "white"
                             font.family: "Outfit"
-                            font.pointSize: ScreenTools.smallFontPointSize * 0.85
+                            font.pointSize: ScreenTools.smallFontPointSize * 0.95
                             font.bold: true
-                            font.letterSpacing: 1.5
-                            opacity: 0.8
+                            font.letterSpacing: 2.0
+                            opacity: 0.9
                         }
                     }
 
@@ -737,7 +795,7 @@ Item {
                         }
 
                         font.family: "Outfit"
-                        font.pointSize: ScreenTools.defaultFontPointSize * 1.05
+                        font.pointSize: ScreenTools.defaultFontPointSize * 1.2
                         font.bold: true
 
                         Behavior on color {
@@ -760,8 +818,8 @@ Item {
                         color: "white"
                         opacity: 0.6
                         font.family: "Outfit"
-                        font.pointSize: ScreenTools.smallFontPointSize * 0.85
-                        lineHeight: 1.2
+                        font.pointSize: ScreenTools.smallFontPointSize * 0.95
+                        lineHeight: 1.3
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -789,10 +847,10 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottomMargin: dp(2)
-            anchors.leftMargin: dp(4)
-            anchors.rightMargin: dp(4)
-            spacing: Math.min(dp(2), parent.width * 0.02)
+            anchors.bottomMargin: (isSmallScreen || isMobile) ? dp(1.5) : dp(2)
+            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            anchors.rightMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            spacing: (isSmallScreen || isMobile) ? dp(0.5) : dp(2)
 
             // Helpful for debugging or ensuring minimum space
             Layout.fillWidth: true
@@ -801,10 +859,11 @@ Item {
             Item {
                 id: connectClick
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
 
                 Rectangle {
                     anchors.fill: parent
@@ -844,7 +903,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }
@@ -864,20 +926,30 @@ Item {
                 }
             }
 
+            // Flexible spacer to push operational buttons to the right
             Item {
                 Layout.fillWidth: true
+                // Removed visibility condition to ensure right alignment even on mobile
             }
-
 
             // Click to Agri
             Item {
                 id: agriClick
                 Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-                Layout.fillWidth: true
-                Layout.maximumWidth: dp(30)
-                Layout.minimumWidth: dp(18)
-                Layout.preferredHeight: dp(7)
-                visible:  true
+
+                // Layout.fillWidth: true
+                // Layout.maximumWidth: dp(30)
+                // Layout.minimumWidth: dp(18)
+                // Layout.preferredHeight: dp(7)
+                // visible:  true
+
+                Layout.fillWidth: false
+                Layout.maximumWidth: dp(28)
+                Layout.preferredWidth: (isSmallScreen || isMobile) ? Math.min(dp(24), parent.width * 0.23) : dp(28)
+                Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
+                Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
+                visible: true
+
 
                 Rectangle {
                     anchors.fill: parent
@@ -919,7 +991,10 @@ Item {
                             color: "white"
                             font.family: "Outfit"
                             font.bold: true
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                            elide: Text.ElideRight
+                            fontSizeMode: Text.Fit
+                            minimumPointSize: 6
                         }
                     }
                 }
@@ -982,304 +1057,303 @@ Item {
                     }
                 }
             }
+        }
 
         }
 
-    }
 
-
-    function showDynamicCalibrationDialog(qmlFile, title) {
-        dynamicCalDialog.dialogTitleText = title;
-        dialogLoader.source = qmlFile;
-        dynamicCalDialog.open();
-    }
-
-    // Logout Dialog Component
-    Component {
-        id: logoutdialog
-
-        QGCPopupDialog {
-            id: popup
-            title: qsTr("Sign Out")
-
-            buttons: Dialog.Yes | Dialog.No
-
-            onAccepted: {
-                QGroundControl.saveBoolGlobalSetting("login", false);
-                QGroundControl.saveGlobalSetting("loadpage", "loadpage");
-                popup.visible = false;
-                MapGlobals.profile();
+            function showDynamicCalibrationDialog(qmlFile, title) {
+                dynamicCalDialog.dialogTitleText = title;
+                dialogLoader.source = qmlFile;
+                dynamicCalDialog.open();
             }
 
-            onRejected: {
-                popup.visible = false;
-            }
+                // Logout Dialog Component
+                Component {
+                    id: logoutdialog
 
-            ColumnLayout {
-                spacing: ScreenTools.defaultFontPixelWidth
-                QGCLabel {
-                    text: qsTr("Are you sure you want to sign out?")
-                    Layout.fillWidth: true
-                }
-            }
-        }
-    }
+                    QGCPopupDialog {
+                        id: popup
+                        title: qsTr("Sign Out")
 
-    // First Dialog – Type Selection Only
-    Component {
-        id: typeSelectionDialogComponent
+                        buttons: Dialog.Yes | Dialog.No
 
-        QGCPopupDialog {
-            id: typeDialog
-            title: qsTr("Select Connection Type")
-            buttons: 0
-            showButtons: false
-            closeOnClickOutside: true
-
-            // Set the overall popup UI width tightly
-            // Set a properly balanced dialog width to prevent text truncation
-            popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
-
-            property int selectedType: -1
-
-            ColumnLayout {
-                spacing: 12
-                width: parent.width - 24
-                anchors.horizontalCenter: parent.horizontalCenter
-                Layout.fillWidth: true
-
-                Text {
-                    text: qsTr("Choose how you want to connect to your drone from the options below.")
-                    font.family: "Outfit"
-                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
-                    color: "black"
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.fillWidth: true
-                    Layout.bottomMargin: 16
-                }
-
-                Repeater {
-                    model: _linkManager.linkTypeStrings
-                    delegate: Rectangle {
-                        id: typeItem
-                        property bool isDisabled: index === 4 || index === 5
-                        visible: !isDisabled
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: visible ? 56 : 0
-                        radius: 8
-                        color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
-                        border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
-                        border.width: 1
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: 150
-                            }
-                        }
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: 150
-                            }
+                        onAccepted: {
+                            QGroundControl.saveBoolGlobalSetting("login", false);
+                            QGroundControl.saveGlobalSetting("loadpage", "loadpage");
+                            popup.visible = false;
+                            MapGlobals.profile();
                         }
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 16
-                            anchors.rightMargin: 16
-                            spacing: 16
+                        onRejected: {
+                            popup.visible = false;
+                        }
 
-                            // Number Icon Box
-                            Rectangle {
-                                width: 34
-                                height: 34
-                                radius: 8
-                                Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
-                                border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
-                                border.width: 1
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    font.family: "Outfit"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                    font.bold: true
-                                    color: typeMouseArea.containsMouse ? "white" : "black"
-                                    text: (index + 1)
-                                }
-                            }
-
-                            // Connection Type Title
-                            Text {
+                        ColumnLayout {
+                            spacing: ScreenTools.defaultFontPixelWidth
+                            QGCLabel {
+                                text: qsTr("Are you sure you want to sign out?")
                                 Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter
-                                text: modelData
-                                font.family: "Outfit"
-                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                font.bold: true
-                                color: "black"
-                                elide: Text.ElideRight
                             }
+                        }
+                    }
+                }
 
-                            // Arrow Indicator
+                // First Dialog – Type Selection Only
+                Component {
+                    id: typeSelectionDialogComponent
+
+                    QGCPopupDialog {
+                        id: typeDialog
+                        title: qsTr("Select Connection Type")
+                        buttons: 0
+                        showButtons: false
+                        closeOnClickOutside: true
+
+                        // Set the overall popup UI width tightly
+                        // Set a properly balanced dialog width to prevent text truncation
+                        popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
+
+                        property int selectedType: -1
+
+                        ColumnLayout {
+                            spacing: 12
+                            width: parent.width - 24
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Layout.fillWidth: true
+
                             Text {
-                                Layout.alignment: Qt.AlignVCenter
-                                text: "→"
+                                text: qsTr("Choose how you want to connect to your drone from the options below.")
                                 font.family: "Outfit"
-                                font.pointSize: ScreenTools.defaultFontPointSize * 1.4
-                                font.bold: true
-                                color: typeMouseArea.containsMouse ? "white" : "#666666"
+                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
+                                color: "black"
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+                                Layout.fillWidth: true
+                                Layout.bottomMargin: 16
                             }
-                        }
 
-                        MouseArea {
-                            id: typeMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                typeDialog.selectedType = index;
-                                typeDialog.close();
-                                var editingConfig = _linkManager.createConfiguration(index, "");
-                                linkConfigDialogComponent.createObject(mainWindow, {
-                                                                           editingConfig: editingConfig,
-                                                                           originalConfig: null,
-                                                                           selectedType: index
-                                                                       }).open();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+                            Repeater {
+                                model: _linkManager.linkTypeStrings
+                                delegate: Rectangle {
+                                    id: typeItem
+                                    property bool isDisabled: index === 4 || index === 5
+                                    visible: !isDisabled
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: visible ? 56 : 0
+                                    radius: 8
+                                    color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
+                                    border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
+                                    border.width: 1
 
-    // Second Dialog - Configuration (without type dropdown)
-    Component {
-        id: linkConfigDialogComponent
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: 150
+                                        }
+                                    }
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: 150
+                                        }
+                                    }
 
-        QGCPopupDialog {
-            id: linkConfigDialog
-            title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
-            buttons: Dialog.Save | Dialog.Cancel
-            acceptAllowed: nameField.text !== ""
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 16
+                                        anchors.rightMargin: 16
+                                        spacing: 16
 
-            property var originalConfig
-            property var editingConfig
-            property int selectedType
+                                        // Number Icon Box
+                                        Rectangle {
+                                            width: 34
+                                            height: 34
+                                            radius: 8
+                                            Layout.alignment: Qt.AlignVCenter
+                                            color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
+                                            border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
+                                            border.width: 1
 
-            property bool _connectionInitiated: false
+                                            Text {
+                                                anchors.centerIn: parent
+                                                font.family: "Outfit"
+                                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                                font.bold: true
+                                                color: typeMouseArea.containsMouse ? "white" : "black"
+                                                text: (index + 1)
+                                            }
+                                        }
 
-            // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
-            Connections {
-                target: linkConfigDialog.editingConfig
-                enabled: linkConfigDialog.editingConfig !== null
+                                        // Connection Type Title
+                                        Text {
+                                            Layout.fillWidth: true
+                                            Layout.alignment: Qt.AlignVCenter
+                                            text: modelData
+                                            font.family: "Outfit"
+                                            font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                            font.bold: true
+                                            color: "black"
+                                            elide: Text.ElideRight
+                                        }
 
-                function onShowToast(message) {
-                    mainWindow.showToastMessage(message);
-                }
-            }
+                                        // Arrow Indicator
+                                        Text {
+                                            Layout.alignment: Qt.AlignVCenter
+                                            text: "→"
+                                            font.family: "Outfit"
+                                            font.pointSize: ScreenTools.defaultFontPointSize * 1.4
+                                            font.bold: true
+                                            color: typeMouseArea.containsMouse ? "white" : "#666666"
+                                        }
+                                    }
 
-            onAccepted: {
-                console.log("Click Save");
-                if (_connectionInitiated) {
-                    console.log("linkConfigDialog: ignoring duplicate accept");
-                    return;
-                }
-                linkSettingsLoader.item.saveSettings();
-                editingConfig.devName = nameField.text;
-                editingConfig.name = editingConfig.devName;
-
-                //connecting_drone = true
-
-                if (originalConfig) {
-                    _linkManager.endConfigurationEditing(originalConfig, editingConfig);
-                } else {
-                    editingConfig.dynamic = false;
-                    _linkManager.endCreateConfiguration(editingConfig);
-                    if (activeVehicle) {
-                        mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
-                        return;
-                    }
-                    _connectionInitiated = true;         // mark as initiated
-                    connecting_drone = true;  // only set true once
-                    _linkManager.createConnectedLink(editingConfig);
-                }
-            }
-
-            onRejected: {
-                console.log("Click Cancel");
-                _connectionInitiated = false;  //reset on cancel
-                _linkManager.cancelConfigurationEditing(editingConfig);
-            }
-
-            // ---------- MAIN LAYOUT ----------
-            ColumnLayout {
-                id: mainColumn
-                spacing: isSmallScreen ? ScreenTools.defaultFontPixelHeight * 0.5 : ScreenTools.defaultFontPixelHeight
-                Layout.fillWidth: true
-                Layout.minimumWidth: isSmallScreen ? mainWindow1.width * 0.9 : 400
-
-                // ---- Name row (not shown for Bluetooth) ----
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: 16
-                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
-
-                    QGCLabel {
-                        text: qsTr("Connection Name")
-                        font.bold: true
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "black"
-                    }
-
-                    TextField {
-                        id: nameField
-                        Layout.fillWidth: true
-                        text: editingConfig.devName
-                        placeholderText: qsTr("e.g. My Custom Drone Connection")
-
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        color: "black"
-                        leftPadding: 16
-                        rightPadding: 16
-
-                        background: Rectangle {
-                            radius: 8
-                            color: "#FFFFFF"
-                            border.color: nameField.activeFocus ? (linkConfigDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
-                            border.width: nameField.activeFocus ? 2 : 1
-                            implicitHeight: 44
-                            Behavior on border.color {
-                                ColorAnimation {
-                                    duration: 200
+                                    MouseArea {
+                                        id: typeMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            typeDialog.selectedType = index;
+                                            typeDialog.close();
+                                            var editingConfig = _linkManager.createConfiguration(index, "");
+                                            linkConfigDialogComponent.createObject(mainWindow, {
+                                                                                       editingConfig: editingConfig,
+                                                                                       originalConfig: null,
+                                                                                       selectedType: index
+                                                                                   }).open();
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                // Divider line if not Bluetooth
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: "#E0E0E0"
-                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
-                }
+                // Second Dialog - Configuration (without type dropdown)
+                Component {
+                    id: linkConfigDialogComponent
 
-                // ---- Device list / settings loader ----
-                Loader {
-                    id: linkSettingsLoader
-                    Layout.fillWidth: true
-                    source: subEditConfig.settingsURL
+                    QGCPopupDialog {
+                        id: linkConfigDialog
+                        title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
+                        buttons: Dialog.Save | Dialog.Cancel
+                        acceptAllowed: nameField.text !== ""
 
-                    property var subEditConfig: linkConfigDialog.editingConfig
-                    property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12
-                    property int _secondColumnWidth: ScreenTools.defaultFontPixelWidth * 30
-                    property int _rowSpacing: ScreenTools.defaultFontPixelHeight / 2
-                    property int _colSpacing: ScreenTools.defaultFontPixelWidth / 2
+                        property var originalConfig
+                        property var editingConfig
+                        property int selectedType
+
+                        property bool _connectionInitiated: false
+
+                        // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
+                        Connections {
+                            target: linkConfigDialog.editingConfig
+                            enabled: linkConfigDialog.editingConfig !== null
+
+                            function onShowToast(message) {
+                                mainWindow.showToastMessage(message);
+                            }
+                        }
+
+                        onAccepted: {
+                            console.log("Click Save");
+                            if (_connectionInitiated) {
+                                console.log("linkConfigDialog: ignoring duplicate accept");
+                                return;
+                            }
+                            linkSettingsLoader.item.saveSettings();
+                            editingConfig.devName = nameField.text;
+                            editingConfig.name = editingConfig.devName;
+
+                            //connecting_drone = true
+
+                            if (originalConfig) {
+                                _linkManager.endConfigurationEditing(originalConfig, editingConfig);
+                            } else {
+                                editingConfig.dynamic = false;
+                                _linkManager.endCreateConfiguration(editingConfig);
+                                if (activeVehicle) {
+                                    mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
+                                    return;
+                                }
+                                _connectionInitiated = true;         // mark as initiated
+                                connecting_drone = true;  // only set true once
+                                _linkManager.createConnectedLink(editingConfig);
+                            }
+                        }
+
+                        onRejected: {
+                            console.log("Click Cancel");
+                            _connectionInitiated = false;  //reset on cancel
+                            _linkManager.cancelConfigurationEditing(editingConfig);
+                        }
+
+                        // ---------- MAIN LAYOUT ----------
+                        ColumnLayout {
+                            id: mainColumn
+                            spacing: isSmallScreen ? ScreenTools.defaultFontPixelHeight * 0.5 : ScreenTools.defaultFontPixelHeight
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: isSmallScreen ? mainWindow1.width * 0.9 : 400
+
+                            // ---- Name row (not shown for Bluetooth) ----
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 16
+                                visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+
+                                QGCLabel {
+                                    text: qsTr("Connection Name")
+                                    font.bold: true
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    color: "black"
+                                }
+
+                                TextField {
+                                    id: nameField
+                                    Layout.fillWidth: true
+                                    text: editingConfig.devName
+                                    placeholderText: qsTr("e.g. My Custom Drone Connection")
+
+                                    font.pointSize: ScreenTools.defaultFontPointSize
+                                    color: "black"
+                                    leftPadding: 16
+                                    rightPadding: 16
+
+                                    background: Rectangle {
+                                        radius: 8
+                                        color: "#FFFFFF"
+                                        border.color: nameField.activeFocus ? (linkConfigDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
+                                        border.width: nameField.activeFocus ? 2 : 1
+                                        implicitHeight: 44
+                                        Behavior on border.color {
+                                            ColorAnimation {
+                                                duration: 200
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Divider line if not Bluetooth
+                            Rectangle {
+                                Layout.fillWidth: true
+                                height: 1
+                                color: "#E0E0E0"
+                                visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+                            }
+
+                            // ---- Device list / settings loader ----
+                            Loader {
+                                id: linkSettingsLoader
+                                Layout.fillWidth: true
+                                source: subEditConfig.settingsURL
+
+                                property var subEditConfig: linkConfigDialog.editingConfig
+                                property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12
+                                property int _secondColumnWidth: ScreenTools.defaultFontPixelWidth * 30
+                                property int _rowSpacing: ScreenTools.defaultFontPixelHeight / 2
+                                property int _colSpacing: ScreenTools.defaultFontPixelWidth / 2
+                            }
+                        }
+                    }
                 }
             }
-        }
-    }
-}

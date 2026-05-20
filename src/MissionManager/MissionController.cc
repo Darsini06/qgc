@@ -19,6 +19,7 @@
 #include "VTOLLandingComplexItem.h"
 #include "StructureScanComplexItem.h"
 #include "CorridorScanComplexItem.h"
+#include "SpotSprayingComplexItem.h"
 #include "JsonHelper.h"
 #include "QGroundControlQmlGlobal.h"
 #include "SettingsManager.h"
@@ -438,6 +439,8 @@ VisualMissionItem* MissionController::insertComplexMissionItem(QString itemName,
         newItem = new StructureScanComplexItem(_masterController, _flyView, QString() /* kmlFile */);
     } else if (itemName == CorridorScanComplexItem::name) {
         newItem = new CorridorScanComplexItem(_masterController, _flyView, QString() /* kmlFile */);
+    } else if (itemName == SpotSprayingComplexItem::name) {
+        newItem = new SpotSprayingComplexItem(_masterController, _flyView, QString() /* kmlFile */);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return nullptr;
@@ -458,6 +461,8 @@ VisualMissionItem* MissionController::insertComplexMissionItemFromKMLOrSHP(QStri
         newItem = new StructureScanComplexItem(_masterController, _flyView, file);
     } else if (itemName == CorridorScanComplexItem::name) {
         newItem = new CorridorScanComplexItem(_masterController, _flyView, file);
+    } else if (itemName == SpotSprayingComplexItem::name) {
+        newItem = new SpotSprayingComplexItem(_masterController, _flyView, file);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return nullptr;
@@ -860,6 +865,15 @@ bool MissionController::_loadJsonMissionFileV2(const QJsonObject& json, QmlObjec
                 nextSequenceNumber = corridorItem->lastSequenceNumber() + 1;
                 qCDebug(MissionControllerLog) << "Corridor Scan load complete: nextSequenceNumber" << nextSequenceNumber;
                 visualItems->append(corridorItem);
+            } else if (complexItemType == SpotSprayingComplexItem::name) {
+                qCDebug(MissionControllerLog) << "Loading Spot Spraying: nextSequenceNumber" << nextSequenceNumber;
+                SpotSprayingComplexItem* spotSprayingItem = new SpotSprayingComplexItem(_masterController, _flyView, QString() /* kmlFile */);
+                if (!spotSprayingItem->load(itemObject, nextSequenceNumber++, errorString)) {
+                    return false;
+                }
+                nextSequenceNumber = spotSprayingItem->lastSequenceNumber() + 1;
+                qCDebug(MissionControllerLog) << "Spot Spraying load complete: nextSequenceNumber" << nextSequenceNumber;
+                visualItems->append(spotSprayingItem);
             } else {
                 errorString = tr("Unsupported complex item type: %1").arg(complexItemType);
             }
@@ -2246,6 +2260,7 @@ QStringList MissionController::complexMissionItemNames(void) const
 
     complexItems.append(SurveyComplexItem::name);
     complexItems.append(CorridorScanComplexItem::name);
+    complexItems.append(SpotSprayingComplexItem::name);
     if (_controllerVehicle->multiRotor() || _controllerVehicle->vtol()) {
         complexItems.append(StructureScanComplexItem::name);
     }
@@ -2518,6 +2533,20 @@ void MissionController::setCurrentPlanViewSeqNum(int sequenceNumber, bool force)
         emit onlyInsertTakeoffValidChanged();
         emit isInsertTakeoffValidChanged();
         emit isInsertLandValidChanged();
+
+        bool isSpotSprayingActive = false;
+        for (int i=0; i<_visualItems->count(); i++) {
+            VisualMissionItem* pVI = _visualItems->value<VisualMissionItem*>(i);
+            if (pVI->commandName() == "Spot Spraying") {
+                isSpotSprayingActive = true;
+                break;
+            }
+        }
+        if (_isSpotSprayingActive != isSpotSprayingActive) {
+            _isSpotSprayingActive = isSpotSprayingActive;
+            emit isSpotSprayingActiveChanged(_isSpotSprayingActive);
+        }
+
         emit isROIActiveChanged();
         emit isROIBeginCurrentItemChanged();
         emit flyThroughCommandsAllowedChanged();
@@ -2688,4 +2717,9 @@ void MissionController::setGlobalAltitudeMode(QGroundControlQmlGlobal::AltMode a
         _globalAltMode = altMode;
         emit globalAltitudeModeChanged();
     }
+}
+
+bool MissionController::isSpotSprayingActive(void) const
+{
+    return _isSpotSprayingActive;
 }

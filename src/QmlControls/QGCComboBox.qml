@@ -93,14 +93,24 @@ T.ComboBox {
             rightPadding:           ScreenTools.defaultFontPixelWidth * 2
             text:                   _text
             font:                   control.font
-            color:                  control.currentIndex === index ? "white" : (highlighted ? "white" : "black")
+            color:                  control.currentIndex === index ? "white" : (highlighted ? "white" : qgcPal.buttonText)
             verticalAlignment:      Text.AlignVCenter
             horizontalAlignment:    Text.AlignLeft
         }
 
         background: Rectangle {
-            color:                  control.currentIndex === index ? "#79AE6F" : (highlighted ? "#79AE6F" : "transparent")
-            radius:                 0
+
+            // color:                  control.currentIndex === index ? "#79AE6F" : (highlighted ? "#79AE6F" : "transparent")
+            // radius:                 0
+
+            anchors.fill:           parent
+            anchors.leftMargin:     4
+            anchors.rightMargin:    4
+            anchors.topMargin:      2
+            anchors.bottomMargin:   2
+            color:                  control.currentIndex === index ? "black" : (highlighted ? "black" : "transparent")
+            radius:                 6
+
         }
 
         highlighted:                control.highlightedIndex === index
@@ -113,7 +123,7 @@ T.ComboBox {
         height:                 ScreenTools.defaultFontPixelWidth * 0.8
         width:                  height
         source:                 "/qmlimages/arrow-down.png"
-        color:                  "#808080"
+        color:                  qgcPal.text
     }
 
     // The label of the button
@@ -125,19 +135,24 @@ T.ComboBox {
         horizontalAlignment:        Text.AlignLeft
         text:                       control.alternateText === "" ? control.currentText : control.alternateText
         font:                       control.font
-        color:                      "black"
+        color:                      qgcPal.buttonText
         elide:                      Text.ElideRight
     }
 
     background: Rectangle {
-        color:          "white"
-        border.color:   "#79AE6F"
+
+        // color:          "white"
+        // border.color:   "#79AE6F"
+
+        color:          qgcPal.button
+        border.color:   qgcPal.buttonBorder
+
         border.width:   1
         radius:         12
     }
 
     popup: T.Popup {
-        x:              control.width - _popupWidth
+        x:              0
         y:              control.height
         width:          _popupWidth
         height:         Math.min(contentItem.implicitHeight, control.Window.window ? control.Window.window.height - topMargin - bottomMargin : 500)
@@ -155,9 +170,13 @@ T.ComboBox {
         }
 
         background: Rectangle {
-            color: "white"
+            color: qgcPal.windowShade
             radius: 12
-            border.color: "#79AE6F"
+
+            //border.color: "#79AE6F"
+
+            border.color: qgcPal.windowShadeDark
+
             border.width: 1
         }
     }

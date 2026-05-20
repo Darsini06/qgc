@@ -64,7 +64,7 @@ Popup {
     property bool   preventClose:           false
     property bool   closeOnClickOutside:    false
     property bool   showCloseButton:        false
-    property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    //property bool   isAgri:                 QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
     property bool   useCenterAnchor:        true
     property real   dialogX:                0
     property real   dialogY:                0
@@ -276,7 +276,7 @@ Popup {
             Rectangle {
                 Layout.fillWidth: true
                 height: Math.max(titleLable.implicitHeight + 20, 50) // More breathing room
-                color: isAgri ? "#79AE6F" : "#262626" // Agri Green or Faded charcoal black
+                color: "#79AE6F"//isAgri ? "#79AE6F" : "#262626" // Agri Green or Faded charcoal black
                 radius: 20
 
                 // Mask bottom rounded corners
@@ -310,7 +310,7 @@ Popup {
                         width: 28
                         height: 28
                         radius: 0
-                        color: closeBtnMouseArea.containsMouse ? (isAgri ? "#588D4E" : "#262626") : (isAgri ? "#79AE6F" : "#262626")
+                        color: closeBtnMouseArea.containsMouse ? "#588D4E" : "#79AE6F"  //(isAgri ? "#588D4E" : "#262626") : (isAgri ? "#79AE6F" : "#262626")
                         anchors.right: parent.right
                         anchors.rightMargin: 12
                         anchors.verticalCenter: parent.verticalCenter
@@ -436,12 +436,13 @@ Popup {
                     Layout.minimumWidth: height * 2.5
                     background: Rectangle {
                         radius: 8
-                        color: {
-                            if (isAgri) {
-                                return acceptButton.pressed ? "#588D4E" : (acceptButton.hovered ? "#8CC881" : "#79AE6F")
-                            }
-                            return acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
-                        }
+                        // color: {
+                        //     if (isAgri) {
+                        //         return acceptButton.pressed ? "#588D4E" : (acceptButton.hovered ? "#8CC881" : "#79AE6F")
+                        //     }
+                        //     return acceptButton.pressed ? "#121212" : (acceptButton.hovered ? "#1a1a1a" : "#262626")
+                        // }
+                        color:  acceptButton.pressed ? "#588D4E" : (acceptButton.hovered ? "#8CC881" : "#79AE6F")
                     }
                     contentItem: Text {
                         text: acceptButton.text

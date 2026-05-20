@@ -215,6 +215,7 @@ SettingsPage {
             }
         }
 
+
         //Not for Mobile
         GridLayout {
             columns:            _isNarrow ? 1 : 3

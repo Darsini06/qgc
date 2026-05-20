@@ -468,14 +468,15 @@ QGCFlickable {
                     }
                     onClicked: {
                         MapGlobals.lastButtonPressTime = new Date().getTime()
-                        if (isAgri) {
-                            MapGlobals.circleAddMode = true
-                        } else {
-                            var r = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y,
-                                            flightMap.centerViewport.width, flightMap.centerViewport.height)
-                            myGeoFenceController.addInclusionCircle(
-                                        flightMap.toCoordinate(Qt.point(r.x + r.width/2, r.y + r.height/2), false), 10)
-                        }
+                        // if (isAgri) {
+                        //     MapGlobals.circleAddMode = true
+                        // } else {
+                        //     var r = Qt.rect(flightMap.centerViewport.x, flightMap.centerViewport.y,
+                        //                     flightMap.centerViewport.width, flightMap.centerViewport.height)
+                        //     myGeoFenceController.addInclusionCircle(
+                        //                 flightMap.toCoordinate(Qt.point(r.x + r.width/2, r.y + r.height/2), false), 10)
+                        // }
+                        MapGlobals.circleAddMode = true
                         myGeoFenceController.clearAllInteractive()
                         root.activeEditType = "circle"
                     }

@@ -89,7 +89,7 @@ Item {
         id: objMgr
     }
 
-    //property bool _isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    //property bool _isAgri: QGroundControl.loadGlobalSetting(" loadpage", "loadpage") === "Agri"
 
     property color _themeColor: "#79AE6F"  // Agri Green or Professional Gray
     property color _themeBorder: Qt.darker("#79AE6F", 1.2)

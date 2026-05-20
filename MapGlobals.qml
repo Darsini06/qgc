@@ -22,6 +22,7 @@ QtObject {
     property string save: "save1"
     property real altitude: 30.5
     property string mapPolygon:" "
+    property bool isSpotSprayingActive: false
 
     property string time: "00:00:00"
 
@@ -102,6 +103,8 @@ QtObject {
 
     property string login: ""
     property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
+    property string userEmail: QGroundControl.loadGlobalSetting("email", "")
+    property string displayName: QGroundControl.loadGlobalSetting("name", "")
     property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
 
@@ -135,6 +138,9 @@ QtObject {
 
                 //feedback table
                 tx.executeSql("CREATE TABLE IF NOT EXISTS feedback (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, mobile_number TEXT, email TEXT, comments TEXT)");
+
+                // Fences table
+                tx.executeSql("CREATE TABLE IF NOT EXISTS fences (plan_path TEXT PRIMARY KEY, lat REAL, lon REAL, radius REAL)");
 
                 console.log("Database and tables created successfully");
 
@@ -313,6 +319,62 @@ QtObject {
             }
         }
         xhr.send(JSON.stringify(data));
+    }
+
+    function normalizePath(path) {
+        if (!path) return ""
+        var s = path.toString()
+        // Extract just the filename and clean it of URI encoding
+        var parts = s.split(/[\/\\]/)
+        var filename = parts[parts.length - 1]
+        filename = decodeURIComponent(filename)
+        
+        // Strip extension if present so "Field1" and "Field1.plan" match same DB key
+        var lastDot = filename.lastIndexOf(".")
+        if (lastDot > 0) {
+            filename = filename.substring(0, lastDot)
+        }
+        
+        console.log("MapGlobals.normalizePath() -> Clean Name:", filename)
+        return filename
+    }
+
+    function saveFence(planPath, lat, lon, radius) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.saveFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                tx.executeSql(
+                    "INSERT OR REPLACE INTO fences (plan_path, lat, lon, radius) VALUES (?, ?, ?, ?)",
+                    [cleanPath, lat, lon, radius]
+                );
+                console.log("Fence saved to database for:", cleanPath);
+            } catch (error) {
+                console.error("Error saving fence to database:", error);
+            }
+        });
+    }
+
+    function getFence(planPath, callback) {
+        var cleanPath = normalizePath(planPath)
+        console.log("MapGlobals.getFence() normalized path:", cleanPath)
+        var db = getDatabase();
+        db.transaction(function(tx) {
+            try {
+                var rs = tx.executeSql("SELECT * FROM fences WHERE plan_path = ?", [cleanPath]);
+                if (rs.rows.length > 0) {
+                    console.log("Fence found for:", cleanPath);
+                    callback(rs.rows.item(0));
+                } else {
+                    console.log("No fence found for:", cleanPath);
+                    callback(null);
+                }
+            } catch (error) {
+                console.error("Error retrieving fence from database:", error);
+                callback(null);
+            }
+        });
     }
 
     //calculate the duration from startsession to end session
@@ -902,6 +964,8 @@ QtObject {
                         QGroundControl.saveGlobalSetting("name", user.displayname);
                         QGroundControl.saveBoolGlobalSetting("login", true);
                         userName = user.username;
+                        userEmail = user.email;
+                        displayName = user.displayname;
 
                         // Sync to local SQLite
                         var db = getDatabase();

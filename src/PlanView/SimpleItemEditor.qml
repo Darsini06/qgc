@@ -324,85 +324,80 @@ Rectangle {
                 }
             }
 
-            GridLayout {
+            ColumnLayout {
                 Layout.fillWidth: true
-                flow:           GridLayout.TopToBottom
-                rows:           missionItem.textFieldFacts.count +
-                                missionItem.nanFacts.count +
-                                (missionItem.speedSection.available ? 1 : 0)
-                columns:        2
+                spacing:        _margin
 
                 Repeater {
                     model: missionItem.textFieldFacts
 
-                    QGCLabel { text: object.name; color: _labelColor }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: _margin / 2
+
+                        QGCLabel { text: object.name; color: _labelColor }
+
+                        Loader {
+                            Layout.fillWidth:   true
+                            sourceComponent:    volumeSliderComponent
+                            property var targetFact: object
+                            enabled:            !object.readOnly
+                            onTargetFactChanged: if (item) item.fact = targetFact
+                            onLoaded: {
+                                if (item) item.fact = targetFact
+                            }
+                        }
+                    }
                 }
 
                 Repeater {
                     model: missionItem.nanFacts
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: _margin / 2
+
+                        QGCCheckBox {
+                            text:           object.name
+                            checked:        !isNaN(object.rawValue)
+                            onClicked:      object.rawValue = checked ? 0 : NaN
+                            textColor:      _labelColor
+                        }
+
+                        Loader {
+                            Layout.fillWidth:   true
+                            sourceComponent:    volumeSliderComponent
+                            property var targetFact: object
+                            enabled:            !isNaN(object.rawValue)
+                            onTargetFactChanged: if (item) item.fact = targetFact
+                            onLoaded: {
+                                if (item) item.fact = targetFact
+                            }
+                        }
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: _margin / 2
+                    visible: missionItem.speedSection.available
 
                     QGCCheckBox {
-                        text:           object.name
-                        checked:        !isNaN(object.rawValue)
-                        onClicked:      object.rawValue = checked ? 0 : NaN
-                        textColor:      _labelColor
+                        id:         flightSpeedCheckbox
+                        text:       qsTr("Flight Speed")
+                        checked:    missionItem.speedSection.specifyFlightSpeed
+                        onClicked:  missionItem.speedSection.specifyFlightSpeed = checked
+                        textColor:  _labelColor
                     }
-                }
-
-                QGCCheckBox {
-                    id:         flightSpeedCheckbox
-                    text:       qsTr("Flight Speed")
-                    checked:    missionItem.speedSection.specifyFlightSpeed
-                    onClicked:  missionItem.speedSection.specifyFlightSpeed = checked
-                    visible:    missionItem.speedSection.available
-                    textColor:  _labelColor
-                }
-
-
-                Repeater {
-                    model: missionItem.textFieldFacts
 
                     Loader {
                         Layout.fillWidth:   true
                         sourceComponent:    volumeSliderComponent
-                        property var targetFact: object
-                        enabled:            !object.readOnly
+                        property var targetFact: missionItem.speedSection.flightSpeed
+                        enabled:            flightSpeedCheckbox.checked
                         onTargetFactChanged: if (item) item.fact = targetFact
                         onLoaded: {
-                            if (item) {
-                                item.fact = targetFact
-                            }
-                        }
-                    }
-                }
-
-                Repeater {
-                    model: missionItem.nanFacts
-
-                    Loader {
-                        Layout.fillWidth:   true
-                        sourceComponent:    volumeSliderComponent
-                        property var targetFact: object
-                        enabled:            !isNaN(object.rawValue)
-                        onTargetFactChanged: if (item) item.fact = targetFact
-                        onLoaded: {
-                            if (item) {
-                                item.fact = targetFact
-                            }
-                        }
-                    }
-                }
-
-                Loader {
-                    Layout.fillWidth:   true
-                    sourceComponent:    volumeSliderComponent
-                    property var targetFact: missionItem.speedSection.flightSpeed
-                    enabled:            flightSpeedCheckbox.checked
-                    visible:            missionItem.speedSection.available
-                    onTargetFactChanged: if (item) item.fact = targetFact
-                    onLoaded: {
-                        if (item) {
-                            item.fact = targetFact
+                            if (item) item.fact = targetFact
                         }
                     }
                 }

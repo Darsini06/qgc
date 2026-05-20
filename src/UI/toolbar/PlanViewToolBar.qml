@@ -69,22 +69,14 @@ Rectangle {
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                    mainWindow.cameraView()
+                if (planType === "Plan") {
+                    mainWindow.showFlyView()
                     mainWindow.closefile()
-                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                    mainWindow.showMapping()
+                } else {
+                    mainWindow.showFlyView1()
                     mainWindow.closefile()
                 }
-                else{
-                    if (planType === "Plan") {
-                        mainWindow.showFlyView()
-                        mainWindow.closefile()
-                    } else {
-                        mainWindow.showFlyView1()
-                        mainWindow.closefile()
-                    }
-                }
+
             }
         }
 
@@ -283,22 +275,15 @@ Rectangle {
                 //waypoint enable disable logic
                 QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
 
-                if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Camera"){
-                    mainWindow.cameraView()
+
+                if (planType === "Plan") {
+                    mainWindow.showFlyView()
                     mainWindow.closefile()
-                }else if(QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping"){
-                    mainWindow.showMapping()
+                } else {
+                    mainWindow.showFlyView1()
                     mainWindow.closefile()
                 }
-                else{
-                    if (planType === "Plan") {
-                                            mainWindow.showFlyView()
-                                            mainWindow.closefile()
-                                        } else {
-                                            mainWindow.showFlyView1()
-                                            mainWindow.closefile()
-                                        }
-                }
+
 
             }
         }

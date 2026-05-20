@@ -32,11 +32,16 @@ bool ShapeFileHelper::_fileIsKML(const QString& file, QString& errorString)
         return false;
     }
 
-    if (file.endsWith(AppSettings::kmlFileExtension)) {
+    if (file.endsWith(AppSettings::kmlFileExtension, Qt::CaseInsensitive)) {
         return true;
-    } else if (file.endsWith(AppSettings::shpFileExtension)) {
+    } else if (file.endsWith(AppSettings::shpFileExtension, Qt::CaseInsensitive)) {
         return false;
     } else {
+        // Android content URIs often do not include the file extension. 
+        // We assume KML and let the parser validate the actual content.
+        if (file.startsWith("content://")) {
+            return true;
+        }
         errorString = QString(_errorPrefix).arg(tr("Unsupported file type. Only .%1 and .%2 are supported.").arg(AppSettings::kmlFileExtension).arg(AppSettings::shpFileExtension));
     }
 

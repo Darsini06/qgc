@@ -7,13 +7,13 @@ import QGroundControl.ScreenTools
 Menu {
     id: menu
 
-    property bool isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
+    //property bool isAgri: QGroundControl.loadGlobalSetting("loadpage", "loadpage") === "Agri"
 
     background: Rectangle {
         implicitWidth:  ScreenTools.defaultFontPixelWidth * 12
         implicitHeight: 40
         color:          "#FFFFFF"
-        border.color:   isAgri ? "#79AE6F" : "#808080"
+        border.color:   "#79AE6F" //isAgri ? "#79AE6F" : "#808080"
         border.width:   1
         radius:         8
     }
@@ -37,7 +37,7 @@ Menu {
         background: Rectangle {
             implicitWidth:  ScreenTools.defaultFontPixelWidth * 12
             implicitHeight: 40
-            color:          menuItem.highlighted ? (isAgri ? "#79AE6F" : "#808080") : "transparent"
+            color:          menuItem.highlighted ? "#79AE6F" /*(isAgri ? "#79AE6F" : "#808080")*/ : "transparent"
             radius:         6
         }
     }

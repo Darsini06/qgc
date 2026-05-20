@@ -24,9 +24,8 @@ public:
     static ShapeFileHelper::ShapeType determineShapeType(const QString& kmlFile, QString& errorString);
     static bool loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString);
     static bool loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoordinate>& coords, QString& errorString);
-
-private:
     static QDomDocument _loadFile(const QString& kmlFile, QString& errorString);
 
+private:
     static constexpr const char* _errorPrefix = QT_TR_NOOP("KML file load failed. %1");
 };

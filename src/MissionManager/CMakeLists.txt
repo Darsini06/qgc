@@ -61,6 +61,8 @@ qt_add_library(MissionManager STATIC
     SimpleMissionItem.h
     SpeedSection.cc
     SpeedSection.h
+    SpotSprayingComplexItem.cc
+    SpotSprayingComplexItem.h
     StructureScanComplexItem.cc
     StructureScanComplexItem.h
     StructureScanPlanCreator.cc
