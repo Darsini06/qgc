@@ -92,7 +92,7 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
     , _dirty(false)
 {
     _points.setParent(this);
-    _editorQml = "qrc:/qml/SpotSprayingEditor.qml";
+
 
 
     if (!kmlOrShpFile.isEmpty()) {
