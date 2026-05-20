@@ -16,13 +16,23 @@
 
 const QString SpotSprayingComplexItem::name = SpotSprayingComplexItem::tr("Spot Spraying");
 
-SpotSprayingPoint::SpotSprayingPoint(const QGeoCoordinate& coord, QObject* parent)
+SpotSprayingPoint::SpotSprayingPoint(
+    const QGeoCoordinate& coord,
+    QObject* parent)
     : QObject(parent)
     , _coordinate(coord)
 {
     if (coord.isValid() && !qIsNaN(coord.altitude())) {
         _altitude = coord.altitude();
     }
+
+    // Default values
+
+    _speed = 5.0;
+
+    _duration = 2.0;
+
+    _pwm = 1500.0;
 }
 
 static void findNodesByTagName(const QDomNode& parentNode, const QString& targetTagName, QList<QDomElement>& matchingElements)
@@ -83,7 +93,8 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
 {
     _points.setParent(this);
     _editorQml = "qrc:/qml/SpotSprayingEditor.qml";
-    
+
+
     if (!kmlOrShpFile.isEmpty()) {
         QList<QGeoCoordinate> coords;
         
@@ -173,7 +184,21 @@ SpotSprayingComplexItem::SpotSprayingComplexItem(PlanMasterController* masterCon
         }
         
         for (const QGeoCoordinate& coord : coords) {
-            _points.append(new SpotSprayingPoint(coord, this));
+
+            SpotSprayingPoint* point =
+                new SpotSprayingPoint(coord, this);
+
+            // Explicitly set all properties
+
+            point->setAltitude(coord.altitude());
+
+            point->setSpeed(5.0);
+
+            point->setDuration(2.0);
+
+            point->setPwm(1500.0);
+
+            _points.append(point);
         }
     }
     
