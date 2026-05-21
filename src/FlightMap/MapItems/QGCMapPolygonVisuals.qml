@@ -1684,7 +1684,7 @@ Item {
 
             onAccepted: {
                 if (filenameTextField.text.length < 3 || filenameTextField1.text.length < 3 || filenameTextField2.text.length < 3) {
-                    mobileFileSaveDialog.preventClose = true
+                    mobileFileSaveDialog.preventClose = true;
                     return
                 }
 
