@@ -7,13 +7,13 @@ import QGroundControl.FlightMap
 
 Item {
     id: root
-
     property var map
     property var missionItem
     property bool interactive: true
     property var vehicle: null
 
     signal clicked(int sequenceNumber)
+    signal pointClicked(int pointIndex)        // ← ADD THIS
 
     property var polygonPath: {
         var coords = []
@@ -28,33 +28,22 @@ Item {
         return coords
     }
 
-    property var closedPath: {
-        if (polygonPath.length < 2) return polygonPath
-        var closed = polygonPath.slice()
-        closed.push(polygonPath[0])   // close the loop
-        return closed
-    }
-
-    // Dynamically created corner markers
     property var _markerItems: []
 
     function _rebuildMarkers() {
-        // Remove old markers
         for (var i = 0; i < _markerItems.length; i++) {
             map.removeMapItem(_markerItems[i])
             _markerItems[i].destroy()
         }
         _markerItems = []
-
         if (!missionItem || !missionItem.points) return
-
         var count = missionItem.points.count
         for (var j = 0; j < count; j++) {
             var pt = missionItem.points.get(j)
             if (!pt || !pt.coordinate || !pt.coordinate.isValid) continue
-
             var marker = markerComponent.createObject(map, {
-                "coordinate": pt.coordinate
+                "coordinate": pt.coordinate,
+                "markerIndex": j                // ← pass index
             })
             map.addMapItem(marker)
             _markerItems.push(marker)
@@ -62,13 +51,11 @@ Item {
     }
 
     Component.onCompleted: {
-        map.addMapItem(sprayPolygon)
         map.addMapItem(sprayPolyline)
         _rebuildMarkers()
     }
 
     Component.onDestruction: {
-        map.removeMapItem(sprayPolygon)
         map.removeMapItem(sprayPolyline)
         for (var i = 0; i < _markerItems.length; i++) {
             map.removeMapItem(_markerItems[i])
@@ -76,13 +63,12 @@ Item {
         }
     }
 
-    // Watch for points changing
     onMissionItemChanged: _rebuildMarkers()
 
-    // Red dot marker component
     Component {
         id: markerComponent
         MapQuickItem {
+            property int markerIndex: 0         // ← index of this point
             anchorPoint: Qt.point(10, 10)
             sourceItem: Rectangle {
                 width:  20
@@ -91,16 +77,25 @@ Item {
                 color:  "red"
                 border.color: "white"
                 border.width: 2
+
+                // Index label inside red dot
+                Text {
+                    anchors.centerIn: parent
+                    text: markerIndex + 1
+                    color: "white"
+                    font.bold: true
+                    font.pixelSize: 9
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        root.clicked(missionItem.sequenceNumber)
+                        root.pointClicked(markerIndex)   // ← emit which point
+                    }
+                }
             }
         }
-    }
-
-    MapPolygon {
-        id: sprayPolygon
-        path: polygonPath
-        border.width: 0
-        color: "transparent"     // ← no fill
-        visible: false           // ← hide completely
     }
 
     MapPolyline {

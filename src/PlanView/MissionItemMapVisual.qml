@@ -26,6 +26,7 @@ Item {
     property var interactive: true    ///< Vehicle associated with this item
 
     signal clicked(int sequenceNumber)
+    signal pointClicked(int pointIndex)
 
     property var _visualItem
 
@@ -37,6 +38,10 @@ Item {
             }
             _visualItem = component.createObject(map, { "map": _root.map,"missionItem": object,vehicle: _root.vehicle, 'opacity': Qt.binding(function() { return _root.opacity }), 'interactive': Qt.binding(function() { return _root.interactive }), 'visible': Qt.binding(function() { return _root.visible }) })
             _visualItem.clicked.connect(_root.clicked)
+            // Forward pointClicked if visual has it
+                   if (_visualItem.pointClicked !== undefined) {
+                       _visualItem.pointClicked.connect(_root.pointClicked)
+                   }
         }
     }
 

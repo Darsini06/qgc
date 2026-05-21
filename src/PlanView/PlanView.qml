@@ -1317,6 +1317,18 @@ Item {
                                          }
                                      }
                                  }
+                    onPointClicked: (pointIndex) => {
+                           // Find the SpotSpraying item and open popup
+                           for (var i = 0; i < _missionController.visualItems.count; i++) {
+                               var item = _missionController.visualItems.get(i)
+                               if (item.commandName === "Spot Spraying") {
+                                   itemEditPopup.popupMissionItem = item
+                                   itemEditPopup.targetPointIndex = pointIndex   // pass index
+                                   itemEditPopup.open()
+                                   break
+                               }
+                           }
+                       }
                 }
             }
 
@@ -3398,6 +3410,7 @@ Item {
     Popup {
         id: itemEditPopup
         property var popupMissionItem: null
+        property int targetPointIndex: -1
 
         // Reserve space: planToolBar height + bottom margin
         readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
@@ -3485,6 +3498,9 @@ Item {
                                 item.missionItem        = itemEditPopup.popupMissionItem
                                 item.availableWidth     = popupScrollView.width
                                 item.masterController   = _planMasterController
+                                if (itemEditPopup.targetPointIndex >= 0 && item.expandedIndex !== undefined) {
+                                               item.expandedIndex = itemEditPopup.targetPointIndex
+                                           }
                                 console.log("Forced missionItem:", item.missionItem)
                                 console.log("Points:", item.missionItem ? item.missionItem.points.count : "NULL")
                             }

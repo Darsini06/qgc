@@ -16,6 +16,12 @@ Item {
     property var    missionItem
     property real   availableWidth
     property var masterController
+    property int selectedIndex: 0
+
+    // readonly property var selectedPoint:
+    //     (missionItem && missionItem.points && missionItem.points.length > 0)
+    //     ? missionItem.points[selectedIndex]
+    //     : null
 
     property int    expandedIndex: -1
 
@@ -42,21 +48,29 @@ Item {
             visible:        pointsHeader.checked
 
             Repeater {
-                model: missionItem ? missionItem.points : []
+model: missionItem.points
 
                delegate: Rectangle {
                     id: cardRect
+                    property var point: object
                     Component.onCompleted: {
                         console.log("------ POINT ------")
-                        console.log("LAT:", object.coordinate.latitude)
-                        console.log("LON:", object.coordinate.longitude)
-                        console.log("ALT:", object.altitude)
-                        console.log("SPEED:", object.speed)
-                        console.log("PWM:", object.pwm)
-                        console.log("DURATION:", object.duration)
+                        console.log("LAT:", point.coordinate.latitude)
+                        console.log("LON:", point.coordinate.longitude)
+                        console.log("ALT:", point.altitude)
+                        console.log("SPEED:", point.speed)
+                        console.log("PWM:", point.pwm)
+                        console.log("DURATION:", point.duration)
                     }
-                    property bool isCardExpanded: true // Expand cards by default so fields are immediately visible!
-
+                    property bool isCardExpanded: (root.expandedIndex === index) ? true : false
+                    Connections {
+                          target: root
+                          function onExpandedIndexChanged() {
+                              if (root.expandedIndex === index) {
+                                  isCardExpanded = true
+                              }
+                          }
+                      }
                     width: parent.width
                     height: contentCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.5)
                     color: isCardExpanded ? qgcPal.windowShade : qgcPal.windowShadeDark
@@ -79,7 +93,7 @@ Item {
                                 width: 8
                                 height: 8
                                 radius: 4
-                                color: (object.pwm > 1200) ? "#2ECC71" : "#E74C3C"
+                                color: (point.pwm > 1200) ? "#2ECC71" : "#E74C3C"
                                 Layout.alignment: Qt.AlignVCenter
                             }
 
@@ -110,65 +124,66 @@ Item {
 
                             QGCLabel { text: qsTr("Lat") }
                             QGCTextField {
-                               text: object.coordinate.latitude.toFixed(6)
+                               text: point.coordinate.latitude.toFixed(6)
                                 onEditingFinished: {
-                                   var coord = object.coordinate
+                                   var coord = point.coordinate
                                     coord.latitude = parseFloat(text)
-                                    object.coordinate = coord
+                                    point.coordinate = coord
                                 }
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Lon") }
                             QGCTextField {
-                                text: object.coordinate.longitude.toFixed(6)
+                                text: point.coordinate.longitude.toFixed(6)
                                 onEditingFinished: {
-                                   var coord = object.coordinate
+                                   var coord = point.coordinate
                                     coord.longitude = parseFloat(text)
-                                    object.coordinate = coord
+                                    point.coordinate = coord
                                 }
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Alt (m)") }
                             QGCTextField {
-                               text: object.altitude.toFixed(1)
-                                onEditingFinished: object.altitude = parseFloat(text)
+                               text: point.altitude.toFixed(1)
+                                onEditingFinished: point.altitude = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Speed (m/s)") }
                             QGCTextField {
-                               text: object.speed.toFixed(1)
-                                onEditingFinished: object.speed = parseFloat(text)
+                               text: point.speed.toFixed(1)
+                                onEditingFinished: point.speed = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Hover (s)") }
                             QGCTextField {
-                                text: object.duration.toFixed(1)
-                                onEditingFinished: object.duration = parseFloat(text)
+                                text: point.duration.toFixed(1)
+                                onEditingFinished: point.duration = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Spray") }
                             QGCCheckBox {
-                                text: (object.pwm > 1200) ? qsTr("ON") : qsTr("OFF")
-                                checked: object.pwm > 1200
-                                onClicked: object.pwm = checked ? 1500.0 : 1000.0
+                                text: (point.pwm > 1200) ? qsTr("ON") : qsTr("OFF")
+                                checked: point.pwm > 1200
+                                onClicked: point.pwm = checked ? 1500.0 : 1000.0
                                 Layout.fillWidth: true
                             }
                         }
                     }
 
-                    // Click area only for the top header part of the card
                     MouseArea {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.top: parent.top
                         height: ScreenTools.defaultFontPixelHeight * 2.5
+
                         onClicked: {
-                            cardRect.isCardExpanded = !cardRect.isCardExpanded
+                            root.selectedIndex = index
+                            root.expandedIndex = index
                         }
                     }
                 }
