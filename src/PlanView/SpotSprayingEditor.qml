@@ -16,15 +16,22 @@ Item {
     property var    missionItem
     property real   availableWidth
     property var masterController
-    property int selectedIndex: 0
+    property int selectedIndex: -1
 
     // readonly property var selectedPoint:
     //     (missionItem && missionItem.points && missionItem.points.length > 0)
     //     ? missionItem.points[selectedIndex]
     //     : null
 
-    property int    expandedIndex: -1
+    property int expandedIndex: -1
 
+    onSelectedIndexChanged: {
+        console.log("OPENING INDEX:", selectedIndex)
+
+        if (selectedIndex >= 0) {
+            expandedIndex = selectedIndex
+        }
+    }
     QGCPalette { id: qgcPal; colorGroupEnabled: true }
 
     ColumnLayout {
@@ -32,12 +39,21 @@ Item {
         anchors.left:       parent.left
         anchors.right:      parent.right
         spacing:            ScreenTools.defaultFontPixelHeight / 2
-
-        SectionHeader {
-            id:             pointsHeader
+        Rectangle {
             Layout.fillWidth: true
-            text:           qsTr("Spot Spraying Waypoints")
-            checked:        true
+            height: 40
+            color: "transparent"
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+
+                text: qsTr("Spot Spraying Waypoints")
+                color: "white"
+                font.bold: true
+                font.pixelSize: 16
+            }
         }
 
 
@@ -45,11 +61,15 @@ Item {
             width:          parent.width
             Layout.fillWidth: true
             spacing:        ScreenTools.defaultFontPixelHeight / 2
-            visible:        pointsHeader.checked
-
+           visible: true
             Repeater {
-model: missionItem.points
-
+                model: (missionItem && missionItem.points)
+                          ? missionItem.points
+                          : 0
+                Component.onCompleted: {
+                    console.log("EDITOR missionItem:", missionItem)
+                    console.log("EDITOR selectedIndex:", selectedIndex)
+                }
                delegate: Rectangle {
                     id: cardRect
                     property var point: object
@@ -63,14 +83,7 @@ model: missionItem.points
                         console.log("DURATION:", point.duration)
                     }
                     property bool isCardExpanded: (root.expandedIndex === index) ? true : false
-                    Connections {
-                          target: root
-                          function onExpandedIndexChanged() {
-                              if (root.expandedIndex === index) {
-                                  isCardExpanded = true
-                              }
-                          }
-                      }
+
                     width: parent.width
                     height: contentCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.5)
                     color: isCardExpanded ? qgcPal.windowShade : qgcPal.windowShadeDark
@@ -182,8 +195,15 @@ model: missionItem.points
                         height: ScreenTools.defaultFontPixelHeight * 2.5
 
                         onClicked: {
-                            root.selectedIndex = index
-                            root.expandedIndex = index
+
+                            // If already open → close it
+                            if (root.expandedIndex === index) {
+                                root.expandedIndex = -1
+                            } else {
+                                // Open selected waypoint
+                                root.selectedIndex = index
+                                root.expandedIndex = index
+                            }
                         }
                     }
                 }

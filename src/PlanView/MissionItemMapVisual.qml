@@ -36,12 +36,27 @@ Item {
             if (component.status === Component.Error) {
                 console.log("Error loading Qml: ", object.mapVisualQML, component.errorString())
             }
-            _visualItem = component.createObject(map, { "map": _root.map,"missionItem": object,vehicle: _root.vehicle, 'opacity': Qt.binding(function() { return _root.opacity }), 'interactive': Qt.binding(function() { return _root.interactive }), 'visible': Qt.binding(function() { return _root.visible }) })
+            // _visualItem = component.createObject(map, { "map": _root.map,"missionItem": object,vehicle: _root.vehicle, 'opacity': Qt.binding(function() { return _root.opacity }), 'interactive': Qt.binding(function() { return _root.interactive }), 'visible': Qt.binding(function() { return _root.visible }) })
+            _visualItem = component.createObject(map, {
+                "map": _root.map,
+                "missionItem": object,
+                "vehicle": _root.vehicle,
+
+                "opacity": Qt.binding(function() { return _root.opacity }),
+                "interactive": Qt.binding(function() { return _root.interactive }),
+                "visible": Qt.binding(function() { return _root.visible })
+            })
             _visualItem.clicked.connect(_root.clicked)
             // Forward pointClicked if visual has it
-                   if (_visualItem.pointClicked !== undefined) {
-                       _visualItem.pointClicked.connect(_root.pointClicked)
-                   }
+            if (_visualItem.pointClicked) {
+
+                _visualItem.pointClicked.connect(function(pointIndex) {
+
+                    console.log("Forwarded point:", pointIndex)
+
+                    _root.pointClicked(pointIndex)
+                })
+            }
         }
     }
 

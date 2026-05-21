@@ -24,7 +24,7 @@ Item {
     id: _root
 
     property bool planControlColapsed: false
-
+    property int selectedSpotPointIndex: -1
     readonly property int   _decimalPlaces:             8
     readonly property real  _margin:                    ScreenTools.defaultFontPixelHeight * 0.5
     readonly property real  _toolsMargin:               ScreenTools.defaultFontPixelWidth * 0.75
@@ -1304,31 +1304,67 @@ Item {
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
-                    onClicked:   (sequenceNumber) => {
-                                     _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
-                                     for (var i = 0; i < _missionController.visualItems.count; i++) {
-                                         var item = _missionController.visualItems.get(i)
-                                         if (item.sequenceNumber === sequenceNumber) {
-                                             missionItemDialog.currentMissionItem = item
-                                             missionItemDialog.currentIndex = i
-                                             missionItemDialog.open()
-                                             missionItemDialog.visible = true
-                                             break
-                                         }
-                                     }
-                                 }
+                    onClicked: (sequenceNumber) => {
+
+                        _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+
+                        for (var i = 0; i < _missionController.visualItems.count; i++) {
+
+                            var item = _missionController.visualItems.get(i)
+
+                            if (item.sequenceNumber === sequenceNumber) {
+
+                                itemEditPopup.popupMissionItem = item
+                                itemEditPopup.open()
+
+                                break
+                            }
+                        }
+                    }
                     onPointClicked: (pointIndex) => {
-                           // Find the SpotSpraying item and open popup
-                           for (var i = 0; i < _missionController.visualItems.count; i++) {
-                               var item = _missionController.visualItems.get(i)
-                               if (item.commandName === "Spot Spraying") {
-                                   itemEditPopup.popupMissionItem = item
-                                   itemEditPopup.targetPointIndex = pointIndex   // pass index
-                                   itemEditPopup.open()
-                                   break
-                               }
-                           }
-                       }
+
+                        console.log("Clicked point:", pointIndex)
+
+                        for (var i = 0; i < _missionController.visualItems.count; i++) {
+
+                            var item = _missionController.visualItems.get(i)
+
+                            if (item.commandName === "Spot Spraying") {
+
+                                                itemEditPopup.popupMissionItem = item
+                                                itemEditPopup.selectedPointIndex = pointIndex
+
+                                                itemEditPopup.open()
+
+                                                Qt.callLater(function() {
+
+                                                    if (genericEditorLoader.item) {
+
+                                                        genericEditorLoader.item.missionItem = item
+
+                                                        genericEditorLoader.item.selectedIndex = pointIndex
+                                                        genericEditorLoader.item.expandedIndex = pointIndex
+
+                                                        console.log("FORCED OPEN:", pointIndex)
+                                                    }
+                                                })
+
+                                // IMPORTANT
+                                Qt.callLater(function() {
+
+                                    if (genericEditorLoader.item) {
+
+                                        genericEditorLoader.item.selectedIndex = pointIndex
+                                        genericEditorLoader.item.expandedIndex = pointIndex
+
+                                        console.log("FORCED OPEN:", pointIndex)
+                                    }
+                                })
+
+                                break
+                            }
+                        }
+                    }
                 }
             }
 
@@ -2283,11 +2319,35 @@ Item {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
                                        }
 
+                            // onEditItemClicked: (popupItem) => {
+                            //                        itemEditPopup.popupMissionItem = popupItem
+                            //                        itemEditPopup.open()
+                            //                        console.log("itemEditPopup.popupMissionItem",popupItem)
+                            //                    }
                             onEditItemClicked: (popupItem) => {
-                                                   itemEditPopup.popupMissionItem = popupItem
-                                                   itemEditPopup.open()
-                                                   console.log("itemEditPopup.popupMissionItem",popupItem)
-                                               }
+
+                                itemEditPopup.popupMissionItem = popupItem
+
+                                // Open first waypoint by default
+                                itemEditPopup.selectedPointIndex = 0
+
+                                itemEditPopup.open()
+
+                                Qt.callLater(function() {
+
+                                    if (genericEditorLoader.item) {
+
+                                        genericEditorLoader.item.missionItem = popupItem
+
+                                        genericEditorLoader.item.selectedIndex = 0
+                                        genericEditorLoader.item.expandedIndex = 0
+
+                                        console.log("DEFAULT OPEN WAYPOINT 0")
+                                    }
+                                })
+
+                                console.log("itemEditPopup.popupMissionItem", popupItem)
+                            }
 
                             onSelectCommandClicked: (missionItem) => {
                                                         commandSelectionPopup.popupMissionItem = missionItem
@@ -3411,6 +3471,7 @@ Item {
         id: itemEditPopup
         property var popupMissionItem: null
         property int targetPointIndex: -1
+        property int selectedPointIndex: -1
 
         // Reserve space: planToolBar height + bottom margin
         readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
@@ -3494,15 +3555,13 @@ Item {
                         property var    editorRoot:         null
 
                         onLoaded: {
-                            if (item) {
-                                item.missionItem        = itemEditPopup.popupMissionItem
-                                item.availableWidth     = popupScrollView.width
-                                item.masterController   = _planMasterController
-                                if (itemEditPopup.targetPointIndex >= 0 && item.expandedIndex !== undefined) {
-                                               item.expandedIndex = itemEditPopup.targetPointIndex
-                                           }
-                                console.log("Forced missionItem:", item.missionItem)
-                                console.log("Points:", item.missionItem ? item.missionItem.points.count : "NULL")
+
+                            if (item && itemEditPopup.selectedPointIndex >= 0) {
+
+                                item.selectedIndex = itemEditPopup.selectedPointIndex
+                                item.expandedIndex = itemEditPopup.selectedPointIndex
+
+                                console.log("OPENING INDEX:", itemEditPopup.selectedPointIndex)
                             }
                         }
                     }
