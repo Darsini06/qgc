@@ -11,6 +11,7 @@ Item {
     property var missionItem
     property bool interactive: true
     property var vehicle: null
+    property int selectedPointIndex: -1
 
     signal clicked(int sequenceNumber)
     signal pointClicked(int pointIndex)        // ← ADD THIS
@@ -68,36 +69,62 @@ Item {
     Component {
         id: markerComponent
         MapQuickItem {
-            property int markerIndex: 0         // ← index of this point
-            anchorPoint: Qt.point(10, 10)
-            sourceItem: Rectangle {
-                width:  20
-                height: 20
-                radius: 10
-                color:  "red"
-                border.color: "white"
-                border.width: 2
+            property int markerIndex: 0
+            anchorPoint: Qt.point(16, 16)    // UPDATE anchor to center of glow
+            sourceItem: Item {
+                width: 32
+                height: 32
 
-                // Index label inside red dot
-                Text {
+                // Glow/pulse ring - shows when this point is selected
+                Rectangle {
                     anchors.centerIn: parent
-                    text: markerIndex + 1
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: 9
+                    width: 28
+                    height: 28
+                    radius: width / 2
+                    color: "transparent"
+                    border.color: "#FFD700"   // gold highlight
+                    border.width: 2.5
+                    visible: root.selectedPointIndex === markerIndex
+
+                    // Pulse animation
+                    SequentialAnimation on scale {
+                        running: root.selectedPointIndex === markerIndex
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 1.3; duration: 600; easing.type: Easing.InOutSine }
+                        NumberAnimation { to: 1.0; duration: 600; easing.type: Easing.InOutSine }
+                    }
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        root.clicked(missionItem.sequenceNumber)
-                        root.pointClicked(markerIndex)   // ← emit which point
+                // Red circle marker
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 20
+                    height: 20
+                    radius: 10
+                    color: "red"
+                    border.color: "white"
+                    border.width: 2
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: markerIndex + 1
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: 9
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.selectedPointIndex = markerIndex  // SET SELECTED
+                            root.clicked(missionItem.sequenceNumber)
+                            root.pointClicked(markerIndex)
+                        }
                     }
                 }
             }
         }
     }
-
     MapPolyline {
         id: sprayPolyline
         path: polygonPath

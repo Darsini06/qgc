@@ -1322,49 +1322,32 @@ Item {
                         }
                     }
                     onPointClicked: (pointIndex) => {
-
                         console.log("Clicked point:", pointIndex)
-
                         for (var i = 0; i < _missionController.visualItems.count; i++) {
-
                             var item = _missionController.visualItems.get(i)
-
                             if (item.commandName === "Spot Spraying") {
+                                itemEditPopup.popupMissionItem = item
+                                itemEditPopup.selectedPointIndex = pointIndex
+                                itemEditPopup.openedFromList = false   // RESET TO FALSE
+                                itemEditPopup.open()
 
-                                                itemEditPopup.popupMissionItem = item
-                                                itemEditPopup.selectedPointIndex = pointIndex
-
-                                                itemEditPopup.open()
-
-                                                Qt.callLater(function() {
-
-                                                    if (genericEditorLoader.item) {
-
-                                                        genericEditorLoader.item.missionItem = item
-
-                                                        genericEditorLoader.item.selectedIndex = pointIndex
-                                                        genericEditorLoader.item.expandedIndex = pointIndex
-
-                                                        console.log("FORCED OPEN:", pointIndex)
-                                                    }
-                                                })
-
-                                // IMPORTANT
-                                Qt.callLater(function() {
-
-                                    if (genericEditorLoader.item) {
-
-                                        genericEditorLoader.item.selectedIndex = pointIndex
-                                        genericEditorLoader.item.expandedIndex = pointIndex
-
-                                        console.log("FORCED OPEN:", pointIndex)
-                                    }
-                                })
-
-                                break
+                                // Force update even if loader already loaded
+                                                if (genericEditorLoader.item) {
+                                                    genericEditorLoader.item.showAllPoints = false
+                                                    genericEditorLoader.item.missionItem = item
+                                                    genericEditorLoader.item.selectedIndex = pointIndex
+                                                    // Force expand after render
+                                                    Qt.callLater(function() {
+                                                        if (genericEditorLoader.item) {
+                                                            genericEditorLoader.item.expandedIndex = pointIndex
+                                                        }
+                                                    })
+                                                }
+                                                break
                             }
                         }
                     }
+
                 }
             }
 
@@ -2325,30 +2308,30 @@ Item {
                             //                        console.log("itemEditPopup.popupMissionItem",popupItem)
                             //                    }
                             onEditItemClicked: (popupItem) => {
-
                                 itemEditPopup.popupMissionItem = popupItem
-
-                                // Open first waypoint by default
-                                itemEditPopup.selectedPointIndex = 0
-
+                                itemEditPopup.openedFromList = (popupItem.commandName === "Spot Spraying")
+                                itemEditPopup.selectedPointIndex = -1
                                 itemEditPopup.open()
 
-                                Qt.callLater(function() {
+                                if (genericEditorLoader.item && popupItem.commandName === "Spot Spraying") {
+                                    genericEditorLoader.item.showAllPoints = false   // 1. reset first
+                                    genericEditorLoader.item.selectedIndex = -1     // 2. clear index
+                                    genericEditorLoader.item.expandedIndex = -1     // 3. clear expanded
+                                    genericEditorLoader.item.missionItem = null     // 4. reset mission
+                                    genericEditorLoader.item.missionItem = popupItem // 5. set fresh
 
-                                    if (genericEditorLoader.item) {
-
-                                        genericEditorLoader.item.missionItem = popupItem
-
-                                        genericEditorLoader.item.selectedIndex = 0
-                                        genericEditorLoader.item.expandedIndex = 0
-
-                                        console.log("DEFAULT OPEN WAYPOINT 0")
-                                    }
-                                })
+                                    // Now apply edit mode after render
+                                    Qt.callLater(function() {
+                                        if (genericEditorLoader.item) {
+                                            genericEditorLoader.item.showAllPoints = true
+                                            genericEditorLoader.item.selectedIndex = -1
+                                            genericEditorLoader.item.expandedIndex = -1
+                                        }
+                                    })
+                                }
 
                                 console.log("itemEditPopup.popupMissionItem", popupItem)
                             }
-
                             onSelectCommandClicked: (missionItem) => {
                                                         commandSelectionPopup.popupMissionItem = missionItem
                                                         commandSelectionPopup.open()
@@ -3472,6 +3455,7 @@ Item {
         property var popupMissionItem: null
         property int targetPointIndex: -1
         property int selectedPointIndex: -1
+        property bool openedFromList: false
 
         // Reserve space: planToolBar height + bottom margin
         readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
@@ -3486,9 +3470,15 @@ Item {
         x: ScreenTools.defaultFontPixelWidth
         y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
 
-        modal: true
-        dim: false
-        closePolicy: Popup.CloseOnEscape
+        modal: itemEditPopup.popupMissionItem ?
+                  itemEditPopup.popupMissionItem.commandName !== "Spot Spraying" : true
+
+           dim: false
+
+           closePolicy: (itemEditPopup.popupMissionItem &&
+                         itemEditPopup.popupMissionItem.commandName === "Spot Spraying")
+                        ? Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                        : Popup.CloseOnEscape
         parent: Overlay.overlay
 
         background: Rectangle {
@@ -3555,13 +3545,16 @@ Item {
                         property var    editorRoot:         null
 
                         onLoaded: {
-
-                            if (item && itemEditPopup.selectedPointIndex >= 0) {
-
+                            if (item) {
+                                item.missionItem = itemEditPopup.popupMissionItem
+                                // Only apply showAllPoints for Spot Spraying
+                                if (itemEditPopup.popupMissionItem &&
+                                    itemEditPopup.popupMissionItem.commandName === "Spot Spraying") {
+                                    item.showAllPoints = itemEditPopup.openedFromList
+                                }
                                 item.selectedIndex = itemEditPopup.selectedPointIndex
                                 item.expandedIndex = itemEditPopup.selectedPointIndex
-
-                                console.log("OPENING INDEX:", itemEditPopup.selectedPointIndex)
+                                console.log("LOADER READY:", itemEditPopup.popupMissionItem.commandName)
                             }
                         }
                     }
