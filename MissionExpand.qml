@@ -15,8 +15,8 @@ import QGroundControl.Palette
 /// Mission item edit control
 Rectangle {
     id:             _root
-    height:         mainColumn.height
-    clip:           true
+    height: mainColumn.implicitHeight
+    clip:           false
 
     gradient: Gradient {
         GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.41) }
@@ -90,13 +90,14 @@ Rectangle {
     Column {
         id:     mainColumn
         width:  parent.width
+        height: implicitHeight
         spacing: 0
 
         // ── Top row: label + Edit button ──────────────────────────────────
         Item {
             id:                 topRowLayout
             width:              parent.width
-            height:             ScreenTools.defaultFontPixelHeight * 2.5
+            height: ScreenTools.defaultFontPixelHeight * 3.2
 
 
 
@@ -207,7 +208,8 @@ Rectangle {
                 // visible:                (missionItem.commandName === "Mission Start" ||
                 //                          missionItem.commandName === "Survey") && MapGlobals.isReviewMode
 
-                visible:                true // Allow editing all items via left popup
+                visible: missionItem.commandName === "Mission Start" ||
+                             missionItem.commandName === "Survey" || missionItem.commandName === "Spot Spraying"
 
                 onClicked:              editItemClicked(missionItem)
 

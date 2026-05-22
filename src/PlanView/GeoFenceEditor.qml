@@ -120,7 +120,7 @@ QGCFlickable {
         anchors.right: parent.right
         height:        mainCol.y + mainCol.height + _margin * 2
         color:         "#E6222222"
-        radius:        6
+        radius:        14
         border.color:  "#444444"
         border.width:  1
 

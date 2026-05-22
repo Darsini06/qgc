@@ -45,6 +45,7 @@ Item {
     property bool   isMissionTab:                       _editingLayer === _layerMission
     property bool   isFenceTab:                         _editingLayer === _layerGeoFence
     property bool   isAgriFenceMode:                    false
+    property bool fenceSettingsVisible:               false
     property int    _toolStripBottom:                   toolStrip.height + toolStrip.y
     property var    _appSettings:                       QGroundControl.settingsManager.appSettings
     property var    _planViewSettings:                  QGroundControl.settingsManager.planViewSettings
@@ -54,6 +55,7 @@ Item {
     property var    _vehicleID
     property bool   _triggerSubmit
     property bool   _resetRegisterFlightPlan
+    property string activeRightPanel: ""  // "" = normal, "obstacles" = obstacles open, "fence" = fence open
 
     readonly property var       _layers:                    [_layerMission, _layerGeoFence, _layerRallyPoints]
     readonly property var       _layersUTMSP:               [_layerMission, _layerRallyPoints, _layerUTMSP] //Adds additional UTMSP layer
@@ -100,37 +102,43 @@ Item {
     Connections {
         target: _planMasterController
         onPlanSaved: (filename) => {
-                         console.log("Plan saved, updating DB and Cloud Log:", filename)
-                         // Inject fence and boundary data into the JSON string before saving to mission log
-                         var planJson = JSON.parse(_planMasterController.saveToJsonString())
+            console.log("Plan saved:", filename)
+            var planJson = JSON.parse(_planMasterController.saveToJsonString())
 
-                         // 1. Circular Fence
-                         planJson.fenceData = {
-                             "lat": mapPolygonvisuals.fenceCenter.latitude,
-                             "lon": mapPolygonvisuals.fenceCenter.longitude,
-                             "radius": mapPolygonvisuals.fenceRadius,
-                             "enabled": QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
-                         }
+            // Only include fence data if fence is actually enabled
+            if (isAgriFenceMode &&
+                mapPolygonvisuals.fenceCenter.isValid &&
+                mapPolygonvisuals.fenceCenter.latitude !== 0) {
+                planJson.fenceData = {
+                    "lat": mapPolygonvisuals.fenceCenter.latitude,
+                    "lon": mapPolygonvisuals.fenceCenter.longitude,
+                    "radius": mapPolygonvisuals.fenceRadius,
+                    "enabled": true
+                }
+                saveFenceData(filename)  // ← only save if fence is ON
+            } else {
+                planJson.fenceData = {
+                    "lat": 0, "lon": 0, "radius": 0, "enabled": false
+                }
+                // ← DO NOT call saveFenceData, DO NOT restart fenceLoadTimer
+            }
 
-                         // 2. Boundary Points
-                         var boundaryPoints = []
-                         if (mapPolygonvisuals.mapPolygon) {
-                             for (var i = 0; i < mapPolygonvisuals.mapPolygon.count; i++) {
-                                 var coord = mapPolygonvisuals.mapPolygon.vertexCoordinate(i)
-                                 boundaryPoints.push({ "lat": coord.latitude, "lon": coord.longitude })
-                             }
-                         }
-                         planJson.boundaryPoints = boundaryPoints
+            var boundaryPoints = []
+            if (mapPolygonvisuals.mapPolygon) {
+                for (var i = 0; i < mapPolygonvisuals.mapPolygon.count; i++) {
+                    var coord = mapPolygonvisuals.mapPolygon.vertexCoordinate(i)
+                    boundaryPoints.push({ "lat": coord.latitude, "lon": coord.longitude })
+                }
+            }
+            planJson.boundaryPoints = boundaryPoints
+            MapGlobals.saveMissionLog(filename, planJson, _planMasterController)
 
-                         MapGlobals.saveMissionLog(filename, planJson, _planMasterController)
-
-                         // Save fence data to local SQLite DB as well
-                         saveFenceData(filename)
-
-                         // After saving, reload after a short delay to confirm fence is visible
-                         fenceLoadTimer.planPath = filename
-                         fenceLoadTimer.restart()
-                     }
+            // Only reload fence timer if fence is active
+            if (isAgriFenceMode) {
+                fenceLoadTimer.planPath = filename
+                fenceLoadTimer.restart()
+            }
+        }
         onCurrentPlanFileChanged: {
             // This fires on both save AND load. On save, onPlanSaved will handle fence.
             // On load (file open), we need to restore the fence from DB.
@@ -153,19 +161,25 @@ Item {
         property string planPath: ""
         onTriggered: {
             MapGlobals.getFence(planPath, function(fenceData) {
+
+                // CLEAR OLD FENCE FIRST
+                isAgriFenceMode = false
+                QGroundControl.saveGlobalSetting("enableFence", "false")  // ← ADD THIS LINE
+                mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                mapPolygonvisuals.fenceRadius = 0
+                mapPolygonvisuals.updateFence()
+
                 if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
-                    console.log("Fence restored after plan open for:", planPath)
-                    // If a fence exists, show it by default so the user knows it's there
-                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    var wasEnabled = fenceData.enabled === true || fenceData.enabled === "true"
+                    isAgriFenceMode = wasEnabled  // ← CHANGE from the forced "true" line
+
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                     mapPolygonvisuals.fenceRadius = fenceData.radius || 60
                     mapPolygonvisuals.updateFence()
                 }
             })
         }
-
     }
-
     property bool gridLines : MapGlobals.gridLines
 
     Component.onCompleted: {
@@ -298,21 +312,27 @@ Item {
     }
 
     function saveFenceData(planPath) {
-        if (!planPath) return
+        if (!planPath) {
+            console.log("saveFenceData: NO PATH, skipping")
+            return
+        }
         var lat = mapPolygonvisuals.fenceCenter.latitude
         var lon = mapPolygonvisuals.fenceCenter.longitude
         var rad = mapPolygonvisuals.fenceRadius
-        // Only save if we have a real non-zero coordinate (fence was actually placed)
+
+        console.log("saveFenceData: isAgriFenceMode=", isAgriFenceMode,
+                    "lat=", lat, "lon=", lon, "rad=", rad, "path=", planPath)
+
         if (lat === 0 && lon === 0) {
-            console.log("saveFenceData: fenceCenter is (0,0), skipping save")
+            console.log("saveFenceData: SKIPPED - lat/lon is 0,0")
             return
         }
-        console.log("saveFenceData: saving fence for:", planPath, "lat:", lat, "lon:", lon, "radius:", rad)
-        // Mark fence as enabled for this plan
-        QGroundControl.saveGlobalSetting("enableFence", "true")
-        MapGlobals.saveFence(planPath, lat, lon, rad)
-    }
 
+        var currentFenceEnabled = isAgriFenceMode
+        console.log("saveFenceData: SAVING with enabled=", currentFenceEnabled)
+        QGroundControl.saveGlobalSetting("enableFence", currentFenceEnabled ? "true" : "false")
+        MapGlobals.saveFence(planPath, lat, lon, rad, currentFenceEnabled)
+    }
     function loadFenceData(planPath) {
         if (!planPath) return
         // Short delay to ensure map is initialized, then load fence
@@ -324,22 +344,30 @@ Item {
         id: fenceLoadTimer
         interval: 300
         property string planPath: ""
+
         onTriggered: {
             MapGlobals.getFence(planPath, function(fenceData) {
+                console.log("fenceLoadTimer: fenceData=", JSON.stringify(fenceData))
+                console.log("fenceLoadTimer: enabled=", fenceData ? fenceData.enabled : "NO DATA")
+
+                isAgriFenceMode = false
+                QGroundControl.saveGlobalSetting("enableFence", "false")
+                mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                mapPolygonvisuals.fenceRadius = 0
+                mapPolygonvisuals.updateFence()
+
                 if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
-                    console.log("Fence loaded from DB for:", planPath, "lat:", fenceData.lat, "lon:", fenceData.lon)
-                    // Always re-enable fence and apply data so it renders
-                    QGroundControl.saveGlobalSetting("enableFence", "true")
+                    var wasEnabled = fenceData.enabled === true || fenceData.enabled === "true"
+                    isAgriFenceMode = wasEnabled
+                    // ← SET BEFORE updateFence
+                    QGroundControl.saveGlobalSetting("enableFence", wasEnabled ? "true" : "false")
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                     mapPolygonvisuals.fenceRadius = fenceData.radius || 60
                     mapPolygonvisuals.updateFence()
-                } else {
-                    console.log("No fence in DB for:", planPath, "- keeping current display")
                 }
             })
         }
     }
-
     Connections {
         target: MapGlobals
         onRequestCloudSync: syncCloud()
@@ -1850,12 +1878,16 @@ Item {
                 anchors.top:        parent.top
                 anchors.topMargin:  ScreenTools.defaultFontPixelHeight * (ScreenTools.isMobile ? 3.5 : 2.5)
 
+
                 // 1st: Boundary Point
                 Loader {
                     id:                 boundaryButtonsLoader
                     width:              parent.width
                     active:             (isMissionTab || _editingLayer === _layerGeoFence) && activePolygon && (activePolygon.traceMode || mapPolygonvisuals.mapping)
-                    visible:            active && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
+                    visible: active && !MapGlobals.isReviewMode &&
+                             MapGlobals.editdialog !== "editdialog" &&
+                             !MapGlobals.isSpotSprayingActive &&
+                             activeRightPanel === ""  // ← ADD
 
                     sourceComponent: Column {
                         spacing:            ScreenTools.defaultFontPixelHeight * 0.6
@@ -1894,7 +1926,11 @@ Item {
                     id:         layerTabBar
                     width:      parent.width
                     spacing:    0
-                    visible:    _geoFenceController.supported && !MapGlobals.isReviewMode && MapGlobals.editdialog !== "editdialog" && !isAgriFenceMode && !MapGlobals.isSpotSprayingActive
+                    visible: _geoFenceController.supported &&
+                             !MapGlobals.isReviewMode &&
+                             MapGlobals.editdialog !== "editdialog" &&
+                             !MapGlobals.isSpotSprayingActive &&
+                             activeRightPanel !== "fence"  // ← ADD (hide when fence open)
 
                     property int currentIndex: 0
                     property bool fenceVisible: _geoFenceController.supported
@@ -1926,9 +1962,11 @@ Item {
                                 if (_editingLayer === _layerGeoFence) {
                                     _editingLayer = _layerMission
                                     layerTabBar.currentIndex = 0
+                                    activeRightPanel = ""  // ← ADD
                                 } else {
                                     _editingLayer = _layerGeoFence
                                     layerTabBar.currentIndex = 1
+                                    activeRightPanel = "obstacles"  // ← ADD
                                 }
                             }
                         }
@@ -1938,7 +1976,11 @@ Item {
                 Column {
                     width:              parent.width
                     spacing:            ScreenTools.defaultFontPixelHeight * 0.4
-                    visible:            (isMissionTab || isAgriFenceMode) && !MapGlobals.isReviewMode &&  MapGlobals.editdialog !== "editdialog" && !MapGlobals.isSpotSprayingActive
+                    visible: isMissionTab &&
+                             !MapGlobals.isReviewMode &&
+                             MapGlobals.editdialog !== "editdialog" &&
+                             !MapGlobals.isSpotSprayingActive &&
+                             activeRightPanel !== "obstacles"  // ← ADD (hide when obstacles open)
 
                     // Main Fence Toggle Button
                     Button {
@@ -1961,11 +2003,13 @@ Item {
                             font.family:        "Outfit"
                         }
                         onClicked: {
-                            isAgriFenceMode = !isAgriFenceMode
-                            if (isAgriFenceMode) {
+                            if (!isAgriFenceMode) {
+                                isAgriFenceMode = true
+                                fenceSettingsVisible = true
+                                activeRightPanel = "fence"  // ← ADD
                                 QGroundControl.saveGlobalSetting("enableFence", "true")
-                                // Initialize fence center if not set
-                                if (mapPolygonvisuals.fenceCenter.latitude === 0 || isNaN(mapPolygonvisuals.fenceCenter.latitude)) {
+                                if (mapPolygonvisuals.fenceCenter.latitude === 0 ||
+                                    isNaN(mapPolygonvisuals.fenceCenter.latitude)) {
                                     var vp = editorMap.centerViewport
                                     var centerPoint = (vp && vp.width > 0)
                                             ? Qt.point(vp.x + vp.width / 2, vp.y + vp.height / 2)
@@ -1973,8 +2017,11 @@ Item {
                                     mapPolygonvisuals.fenceCenter = editorMap.toCoordinate(centerPoint, false)
                                     mapPolygonvisuals.fenceRadius = 60
                                 }
+                                mapPolygonvisuals.updateFence()
+                            } else {
+                                fenceSettingsVisible = !fenceSettingsVisible
+                                activeRightPanel = fenceSettingsVisible ? "fence" : ""  // ← ADD
                             }
-                            mapPolygonvisuals.updateFence()
                         }
                     }
 
@@ -1984,7 +2031,10 @@ Item {
                         id:                 fenceSettingsPanel
                         width:              parent.width
                         height:             fenceSubCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 2)
-                        visible:            isAgriFenceMode
+                        visible: fenceSettingsVisible &&    // ← CHANGE THIS
+                                   isAgriFenceMode &&
+                                   mapPolygonvisuals.fenceCenter.isValid &&
+                                   mapPolygonvisuals.fenceRadius > 0
                         color:              "#3A3A3A" // Milder grey
                         radius:             8
                         border.color:       "#555555"
@@ -2115,15 +2165,17 @@ Item {
                                 }
                                 onClicked: {
                                     mainWindow.showMessageDialog(qsTr("Delete Fence"),
-                                                                 qsTr("Are you sure you want to permanently delete the circular fence data?"),
-                                                                 Dialog.Yes | Dialog.No,
-                                                                 function() {
-                                                                     QGroundControl.saveGlobalSetting("enableFence", "false")
-                                                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
-                                                                     mapPolygonvisuals.updateFence()
-                                                                     isAgriFenceMode = false
-                                                                 }
-                                                                 )
+                                        qsTr("Are you sure you want to permanently delete the circular fence data?"),
+                                        Dialog.Yes | Dialog.No,
+                                        function() {
+                                            isAgriFenceMode = false
+                                            fenceSettingsVisible = false
+                                            activeRightPanel = ""
+                                            QGroundControl.saveGlobalSetting("enableFence", "false")  // ← ADD THIS
+                                            mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                            mapPolygonvisuals.fenceRadius = 0
+                                            mapPolygonvisuals.updateFence()
+                                        })
                                 }
                             }
                         }
@@ -2229,11 +2281,11 @@ Item {
 
             }
 
-
             GeoFenceEditor {
                 anchors.top:            rightControls.bottom
                 anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         parent.bottom
+                anchors.bottom:         savePlanBtn.top        // ← CHANGE from parent.bottom
+                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 myGeoFenceController:   _geoFenceController
@@ -2247,10 +2299,10 @@ Item {
                 id:                     missionItemEditor
                 anchors.left:           parent.left
                 anchors.right:          parent.right
-                anchors.top:            MapGlobals.isReviewMode ? planToolBar.bottom : rightControls.bottom
-                anchors.topMargin:      -(ScreenTools.defaultFontPixelHeight * 2.7)
-                anchors.bottom:         parent.bottom
-                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.35
+                anchors.top:            parent.top
+                    anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 3.5
+                anchors.bottom:         savePlanBtn.top    // CHANGE THIS
+                    anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
                 visible:                _editingLayer == _layerMission
 
                 QGCListView {
@@ -2387,14 +2439,17 @@ Item {
             // 3rd: Save Plan at the bottom
             Button {
                 id:                     savePlanBtn
+
                 anchors.bottom:         parent.bottom
                 anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 height:                 ScreenTools.defaultFontPixelHeight * 2.5
                 text:                   qsTr("Save Plan")
-                visible:                (isMissionTab || isAgriFenceMode) && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
-
+                visible: (isMissionTab || isAgriFenceMode) &&
+                         (!MapGlobals.isReviewMode || MapGlobals.showMissionItems) &&
+                         !(isAgriFenceMode && fenceSettingsVisible) &&
+                         activeRightPanel !== "obstacles"
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
                     color: "black"
@@ -3533,8 +3588,9 @@ Item {
                                  itemEditPopup.popupMissionItem.commandName !== "Survey")
                                 ? (itemEditPopup.popupMissionItem.commandName === "Spot Spraying"
                                    ? "qrc:/qml/SpotSprayingEditor.qml"
-                                   : itemEditPopup.popupMissionItem.editorQML)
+                                   : itemEditPopup.popupMissionItem.editorQml)
                                 : ""
+
                         visible: itemEditPopup.popupMissionItem !== null &&
                                  itemEditPopup.popupMissionItem.commandName !== "Mission Start" &&
                                  itemEditPopup.popupMissionItem.commandName !== "Survey"
@@ -3546,19 +3602,17 @@ Item {
 
                         onLoaded: {
                             if (item) {
-                                item.missionItem = itemEditPopup.popupMissionItem
-                                // Only apply showAllPoints for Spot Spraying
                                 if (itemEditPopup.popupMissionItem &&
                                     itemEditPopup.popupMissionItem.commandName === "Spot Spraying") {
+                                    item.missionItem = itemEditPopup.popupMissionItem
                                     item.showAllPoints = itemEditPopup.openedFromList
+                                    item.selectedIndex = itemEditPopup.selectedPointIndex
+                                    item.expandedIndex = itemEditPopup.selectedPointIndex
                                 }
-                                item.selectedIndex = itemEditPopup.selectedPointIndex
-                                item.expandedIndex = itemEditPopup.selectedPointIndex
                                 console.log("LOADER READY:", itemEditPopup.popupMissionItem.commandName)
                             }
                         }
                     }
-
 
                     Loader {
                         id:     surveyEditorLoader
@@ -3573,6 +3627,7 @@ Item {
                         property var    editorRoot:         null
                     }
                 }
+
             }
 
             Button {
