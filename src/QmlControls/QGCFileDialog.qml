@@ -733,6 +733,7 @@ Item {
             onOpened: {
                 MapGlobals.editdialog = "editdialog"
             }
+
             onClosed: {
                 MapGlobals.editdialog = "editdialog1"
             }
@@ -754,6 +755,7 @@ Item {
                     Layout.preferredHeight: parent.height * 0.28
                     color: "#262626"
                     radius: 20
+
                     // Top rounded corners only
                     Rectangle {
                         anchors.bottom: parent.bottom

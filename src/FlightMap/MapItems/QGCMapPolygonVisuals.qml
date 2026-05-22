@@ -143,26 +143,27 @@ Item {
     function addToolbarVisuals() {
         console.log("new_addToolbarVisuals")
         if (_objMgrToolVisuals.empty) {
-            // if(QGroundControl.loadGlobalSetting("mapping","mapping")==="basic"){
-            //     _resetPolygon()
-            // }else if(QGroundControl.loadGlobalSetting("mapping","mapping")==="circle"){
-            //     _resetCircle()
-            // }
+
             _toolbarItem = _objMgrToolVisuals.createObject(toolbarComponent, mapControl)
             _toolbarItem.z = QGroundControl.zOrderWidgets
+
             var edit = MapGlobals.edit
-            console.log("MapGlobals.edit")
             console.log("MapGlobals.edit",MapGlobals.edit)
+
             if(MapGlobals.edit==="edit"){
+
                 if(QGroundControl.loadGlobalSetting("load","load")==="load"){
                     customdialog.createObject(mainWindow).open()
                 }
 
             }else if (MapGlobals.edit==="edit2"){
+                console.log("MapGlobals.edit_else if",MapGlobals.edit)
                 _saveCurrentVertices()
                 _circleMode = false
                 if (mapPolygon) mapPolygon.traceMode = true
+
             }else{
+                console.log("MapGlobals.edit else",MapGlobals.edit)
                 _saveCurrentVertices()
                 _circleMode = false
                 if (mapPolygon) mapPolygon.traceMode = true

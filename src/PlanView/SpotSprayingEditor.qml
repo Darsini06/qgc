@@ -48,9 +48,9 @@ Item {
             visible:        pointsHeader.checked
 
             Repeater {
-model: missionItem.points
+                model: missionItem.points
 
-               delegate: Rectangle {
+                delegate: Rectangle {
                     id: cardRect
                     property var point: object
                     Component.onCompleted: {
@@ -63,14 +63,16 @@ model: missionItem.points
                         console.log("DURATION:", point.duration)
                     }
                     property bool isCardExpanded: (root.expandedIndex === index) ? true : false
+
                     Connections {
-                          target: root
-                          function onExpandedIndexChanged() {
-                              if (root.expandedIndex === index) {
-                                  isCardExpanded = true
-                              }
-                          }
-                      }
+                        target: root
+                        function onExpandedIndexChanged() {
+                            if (root.expandedIndex === index) {
+                                isCardExpanded = true
+                            }
+                        }
+                    }
+
                     width: parent.width
                     height: contentCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.5)
                     color: isCardExpanded ? qgcPal.windowShade : qgcPal.windowShadeDark
@@ -124,9 +126,9 @@ model: missionItem.points
 
                             QGCLabel { text: qsTr("Lat") }
                             QGCTextField {
-                               text: point.coordinate.latitude.toFixed(6)
+                                text: point.coordinate.latitude.toFixed(6)
                                 onEditingFinished: {
-                                   var coord = point.coordinate
+                                    var coord = point.coordinate
                                     coord.latitude = parseFloat(text)
                                     point.coordinate = coord
                                 }
@@ -137,7 +139,7 @@ model: missionItem.points
                             QGCTextField {
                                 text: point.coordinate.longitude.toFixed(6)
                                 onEditingFinished: {
-                                   var coord = point.coordinate
+                                    var coord = point.coordinate
                                     coord.longitude = parseFloat(text)
                                     point.coordinate = coord
                                 }
@@ -146,14 +148,14 @@ model: missionItem.points
 
                             QGCLabel { text: qsTr("Alt (m)") }
                             QGCTextField {
-                               text: point.altitude.toFixed(1)
+                                text: point.altitude.toFixed(1)
                                 onEditingFinished: point.altitude = parseFloat(text)
                                 Layout.fillWidth: true
                             }
 
                             QGCLabel { text: qsTr("Speed (m/s)") }
                             QGCTextField {
-                               text: point.speed.toFixed(1)
+                                text: point.speed.toFixed(1)
                                 onEditingFinished: point.speed = parseFloat(text)
                                 Layout.fillWidth: true
                             }

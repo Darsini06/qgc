@@ -488,44 +488,44 @@ Item {
             opacity: 1
             z: 10
 
-            // 1. Tagline (Moved to the top of the column for home page)
-            Label {
-                id: heroSubtitle
-                visible: !isSmallScreen //(droneType === "loadpage") ? true : !isSmallScreen
-                width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
-                // text: {
-                //     if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
-                //     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
-                //     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
-                //     if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
-                //     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
-                // }
+            // // 1. Tagline (Moved to the top of the column for home page)
+            // Label {
+            //     id: heroSubtitle
+            //     visible: !isSmallScreen //(droneType === "loadpage") ? true : !isSmallScreen
+            //     width: parent.width
+            //     wrapMode: Text.WordWrap
+            //     horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+            //     // text: {
+            //     //     if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
+            //     //     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
+            //     //     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+            //     //     if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
+            //     //     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
+            //     // }
 
-                text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
+            //     text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
 
-                color: Qt.rgba(255, 255, 255, 0.9) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
-                font.pointSize: {
-                    var baseSize = ScreenTools.defaultFontPointSize;
-                    if (isDesktop) return baseSize * 1.2;
-                    if (isTablet) return baseSize * 1.1;
-                    return isSmallScreen ? baseSize * 0.6 : baseSize * 0.7;
-                }
-                font.family: "Outfit"
-                font.italic: false//droneType === "loadpage"
-                font.bold: false
-                lineHeight: 1.1
-                bottomPadding: dp(0.5) //(droneType === "loadpage" && isSmallScreen) ? 0 : dp(0.5)
+            //     color: Qt.rgba(255, 255, 255, 0.9) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
+            //     font.pointSize: {
+            //         var baseSize = ScreenTools.defaultFontPointSize;
+            //         if (isDesktop) return baseSize * 1.2;
+            //         if (isTablet) return baseSize * 1.1;
+            //         return isSmallScreen ? baseSize * 0.6 : baseSize * 0.7;
+            //     }
+            //     font.family: "Outfit"
+            //     font.italic: false//droneType === "loadpage"
+            //     font.bold: false
+            //     lineHeight: 1.1
+            //     bottomPadding: dp(0.5) //(droneType === "loadpage" && isSmallScreen) ? 0 : dp(0.5)
 
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.6) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
-                    shadowBlur: 0.2
-                    shadowVerticalOffset: 1
-                }
-            }
+            //     layer.enabled: true
+            //     layer.effect: MultiEffect {
+            //         shadowEnabled: true
+            //         shadowColor: Qt.rgba(0, 0, 0, 0.6) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
+            //         shadowBlur: 0.2
+            //         shadowVerticalOffset: 1
+            //     }
+            // }
 
             // 2. Main Title (Moved inside the column)
             Text {
@@ -572,6 +572,8 @@ Item {
                     return baseSize * 0.85;
 
                 }
+
+
                 font.bold: true
                 font.family: "Outfit"
                 font.letterSpacing: (!isSmallScreen) ? 4 : 1.2

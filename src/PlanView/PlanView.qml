@@ -131,6 +131,7 @@ Item {
                          fenceLoadTimer.planPath = filename
                          fenceLoadTimer.restart()
                      }
+
         onCurrentPlanFileChanged: {
             // This fires on both save AND load. On save, onPlanSaved will handle fence.
             // On load (file open), we need to restore the fence from DB.
@@ -589,6 +590,166 @@ Item {
         }
     }
 
+    Component {
+        id: spotSprayingNameDialogComponent
+
+        Dialog {
+            id: spotSprayingDialog
+            modal: true
+            dim: true
+            closePolicy: Popup.NoAutoClose
+            anchors.centerIn: parent
+            width: ScreenTools.defaultFontPixelWidth * 38
+            height: ScreenTools.defaultFontPixelHeight * 11
+            padding: 0
+
+            background: Rectangle {
+                radius: 20
+                color: "white"
+                border.width: 0
+                clip: true
+            }
+
+            contentItem: ColumnLayout {
+                anchors.fill: parent
+                spacing: 0
+
+                // Header
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.28
+                    color: "#262626"
+                    radius: 20
+                    Rectangle {
+                        anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
+                        height: parent.radius; color: parent.color; visible: parent.radius > 0
+                    }
+                    Text {
+                        text: qsTr("Set Ground Name")
+                        font.bold: true; color: "white"; font.pointSize: 14; anchors.centerIn: parent; font.family: "Outfit"
+                    }
+                }
+
+                Rectangle { Layout.fillWidth: true; height: 1; color: "black"; opacity: 0.15 }
+
+                // Content Area
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    RowLayout {
+                        anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 25; rightMargin: 25 }
+                        spacing: 15
+
+                        Text { text: qsTr("Project Name:"); color: "black"; font.bold: true; font.pointSize: 11; font.family: "Outfit" }
+
+                        TextField {
+                            id: nameField
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 40
+                            placeholderText: qsTr("Enter your project name")
+                            placeholderTextColor: "#888888"
+                            font.pointSize: 11
+                            color: "black"
+                            verticalAlignment: TextInput.AlignVCenter
+                            leftPadding: 15
+                            background: Rectangle {
+                                radius: 10; color: "#FFFFFF"
+                                border.color: nameField.activeFocus ? "#262626" : "#DDE1EA"
+                                border.width: nameField.activeFocus ? 2 : 1
+                            }
+                        }
+                    }
+                }
+
+                Rectangle { Layout.fillWidth: true; height: 1; color: "black"; opacity: 0.15 }
+
+                // Buttons Area
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.32
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: 0
+
+                        // Cancel Column
+                        Item {
+                            Layout.fillWidth: true; Layout.fillHeight: true
+                            Button {
+                                id: cancelBtn
+                                anchors.centerIn: parent
+                                width: 125; height: 36
+                                onClicked: {
+                                    // 1. Reset state on Cancel
+                                    MapGlobals.isSpotSprayingActive = false
+                                    spotSprayingDialog.close()
+                                }
+                                background: Rectangle {
+                                    radius: 12
+                                    color: cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
+                                }
+                                contentItem: Text { text: qsTr("Cancel"); color: "white"; font.bold: true; font.pointSize: 12; font.family: "Outfit"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                            }
+                        }
+
+                        Rectangle { Layout.fillHeight: true; width: 1; color: "black"; opacity: 0.15; Layout.topMargin: 10; Layout.bottomMargin: 10 }
+
+                        // Confirm Column
+                        Item {
+                            Layout.fillWidth: true; Layout.fillHeight: true
+                            Button {
+                                id: confirmBtn
+                                anchors.centerIn: parent
+                                width: 125; height: 36
+                                onClicked: {
+
+                                    QGroundControl.saveGlobalSetting("load", "load1")
+
+                                    if (nameField.text.length < 3) {
+                                        mainWindow.showToastMessage(qsTr("Please enter a valid project name"))
+                                        return
+                                    }
+
+                                    MapGlobals.setGridLines(false)
+
+                                    // 2. Set the global username / project name
+                                    let concatenatedText = nameField.text.substring(0, 10);
+                                    _appSettings.username = concatenatedText;
+
+                                    // 3. Execute Spot Spraying Logic
+                                    console.log("Loading Spot Spraying KML path:", MapGlobals.kmlPath)
+                                    _planMasterController.removeAll()
+                                    var spotItem = _missionController.insertComplexMissionItemFromKMLOrSHP("Spot Spraying", MapGlobals.kmlPath, -1, true)
+                                    
+                                    if (spotItem) {
+                                        _missionController.setCurrentPlanViewSeqNum(spotItem.sequenceNumber, true)
+                                        planMasterController.fitViewportToItems()
+                                        if (spotItem.points.count === 0) {
+                                            mainWindow.showMessageDialog(qsTr("Spot Spraying"), qsTr("KML file opened successfully, but parsed 0 points. Please check that your KML contains standard Point markers."))
+                                        }
+                                    } else {
+                                        console.log("Failed to insert Spot Spraying item from KML")
+                                        mainWindow.showMessageDialog(qsTr("Spot Spraying"), qsTr("Failed to open or load the KML file at: ") + MapGlobals.kmlPath)
+                                    }
+
+                                    spotSprayingDialog.close()
+                                }
+
+                                background: Rectangle {
+                                    radius: 12
+                                    gradient: Gradient { GradientStop { position: 0.0; color: "#262626" } GradientStop { position: 1.0; color: "#262626" } }
+                                    opacity: confirmBtn.pressed ? 0.8 : 1.0
+                                }
+
+                                contentItem: Text { text: qsTr("Confirm"); color: "white"; font.bold: true; font.pointSize: 12; font.family: "Outfit"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     PlanMasterController {
         id:         planMasterController
         flyView:    false
@@ -709,21 +870,11 @@ Item {
 
         function data() {
             if (MapGlobals.isSpotSprayingActive) {
-                console.log("Loading Spot Spraying KML path:", MapGlobals.kmlPath)
-                _planMasterController.removeAll()
-                var spotItem = _missionController.insertComplexMissionItemFromKMLOrSHP("Spot Spraying", MapGlobals.kmlPath, -1, true)
-                if (spotItem) {
-                    _missionController.setCurrentPlanViewSeqNum(spotItem.sequenceNumber, true)
-                    fitViewportToItems()
-                    if (spotItem.points.count === 0) {
-                        mainWindow.showMessageDialog(qsTr("Spot Spraying"), qsTr("KML file opened successfully, but parsed 0 points. Please check that your KML contains standard Point markers."))
-                    }
-                } else {
-                    console.log("Failed to insert Spot Spraying item from KML")
-                    mainWindow.showMessageDialog(qsTr("Spot Spraying"), qsTr("Failed to open or load the KML file at: ") + MapGlobals.kmlPath)
-                }
+                // Open the dialog instead of loading immediately
+                spotSprayingNameDialogComponent.createObject(mainWindow).open()
             } else {
                 // Find the SurveyPlanCreator in the list
+                console.log("normal KML file", MapGlobals.kmlPath)
                 var surveyCreator = null
                 for (var i = 0; i < _planMasterController.planCreators.count; i++) {
                     var creator = _planMasterController.planCreators.get(i)
@@ -1318,17 +1469,17 @@ Item {
                                      }
                                  }
                     onPointClicked: (pointIndex) => {
-                           // Find the SpotSpraying item and open popup
-                           for (var i = 0; i < _missionController.visualItems.count; i++) {
-                               var item = _missionController.visualItems.get(i)
-                               if (item.commandName === "Spot Spraying") {
-                                   itemEditPopup.popupMissionItem = item
-                                   itemEditPopup.targetPointIndex = pointIndex   // pass index
-                                   itemEditPopup.open()
-                                   break
-                               }
-                           }
-                       }
+                                        // Find the SpotSpraying item and open popup
+                                        for (var i = 0; i < _missionController.visualItems.count; i++) {
+                                            var item = _missionController.visualItems.get(i)
+                                            if (item.commandName === "Spot Spraying") {
+                                                itemEditPopup.popupMissionItem = item
+                                                itemEditPopup.targetPointIndex = pointIndex   // pass index
+                                                itemEditPopup.open()
+                                                break
+                                            }
+                                        }
+                                    }
                 }
             }
 
@@ -3499,8 +3650,8 @@ Item {
                                 item.availableWidth     = popupScrollView.width
                                 item.masterController   = _planMasterController
                                 if (itemEditPopup.targetPointIndex >= 0 && item.expandedIndex !== undefined) {
-                                               item.expandedIndex = itemEditPopup.targetPointIndex
-                                           }
+                                    item.expandedIndex = itemEditPopup.targetPointIndex
+                                }
                                 console.log("Forced missionItem:", item.missionItem)
                                 console.log("Points:", item.missionItem ? item.missionItem.points.count : "NULL")
                             }

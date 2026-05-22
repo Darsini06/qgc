@@ -1862,8 +1862,8 @@ ApplicationWindow {
                         //   Linux:   "file:///home/u/f.kml"  → "/home/u/f.kml"  (restore leading /)
                         var stripped = fileStr.slice(8)
                         localPath = (stripped.charAt(1) === ":")
-                                  ? stripped
-                                  : "/" + stripped
+                                ? stripped
+                                : "/" + stripped
                     } else if (fileStr.startsWith("file://")) {
                         localPath = fileStr.slice(7)
                     } else if (fileStr.startsWith("content://")) {
@@ -1887,6 +1887,7 @@ ApplicationWindow {
                     MapGlobals.share_edit_visibility = false
                     MapGlobals.isReviewMode          = false
                     MapGlobals.showMissionItems      = false
+
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
@@ -2122,6 +2123,7 @@ ApplicationWindow {
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
+
                     MouseArea {
                         id: ma5; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
@@ -2183,6 +2185,9 @@ ApplicationWindow {
                         onClicked: {
                             dialog._kmlForSpotSpraying = false
                             kmlFileDialog.open()
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
                         }
                     }
                 }
@@ -2196,7 +2201,6 @@ ApplicationWindow {
                     color:         maSpot.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  maSpot.containsMouse ? app_color : "#2e2e2e"
                     border.width:  maSpot.containsMouse ? 2 : 1
-                    visible: true // Always visible or Agri only? User said "in select mission type", usually implying always.
 
                     Column {
                         anchors.centerIn: parent

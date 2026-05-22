@@ -349,8 +349,9 @@ ComplexMissionItem::ReadyForSaveState SpotSprayingComplexItem::readyForSaveState
 void SpotSprayingComplexItem::save(QJsonArray& missionItems)
 {
     QJsonObject complexObject;
-    complexObject["version"] = 1;
-    complexObject["type"] = name;
+    complexObject[JsonHelper::jsonVersionKey] = 1;
+    complexObject[VisualMissionItem::jsonTypeKey] = VisualMissionItem::jsonTypeComplexItemValue;
+    complexObject[ComplexMissionItem::jsonComplexItemTypeKey] = name;
 
     QJsonArray pointsArray;
     for (int i=0; i<_points.count(); i++) {
