@@ -136,6 +136,7 @@ Item {
                             }
 
                             QGCLabel { text: qsTr("Lon") }
+
                             QGCTextField {
                                 text: point.coordinate.longitude.toFixed(6)
                                 onEditingFinished: {
@@ -147,6 +148,7 @@ Item {
                             }
 
                             QGCLabel { text: qsTr("Alt (m)") }
+
                             QGCTextField {
                                 text: point.altitude.toFixed(1)
                                 onEditingFinished: point.altitude = parseFloat(text)
@@ -154,6 +156,7 @@ Item {
                             }
 
                             QGCLabel { text: qsTr("Speed (m/s)") }
+
                             QGCTextField {
                                 text: point.speed.toFixed(1)
                                 onEditingFinished: point.speed = parseFloat(text)
