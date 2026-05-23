@@ -25,6 +25,7 @@ Item {
 
     property bool planControlColapsed: false
     property int selectedSpotPointIndex: -1
+    property var fileDialogRef: null
     readonly property int   _decimalPlaces:             8
     readonly property real  _margin:                    ScreenTools.defaultFontPixelHeight * 0.5
     readonly property real  _toolsMargin:               ScreenTools.defaultFontPixelWidth * 0.75
@@ -161,21 +162,28 @@ Item {
         property string planPath: ""
         onTriggered: {
             MapGlobals.getFence(planPath, function(fenceData) {
+                console.log("fenceLoadAfterOpenTimer: fenceData=", fenceData)
 
-                // CLEAR OLD FENCE FIRST
+                // Clear existing fence
                 isAgriFenceMode = false
-                QGroundControl.saveGlobalSetting("enableFence", "false")  // ← ADD THIS LINE
                 mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
                 mapPolygonvisuals.fenceRadius = 0
                 mapPolygonvisuals.updateFence()
 
-                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
-                    var wasEnabled = fenceData.enabled === true || fenceData.enabled === "true"
-                    isAgriFenceMode = wasEnabled  // ← CHANGE from the forced "true" line
+                // Load fence if we have valid coordinates
+                if (fenceData && fenceData.lat && fenceData.lon &&
+                    fenceData.lat !== 0 && fenceData.lon !== 0 &&
+                    Math.abs(fenceData.lat) > 0.0001) {
+
+                    // CRITICAL: ALWAYS set to true when coordinates exist
+                    isAgriFenceMode = true
+                    fenceSettingsVisible = true
 
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                     mapPolygonvisuals.fenceRadius = fenceData.radius || 60
                     mapPolygonvisuals.updateFence()
+
+                    console.log("fenceLoadAfterOpenTimer: Fence restored")
                 }
             })
         }
@@ -186,6 +194,9 @@ Item {
         QGroundControl.saveGlobalSetting("waypointvisible", "");  // reset when entering PlanView
         QGroundControl.saveGlobalSetting("returnWaypointEnabled", "true")
         _editingLayer = _layerMission
+        if (fileDialog) {
+            fileDialog.planViewRef = _root
+        }
     }
 
     onVisibleChanged: {
@@ -213,13 +224,22 @@ Item {
 
     function mapclear() {
         console.log("MapClear")
+
+        // RESET FENCE DATA for new plan
+        isAgriFenceMode = false
+        fenceSettingsVisible = false
+        activeRightPanel = ""
+        mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()  // Clear to 0,0
+        mapPolygonvisuals.fenceRadius = 0
+        mapPolygonvisuals.updateFence()
+        QGroundControl.saveGlobalSetting("enableFence", "false")
+
         if (_utmspEnabled) {
             QGroundControl.utmspManager.utmspVehicle.triggerActivationStatusBar(true);
             UTMSPStateStorage.removeFlightPlanState = true
             UTMSPStateStorage.indicatorDisplayStatus = true
         }
         _planMasterController.removeAll()
-        //_planMasterController.upload();
         uploadload()
     }
 
@@ -312,32 +332,83 @@ Item {
     }
 
     function saveFenceData(planPath) {
-        if (!planPath) {
-            console.log("saveFenceData: NO PATH, skipping")
+        if (!planPath || planPath === "") {
+            console.log("saveFenceData: NO PATH or empty path, skipping")
             return
         }
+
         var lat = mapPolygonvisuals.fenceCenter.latitude
         var lon = mapPolygonvisuals.fenceCenter.longitude
         var rad = mapPolygonvisuals.fenceRadius
 
         console.log("saveFenceData: isAgriFenceMode=", isAgriFenceMode,
+                    "fenceSettingsVisible=", fenceSettingsVisible,
                     "lat=", lat, "lon=", lon, "rad=", rad, "path=", planPath)
 
-        if (lat === 0 && lon === 0) {
-            console.log("saveFenceData: SKIPPED - lat/lon is 0,0")
+        // CRITICAL FIX: Always save fence data if coordinates are valid
+        // Don't rely on isAgriFenceMode - it might be false when saving
+        var hasValidCoords = lat && lon && !isNaN(lat) && !isNaN(lon) &&
+                             (Math.abs(lat) > 0.0001 || Math.abs(lon) > 0.0001) &&
+                             lat !== 0 && lon !== 0
+
+        // Check if fence has ever been set (radius > 0 indicates user set it)
+        var fenceHasBeenSet = rad > 0 || hasValidCoords
+
+        if (!hasValidCoords || !fenceHasBeenSet) {
+            console.log("saveFenceData: SKIPPED - no valid fence coordinates")
+            // Clear any existing fence for this path
+            MapGlobals.saveFence(planPath, 0, 0, 0, false)
             return
         }
 
-        var currentFenceEnabled = isAgriFenceMode
-        console.log("saveFenceData: SAVING with enabled=", currentFenceEnabled)
-        QGroundControl.saveGlobalSetting("enableFence", currentFenceEnabled ? "true" : "false")
-        MapGlobals.saveFence(planPath, lat, lon, rad, currentFenceEnabled)
+        // Save with enabled=true if fence has valid coordinates
+        // This ensures fence data persists even if panel is closed
+        var shouldBeEnabled = true  // ← ALWAYS save as enabled if coordinates exist
+
+        console.log("saveFenceData: SAVING with enabled=", shouldBeEnabled, "radius=", rad)
+        QGroundControl.saveGlobalSetting("enableFence", shouldBeEnabled ? "true" : "false")
+        MapGlobals.saveFence(planPath, lat, lon, rad, shouldBeEnabled)
+    }
+    // Add this function right after your existing saveFenceData function
+    function saveFenceBeforeSave(filePath) {
+        console.log("saveFenceBeforeSave called for:", filePath)
+        if (typeof saveFenceData === 'function') {
+            saveFenceData(filePath)
+        }
     }
     function loadFenceData(planPath) {
         if (!planPath) return
-        // Short delay to ensure map is initialized, then load fence
-        fenceLoadTimer.planPath = planPath
-        fenceLoadTimer.restart()
+
+        console.log("loadFenceData called for:", planPath)
+
+        // Don't use timer, load directly
+        MapGlobals.getFence(planPath, function(fenceData) {
+            console.log("loadFenceData: fenceData=", JSON.stringify(fenceData))
+
+            if (fenceData && fenceData.lat && fenceData.lon &&
+                fenceData.lat !== 0 && fenceData.lon !== 0 &&
+                Math.abs(fenceData.lat) > 0.0001) {
+
+                console.log("loadFenceData: Restoring fence - lat:", fenceData.lat, "lon:", fenceData.lon)
+
+                // Force set fence mode
+                isAgriFenceMode = true
+                fenceSettingsVisible = true
+
+                mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                mapPolygonvisuals.fenceRadius = fenceData.radius || 60
+                mapPolygonvisuals.updateFence()
+
+                // Also update the fence button appearance
+                if (circularFenceBtn) {
+                    circularFenceBtn.checked = true
+                }
+            } else {
+                console.log("loadFenceData: No valid fence data found")
+                isAgriFenceMode = false
+                fenceSettingsVisible = false
+            }
+        })
     }
 
     Timer {
@@ -348,22 +419,33 @@ Item {
         onTriggered: {
             MapGlobals.getFence(planPath, function(fenceData) {
                 console.log("fenceLoadTimer: fenceData=", JSON.stringify(fenceData))
-                console.log("fenceLoadTimer: enabled=", fenceData ? fenceData.enabled : "NO DATA")
 
+                // Clear existing fence
                 isAgriFenceMode = false
-                QGroundControl.saveGlobalSetting("enableFence", "false")
                 mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
                 mapPolygonvisuals.fenceRadius = 0
                 mapPolygonvisuals.updateFence()
 
-                if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
-                    var wasEnabled = fenceData.enabled === true || fenceData.enabled === "true"
-                    isAgriFenceMode = wasEnabled
-                    // ← SET BEFORE updateFence
-                    QGroundControl.saveGlobalSetting("enableFence", wasEnabled ? "true" : "false")
+                // Load fence if we have valid coordinates
+                if (fenceData && fenceData.lat && fenceData.lon &&
+                    fenceData.lat !== 0 && fenceData.lon !== 0 &&
+                    Math.abs(fenceData.lat) > 0.0001) {
+
+                    // CRITICAL: ALWAYS set to true when coordinates exist
+                    isAgriFenceMode = true
+                    fenceSettingsVisible = true  // Also show the settings panel
+
                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                     mapPolygonvisuals.fenceRadius = fenceData.radius || 60
                     mapPolygonvisuals.updateFence()
+
+                    console.log("fenceLoadTimer: Fence restored - center:", fenceData.lat, fenceData.lon, "radius:", fenceData.radius)
+                    console.log("fenceLoadTimer: isAgriFenceMode set to:", isAgriFenceMode)
+                } else {
+                    console.log("fenceLoadTimer: No valid fence data found")
+                    isAgriFenceMode = false
+                    fenceSettingsVisible = false
+                    QGroundControl.saveGlobalSetting("enableFence", "false")
                 }
             })
         }
@@ -379,43 +461,47 @@ Item {
                              MapGlobals.showMissionItems = false
                          }
         onLoadCloudPlan: (data) => {
-                             console.log("PlanView: loading cloud plan data")
-                             try {
-                                 var json = (typeof data === "string") ? JSON.parse(data) : data
-                                 _planMasterController.loadFromJson(json)
+            console.log("PlanView: loading cloud plan data")
+            try {
+                var json = (typeof data === "string") ? JSON.parse(data) : data
+                _planMasterController.loadFromJson(json)
 
-                                 // Restore fence from cloud data
-                                 if (json.fenceData) {
-                                     // Restore the enabled state as it was when saved
-                                     var fenceEnabled = (json.fenceData.enabled === true || json.fenceData.enabled === "true")
-                                     QGroundControl.saveGlobalSetting("enableFence", fenceEnabled ? "true" : "false")
+                // Restore fence from cloud data
+                if (json.fenceData && json.fenceData.lat && json.fenceData.lon &&
+                    json.fenceData.lat !== 0 && json.fenceData.lon !== 0) {
 
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
-                                     mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
-                                     mapPolygonvisuals.updateFence()
-                                     console.log("PlanView: Restored cloud fence data. Visible:", fenceEnabled)
-                                 } else {
-                                     // Cloud plans without fence data should clear any existing fence
-                                     QGroundControl.saveGlobalSetting("enableFence", "false")
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
-                                     mapPolygonvisuals.updateFence()
-                                 }
+                    // Set fence mode BEFORE updating visuals
+                    isAgriFenceMode = true
+                    fenceSettingsVisible = true
 
-                                 // Restore boundary points
-                                 if (json.boundaryPoints && json.boundaryPoints.length > 0) {
-                                     console.log("PlanView: Restoring", json.boundaryPoints.length, "boundary points")
-                                     mapPolygonvisuals.mapPolygon.clear()
-                                     for (var j = 0; j < json.boundaryPoints.length; j++) {
-                                         mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[j].lat, json.boundaryPoints[j].lon))
-                                     }
-                                 }
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
+                    mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
+                    mapPolygonvisuals.updateFence()
 
-                                 MapGlobals.isReviewMode = true
-                                 MapGlobals.showMissionItems = false
-                             } catch (e) {
-                                 console.error("Failed to process cloud plan data:", e)
-                             }
-                         }
+                    console.log("PlanView: Restored cloud fence data at:", json.fenceData.lat, json.fenceData.lon)
+                } else {
+                    // Clear fence if no data
+                    isAgriFenceMode = false
+                    fenceSettingsVisible = false
+                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                    mapPolygonvisuals.updateFence()
+                }
+
+                // Restore boundary points
+                if (json.boundaryPoints && json.boundaryPoints.length > 0) {
+                    console.log("PlanView: Restoring", json.boundaryPoints.length, "boundary points")
+                    mapPolygonvisuals.mapPolygon.clear()
+                    for (var j = 0; j < json.boundaryPoints.length; j++) {
+                        mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[j].lat, json.boundaryPoints[j].lon))
+                    }
+                }
+
+                MapGlobals.isReviewMode = true
+                MapGlobals.showMissionItems = false
+            } catch (e) {
+                console.error("Failed to process cloud plan data:", e)
+            }
+        }
     }
 
     ColumnLayout {
@@ -2446,10 +2532,12 @@ Item {
                 anchors.right:          parent.right
                 height:                 ScreenTools.defaultFontPixelHeight * 2.5
                 text:                   qsTr("Save Plan")
+
+                // FIXED: Show Save button in more cases
                 visible: (isMissionTab || isAgriFenceMode) &&
                          (!MapGlobals.isReviewMode || MapGlobals.showMissionItems) &&
-                         !(isAgriFenceMode && fenceSettingsVisible) &&
-                         activeRightPanel !== "obstacles"
+                         activeRightPanel !== "obstacles"  // Removed the fenceSettingsVisible condition
+
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
                     color: "black"
@@ -2491,7 +2579,6 @@ Item {
                         _planMasterController.saveToSelectedFile()
                     }
                 }
-
             }
         }
 
@@ -3278,14 +3365,22 @@ Item {
     }
 
     function newmap() {
+        // RESET FENCE DATA for new plan
+        isAgriFenceMode = false
+        fenceSettingsVisible = false
+        activeRightPanel = ""
+        mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()  // Clear to 0,0
+        mapPolygonvisuals.fenceRadius = 0
+        mapPolygonvisuals.updateFence()
+        QGroundControl.saveGlobalSetting("enableFence", "false")
 
-        var creator = _planMasterController.planCreators[0] // or selectedPlanCreator
+        var creator = _planMasterController.planCreators[0]
         if (creator) {
             var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2),
                                        editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
             var centerCoord = editorMap.toCoordinate(centerPoint, false)
             creator.createPlan(centerCoord)
-            console.log("No plan creator available1")
+            console.log("Plan created")
         } else {
             console.log("No plan creator available")
         }
@@ -3293,8 +3388,6 @@ Item {
         MapGlobals.isReviewMode = false
         MapGlobals.showMissionItems = false
     }
-
-
     function _mapCenter() {
         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2), editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
         return editorMap.toCoordinate(centerPoint, false /* clipToViewPort */)
