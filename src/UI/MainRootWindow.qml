@@ -2224,6 +2224,7 @@ ApplicationWindow {
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
+
                     MouseArea {
                         id: maSpot; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor

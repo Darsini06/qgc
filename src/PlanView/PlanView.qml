@@ -24,7 +24,7 @@ Item {
     id: _root
 
     property bool planControlColapsed: false
-
+    property int selectedSpotPointIndex: -1
     readonly property int   _decimalPlaces:             8
     readonly property real  _margin:                    ScreenTools.defaultFontPixelHeight * 0.5
     readonly property real  _toolsMargin:               ScreenTools.defaultFontPixelWidth * 0.75
@@ -1106,230 +1106,231 @@ Item {
 
     }
 
-    Component {
-        id: saveOptionsDialogComponent
-        QGCPopupDialog {
-            id:         saveOptionsPopup
-            title:      qsTr("Save Plan Options")
-            showButtons: false
+    // Component {
+    //     id: saveOptionsDialogComponent
 
-            Column {
-                width:      parent.width
-                spacing:    25
-                bottomPadding: 10
+    //     QGCPopupDialog {
+    //         id:         saveOptionsPopup
+    //         title:      qsTr("Save Plan Options")
+    //         showButtons: false
 
-                QGCLabel {
-                    width:              parent.width
-                    text:               qsTr("Choose your save preference:")
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize:     14
-                    font.bold:          true
-                    color:              "black"
-                    font.family:        "Outfit"
-                }
+    //         Column {
+    //             width:      parent.width
+    //             spacing:    25
+    //             bottomPadding: 10
 
-                // Save Button (Local Overwrite)
-                Rectangle {
-                    width:          parent.width
-                    height:         70
-                    radius:         15
-                    color:          saveMouse.containsMouse ? "#f0f0f0" : "#ffffff"
-                    border.color:   "#e0e0e0"
-                    border.width:   1
-                    visible:        _planMasterController.currentPlanFile !== ""
+    //             QGCLabel {
+    //                 width:              parent.width
+    //                 text:               qsTr("Choose your save preference:")
+    //                 horizontalAlignment: Text.AlignHCenter
+    //                 font.pointSize:     14
+    //                 font.bold:          true
+    //                 color:              "black"
+    //                 font.family:        "Outfit"
+    //             }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 15
-                        spacing: 15
+    //             // Save Button (Local Overwrite)
+    //             Rectangle {
+    //                 width:          parent.width
+    //                 height:         70
+    //                 radius:         15
+    //                 color:          saveMouse.containsMouse ? "#f0f0f0" : "#ffffff"
+    //                 border.color:   "#e0e0e0"
+    //                 border.width:   1
+    //                 visible:        _planMasterController.currentPlanFile !== ""
 
-                        Rectangle {
-                            width: 40
-                            height: 40
-                            radius: 10
-                            color: "#E3F2FD"
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width: 24
-                                height: 24
-                                source: "qrc:/res/save.svg"
-                                color: "#2196F3"
-                            }
-                        }
+    //                 RowLayout {
+    //                     anchors.fill: parent
+    //                     anchors.margins: 15
+    //                     spacing: 15
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 2
-                            QGCLabel {
-                                text: qsTr("Save")
-                                font.bold: true
-                                font.pointSize: 13
-                                color: "black"
-                            }
-                            QGCLabel {
-                                text: qsTr("Overwrite current plan file")
-                                font.pointSize: 10
-                                color: "#666666"
-                            }
-                        }
-                    }
+    //                     Rectangle {
+    //                         width: 40
+    //                         height: 40
+    //                         radius: 10
+    //                         color: "#E3F2FD"
+    //                         QGCColoredImage {
+    //                             anchors.centerIn: parent
+    //                             width: 24
+    //                             height: 24
+    //                             source: "qrc:/res/save.svg"
+    //                             color: "#2196F3"
+    //                         }
+    //                     }
 
-                    MouseArea {
-                        id: saveMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            saveOptionsPopup.close()
-                            if (_planMasterController.currentPlanFile !== "") {
-                                _planMasterController.saveToCurrent()
-                                saveFenceData(_planMasterController.currentPlanFile)
-                            } else {
-                                // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                //     _planMasterController.saveToSelectedFile1()
-                                // } else {
-                                //     _planMasterController.saveToSelectedFile()
-                                // }
-                                _planMasterController.saveToSelectedFile()
-                            }
-                        }
-                    }
-                }
+    //                     ColumnLayout {
+    //                         Layout.fillWidth: true
+    //                         spacing: 2
+    //                         QGCLabel {
+    //                             text: qsTr("Save")
+    //                             font.bold: true
+    //                             font.pointSize: 13
+    //                             color: "black"
+    //                         }
+    //                         QGCLabel {
+    //                             text: qsTr("Overwrite current plan file")
+    //                             font.pointSize: 10
+    //                             color: "#666666"
+    //                         }
+    //                     }
+    //                 }
 
-                // Save As Button
-                Rectangle {
-                    width:          parent.width
-                    height:         70
-                    radius:         15
-                    color:          saveAsMouse.containsMouse ? "#f0f0f0" : "#ffffff"
-                    border.color:   "#e0e0e0"
-                    border.width:   1
+    //                 MouseArea {
+    //                     id: saveMouse
+    //                     anchors.fill: parent
+    //                     hoverEnabled: true
+    //                     onClicked: {
+    //                         saveOptionsPopup.close()
+    //                         if (_planMasterController.currentPlanFile !== "") {
+    //                             _planMasterController.saveToCurrent()
+    //                             saveFenceData(_planMasterController.currentPlanFile)
+    //                         } else {
+    //                             // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+    //                             //     _planMasterController.saveToSelectedFile1()
+    //                             // } else {
+    //                             //     _planMasterController.saveToSelectedFile()
+    //                             // }
+    //                             _planMasterController.saveToSelectedFile()
+    //                         }
+    //                     }
+    //                 }
+    //             }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 15
-                        spacing: 15
+    //             // Save As Button
+    //             Rectangle {
+    //                 width:          parent.width
+    //                 height:         70
+    //                 radius:         15
+    //                 color:          saveAsMouse.containsMouse ? "#f0f0f0" : "#ffffff"
+    //                 border.color:   "#e0e0e0"
+    //                 border.width:   1
 
-                        Rectangle {
-                            width: 40
-                            height: 40
-                            radius: 10
-                            color: "#FFF3E0"
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width: 24
-                                height: 24
-                                source: "qrc:/res/save.svg"
-                                color: "#FF9800"
-                            }
-                        }
+    //                 RowLayout {
+    //                     anchors.fill: parent
+    //                     anchors.margins: 15
+    //                     spacing: 15
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 2
-                            QGCLabel {
-                                text: qsTr("Save As")
-                                font.bold: true
-                                font.pointSize: 13
-                                color: "black"
-                            }
-                            QGCLabel {
-                                text: qsTr("Save as a new plan file")
-                                font.pointSize: 10
-                                color: "#666666"
-                            }
-                        }
-                    }
+    //                     Rectangle {
+    //                         width: 40
+    //                         height: 40
+    //                         radius: 10
+    //                         color: "#FFF3E0"
+    //                         QGCColoredImage {
+    //                             anchors.centerIn: parent
+    //                             width: 24
+    //                             height: 24
+    //                             source: "qrc:/res/save.svg"
+    //                             color: "#FF9800"
+    //                         }
+    //                     }
 
-                    MouseArea {
-                        id: saveAsMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            saveOptionsPopup.close()
+    //                     ColumnLayout {
+    //                         Layout.fillWidth: true
+    //                         spacing: 2
+    //                         QGCLabel {
+    //                             text: qsTr("Save As")
+    //                             font.bold: true
+    //                             font.pointSize: 13
+    //                             color: "black"
+    //                         }
+    //                         QGCLabel {
+    //                             text: qsTr("Save as a new plan file")
+    //                             font.pointSize: 10
+    //                             color: "#666666"
+    //                         }
+    //                     }
+    //                 }
 
-                            // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                            //     _planMasterController.saveToSelectedFile1()
-                            // } else {
-                            //     _planMasterController.saveToSelectedFile()
-                            // }
+    //                 MouseArea {
+    //                     id: saveAsMouse
+    //                     anchors.fill: parent
+    //                     hoverEnabled: true
+    //                     onClicked: {
+    //                         saveOptionsPopup.close()
 
-                            _planMasterController.saveToSelectedFile()
-                        }
-                    }
-                }
+    //                         // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+    //                         //     _planMasterController.saveToSelectedFile1()
+    //                         // } else {
+    //                         //     _planMasterController.saveToSelectedFile()
+    //                         // }
 
-                // Cloud Save Button
-                Rectangle {
-                    width:          parent.width
-                    height:         110
-                    radius:         15
-                    color:          cloudSaveMouse.containsMouse ? "#E8F5E9" : "#ffffff"
-                    border.color:   "#C8E6C9"
-                    border.width:   1
+    //                         _planMasterController.saveToSelectedFile()
+    //                     }
+    //                 }
+    //             }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 15
-                        spacing: 15
+    //             // Cloud Save Button
+    //             Rectangle {
+    //                 width:          parent.width
+    //                 height:         110
+    //                 radius:         15
+    //                 color:          cloudSaveMouse.containsMouse ? "#E8F5E9" : "#ffffff"
+    //                 border.color:   "#C8E6C9"
+    //                 border.width:   1
 
-                        Rectangle {
-                            width: 40
-                            height: 40
-                            radius: 10
-                            color: "#E8F5E9"
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                width: 24
-                                height: 24
-                                source: "qrc:/InstrumentValueIcons/share-alt.svg"
-                                color: "#4CAF50"
-                            }
-                        }
+    //                 RowLayout {
+    //                     anchors.fill: parent
+    //                     anchors.margins: 15
+    //                     spacing: 15
 
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            spacing: 4
-                            QGCLabel {
-                                text: qsTr("Cloud Save")
-                                font.bold: true
-                                font.pointSize: 13
-                                color: "black"
-                            }
-                            QGCLabel {
-                                text: qsTr("(save in cloud only in another phonbe you can see yur plans)")
-                                Layout.fillWidth: true
-                                wrapMode: Text.WordWrap
-                                font.pointSize: 10
-                                color: "#455A64"
-                                font.italic: true
-                            }
-                        }
-                    }
+    //                     Rectangle {
+    //                         width: 40
+    //                         height: 40
+    //                         radius: 10
+    //                         color: "#E8F5E9"
+    //                         QGCColoredImage {
+    //                             anchors.centerIn: parent
+    //                             width: 24
+    //                             height: 24
+    //                             source: "qrc:/InstrumentValueIcons/share-alt.svg"
+    //                             color: "#4CAF50"
+    //                         }
+    //                     }
 
-                    MouseArea {
-                        id: cloudSaveMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            saveOptionsPopup.close()
-                            if (_planMasterController.currentPlanFile !== "") {
-                                _planMasterController.saveToCurrent()
-                                saveFenceData(_planMasterController.currentPlanFile)
-                            } else {
-                                // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
-                                //     _planMasterController.saveToSelectedFile1()
-                                // } else {
-                                //     _planMasterController.saveToSelectedFile()
-                                // }
-                                _planMasterController.saveToSelectedFile()
-                            }
-                            syncCloud()
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                     ColumnLayout {
+    //                         Layout.fillWidth: true
+    //                         spacing: 4
+    //                         QGCLabel {
+    //                             text: qsTr("Cloud Save")
+    //                             font.bold: true
+    //                             font.pointSize: 13
+    //                             color: "black"
+    //                         }
+    //                         QGCLabel {
+    //                             text: qsTr("(save in cloud only in another phonbe you can see yur plans)")
+    //                             Layout.fillWidth: true
+    //                             wrapMode: Text.WordWrap
+    //                             font.pointSize: 10
+    //                             color: "#455A64"
+    //                             font.italic: true
+    //                         }
+    //                     }
+    //                 }
+
+    //                 MouseArea {
+    //                     id: cloudSaveMouse
+    //                     anchors.fill: parent
+    //                     hoverEnabled: true
+    //                     onClicked: {
+    //                         saveOptionsPopup.close()
+    //                         if (_planMasterController.currentPlanFile !== "") {
+    //                             _planMasterController.saveToCurrent()
+    //                             saveFenceData(_planMasterController.currentPlanFile)
+    //                         } else {
+    //                             // if (QGroundControl.loadGlobalSetting("loadpage","loadpage")==="Mapping") {
+    //                             //     _planMasterController.saveToSelectedFile1()
+    //                             // } else {
+    //                             //     _planMasterController.saveToSelectedFile()
+    //                             // }
+    //                             _planMasterController.saveToSelectedFile()
+    //                         }
+    //                         syncCloud()
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
 
     AirspaceRestrictionDialog {
@@ -1455,31 +1456,51 @@ Item {
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
-                    onClicked:   (sequenceNumber) => {
-                                     _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
-                                     for (var i = 0; i < _missionController.visualItems.count; i++) {
-                                         var item = _missionController.visualItems.get(i)
-                                         if (item.sequenceNumber === sequenceNumber) {
-                                             missionItemDialog.currentMissionItem = item
-                                             missionItemDialog.currentIndex = i
-                                             missionItemDialog.open()
-                                             missionItemDialog.visible = true
-                                             break
-                                         }
-                                     }
-                                 }
+                    onClicked: (sequenceNumber) => {
+
+                                   _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
+
+                                   for (var i = 0; i < _missionController.visualItems.count; i++) {
+
+                                       var item = _missionController.visualItems.get(i)
+
+                                       if (item.sequenceNumber === sequenceNumber) {
+
+                                           itemEditPopup.popupMissionItem = item
+                                           itemEditPopup.open()
+
+                                           break
+                                       }
+                                   }
+                               }
                     onPointClicked: (pointIndex) => {
-                                        // Find the SpotSpraying item and open popup
+
+                                        console.log("Clicked point:", pointIndex)
                                         for (var i = 0; i < _missionController.visualItems.count; i++) {
                                             var item = _missionController.visualItems.get(i)
                                             if (item.commandName === "Spot Spraying") {
                                                 itemEditPopup.popupMissionItem = item
-                                                itemEditPopup.targetPointIndex = pointIndex   // pass index
+                                                itemEditPopup.selectedPointIndex = pointIndex
+                                                itemEditPopup.openedFromList = false   // RESET TO FALSE
                                                 itemEditPopup.open()
+
+                                                // Force update even if loader already loaded
+                                                if (genericEditorLoader.item) {
+                                                    genericEditorLoader.item.showAllPoints = false
+                                                    genericEditorLoader.item.missionItem = item
+                                                    genericEditorLoader.item.selectedIndex = pointIndex
+                                                    // Force expand after render
+                                                    Qt.callLater(function() {
+                                                        if (genericEditorLoader.item) {
+                                                            genericEditorLoader.item.expandedIndex = pointIndex
+                                                        }
+                                                    })
+                                                }
                                                 break
                                             }
                                         }
                                     }
+
                 }
             }
 
@@ -1775,22 +1796,23 @@ Item {
 
 
                     // },
-                    ToolStripAction {
-                        text:       qsTr("Share")
-                        iconSource: "qrc:/InstrumentValueIcons/share-alt.svg"
-                        //enabled:    _missionController.isInsertTakeoffValid
-                        visible:    planType==="Plan"?true:false//(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover
-                        onTriggered: {
+                    // ToolStripAction {
+                    //     text:       qsTr("Share")
+                    //     iconSource: "qrc:/InstrumentValueIcons/share-alt.svg"
+                    //     //enabled:    _missionController.isInsertTakeoffValid
+                    //     visible:    planType==="Plan"?true:false//(toolStrip._isMissionLayer || toolStrip._isUtmspLayer) && !_planMasterController.controllerVehicle.rover
+                    //     onTriggered: {
 
-                            dialog.open()
+                    //         dialog.open()
 
-                            // if(_planMasterController.currentPlanFile !== "") {
-                            //     _planMasterController.saveToCurrent()
-                            // } else {
-                            //     _planMasterController.saveToSelectedFile1()
-                            // }
-                        }
-                    },
+                    //         // if(_planMasterController.currentPlanFile !== "") {
+                    //         //     _planMasterController.saveToCurrent()
+                    //         // } else {
+                    //         //     _planMasterController.saveToSelectedFile1()
+                    //         // }
+                    //     }
+                    // },
+
                     ToolStripAction {
                         text:       qsTr("Takeoff")
                         iconSource: "/res/takeoff.svg"
@@ -2434,12 +2456,36 @@ Item {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
                                        }
 
+                            // onEditItemClicked: (popupItem) => {
+                            //                        itemEditPopup.popupMissionItem = popupItem
+                            //                        itemEditPopup.open()
+                            //                        console.log("itemEditPopup.popupMissionItem",popupItem)
+                            //                    }
                             onEditItemClicked: (popupItem) => {
                                                    itemEditPopup.popupMissionItem = popupItem
+                                                   itemEditPopup.openedFromList = (popupItem.commandName === "Spot Spraying")
+                                                   itemEditPopup.selectedPointIndex = -1
                                                    itemEditPopup.open()
-                                                   console.log("itemEditPopup.popupMissionItem",popupItem)
-                                               }
 
+                                                   if (genericEditorLoader.item && popupItem.commandName === "Spot Spraying") {
+                                                       genericEditorLoader.item.showAllPoints = false   // 1. reset first
+                                                       genericEditorLoader.item.selectedIndex = -1     // 2. clear index
+                                                       genericEditorLoader.item.expandedIndex = -1     // 3. clear expanded
+                                                       genericEditorLoader.item.missionItem = null     // 4. reset mission
+                                                       genericEditorLoader.item.missionItem = popupItem // 5. set fresh
+
+                                                       // Now apply edit mode after render
+                                                       Qt.callLater(function() {
+                                                           if (genericEditorLoader.item) {
+                                                               genericEditorLoader.item.showAllPoints = true
+                                                               genericEditorLoader.item.selectedIndex = -1
+                                                               genericEditorLoader.item.expandedIndex = -1
+                                                           }
+                                                       })
+                                                   }
+
+                                                   console.log("itemEditPopup.popupMissionItem", popupItem)
+                                               }
                             onSelectCommandClicked: (missionItem) => {
                                                         commandSelectionPopup.popupMissionItem = missionItem
                                                         commandSelectionPopup.open()
@@ -2501,7 +2547,7 @@ Item {
                 anchors.right:          parent.right
                 height:                 ScreenTools.defaultFontPixelHeight * 2.5
                 text:                   qsTr("Save Plan")
-                visible:                (isMissionTab || isAgriFenceMode) && (!MapGlobals.isReviewMode || MapGlobals.showMissionItems)
+                visible:                isMissionTab || isAgriFenceMode
 
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
@@ -2531,6 +2577,7 @@ Item {
 
                     if (isMissionActionPage && !isBoundaryMode) {
                         MapGlobals.save = "save1"
+                        //saveOptionsDialogComponent.createObject(mainWindow).open()
                         _planMasterController.saveToSelectedFile()
                     } else {
                         if (activePolygon && activePolygon.traceMode) {
@@ -2541,6 +2588,7 @@ Item {
                             }
                             activePolygon.traceMode = false
                         }
+                        //saveOptionsDialogComponent.createObject(mainWindow).open()
                         _planMasterController.saveToSelectedFile()
                     }
                 }
@@ -3562,6 +3610,8 @@ Item {
         id: itemEditPopup
         property var popupMissionItem: null
         property int targetPointIndex: -1
+        property int selectedPointIndex: -1
+        property bool openedFromList: false
 
         // Reserve space: planToolBar height + bottom margin
         readonly property real _maxPopupHeight: parent ? (parent.height - planToolBar.height - ScreenTools.defaultFontPixelHeight * 2) : 500
@@ -3576,9 +3626,15 @@ Item {
         x: ScreenTools.defaultFontPixelWidth
         y: parent ? parent.height - height - ScreenTools.defaultFontPixelHeight * 1.5 : 0
 
-        modal: true
+        modal: itemEditPopup.popupMissionItem ?
+                   itemEditPopup.popupMissionItem.commandName !== "Spot Spraying" : true
+
         dim: false
-        closePolicy: Popup.CloseOnEscape
+
+        closePolicy: (itemEditPopup.popupMissionItem &&
+                      itemEditPopup.popupMissionItem.commandName === "Spot Spraying")
+                     ? Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                     : Popup.CloseOnEscape
         parent: Overlay.overlay
 
         background: Rectangle {
@@ -3646,14 +3702,16 @@ Item {
 
                         onLoaded: {
                             if (item) {
-                                item.missionItem        = itemEditPopup.popupMissionItem
-                                item.availableWidth     = popupScrollView.width
-                                item.masterController   = _planMasterController
-                                if (itemEditPopup.targetPointIndex >= 0 && item.expandedIndex !== undefined) {
-                                    item.expandedIndex = itemEditPopup.targetPointIndex
+                                item.missionItem = itemEditPopup.popupMissionItem
+                                // Only apply showAllPoints for Spot Spraying
+                                if (itemEditPopup.popupMissionItem &&
+                                        itemEditPopup.popupMissionItem.commandName === "Spot Spraying") {
+                                    item.showAllPoints = itemEditPopup.openedFromList
                                 }
-                                console.log("Forced missionItem:", item.missionItem)
-                                console.log("Points:", item.missionItem ? item.missionItem.points.count : "NULL")
+                                item.selectedIndex = itemEditPopup.selectedPointIndex
+                                item.expandedIndex = itemEditPopup.selectedPointIndex
+                                console.log("LOADER READY:", itemEditPopup.popupMissionItem.commandName)
+
                             }
                         }
                     }

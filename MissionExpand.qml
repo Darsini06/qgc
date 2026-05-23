@@ -207,7 +207,8 @@ Rectangle {
                 // visible:                (missionItem.commandName === "Mission Start" ||
                 //                          missionItem.commandName === "Survey") && MapGlobals.isReviewMode
 
-                visible:                true // Allow editing all items via left popup
+                visible: missionItem.commandName === "Mission Start" ||
+                         missionItem.commandName === "Survey" || missionItem.commandName === "Spot Spraying"
 
                 onClicked:              editItemClicked(missionItem)
 

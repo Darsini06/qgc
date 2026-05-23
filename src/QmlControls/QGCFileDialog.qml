@@ -489,8 +489,17 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var fallback = controller.fullyQualifiedFilename(folder, userName !== "" ? userName : "Guest", _rgExtensions)
-                            _root.acceptedForOverwrite(fallback)
+
+                            // Update latest fence/circle values
+                            MapGlobals.setGridLines(false)
+
+                            var fallback = controller.fullyQualifiedFilename(
+                                        folder,
+                                        userName !== "" ? userName : "Guest",
+                                        _rgExtensions)
+
+                            _root.acceptedForSave(fallback)
+
                             popup.visible = false
                         }
                     }
@@ -733,7 +742,6 @@ Item {
             onOpened: {
                 MapGlobals.editdialog = "editdialog"
             }
-
             onClosed: {
                 MapGlobals.editdialog = "editdialog1"
             }
@@ -755,7 +763,6 @@ Item {
                     Layout.preferredHeight: parent.height * 0.28
                     color: "#262626"
                     radius: 20
-
                     // Top rounded corners only
                     Rectangle {
                         anchors.bottom: parent.bottom
@@ -896,18 +903,23 @@ Item {
                                 height: 36
                                 onClicked: {
 
+                                    if (nameField.text.length < 3) {
+                                        return
+                                    }
+
+                                    let concatenatedText = nameField.text.substring(0, 10)
+
+                                    _appSettings.username = concatenatedText
+
+                                    _root.acceptedForSave(
+                                                controller.fullyQualifiedFilename(
+                                                    folder,
+                                                    concatenatedText,
+                                                    _rgExtensions))
+
                                     MapGlobals.setGridLines(false)
 
-                                    if (nameField.text.length < 3 ) {
-                                        mobileFileSaveDialog.preventClose = true
-                                        return
-
-                                        let concatenatedText = nameField.text.substring(0, 10);
-                                        _appSettings.username = concatenatedText;
-                                        _root.acceptedForSave(controller.fullyQualifiedFilename(folder, concatenatedText, _rgExtensions))
-
-                                        customDialog.visible = false
-                                    }
+                                    customDialog.close()
                                 }
                                 background: Rectangle {
                                     radius:     12
@@ -935,4 +947,3 @@ Item {
         }
     }
 }
-
