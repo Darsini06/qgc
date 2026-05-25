@@ -2119,7 +2119,7 @@ Item {
                     Rectangle {
                         id:                 fenceSettingsPanel
                         width:              parent.width
-                        height:             fenceSubCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 2)
+                        height:             fenceMainCol.implicitHeight + (ScreenTools.defaultFontPixelHeight * 1.6)
                         visible: fenceSettingsVisible &&    // ← CHANGE THIS
                                    isAgriFenceMode &&
                                    mapPolygonvisuals.fenceCenter.isValid &&
@@ -2130,146 +2130,163 @@ Item {
                         border.width:       1
 
                         ColumnLayout {
-                            id:                 fenceSubCol
-                            anchors.fill:       parent
+                            id:                 fenceMainCol
+                            anchors.top:        parent.top
+                            anchors.left:       parent.left
+                            anchors.right:      parent.right
                             anchors.margins:    ScreenTools.defaultFontPixelHeight * 0.8
                             spacing:            ScreenTools.defaultFontPixelHeight * 0.8
 
-                            // Header like Obstacles Settings
-                            Text {
-                                text:           qsTr("Fence Settings")
-                                color:          "white"
-                                font.bold:      true
-                                font.pointSize: ScreenTools.defaultFontPointSize + 2
-                                font.family:    "Outfit"
-                            }
-
-                            // Divider
-                            Rectangle {
+                            // 1. Header (Static)
+                            ColumnLayout {
+                                id: headerLayout
                                 Layout.fillWidth: true
-                                height: 1; color: "#3A3A3A"
-                            }
+                                spacing:            ScreenTools.defaultFontPixelHeight * 0.8
 
-                            // Section header with blue accent
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-                                Rectangle { width: 4; height: 16; radius: 2; color: "#3498DB" }
                                 Text {
-                                    text:           qsTr("FENCE RADIUS")
-                                    color:          "#3498DB"
+                                    text:           qsTr("Fence Settings")
+                                    color:          "white"
                                     font.bold:      true
-                                    font.pointSize: 10
+                                    font.pointSize: ScreenTools.defaultFontPointSize + 2
                                     font.family:    "Outfit"
                                 }
-                            }
 
-                            // 1. Radius Adjustment
-                            RowLayout {
-                                Layout.fillWidth:   true
-                                spacing:            ScreenTools.defaultFontPixelWidth * 0.5
-
-                                Button {
-                                    Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
-                                    height:                 ScreenTools.defaultFontPixelHeight * 2.2
-                                    background: Rectangle {
-                                        radius: ScreenTools.defaultFontPixelHeight * 0.45
-                                        color:  Qt.rgba(0, 0, 0, 0.41)
-                                        border.color: "white"
-                                        border.width: 1
-                                    }
-                                    contentItem: Text {
-                                        text:               "−"
-                                        color:              "white"
-                                        font.bold:          true
-                                        font.pointSize:     ScreenTools.defaultFontPointSize + 2
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment:   Text.AlignVCenter
-                                    }
-                                    onClicked: {
-                                        mapPolygonvisuals.fenceRadius = Math.max(1, mapPolygonvisuals.fenceRadius - 5)
-                                        mapPolygonvisuals.updateFence()
-                                        saveFenceData(_planMasterController.currentPlanFile)
-                                    }
-                                }
-
+                                // Divider
                                 Rectangle {
-                                    Layout.fillWidth:   true
-                                    height:             ScreenTools.defaultFontPixelHeight * 2.2
-                                    radius:             ScreenTools.defaultFontPixelHeight * 0.45
-                                    color:              Qt.rgba(0, 0, 0, 0.6)
-                                    border.color:       "white"
-                                    border.width:       1
-                                    Text {
-                                        anchors.centerIn:   parent
-                                        text:               mapPolygonvisuals.fenceRadius.toFixed(0) + "m"
-                                        color:              "white"
-                                        font.bold:          true
-                                        font.pointSize:     ScreenTools.defaultFontPointSize
-                                        font.family:        "Outfit"
-                                    }
-                                }
-
-                                Button {
-                                    Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
-                                    height:                 ScreenTools.defaultFontPixelHeight * 2.2
-                                    background: Rectangle {
-                                        radius: ScreenTools.defaultFontPixelHeight * 0.45
-                                        color:  Qt.rgba(0, 0, 0, 0.41)
-                                        border.color: "white"
-                                        border.width: 1
-                                    }
-                                    contentItem: Text {
-                                        text:               "+"
-                                        color:              "white"
-                                        font.bold:          true
-                                        font.pointSize:     ScreenTools.defaultFontPointSize + 2
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment:   Text.AlignVCenter
-                                    }
-                                    onClicked: {
-                                        mapPolygonvisuals.fenceRadius = mapPolygonvisuals.fenceRadius + 5
-                                        mapPolygonvisuals.updateFence()
-                                        saveFenceData(_planMasterController.currentPlanFile)
-                                    }
+                                    Layout.fillWidth: true
+                                    height: 1; color: "#3A3A3A"
                                 }
                             }
 
-                            // 2. Delete Button
-                            Button {
-                                Layout.fillWidth:       true
-                                height:                 ScreenTools.defaultFontPixelHeight * 2.0
-                                background: Rectangle {
-                                    radius: ScreenTools.defaultFontPixelHeight * 0.45
-                                    color:  "#E74C3C"
-                                }
-                                contentItem: Text {
-                                    text:               qsTr("Delete")
-                                    color:              "white"
-                                    font.bold:          true
-                                    font.pointSize:     ScreenTools.defaultFontPointSize
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment:   Text.AlignVCenter
-                                    font.family:        "Outfit"
-                                }
-                                onClicked: {
-                                    mainWindow.showMessageDialog(qsTr("Delete Fence"),
-                                        qsTr("Are you sure you want to permanently delete the circular fence data?"),
-                                        Dialog.Yes | Dialog.No,
-                                        function() {
-                                            isAgriFenceMode = false
-                                            fenceSettingsVisible = false
-                                            activeRightPanel = ""
-                                            QGroundControl.saveGlobalSetting("enableFence", "false")  // ← ADD THIS
-                                            mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
-                                            mapPolygonvisuals.fenceRadius = 0
-                                            mapPolygonvisuals.updateFence()
-                                        })
+                            // 2. Middle Area
+                            ColumnLayout {
+                                id: fenceScrollCol
+                                Layout.fillWidth: true
+                                width: parent.width - 12
+                                    spacing:            ScreenTools.defaultFontPixelHeight * 0.8
+
+                                    // Section header with blue accent
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 8
+                                        Rectangle { width: 4; height: 16; radius: 2; color: "#3498DB" }
+                                        Text {
+                                            text:           qsTr("FENCE RADIUS")
+                                            color:          "#3498DB"
+                                            font.bold:      true
+                                            font.pointSize: 10
+                                            font.family:    "Outfit"
+                                        }
+                                    }
+
+                                    // 1. Radius Adjustment
+                                    RowLayout {
+                                        Layout.fillWidth:   true
+                                        spacing:            ScreenTools.defaultFontPixelWidth * 0.5
+
+                                        Button {
+                                            Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
+                                            height:                 ScreenTools.defaultFontPixelHeight * 2.2
+                                            background: Rectangle {
+                                                radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                                color:  Qt.rgba(0, 0, 0, 0.41)
+                                                border.color: "white"
+                                                border.width: 1
+                                            }
+                                            contentItem: Text {
+                                                text:               "−"
+                                                color:              "white"
+                                                font.bold:          true
+                                                font.pointSize:     ScreenTools.defaultFontPointSize + 2
+                                                horizontalAlignment: Text.AlignHCenter
+                                                verticalAlignment:   Text.AlignVCenter
+                                            }
+                                            onClicked: {
+                                                mapPolygonvisuals.fenceRadius = Math.max(1, mapPolygonvisuals.fenceRadius - 5)
+                                                mapPolygonvisuals.updateFence()
+                                                saveFenceData(_planMasterController.currentPlanFile)
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            Layout.fillWidth:   true
+                                            height:             ScreenTools.defaultFontPixelHeight * 2.2
+                                            radius:             ScreenTools.defaultFontPixelHeight * 0.45
+                                            color:              Qt.rgba(0, 0, 0, 0.6)
+                                            border.color:       "white"
+                                            border.width:       1
+                                            Text {
+                                                anchors.centerIn:   parent
+                                                text:               mapPolygonvisuals.fenceRadius.toFixed(0) + "m"
+                                                color:              "white"
+                                                font.bold:          true
+                                                font.pointSize:     ScreenTools.defaultFontPointSize
+                                                font.family:        "Outfit"
+                                            }
+                                        }
+
+                                        Button {
+                                            Layout.preferredWidth:  ScreenTools.defaultFontPixelHeight * 2.2
+                                            height:                 ScreenTools.defaultFontPixelHeight * 2.2
+                                            background: Rectangle {
+                                                radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                                color:  Qt.rgba(0, 0, 0, 0.41)
+                                                border.color: "white"
+                                                border.width: 1
+                                            }
+                                            contentItem: Text {
+                                                text:               "+"
+                                                color:              "white"
+                                                font.bold:          true
+                                                font.pointSize:     ScreenTools.defaultFontPointSize + 2
+                                                horizontalAlignment: Text.AlignHCenter
+                                                verticalAlignment:   Text.AlignVCenter
+                                            }
+                                            onClicked: {
+                                                mapPolygonvisuals.fenceRadius = mapPolygonvisuals.fenceRadius + 5
+                                                mapPolygonvisuals.updateFence()
+                                                saveFenceData(_planMasterController.currentPlanFile)
+                                            }
+                                        }
+                                    }
+
+                                    // 2. Delete Button
+                                    Button {
+                                        Layout.fillWidth:       true
+                                        height:                 ScreenTools.defaultFontPixelHeight * 2.0
+                                        background: Rectangle {
+                                            radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                            color:  "#E74C3C"
+                                        }
+                                        contentItem: Text {
+                                            text:               qsTr("Delete")
+                                            color:              "white"
+                                            font.bold:          true
+                                            font.pointSize:     ScreenTools.defaultFontPointSize
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment:   Text.AlignVCenter
+                                            font.family:        "Outfit"
+                                        }
+                                        onClicked: {
+                                            mainWindow.showMessageDialog(qsTr("Delete Fence"),
+                                                qsTr("Are you sure you want to permanently delete the circular fence data?"),
+                                                Dialog.Yes | Dialog.No,
+                                                function() {
+                                                    isAgriFenceMode = false
+                                                    fenceSettingsVisible = false
+                                                    activeRightPanel = ""
+                                                    QGroundControl.saveGlobalSetting("enableFence", "false")  // ← ADD THIS
+                                                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                                    mapPolygonvisuals.fenceRadius = 0
+                                                    mapPolygonvisuals.updateFence()
+                                                })
+                                        }
                                 }
                             }
 
-                            // In fenceSubCol ColumnLayout, after the Delete Button
+                            // 3. Done Button (Static)
                             Button {
+                                id: doneBtnRect
                                 Layout.fillWidth: true
                                 height:           ScreenTools.defaultFontPixelHeight * 2.0
                                 background: Rectangle {
@@ -2398,8 +2415,12 @@ Item {
             GeoFenceEditor {
                 anchors.top:            rightControls.bottom
                 anchors.topMargin:      ScreenTools.defaultFontPixelHeight * 0.25
-                anchors.bottom:         savePlanBtn.top        // ← CHANGE from parent.bottom
-                anchors.bottomMargin:   ScreenTools.defaultFontPixelHeight * 0.5
+                anchors.bottom:         parent.bottom
+                anchors.bottomMargin:   savePlanBtn.visible 
+                                            ? (savePlanBtn.height + ScreenTools.defaultFontPixelHeight * 1.0) 
+                                            : (ScreenTools.isMobile 
+                                                ? ScreenTools.defaultFontPixelHeight * 1.5 
+                                                : ScreenTools.defaultFontPixelHeight * 1.0)
                 anchors.left:           parent.left
                 anchors.right:          parent.right
                 myGeoFenceController:   _geoFenceController
@@ -2569,7 +2590,7 @@ Item {
                 // FIXED: Show Save button in more cases
                 visible: (isMissionTab || isAgriFenceMode) &&
                          (!MapGlobals.isReviewMode || MapGlobals.showMissionItems) &&
-                         activeRightPanel !== "obstacles"  // Removed the fenceSettingsVisible condition
+                         activeRightPanel !== "obstacles" && !fenceSettingsVisible
 
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
