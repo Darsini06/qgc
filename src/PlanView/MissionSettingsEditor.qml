@@ -27,9 +27,9 @@ Rectangle {
 
     property real   _panelRadius:   8
     property real   _fieldRadius:   4
-    property color  _panelColor:    "#333333"
+    property color  _panelColor:    "transparent"
     property color  _panelBorder:   "#444444"
-    property color  _fieldColor:    "#444444"
+    property color  _fieldColor:    "transparent"
     property color  _fieldBorder:   "#555555"
     property color  _headingColor:  "#ffffff"
     property color  _labelColor:    "#ffffff"
@@ -282,7 +282,7 @@ Rectangle {
                                 if (item) {
                                     item.fact = targetFact
                                     item.trackFillColor = _colorAccent
-                                    item.showMinusButton = false
+                                    item.showMinusButton = true
                                     item.showPlusButton = true
                                 }
                             }

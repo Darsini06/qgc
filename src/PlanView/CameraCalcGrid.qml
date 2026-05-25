@@ -292,33 +292,33 @@ Column {
             opacity:     0.5
         }
 
-        // ── Trigger Distance ──────────────────────────────────────────────
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing:          _margin * 0.5
+        // // ── Trigger Distance ──────────────────────────────────────────────
+        // ColumnLayout {
+        //     Layout.fillWidth: true
+        //     spacing:          _margin * 0.5
 
-            QGCLabel {
-                text:  frontalDistanceLabel
-                color: _colorTextSecondary
-                font.pointSize: ScreenTools.defaultFontPointSize
-            }
+        //     QGCLabel {
+        //         text:  frontalDistanceLabel
+        //         color: _colorTextSecondary
+        //         font.pointSize: ScreenTools.defaultFontPointSize
+        //     }
 
-            Loader {
-                Layout.fillWidth: true
-                sourceComponent:  volumeSliderComponent
-                property var targetFact: cameraCalc.adjustedFootprintFrontal
-                onTargetFactChanged: if (item) item.fact = targetFact
-                onLoaded:            if (item) item.fact = targetFact
-            }
-        }
+        //     Loader {
+        //         Layout.fillWidth: true
+        //         sourceComponent:  volumeSliderComponent
+        //         property var targetFact: cameraCalc.adjustedFootprintFrontal
+        //         onTargetFactChanged: if (item) item.fact = targetFact
+        //         onLoaded:            if (item) item.fact = targetFact
+        //     }
+        // }
 
         // Divider
-        Rectangle {
-            Layout.fillWidth: true
-            height:      1
-            color:       _colorBorder
-            opacity:     0.5
-        }
+        // Rectangle {
+        //     Layout.fillWidth: true
+        //     height:      1
+        //     color:       _colorBorder
+        //     opacity:     0.5
+        // }
 
         // ── Side Spacing ──────────────────────────────────────────────────
         ColumnLayout {

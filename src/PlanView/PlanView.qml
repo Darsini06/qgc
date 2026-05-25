@@ -218,6 +218,10 @@ Item {
 
             waypointMark = QGroundControl.loadGlobalSetting("waypointMark", "true") === "true"
             mapPolygonvisuals.updateFence()
+            // ← ADD THESE: reset obstacle/fence panel state on every entry
+                   activeRightPanel         = ""
+                   _editingLayer            = _layerMission
+                   layerTabBar.currentIndex = 0
         }
     }
 
@@ -2058,7 +2062,6 @@ Item {
                         }
                     }
                 }
-
                 Column {
                     width:              parent.width
                     spacing:            ScreenTools.defaultFontPixelHeight * 0.4
@@ -2264,6 +2267,31 @@ Item {
                                         })
                                 }
                             }
+
+                            // In fenceSubCol ColumnLayout, after the Delete Button
+                            Button {
+                                Layout.fillWidth: true
+                                height:           ScreenTools.defaultFontPixelHeight * 2.0
+                                background: Rectangle {
+                                    radius: ScreenTools.defaultFontPixelHeight * 0.45
+                                    color:  "black"
+                                    border.color: "white"
+                                    border.width: 1
+                                }
+                                contentItem: Text {
+                                    text:                qsTr("Done")
+                                    color:               "white"
+                                    font.bold:           true
+                                    font.pointSize:      ScreenTools.defaultFontPointSize
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment:   Text.AlignVCenter
+                                    font.family:         "Outfit"
+                                }
+                                onClicked: {
+                                    fenceSettingsVisible = false
+                                    activeRightPanel     = ""
+                                }
+                            }
                         }
                     }
                 }
@@ -2377,6 +2405,11 @@ Item {
                 myGeoFenceController:   _geoFenceController
                 flightMap:              editorMap
                 visible:                _editingLayer == _layerGeoFence
+                onCloseRequested: {                  // ← ADD THIS
+                       _editingLayer            = _layerMission
+                       layerTabBar.currentIndex = 0
+                       activeRightPanel         = ""
+                   }
             }
 
             //-------------------------------------------------------

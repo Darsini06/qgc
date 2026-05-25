@@ -55,7 +55,7 @@ QtObject {
     // Grid lines setting for Map Items
     property bool gridLines: QGroundControl.loadBoolGlobalSetting("gridLines", true)
     property real gridLineWidth: parseFloat(QGroundControl.loadGlobalSetting("gridLineWidth", "5"))
-    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#011F05")
+    property color gridColor: QGroundControl.loadGlobalSetting("gridColor", "#ffffff")
     property color obstacleColor: QGroundControl.loadGlobalSetting("obstacleColor", "#F1C40F")
     property real obstacleLineWidth: parseFloat(QGroundControl.loadGlobalSetting("obstacleLineWidth", "2"))
     property real obstacleOpacity: parseFloat(QGroundControl.loadGlobalSetting("obstacleOpacity", "0.2"))
