@@ -219,6 +219,21 @@ QObject* SpotSprayingComplexItem::createPoint(const QGeoCoordinate& coord)
 
 void SpotSprayingComplexItem::_updatePoints()
 {
+    if (_points.count() > 0) {
+        double latMin = 90.0, latMax = -90.0;
+        double lonMin = 180.0, lonMax = -180.0;
+        for (int i = 0; i < _points.count(); i++) {
+            SpotSprayingPoint* p = _points.value<SpotSprayingPoint*>(i);
+            latMin = qMin(latMin, p->coordinate().latitude());
+            latMax = qMax(latMax, p->coordinate().latitude());
+            lonMin = qMin(lonMin, p->coordinate().longitude());
+            lonMax = qMax(lonMax, p->coordinate().longitude());
+        }
+        _setBoundingCube(QGCGeoBoundingCube(QGeoCoordinate(latMax, lonMin), QGeoCoordinate(latMin, lonMax)));
+    } else {
+        _setBoundingCube(QGCGeoBoundingCube());
+    }
+
     setDirty(true);
     emit coordinateChanged(coordinate());
     emit exitCoordinateChanged(exitCoordinate());

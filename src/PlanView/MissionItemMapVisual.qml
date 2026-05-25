@@ -28,6 +28,13 @@ Item {
     signal clicked(int sequenceNumber)
     signal pointClicked(int pointIndex)
 
+    property int selectedPointIndex: -1
+    onSelectedPointIndexChanged: {
+        if (_visualItem && _visualItem.hasOwnProperty("selectedPointIndex")) {
+            _visualItem.selectedPointIndex = selectedPointIndex
+        }
+    }
+
     property var _visualItem
 
     Component.onCompleted: {
@@ -44,7 +51,8 @@ Item {
 
                 "opacity": Qt.binding(function() { return _root.opacity }),
                 "interactive": Qt.binding(function() { return _root.interactive }),
-                "visible": Qt.binding(function() { return _root.visible })
+                "visible": Qt.binding(function() { return _root.visible }),
+                "selectedPointIndex": Qt.binding(function() { return _root.selectedPointIndex })
             })
             _visualItem.clicked.connect(_root.clicked)
             // Forward pointClicked if visual has it

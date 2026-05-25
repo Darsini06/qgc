@@ -1356,6 +1356,7 @@ Item {
                     opacity:     _editingLayer == _layerMission || _editingLayer == _layerUTMSP ? 1 : editorMap._nonInteractiveOpacity
                     interactive: _editingLayer == _layerMission || _editingLayer == _layerUTMSP
                     vehicle:     _planMasterController.controllerVehicle
+                    selectedPointIndex: (itemEditPopup.popupMissionItem === object) ? itemEditPopup.selectedPointIndex : -1
                     onClicked: (sequenceNumber) => {
 
                                    _missionController.setCurrentPlanViewSeqNum(sequenceNumber, false)
@@ -3622,6 +3623,11 @@ Item {
                      : Popup.CloseOnEscape
         parent: Overlay.overlay
 
+        onClosed: {
+            // Clear map hover highlight when settings panel is closed
+            selectedPointIndex = -1
+        }
+
         background: Rectangle {
             color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
             radius: 12
@@ -3697,6 +3703,16 @@ Item {
                                 }
                                 console.log("LOADER READY:", itemEditPopup.popupMissionItem.commandName)
 
+                            }
+                        }
+                        
+                        Connections {
+                            target: genericEditorLoader.item
+                            ignoreUnknownSignals: true
+                            function onSelectedIndexChanged() {
+                                if (genericEditorLoader.item && itemEditPopup.popupMissionItem && itemEditPopup.popupMissionItem.commandName === "Spot Spraying") {
+                                    itemEditPopup.selectedPointIndex = genericEditorLoader.item.selectedIndex
+                                }
                             }
                         }
                     }
