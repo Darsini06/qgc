@@ -187,8 +187,6 @@ Rectangle {
         anchors.leftMargin: _margin
         anchors.rightMargin: _margin
 
-
-
         QGCLabel {
             id:                     transectAreaDefinitionCompleteLabel
             Layout.fillWidth:       true
@@ -355,7 +353,11 @@ Rectangle {
                         anchors.margins: _margin
                     }
                 }
-            } // Grid Column
+            }
+
+
+
+            // Grid Column
 
             // ─── Camera Tab ────────────────────────────────────────────────
             // Rectangle {

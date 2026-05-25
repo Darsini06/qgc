@@ -2184,6 +2184,7 @@ ApplicationWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             dialog._kmlForSpotSpraying = false
+                            MapGlobals.isSpotSprayingActive = false
                             kmlFileDialog.open()
 
                             //Disable Spot Spraying Options

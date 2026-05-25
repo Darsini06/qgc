@@ -21,6 +21,7 @@ Item {
     property string title
     property bool   selectFolder:   false
     property string defaultSuffix:  ""
+    property var planViewRef: null   // Reference back to PlanView
 
     signal acceptedForLoad(string file)
     signal acceptedForSave(string file)
@@ -491,21 +492,23 @@ Item {
                         onClicked: {
 
                             // Update latest fence/circle values
-                            MapGlobals.setGridLines(false)
+                            //MapGlobals.setGridLines(false)
 
                             var fallback = controller.fullyQualifiedFilename(
                                         folder,
                                         userName !== "" ? userName : "Guest",
                                         _rgExtensions)
 
-                            _root.acceptedForSave(fallback)
+                            // ADD THIS - Save fence data before saving the file
+                            if (planViewRef && planViewRef.saveFenceBeforeSave) {
+                                planViewRef.saveFenceBeforeSave(fallback)
+                            }
 
+                            _root.acceptedForSave(fallback)
                             popup.visible = false
                         }
                     }
                 }
-
-
             }
         }
     }
@@ -917,7 +920,9 @@ Item {
                                                     concatenatedText,
                                                     _rgExtensions))
 
-                                    MapGlobals.setGridLines(false)
+
+                                    //MapGlobals.setGridLines(false)
+
 
                                     customDialog.close()
                                 }

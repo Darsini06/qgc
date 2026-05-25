@@ -18,6 +18,8 @@ QGCFlickable {
     flickableDirection: Flickable.VerticalFlick
     boundsBehavior: Flickable.StopAtBounds
 
+    signal closeRequested()
+
     property var    myGeoFenceController
     property var    flightMap
     property string activeEditType: ""
@@ -120,7 +122,7 @@ QGCFlickable {
         anchors.right: parent.right
         height:        mainCol.y + mainCol.height + _margin * 2
         color:         "#E6222222"
-        radius:        6
+        radius:        14
         border.color:  "#444444"
         border.width:  1
 
@@ -643,6 +645,27 @@ QGCFlickable {
                         }
                     }
                 }
+            }
+
+            Button {
+                Layout.fillWidth: true
+                height:           ScreenTools.defaultFontPixelHeight * 2.5
+                background: Rectangle {
+                    radius:       10
+                    color:        parent.pressed ? "#1A1A1A" : "black"
+                    border.color: "white"
+                    border.width: 1
+                }
+                contentItem: Text {
+                    text:                qsTr("Done")
+                    color:               "white"
+                    font.bold:           true
+                    font.pointSize:      ScreenTools.defaultFontPointSize
+                    font.family:         "Outfit"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment:   Text.AlignVCenter
+                }
+                onClicked: root.closeRequested()
             }
         }
 

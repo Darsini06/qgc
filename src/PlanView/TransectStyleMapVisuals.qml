@@ -116,7 +116,7 @@ Item {
             line.width: MapGlobals.gridLineWidth
             z:          QGroundControl.zOrderMapItems
             path:       _transectPoints
-            visible:    gridLines
+            visible:   gridLines
             opacity:    _root.opacity
         }
     }
