@@ -566,7 +566,7 @@ Item {
         y: 60
         z: 1000
         radius: 8
-        color: Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.75)
+        color: "transparent"
         border.color: qgcPal.text
         border.width: 1
         opacity: 0
@@ -1417,7 +1417,7 @@ Item {
                 y: 60
                 z: 1000
                 radius: 8
-                color: Qt.rgba(qgcPal.window.r, qgcPal.window.g, qgcPal.window.b, 0.75)
+                color: "transparent"
                 border.color: qgcPal.text
                 border.width: 1
                 opacity: 0

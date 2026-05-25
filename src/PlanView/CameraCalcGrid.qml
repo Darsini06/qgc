@@ -292,7 +292,8 @@ Column {
             opacity:     0.5
         }
 
-        // ── Trigger Distance ──────────────────────────────────────────────
+
+        // // ── Trigger Distance ──────────────────────────────────────────────
         // ColumnLayout {
         //     Layout.fillWidth: true
         //     spacing:          _margin * 0.5
@@ -312,7 +313,9 @@ Column {
         //     }
         // }
 
-        // // Divider
+
+        // Divider
+
         // Rectangle {
         //     Layout.fillWidth: true
         //     height:      1
