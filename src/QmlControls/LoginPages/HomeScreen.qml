@@ -867,67 +867,113 @@ Item {
                 Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
                 Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
 
+                property bool _swiped: false
+                property real _progress: 0
+
                 Rectangle {
+                    id: swipeTrack
                     anchors.fill: parent
-                    radius: 20
-                    color: connectMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
-                    border.color: connectMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.15)
+                    radius: height / 2
+                    color: Qt.rgba(0, 0, 0, 0.4)
+                    border.color: Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 150
-                        }
+                    clip: true
+
+                    // Fill strip — no radius, clip handles pill shape
+                    Rectangle {
+                        x: 0; y: 0
+                        width: swipeThumb.x + swipeThumb.width / 2
+                        height: parent.height
+                        radius: 0
+                        color: connectClick._swiped ? "#2e7d32" : accent_color
+                        opacity: 0.85
+                        Behavior on color { ColorAnimation { duration: 200 } }
                     }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: dp(0.8)
-                        spacing: dp(1.5)
+                    // Label
+                    Label {
+                        anchors.left: swipeThumb.right
+                        anchors.leftMargin: dp(1.5)
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: dp(1)
+                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT")
+                        color: "white"
+                        font.family: "Outfit"
+                        font.bold: true
+                        font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                        elide: Text.ElideRight
+                        fontSizeMode: Text.Fit
+                        minimumPointSize: 6
+                        opacity: connectClick._swiped ? 1.0 : Math.max(0, 1 - connectClick._progress * 3)
+                    }
 
-                        Rectangle {
-                            Layout.preferredWidth: parent.height - dp(1)
-                            Layout.preferredHeight: Layout.preferredWidth
-                            radius: width / 2
-                            color: accent_color
+                    // Thumb
+                    Rectangle {
+                        id: swipeThumb
+                        width: parent.height - dp(1)
+                        height: width
+                        radius: width / 2
+                        x: dp(0.5)
+                        y: dp(0.5)
+                        color: connectClick._swiped ? "#388e3c" : accent_color
 
-                            Image {
-                                source: "qrc:/qmlimages/NewImages/commlinks.svg"
-                                width: parent.width * 0.5
-                                height: width
-                                anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
+                        Behavior on x {
+                            enabled: !dragHandler.active
+                            NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
+                        }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+
+                        Image {
+                            source: connectClick._swiped
+                                ? "qrc:/qmlimages/NewImages/check.svg"
+                                : "qrc:/qmlimages/NewImages/commlinks.svg"
+                            width: parent.width * 0.5
+                            height: width
+                            anchors.centerIn: parent
+                            fillMode: Image.PreserveAspectFit
                         }
 
-                        Label {
-                            Layout.fillWidth: true
-                            text: qsTr("CONNECT")
-                            color: "white"
-                            font.family: "Outfit"
-                            font.bold: true
-                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                            elide: Text.ElideRight
-                            fontSizeMode: Text.Fit
-                            minimumPointSize: 6
+                        DragHandler {
+                            id: dragHandler
+                            xAxis.minimum: dp(0.5)
+                            xAxis.maximum: swipeTrack.width - swipeThumb.width - dp(0.5)
+                            yAxis.enabled: false
+                            onActiveChanged: {
+                                if (!active && connectClick._progress < 0.95)
+                                    swipeThumb.x = dp(0.5)  // snap back
+                            }
+                            onTranslationChanged: {
+                                var maxX = swipeTrack.width - swipeThumb.width - dp(1)
+                                connectClick._progress = Math.min(1, (swipeThumb.x - dp(0.5)) / maxX)
+                                if (connectClick._progress >= 0.95 && !connectClick._swiped) {
+                                    connectClick._swiped = true
+                                    swipeThumb.x = maxX + dp(0.5)
+                                    // ---- your original onClicked logic here ----
+                                    var editingConfig = _linkManager.createConfiguration(
+                                        ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
+                                    typeSelectionDialogComponent.createObject(mainWindow1, {
+                                        editingConfig: editingConfig,
+                                        originalConfig: null
+                                    }).open()
+                                    // reset after 2 seconds
+                                    resetTimer.start()
+                                }
+                            }
                         }
                     }
                 }
 
-                MouseArea {
-                    id: connectMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "");
-                        typeSelectionDialogComponent.createObject(mainWindow1, {
-                                                                      editingConfig: editingConfig,
-                                                                      originalConfig: null
-                                                                  }).open();
+                Timer {
+                    id: resetTimer
+                    interval: 2000
+                    onTriggered: {
+                        connectClick._swiped = false
+                        connectClick._progress = 0
+                        swipeThumb.x = dp(0.5)
                     }
                 }
             }
-
             // Flexible spacer to push operational buttons to the right
             Item {
                 Layout.fillWidth: true
@@ -1119,7 +1165,7 @@ Item {
                         property int selectedType: -1
 
                         ColumnLayout {
-                            spacing: 12
+                            spacing: 18
                             width: parent.width - 24
                             anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
@@ -1142,7 +1188,8 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 56 : 0
+                                    Layout.preferredHeight: visible ? 68 : 0
+                                    Layout.bottomMargin: 12
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
                                     border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
