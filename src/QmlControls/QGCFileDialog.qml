@@ -510,6 +510,11 @@ Item {
                         }
                     }
                 }
+                // ← Bottom spacer
+                  Item {
+                      width: parent.width
+                      height: 20
+                  }
             }
         }
     }
@@ -765,7 +770,7 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * 0.28
-                    color: "#262626"
+                    color: app_color
                     radius: 20
                     // Top rounded corners only
                     Rectangle {
@@ -778,7 +783,7 @@ Item {
                     }
 
                     Text {
-                        text:               qsTr("Set Ground Name")
+                        text:               qsTr("Set Ground Baveesh")
                         font.bold:          true
                         color:              "white"
                         font.pointSize:     14
@@ -799,7 +804,17 @@ Item {
                 Item {
                     Layout.fillWidth:   true
                     Layout.fillHeight:  true
+                    Text {
+                        visible: nameField.text.length >= 12
+                        text: qsTr("Only 12 characters allowed")
 
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+
+                        color: "red"
+                        font.bold: true
+                        font.pointSize: 11
+                    }
                     RowLayout {
                         anchors {
                             left:           parent.left
@@ -819,20 +834,30 @@ Item {
                         }
 
                         TextField {
-                            id:             nameField
+                            id: nameField
                             Layout.fillWidth: true
                             Layout.preferredHeight: 40
+
+                            maximumLength: 12
+
+                            validator: RegularExpressionValidator {
+                                regularExpression: /^[A-Za-z0-9]*$/
+                            }
+
                             placeholderText: qsTr("Enter your project name")
                             placeholderTextColor: "#888888"
+
                             font.pointSize: 11
-                            color:          "black"
+                            color: "black"
+
                             verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    15
+                            leftPadding: 15
+
                             background: Rectangle {
-                                radius:         10
-                                color:          "#FFFFFF"
-                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
-                                border.width:   nameField.activeFocus ? 2 : 1
+                                radius: 10
+                                color: "#FFFFFF"
+                                border.color: nameField.activeFocus ? "#262626" : "#DDE1EA"
+                                border.width: nameField.activeFocus ? 2 : 1
                             }
                         }
                     }
@@ -850,6 +875,7 @@ Item {
                 Item {
                     Layout.fillWidth:   true
                     Layout.preferredHeight: parent.height * 0.32
+
                     RowLayout {
                         anchors.fill: parent
                         spacing: 0
@@ -911,7 +937,7 @@ Item {
                                         return
                                     }
 
-                                    let concatenatedText = nameField.text.substring(0, 10)
+                             let concatenatedText = nameField.text
 
                                     _appSettings.username = concatenatedText
 
@@ -952,4 +978,5 @@ Item {
             }
         }
     }
+
 }

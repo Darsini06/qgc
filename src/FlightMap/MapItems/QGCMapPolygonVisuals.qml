@@ -1689,9 +1689,10 @@ Item {
                     return
                 }
 
-                let concatenatedText = filenameTextField.text.substring(0, 3) +
-                    filenameTextField1.text.substring(0, 3) +
-                    filenameTextField2.text.substring(0, 3);
+                let concatenatedText =
+                    filenameTextField.text +
+                    filenameTextField1.text +
+                    filenameTextField2.text;
 
                 _appSettings.username = concatenatedText;
                 console.log(concatenatedText);
@@ -1755,7 +1756,7 @@ Item {
                             }
 
                             Label {
-                                text: qsTr("Set Ground Name")
+                                text: qsTr("Set Ground Darsini")
                                 font.bold: true
                                 color: "white"
                                 font.pointSize: 14
@@ -1772,6 +1773,7 @@ Item {
                             TextField {
                                 id: filenameTextField
                                 Layout.fillWidth: true
+                                maximumLength: 20
                                 color: "black"
                                 background: Rectangle {
                                     radius: 8
@@ -1810,6 +1812,7 @@ Item {
                             TextField {
                                 id: filenameTextField2
                                 Layout.fillWidth: true
+                                maximumLength: 20
                                 color: "black"
                                 background: Rectangle {
                                     radius: 8
@@ -1934,7 +1937,7 @@ Item {
                     }
 
                     Text {
-                        text:               qsTr("Set Ground Name")
+                        text:               qsTr("Set Ground Selvaraj")
                         font.bold:          true
                         color:              "white"
                         font.pointSize:     14
@@ -1953,45 +1956,69 @@ Item {
 
                 // Content Area
                 Item {
-                    Layout.fillWidth:   true
-                    Layout.fillHeight:  true
-                    RowLayout {
-                        anchors {
-                            left:           parent.left
-                            right:          parent.right
-                            verticalCenter: parent.verticalCenter
-                            leftMargin:     25
-                            rightMargin:    25
-                        }
-                        spacing:          15
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 15
+                        spacing: 12
 
                         Text {
-                            text:           qsTr("Project Name:")
-                            color:          "black"
-                            font.bold:      true
-                            font.pointSize: 11
+                            id: limitText
+                            visible: nameField.text.length >= 12
+                            text: qsTr("Only 12 characters allowed")
+
+                            color: "red"
+                            font.pixelSize: 14
+                            font.bold: true
+
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
-                        TextField {
-                            id:             nameField
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 40
-                            placeholderText: qsTr("Enter your project name")
-                            placeholderTextColor: "#888888"
-                            font.pointSize: 11
-                            color:          "black"
-                            verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    15
-                            background: Rectangle {
-                                radius:         10
-                                color:          "#FFFFFF"
-                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
-                                border.width:   nameField.activeFocus ? 2 : 1
+                        RowLayout {
+                            width: parent.width
+                            spacing: 15
+
+                            Text {
+                                text: qsTr("Project Name:")
+                                color: "black"
+                                font.bold: true
+                                font.pointSize: 11
+                            }
+
+                            TextField {
+                                id: nameField
+
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 40
+
+                                maximumLength: 12
+
+                                validator: RegularExpressionValidator {
+                                    regularExpression: /^[A-Za-z0-9]*$/
+                                }
+
+                                placeholderText: qsTr("Enter your project name")
+                                placeholderTextColor: "#888888"
+
+                                font.pointSize: 11
+                                color: "black"
+
+                                verticalAlignment: TextInput.AlignVCenter
+                                leftPadding: 15
+
+                                background: Rectangle {
+                                    radius: 10
+                                    color: "#FFFFFF"
+                                    border.color: nameField.activeFocus ? "#262626" : "#DDE1EA"
+                                    border.width: nameField.activeFocus ? 2 : 1
+                                }
                             }
                         }
                     }
                 }
-
                 // Separator 2
                 Rectangle {
                     Layout.fillWidth: true
@@ -2070,7 +2097,7 @@ Item {
 
                                     MapGlobals.setGridLines(false)
 
-                                    let concatenatedText = nameField.text.substring(0, 10)
+                                    let concatenatedText = nameField.text
                                     _appSettings.username = concatenatedText
 
                                     _saveCurrentVertices()

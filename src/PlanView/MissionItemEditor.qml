@@ -17,7 +17,7 @@ Rectangle {
     id:             _root
     height:         editorLoader.visible ? (editorLoader.y + editorLoader.height + _innerMargin) : (topRowLayout.y + topRowLayout.height + _margin)
     implicitHeight: height
-    color:          "transparent"
+    color:          "#30000000"
     radius:         _radius
     opacity:        _currentItem ? 1.0 : 0.7
     border.width:   0
@@ -114,7 +114,7 @@ Rectangle {
             fillMode:               Image.PreserveAspectFit
             mipmap:                 true
             smooth:                 true
-            color:                  "#9090b0"
+            color:                  "#1E293B"
             visible:                _currentItem && missionItem.sequenceNumber !== 0
             source:                 "/res/TrashDelete.svg"
 
@@ -243,7 +243,7 @@ Rectangle {
         sourceSize.height:      _hamburgerSize
         source:                 "qrc:/qmlimages/Hamburger.svg"
         visible:                missionItem.isCurrentItem && missionItem.sequenceNumber !== 0
-        color:                  "#475569" // Slate grey for hamburger
+        color:                  "#1E293B" // Slate grey for hamburger
 
         QGCMouseArea {
             fillItem:   hamburger

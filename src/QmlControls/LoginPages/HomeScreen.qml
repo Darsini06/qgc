@@ -879,10 +879,10 @@ Item {
                     border.width: 1
                     clip: true
 
-                    // Fill strip — no radius, clip handles pill shape
+                    // Fill strip — starts hidden, grows as thumb moves
                     Rectangle {
                         x: 0; y: 0
-                        width: swipeThumb.x + swipeThumb.width / 2
+                        width: Math.max(0, swipeThumb.x - dp(0.5))  // ← only show BEHIND thumb, not under it
                         height: parent.height
                         radius: 0
                         color: connectClick._swiped ? "#2e7d32" : accent_color
