@@ -462,7 +462,8 @@ Item {
                         color: Qt.rgba(255, 255, 255, 0.08)
                         border.color: Qt.rgba(255, 255, 255, 0.15)
                         QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: logfiles.backClicked() }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {MapGlobals.rootWindow.homescreen()
+                                console.log("Button clicked2")} }
                     }
 
                     Item { Layout.fillHeight: true }
@@ -529,6 +530,9 @@ Item {
                         anchors.fill: parent; anchors.margins: 20
                         QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 24; height: 24; color: "#111827"; MouseArea { anchors.fill: parent; onClicked: logfiles.backClicked() } }
                         Text { text: "Log Files"; font.family: "Outfit"; font.bold: true; font.pointSize: ScreenTools.mediumFontPointSize; color: "#111827" }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {logfiles.backClicked()
+                            console.log("Button clicked")}
+                        }
                     }
                 }
 

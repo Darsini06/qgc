@@ -1260,7 +1260,7 @@ ApplicationWindow {
 
             QGCColoredImage {
                 id: takeofficon
-                source: "/qmlimages/PaperPlane.svg"
+                source: "/qmlimages/NewImages/takeOff.svg"//"/qmlimages/PaperPlane.svg"
                 width: columnbtn._iconSize
                 height: width
                 anchors.centerIn: parent
@@ -1272,7 +1272,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onClicked: {
                     //guidedValueSlider.visible = true
-                    myDialog.imageSource = "/qmlimages/PaperPlane.svg"
+                    myDialog.imageSource = "/qmlimages/NewImages/takeOff.svg"//"/qmlimages/PaperPlane.svg"
                     myDialog.dialogText = "settings"
                     myDialog.open()
                 }

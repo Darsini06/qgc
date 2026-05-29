@@ -335,15 +335,16 @@ Item {
         Image {
             id: mainLogo
             source: "qrc:/qmlimages/NewImages/dronecommanderlogo.svg"
-            width: ScreenTools.defaultFontPixelWidth * (isMobile ? 8 : 10)
-            height: width * (100 / 220)
+            width: ScreenTools.defaultFontPixelWidth * (isMobile ? 6 : 8)
+            height: width * (80 / 180)
             fillMode: Image.PreserveAspectFit
             asynchronous: true
             smooth: true
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(2) : dp(5)
+            anchors.leftMargin:((isSmallScreen || isMobile) ? dp(4) : 40)
             anchors.topMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+
             z: 50
             opacity: 0
             Behavior on opacity {
@@ -470,11 +471,11 @@ Item {
             // Conditional positioning: Center for the main tagline, Left for operational modes
             anchors.horizontalCenter:  undefined
             anchors.left:  parent.left
+
             anchors.leftMargin:((isSmallScreen || isMobile) ? dp(4) : 40)
 
             // Center the whole block in the available vertical space
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -dp(5)
 
             width: {
                 if (isSmallScreen || isMobile)
@@ -485,71 +486,8 @@ Item {
 
             // Reduced basic spacing between elements
             spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1)
-            opacity: 1
-            z: 10
 
-            // 1. Tagline (Moved to the top of the column for home page)
-            Label {
-                id: heroSubtitle
-                visible: !isSmallScreen //(droneType === "loadpage") ? true : !isSmallScreen
-                width: parent.width
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
-                // text: {
-                //     if (droneType === "Camera")  return "Master the sky with cinematic 4K vision and precise control.\nCapture high-definition visuals for professional surveillance."
-                //     if (droneType === "Mapping") return "Industrial-grade photogrammetry and 3D terrain modeling.\nExecute automated flight missions to generate centimeter-level accuracy maps."
-                //     if (droneType === "Agri")    return "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
-                //     if (droneType === "AI")      return "Autonomous intelligence and advanced object recognition.\nReal-time mission optimization with neural-link drone coordination."
-                //     return "THE ADVANCED GROUND CONTROL STATION FOR ELITE DRONE MISSIONS"
-                // }
 
-                text: "Smart farming through multispectral crop analysis and automated spraying.\nOptimize your yield with intelligent field coverage and health monitoring."
-
-                color: Qt.rgba(255, 255, 255, 0.9) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.7) : Qt.rgba(255, 255, 255, 0.9)
-                font.pointSize: {
-                    var baseSize = ScreenTools.defaultFontPointSize;
-                    if (isDesktop) return baseSize * 1.2;
-                    if (isTablet) return baseSize * 1.1;
-                    return isSmallScreen ? baseSize * 0.6 : baseSize * 0.7;
-                }
-                font.family: "Outfit"
-                font.italic: false//droneType === "loadpage"
-                font.bold: false
-                lineHeight: 1.1
-                bottomPadding: dp(0.5) //(droneType === "loadpage" && isSmallScreen) ? 0 : dp(0.5)
-
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.6) //(droneType === "loadpage") ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(0, 0, 0, 0.6)
-                    shadowBlur: 0.2
-                    shadowVerticalOffset: 1
-                }
-            }
-
-            // 2. Main Title (Moved inside the column)
-            Text {
-                id: topBrandText
-                text: "DRONE COMMANDER"
-                width: parent.width
-                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
-                visible: false //(droneType === "loadpage")
-                color: "#262626"
-                font.family: "Outfit"
-                font.bold: true
-                font.letterSpacing: isSmallScreen ? 0 : (isTablet || isDesktop ? 8 : 1.2)
-                
-                // Automatic fitting logic
-                fontSizeMode: Text.HorizontalFit
-                minimumPointSize: 6
-                font.pointSize: {
-                    var baseSize = ScreenTools.largeFontPointSize;
-                    if (isDesktop) return baseSize * 4.0;
-                    if (isTablet) return baseSize * 3.5;
-                    return isSmallScreen ? 18 : 26; // Target sizes, reduced for mobile
-                }
-                lineHeight: 1.1
-            }
 
             // 3. Mode Title (Original heroTitle, hidden on home page)
             Label {
@@ -848,7 +786,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottomMargin: (isSmallScreen || isMobile) ? dp(1.5) : dp(2)
-            anchors.leftMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
+            anchors.leftMargin:((isSmallScreen || isMobile) ? dp(4) : 40)
             anchors.rightMargin: (isSmallScreen || isMobile) ? dp(2) : dp(4)
             spacing: (isSmallScreen || isMobile) ? dp(0.5) : dp(2)
 

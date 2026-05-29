@@ -20,12 +20,13 @@ import QGroundControl.UTMSP
 Rectangle {
     id:         _root
     width:      ScreenTools.defaultFontPixelWidth * 35
-    height:     mainLayout.height + (_margins * 2)
+    height: Math.max(320, mainLayout.implicitHeight + 60)
     radius:     20//ScreenTools.defaultFontPixelWidth / 2
-    color:      "white"
+    color: "#CCFFFFFF"
     visible:    _utmspEnabled === true ? utmspSliderTrigger: false
     border.width: 2//width * 0.05
     border.color: "#301934"
+    anchors.centerIn: parent
 
     property var    guidedController
     property var    guidedValueSlider
@@ -59,21 +60,30 @@ Rectangle {
         }
     }
 
+    // Close Button
         Rectangle {
-            width: 36
-            height: 36
-            radius: 18
-            color: "red"//qgcPal.primaryButton
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.margins: 4
+            id: closeButton
+
+            width: 40
+            height: 40
+            radius: 20
+            color: "#E53935"
+
+            anchors {
+                top: parent.top
+                right: parent.right
+                topMargin: -10
+                rightMargin: -10
+            }
+
+            z: 999
 
             QGCColoredImage {
-                anchors.margins: 10
                 anchors.fill: parent
+                anchors.margins: 10
                 source: "/res/XDelete.svg"
                 fillMode: Image.PreserveAspectFit
-                color: "white"//qgcPal.text
+                color: "white"
             }
 
             QGCMouseArea {
@@ -81,6 +91,7 @@ Rectangle {
                 onClicked: confirmCancelled()
             }
         }
+
 
     function show(immediate) {
         if (immediate) {
@@ -113,35 +124,43 @@ Rectangle {
     QGCPalette { id: qgcPal }
 
     ColumnLayout {
-        id:                 mainLayout
-        anchors.centerIn:   parent
-        width:              parent.width - (_margins * 2)
-        spacing:            _margins
+        id: mainLayout
 
-        QGCLabel {
-            id:                     messageText
-            Layout.fillWidth:       true
-            horizontalAlignment:    Text.AlignHCenter
-            wrapMode:               Text.WordWrap
-            font.pointSize:         ScreenTools.defaultFontPointSize
-            font.bold:              true
-            color:"black"
-        }
+            anchors.centerIn: parent
+            width: parent.width - 40
 
-        QGCCheckBox {
-            id:                 optionCheckBox
-            Layout.alignment:   Qt.AlignHCenter
-            text:               ""
-            visible:            text !== ""
-        }
+            spacing: 20
 
-        RowLayout {
-            Layout.fillWidth:   true
-            spacing:            ScreenTools.defaultFontPixelWidth
+            QGCLabel {
+                    id: messageText
+
+                    Layout.fillWidth: true
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    wrapMode: Text.WordWrap
+
+                    font.pointSize: ScreenTools.defaultFontPointSize + 2
+                    font.bold: true
+
+                    color: "#222222"
+                }
+
+                QGCCheckBox {
+                    id: optionCheckBox
+
+                    Layout.alignment: Qt.AlignHCenter
+
+                    text: ""
+                    visible: text !== ""
+                }
+
 
             Item {
                         Layout.fillWidth: true
-                        height: 100
+                        width: 120
+                                height: 120
 
                         Rectangle {
                             id: circularButton
@@ -151,11 +170,10 @@ Rectangle {
                             color: "white"
                             border.color: "#301934"
                             border.width: 2
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.centerIn: parent
 
                                 QGCLabel {
-                                    id:                     messageText12
+                                    id: messageText12
                                     anchors.centerIn: parent
                                        horizontalAlignment: Text.AlignHCenter
                                        verticalAlignment: Text.AlignVCenter
@@ -163,7 +181,7 @@ Rectangle {
                                     font.pointSize:         ScreenTools.defaultFontPointSize
                                     font.bold:              true
                                     color: "black"
-                                    text:       qsTr("Press here")
+                                    text:       qsTr("Press & Hold")
                                 }
 
                             MouseArea {
@@ -183,9 +201,7 @@ Rectangle {
 
                             Canvas {
                                 id: progressCircle
-                                width: parent.width
-                                height: parent.height
-                                anchors.centerIn: parent
+                                anchors.fill: parent
 
                                 onPaint: {
                                     var ctx = getContext("2d")
@@ -270,25 +286,7 @@ Rectangle {
                 }
             }
 
-            Rectangle {
-                height: slider.height * 0.75
-                width:  height
-                radius: height / 2
-                color:  "#301934"
 
-                QGCColoredImage {
-                    anchors.margins:    parent.height / 4
-                    anchors.fill:       parent
-                    source:             "/res/XDelete.svg"
-                    fillMode:           Image.PreserveAspectFit
-                    color:              "white"
-                }
 
-                QGCMouseArea {
-                    fillItem:   parent
-                    onClicked:  confirmCancelled()
-                }
-            }
-        }
     }
 }
