@@ -10,9 +10,117 @@ import QGroundControl.Controls
 import QGroundControl.ScreenTools
 import QGroundControl.MultiVehicleManager
 import QGroundControl.Palette
+import QGroundControl.SettingsManager
 
 SettingsPage {
     id: root
+
+    component UnitSelector: RowLayout {
+        spacing:            6
+        Layout.fillWidth:   true
+
+        property string labelText
+        property Fact fact
+        property var options: []
+        property var customValue: null
+        property var customSelectCallback: null
+
+        function isSelected(val) {
+            if (customSelectCallback !== null) {
+                return customValue === val
+            }
+            return fact ? fact.value === val : false
+        }
+
+        QGCLabel {
+            text:                   labelText
+            color:                  "black"
+            font.bold:              true
+            Layout.alignment:       Qt.AlignVCenter
+        }
+
+        Flow {
+            id:                     selectorFlow
+            spacing:                6
+            Layout.fillWidth:       true
+            Layout.alignment:       Qt.AlignVCenter
+
+            Repeater {
+                model: options
+
+                delegate: Rectangle {
+                    width:                  Math.max(ScreenTools.defaultFontPixelWidth * 7, textLabel.implicitWidth + ScreenTools.defaultFontPixelWidth * 3.5)
+                    height:                 32
+                    radius:                 4
+                    border.width:           1
+                    border.color:           isSelected(modelData.value) ? "#79AE6F" : "#CCCCCC"
+                    color:                  isSelected(modelData.value) ? "#79AE6F" : (mouseArea.containsMouse ? "#E8F4E5" : "white")
+
+                    QGCLabel {
+                        id:                 textLabel
+                        anchors.centerIn:   parent
+                        text:               modelData.text
+                        color:              isSelected(modelData.value) ? "white" : "black"
+                        font.bold:          isSelected(modelData.value)
+                        font.pointSize:     ScreenTools.defaultFontPointSize
+                    }
+
+                    MouseArea {
+                        id:                 mouseArea
+                        anchors.fill:       parent
+                        hoverEnabled:       true
+                        cursorShape:        Qt.PointingHandCursor
+                        onClicked: {
+                            if (customSelectCallback !== null) {
+                                customSelectCallback(modelData.value)
+                            } else if (fact) {
+                                fact.value = modelData.value
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    component OnOffToggle: Rectangle {
+        id: toggleRoot
+        width:              48
+        height:             26
+        radius:             height / 2
+        color:              checked ? "#79AE6F" : "#E0E0E0"
+        border.color:       checked ? "#79AE6F" : "#CCCCCC"
+        border.width:       1
+        
+        property bool checked: false
+        signal toggled(bool newValue)
+
+        Behavior on color {
+            ColorAnimation { duration: 150 }
+        }
+
+        Rectangle {
+            id: thumb
+            width:              20
+            height:             20
+            radius:             height / 2
+            color:              "white"
+            anchors.verticalCenter: parent.verticalCenter
+            x:                  checked ? (parent.width - width - 3) : 3
+
+            Behavior on x {
+                NumberAnimation { duration: 150; easing.type: Easing.InOutQuad }
+            }
+        }
+
+        MouseArea {
+            anchors.fill:       parent
+            cursorShape:        Qt.PointingHandCursor
+            onClicked: {
+                toggleRoot.toggled(!toggleRoot.checked)
+            }
+        }
+    }
 
     //General Settings ------------------------------------------------------------------------------------
     property var    _settingsManager:           QGroundControl.settingsManager
@@ -162,10 +270,8 @@ SettingsPage {
         }
 
         // --- SD Card Save (Tick Style) ---
-        GridLayout {
-            columns:            _isNarrow ? 1 : 3
-            columnSpacing:      10
-            rowSpacing:         _isNarrow ? 5 : 0
+        RowLayout {
+            spacing:            10
             Layout.fillWidth:   true
             visible:            _appSettings.androidSaveToSDCard.visible
 
@@ -173,45 +279,13 @@ SettingsPage {
                 text:                   qsTr("Save application data to SD Card")
                 color:                  "black"
                 font.bold:              true
-                Layout.fillWidth:       _isNarrow
-                Layout.preferredWidth:  _labelWidth
+                Layout.fillWidth:       true
                 wrapMode:               Text.WordWrap
             }
 
-            Item { 
-                Layout.fillWidth: true
-                visible:          !_isNarrow 
-            }
-
-            Item {
-                Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
-                Layout.preferredHeight: 26
-                Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
-
-                Rectangle {
-                    anchors.right:  _isNarrow ? undefined : parent.right
-                    anchors.left:   _isNarrow ? parent.left : undefined
-                    width:          26
-                    height:         26
-                    border.color:   _appSettings.androidSaveToSDCard.value != 0 ? "black" : "#CCC"
-                    border.width:   2
-                    radius:         4
-                    color:          "white"
-
-                    QGCColoredImage {
-                        anchors.centerIn: parent
-                        width:            18
-                        height:           18
-                        source:           "/qmlimages/checkbox-check.svg"
-                        color:            "black"
-                        visible:          _appSettings.androidSaveToSDCard.value != 0
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked:    _appSettings.androidSaveToSDCard.value = (_appSettings.androidSaveToSDCard.value == 0 ? 1 : 0)
-                    }
-                }
+            OnOffToggle {
+                checked:                _appSettings.androidSaveToSDCard.value != 0
+                onToggled: (val) =>     _appSettings.androidSaveToSDCard.value = val ? 1 : 0
             }
         }
 
@@ -263,73 +337,59 @@ SettingsPage {
             }
         }
 
-        Repeater {
-            visible: _settingsManager.unitsSettings.visible
-
-            model:   [
-                _settingsManager.unitsSettings.horizontalDistanceUnits,
-                _settingsManager.unitsSettings.verticalDistanceUnits,
-                _settingsManager.unitsSettings.areaUnits,
-                _settingsManager.unitsSettings.speedUnits,
-                _settingsManager.unitsSettings.temperatureUnits
+        // Distance Selector (Combines Horizontal and Vertical Distance)
+        UnitSelector {
+            labelText:              qsTr("Distance")
+            visible:                _settingsManager.unitsSettings.visible
+            customValue:            _settingsManager.unitsSettings.horizontalDistanceUnits.value
+            options: [
+                { text: qsTr("m"),  value: UnitsSettings.HorizontalDistanceUnitsMeters },
+                { text: qsTr("ft"), value: UnitsSettings.HorizontalDistanceUnitsFeet }
             ]
-
-            delegate: GridLayout {
-                columns:            _isNarrow ? 1 : 2
-                columnSpacing:      10
-                rowSpacing:         _isNarrow ? 5 : 0
-                Layout.fillWidth:   true
-                property var unitFact: modelData
-
-                QGCLabel {
-                    text:                   unitFact.shortDescription
-                    color:                  "black"
-                    font.bold:              true
-                    Layout.fillWidth:       true
-                    wrapMode:               Text.WordWrap
-                    Layout.preferredWidth:  _labelWidth
-                }
-
-                FactComboBox {
-                    id:                     unitCombo
-                    fact:                   unitFact
-                    sizeToContents:         false
-                    Layout.fillWidth:       true
-                    Layout.maximumWidth:    _isNarrow ? 10000 : _controlWidth
-                    Layout.preferredWidth:  _controlWidth
-                    Layout.preferredHeight: 40
-                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
-                    background: Rectangle {
-                        color:          "white"
-                        border.color:   "#808080"
-                        border.width:   1
-                        radius:         4
-                    }
-                    onPressedChanged: {
-                        if (pressed) {
-                            popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
-                            popup.x = width - popup.width
-                        }
-                    }
-                    delegate: ItemDelegate {
-                        width:          parent.width
-                        padding:        ScreenTools.defaultFontPixelHeight / 4
-                        contentItem: QGCLabel {
-                            text:       modelData
-                            color:      (unitCombo.currentIndex === index || highlighted) ? "white" : "black"
-                            verticalAlignment: Text.AlignVCenter
-                            leftPadding: ScreenTools.defaultFontPixelWidth * 2
-                            rightPadding: ScreenTools.defaultFontPixelWidth * 2
-                        }
-                        background: Rectangle {
-                            color:      (unitCombo.currentIndex === index || highlighted) ? "#79AE6F" : "transparent"
-                            radius:     4
-                            anchors.fill: parent
-                            anchors.margins: 2
-                        }
-                    }
-                }
+            customSelectCallback:   function(val) {
+                _settingsManager.unitsSettings.horizontalDistanceUnits.value = val
+                _settingsManager.unitsSettings.verticalDistanceUnits.value = val
             }
+        }
+
+        // Area Selector
+        UnitSelector {
+            labelText:              qsTr("Area")
+            visible:                _settingsManager.unitsSettings.visible
+            fact:                   _settingsManager.unitsSettings.areaUnits
+            options: [
+                { text: qsTr("m²"),  value: UnitsSettings.AreaUnitsSquareMeters },
+                { text: qsTr("ft²"), value: UnitsSettings.AreaUnitsSquareFeet },
+                { text: qsTr("km²"), value: UnitsSettings.AreaUnitsSquareKilometers },
+                { text: qsTr("ha"),  value: UnitsSettings.AreaUnitsHectares },
+                { text: qsTr("ac"),  value: UnitsSettings.AreaUnitsAcres },
+                { text: qsTr("mi²"), value: UnitsSettings.AreaUnitsSquareMiles }
+            ]
+        }
+
+        // Speed Selector
+        UnitSelector {
+            labelText:              qsTr("Speed")
+            visible:                _settingsManager.unitsSettings.visible
+            fact:                   _settingsManager.unitsSettings.speedUnits
+            options: [
+                { text: qsTr("m/s"),  value: UnitsSettings.SpeedUnitsMetersPerSecond },
+                { text: qsTr("ft/s"), value: UnitsSettings.SpeedUnitsFeetPerSecond },
+                { text: qsTr("km/h"), value: UnitsSettings.SpeedUnitsKilometersPerHour },
+                { text: qsTr("mph"),  value: UnitsSettings.SpeedUnitsMilesPerHour },
+                { text: qsTr("kt"),   value: UnitsSettings.SpeedUnitsKnots }
+            ]
+        }
+
+        // Temperature Selector
+        UnitSelector {
+            labelText:              qsTr("Temperature")
+            visible:                _settingsManager.unitsSettings.visible
+            fact:                   _settingsManager.unitsSettings.temperatureUnits
+            options: [
+                { text: qsTr("°C"), value: UnitsSettings.TemperatureUnitsCelsius },
+                { text: qsTr("°F"), value: UnitsSettings.TemperatureUnitsFarenheit }
+            ]
         }
 
         //Not for Mobile
@@ -709,10 +769,8 @@ SettingsPage {
                 { t: qsTr("Low Latency Mode"), f: _videoSettings.lowLatencyMode, v: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.lowLatencyMode.visible && _isGST, e: true }
             ]
 
-            delegate: GridLayout {
-                columns:            _isNarrow ? 1 : 3
-                columnSpacing:      10
-                rowSpacing:         _isNarrow ? 5 : 0
+            delegate: RowLayout {
+                spacing:            10
                 visible:            modelData.v
                 Layout.fillWidth:   true
 
@@ -720,45 +778,14 @@ SettingsPage {
                     text:                   modelData.t
                     color:                  "black"
                     font.bold:              true
-                    Layout.fillWidth:       _isNarrow
-                    Layout.preferredWidth:  _labelWidth
+                    Layout.fillWidth:       true
                     wrapMode:               Text.WordWrap
                 }
 
-                Item { 
-                    Layout.fillWidth: true
-                    visible:          !_isNarrow 
-                }
-
-                Item {
-                    Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
-                    Layout.preferredHeight: 26
-                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
-
-                    Rectangle {
-                        anchors.right:  _isNarrow ? undefined : parent.right
-                        anchors.left:   _isNarrow ? parent.left : undefined
-                        width:          26
-                        height:         26
-                        border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width:   2
-                        radius:         4
-                        color:          "white"
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width:            18
-                            height:           18
-                            source:           "/qmlimages/checkbox-check.svg"
-                            color:            "black"
-                            visible:          modelData.f.value != 0
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
-                        }
-                    }
+                OnOffToggle {
+                    checked:                modelData.f.value != 0
+                    enabled:                modelData.e
+                    onToggled: (val) =>     modelData.f.value = val ? 1 : 0
                 }
             }
         }
@@ -794,10 +821,8 @@ SettingsPage {
                 { t: qsTr("Save log after each flight"), f: _appSettings.telemetrySave, v: _appSettings.telemetrySave.visible, e: true },
                 { t: qsTr("Save logs even if vehicle was not armed"), f: _appSettings.telemetrySaveNotArmed, v: _appSettings.telemetrySaveNotArmed.visible, e: _appSettings.telemetrySave.rawValue },
             ]
-            delegate: GridLayout {
-                columns:            _isNarrow ? 1 : 3
-                columnSpacing:      10
-                rowSpacing:         _isNarrow ? 5 : 0
+            delegate: RowLayout {
+                spacing:            10
                 visible:            modelData.v
                 opacity:            modelData.e ? 1 : 0.5
                 Layout.fillWidth:   true
@@ -806,46 +831,14 @@ SettingsPage {
                     text:                   modelData.t
                     color:                  "black"
                     font.bold:              true
-                    Layout.fillWidth:       _isNarrow
-                    Layout.preferredWidth:  _labelWidth
+                    Layout.fillWidth:       true
                     wrapMode:               Text.WordWrap
                 }
 
-                Item { 
-                    Layout.fillWidth: true
-                    visible:          !_isNarrow 
-                }
-
-                Item {
-                    Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
-                    Layout.preferredHeight: 26
-                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
-
-                    Rectangle {
-                        anchors.right:  _isNarrow ? undefined : parent.right
-                        anchors.left:   _isNarrow ? parent.left : undefined
-                        width:          26
-                        height:         26
-                        border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width:   2
-                        radius:         4
-                        color:          "white"
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width:            18
-                            height:           18
-                            source:           "/qmlimages/checkbox-check.svg"
-                            color:            "black"
-                            visible:          modelData.f.value != 0
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled:      modelData.e
-                            onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
-                        }
-                    }
+                OnOffToggle {
+                    checked:                modelData.f.value != 0
+                    enabled:                modelData.e
+                    onToggled: (val) =>     modelData.f.value = val ? 1 : 0
                 }
             }
         }

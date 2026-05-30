@@ -209,11 +209,13 @@ Item {
     }
 
     onVisibleChanged: {
-
-        if(visible) {
-            editorMap.zoomLevel = QGroundControl.flightMapZoom
-            editorMap.center    = QGroundControl.flightMapPosition
-
+        if (visible) {
+            // Only reset map view if there are no mission items loaded.
+            // This prevents overriding the viewport that was adjusted to fit the loaded KML or mission data.
+            if (!_planMasterController.containsItems) {
+                editorMap.zoomLevel = QGroundControl.flightMapZoom
+                editorMap.center    = QGroundControl.flightMapPosition
+            }
             if (!_planMasterController.containsItems) {
                 toolStrip.simulateClick(toolStrip.fileButtonIndex)
             }
@@ -2312,9 +2314,7 @@ Item {
                                 height:           ScreenTools.defaultFontPixelHeight * 2.0
                                 background: Rectangle {
                                     radius: ScreenTools.defaultFontPixelHeight * 0.45
-                                    color:  "black"
-                                    border.color: "white"
-                                    border.width: 1
+                                    color:  "#4CAF50" // Green
                                 }
                                 contentItem: Text {
                                     text:                qsTr("Done")
@@ -3825,13 +3825,13 @@ Item {
                 onClicked: itemEditPopup.close()
 
                 background: Rectangle {
-                    color: "white"
+                    color: "#4CAF50"
                     radius: 20
                 }
 
                 contentItem: Text {
                     text: parent.text
-                    color: "black"
+                    color: "white"
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter

@@ -903,6 +903,7 @@ ApplicationWindow {
         ListModel {
             id: tabModel
             ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
+            ListElement { image: "qrc:/InstrumentValueIcons/camera.svg"; file: "VideoSettings.qml"; title: "Camera" }
             ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
             ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
             ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
@@ -922,10 +923,10 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(3, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(4, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
-                    tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
+                    tabModel.setProperty(4, "file", "APMSensorsComponent.qml");
                 }
             }
         }

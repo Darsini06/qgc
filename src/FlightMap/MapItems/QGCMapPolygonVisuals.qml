@@ -732,39 +732,21 @@ Item {
             Rectangle {
                 id: editBtn
                 visible: !_circleMode && vertexMenu._editingVertexIndex >= 0
-                implicitWidth:  editRow.implicitWidth  + 28
-                implicitHeight: editRow.implicitHeight + 20
-                color:  "transparent"//editMouseArea.containsMouse ? app_color  : "transparent"
+                implicitWidth: ScreenTools.defaultFontPixelHeight * 2
+                implicitHeight: ScreenTools.defaultFontPixelHeight * 2
+                color: "transparent"
                 radius: 8
-
                 Behavior on color { ColorAnimation { duration: 120 } }
-
-                Row {
-                    id: editRow
+                QGCColoredImage {
                     anchors.centerIn: parent
-                    spacing: 10
-
-                    QGCColoredImage {
-                        width:              ScreenTools.defaultFontPixelHeight * 0.9
-                        height:             ScreenTools.defaultFontPixelHeight * 0.9
-                        anchors.verticalCenter: parent.verticalCenter
-                        sourceSize.height:  height
-                        source:             "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                        fillMode:           Image.PreserveAspectFit
-                        mipmap:             true
-                        smooth:             true
-                        color:              qgcPal.text
-                    }
-
-                    Text {
-                        text: qsTr("Edit")
-                        color: qgcPal.text
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.weight: Font.Medium
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                    width: ScreenTools.defaultFontPixelHeight * 0.9
+                    height: ScreenTools.defaultFontPixelHeight * 0.9
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                    fillMode: Image.PreserveAspectFit
+                    mipmap: true
+                    smooth: true
+                    color: qgcPal.text
                 }
-
                 MouseArea {
                     id: editMouseArea
                     anchors.fill: parent
