@@ -480,7 +480,7 @@ Rectangle {
             QGCColoredImage {
                 id: settingsIcon
                 anchors.fill: parent
-                source: "/qmlimages/NewImages/settings.svg"
+                source: "/qmlimages/NewImages/settings.png"
                 color: "white"
             }
 

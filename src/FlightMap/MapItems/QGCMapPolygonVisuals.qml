@@ -732,39 +732,21 @@ Item {
             Rectangle {
                 id: editBtn
                 visible: !_circleMode && vertexMenu._editingVertexIndex >= 0
-                implicitWidth:  editRow.implicitWidth  + 28
-                implicitHeight: editRow.implicitHeight + 20
-                color:  "transparent"//editMouseArea.containsMouse ? app_color  : "transparent"
+                implicitWidth: ScreenTools.defaultFontPixelHeight * 2
+                implicitHeight: ScreenTools.defaultFontPixelHeight * 2
+                color: "transparent"
                 radius: 8
-
                 Behavior on color { ColorAnimation { duration: 120 } }
-
-                Row {
-                    id: editRow
+                QGCColoredImage {
                     anchors.centerIn: parent
-                    spacing: 10
-
-                    QGCColoredImage {
-                        width:              ScreenTools.defaultFontPixelHeight * 0.9
-                        height:             ScreenTools.defaultFontPixelHeight * 0.9
-                        anchors.verticalCenter: parent.verticalCenter
-                        sourceSize.height:  height
-                        source:             "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                        fillMode:           Image.PreserveAspectFit
-                        mipmap:             true
-                        smooth:             true
-                        color:              qgcPal.text
-                    }
-
-                    Text {
-                        text: qsTr("Edit")
-                        color: qgcPal.text
-                        font.pointSize: ScreenTools.defaultFontPointSize
-                        font.weight: Font.Medium
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                    width: ScreenTools.defaultFontPixelHeight * 0.9
+                    height: ScreenTools.defaultFontPixelHeight * 0.9
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                    fillMode: Image.PreserveAspectFit
+                    mipmap: true
+                    smooth: true
+                    color: qgcPal.text
                 }
-
                 MouseArea {
                     id: editMouseArea
                     anchors.fill: parent
@@ -1689,9 +1671,10 @@ Item {
                     return
                 }
 
-                let concatenatedText = filenameTextField.text.substring(0, 3) +
-                    filenameTextField1.text.substring(0, 3) +
-                    filenameTextField2.text.substring(0, 3);
+                let concatenatedText =
+                    filenameTextField.text +
+                    filenameTextField1.text +
+                    filenameTextField2.text;
 
                 _appSettings.username = concatenatedText;
                 console.log(concatenatedText);
@@ -1755,7 +1738,7 @@ Item {
                             }
 
                             Label {
-                                text: qsTr("Set Ground Name")
+                                text: qsTr("Set Ground Darsini")
                                 font.bold: true
                                 color: "white"
                                 font.pointSize: 14
@@ -1772,6 +1755,7 @@ Item {
                             TextField {
                                 id: filenameTextField
                                 Layout.fillWidth: true
+                                maximumLength: 20
                                 color: "black"
                                 background: Rectangle {
                                     radius: 8
@@ -1810,6 +1794,7 @@ Item {
                             TextField {
                                 id: filenameTextField2
                                 Layout.fillWidth: true
+                                maximumLength: 20
                                 color: "black"
                                 background: Rectangle {
                                     radius: 8
@@ -1890,15 +1875,14 @@ Item {
 
     Component {
         id: customdialog
-
         Dialog {
             id:             customDialog
             modal:          true
-            dim:            true
+            dim:            false
             closePolicy:    Popup.NoAutoClose
             anchors.centerIn: parent
             width:          ScreenTools.defaultFontPixelWidth * 38
-            height:         ScreenTools.defaultFontPixelHeight * 11
+            height:         ScreenTools.defaultFontPixelHeight * 12
             padding:        0
 
             onOpened: {
@@ -1908,195 +1892,273 @@ Item {
                 MapGlobals.editdialog = "editdialog1"
             }
 
+            // ================= BACKGROUND =================
             background: Rectangle {
-                radius: 20
-                color: "white"
-                border.width: 0
+                radius: 24
+                color: "#22000000"
+                border.color: "#33FFFFFF"
+                border.width: 1
+                clip: true
             }
 
             contentItem: ColumnLayout {
                 anchors.fill: parent
                 spacing: 0
 
-                // Header
-                Rectangle {
+                // ================= HEADER =================
+                Item {
+                    id: headerContainer
                     Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * 0.28
-                    color: app_color
-                    radius: 20
-                    // Top rounded corners only
+                    Layout.preferredHeight: parent.height * 0.30
+                    clip: true
+
                     Rectangle {
-                        anchors.bottom: parent.bottom
+                        anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        height: parent.radius
-                        color: parent.color
+                        height: parent.height + radius
+
+                        radius: 24
+                        color: "#000000"
                     }
 
+                    // ===== ICON =====
+                    Image {
+                        source: "qrc:/qmlimages/NewImages/ground_name.png"
+
+                        width: 140
+                        height: 140
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.horizontalCenterOffset: -120
+
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    // ===== TITLE =====
                     Text {
-                        text:               qsTr("Set Ground Name")
+                        text:               qsTr("Set Ground Selvaraj")
                         font.bold:          true
                         color:              "white"
-                        font.pointSize:     14
+                        font.pointSize:     15
                         anchors.centerIn:    parent
                         font.family:        "Outfit"
                     }
-                }
 
-                // Separator 1
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:             1
-                    color:              "white"
-                    opacity:            0.15
-                }
-
-                // Content Area
-                Item {
-                    Layout.fillWidth:   true
-                    Layout.fillHeight:  true
-                    RowLayout {
-                        anchors {
-                            left:           parent.left
-                            right:          parent.right
-                            verticalCenter: parent.verticalCenter
-                            leftMargin:     25
-                            rightMargin:    25
+                    // ===== CLOSE SYMBOL =====
+                    Item {
+                        width: 30; height: 30
+                        anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 10
+                        
+                        Item {
+                            anchors.centerIn: parent
+                            width: 14; height: 14
+                            Rectangle {
+                                width: 18; height: 2
+                                color: "white"
+                                anchors.centerIn: parent
+                                rotation: 45
+                                antialiasing: true
+                            }
+                            Rectangle {
+                                width: 18; height: 2
+                                color: "white"
+                                anchors.centerIn: parent
+                                rotation: -45
+                                antialiasing: true
+                            }
                         }
-                        spacing:          15
-
-                        Text {
-                            text:           qsTr("Project Name:")
-                            color:          "black"
-                            font.bold:      true
-                            font.pointSize: 11
-                        }
-
-                        TextField {
-                            id:             nameField
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 40
-                            placeholderText: qsTr("Enter your project name")
-                            placeholderTextColor: "#888888"
-                            font.pointSize: 11
-                            color:          "black"
-                            verticalAlignment: TextInput.AlignVCenter
-                            leftPadding:    15
-                            background: Rectangle {
-                                radius:         10
-                                color:          "#FFFFFF"
-                                border.color:   nameField.activeFocus ? "#262626" : "#DDE1EA"
-                                border.width:   nameField.activeFocus ? 2 : 1
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                QGroundControl.saveGlobalSetting("load", "load")
+                                customDialog.close()
+                                mainWindow.showFlyView()
+                                MapGlobals.editdialog = "editdialog1"
                             }
                         }
                     }
                 }
 
-                // Separator 2
-                Rectangle {
-                    Layout.fillWidth: true
-                    height:             1
-                    color:              "white"
-                    opacity:            0.15
-                }
-
-                // Buttons Area
+                // ================= CONTENT AREA =================
                 Item {
-                    Layout.fillWidth:   true
-                    Layout.preferredHeight: parent.height * 0.32
-                    RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Column {
                         anchors.fill: parent
-                        spacing: 0
+                        anchors.margins: 20
+                        spacing: 15
 
-                        // Cancel Column
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Button {
-                                id:             cancelBtn
-                                anchors.centerIn: parent
-                                width: 125
-                                height: 36
-                                onClicked: {
-                                    QGroundControl.saveGlobalSetting("load", "load")
+                        // ===== LIMIT WARNING =====
+                        Text {
+                            id: limitText
+                            visible: nameField.text.length >= 12
+                            text: qsTr("Only 12 characters allowed")
 
-                                    customDialog.close()
-                                    mainWindow.showFlyView()
-                                    MapGlobals.editdialog = "editdialog1"
+                            color: "#EF5350"
+                            font.pointSize: 12
+                            font.bold: true
+                            font.family: "Outfit"
+
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        // ===== INPUT ROW =====
+                        RowLayout {
+                            width: parent.width
+                            spacing: 15
+
+                            Text {
+                                text: qsTr("Project Name:")
+                                color: "white"
+                                font.bold: true
+                                font.pointSize: 13
+                                font.family: "Outfit"
+                            }
+
+                            // ===== TEXT FIELD =====
+                            TextField {
+                                id: nameField
+
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 44
+
+                                maximumLength: 12
+
+                                validator: RegularExpressionValidator {
+                                    regularExpression: /^[A-Za-z0-9]*$/
                                 }
+
+                                placeholderText: qsTr("Enter your project name")
+                                placeholderTextColor: "#666666"
+
+                                color: "#111111"
+
+                                font.pointSize: 13
+                                font.family: "Outfit"
+
+                                leftPadding: 15
+
+                                verticalAlignment: TextInput.AlignVCenter
+
                                 background: Rectangle {
-                                    radius:     12
-                                    color:      cancelBtn.pressed ? "#C0392B" : (cancelBtn.hovered ? "#E74C3C" : "#E74C3C")
-                                    border.width: 0
-                                }
-                                contentItem: Text {
-                                    text:               qsTr("Cancel")
-                                    color:              "white"
-                                    font.bold:          true
-                                    font.pointSize:     12
-                                    font.family:        "Outfit"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment:   Text.AlignVCenter
+                                    radius: 12
+                                    color: "#EAEAEA"
+                                    border.color: nameField.activeFocus ? "#555555" : "#BBBBBB"
+                                    border.width: 1.3
                                 }
                             }
                         }
+                    }
+                }
 
-                        // Vertical Separator
-                        Rectangle {
-                            Layout.fillHeight: true
-                            width: 1
-                            color: "white"
-                            opacity: 0.15
-                            Layout.topMargin: 10
-                            Layout.bottomMargin: 10
+                // ================= BUTTON AREA =================
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * 0.30
+
+                    RowLayout {
+                        anchors.fill: parent
+
+                        anchors.leftMargin: 25
+                        anchors.rightMargin: 25
+
+                        spacing: 25
+
+                        // ===== CANCEL BUTTON =====
+                        Button {
+                            id: cancelBtn
+
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 42
+
+                            onClicked: {
+                                QGroundControl.saveGlobalSetting("load", "load")
+
+                                customDialog.close()
+                                mainWindow.showFlyView()
+                                MapGlobals.editdialog = "editdialog1"
+                            }
+
+                            background: Rectangle {
+                                radius: 14
+
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: "#E57373" }
+                                    GradientStop { position: 1.0; color: "#D84343" }
+                                }
+                            }
+
+                            contentItem: Text {
+                                text: qsTr("Cancel")
+
+                                color: "white"
+
+                                font.bold: true
+                                font.pointSize: 12
+                                font.family: "Outfit"
+
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
                         }
 
-                        // Confirm Column
-                        Item {
+                        // ===== CONFIRM BUTTON =====
+                        Button {
+                            id: confirmBtn
+
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Button {
-                                id:             confirmBtn
-                                anchors.centerIn: parent
-                                width: 125
-                                height: 36
-                                onClicked: {
-                                    QGroundControl.saveGlobalSetting("load", "load1")
+                            Layout.preferredHeight: 42
 
-                                    if (nameField.text.length < 3) {
-                                        mainWindow.showToastMessage(qsTr("Please enter a valid project name"))
-                                        return
-                                    }
+                            onClicked: {
+                                QGroundControl.saveGlobalSetting("load", "load1")
 
-                                    MapGlobals.setGridLines(false)
-
-                                    let concatenatedText = nameField.text.substring(0, 10)
-                                    _appSettings.username = concatenatedText
-
-                                    _saveCurrentVertices()
-                                    _circleMode = false
-                                    mapPolygon.traceMode = true
-
-                                    if(MapGlobals.mark_with !== "KML_File") {
-                                        mapPolygon.clear()
-                                    }
-
-                                    customDialog.close()
-                                    MapGlobals.editdialog = "editdialog1"
+                                if (nameField.text.length < 3) {
+                                    mainWindow.showToastMessage(qsTr("Please enter a valid project name"))
+                                    return
                                 }
-                                background: Rectangle {
-                                    radius:     12
-                                    color:      confirmBtn.pressed ? Qt.darker(app_color, 1.2) : (confirmBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
-                                    border.width: 0
+
+                                MapGlobals.setGridLines(false)
+
+                                let concatenatedText = nameField.text
+                                _appSettings.username = concatenatedText
+
+                                _saveCurrentVertices()
+                                _circleMode = false
+                                mapPolygon.traceMode = true
+
+                                if(MapGlobals.mark_with !== "KML_File") {
+                                    mapPolygon.clear()
                                 }
-                                contentItem: Text {
-                                    text:               qsTr("Confirm")
-                                    color:              "white"
-                                    font.bold:          true
-                                    font.pointSize:     12
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment:   Text.AlignVCenter
+
+                                customDialog.close()
+                                MapGlobals.editdialog = "editdialog1"
+                            }
+
+                            background: Rectangle {
+                                radius: 14
+
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: "#66BB6A" }
+                                    GradientStop { position: 1.0; color: "#43A047" }
                                 }
+                            }
+
+                            contentItem: Text {
+                                text: qsTr("Confirm")
+
+                                color: "white"
+
+                                font.bold: true
+                                font.pointSize: 12
+                                font.family: "Outfit"
+
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
                     }

@@ -647,9 +647,8 @@ Rectangle {
             height:           ScreenTools.defaultFontPixelHeight * 2.5
             background: Rectangle {
                 radius:       10
-                color:        doneBtn.pressed ? "#1A1A1A" : "black"
-                border.color: "white"
-                border.width: 1
+                color:        doneBtn.pressed ? "#388E3C" : "#4CAF50" // Green
+                border.width: 0
             }
             contentItem: Text {
                 text:                qsTr("Done")

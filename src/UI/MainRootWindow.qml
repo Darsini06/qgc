@@ -907,12 +907,13 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
-            ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
-            ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
-            ListElement { image: "/qmlimages/FirmwareUpgradeIcon.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
+            ListElement { image: "/qmlimages/NewImages/settings.png"; file: "GeneralSettings.qml"; title: "General Settings" }
+            ListElement { image: "/qmlimages/NewImages/camera.png"; file: "VideoSettings.qml"; title: "Camera" }
+            ListElement { image: "/qmlimages/NewImages/airspace.png"; file: "AirspaceSettings.qml"; title: "Airspace" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.png"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
+            ListElement { image: "/qmlimages/NewImages/calibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
+            ListElement { image: "/qmlimages/NewImages/parameters.png"; file: "BasicParameters.qml"; title: "Parameters" }
+            ListElement { image: "/qmlimages/NewImages/firmware.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
@@ -927,10 +928,10 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(3, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(4, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
-                    tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
+                    tabModel.setProperty(4, "file", "APMSensorsComponent.qml");
                 }
             }
         }
@@ -1025,7 +1026,7 @@ ApplicationWindow {
                                         width: 20
                                         height: 20
                                         source: model.image
-                                        color: sidebarList.currentIndex === index ? app_color : "#666666"
+                                        color: "transparent"//sidebarList.currentIndex === index ? app_color : "#666666"
                                     }
 
                                     Text {
