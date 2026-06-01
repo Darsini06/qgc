@@ -1686,15 +1686,179 @@ Item {
             }
 
             GeoFenceMapVisuals {
-                map:                    editorMap
-                myGeoFenceController:   _geoFenceController
-                interactive:            _editingLayer == _layerGeoFence
-                homePosition:           _missionController.plannedHomePosition
-                planView:               true
-                opacity:                _editingLayer != _layerGeoFence ? editorMap._nonInteractiveOpacity : 1
-            }
+                                        map:                    editorMap
+                                        myGeoFenceController:   _geoFenceController
+                                        interactive:            _editingLayer == _layerGeoFence
+                                        homePosition:           _missionController.plannedHomePosition
+                                        planView:               true
+                                        opacity:                _editingLayer != _layerGeoFence ? editorMap._nonInteractiveOpacity : 1
+                                    }
 
-            RallyPointMapVisuals {
+                                    // ── Fence center drag handle (yellow circle, no icon) ──
+                                    MapQuickItem {
+                                        id: fenceCenterHandle
+                                        visible: isAgriFenceMode &&
+                                                 mapPolygonvisuals.fenceCenter.isValid &&
+                                                 mapPolygonvisuals.fenceRadius > 0
+
+                                        coordinate: mapPolygonvisuals.fenceCenter.isValid
+                                                    ? mapPolygonvisuals.fenceCenter
+                                                    : QtPositioning.coordinate()
+
+                                        anchorPoint.x: 18
+                                        anchorPoint.y: 18
+                                        z: QGroundControl.zOrderMapItems + 3
+
+                                        sourceItem: Rectangle {
+                                            width: 36; height: 36; radius: 18
+                                            color: centerDrag.pressed ? "#E67E22" : "#F1C40F"
+                                            border.color: "white"; border.width: 2
+
+                                            MouseArea {
+                                                id: centerDrag
+                                                anchors.fill: parent
+                                                cursorShape: Qt.SizeAllCursor
+
+                                                property real _startX: 0
+                                                property real _startY: 0
+
+                                                onPressed: (mouse) => {
+                                                    _startX = mouse.x
+                                                    _startY = mouse.y
+                                                }
+
+                                                onPositionChanged: (mouse) => {
+                                                    if (!pressed) return
+                                                    var sc = editorMap.fromCoordinate(
+                                                        mapPolygonvisuals.fenceCenter, false)
+                                                    var nc = editorMap.toCoordinate(
+                                                        Qt.point(sc.x + (mouse.x - _startX),
+                                                                 sc.y + (mouse.y - _startY)), false)
+                                                    mapPolygonvisuals.fenceCenter = nc
+                                                    mapPolygonvisuals.updateFence()
+                                                }
+
+                                                onReleased: {
+                                                    saveFenceData(_planMasterController.currentPlanFile)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // ── Resize icon on left edge — NO background circle ──
+                                    MapQuickItem {
+                                        id: fenceEditLabel
+                                        visible: isAgriFenceMode &&
+                                                 mapPolygonvisuals.fenceCenter.isValid &&
+                                                 mapPolygonvisuals.fenceRadius > 0
+
+                                        coordinate: mapPolygonvisuals.fenceCenter.isValid
+                                                    ? mapPolygonvisuals.fenceCenter.atDistanceAndAzimuth(
+                                                          mapPolygonvisuals.fenceRadius, 270)
+                                                    : QtPositioning.coordinate()
+
+                                        anchorPoint.x: 18
+                                        anchorPoint.y: 18
+                                        z: QGroundControl.zOrderMapItems + 3
+
+                                        sourceItem: Item {
+                                            width: 36; height: 36
+
+                                            Canvas {
+                                                width: 36; height: 36
+                                                anchors.centerIn: parent
+                                                onPaint: {
+                                                    var ctx = getContext("2d")
+                                                    ctx.clearRect(0, 0, width, height)
+                                                    ctx.fillStyle = "white"
+                                                    var cx = width / 2
+                                                    var cy = height / 2
+                                                    var aw = 4
+                                                    var al = 14
+                                                    var ah = 6
+
+                                                    // UP
+                                                    ctx.beginPath()
+                                                    ctx.moveTo(cx, cy - al)
+                                                    ctx.lineTo(cx - ah, cy - al + ah)
+                                                    ctx.lineTo(cx - aw, cy - al + ah)
+                                                    ctx.lineTo(cx - aw, cy - 2)
+                                                    ctx.lineTo(cx + aw, cy - 2)
+                                                    ctx.lineTo(cx + aw, cy - al + ah)
+                                                    ctx.lineTo(cx + ah, cy - al + ah)
+                                                    ctx.closePath()
+                                                    ctx.fill()
+
+                                                    // DOWN
+                                                    ctx.beginPath()
+                                                    ctx.moveTo(cx, cy + al)
+                                                    ctx.lineTo(cx - ah, cy + al - ah)
+                                                    ctx.lineTo(cx - aw, cy + al - ah)
+                                                    ctx.lineTo(cx - aw, cy + 2)
+                                                    ctx.lineTo(cx + aw, cy + 2)
+                                                    ctx.lineTo(cx + aw, cy + al - ah)
+                                                    ctx.lineTo(cx + ah, cy + al - ah)
+                                                    ctx.closePath()
+                                                    ctx.fill()
+
+                                                    // LEFT
+                                                    ctx.beginPath()
+                                                    ctx.moveTo(cx - al, cy)
+                                                    ctx.lineTo(cx - al + ah, cy - ah)
+                                                    ctx.lineTo(cx - al + ah, cy - aw)
+                                                    ctx.lineTo(cx - 2, cy - aw)
+                                                    ctx.lineTo(cx - 2, cy + aw)
+                                                    ctx.lineTo(cx - al + ah, cy + aw)
+                                                    ctx.lineTo(cx - al + ah, cy + ah)
+                                                    ctx.closePath()
+                                                    ctx.fill()
+
+                                                    // RIGHT
+                                                    ctx.beginPath()
+                                                    ctx.moveTo(cx + al, cy)
+                                                    ctx.lineTo(cx + al - ah, cy - ah)
+                                                    ctx.lineTo(cx + al - ah, cy - aw)
+                                                    ctx.lineTo(cx + 2, cy - aw)
+                                                    ctx.lineTo(cx + 2, cy + aw)
+                                                    ctx.lineTo(cx + al - ah, cy + aw)
+                                                    ctx.lineTo(cx + al - ah, cy + ah)
+                                                    ctx.closePath()
+                                                    ctx.fill()
+                                                }
+                                            }
+
+                                            MouseArea {
+                                                id: resizeHandle
+                                                anchors.fill: parent
+                                                cursorShape: Qt.SizeHorCursor
+
+                                                property real _startX: 0
+                                                property real _startY: 0
+
+                                                onPressed: (mouse) => {
+                                                    _startX = mouse.x
+                                                    _startY = mouse.y
+                                                }
+
+                                                onPositionChanged: (mouse) => {
+                                                    if (!pressed) return
+                                                    var handleSc = editorMap.fromCoordinate(
+                                                        fenceEditLabel.coordinate, false)
+                                                    var newHandleCoord = editorMap.toCoordinate(
+                                                        Qt.point(handleSc.x + (mouse.x - _startX),
+                                                                 handleSc.y + (mouse.y - _startY)), false)
+                                                    var newRadius = mapPolygonvisuals.fenceCenter.distanceTo(newHandleCoord)
+                                                    mapPolygonvisuals.fenceRadius = Math.max(10, Math.round(newRadius))
+                                                    mapPolygonvisuals.updateFence()
+                                                }
+
+                                                onReleased: {
+                                                    saveFenceData(_planMasterController.currentPlanFile)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    RallyPointMapVisuals {
                 map:                    editorMap
                 myRallyPointController: _rallyPointController
                 interactive:            _editingLayer == _layerRallyPoints
@@ -2134,10 +2298,9 @@ Item {
                                 }
                                 mapPolygonvisuals.updateFence()
                             } else {
-                                fenceSettingsVisible = !fenceSettingsVisible
-                                //activeRightPanel = fenceSettingsVisible ? "fence" : ""  // ← ADD
-                                activeRightPanel = ""
-                            }
+                                                            fenceSettingsVisible = true   // always show when fence exists
+                                                            activeRightPanel = "fence"
+                                                        }
                         }
                     }
 
@@ -2330,9 +2493,10 @@ Item {
                                     font.family:         "Outfit"
                                 }
                                 onClicked: {
-                                    fenceSettingsVisible = false
-                                    activeRightPanel     = ""
-                                }
+                                                               fenceSettingsVisible = false
+                                                               activeRightPanel     = ""
+                                                               isAgriFenceMode      = true  // keep fence visible on map
+                                                           }
                             }
                         }
                     }
