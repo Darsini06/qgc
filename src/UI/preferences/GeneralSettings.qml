@@ -60,7 +60,8 @@ SettingsPage {
         id:                 contentLayout
         width:              _contentWidth
         spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight : ScreenTools.defaultFontPixelHeight * 1.5
-        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.horizontalCenter: parent.horizontalCenter
+        Layout.alignment:   Qt.AlignHCenter
 
 
         Rectangle {
@@ -178,9 +179,9 @@ SettingsPage {
                 wrapMode:               Text.WordWrap
             }
 
-            Item { 
+            Item {
                 Layout.fillWidth: true
-                visible:          !_isNarrow 
+                visible:          !_isNarrow
             }
 
             Item {
@@ -229,7 +230,7 @@ SettingsPage {
                 Layout.preferredWidth: _labelWidth
                 spacing:            0
 
-                QGCLabel { 
+                QGCLabel {
                     text: qsTr("Application Load/Save Path")
                     font.bold: true
                     color: "black"
@@ -244,9 +245,9 @@ SettingsPage {
                 }
             }
 
-            Item { 
+            Item {
                 Layout.fillWidth: true
-                visible:          !_isNarrow 
+                visible:          !_isNarrow
             }
 
             QGCButton {
@@ -362,9 +363,9 @@ SettingsPage {
                 }
             }
 
-            Item { 
+            Item {
                 Layout.fillWidth: true
-                visible:          !_isNarrow 
+                visible:          !_isNarrow
             }
 
             QGCButton {
@@ -411,9 +412,9 @@ SettingsPage {
                 }
             }
 
-            Item { 
+            Item {
                 Layout.fillWidth: true
-                visible:          !_isNarrow 
+                visible:          !_isNarrow
             }
 
             QGCButton {
@@ -447,9 +448,9 @@ SettingsPage {
                 Layout.fillWidth:   _isNarrow
             }
 
-            Item { 
+            Item {
                 Layout.fillWidth: true
-                visible:          !_isNarrow 
+                visible:          !_isNarrow
             }
 
             QGCButton {
@@ -704,64 +705,64 @@ SettingsPage {
             spacing: 12
             Layout.fillWidth: true
 
-        Repeater {
-            model: [
-                { t: qsTr("Low Latency Mode"), f: _videoSettings.lowLatencyMode, v: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.lowLatencyMode.visible && _isGST, e: true }
-            ]
+            Repeater {
+                model: [
+                    { t: qsTr("Low Latency Mode"), f: _videoSettings.lowLatencyMode, v: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.lowLatencyMode.visible && _isGST, e: true }
+                ]
 
-            delegate: GridLayout {
-                columns:            _isNarrow ? 1 : 3
-                columnSpacing:      10
-                rowSpacing:         _isNarrow ? 5 : 0
-                visible:            modelData.v
-                Layout.fillWidth:   true
+                delegate: GridLayout {
+                    columns:            _isNarrow ? 1 : 3
+                    columnSpacing:      10
+                    rowSpacing:         _isNarrow ? 5 : 0
+                    visible:            modelData.v
+                    Layout.fillWidth:   true
 
-                QGCLabel {
-                    text:                   modelData.t
-                    color:                  "black"
-                    font.bold:              true
-                    Layout.fillWidth:       _isNarrow
-                    Layout.preferredWidth:  _labelWidth
-                    wrapMode:               Text.WordWrap
-                }
+                    QGCLabel {
+                        text:                   modelData.t
+                        color:                  "black"
+                        font.bold:              true
+                        Layout.fillWidth:       _isNarrow
+                        Layout.preferredWidth:  _labelWidth
+                        wrapMode:               Text.WordWrap
+                    }
 
-                Item { 
-                    Layout.fillWidth: true
-                    visible:          !_isNarrow 
-                }
+                    Item {
+                        Layout.fillWidth: true
+                        visible:          !_isNarrow
+                    }
 
-                Item {
-                    Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
-                    Layout.preferredHeight: 26
-                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
+                    Item {
+                        Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
+                        Layout.preferredHeight: 26
+                        Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
 
-                    Rectangle {
-                        anchors.right:  _isNarrow ? undefined : parent.right
-                        anchors.left:   _isNarrow ? parent.left : undefined
-                        width:          26
-                        height:         26
-                        border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width:   2
-                        radius:         4
-                        color:          "white"
+                        Rectangle {
+                            anchors.right:  _isNarrow ? undefined : parent.right
+                            anchors.left:   _isNarrow ? parent.left : undefined
+                            width:          26
+                            height:         26
+                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                            border.width:   2
+                            radius:         4
+                            color:          "white"
 
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width:            18
-                            height:           18
-                            source:           "/qmlimages/checkbox-check.svg"
-                            color:            "black"
-                            visible:          modelData.f.value != 0
-                        }
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          modelData.f.value != 0
+                            }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                            }
                         }
                     }
                 }
             }
-        }
         }
 
 
@@ -789,66 +790,66 @@ SettingsPage {
             Layout.fillWidth: true
             visible: !_disableAllDataPersistence
 
-        Repeater {
-            model: [
-                { t: qsTr("Save log after each flight"), f: _appSettings.telemetrySave, v: _appSettings.telemetrySave.visible, e: true },
-                { t: qsTr("Save logs even if vehicle was not armed"), f: _appSettings.telemetrySaveNotArmed, v: _appSettings.telemetrySaveNotArmed.visible, e: _appSettings.telemetrySave.rawValue },
-            ]
-            delegate: GridLayout {
-                columns:            _isNarrow ? 1 : 3
-                columnSpacing:      10
-                rowSpacing:         _isNarrow ? 5 : 0
-                visible:            modelData.v
-                opacity:            modelData.e ? 1 : 0.5
-                Layout.fillWidth:   true
+            Repeater {
+                model: [
+                    { t: qsTr("Save log after each flight"), f: _appSettings.telemetrySave, v: _appSettings.telemetrySave.visible, e: true },
+                    { t: qsTr("Save logs even if vehicle was not armed"), f: _appSettings.telemetrySaveNotArmed, v: _appSettings.telemetrySaveNotArmed.visible, e: _appSettings.telemetrySave.rawValue },
+                ]
+                delegate: GridLayout {
+                    columns:            _isNarrow ? 1 : 3
+                    columnSpacing:      10
+                    rowSpacing:         _isNarrow ? 5 : 0
+                    visible:            modelData.v
+                    opacity:            modelData.e ? 1 : 0.5
+                    Layout.fillWidth:   true
 
-                QGCLabel {
-                    text:                   modelData.t
-                    color:                  "black"
-                    font.bold:              true
-                    Layout.fillWidth:       _isNarrow
-                    Layout.preferredWidth:  _labelWidth
-                    wrapMode:               Text.WordWrap
-                }
+                    QGCLabel {
+                        text:                   modelData.t
+                        color:                  "black"
+                        font.bold:              true
+                        Layout.fillWidth:       _isNarrow
+                        Layout.preferredWidth:  _labelWidth
+                        wrapMode:               Text.WordWrap
+                    }
 
-                Item { 
-                    Layout.fillWidth: true
-                    visible:          !_isNarrow 
-                }
+                    Item {
+                        Layout.fillWidth: true
+                        visible:          !_isNarrow
+                    }
 
-                Item {
-                    Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
-                    Layout.preferredHeight: 26
-                    Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
+                    Item {
+                        Layout.preferredWidth:  _isNarrow ? 26 : _controlWidth
+                        Layout.preferredHeight: 26
+                        Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
 
-                    Rectangle {
-                        anchors.right:  _isNarrow ? undefined : parent.right
-                        anchors.left:   _isNarrow ? parent.left : undefined
-                        width:          26
-                        height:         26
-                        border.color:   modelData.f.value != 0 ? "black" : "#CCC"
-                        border.width:   2
-                        radius:         4
-                        color:          "white"
+                        Rectangle {
+                            anchors.right:  _isNarrow ? undefined : parent.right
+                            anchors.left:   _isNarrow ? parent.left : undefined
+                            width:          26
+                            height:         26
+                            border.color:   modelData.f.value != 0 ? "black" : "#CCC"
+                            border.width:   2
+                            radius:         4
+                            color:          "white"
 
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            width:            18
-                            height:           18
-                            source:           "/qmlimages/checkbox-check.svg"
-                            color:            "black"
-                            visible:          modelData.f.value != 0
-                        }
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width:            18
+                                height:           18
+                                source:           "/qmlimages/checkbox-check.svg"
+                                color:            "black"
+                                visible:          modelData.f.value != 0
+                            }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled:      modelData.e
-                            onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                            MouseArea {
+                                anchors.fill: parent
+                                enabled:      modelData.e
+                                onClicked:    modelData.f.value = (modelData.f.value == 0 ? 1 : 0)
+                            }
                         }
                     }
                 }
             }
-        }
         }
 
         // FactCheckBoxSlider {
@@ -886,4 +887,5 @@ SettingsPage {
             Layout.preferredHeight: 20
         }
     }
+
 }

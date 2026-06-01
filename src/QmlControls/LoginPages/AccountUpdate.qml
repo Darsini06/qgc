@@ -306,7 +306,7 @@ Item {
 
                                     TextField {
                                         id: mobileField
-                                        anchors.left: parent.left        // was: nameIcon.right
+                                        anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.leftMargin: 14           // was: 10 (match email field margin)

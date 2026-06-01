@@ -84,7 +84,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Low action:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -97,7 +97,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Critical action:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -110,7 +110,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Low voltage threshold:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -123,7 +123,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Critical voltage threshold:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -136,7 +136,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Low mAh threshold:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -149,7 +149,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("Critical mAh threshold:")
                         font.bold:      true
-                        color:          "white"
+                        color:          "black"
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
                     }
@@ -193,8 +193,8 @@ SetupPage {
                 Rectangle {
                     width:              mainGrid.implicitWidth + (_margins * 2)
                     height:             mainGrid.implicitHeight + (_margins * 2)
-                    color:              Qt.rgba(0, 0, 0, 0.4)
-                    border.color:       QGroundControl.globalPalette.groupBorder
+                    color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                    border.color:       "black"//QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -339,7 +339,7 @@ SetupPage {
                         font.bold:   true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                        color: "white"
+                        color: "black"
                     }
 
                     Rectangle {
@@ -347,8 +347,8 @@ SetupPage {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             fsGrid.height + (_margins * 2)
-                        color:              Qt.rgba(0, 0, 0, 0.4)
-                        border.color:       QGroundControl.globalPalette.groupBorder
+                        color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                        border.color:       "black"//QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
 
@@ -363,7 +363,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Ground Station failsafe:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -376,7 +376,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Throttle failsafe:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -389,7 +389,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("PWM threshold:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -401,7 +401,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Failsafe Crash Check:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -438,7 +438,7 @@ SetupPage {
                     QGCLabel {
                         text:       qsTr("General Failsafe Triggers")
                         font.pixelSize: 20
-                        color: "white"
+                        color: "black"
                         font.bold:   true
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -447,8 +447,8 @@ SetupPage {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             generalFailsafeGrid.height + (_margins * 2)
-                        color:              Qt.rgba(0, 0, 0, 0.4)
-                        border.color:       QGroundControl.globalPalette.groupBorder
+                        color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                        border.color:       "black"//QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
 
@@ -463,7 +463,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Ground Station failsafe:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -476,7 +476,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Throttle failsafe:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -490,7 +490,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("PWM threshold:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -531,7 +531,7 @@ SetupPage {
                     QGCLabel {
                         text:           qsTr("GeoFence")
                         font.pixelSize: 20
-                        color:          "white"
+                        color:          "black"
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
@@ -540,8 +540,8 @@ SetupPage {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             mainLayout.height + (_margins * 2)
-                        color:              Qt.rgba(0, 0, 0, 0.4)
-                        border.color:       QGroundControl.globalPalette.groupBorder
+                        color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                        border.color:       "black"//QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
 
@@ -620,7 +620,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Breach action")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
@@ -635,7 +635,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Fence margin")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 enabled:        enabledCheckBox.checked
                                 Layout.alignment: Qt.AlignVCenter
@@ -674,7 +674,7 @@ SetupPage {
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                        color: "white"
+                        color: "black"
                     }
 
                     Rectangle {
@@ -682,8 +682,8 @@ SetupPage {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             rtlGrid.height + (_margins * 2)
-                        color:              Qt.rgba(0, 0, 0, 0.4)
-                        border.color:       QGroundControl.globalPalette.groupBorder
+                        color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                        border.color:       "black"//QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
 
@@ -753,7 +753,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Final land stage altitude:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -767,7 +767,7 @@ SetupPage {
 
                             QGCLabel {
                                 text:           qsTr("Final land stage descent speed:")
-                                color:          "white"
+                                color:          "black"
                                 font.bold:      true
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 25)
@@ -808,15 +808,15 @@ SetupPage {
                         font.bold:      true
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: 20
-                        color: "white"
+                        color: "black"
                     }
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width:              Math.min(availableWidth - (_margins * 2), ScreenTools.defaultFontPixelWidth * 80)
                         height:             planeRtlGrid.height + (_margins * 2)
-                        color:              Qt.rgba(0, 0, 0, 0.4)
-                        border.color:       QGroundControl.globalPalette.groupBorder
+                        color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                        border.color:       "black"//QGroundControl.globalPalette.groupBorder
                         border.width:       showBorder ? 1 : 0
                         radius:             ScreenTools.defaultFontPixelHeight / 2
 
@@ -871,14 +871,14 @@ SetupPage {
                     font.bold:      true
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 20
-                    color: "white"
+                    color: "black"
                 }
 
                 Rectangle {
                     width:  parent.width
                     height: armingCheckInnerColumn.height + (_margins * 2)
-                    color:              Qt.rgba(0, 0, 0, 0.4)
-                    border.color:       QGroundControl.globalPalette.groupBorder
+                    color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                    border.color:       "black"//QGroundControl.globalPalette.groupBorder
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
                     anchors.horizontalCenter: parent.horizontalCenter
