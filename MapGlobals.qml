@@ -106,7 +106,11 @@ QtObject {
     property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
     property string userEmail: QGroundControl.loadGlobalSetting("email", "")
     property string displayName: QGroundControl.loadGlobalSetting("name", "")
+    
     property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
+
+    //property string backendUrl: "http://192.168.1.104:5000/api"
+
 
 
     function recenterMap() {
@@ -129,7 +133,6 @@ QtObject {
         var db = getDatabase();
         db.transaction(function(tx) {
             try {
-
                 // Users table - simplified
                 tx.executeSql("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, displayname TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, mobile_number TEXT, rpc_completed INTEGER DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
@@ -169,9 +172,9 @@ QtObject {
         db.transaction(function(tx) {
             try {
                 tx.executeSql(
-                    "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
-                    [date, startTime, endTime, duration]
-                );
+                            "INSERT INTO drone_sessions (date, start_time, end_time, duration) VALUES (?, ?, ?, ?)",
+                            [date, startTime, endTime, duration]
+                            );
                 console.log("Session saved locally to SQLite");
                 newSessionAdded(); // Notify listeners (like LogFiles.qml) to refresh
             } catch (error) {
@@ -347,9 +350,9 @@ QtObject {
         db.transaction(function(tx) {
             try {
                 tx.executeSql(
-                    "INSERT OR REPLACE INTO fences (plan_path, lat, lon, radius) VALUES (?, ?, ?, ?)",
-                    [cleanPath, lat, lon, radius]
-                );
+                            "INSERT OR REPLACE INTO fences (plan_path, lat, lon, radius) VALUES (?, ?, ?, ?)",
+                            [cleanPath, lat, lon, radius]
+                            );
                 console.log("Fence saved to database for:", cleanPath);
             } catch (error) {
                 console.error("Error saving fence to database:", error);
@@ -410,30 +413,39 @@ QtObject {
     }
 
     function getAllSessions(callback) {
-        console.log("MapGlobals.getAllSessions()")
-        var db = getDatabase();
-        db.transaction(function(tx) {
-            try {
-                var rs = tx.executeSql("SELECT * FROM drone_sessions ORDER BY date DESC, start_time DESC");
-                var sessions = [];
+        console.log("MapGlobals.getAllSessionsFromCloud()")
 
-                console.log("Found", rs.rows.length, "drone sessions in database");
+        console.log("Username : ",userName)
 
-                for (var i = 0; i < rs.rows.length; i++) {
-                    sessions.push(rs.rows.item(i));
-                }
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET", backendUrl + "/sessions?username=" + encodeURIComponent(userName))
+        xhr.setRequestHeader("Content-Type", "application/json")
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("request Done")
+                if (xhr.status === 200) {
+                    console.log("request status",xhr.status)
+                    try {
 
-                if (callback) {
-                    callback(sessions);
-                }
+                        var response = JSON.parse(xhr.responseText)
+                        console.log("request response",response)
 
-            } catch (error) {
-                console.error("Error retrieving sessions:", error);
-                if (callback) {
-                    callback([]);
+                        // Normalize: backend may return { sessions: [...] } or just [...]
+                        var sessions = Array.isArray(response) ? response : (response.sessions || [])
+                        console.log("Fetched", sessions.length, "sessions from cloud")
+                        if (callback) callback(sessions, null)
+
+                    } catch (e) {
+                        console.error("Failed to parse cloud sessions response:", e)
+                        if (callback) callback([], e)
+                    }
+                } else {
+                    console.error("Cloud fetch failed, status:", xhr.status, xhr.responseText)
+                    if (callback) callback([], xhr.responseText)
                 }
             }
-        });
+        }
+        xhr.send()
     }
 
     function sendOTP(email, callback) {
@@ -464,10 +476,10 @@ QtObject {
 
     function verifyOTP(email, otp, callback) {
         console.log("MapGlobals.verifyOTP() - Verifying OTP for:", email);
-        var data = { "email": email, "otp": otp };
+        var data = { "email": email, "otp": otp } ;
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", backendUrl + "/verify-otp");
-        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.open("POST", backendUrl + "/verify-otp") ;
+        xhr.setRequestHeader("Content-Type", "application/json") ;
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
@@ -819,6 +831,7 @@ QtObject {
         return true;
     }
 
+    
     function validatePassword(password, focusField, isUpdate = false) {
 
         console.log("MapGlobals.validatePassword()")
@@ -1027,11 +1040,6 @@ QtObject {
     //     rootWindow.showToastMessage("Login Successfully");
     //     login="login"
     //     QGroundControl.saveBoolGlobalSetting("login", true)
-
-
-
-
-
     // } else {
     //     rootWindow.showToastMessage("Incorrect password");
     //     result = false;
@@ -1262,6 +1270,7 @@ QtObject {
         }
         xhr.send();
     }
+
     function deleteCloudPlan(planName, callback) {
         console.log("MapGlobals.deleteCloudPlan() - Deleting:", planName);
         var xhr = new XMLHttpRequest();
@@ -1279,6 +1288,7 @@ QtObject {
         };
         xhr.send();
     }
+
     function fetchCloudSessions(email) {
         console.log("MapGlobals.fetchCloudSessions() for:", email);
         var xhr = new XMLHttpRequest();
@@ -1296,12 +1306,12 @@ QtObject {
                                 var s = sessions[i];
                                 // Check if session already exists by date/time to avoid duplicates
                                 tx.executeSql(
-                                    "INSERT INTO drone_sessions (date, start_time, end_time, duration) " +
-                                    "SELECT ?, ?, ?, ? WHERE NOT EXISTS (" +
-                                    "SELECT 1 FROM drone_sessions WHERE date = ? AND start_time = ? AND end_time = ?" +
-                                    ")",
-                                    [s.date, s.start_time, s.end_time, s.duration, s.date, s.start_time, s.end_time]
-                                );
+                                            "INSERT INTO drone_sessions (date, start_time, end_time, duration) " +
+                                            "SELECT ?, ?, ?, ? WHERE NOT EXISTS (" +
+                                            "SELECT 1 FROM drone_sessions WHERE date = ? AND start_time = ? AND end_time = ?" +
+                                            ")",
+                                            [s.date, s.start_time, s.end_time, s.duration, s.date, s.start_time, s.end_time]
+                                            );
                             }
                         });
                         newSessionAdded(); // Refresh UI

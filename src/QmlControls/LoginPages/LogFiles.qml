@@ -462,7 +462,7 @@ Item {
                         color: Qt.rgba(255, 255, 255, 0.08)
                         border.color: Qt.rgba(255, 255, 255, 0.15)
                         QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: logfiles.backClicked() }
+                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: MapGlobals.rootWindow.homescreen() }
                     }
 
                     Item { Layout.fillHeight: true }

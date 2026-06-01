@@ -394,14 +394,24 @@ Item {
                                                 QGroundControl.saveGlobalSetting("name", response.user.displayname);
                                                 QGroundControl.saveGlobalSetting("email", response.user.email);
                                                 QGroundControl.saveBoolGlobalSetting("login", true);
+
+                                                MapGlobals.userName = response.user.username
+                                                MapGlobals.userEmail = response.user.email
+                                                MapGlobals.displayName = response.user.displayname
+
+
                                                 // Clear fields
                                                 loginUser.text = "";
                                                 loginPass.text = "";
                                                 // Go to homescreen
                                                 MapGlobals.rootWindow.homescreen();
+
+                                                console.log("username",response.user.username)
+
                                             } else {
                                                 rootWindow.showToastMessage(response.message || "Login failed");
                                             }
+
                                         } else {
                                             rootWindow.showToastMessage("Login failed. Server error: " + xhr.status);
                                         }
@@ -937,6 +947,7 @@ Item {
                                 }
                             }
                         }
+
                         // Password
                         Column {
                             width: parent.width

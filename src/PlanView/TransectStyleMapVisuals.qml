@@ -337,6 +337,7 @@ Item {
 
                 MapGlobals.share_edit_visibility = false
                 MapGlobals.showMissionItems = true
+
             }
         }
     }

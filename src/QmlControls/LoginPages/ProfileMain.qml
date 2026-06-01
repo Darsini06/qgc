@@ -95,11 +95,13 @@ Item {
                     spacing: 20
 
                     Rectangle {
+
                         Layout.alignment: Qt.AlignHCenter
                         width: 100; height: 100; radius: 50 // Reduced Size
                         color: "white"
                         border.color: accent_color
                         border.width: 3
+
                         Image { // Removed Animation (Standard Image)
                             anchors.fill: parent
                             anchors.margins: 4
@@ -132,12 +134,14 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 15
+
                     Text {
                         Layout.alignment: Qt.AlignHCenter
                         text: "MISSION STATS"
                         color: Qt.rgba(255, 255, 255, 0.5)
                         font.pointSize: 8; font.bold: true; font.letterSpacing: 1.2
                     }
+
                     RowLayout {
                         Layout.fillWidth: true; spacing: 12
                         Rectangle {
@@ -150,6 +154,7 @@ Item {
                         }
                         Rectangle {
                             Layout.fillWidth: true; height: 75; radius: 15; color: "white" // Reduced Height
+
                             Column {
                                 anchors.centerIn: parent
                                 Text { text: "MISSIONS"; color: "#94a3b8"; font.pointSize: 6.5; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
@@ -157,6 +162,7 @@ Item {
                             }
                         }
                     }
+
                 }
             }
         }

@@ -21,6 +21,9 @@ import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 
+import QtPositioning
+import QGroundControl.QGCPositionManager
+
 
 import QGroundControl.UTMSP
 import QGroundControl.Palette
@@ -54,6 +57,8 @@ ApplicationWindow {
     property alias  optionChecked:      optionCheckBox.checked
 
     property var _appSettings: QGroundControl.settingsManager.appSettings
+
+    property var _gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
 
     QGCCheckBox {
         id:                 optionCheckBox
@@ -2128,22 +2133,36 @@ ApplicationWindow {
                         id: ma5; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            QGroundControl.saveGlobalSetting("mapping", "agri")
-                            planView.mapclear()
-                            MapGlobals.mark_with = "Mark_With_GPS"
 
-                            //Disable Spot Spraying Options
-                            MapGlobals.isSpotSprayingActive = false
+                            if(MapGlobals.activeFlightMap && _gcsPosition.isValid) {
 
-                            MapGlobals.edit = "edit"
-                            MapGlobals.share_edit_visibility = false
-                            MapGlobals.isReviewMode = false
-                            MapGlobals.showMissionItems = false
+                                QGroundControl.saveGlobalSetting("mapping", "agri")
+                                planView.mapclear()
+                                MapGlobals.mark_with = "Mark_With_GPS"
 
-                            //Grid Lines set to false
-                            MapGlobals.setGridLines(false)
+                                //Disable Spot Spraying Options
+                                MapGlobals.isSpotSprayingActive = false
 
-                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                                MapGlobals.edit = "edit"
+                                MapGlobals.share_edit_visibility = false
+                                MapGlobals.isReviewMode = false
+                                MapGlobals.showMissionItems = false
+
+                                //Grid Lines set to false
+                                MapGlobals.setGridLines(false)
+
+                                mainWindow.showPlanView();
+
+                                planView.data1();
+
+                                dialog.visible = false;
+
+                            } else {
+
+                                mainWindow.showToastMessage("GPS Not Set")
+                                dialog.visible = false;
+
+                            }
                         }
                     }
                 }

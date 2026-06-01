@@ -32,16 +32,29 @@ Item {
 
     // Load logic
     function loadSessions() {
+        console.log("loadSessions()")
         MapGlobals.getAllSessions(function(sessions) {
+
             var total = 0;
             for (var i = 0; i < sessions.length; i++) {
                 total += Number(sessions[i].duration || 0);
             }
+
             totalMinutes = total;
             missionsCompleted = sessions.length;
             var hours = Math.floor(total / 60);
             var minutes = total % 60;
             totalDurationFormatted = hours + "h " + minutes + "m";
+
+            console.log("totalDurationFormatted : ",totalDurationFormatted)
+
+            if (pageLoader.item) {
+                        if (pageLoader.item.hasOwnProperty("totalDurationFormatted"))
+                            pageLoader.item.totalDurationFormatted = totalDurationFormatted
+                        if (pageLoader.item.hasOwnProperty("missionsCompleted"))
+                            pageLoader.item.missionsCompleted = missionsCompleted
+                    }
+
         });
     }
 
@@ -72,6 +85,7 @@ Item {
     Loader {
         id: pageLoader
         anchors.fill: parent
+
         source: {
             var pathPrefix = "qrc:/qml/LoginPages/"
             switch (currentView) {

@@ -38,8 +38,8 @@ Item {
     property color  interiorColor:      "transparent"
     property color  altColor:           "transparent"
     property real   interiorOpacity:    1
-    property int    borderWidth:        mapping ? 4 : 0
-    property color  borderColor:        mapping ? "white" : "black"
+    property int    borderWidth:        0
+    property color  borderColor:        "black"
 
     property bool   _circleMode:                false
     property real   _circleRadius
@@ -77,7 +77,7 @@ Item {
 
     property var activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property var activeVehicleCoordinate: activeVehicle ? activeVehicle.coordinate : QtPositioning.coordinate()
-    property bool   mapping:                false
+
 
     property var    _toolbarItem:           null
 
@@ -1392,7 +1392,7 @@ Item {
                     anchors.centerIn: parent
                     width: 32
                     height: 32
-                    visible: (mapPolygon ? mapPolygon.traceMode : false) && MapGlobals.mark_with === "Mark_With_Manual" || mapping
+                    visible: (mapPolygon ? mapPolygon.traceMode : false) && MapGlobals.mark_with === "Mark_With_Manual"
                 }
             }
 
