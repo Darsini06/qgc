@@ -34,10 +34,10 @@ RowLayout {
     }
 
     FactComboBox {
-        id:                     _comboBox
-        Layout.preferredWidth:  comboBoxPreferredWidth
-        sizeToContents:         true
-        
+        id: _comboBox
+           Layout.fillWidth: true
+           Layout.preferredWidth: comboBoxPreferredWidth
+           sizeToContents: false
         onActivated: (index) => { parent.activated(index) }
     }
 }
