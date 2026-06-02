@@ -65,6 +65,8 @@
         <file alias="NewImages/firmware.png">src/NewImages/firmware.png</file>
         <file alias="NewImages/parameters.png">src/NewImages/parameters.png</file>
         <file alias="NewImages/failsafe.png">src/NewImages/failsafe.png</file>
+        <file alias="NewImages/failsafe_signal_lost.png">src/NewImages/failsafe_signal_lost.png</file>
+        <file alias="NewImages/geofence_area.png">src/NewImages/geofence_area.png</file>
         
         <file alias="NewImages/diamond.png">src/NewImages/diamond.png</file>
         <file alias="NewImages/profile.png">src/NewImages/profile.png</file>

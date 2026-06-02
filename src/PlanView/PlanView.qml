@@ -1858,6 +1858,7 @@ Item {
                                             }
                                         }
                                     }
+
                                     RallyPointMapVisuals {
                 map:                    editorMap
                 myRallyPointController: _rallyPointController
