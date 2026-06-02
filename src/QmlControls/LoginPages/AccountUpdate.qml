@@ -22,10 +22,11 @@ Item {
     property color text_muted:      "#64748b"
     property color border_color:    "#e2e8f0"
 
-    property string userName: MapGlobals.userName
-    property string displayName: MapGlobals.displayName
-    property string mobileNo_from_db: ""
-    property int rpcCompletedStatus: -1
+    property string userName:          ""
+    property string displayName:       ""
+    property string userEmail:         ""
+    property string mobileNo:          ""
+    property int    rpcCompletedStatus: -1
 
     signal backClicked()
     signal updated()
@@ -33,6 +34,16 @@ Item {
     //readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 50
     property bool isSmallScreen: ScreenTools.isTinyScreen
     readonly property real baseMargin: ScreenTools.defaultFontPixelWidth * 1.5
+
+    // onVisibleChanged: {
+
+    //     if (visible) {
+    //         console.log("onVisibleChanged from AccountUpdate.qml")
+    //         rpcCompletedStatus = Number(MapGlobals.rpcStatus)
+
+    //         mobileNo =  MapGlobals.mobileNo
+    //     }
+    // }
 
     Rectangle {
         anchors.fill: parent
@@ -270,7 +281,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.leftMargin: 14           // was: 10 (match email field margin)
                                         anchors.rightMargin: 12
-                                        text: MapGlobals.userEmail
+                                        text: userEmail
                                         background: null
                                         selectByMouse: true
                                         color: "#1e293b"
@@ -311,7 +322,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.leftMargin: 14           // was: 10 (match email field margin)
                                         anchors.rightMargin: 12
-                                        text: mobileNo_from_db
+                                        text: mobileNo
                                         background: null
                                         selectByMouse: true
                                         inputMethodHints: Qt.ImhDigitsOnly
@@ -328,19 +339,46 @@ Item {
 
                         // RPC Question
                         ColumnLayout {
-                            Layout.fillWidth: true; spacing: 14; Layout.topMargin: 8
-                            Text { text: qsTr("Have you completed the RPC?"); font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: text_primary }
+                            Layout.fillWidth: true
+                            spacing: 14
+                            Layout.topMargin: 8
+                            Text { text: qsTr("Have you completed the RPC?")
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.bold: true
+                                color: text_primary }
                             RowLayout {
                                 spacing: 16
+
                                 Repeater {
-                                    model: [{label: qsTr("Yes, Certified"), val: 1}, {label: qsTr("Not Yet"), val: 0}]
+                                    model: [
+                                        { label: qsTr("Yes, Certified"), val: 1 },
+                                        { label: qsTr("Not Yet"),        val: 0 }
+                                    ]
                                     Rectangle {
-                                        Layout.preferredWidth: 160; Layout.preferredHeight: 46; radius: 23
-                                        color: rpcCompletedStatus === modelData.val ? accent_color : "white"
+                                        Layout.preferredWidth: 160
+                                        Layout.preferredHeight: 46
+                                        radius: 23
+                                        color:        rpcCompletedStatus === modelData.val ? accent_color : "white"
                                         border.color: rpcCompletedStatus === modelData.val ? accent_color : border_color
                                         border.width: 1
-                                        Text { anchors.centerIn: parent; text: modelData.label; color: rpcCompletedStatus === modelData.val ? "white" : text_primary; font.family: "Outfit"; font.bold: rpcCompletedStatus === modelData.val }
-                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: rpcCompletedStatus = modelData.val }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text:      modelData.label
+                                            color:     rpcCompletedStatus === modelData.val ? "white" : text_primary
+                                            font.family: "Outfit"
+                                            font.bold: rpcCompletedStatus === modelData.val
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                rpcCompletedStatus = modelData.val
+                                                console.log("rpcCompletedStatus : ", modelData.val)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -369,11 +407,25 @@ Item {
                                 if (!MapGlobals.validateDisplayName(nameField.text, nameField)) return;
                                 if (!MapGlobals.validateEmail(emailField.text, emailField)) return;
 
-                                MapGlobals.updateUser(userName, usernameField.text, nameField.text, emailField.text, mobileNo_from_db, rpcCompletedStatus, function(result) {
+                                MapGlobals.updateUser(userName, usernameField.text, nameField.text, emailField.text, mobileField.text, rpcCompletedStatus, function(result) {
                                     if (result) {
                                         QGroundControl.saveGlobalSetting("username", usernameField.text);
                                         QGroundControl.saveGlobalSetting("name", nameField.text);
                                         QGroundControl.saveGlobalSetting("email", emailField.text);
+                                        QGroundControl.saveGlobalSetting("mobileNo", mobileField.text);
+
+                                        QGroundControl.saveGlobalSetting("rpcStatus",rpcCompletedStatus.toString());
+
+                                        MapGlobals.rpcStatus = rpcCompletedStatus
+                                        MapGlobals.userName = usernameField.text
+                                        MapGlobals.userEmail = emailField.text
+                                        MapGlobals.displayName = nameField.text
+                                        MapGlobals.mobileNo = mobileField.text
+
+                                        console.log("mobileNumber",mobileField.text)
+
+                                        console.log("rpcCompletedStatus in save button : ",rpcCompletedStatus)
+
                                         if (MapGlobals.rootWindow) MapGlobals.rootWindow.showToastMessage(qsTr("Profile updated successfully!"));
                                         accountUpdateRoot.updated();
                                     }

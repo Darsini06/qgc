@@ -17,13 +17,16 @@ Item {
     property string displayName: MapGlobals.displayName
     property string userEmail: MapGlobals.userEmail
     
-    property string mobileNo_from_db: QGroundControl.loadGlobalSetting("mobile_number", "")
+    property string mobileNo: MapGlobals.mobileNo
     property int rpcCompletedStatus: -1
 
     onUserNameChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("userName")) pageLoader.item.userName = userName
     onUserEmailChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("userEmail")) pageLoader.item.userEmail = userEmail
-    onMobileNo_from_dbChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("mobileNo_from_db")) pageLoader.item.mobileNo_from_db = mobileNo_from_db
+    onDisplayNameChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("displayName")) pageLoader.item.displayName = displayName
+    onMobileNoChanged:    if (pageLoader.item && pageLoader.item.hasOwnProperty("mobileNo"))    pageLoader.item.mobileNo    = mobileNo
     onRpcCompletedStatusChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("rpcCompletedStatus")) pageLoader.item.rpcCompletedStatus = rpcCompletedStatus
+    onTotalDurationFormattedChanged: if (pageLoader.item && pageLoader.item.hasOwnProperty("totalDurationFormatted")) pageLoader.item.totalDurationFormatted = totalDurationFormatted
+    onMissionsCompletedChanged:      if (pageLoader.item && pageLoader.item.hasOwnProperty("missionsCompleted"))      pageLoader.item.missionsCompleted = missionsCompleted
 
     property int totalMinutes: 0
     property int missionsCompleted: 0
@@ -34,44 +37,65 @@ Item {
     function loadSessions() {
         console.log("loadSessions()")
         MapGlobals.getAllSessions(function(sessions) {
-
             var total = 0;
             for (var i = 0; i < sessions.length; i++) {
                 total += Number(sessions[i].duration || 0);
             }
-
             totalMinutes = total;
             missionsCompleted = sessions.length;
             var hours = Math.floor(total / 60);
             var minutes = total % 60;
             totalDurationFormatted = hours + "h " + minutes + "m";
+            rpcCompletedStatus = MapGlobals.rpcStatus   // onRpcCompletedStatusChanged handles the push
 
-            console.log("totalDurationFormatted : ",totalDurationFormatted)
-
-            if (pageLoader.item) {
-                        if (pageLoader.item.hasOwnProperty("totalDurationFormatted"))
-                            pageLoader.item.totalDurationFormatted = totalDurationFormatted
-                        if (pageLoader.item.hasOwnProperty("missionsCompleted"))
-                            pageLoader.item.missionsCompleted = missionsCompleted
-                    }
-
+            console.log("totalDurationFormatted:", totalDurationFormatted)
+            console.log("rpcCompletedStatus:", rpcCompletedStatus)
         });
     }
 
-    function loadUserData() {
+    function loadUserData(onComplete) {
         MapGlobals.loadUserData(userName, function(userData) {
             if (userData) {
-                MapGlobals.displayName = userData.displayname || MapGlobals.displayName;
-                MapGlobals.userEmail = userData.email || MapGlobals.userEmail;
-                mobileNo_from_db = userData.mobile_number || mobileNo_from_db;
-                rpcCompletedStatus = (userData.rpc_completed !== undefined && userData.rpc_completed !== null) ? Number(userData.rpc_completed) : -1;
+
+                MapGlobals.displayName = userData.displayname ?? ""
+
+                MapGlobals.userEmail = userData.email ?? ""
+
+                MapGlobals.mobileNo =
+                        userData.mobile_number !== undefined &&
+                        userData.mobile_number !== null
+                        ? userData.mobile_number
+                        : ""
+
+                MapGlobals.rpcStatus   = (userData.rpc_completed !== undefined && userData.rpc_completed !== null)
+                        ? Number(userData.rpc_completed) : -1
+
+                rpcCompletedStatus = Number(MapGlobals.rpcStatus)
+                mobileNo = MapGlobals.mobileNo
+
+                // FORCE update currently loaded page
+                if (pageLoader.item) {
+
+                    if (pageLoader.item.hasOwnProperty("rpcCompletedStatus")) {
+                        pageLoader.item.rpcCompletedStatus =
+                                rpcCompletedStatus
+                    }
+
+                    if (pageLoader.item.hasOwnProperty("mobileNo")) {
+                        pageLoader.item.mobileNo =
+                                mobileNo
+                    }
+                }
+
+                console.log("loadUserData — rpcStatus:", MapGlobals.rpcStatus, "mobileNo:", MapGlobals.mobileNo)
             }
-        });
+            if (typeof onComplete === "function") onComplete()
+        })
     }
 
     Component.onCompleted: {
-        loadSessions();
-        if (userName !== "") loadUserData();
+        loadSessions()
+        if (userName !== "") loadUserData()   // no callback = fine, undefined check handles it
     }
 
     onVisibleChanged: {
@@ -103,16 +127,24 @@ Item {
 
         onLoaded: {
             // Pass data to sub-screens
-            if (item.hasOwnProperty("app_color")) item.app_color = profilescreen.app_color
-            if (item.hasOwnProperty("userName")) item.userName = profilescreen.userName
-            if (item.hasOwnProperty("displayName")) item.displayName = profilescreen.displayName
-            if (item.hasOwnProperty("userEmail")) item.userEmail = profilescreen.userEmail
-            if (item.hasOwnProperty("totalDurationFormatted")) item.totalDurationFormatted = profilescreen.totalDurationFormatted
-            if (item.hasOwnProperty("missionsCompleted")) item.missionsCompleted = profilescreen.missionsCompleted
-            
-            // For AccountUpdate
-            if (item.hasOwnProperty("mobileNo_from_db")) item.mobileNo_from_db = profilescreen.mobileNo_from_db
-            if (item.hasOwnProperty("rpcCompletedStatus")) item.rpcCompletedStatus = profilescreen.rpcCompletedStatus
+            if (item.hasOwnProperty("app_color"))             item.app_color             = profilescreen.app_color
+            if (item.hasOwnProperty("userName"))              item.userName              = profilescreen.userName
+            if (item.hasOwnProperty("displayName"))           item.displayName           = profilescreen.displayName
+            if (item.hasOwnProperty("userEmail"))             item.userEmail             = profilescreen.userEmail
+            if (item.hasOwnProperty("totalDurationFormatted"))item.totalDurationFormatted= profilescreen.totalDurationFormatted
+            if (item.hasOwnProperty("missionsCompleted"))     item.missionsCompleted     = profilescreen.missionsCompleted
+            if (item.hasOwnProperty("mobileNo"))              item.mobileNo              = profilescreen.mobileNo
+
+            Qt.callLater(function() {
+
+                if (item.hasOwnProperty("rpcCompletedStatus"))
+                    item.rpcCompletedStatus =
+                            Number(MapGlobals.rpcStatus)
+
+                if (item.hasOwnProperty("mobileNo"))
+                    item.mobileNo =
+                            MapGlobals.mobileNo
+            })
 
             // select the App then go to the Homescreen
             if (item && typeof item.appSelected !== "undefined") {
@@ -161,8 +193,9 @@ Item {
             //Profile Update
             if (item && typeof item.updated !== "undefined") {
                 item.updated.connect(function() {
-                    loadUserData(); // Refresh data
-                    currentView = "profile";
+                    loadUserData(function() {
+                        currentView = "profile"
+                    })
                 })
             }
         }

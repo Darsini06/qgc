@@ -315,16 +315,19 @@ Item {
                                 typeNameSuffix: "street"
                                 iconSource: "map_default.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Satellite")
                                 typeNameSuffix: "satellite"
                                 iconSource: "map_satellite.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Terrain")
                                 typeNameSuffix: "terrain"
                                 iconSource: "map_terrain.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Hybrid")
                                 typeNameSuffix: "hybrid"
