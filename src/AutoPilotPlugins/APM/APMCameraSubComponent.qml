@@ -289,6 +289,7 @@ SetupPage {
                             id:          directionLabel
                             text:        qsTr("Gimbal ") + directionTitle
                             font.bold:   true
+                            color:       "black"
                         }
 
                         // Section Backdrop
@@ -296,7 +297,10 @@ SetupPage {
                             id:     rectangle
                             height: innerColumn.height + _margins*2
                             width:  innerColumn.width + _margins*2
-                            color:  qgcPal.windowShade
+                            color:  "white"
+                            border.color: "black"
+                            border.width: 1
+                            radius: ScreenTools.defaultFontPixelHeight / 2
 
                             // Section Content - 3 Rows
                             Column {
@@ -321,6 +325,7 @@ SetupPage {
                                                 id:               gimbalOutLabel
                                                 anchors.baseline: outputChan.baseline
                                                 text:             qsTr("Output channel:")
+                                                color:            "black"
                                             }
 
                                             QGCComboBox {
@@ -376,11 +381,13 @@ SetupPage {
                                         text:             qsTr("Servo PWM limits:")
                                         anchors.baseline: servoLimitRow._labelBaseline
                                         width:            angleLimitLabel.width
+                                        color:            "black"
                                     }
 
                                     QGCLabel {
                                         text:             qsTr("min")
                                         anchors.baseline: servoLimitRow._labelBaseline
+                                        color:            "black"
                                     }
 
                                     FactTextField {
@@ -391,6 +398,7 @@ SetupPage {
                                     QGCLabel {
                                         text:             qsTr("max")
                                         anchors.baseline: servoLimitRow._labelBaseline
+                                        color:            "black"
                                     }
 
                                     FactTextField {
@@ -411,11 +419,13 @@ SetupPage {
                                         id:                 angleLimitLabel
                                         text:               qsTr("Gimbal angle limits:")
                                         anchors.baseline:   angleLimitRow._labelBaseline
+                                        color:              "black"
                                     }
 
                                     QGCLabel {
                                         text:               qsTr("min")
                                         anchors.baseline:   angleLimitRow._labelBaseline
+                                        color:              "black"
                                     }
 
                                     FactTextField {
@@ -426,6 +436,7 @@ SetupPage {
                                     QGCLabel {
                                         text:              qsTr("max")
                                         anchors.baseline:  angleLimitRow._labelBaseline
+                                        color:             "black"
                                     }
 
                                     FactTextField {
@@ -441,9 +452,8 @@ SetupPage {
             Component {
                 id: gimbalSettings
 
-                Item {
-                    width:  rectangle.x + rectangle.width
-                    height: rectangle.y + rectangle.height
+                Column {
+                    spacing: _margins / 2
 
                     property Fact _mountDefaultMode:    controller.getParameterFact(-1, "MNT_DEFLT_MODE")
                     property Fact _mountType:           controller.getParameterFact(-1, "MNT_TYPE")
@@ -452,65 +462,71 @@ SetupPage {
                         id:             settingsLabel
                         text:           qsTr("Gimbal Settings")
                         font.bold:      true
+                        color:          "black"
                     }
 
                     Rectangle {
                         id:                 rectangle
-                        anchors.topMargin:  _margins / 2
-                        anchors.top:        settingsLabel.bottom
-                        width:              gimbalModeCombo.x + gimbalModeCombo.width + _margins
-                        height:             gimbalModeCombo.y + gimbalModeCombo.height + _margins
-                        color:              qgcPal.windowShade
+                        width:              innerColumn.width + (_margins * 2)
+                        height:             innerColumn.height + (_margins * 2)
+                        color:              "white"
+                        border.color:       "black"
+                        border.width:       1
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
-                        QGCLabel {
-                            id:                 gimbalTypeLabel
+                        Column {
+                            id:                 innerColumn
                             anchors.margins:    _margins
-                            anchors.left:       parent.left
-                            anchors.baseline:   gimbalTypeCombo.baseline
-                            text:               qsTr("Type:")
-                        }
-
-                        FactComboBox {
-                            id:                 gimbalTypeCombo
-                            anchors.topMargin:  _margins
                             anchors.top:        parent.top
-                            anchors.left:       gimbalModeCombo.left
-                            width:              gimbalModeCombo.width
-                            fact:               _mountType
-                            indexModel:         false
-                        }
-
-                        QGCLabel {
-                            id:                     rebootLabel
-                            anchors.topMargin:      _margins / 2
-                            anchors.leftMargin:     _margins
-                            anchors.rightMargin:    _margins
-                            anchors.left:           parent.left
-                            anchors.right:          parent.right
-                            anchors.top:            gimbalTypeCombo.bottom
-                            wrapMode:               Text.WordWrap
-                            text:                   qsTr("Gimbal Type changes takes affect next reboot of autopilot")
-                        }
-
-                        QGCLabel {
-                            id:                 gimbalModeLabel
-                            anchors.margins:    _margins
                             anchors.left:       parent.left
-                            anchors.baseline:   gimbalModeCombo.baseline
-                            text:               qsTr("Default Mode:")
-                        }
+                            spacing:            _margins
 
-                        FactComboBox {
-                            id:                 gimbalModeCombo
-                            anchors.margins:    _margins
-                            anchors.top:        rebootLabel.bottom
-                            anchors.left:       gimbalModeLabel.right
-                            width:              ScreenTools.defaultFontPixelWidth * 15
-                            fact:               _mountDefaultMode
-                            indexModel:         false
-                        }
+                            Row {
+                                spacing: _margins
+                                QGCLabel {
+                                    id:                 gimbalTypeLabel
+                                    anchors.baseline:   gimbalTypeCombo.baseline
+                                    text:               qsTr("Type:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                FactComboBox {
+                                    id:                 gimbalTypeCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 15
+                                    fact:               _mountType
+                                    indexModel:         false
+                                }
+                            }
+
+                            QGCLabel {
+                                id:                     rebootLabel
+                                width:                  ScreenTools.defaultFontPixelWidth * 30
+                                wrapMode:               Text.WordWrap
+                                text:                   qsTr("Gimbal Type changes takes affect next reboot of autopilot")
+                                color:                  "black"
+                            }
+
+                            Row {
+                                spacing: _margins
+                                QGCLabel {
+                                    id:                 gimbalModeLabel
+                                    anchors.baseline:   gimbalModeCombo.baseline
+                                    text:               qsTr("Default Mode:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                FactComboBox {
+                                    id:                 gimbalModeCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 15
+                                    fact:               _mountDefaultMode
+                                    indexModel:         false
+                                }
+                            }
+                        } // Column
                     } // Rectangle
-                } // Item
+                } // Column
             } // Component - gimbalSettings
 
             Loader {
