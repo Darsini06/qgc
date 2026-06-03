@@ -76,7 +76,7 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"
+                color: Qt.rgba(0, 0, 0, 0.40)
                 clip: true
 
                 MouseArea {
@@ -99,7 +99,7 @@ Item {
                         origin.y: compassArrow.height / 2
                         angle: -MapGlobals.mapRotation
                     }
-                    color : "transparent"
+                    color : "white"
                 }
 
             }
@@ -111,9 +111,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"
+                color: Qt.rgba(0, 0, 0, 0.40)
                 border.width: width * 0.05
-                border.color: "white"
+                border.color: Qt.rgba(0, 0, 0, 0.40)
                 clip: true
 
                 MouseArea {
@@ -128,7 +128,7 @@ Item {
                     anchors.centerIn: parent
                     width: iconSize * 0.5
                     height: iconSize * 0.5
-                    color : "transparent"
+                    color : "white"
                 }
             }
 
@@ -139,9 +139,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"
+                color: Qt.rgba(0, 0, 0, 0.40)
                 border.width: width * 0.05
-                border.color: "white"
+                border.color: Qt.rgba(0, 0, 0, 0.40)
                 clip: true
 
                 MouseArea {
@@ -161,7 +161,7 @@ Item {
                     anchors.centerIn: parent
                     width: iconSize * 0.5
                     height: iconSize * 0.5
-                    color : "black"
+                    color : "white"
                 }
 
                 // Dropdown Popup for Map Types - BALANCED VERY SMALL VERSION
@@ -342,9 +342,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: "white"
+                color: Qt.rgba(0, 0, 0, 0.40)
                 border.width: width * 0.05
-                border.color: "white"
+                border.color: Qt.rgba(0, 0, 0, 0.40)
 
                 MouseArea {
                     anchors.fill: parent
@@ -359,7 +359,7 @@ Item {
                     anchors.centerIn: parent
                     width: iconSize * 0.5
                     height: iconSize * 0.5
-                    color : "black"
+                    color : "white"
                 }
 
                 Popup {

@@ -164,7 +164,7 @@ ApplicationWindow {
         // Reference Variable for MainRootWindow
         MapGlobals.rootWindow = mainWindow
 
-        MapGlobals.modeBtn1    = modebtn1
+
 
         // Initialize the Database and Create Tables
         MapGlobals.initDB()
@@ -303,7 +303,6 @@ ApplicationWindow {
         rtlbtn.visible = false
         flyView.visible = false
         planView.visible = false
-        modebtn1.visible = false
         mainrootIcons.visible = false
         waypointbtn.visible = false
 
@@ -320,7 +319,6 @@ ApplicationWindow {
         rtlbtn.visible = false
         flyView.visible = false
         planView.visible = false
-        modebtn1.visible = false
         mainrootIcons.visible = false
         waypointbtn.visible = false
         mainWindow.logfiles()
@@ -335,7 +333,6 @@ ApplicationWindow {
         //modebtn.visible = false
         flyView.visible = false
         planView.visible = true
-        modebtn1.visible = false
         mainrootIcons.visible = false
 
         waypointbtn.visible = false
@@ -348,7 +345,6 @@ ApplicationWindow {
         listbtn.visible = false
         rtlbtn.visible = false
         planView.visible = false
-        modebtn1.visible = false
         mainrootIcons.visible = false
 
         //homescreen.visible = false
@@ -374,7 +370,6 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
-        modebtn1.visible = activeVehicle ? true : false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -399,7 +394,6 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
-        modebtn1.visible = activeVehicle ? true : false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -423,8 +417,6 @@ ApplicationWindow {
 
         //homescreen.visible = false
         mainWindow.closeScreens();
-
-        modebtn1.visible = activeVehicle ? true : false
         plan="Start"
         MapGlobals.edit = "edit1"
 
@@ -1188,7 +1180,6 @@ ApplicationWindow {
             height: width                 // Keep it square
             radius: width / 2            // Circle
             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
-            visible: false
             border.width: 0
             border.color:  "transparent"
 
@@ -1446,26 +1437,7 @@ ApplicationWindow {
             }
         }
 
-        Rectangle {
-            id: modebtn1
-            Layout.alignment: Qt.AlignLeft
 
-            // Base it on flight mode text's size
-            width: flightmode1.implicitWidth + 30   // 10px padding left/right
-            height: flightmode1.implicitHeight + 15 // 5px padding top/bottom
-            radius: height / 2   // pill/capsule shaped
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
-            visible: false // Only visible in toolbar per user request
-
-            border.width: 0
-            border.color:  "transparent"
-
-            FlightModeIndicator {
-                id: flightmode1
-                //visible: true
-                anchors.centerIn: parent
-            }
-        }
 
     }
 

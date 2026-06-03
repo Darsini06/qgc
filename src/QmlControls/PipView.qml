@@ -273,7 +273,7 @@ Item {
         anchors.bottom:         parent.bottom
         height:                 ScreenTools.defaultFontPixelHeight * 2
         width:                  ScreenTools.defaultFontPixelHeight * 2
-        radius:                 ScreenTools.defaultFontPixelHeight / 3
+        radius:                 width/2
         visible:                !_isExpanded
         color:                  Qt.rgba(0, 0, 0, 0.40)
 

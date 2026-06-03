@@ -302,42 +302,48 @@ Item {
     }
 
     Item {
-        x: map.parent.parent.compassNorthX
-        y: map.parent.parent.compassBottomY
+           x: map.parent.parent.compassNorthX
+           y: map.parent.parent.compassBottomY
 
-        Button {
-            id: editBtn
-            padding: 0
-            visible: MapGlobals.share_edit_visibility
-            implicitWidth: baseSize
-            implicitHeight: baseSize
+           Button {
+               id: editBtn
+               padding: 0
+               visible: MapGlobals.share_edit_visibility
+               implicitWidth: baseSize
+               implicitHeight: baseSize
 
-            background: Rectangle {
-                radius: width / 2
-                color: "white"//"#1b1c3e"
-                //border.color: "#005BBB"
-                //border.width: 2
-            }
+               readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+               readonly property real _iconSize: _btnSize * 0.50
 
-            contentItem: Item {
-                anchors.fill: parent
+               background: Rectangle {
+                   width:  editBtn._btnSize
+                   height: width                 // Keep it square
+                   radius: width / 2
+                   color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+                   border.width: 0
+                   border.color:  "transparent"
+               }
 
-                QGCColoredImage {
-                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                    width: iconSize * 0.5
-                    height: iconSize * 0.5
-                    anchors.centerIn: parent
-                    color: "black"
-                }
-            }
+               contentItem: Item {
+                   anchors.fill: parent
 
-            onClicked: {
-                console.log("Edit clicked")
-                if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+                   QGCColoredImage {
+                       source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                       width:            editBtn._iconSize
+                       height:           width
+                       anchors.centerIn: parent
+                       color: "white"
+                   }
+               }
 
-                MapGlobals.share_edit_visibility = false
-                MapGlobals.showMissionItems = true
-            }
-        }
-    }
+               onClicked: {
+                   console.log("Edit clicked")
+                   if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
+
+                   MapGlobals.share_edit_visibility = false
+                   MapGlobals.showMissionItems = true
+
+               }
+           }
+       }
 }
