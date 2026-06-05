@@ -40,7 +40,7 @@ QList<QLocale::Language> AppSettings::_rgPartialLanguages = {
 };
 
 AppSettings::LanguageInfo_t AppSettings::_rgLanguageInfo[] = {
-    { QLocale::AnyLanguage,     "System" },                     // Must be first
+    { QLocale::English,     "English" },                     // Must be first
     { QLocale::Azerbaijani,     "Azerbaijani (Azerbaijani)" },
     { QLocale::Bulgarian,       "български (Bulgarian)" },
     { QLocale::Chinese,         "中文 (Chinese)" },
@@ -194,10 +194,10 @@ DECLARE_SETTINGSFACT_NO_FUNC(AppSettings, qLocaleLanguage)
         FactMetaData*   metaData            = _qLocaleLanguageFact->metaData();
         QStringList     rgEnumStrings;
         QVariantList    rgEnumValues;
-
+        qDebug() <<"languageName =========="<<_rgLanguageInfo[5].languageName << " : " <<_rgLanguageInfo[5].languageId<<"";
         // System is always an available selection
-        rgEnumStrings.append(_rgLanguageInfo[0].languageName);
-        rgEnumValues.append(_rgLanguageInfo[0].languageId);
+        rgEnumStrings.append(_rgLanguageInfo[5].languageName);
+        rgEnumValues.append(_rgLanguageInfo[5].languageId);
 
         for (const auto& languageInfo: _rgLanguageInfo) {
             if (_rgReleaseLanguages.contains(languageInfo.languageId)) {
@@ -223,7 +223,7 @@ DECLARE_SETTINGSFACT_NO_FUNC(AppSettings, qLocaleLanguage)
         metaData->setEnumInfo(rgEnumStrings, rgEnumValues);
 
         if (_qLocaleLanguageFact->enumIndex() == -1) {
-            _qLocaleLanguageFact->setRawValue(QLocale::AnyLanguage);
+            _qLocaleLanguageFact->setRawValue(QLocale::English);
         }
     }
     return _qLocaleLanguageFact;
@@ -398,7 +398,7 @@ QLocale::Language AppSettings::_qLocaleLanguageEarlyAccess(void)
         }
     }
 
-    localeLanguage = QLocale::AnyLanguage;
+    localeLanguage = QLocale::English;
     settings.setValue(qLocaleLanguageName, localeLanguage);
 
     return localeLanguage;
