@@ -94,6 +94,8 @@ Item {
     }
 
     Component.onCompleted: {
+        console.log("isMobile in ProfileScreen",ScreenTools.isMobile)
+        console.log("isSmallScreen in ProfileScreen",ScreenTools.isTinyScreen)
         loadSessions()
         if (userName !== "") loadUserData()   // no callback = fine, undefined check handles it
     }

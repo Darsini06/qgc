@@ -60,7 +60,7 @@ public:
     Q_INVOKABLE LinkConfiguration *startConfigurationEditing(LinkConfiguration *config);
     Q_INVOKABLE void cancelConfigurationEditing(LinkConfiguration *config) const { delete config; }
     Q_INVOKABLE void endConfigurationEditing(LinkConfiguration *config, LinkConfiguration *editedConfig);
-    Q_INVOKABLE void endCreateConfiguration(LinkConfiguration *config);
+    Q_INVOKABLE bool endCreateConfiguration(LinkConfiguration *config);
     Q_INVOKABLE void removeConfiguration(LinkConfiguration *config);
     /// This should only be used by Qml code
     Q_INVOKABLE void createConnectedLink(const LinkConfiguration *config);

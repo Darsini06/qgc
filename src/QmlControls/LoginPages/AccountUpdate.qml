@@ -32,7 +32,8 @@ Item {
     signal updated()
 
     //readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 50
-    property bool isSmallScreen: ScreenTools.isTinyScreen
+    //property bool isSmallScreen: ScreenTools.isTinyScreen
+    property bool isMobile: ScreenTools.isMobile
     readonly property real baseMargin: ScreenTools.defaultFontPixelWidth * 1.5
 
     // onVisibleChanged: {
@@ -44,6 +45,12 @@ Item {
     //         mobileNo =  MapGlobals.mobileNo
     //     }
     // }
+
+    Component.onCompleted: {
+
+        console.log("isMobile in AccountUpdate",ScreenTools.isMobile)
+
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -57,10 +64,9 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: 320
                 color: "#1A1A1A"
                 clip: true
-                visible: !isSmallScreen
 
                 // Back Button
                 Rectangle {
@@ -165,43 +171,67 @@ Item {
 
                 Flickable {
                     anchors.fill: parent
-                    contentHeight: formColumn.implicitHeight + 100
+                    contentHeight: formColumn.implicitHeight + (isMobile ? 80 : 100)
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
 
                     ColumnLayout {
                         id: formColumn
-                        width: Math.min(650, parent.width - 100)
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: Math.min(600, parent.width - 100)
+                        //anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: isMobile ? 15 : 48
                         anchors.top: parent.top
-                        anchors.topMargin: 50
-                        spacing: 28
+                        anchors.topMargin: isMobile ? 20 : 50
+                        spacing: 20
 
                         Text {
                             text: qsTr("ACCOUNT INFORMATION")
                             font.family: "Outfit"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: text_primary
                         }
 
-                        Rectangle { Layout.fillWidth: true; height: 1; color: border_color; Layout.bottomMargin: 10 }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: border_color
+                            Layout.bottomMargin: isMobile ? 2 : 10
+                        }
 
                         GridLayout {
-                            columns: isSmallScreen ? 1 : 2
-                            columnSpacing: 28; rowSpacing: 24; Layout.fillWidth: true
+                            columns: isMobile ? 1 : 2
+                            columnSpacing: 28
+                            rowSpacing: 24
+                            Layout.fillWidth: true
 
                             // Full Name
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
-                                Text { text: qsTr("Full Name"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                Text {
+                                    text: qsTr("Full Name")
+                                    font.family: "Outfit"
+                                    font.pointSize: ScreenTools.smallFontPointSize
+                                    font.bold: true
+                                    color: text_primary
+                                }
+
                                 Rectangle {
-                                    Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+                                    Layout.fillWidth: true
+                                    height: 56
+                                    radius: 10
+                                    color: "#f8fafc"
                                     border.color: nameField.activeFocus ? accent_color : border_color
                                     border.width: nameField.activeFocus ? 2 : 1
                                     
                                     // QGCColoredImage {
                                     //     id: nameIcon
-                                    //     source: "qrc:/InstrumentValueIcons/contacts.svg"; width: 22; height: 22
+                                    //     source: "qrc:/InstrumentValueIcons/contacts.svg"
+                                    //width: 22
+                                    //height: 22
                                     //     anchors.verticalCenter: parent.verticalCenter
-                                    //     anchors.left: parent.left; anchors.leftMargin: 16
+                                    //     anchors.left: parent.left
+                                    //anchors.leftMargin: 16
                                     //     color: nameField.activeFocus ? accent_color : text_muted
                                     // }
 
@@ -284,16 +314,16 @@ Item {
                                         text: userEmail
                                         background: null
                                         selectByMouse: true
-                                        color: "#1e293b"
+                                        color: text_primary
                                         font.family: "Outfit"
-                                        font.pointSize: ScreenTools.smallFontPointSize
-                                        clip: true
-                                        selectionColor: accent_color
-                                        selectedTextColor: "white"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        //clip: true
+                                        //selectionColor: accent_color
+                                        //selectedTextColor: "white"
                                         horizontalAlignment: Qt.AlignLeft
                                         verticalAlignment: Qt.AlignVCenter
-                                        placeholderText: qsTr("Email")
-                                        onActiveFocusChanged: if(activeFocus) cursorPosition = 0
+                                        placeholderText: qsTr("Emailllllll")
+                                        //onActiveFocusChanged: if(activeFocus) cursorPosition = 0
                                     }
                                 }
                             }
@@ -384,7 +414,7 @@ Item {
                             }
                         }
 
-                        Item { Layout.preferredHeight: 32 }
+                        Item { Layout.preferredHeight: isMobile ? 20 : 32 }
 
                         // Update Button
                         Button {
@@ -437,4 +467,5 @@ Item {
             }
         }
     }
+
 }
