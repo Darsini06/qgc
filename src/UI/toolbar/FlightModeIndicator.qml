@@ -84,7 +84,7 @@ RowLayout {
 
         Rectangle {
             id: container
-            implicitWidth:  ScreenTools.defaultFontPixelWidth * 35
+            implicitWidth:  ScreenTools.defaultFontPixelWidth * 22
             implicitHeight: Math.min(ScreenTools.screenHeight * 0.8, contentColumn.implicitHeight + headerArea.height + ScreenTools.defaultFontPixelHeight * 2)
             radius:         15
             clip:           true

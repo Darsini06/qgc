@@ -26,10 +26,9 @@ Rectangle {
     id: bgRect
     width:      mainLayout.width + (_margins * 2.5)
     height:     mainLayout.height + (_margins * 2.5)
-    color:      Qt.rgba(0, 0, 0, 0.45) // Modern dark frosted panel
+    color:      "transparent"
     radius:     16
-    border.color: Qt.rgba(1, 1, 1, 0.15)
-    border.width: 1
+    border.width: 0
     visible:    _camera.capturesVideo || _camera.capturesPhotos
 
     anchors.top: parent.top
@@ -47,6 +46,279 @@ Rectangle {
     property bool   _photoCaptureIntervalIdle:  _camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_INTERVAL_IDLE
     property bool   _photoCaptureIdle:          _photoCaptureSingleIdle || _photoCaptureIntervalIdle
     property bool   _isSelectingMode:           false
+    
+    // Properties for last captured photo/video
+    property string lastCapturedPath: ""
+    property bool   isLastCaptureVideo: false
+
+    function toUrl(filePath) {
+        if (!filePath) return "";
+        if (filePath.indexOf("file://") === 0) {
+            return filePath;
+        }
+        var cleanPath = filePath.replace(/\\/g, "/");
+        if (cleanPath.indexOf(":") === 1) {
+            return "file:///" + cleanPath;
+        }
+        if (cleanPath.indexOf("/") !== 0) {
+            return "file:///" + cleanPath;
+        }
+        return "file://" + cleanPath;
+    }
+
+    Connections {
+        target: QGroundControl.videoManager
+        function onImageFileChanged() {
+            var path = QGroundControl.videoManager.imageFile;
+            if (path && path !== "") {
+                lastCapturedPath = toUrl(path);
+                isLastCaptureVideo = !_cameraInPhotoMode;
+                // Trigger toast preview
+                toastTimer.stop();
+                hideToastAnimation.stop();
+                showToastAnimation.start();
+            }
+        }
+        function onRecordingChanged() {
+            if (!QGroundControl.videoManager.recording) {
+                // Grab screenshot of the video when recording stops
+                QGroundControl.videoManager.grabImage();
+            }
+        }
+    }
+
+    // Camera Shutter animation overlay
+    Item {
+        id: shutterOverlay
+        anchors.fill: mainWindow.contentItem
+        z: 99999
+        visible: false
+
+        Rectangle {
+            id: topShutter
+            anchors.top: parent.top
+            width: parent.width
+            height: 0
+            color: "black"
+        }
+
+        Rectangle {
+            id: bottomShutter
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: 0
+            color: "black"
+        }
+
+        SequentialAnimation {
+            id: shutterAnimation
+            
+            ScriptAction {
+                script: {
+                    shutterOverlay.visible = true;
+                }
+            }
+            
+            // Close shutter
+            ParallelAnimation {
+                NumberAnimation {
+                    target: topShutter
+                    property: "height"
+                    to: shutterOverlay.height / 2
+                    duration: 120
+                    easing.type: Easing.OutQuad
+                }
+                NumberAnimation {
+                    target: bottomShutter
+                    property: "height"
+                    to: shutterOverlay.height / 2
+                    duration: 120
+                    easing.type: Easing.OutQuad
+                }
+            }
+            
+            // Open shutter
+            ParallelAnimation {
+                NumberAnimation {
+                    target: topShutter
+                    property: "height"
+                    to: 0
+                    duration: 120
+                    easing.type: Easing.InQuad
+                }
+                NumberAnimation {
+                    target: bottomShutter
+                    property: "height"
+                    to: 0
+                    duration: 120
+                    easing.type: Easing.InQuad
+                }
+            }
+            
+            ScriptAction {
+                script: {
+                    shutterOverlay.visible = false;
+                }
+            }
+        }
+    }
+
+    // Captured Media Toast Preview
+    Rectangle {
+        id: mediaToastPreview
+        anchors.centerIn: mainWindow.contentItem
+        width: Math.min(mainWindow.contentItem.width * 0.5, ScreenTools.defaultFontPixelHeight * 20)
+        height: width * (9/16)
+        radius: 12
+        color: "#1e1e1e"
+        border.color: "white"
+        border.width: 2
+        clip: true
+        z: 99998
+        opacity: 0
+        scale: 0.8
+        visible: false
+
+        Image {
+            anchors.fill: parent
+            source: lastCapturedPath
+            fillMode: Image.PreserveAspectCrop
+            cache: false
+        }
+
+        // Dark gradient overlay at the bottom for text readability
+        Rectangle {
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: parent.height * 0.3
+            color: "transparent"
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.8) }
+            }
+        }
+
+        RowLayout {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 10
+            spacing: 8
+
+            QGCColoredImage {
+                width: 16
+                height: 16
+                source: isLastCaptureVideo ? "/qmlimages/camera_video.svg" : "/qmlimages/camera_photo.svg"
+                color: "white"
+                fillMode: Image.PreserveAspectFit
+            }
+
+            QGCLabel {
+                text: isLastCaptureVideo ? qsTr("Video Saved Successfully") : qsTr("Photo Saved Successfully")
+                color: "white"
+                font.bold: true
+                font.pointSize: ScreenTools.smallFontPointSize
+            }
+        }
+
+        // Show/hide animations
+        ParallelAnimation {
+            id: showToastAnimation
+            ScriptAction {
+                script: {
+                    mediaToastPreview.visible = true;
+                }
+            }
+            NumberAnimation {
+                target: mediaToastPreview
+                property: "opacity"
+                to: 1.0
+                duration: 300
+                easing.type: Easing.OutBack
+            }
+            NumberAnimation {
+                target: mediaToastPreview
+                property: "scale"
+                to: 1.0
+                duration: 300
+                easing.type: Easing.OutBack
+            }
+            onFinished: toastTimer.start()
+        }
+
+        ParallelAnimation {
+            id: hideToastAnimation
+            NumberAnimation {
+                target: mediaToastPreview
+                property: "opacity"
+                to: 0.0
+                duration: 250
+                easing.type: Easing.InQuad
+            }
+            NumberAnimation {
+                target: mediaToastPreview
+                property: "scale"
+                to: 0.8
+                duration: 250
+                easing.type: Easing.InQuad
+            }
+            onFinished: mediaToastPreview.visible = false
+        }
+
+        Timer {
+            id: toastTimer
+            interval: 2500
+            repeat: false
+            onTriggered: hideToastAnimation.start()
+        }
+    }
+
+    // Full Screen Preview Dialog
+    Popup {
+        id: previewPopup
+        anchors.centerIn: parent
+        width: parent.width * 0.9
+        height: parent.height * 0.9
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Qt.rgba(0, 0, 0, 0.9)
+            radius: 16
+            border.color: "#3d3d3d"
+            border.width: 1
+        }
+
+        contentItem: Item {
+            Image {
+                anchors.fill: parent
+                anchors.margins: 20
+                source: lastCapturedPath
+                fillMode: Image.PreserveAspectFit
+                cache: false
+            }
+
+            QGCLabel {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 20
+                text: isLastCaptureVideo ? qsTr("Last Captured Video Frame") : qsTr("Last Captured Photo")
+                color: "white"
+                font.bold: true
+                font.pointSize: ScreenTools.largeFontPointSize
+            }
+
+            QGCButton {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 20
+                text: qsTr("Close")
+                onClicked: previewPopup.close()
+            }
+        }
+    }
+
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     DeadMouseArea { anchors.fill: parent }
@@ -103,7 +375,7 @@ Rectangle {
                     color: Qt.rgba(0, 0, 0, 0.45)
                     border.color: Qt.rgba(1, 1, 1, 0.2)
                     border.width: 1
-                    
+
                     // Highlight Toggle Pill
                     Rectangle {
                         width: parent.width / 2
@@ -117,7 +389,7 @@ Rectangle {
 
                     Row {
                         anchors.fill: parent
-                        
+
                         // Photo Button
                         Item {
                             width: parent.width / 2
@@ -134,7 +406,10 @@ Rectangle {
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
-                                onClicked: _camera.setCameraModePhoto()
+                                onClicked: {
+                                    _camera.setCameraModePhoto()
+                                    shutterAnimation.start()
+                                }
                             }
                         }
 
@@ -185,11 +460,11 @@ Rectangle {
                         height: width
                         radius: _isShootingInCurrentMode ? 6 : width / 2
                         color: _cameraInPhotoMode ? "white" : qgcPal.colorRed
-                        
+
                         property bool _isShootingInPhotoMode: _cameraInPhotoMode && _camera.photoCaptureStatus === MavlinkCameraControl.PHOTO_CAPTURE_IN_PROGRESS
                         property bool _isShootingInVideoMode: (!_cameraInPhotoMode && _camera.videoCaptureStatus === MavlinkCameraControl.VIDEO_CAPTURE_STATUS_RUNNING)
                         property bool _isShootingInCurrentMode: _cameraInPhotoMode ? _isShootingInPhotoMode : _isShootingInVideoMode
-                        
+
                         Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
                         Behavior on radius { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
                         Behavior on color { ColorAnimation { duration: 300 } }
@@ -205,6 +480,8 @@ Rectangle {
                                     _camera.stopTakePhoto()
                                 } else {
                                     _camera.takePhoto()
+                                    QGroundControl.videoManager.grabImage()
+                                    shutterAnimation.start()
                                 }
                             } else {
                                 _camera.toggleVideoRecording()
@@ -217,7 +494,7 @@ Rectangle {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: _smallMargins
-                    
+
                     // Recording Red Dot indicator
                     Rectangle {
                         width: 8
@@ -225,7 +502,7 @@ Rectangle {
                         radius: 4
                         color: qgcPal.colorRed
                         visible: _cameraInVideoMode && !_videoCaptureIdle
-                        
+
                         SequentialAnimation on opacity {
                             loops: Animation.Infinite
                             running: _cameraInVideoMode && !_videoCaptureIdle
@@ -308,33 +585,88 @@ Rectangle {
                 }
             }
 
-            Item {
+            RowLayout {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredHeight: ScreenTools.defaultFontPixelHeight * 1.5
-                Layout.preferredWidth:  Layout.preferredHeight
-                
-                QGCColoredImage {
-                    id: gearIcon
-                    anchors.centerIn: parent
-                    height: parent.height * 0.6
-                    width: height
-                    source: "/res/gear-black.svg"
-                    mipmap: true
-                    sourceSize.height: height
-                    color: "white"
-                    fillMode: Image.PreserveAspectFit
-                    
-                    scale: gearMouseArea.containsMouse ? 1.15 : 1.0
-                    rotation: gearMouseArea.containsMouse ? 45 : 0
-                    Behavior on scale { NumberAnimation { duration: 200 } }
-                    Behavior on rotation { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
+                spacing: _margins * 2
+
+                // Last Captured Media Preview Thumbnail
+                Item {
+                    id: thumbnailPreview
+                    width: ScreenTools.defaultFontPixelHeight * 2
+                    height: width
+                    visible: lastCapturedPath !== ""
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 8
+                        color: "black"
+                        border.color: "white"
+                        border.width: 1
+                        clip: true
+
+                        Image {
+                            anchors.fill: parent
+                            source: lastCapturedPath
+                            fillMode: Image.PreserveAspectCrop
+                            cache: false
+                        }
+
+                        // Play indicator icon if it was a video
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: parent.width * 0.4
+                            height: width
+                            radius: width / 2
+                            color: Qt.rgba(0, 0, 0, 0.6)
+                            visible: isLastCaptureVideo
+
+                            QGCColoredImage {
+                                anchors.centerIn: parent
+                                width: parent.width * 0.6
+                                height: width
+                                source: "/qmlimages/camera_video.svg"
+                                color: "white"
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            previewPopup.open()
+                        }
+                    }
                 }
 
-                MouseArea {
-                    id: gearMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: settingsDialogComponent.createObject(mainWindow).open()
+                // Settings Gear Button
+                Item {
+                    width: ScreenTools.defaultFontPixelHeight * 1.5
+                    height: width
+
+                    QGCColoredImage {
+                        id: gearIcon
+                        anchors.centerIn: parent
+                        height: parent.height * 0.6
+                        width: height
+                        source: "/res/gear-black.svg"
+                        mipmap: true
+                        sourceSize.height: height
+                        color: "white"
+                        fillMode: Image.PreserveAspectFit
+
+                        scale: gearMouseArea.containsMouse ? 1.15 : 1.0
+                        rotation: gearMouseArea.containsMouse ? 45 : 0
+                        Behavior on scale { NumberAnimation { duration: 200 } }
+                        Behavior on rotation { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
+                    }
+
+                    MouseArea {
+                        id: gearMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: settingsDialogComponent.createObject(mainWindow).open()
+                    }
                 }
             }
         }

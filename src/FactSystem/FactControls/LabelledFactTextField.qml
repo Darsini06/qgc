@@ -23,13 +23,15 @@ RowLayout {
     property alias  textFieldUnitsLabel:     _factTextField.unitsLabel
     property alias  textFieldShowUnits:      _factTextField.showUnits
     property alias  textFieldShowHelp:       _factTextField.showHelp
+    property real   labelPreferredWidth:     -1
 
     spacing: ScreenTools.defaultFontPixelWidth * 2
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     QGCLabel {
-        Layout.fillWidth:   true
+        Layout.fillWidth:   labelPreferredWidth < 0
+        Layout.preferredWidth: labelPreferredWidth
         text:               label
         color:              qgcPal.text
     }

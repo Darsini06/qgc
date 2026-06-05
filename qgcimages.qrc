@@ -80,7 +80,7 @@
         <file alias="NewImages/profileImage.png">src/NewImages/profileImage.png</file>
         <file alias="NewImages/homeIcon.png">src/NewImages/homeIcon.png</file>
         <file alias="NewImages/userGuide.png">src/NewImages/userGuide.png</file>
-        <file alias="NewImages/accountUpdate.png">src/NewImages/accountUpdate.png</file>
+        <file alias="NewImages/account_settings_colour.png">src/NewImages/account_settings_colour.png</file>
         <file alias="NewImages/leftArrow.png">src/NewImages/leftArrow.png</file>
         <file alias="NewImages/mapSelection.png">src/NewImages/mapSelection.png</file>
         <file alias="NewImages/droneGpsMarking.png">src/NewImages/droneGpsMarking.png</file>
@@ -127,7 +127,22 @@
         <file alias="NewImages/upload_modern.svg">src/NewImages/upload_modern.svg</file>
         <file alias="NewImages/location_mark.svg">src/NewImages/location_mark.svg</file>
         <file alias="NewImages/privacy_policy_black.svg">src/NewImages/privacy_policy_black.svg</file>
+
+
+
         <file alias="NewImages/accountUpdate_black.svg">src/NewImages/accountUpdate_black.svg</file>
+          <file alias="NewImages/cloud_plan_colour.png">src/NewImages/cloud_plan_colour.png</file>
+            <file alias="NewImages/mission_history_colour.png">src/NewImages/mission_history_colour.png</file>
+              <file alias="NewImages/log_files_colour.jfif">src/NewImages/log_files_colour.jfif</file>
+                <file alias="NewImages/feedback_colour.png">src/NewImages/feedback_colour.png</file>
+                  <file alias="NewImages/privacy_policy_colour.png">src/NewImages/privacy_policy_colour.png</file>
+                    <file alias="NewImages/terms_condition_colour.jfif">src/NewImages/terms_condition_colour.jfif</file>
+                      <file alias="NewImages/change_password_colour.png">src/NewImages/change_password_colour.png</file>
+
+
+
+
+
         <file alias="NewImages/total_hours.svg">src/NewImages/total_hours.svg</file>
         <file alias="NewImages/terms_condition_black.svg">src/NewImages/terms_condition_black.svg</file>
         <file alias="NewImages/select_drone_type_black.svg">src/NewImages/select_drone_type_black.svg</file>

@@ -135,7 +135,7 @@ T.ComboBox {
         horizontalAlignment:        Text.AlignLeft
         text:                       control.alternateText === "" ? control.currentText : control.alternateText
         font:                       control.font
-        color:                      qgcPal.buttonText
+        color:                      qgcPal.text
         elide:                      Text.ElideRight
     }
 

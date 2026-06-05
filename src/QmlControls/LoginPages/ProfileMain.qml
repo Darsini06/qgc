@@ -199,32 +199,38 @@ Item {
 
                         Repeater {
                             model: [
-                                { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/accountUpdate_black.svg" },
-                                { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
-                                { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
+                                { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/account_settings_colour.png" },
+                                { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/cloud_plan_colour.png" },
+                                { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/mission_history_colour.png" },
                                 { "id": "logfiles",      "name": "Log Files",        "desc": "View logs and performance of previous flights",
-                                    "icon": "qrc:/qmlimages/NewImages/report_color.svg", "color": "#475569" },
+                                    "icon": "qrc:/qmlimages/NewImages/log_files_colour.jfif", "color": "#475569" },
                                 //{ "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
-                                { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_color.svg" },
-                                { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
-                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_black.svg"},
-                                { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
+                                { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_colour.png" },
+                                { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_colour.png" },
+                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_colour.jfif"},
+                                { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/change_password_colour.png" },
                                 { "id": "logout",         "name": "Sign Out",         "icon": "qrc:/qmlimages/NewImages/signIn.svg", "isWarning": true }
                             ]
 
                             Rectangle {
                                 Layout.fillWidth: true; height: 68; radius: 14
-                                color: mouseItem.containsMouse ? "white" : "transparent"
+                                color: mouseItem.containsMouse ? "white" :"transparent"
                                 border.color: mouseItem.containsMouse ? "#f1f5f9" : "transparent"
                                 
                                 RowLayout {
                                     anchors.fill: parent; anchors.margins: 20; spacing: 20
                                     Rectangle {
-                                        width: 44; height: 44; radius: 10; color: "#f1f5f9"
-                                        QGCColoredImage {
+                                        width: 44
+                                        height: 44
+                                        radius: 10
+                                        color: "#f1f5f9"
+
+                                        Image {
                                             anchors.centerIn: parent
-                                            source: modelData.icon; width: 22; height: 22
-                                            color: modelData.isWarning ? "#ef4444" : "#475569"
+                                            source: modelData.icon
+                                            width: 22
+                                            height: 22
+                                            fillMode: Image.PreserveAspectFit
                                         }
                                     }
                                     Text {
@@ -260,6 +266,7 @@ Item {
                 }
             }
         }
+
     }
 
     Component.onCompleted: {

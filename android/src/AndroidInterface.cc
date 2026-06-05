@@ -81,8 +81,12 @@ bool checkStoragePermissions()
 {
     const QString readPermission("android.permission.READ_EXTERNAL_STORAGE");
     const QString writePermission("android.permission.WRITE_EXTERNAL_STORAGE");
+    const QString cameraPermission("android.permission.CAMERA");
+    const QString recordAudioPermission("android.permission.RECORD_AUDIO");
 
-    const QStringList permissions = { readPermission, writePermission };
+    const QStringList permissions = { readPermission, writePermission, cameraPermission, recordAudioPermission };
+    bool storageOk = true;
+
     for (const auto& permission: permissions) {
         QFuture<QtAndroidPrivate::PermissionResult> futurePermissionResult = QtAndroidPrivate::checkPermission(permission);
         QtAndroidPrivate::PermissionResult permissionResult = futurePermissionResult.result();
@@ -90,12 +94,15 @@ bool checkStoragePermissions()
             futurePermissionResult = QtAndroidPrivate::requestPermission(permission);
             permissionResult = futurePermissionResult.result();
             if (permissionResult == QtAndroidPrivate::PermissionResult::Denied) {
-                return false;
+                qCWarning(AndroidInterfaceLog) << "Permission Denied:" << permission;
+                if (permission == readPermission || permission == writePermission) {
+                    storageOk = false;
+                }
             }
         }
     }
 
-    return true;
+    return storageOk;
 }
 
 QString getSDCardPath()

@@ -36,6 +36,7 @@ ToolIndicatorPage {
             SettingsGroupLayout {
                 heading: qsTr("Vehicle GPS Status")
                 visible: activeVehicle
+                Layout.topMargin: 4
 
                 LabelledLabel {
                     label:      qsTr("Satellites")

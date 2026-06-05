@@ -379,7 +379,7 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
-        modebtn1.visible = activeVehicle ? true : false
+        modebtn1.visible = false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -404,7 +404,7 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
-        modebtn1.visible = activeVehicle ? true : false
+        modebtn1.visible = false
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -429,7 +429,7 @@ ApplicationWindow {
         //homescreen.visible = false
         mainWindow.closeScreens();
 
-        modebtn1.visible = activeVehicle ? true : false
+        modebtn1.visible = false
         plan="Start"
         MapGlobals.edit = "edit1"
 
@@ -1688,7 +1688,7 @@ ApplicationWindow {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("press & hold to confirm")
+                text: qsTr("Press & Hold to confirm")
                 color: "#dddddd"
                 font.pointSize: 10
             }
@@ -2480,17 +2480,17 @@ ApplicationWindow {
                             }
                         }
 
-                        SubMenuButton {
-                            id:                 analyzeButton2
-                            height:             toolSelectDialog._toolButtonHeight
-                            Layout.fillWidth:   true
-                            text:               qsTr("Loiter")
-                            imageResource:      "/res/ArrowRight.svg"
-                            visible:            true
-                            onClicked: {
+                        // SubMenuButton {
+                        //     id:                 analyzeButton2
+                        //     height:             toolSelectDialog._toolButtonHeight
+                        //     Layout.fillWidth:   true
+                        //     text:               qsTr("Loiter")
+                        //     imageResource:      "/res/ArrowRight.svg"
+                        //     visible:            true
+                        //     onClicked: {
 
-                            }
-                        }
+                        //     }
+                        // }
 
                         SubMenuButton {
                             id:                 analyzeButton7
@@ -2778,6 +2778,10 @@ ApplicationWindow {
         topInset:       0
         bottomInset:    0
         padding:        0
+        topPadding:     12
+        leftPadding:    8
+        rightPadding:   8
+        bottomPadding:  12
         visible:        false
         modal:          true
         focus:          true
@@ -2787,7 +2791,7 @@ ApplicationWindow {
         property var indicatorItem
         property bool isRightAligned: false
         property bool _expanded:    false
-        property real _margins:     ScreenTools.defaultFontPixelHeight / 4
+        property real _margins:     ScreenTools.defaultFontPixelHeight
 
         function calcXPosition() {
             if (indicatorItem) {

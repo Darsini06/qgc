@@ -494,6 +494,7 @@ Item {
                     heading: qsTr("Battery Status")/*.arg(_activeVehicle.batteries.length === 1 ? qsTr("Status") : object.id.rawValue)*/
                     contentSpacing: 0
                     showDividers: false
+                    Layout.topMargin: 4
 
                     property var batteryValuesAvailable: batteryValuesAvailableLoader.item
 
