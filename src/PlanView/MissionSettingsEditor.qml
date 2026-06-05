@@ -27,10 +27,10 @@ Rectangle {
 
     property real   _panelRadius:   8
     property real   _fieldRadius:   4
-    property color  _panelColor:    "#333333"
-    property color  _panelBorder:   "#444444"
-    property color  _fieldColor:    "#444444"
-    property color  _fieldBorder:   "#555555"
+    property color  _panelColor:    "#20000000"
+    property color  _panelBorder:   "#556070"
+    property color  _fieldColor:    "#25FFFFFF"
+    property color  _fieldBorder:   "#334155"
     property color  _headingColor:  "#ffffff"
     property color  _labelColor:    "#ffffff"
     property color  _valueColor:    "#ffffff"
@@ -89,7 +89,7 @@ Rectangle {
                             Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                             Layout.preferredWidth: Layout.preferredHeight
                             radius: 4
-                            color: minusArea.pressed ? _colorAccent : (minusArea.containsMouse ? _fieldColor : _panelColor)
+                            color: "#66000000"
                             border.color: minusArea.containsMouse ? _colorAccent : _panelBorder
                             border.width: 1
 
@@ -123,7 +123,7 @@ Rectangle {
                             color:                  _valueColor
                             horizontalAlignment:    Qt.AlignHCenter
                             background: Rectangle {
-                                color:        factField.activeFocus ? _fieldColor : _panelColor
+                                color:        "#66000000"
                                 border.color: factField.activeFocus ? _colorAccent : _panelBorder
                                 border.width: factField.activeFocus ? 2 : 1
                                 radius:       4
@@ -135,7 +135,7 @@ Rectangle {
                             Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
                             Layout.preferredWidth: Layout.preferredHeight
                             radius: 4
-                            color: plusArea.pressed ? _colorAccent : (plusArea.containsMouse ? _fieldColor : _panelColor)
+                            color: "#66000000"
                             border.color: plusArea.containsMouse ? _colorAccent : _panelBorder
                             border.width: 1
 
@@ -282,7 +282,7 @@ Rectangle {
                                 if (item) {
                                     item.fact = targetFact
                                     item.trackFillColor = _colorAccent
-                                    item.showMinusButton = false
+                                    item.showMinusButton = true
                                     item.showPlusButton = true
                                 }
                             }

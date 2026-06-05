@@ -462,8 +462,13 @@ Item {
                         color: Qt.rgba(255, 255, 255, 0.08)
                         border.color: Qt.rgba(255, 255, 255, 0.15)
                         QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {MapGlobals.rootWindow.homescreen()
-                                console.log("Button clicked2")} }
+
+                        MouseArea {
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                            onClicked: {MapGlobals.rootWindow.homescreen()
+                                console.log("Button clicked2")
+                            } }
+
                     }
 
                     Item { Layout.fillHeight: true }
@@ -473,8 +478,11 @@ Item {
                         Text { text: "Log Files"; font.family: "Outfit"; font.pointSize: 32; font.bold: true; color: "white" }
                         Text {
                             text: "Access and manage your cloud-synced mission plan files. Securely store and retrieve your flight plans anytime."
-                            font.family: "Outfit"; font.pointSize: 12; color: Qt.rgba(255, 255, 255, 0.6)
-                            wrapMode: Text.WordWrap; Layout.fillWidth: true; lineHeight: 1.5
+                            font.family: "Outfit"
+                            font.pointSize: 12; color: Qt.rgba(255, 255, 255, 0.6)
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            lineHeight: 1.5
                         }
                     }
 
@@ -531,7 +539,7 @@ Item {
                         QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 24; height: 24; color: "#111827"; MouseArea { anchors.fill: parent; onClicked: logfiles.backClicked() } }
                         Text { text: "Log Files"; font.family: "Outfit"; font.bold: true; font.pointSize: ScreenTools.mediumFontPointSize; color: "#111827" }
                         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: {logfiles.backClicked()
-                            console.log("Button clicked")}
+                                console.log("Button clicked")}
                         }
                     }
                 }

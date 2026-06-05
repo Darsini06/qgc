@@ -122,7 +122,16 @@ Item {
             borderColor:        _borderColor
             interiorColor:      object.inclusion ? _interiorColorInclusion : _interiorColorExclusion
             interiorOpacity:    object.inclusion ? _interiorOpacityInclusion : _interiorOpacityExclusion
-            interactive:         _root.interactive && mapCircle && mapCircle.interactive
+            // Bind interactive flag from model to mapCircle
+            Component.onCompleted: {
+                mapCircle.interactive = object.interactive
+            }
+            Connections {
+                target: object
+                function onInteractiveChanged() {
+                    mapCircle.interactive = object.interactive
+                }
+            }
         }
     }
 

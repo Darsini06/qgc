@@ -116,10 +116,12 @@ Item {
             anchors.fill: parent
             visible: false
             gradient: Gradient {
+
                 GradientStop {
                     position: 0.0
                     color: "#E0E0E0"
                 } // Light grey top
+
                 GradientStop {
                     position: 1.0
                     color: "#EDEEF4"
@@ -487,6 +489,29 @@ Item {
             // Reduced basic spacing between elements
             spacing: (isSmallScreen || isMobile) ? dp(0.4) : dp(1)
 
+            // 2. Main Title (Moved inside the column)
+            Text {
+                id: topBrandText
+                text: "DRONE COMMANDER"
+                width: parent.width
+                horizontalAlignment: Text.AlignLeft //(droneType === "Camera" || droneType === "Mapping" || droneType === "Agri" || droneType === "AI") ? Text.AlignLeft : Text.AlignHCenter
+                visible: false //(droneType === "loadpage")
+                color: "#262626"
+                font.family: "Outfit"
+                font.bold: true
+                font.letterSpacing: isSmallScreen ? 0 : (isTablet || isDesktop ? 8 : 1.2)
+                
+                // Automatic fitting logic
+                fontSizeMode: Text.HorizontalFit
+                minimumPointSize: 6
+                font.pointSize: {
+                    var baseSize = ScreenTools.largeFontPointSize;
+                    if (isDesktop) return baseSize * 4.0;
+                    if (isTablet) return baseSize * 3.5;
+                    return isSmallScreen ? 18 : 26; // Target sizes, reduced for mobile
+                }
+                lineHeight: 1.1
+            }
 
 
             // 3. Mode Title (Original heroTitle, hidden on home page)
@@ -510,6 +535,8 @@ Item {
                     return baseSize * 0.85;
 
                 }
+
+
                 font.bold: true
                 font.family: "Outfit"
                 font.letterSpacing: (!isSmallScreen) ? 4 : 1.2
@@ -803,67 +830,113 @@ Item {
                 Layout.minimumWidth: (isSmallScreen || isMobile) ? dp(10) : dp(18)
                 Layout.preferredHeight: (isSmallScreen || isMobile) ? dp(6.5) : dp(7.5)
 
+                property bool _swiped: false
+                property real _progress: 0
+
                 Rectangle {
+                    id: swipeTrack
                     anchors.fill: parent
-                    radius: 20
-                    color: connectMouse.pressed ? Qt.rgba(255, 255, 255, 0.2) : Qt.rgba(0, 0, 0, 0.4)
-                    border.color: connectMouse.containsMouse ? accent_color : Qt.rgba(255, 255, 255, 0.15)
+                    radius: height / 2
+                    color: Qt.rgba(0, 0, 0, 0.4)
+                    border.color: Qt.rgba(255, 255, 255, 0.15)
                     border.width: 1
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: 150
-                        }
+                    clip: true
+
+                    // Fill strip — starts hidden, grows as thumb moves
+                    Rectangle {
+                        x: 0; y: 0
+                        width: Math.max(0, swipeThumb.x - dp(0.5))  // ← only show BEHIND thumb, not under it
+                        height: parent.height
+                        radius: 0
+                        color: connectClick._swiped ? "#2e7d32" : accent_color
+                        opacity: 0.85
+                        Behavior on color { ColorAnimation { duration: 200 } }
                     }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: dp(0.8)
-                        spacing: dp(1.5)
+                    // Label
+                    Label {
+                        anchors.left: swipeThumb.right
+                        anchors.leftMargin: dp(1.5)
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: dp(1)
+                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT")
+                        color: "white"
+                        font.family: "Outfit"
+                        font.bold: true
+                        font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                        elide: Text.ElideRight
+                        fontSizeMode: Text.Fit
+                        minimumPointSize: 6
+                        opacity: connectClick._swiped ? 1.0 : Math.max(0, 1 - connectClick._progress * 3)
+                    }
 
-                        Rectangle {
-                            Layout.preferredWidth: parent.height - dp(1)
-                            Layout.preferredHeight: Layout.preferredWidth
-                            radius: width / 2
-                            color: accent_color
+                    // Thumb
+                    Rectangle {
+                        id: swipeThumb
+                        width: parent.height - dp(1)
+                        height: width
+                        radius: width / 2
+                        x: dp(0.5)
+                        y: dp(0.5)
+                        color: connectClick._swiped ? "#388e3c" : accent_color
 
-                            Image {
-                                source: "qrc:/qmlimages/NewImages/commlinks.svg"
-                                width: parent.width * 0.5
-                                height: width
-                                anchors.centerIn: parent
-                                fillMode: Image.PreserveAspectFit
-                            }
+                        Behavior on x {
+                            enabled: !dragHandler.active
+                            NumberAnimation { duration: 280; easing.type: Easing.OutCubic }
+                        }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+
+                        Image {
+                            source: connectClick._swiped
+                                ? "qrc:/qmlimages/NewImages/check.svg"
+                                : "qrc:/qmlimages/NewImages/commlinks.svg"
+                            width: parent.width * 0.5
+                            height: width
+                            anchors.centerIn: parent
+                            fillMode: Image.PreserveAspectFit
                         }
 
-                        Label {
-                            Layout.fillWidth: true
-                            text: qsTr("CONNECT")
-                            color: "white"
-                            font.family: "Outfit"
-                            font.bold: true
-                            font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                            elide: Text.ElideRight
-                            fontSizeMode: Text.Fit
-                            minimumPointSize: 6
+                        DragHandler {
+                            id: dragHandler
+                            xAxis.minimum: dp(0.5)
+                            xAxis.maximum: swipeTrack.width - swipeThumb.width - dp(0.5)
+                            yAxis.enabled: false
+                            onActiveChanged: {
+                                if (!active && connectClick._progress < 0.95)
+                                    swipeThumb.x = dp(0.5)  // snap back
+                            }
+                            onTranslationChanged: {
+                                var maxX = swipeTrack.width - swipeThumb.width - dp(1)
+                                connectClick._progress = Math.min(1, (swipeThumb.x - dp(0.5)) / maxX)
+                                if (connectClick._progress >= 0.95 && !connectClick._swiped) {
+                                    connectClick._swiped = true
+                                    swipeThumb.x = maxX + dp(0.5)
+                                    // ---- your original onClicked logic here ----
+                                    var editingConfig = _linkManager.createConfiguration(
+                                        ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
+                                    typeSelectionDialogComponent.createObject(mainWindow1, {
+                                        editingConfig: editingConfig,
+                                        originalConfig: null
+                                    }).open()
+                                    // reset after 2 seconds
+                                    resetTimer.start()
+                                }
+                            }
                         }
                     }
                 }
 
-                MouseArea {
-                    id: connectMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        var editingConfig = _linkManager.createConfiguration(ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "");
-                        typeSelectionDialogComponent.createObject(mainWindow1, {
-                                                                      editingConfig: editingConfig,
-                                                                      originalConfig: null
-                                                                  }).open();
+                Timer {
+                    id: resetTimer
+                    interval: 2000
+                    onTriggered: {
+                        connectClick._swiped = false
+                        connectClick._progress = 0
+                        swipeThumb.x = dp(0.5)
                     }
                 }
             }
-
             // Flexible spacer to push operational buttons to the right
             Item {
                 Layout.fillWidth: true
@@ -1055,7 +1128,7 @@ Item {
                         property int selectedType: -1
 
                         ColumnLayout {
-                            spacing: 12
+                            spacing: 18
                             width: parent.width - 24
                             anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
@@ -1078,7 +1151,8 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 56 : 0
+                                    Layout.preferredHeight: visible ? 68 : 0
+                                    Layout.bottomMargin: 12
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
                                     border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
@@ -1174,7 +1248,9 @@ Item {
                         id: linkConfigDialog
                         title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
                         buttons: Dialog.Save | Dialog.Cancel
-                        acceptAllowed: nameField.text !== ""
+                        acceptAllowed: _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
+                                        ? (editingConfig && editingConfig.devName !== "")
+                                        : nameField.text !== ""
 
                         property var originalConfig
                         property var editingConfig
@@ -1184,8 +1260,8 @@ Item {
 
                         // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
                         Connections {
-                            target: linkConfigDialog.editingConfig
-                            enabled: linkConfigDialog.editingConfig !== null
+                            target: editingConfig
+                            enabled: editingConfig !== null
 
                             function onShowToast(message) {
                                 mainWindow.showToastMessage(message);
@@ -1196,19 +1272,32 @@ Item {
                             console.log("Click Save");
                             if (_connectionInitiated) {
                                 console.log("linkConfigDialog: ignoring duplicate accept");
+                                preventClose = true;
                                 return;
                             }
-                            linkSettingsLoader.item.saveSettings();
-                            editingConfig.devName = nameField.text;
+                            if (!editingConfig) {
+                                preventClose = true;
+                                return;
+                            }
+                            if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                                editingConfig.stopScan();
+                            }
+                            if (linkSettingsLoader.item) {
+                                linkSettingsLoader.item.saveSettings();
+                            }
+                            if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
+                                editingConfig.devName = nameField.text;
+                            }
                             editingConfig.name = editingConfig.devName;
-
-                            //connecting_drone = true
 
                             if (originalConfig) {
                                 _linkManager.endConfigurationEditing(originalConfig, editingConfig);
                             } else {
                                 editingConfig.dynamic = false;
-                                _linkManager.endCreateConfiguration(editingConfig);
+                                if (!_linkManager.endCreateConfiguration(editingConfig)) {
+                                    preventClose = true;
+                                    return;
+                                }
                                 if (activeVehicle) {
                                     mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
                                     return;
@@ -1222,6 +1311,9 @@ Item {
                         onRejected: {
                             console.log("Click Cancel");
                             _connectionInitiated = false;  //reset on cancel
+                            if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                                editingConfig.stopScan();
+                            }
                             _linkManager.cancelConfigurationEditing(editingConfig);
                         }
 
@@ -1283,7 +1375,7 @@ Item {
                             Loader {
                                 id: linkSettingsLoader
                                 Layout.fillWidth: true
-                                source: subEditConfig.settingsURL
+                                source: editingConfig ? editingConfig.settingsURL : ""
 
                                 property var subEditConfig: linkConfigDialog.editingConfig
                                 property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12

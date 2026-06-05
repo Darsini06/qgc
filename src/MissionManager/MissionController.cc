@@ -811,14 +811,19 @@ bool MissionController::_loadJsonMissionFileV2(const QJsonObject& json, QmlObjec
             } else {
                 return false;
             }
-        } else if (itemType == VisualMissionItem::jsonTypeComplexItemValue) {
-            QList<JsonHelper::KeyValidateInfo> complexItemKeyInfoList = {
-                { ComplexMissionItem::jsonComplexItemTypeKey,  QJsonValue::String, true },
-            };
-            if (!JsonHelper::validateKeys(itemObject, complexItemKeyInfoList, errorString)) {
-                return false;
+        } else if (itemType == VisualMissionItem::jsonTypeComplexItemValue || itemType == SpotSprayingComplexItem::name) {
+            QString complexItemType;
+            if (itemType == SpotSprayingComplexItem::name) {
+                complexItemType = itemType;
+            } else {
+                QList<JsonHelper::KeyValidateInfo> complexItemKeyInfoList = {
+                    { ComplexMissionItem::jsonComplexItemTypeKey,  QJsonValue::String, true },
+                };
+                if (!JsonHelper::validateKeys(itemObject, complexItemKeyInfoList, errorString)) {
+                    return false;
+                }
+                complexItemType = itemObject[ComplexMissionItem::jsonComplexItemTypeKey].toString();
             }
-            QString complexItemType = itemObject[ComplexMissionItem::jsonComplexItemTypeKey].toString();
 
             if (complexItemType == SurveyComplexItem::jsonComplexItemTypeValue) {
                 qCDebug(MissionControllerLog) << "Loading Survey: nextSequenceNumber" << nextSequenceNumber;

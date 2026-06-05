@@ -14,7 +14,7 @@ Item {
     anchors.fill: parent
 
     // --- Design Tokens (Consistent with ProfileMain.qml) ---
-    property color app_color:       MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#262626" 
+    property color app_color:       MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#262626"
     property color accent_color:    MapGlobals.rootWindow ? MapGlobals.rootWindow.accent_color : "#4A2C6D"
     property color surface_color:   "#ffffff"
     property color bg_color:        "#f8f9fa"
@@ -22,16 +22,35 @@ Item {
     property color text_muted:      "#64748b"
     property color border_color:    "#e2e8f0"
 
-    property string userName: MapGlobals.userName
-    property string displayName: MapGlobals.displayName
-    property string mobileNo_from_db: ""
-    property int rpcCompletedStatus: -1
+    property string userName:          ""
+    property string displayName:       ""
+    property string userEmail:         ""
+    property string mobileNo:          ""
+    property int    rpcCompletedStatus: -1
 
     signal backClicked()
     signal updated()
 
-    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 60
+    //readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 50
+    //property bool isSmallScreen: ScreenTools.isTinyScreen
+    property bool isMobile: ScreenTools.isMobile
     readonly property real baseMargin: ScreenTools.defaultFontPixelWidth * 1.5
+
+    // onVisibleChanged: {
+
+    //     if (visible) {
+    //         console.log("onVisibleChanged from AccountUpdate.qml")
+    //         rpcCompletedStatus = Number(MapGlobals.rpcStatus)
+
+    //         mobileNo =  MapGlobals.mobileNo
+    //     }
+    // }
+
+    Component.onCompleted: {
+
+        console.log("isMobile in AccountUpdate",ScreenTools.isMobile)
+
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -45,10 +64,9 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: 320
                 color: "#1A1A1A"
                 clip: true
-                visible: !isSmallScreen
 
                 // Back Button
                 Rectangle {
@@ -99,19 +117,19 @@ Item {
                     ColumnLayout {
                         Layout.alignment: Qt.AlignHCenter
                         spacing: 2
-                        Text { 
-                            text: name_from_db || qsTr("Review Profile")
+                        Text {
+                            text: displayName ? displayName : ""
                             font.family: "Outfit"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: "white"
                             Layout.alignment: Qt.AlignHCenter
                         }
-                        Text { 
+                        Text {
                             text: MapGlobals.userEmail || QGroundControl.loadGlobalSetting("email", "")
-                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; color: Qt.rgba(255, 255, 255, 0.85); Layout.alignment: Qt.AlignHCenter 
+                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; color: Qt.rgba(255, 255, 255, 0.85); Layout.alignment: Qt.AlignHCenter
                             elide: Text.ElideRight; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter
                         }
-                        Text { 
-                            text: userName ? "@" + userName : ""
-                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.9; color: Qt.rgba(255, 255, 255, 0.4); Layout.alignment: Qt.AlignHCenter 
+                        Text {
+                            text: userName ? userName : ""
+                            font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.9; color: Qt.rgba(255, 255, 255, 0.4); Layout.alignment: Qt.AlignHCenter
                         }
                     }
 
@@ -153,53 +171,86 @@ Item {
 
                 Flickable {
                     anchors.fill: parent
-                    contentHeight: formColumn.implicitHeight + 100
+                    contentHeight: formColumn.implicitHeight + (isMobile ? 80 : 100)
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
 
                     ColumnLayout {
                         id: formColumn
-                        width: Math.min(650, parent.width - 100)
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: Math.min(600, parent.width - 100)
+                        //anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: isMobile ? 15 : 48
                         anchors.top: parent.top
-                        anchors.topMargin: 50
-                        spacing: 28
+                        anchors.topMargin: isMobile ? 20 : 50
+                        spacing: 20
 
                         Text {
                             text: qsTr("ACCOUNT INFORMATION")
                             font.family: "Outfit"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: text_primary
                         }
 
-                        Rectangle { Layout.fillWidth: true; height: 1; color: border_color; Layout.bottomMargin: 10 }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: border_color
+                            Layout.bottomMargin: isMobile ? 2 : 10
+                        }
 
                         GridLayout {
-                            columns: isSmallScreen ? 1 : 2
-                            columnSpacing: 28; rowSpacing: 24; Layout.fillWidth: true
+                            columns: isMobile ? 1 : 2
+                            columnSpacing: 28
+                            rowSpacing: 24
+                            Layout.fillWidth: true
 
                             // Full Name
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
-                                Text { text: qsTr("Full Name"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                Text {
+                                    text: qsTr("Full Name")
+                                    font.family: "Outfit"
+                                    font.pointSize: ScreenTools.smallFontPointSize
+                                    font.bold: true
+                                    color: text_primary
+                                }
+
                                 Rectangle {
-                                    Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+                                    Layout.fillWidth: true
+                                    height: 56
+                                    radius: 10
+                                    color: "#f8fafc"
                                     border.color: nameField.activeFocus ? accent_color : border_color
                                     border.width: nameField.activeFocus ? 2 : 1
                                     
-                                    QGCColoredImage {
-                                        id: nameIcon
-                                        source: "qrc:/InstrumentValueIcons/contacts.svg"; width: 22; height: 22
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left; anchors.leftMargin: 16
-                                        color: nameField.activeFocus ? accent_color : text_muted
-                                    }
+                                    // QGCColoredImage {
+                                    //     id: nameIcon
+                                    //     source: "qrc:/InstrumentValueIcons/contacts.svg"
+                                    //width: 22
+                                    //height: 22
+                                    //     anchors.verticalCenter: parent.verticalCenter
+                                    //     anchors.left: parent.left
+                                    //anchors.leftMargin: 16
+                                    //     color: nameField.activeFocus ? accent_color : text_muted
+                                    // }
+
                                     TextField {
                                         id: nameField
-                                        anchors.left: nameIcon.right
+                                        anchors.left: parent.left        // was: nameIcon.right
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 10; anchors.rightMargin: 12
-                                        text: displayName; background: null; selectByMouse: true; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
-                                        horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Enter Full Name")
+                                        anchors.leftMargin: 14           // was: 10 (match email field margin)
+                                        anchors.rightMargin: 12
+                                        text: displayName
+                                        background: null
+                                        selectByMouse: true
+                                        color: text_primary
+                                        font.family: "Outfit"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        horizontalAlignment: Qt.AlignLeft
+                                        verticalAlignment: Qt.AlignVCenter
+                                        placeholderText: qsTr("Enter Full Name")
                                     }
                                 }
                             }
@@ -213,21 +264,30 @@ Item {
                                     border.color: usernameField.activeFocus ? accent_color : border_color
                                     border.width: usernameField.activeFocus ? 2 : 1
                                     
-                                    QGCColoredImage {
-                                        id: userIcon
-                                        source: "qrc:/qmlimages/NewImages/accountUpdate_black.svg"; width: 22; height: 22
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left; anchors.leftMargin: 16
-                                        color: usernameField.activeFocus ? accent_color : text_muted
-                                    }
+                                    // QGCColoredImage {
+                                    //     id: userIcon
+                                    //     source: "qrc:/qmlimages/NewImages/accountUpdate_black.svg"; width: 22; height: 22
+                                    //     anchors.verticalCenter: parent.verticalCenter
+                                    //     anchors.left: parent.left; anchors.leftMargin: 16
+                                    //     color: usernameField.activeFocus ? accent_color : text_muted
+                                    // }
+
                                     TextField {
                                         id: usernameField
-                                        anchors.left: userIcon.right
+                                        anchors.left: parent.left        // was: nameIcon.right
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 10; anchors.rightMargin: 12
-                                        text: userName; background: null; selectByMouse: true; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
-                                        horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Username")
+                                        anchors.leftMargin: 14           // was: 10 (match email field margin)
+                                        anchors.rightMargin: 12
+                                        text: userName
+                                        background: null
+                                        selectByMouse: true
+                                        color: text_primary
+                                        font.family: "Outfit"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        horizontalAlignment: Qt.AlignLeft
+                                        verticalAlignment: Qt.AlignVCenter
+                                        placeholderText: qsTr("Username")
                                     }
                                 }
                             }
@@ -242,17 +302,28 @@ Item {
                                     border.width: emailField.activeFocus ? 2 : 1
                                     
                                     /* Email Icon removed for more space */
-                                    Item { id: emailIcon; width: 0; height: 0 }
+                                    // Item { id: emailIcon; width: 0; height: 0 }
+
                                     TextField {
                                         id: emailField
-                                        anchors.left: parent.left
+                                        anchors.left: parent.left        // was: nameIcon.right
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 14; anchors.rightMargin: 14
-                                        text: MapGlobals.userEmail; background: null; selectByMouse: true; color: "#1e293b"; font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
-                                        clip: true; selectionColor: accent_color; selectedTextColor: "white"
-                                        horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Email")
-                                        onActiveFocusChanged: if(activeFocus) cursorPosition = 0
+                                        anchors.leftMargin: 14           // was: 10 (match email field margin)
+                                        anchors.rightMargin: 12
+                                        text: userEmail
+                                        background: null
+                                        selectByMouse: true
+                                        color: text_primary
+                                        font.family: "Outfit"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        //clip: true
+                                        //selectionColor: accent_color
+                                        //selectedTextColor: "white"
+                                        horizontalAlignment: Qt.AlignLeft
+                                        verticalAlignment: Qt.AlignVCenter
+                                        placeholderText: qsTr("Emailllllll")
+                                        //onActiveFocusChanged: if(activeFocus) cursorPosition = 0
                                     }
                                 }
                             }
@@ -266,21 +337,31 @@ Item {
                                     border.color: mobileField.activeFocus ? accent_color : border_color
                                     border.width: mobileField.activeFocus ? 2 : 1
                                     
-                                    QGCColoredImage {
-                                        id: phoneIcon
-                                        source: "qrc:/InstrumentValueIcons/phone-incoming.svg"; width: 22; height: 22
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left; anchors.leftMargin: 16
-                                        color: mobileField.activeFocus ? accent_color : text_muted
-                                    }
+                                    // QGCColoredImage {
+                                    //     id: phoneIcon
+                                    //     source: "qrc:/InstrumentValueIcons/phone-incoming.svg"; width: 22; height: 22
+                                    //     anchors.verticalCenter: parent.verticalCenter
+                                    //     anchors.left: parent.left; anchors.leftMargin: 16
+                                    //     color: mobileField.activeFocus ? accent_color : text_muted
+                                    // }
+
                                     TextField {
                                         id: mobileField
-                                        anchors.left: phoneIcon.right
+                                        anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        anchors.leftMargin: 10; anchors.rightMargin: 12
-                                        text: mobileNo_from_db; background: null; selectByMouse: true; inputMethodHints: Qt.ImhDigitsOnly; color: text_primary; font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
-                                        horizontalAlignment: Qt.AlignLeft; verticalAlignment: Qt.AlignVCenter; placeholderText: qsTr("Mobile No.")
+                                        anchors.leftMargin: 14           // was: 10 (match email field margin)
+                                        anchors.rightMargin: 12
+                                        text: mobileNo
+                                        background: null
+                                        selectByMouse: true
+                                        inputMethodHints: Qt.ImhDigitsOnly
+                                        color: text_primary
+                                        font.family: "Outfit"
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        horizontalAlignment: Qt.AlignLeft
+                                        verticalAlignment: Qt.AlignVCenter
+                                        placeholderText: qsTr("Mobile No.")
                                     }
                                 }
                             }
@@ -288,25 +369,52 @@ Item {
 
                         // RPC Question
                         ColumnLayout {
-                            Layout.fillWidth: true; spacing: 14; Layout.topMargin: 8
-                            Text { text: qsTr("Have you completed the RPC?"); font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true; color: text_primary }
+                            Layout.fillWidth: true
+                            spacing: 14
+                            Layout.topMargin: 8
+                            Text { text: qsTr("Have you completed the RPC?")
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.bold: true
+                                color: text_primary }
                             RowLayout {
                                 spacing: 16
+
                                 Repeater {
-                                    model: [{label: qsTr("Yes, Certified"), val: 1}, {label: qsTr("Not Yet"), val: 0}]
+                                    model: [
+                                        { label: qsTr("Yes, Certified"), val: 1 },
+                                        { label: qsTr("Not Yet"),        val: 0 }
+                                    ]
                                     Rectangle {
-                                        Layout.preferredWidth: 160; Layout.preferredHeight: 46; radius: 23
-                                        color: rpcCompletedStatus === modelData.val ? accent_color : "white"
+                                        Layout.preferredWidth: 160
+                                        Layout.preferredHeight: 46
+                                        radius: 23
+                                        color:        rpcCompletedStatus === modelData.val ? accent_color : "white"
                                         border.color: rpcCompletedStatus === modelData.val ? accent_color : border_color
                                         border.width: 1
-                                        Text { anchors.centerIn: parent; text: modelData.label; color: rpcCompletedStatus === modelData.val ? "white" : text_primary; font.family: "Outfit"; font.bold: rpcCompletedStatus === modelData.val }
-                                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: rpcCompletedStatus = modelData.val }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text:      modelData.label
+                                            color:     rpcCompletedStatus === modelData.val ? "white" : text_primary
+                                            font.family: "Outfit"
+                                            font.bold: rpcCompletedStatus === modelData.val
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                rpcCompletedStatus = modelData.val
+                                                console.log("rpcCompletedStatus : ", modelData.val)
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        Item { Layout.preferredHeight: 32 }
+                        Item { Layout.preferredHeight: isMobile ? 20 : 32 }
 
                         // Update Button
                         Button {
@@ -329,11 +437,25 @@ Item {
                                 if (!MapGlobals.validateDisplayName(nameField.text, nameField)) return;
                                 if (!MapGlobals.validateEmail(emailField.text, emailField)) return;
 
-                                MapGlobals.updateUser(userName, usernameField.text, nameField.text, emailField.text, mobileNo_from_db, rpcCompletedStatus, function(result) {
+                                MapGlobals.updateUser(userName, usernameField.text, nameField.text, emailField.text, mobileField.text, rpcCompletedStatus, function(result) {
                                     if (result) {
                                         QGroundControl.saveGlobalSetting("username", usernameField.text);
                                         QGroundControl.saveGlobalSetting("name", nameField.text);
                                         QGroundControl.saveGlobalSetting("email", emailField.text);
+                                        QGroundControl.saveGlobalSetting("mobileNo", mobileField.text);
+
+                                        QGroundControl.saveGlobalSetting("rpcStatus",rpcCompletedStatus.toString());
+
+                                        MapGlobals.rpcStatus = rpcCompletedStatus
+                                        MapGlobals.userName = usernameField.text
+                                        MapGlobals.userEmail = emailField.text
+                                        MapGlobals.displayName = nameField.text
+                                        MapGlobals.mobileNo = mobileField.text
+
+                                        console.log("mobileNumber",mobileField.text)
+
+                                        console.log("rpcCompletedStatus in save button : ",rpcCompletedStatus)
+
                                         if (MapGlobals.rootWindow) MapGlobals.rootWindow.showToastMessage(qsTr("Profile updated successfully!"));
                                         accountUpdateRoot.updated();
                                     }
@@ -345,4 +467,5 @@ Item {
             }
         }
     }
+
 }

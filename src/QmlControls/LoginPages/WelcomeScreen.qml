@@ -371,51 +371,87 @@ Item {
                                     }
                                 }
                             }
+
                             onClicked: {
                                 if (loginUser.text.trim() === "" || loginPass.text === "") {
                                     rootWindow.showToastMessage("Please fill all fields")
                                     return
                                 }
 
-                                // Direct login with correct API endpoint
-                                var xhr = new XMLHttpRequest();
-                                var url = MapGlobals.backendUrl +'/login';
-                                xhr.open('POST', url, true);
-                                xhr.setRequestHeader('Content-Type', 'application/json');
+                                var xhr = new XMLHttpRequest()
+                                var url = MapGlobals.backendUrl + "/login"
+
+                                xhr.open("POST", url, true)
+                                xhr.setRequestHeader("Content-Type", "application/json")
 
                                 xhr.onreadystatechange = function() {
+
                                     if (xhr.readyState === XMLHttpRequest.DONE) {
+
                                         if (xhr.status === 200) {
-                                            var response = JSON.parse(xhr.responseText);
-                                            if (response.success) {
-                                                rootWindow.showToastMessage("Login successful!");
-                                                // Save user data
-                                                QGroundControl.saveGlobalSetting("username", response.user.username);
-                                                QGroundControl.saveGlobalSetting("name", response.user.displayname);
-                                                QGroundControl.saveGlobalSetting("email", response.user.email);
-                                                QGroundControl.saveBoolGlobalSetting("login", true);
-                                                // Clear fields
-                                                loginUser.text = "";
-                                                loginPass.text = "";
-                                                // Go to homescreen
-                                                MapGlobals.rootWindow.homescreen();
+
+                                            var response = JSON.parse(xhr.responseText)
+
+                                            if (response.success && response.user) {
+
+                                                rootWindow.showToastMessage("Login successful!")
+
+                                                // Save fresh user data
+                                                QGroundControl.saveGlobalSetting("username", response.user.username || "")
+                                                QGroundControl.saveGlobalSetting("name", response.user.displayname || "")
+                                                QGroundControl.saveGlobalSetting("email", response.user.email || "")
+                                                QGroundControl.saveGlobalSetting("mobileNo", response.user.mobile_number || "")
+                                                QGroundControl.saveGlobalSetting(
+                                                            "rpcStatus",
+                                                            String(response.user.rpc_completed ?? -1)
+                                                            )
+
+                                                QGroundControl.saveBoolGlobalSetting("login", true)
+
+                                                // Update runtime globals immediately
+                                                MapGlobals.userName     = response.user.username || ""
+                                                MapGlobals.displayName  = response.user.displayname || ""
+                                                MapGlobals.userEmail    = response.user.email || ""
+                                                MapGlobals.mobileNo     = response.user.mobile_number || ""
+                                                MapGlobals.rpcStatus    = Number(response.user.rpc_completed ?? -1)
+
+                                                console.log("username:", MapGlobals.userName)
+                                                console.log("mobile:", MapGlobals.mobileNo)
+                                                console.log("rpc:", MapGlobals.rpcStatus)
+
+                                                // Clear login form
+                                                loginUser.text = ""
+                                                loginPass.text = ""
+
+                                                // Navigate
+                                                MapGlobals.rootWindow.homescreen()
+
                                             } else {
-                                                rootWindow.showToastMessage(response.message || "Login failed");
+
+                                                rootWindow.showToastMessage(
+                                                            response.message || "Login failed"
+                                                            )
                                             }
+
                                         } else {
-                                            rootWindow.showToastMessage("Login failed. Server error: " + xhr.status);
+
+                                            rootWindow.showToastMessage(
+                                                        "Login failed. Server error: " + xhr.status
+                                                        )
                                         }
                                     }
-                                };
+                                }
 
                                 xhr.onerror = function() {
-                                    rootWindow.showToastMessage("Network error. Check your connection.");
-                                };
+                                    rootWindow.showToastMessage(
+                                                "Network error. Check your connection."
+                                                )
+                                }
 
                                 xhr.send(JSON.stringify({
                                                             userInput: loginUser.text.trim(),
                                                             password: loginPass.text
-                                                        }));
+                                                        }))
                             }
                         }
 
@@ -937,6 +973,7 @@ Item {
                                 }
                             }
                         }
+
                         // Password
                         Column {
                             width: parent.width

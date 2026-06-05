@@ -69,12 +69,7 @@ ListModel {
         pageVisible: function() { return true }
     }
 
-    ListElement {
-        name: qsTr("Airspace")
-        url: "/qml/AirspaceSettings.qml"
-        iconUrl: "qrc:/InstrumentValueIcons/globe.svg"
-        pageVisible: function() { return true }
-    }
+
 
     ListElement {
         name: qsTr("PX4 Log Transfer")

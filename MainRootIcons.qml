@@ -315,16 +315,19 @@ Item {
                                 typeNameSuffix: "street"
                                 iconSource: "map_default.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Satellite")
                                 typeNameSuffix: "satellite"
                                 iconSource: "map_satellite.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Terrain")
                                 typeNameSuffix: "terrain"
                                 iconSource: "map_terrain.jpeg"
                             }
+
                             MapIconColumn {
                                 label: qsTr("Hybrid")
                                 typeNameSuffix: "hybrid"
@@ -427,6 +430,7 @@ Item {
                                     anchors.fill: parent
                                     onClicked: {
                                         console.log("MapRedirect1 clicked");
+
                                         MapGlobals.recenterMap();
 
                                         if(flightMap && flightMap.gcsPosition.isValid){
@@ -445,17 +449,17 @@ Item {
                 }
             }
 
-            QGCCompassWidget {
-                id:                     compass
-                //anchors.centerIn: parent
-                size:                   _innerRadius * 2.5
+            // QGCCompassWidget {
+            //     id:                     compass
+            //     //anchors.centerIn: parent
+            //     size:                   _innerRadius * 2.5
 
-                                        Layout.preferredHeight: baseSize * 1.5
-                Layout.preferredWidth:  baseSize * 1.5
-                Layout.alignment:       Qt.AlignVCenter
-                vehicle:                _activeVehicle
-                visible :               _activeVehicle
-            }
+            //                             Layout.preferredHeight: baseSize * 1.5
+            //     Layout.preferredWidth:  baseSize * 1.5
+            //     Layout.alignment:       Qt.AlignVCenter
+            //     vehicle:                _activeVehicle
+            //     visible :               _activeVehicle
+            // }
 
         }
 

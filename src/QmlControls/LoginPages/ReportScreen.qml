@@ -38,28 +38,38 @@ Item {
     Component.onCompleted: loadSessions()
 
     function loadSessions() {
-        sessionModel.clear();
-        MapGlobals.getAllSessions(function(sessions) {
-            var total = 0;
-            for (var i = 0; i < sessions.length; i++) {
-                var session = sessions[i];
-                sessionModel.append({
-                    id: session.id,
-                    date: session.date || "N/A",
-                    start_time: session.start_time || "--:--",
-                    end_time: session.end_time || "--:--",
-                    duration: session.duration || 0
-                });
-                total += Number(session.duration || 0);
+        sessionModel.clear()
+        MapGlobals.getAllSessions(function(sessions, error) {
+            if (error || sessions.length === 0) {
+                console.warn("Cloud fetch failed or empty, falling back to local DB")
+                MapGlobals.getAllSessions(function(localSessions) {
+                    populateSessionModel(localSessions)
+                })
+            } else {
+                populateSessionModel(sessions)
             }
-            
-            totalMinutes = total;
-            missionsCompleted = sessions.length;
-            
-            var hours = Math.floor(total / 60);
-            var minutes = total % 60;
-            totalDurationFormatted = hours + "h " + minutes + "m";
-        });
+        })
+    }
+
+    function populateSessionModel(sessions) {
+        sessionModel.clear()
+        var total = 0
+        for (var i = 0; i < sessions.length; i++) {
+            var session = sessions[i]
+            sessionModel.append({
+                id:         session.id        || 0,
+                date:       session.date      || "N/A",
+                start_time: session.start_time || "--:--",
+                end_time:   session.end_time   || "--:--",
+                duration:   session.duration   || 0
+            })
+            total += Number(session.duration || 0)
+        }
+        totalMinutes = total
+        missionsCompleted = sessions.length
+        var hours   = Math.floor(total / 60)
+        var minutes = total % 60
+        totalDurationFormatted = hours + "h " + minutes + "m"
     }
 
     Rectangle {

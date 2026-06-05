@@ -15,8 +15,8 @@ import QGroundControl.Palette
 /// Mission item edit control
 Rectangle {
     id:             _root
-    height:         mainColumn.height
-    clip:           true
+    height: mainColumn.implicitHeight
+    clip:           false
 
     gradient: Gradient {
         GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.41) }
@@ -25,8 +25,8 @@ Rectangle {
 
     radius:         ScreenTools.defaultFontPixelHeight * 0.45
     opacity:        _currentItem ? 1.0 : 0.75
-    border.width:   1
-    border.color:   _currentItem ? "#8a6cad" : "#3d2455"
+    border.width:   0
+    border.color:   "transparent"
 
     property var    map                 ///< Map control
     property var    masterController
@@ -90,13 +90,14 @@ Rectangle {
     Column {
         id:     mainColumn
         width:  parent.width
+        height: implicitHeight
         spacing: 0
 
         // ── Top row: label + Edit button ──────────────────────────────────
         Item {
             id:                 topRowLayout
             width:              parent.width
-            height:             ScreenTools.defaultFontPixelHeight * 2.5
+            height: ScreenTools.defaultFontPixelHeight * 3.2
 
 
 
@@ -195,34 +196,38 @@ Rectangle {
                 }
             }
 
-            QGCButton {
+            Rectangle {
                 id:                     editItemBtn
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right:          parent.right
                 anchors.rightMargin:    ScreenTools.defaultFontPixelWidth * 0.5
                 height:                 ScreenTools.defaultFontPixelHeight * 1.5
-                width:                  ScreenTools.defaultFontPixelWidth * 6
-                text:                   qsTr("Edit")
+                width:                  ScreenTools.defaultFontPixelHeight * 1.5
+                
+                visible: missionItem.commandName === "Mission Start" ||
+                         missionItem.commandName === "Survey" || missionItem.commandName === "Spot Spraying"
 
-                // visible:                (missionItem.commandName === "Mission Start" ||
-                //                          missionItem.commandName === "Survey") && MapGlobals.isReviewMode
+                color:  editMouseArea.pressed ? "#444" : "#222"
+                radius: ScreenTools.defaultFontPixelHeight * 0.2
+                border.color: "white"
+                border.width: 1
 
-                visible:                true // Allow editing all items via left popup
-
-                onClicked:              editItemClicked(missionItem)
-
-                background: Rectangle {
-                    color:  editItemBtn.pressed ? "#444" : "#222"
-                    radius: ScreenTools.defaultFontPixelHeight * 0.2
-                    border.color: "white"
-                    border.width: 1
+                QGCColoredImage {
+                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                    color: "white"
+                    fillMode: Image.PreserveAspectFit
+                    mipmap: true
+                    smooth: true
+                    anchors.centerIn: parent
+                    width: parent.height * 0.4
+                    height: parent.height * 0.4
                 }
-                contentItem: Text {
-                    text:                   editItemBtn.text
-                    color:                  "white"
-                    font.pointSize:         ScreenTools.smallFontPointSize
-                    horizontalAlignment:    Text.AlignHCenter
-                    verticalAlignment:      Text.AlignVCenter
+
+                MouseArea {
+                    id: editMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: editItemClicked(missionItem)
                 }
             }
         } // topRowLayout Item

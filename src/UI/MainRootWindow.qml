@@ -21,6 +21,9 @@ import QGroundControl.ScreenTools
 import QGroundControl.FlightDisplay
 import QGroundControl.FlightMap
 
+import QtPositioning
+import QGroundControl.QGCPositionManager
+
 
 import QGroundControl.UTMSP
 import QGroundControl.Palette
@@ -54,6 +57,8 @@ ApplicationWindow {
     property alias  optionChecked:      optionCheckBox.checked
 
     property var _appSettings: QGroundControl.settingsManager.appSettings
+
+    property var _gcsPosition: QGroundControl.qgcPositionManager.gcsPosition
 
     QGCCheckBox {
         id:                 optionCheckBox
@@ -894,12 +899,13 @@ ApplicationWindow {
 
         ListModel {
             id: tabModel
-            ListElement { image: "/qmlimages/NewImages/settings.svg"; file: "GeneralSettings.qml"; title: "General Settings" }
-            ListElement { image: "qrc:/InstrumentValueIcons/globe.svg"; file: "AirspaceSettings.qml"; title: "Airspace" }
-            ListElement { image: "/qmlimages/NewImages/failsafe.svg"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
-            ListElement { image: "/qmlimages/NewImages/callibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
-            ListElement { image: "/qmlimages/NewImages/parameterSettings.svg"; file: "BasicParameters.qml"; title: "Parameters" }
-            ListElement { image: "/qmlimages/FirmwareUpgradeIcon.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
+            ListElement { image: "/qmlimages/NewImages/settings.png"; file: "GeneralSettings.qml"; title: "General Settings" }
+            ListElement { image: "/qmlimages/NewImages/camera.png"; file: "VideoSettings.qml"; title: "Camera" }
+            ListElement { image: "/qmlimages/NewImages/airspace.png"; file: "AirspaceSettings.qml"; title: "Airspace" }
+            ListElement { image: "/qmlimages/NewImages/failsafe.png"; file: "APMSafetyComponent.qml"; title: "Fail Safe" }
+            ListElement { image: "/qmlimages/NewImages/calibration.png"; file: "APMSensorsComponent.qml"; title: "Calibration" }
+            ListElement { image: "/qmlimages/NewImages/parameters.png"; file: "BasicParameters.qml"; title: "Parameters" }
+            ListElement { image: "/qmlimages/NewImages/firmware.png"; file: "FirmwareUpgrade.qml"; title: "Firmware" }
             //ListElement { image: "/qmlimages/NewImages/commlinks.svg"; file: "LinkSettings.qml"; title: "Info" }
 
             // Update when activeVehicle changes
@@ -914,10 +920,10 @@ ApplicationWindow {
             function updateSettingsTab() {
                 if (activeVehicle) {
 
-                    tabModel.setProperty(3, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
+                    tabModel.setProperty(4, "file", "qrc:/qml/SettingsPanel/CalibrationSettings.qml");
 
                 } else {
-                    tabModel.setProperty(3, "file", "APMSensorsComponent.qml");
+                    tabModel.setProperty(4, "file", "APMSensorsComponent.qml");
                 }
             }
         }
@@ -1012,7 +1018,7 @@ ApplicationWindow {
                                         width: 20
                                         height: 20
                                         source: model.image
-                                        color: sidebarList.currentIndex === index ? app_color : "#666666"
+                                        color: "transparent"//sidebarList.currentIndex === index ? app_color : "#666666"
                                     }
 
                                     Text {
@@ -1148,6 +1154,7 @@ ApplicationWindow {
 
         readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
         readonly property real _iconSize: _btnSize * 0.55
+
         Rectangle {
             id:         utmIndicatorBtn
             Layout.alignment: Qt.AlignLeft
@@ -1244,7 +1251,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1471,11 +1478,11 @@ ApplicationWindow {
                     mainWindow.closefile()
                 }
 
-
             }
 
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
+
                 QGCLabel {
                     text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
                     Layout.fillWidth: true
@@ -1834,8 +1841,8 @@ ApplicationWindow {
                         //   Linux:   "file:///home/u/f.kml"  → "/home/u/f.kml"  (restore leading /)
                         var stripped = fileStr.slice(8)
                         localPath = (stripped.charAt(1) === ":")
-                                  ? stripped
-                                  : "/" + stripped
+                                ? stripped
+                                : "/" + stripped
                     } else if (fileStr.startsWith("file://")) {
                         localPath = fileStr.slice(7)
                     } else if (fileStr.startsWith("content://")) {
@@ -1859,6 +1866,7 @@ ApplicationWindow {
                     MapGlobals.share_edit_visibility = false
                     MapGlobals.isReviewMode          = false
                     MapGlobals.showMissionItems      = false
+
                     mainWindow.showPlanView()
                     dialog.visible = false
                     planView.data1()
@@ -2094,26 +2102,41 @@ ApplicationWindow {
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
+
                     MouseArea {
                         id: ma5; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            QGroundControl.saveGlobalSetting("mapping", "agri")
-                            planView.mapclear()
-                            MapGlobals.mark_with = "Mark_With_GPS"
 
-                            //Disable Spot Spraying Options
-                            MapGlobals.isSpotSprayingActive = false
+                            if(MapGlobals.activeFlightMap && _gcsPosition.isValid) {
 
-                            MapGlobals.edit = "edit"
-                            MapGlobals.share_edit_visibility = false
-                            MapGlobals.isReviewMode = false
-                            MapGlobals.showMissionItems = false
+                                QGroundControl.saveGlobalSetting("mapping", "agri")
+                                planView.mapclear()
+                                MapGlobals.mark_with = "Mark_With_GPS"
 
-                            //Grid Lines set to false
-                            MapGlobals.setGridLines(false)
+                                //Disable Spot Spraying Options
+                                MapGlobals.isSpotSprayingActive = false
 
-                            mainWindow.showPlanView(); dialog.visible = false; planView.data1()
+                                MapGlobals.edit = "edit"
+                                MapGlobals.share_edit_visibility = false
+                                MapGlobals.isReviewMode = false
+                                MapGlobals.showMissionItems = false
+
+                                //Grid Lines set to false
+                                MapGlobals.setGridLines(false)
+
+                                mainWindow.showPlanView();
+
+                                planView.data1();
+
+                                dialog.visible = false;
+
+                            } else {
+
+                                mainWindow.showToastMessage("GPS Not Set")
+                                dialog.visible = false;
+
+                            }
                         }
                     }
                 }
@@ -2154,7 +2177,11 @@ ApplicationWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             dialog._kmlForSpotSpraying = false
+                            MapGlobals.isSpotSprayingActive = false
                             kmlFileDialog.open()
+
+                            //Disable Spot Spraying Options
+                            MapGlobals.isSpotSprayingActive = false
                         }
                     }
                 }
@@ -2168,7 +2195,6 @@ ApplicationWindow {
                     color:         maSpot.containsMouse ? "#1e1e1e" : "#161616"
                     border.color:  maSpot.containsMouse ? app_color : "#2e2e2e"
                     border.width:  maSpot.containsMouse ? 2 : 1
-                    visible: true // Always visible or Agri only? User said "in select mission type", usually implying always.
 
                     Column {
                         anchors.centerIn: parent
@@ -2192,6 +2218,7 @@ ApplicationWindow {
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
                     }
+
                     MouseArea {
                         id: maSpot; anchors.fill: parent; hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor

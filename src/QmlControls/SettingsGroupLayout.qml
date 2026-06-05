@@ -29,10 +29,10 @@ ColumnLayout {
     ColumnLayout {
         Layout.leftMargin:  _margins
         Layout.fillWidth:   true
-        spacing:            20
+        spacing:            2
         visible:            heading !== ""
-        Layout.topMargin:    20     // 🔼 top padding
-        Layout.bottomMargin: 20     // 🔽 bottom padding
+        Layout.topMargin:    0     // 🔼 top padding
+        Layout.bottomMargin: 0     // 🔽 bottom padding
 
         QGCLabel {
             text:           heading

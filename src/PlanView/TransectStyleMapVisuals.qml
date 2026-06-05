@@ -116,7 +116,7 @@ Item {
             line.width: MapGlobals.gridLineWidth
             z:          QGroundControl.zOrderMapItems
             path:       _transectPoints
-            visible:    gridLines
+            visible:   gridLines
             opacity:    _root.opacity
         }
     }
@@ -336,6 +336,7 @@ Item {
                    }
                }
 
+
                onClicked: {
                    console.log("Edit clicked")
                    if(_root.interactive) _root.clicked(_missionItem.sequenceNumber)
@@ -346,4 +347,5 @@ Item {
                }
            }
        }
+
 }

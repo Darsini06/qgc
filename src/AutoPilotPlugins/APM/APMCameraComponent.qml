@@ -212,191 +212,183 @@ SetupPage {
                 //      property bool servoReverseIsBool
                 //      property int rcFunction
 
-                Item {
-                    width:  rectangle.x + rectangle.width
-                    height: rectangle.y + rectangle.height
+                Column {
+                    spacing: _margins / 2
 
                     QGCLabel {
                         id:         directionLabel
                         text:       qsTr("Gimbal ") + directionTitle
                         font.bold:   true
+                        color:      "black"
                     }
 
                     Rectangle {
                         id:                 rectangle
-                        anchors.topMargin:  _margins / 2
-                        anchors.left:       parent.left
-                        anchors.top:        directionLabel.bottom
-                        width:              mountAngMaxField.x + mountAngMaxField.width + _margins
-                        height:             servoPWMMaxField.y + servoPWMMaxField.height + _margins
-                        color:              qgcPal.windowShade
+                        width:              innerColumn.width + (_margins * 2)
+                        height:             innerColumn.height + (_margins * 2)
+                        color:              "white"
+                        border.color:       "black"
+                        border.width:       1
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
-                        FactCheckBox {
-                            id:                 mountStabCheckBox
-                            anchors.topMargin:  _margins
-                            anchors.left:       servoReverseCheckBox.left
-                            anchors.top:        parent.top
-                            text:               qsTr("Stabilize")
-                            fact:               mountStabFact
-                            checkedValue:       1
-                            uncheckedValue:     0
-                            enabled:            directionEnabled
-                        }
-
-                        FactCheckBox {
-                            id:                 servoReverseCheckBox
-                            anchors.margins:    _margins
-                            anchors.top:        mountStabCheckBox.bottom
-                            anchors.right:       parent.right
-                            text:               qsTr("Servo reverse")
-                            checkedValue:       _servoReverseIsBool ? 1 : -1
-                            uncheckedValue:     _servoReverseIsBool ? 0 : 1
-                            fact:               servoReverseFact
-                            enabled:            directionEnabled
-
-                            property bool _servoReverseIsBool: servoReverseIsBool
-                        }
-
-                        QGCLabel {
-                            id:                 gimbalOutLabel
-                            anchors.margins:    _margins
-                            anchors.left:       parent.left
-                            anchors.baseline:   gimbalOutCombo.baseline
-                            text:               qsTr("Output channel:")
-                        }
-
-                        QGCComboBox {
-                            id:                 gimbalOutCombo
+                        Column {
+                            id:                 innerColumn
                             anchors.margins:    _margins
                             anchors.top:        parent.top
-                            anchors.left:       gimbalOutLabel.right
-                            width:              mountAngMinField.width
-                            model:              gimbalOutModel
-                            textRole:           "text"
-                            currentIndex:       gimbalOutIndex
-
-                            onActivated: (index) => { setRCFunction(gimbalOutModel.get(index).value, rcFunction) }
-                        }
-
-                        QGCLabel {
-                            id:                 mountRcInLabel
-                            anchors.margins:    _margins
                             anchors.left:       parent.left
-                            anchors.baseline:   mountRcInCombo.baseline
-                            text:               qsTr("Input channel:")
-                            enabled:            directionEnabled
-                        }
+                            spacing:            _margins
 
-                        FactComboBox {
-                            id:                 mountRcInCombo
-                            anchors.topMargin:  _margins / 2
-                            anchors.top:        gimbalOutCombo.bottom
-                            anchors.left:       gimbalOutCombo.left
-                            width:              mountAngMinField.width
-                            fact:               mountRcInFact
-                            indexModel:         false
-                            enabled:            directionEnabled
-                        }
+                            Row {
+                                spacing: _margins
+                                QGCLabel {
+                                    id:                 gimbalOutLabel
+                                    anchors.baseline:   gimbalOutCombo.baseline
+                                    text:               qsTr("Output channel:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
 
-                        QGCLabel {
-                            id:                 mountAngLabel
-                            anchors.margins:    _margins
-                            anchors.left:       parent.left
-                            anchors.baseline:   mountAngMinField.baseline
-                            text:               qsTr("Gimbal angle limits:")
-                            enabled:            directionEnabled
-                        }
+                                QGCComboBox {
+                                    id:                 gimbalOutCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 12
+                                    model:              gimbalOutModel
+                                    textRole:           "text"
+                                    currentIndex:       gimbalOutIndex
 
-                        QGCLabel {
-                            id:                 mountAngMinLabel
-                            anchors.margins:    _margins
-                            anchors.left:       mountAngLabel.right
-                            anchors.baseline:   mountAngMinField.baseline
-                            text:               qsTr("min")
-                            enabled:            directionEnabled
-                        }
+                                    onActivated: (index) => { setRCFunction(gimbalOutModel.get(index).value, rcFunction) }
+                                }
+                            }
 
-                        FactTextField {
-                            id:                 mountAngMinField
-                            anchors.margins:    _margins
-                            anchors.top:        mountRcInCombo.bottom
-                            anchors.left:       mountAngMinLabel.right
-                            fact:               mountAngMinFact
-                            enabled:            directionEnabled
-                        }
+                            Row {
+                                spacing: _margins
+                                enabled: directionEnabled
 
-                        QGCLabel {
-                            id:                 mountAngMaxLabel
-                            anchors.margins:    _margins
-                            anchors.left:       mountAngMinField.right
-                            anchors.baseline:   mountAngMinField.baseline
-                            text:               qsTr("max")
-                            enabled:            directionEnabled
-                        }
+                                QGCLabel {
+                                    id:                 mountRcInLabel
+                                    anchors.baseline:   mountRcInCombo.baseline
+                                    text:               qsTr("Input channel:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
 
-                        FactTextField {
-                            id:                 mountAngMaxField
-                            anchors.leftMargin: _margins
-                            anchors.top:        mountAngMinField.top
-                            anchors.left:       mountAngMaxLabel.right
-                            fact:               mountAngMaxFact
-                            enabled:            directionEnabled
-                        }
+                                FactComboBox {
+                                    id:                 mountRcInCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 12
+                                    fact:               mountRcInFact
+                                    indexModel:         false
+                                }
+                            }
 
-                        QGCLabel {
-                            id:                 servoPWMLabel
-                            anchors.margins:    _margins
-                            anchors.left:       parent.left
-                            anchors.baseline:   servoPWMMinField.baseline
-                            text:               qsTr("Servo PWM limits:")
-                            enabled:            directionEnabled
-                        }
+                            Row {
+                                spacing: _margins
+                                enabled: directionEnabled
 
-                        QGCLabel {
-                            id:                 servoPWMMinLabel
-                            anchors.left:       mountAngMinLabel.left
-                            anchors.baseline:   servoPWMMinField.baseline
-                            text:               qsTr("min")
-                            enabled:            directionEnabled
-                        }
+                                FactCheckBox {
+                                    id:                 mountStabCheckBox
+                                    text:               qsTr("Stabilize")
+                                    fact:               mountStabFact
+                                    checkedValue:       1
+                                    uncheckedValue:     0
+                                }
 
-                        FactTextField {
-                            id:                 servoPWMMinField
-                            anchors.topMargin:  _margins / 2
-                            anchors.leftMargin: _margins
-                            anchors.top:        mountAngMaxField.bottom
-                            anchors.left:       servoPWMMinLabel.right
-                            fact:               servoPWMMinFact
-                            enabled:            directionEnabled
-                        }
+                                FactCheckBox {
+                                    id:                 servoReverseCheckBox
+                                    text:               qsTr("Servo reverse")
+                                    checkedValue:       _servoReverseIsBool ? 1 : -1
+                                    uncheckedValue:     _servoReverseIsBool ? 0 : 1
+                                    fact:               servoReverseFact
 
-                        QGCLabel {
-                            id:                 servoPWMMaxLabel
-                            anchors.margins:    _margins
-                            anchors.left:       servoPWMMinField.right
-                            anchors.baseline:   servoPWMMinField.baseline
-                            text:               qsTr("max")
-                            enabled:            directionEnabled
-                        }
+                                    property bool _servoReverseIsBool: servoReverseIsBool
+                                }
+                            }
 
-                        FactTextField {
-                            id:                 servoPWMMaxField
-                            anchors.leftMargin: _margins
-                            anchors.top:        servoPWMMinField.top
-                            anchors.left:       servoPWMMaxLabel.right
-                            fact:               servoPWMMaxFact
-                            enabled:            directionEnabled
-                        }
+                            Row {
+                                id:                 angleLimitRow
+                                spacing:            _margins
+                                enabled:            directionEnabled
+                                property var _labelBaseline: mountAngMinField.baseline
+
+                                QGCLabel {
+                                    id:                 mountAngLabel
+                                    anchors.baseline:   angleLimitRow._labelBaseline
+                                    text:               qsTr("Gimbal angle limits:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                QGCLabel {
+                                    id:                 mountAngMinLabel
+                                    anchors.baseline:   angleLimitRow._labelBaseline
+                                    text:               qsTr("min")
+                                    color:              "black"
+                                }
+
+                                FactTextField {
+                                    id:                 mountAngMinField
+                                    fact:               mountAngMinFact
+                                }
+
+                                QGCLabel {
+                                    id:                 mountAngMaxLabel
+                                    anchors.baseline:   angleLimitRow._labelBaseline
+                                    text:               qsTr("max")
+                                    color:              "black"
+                                }
+
+                                FactTextField {
+                                    id:                 mountAngMaxField
+                                    fact:               mountAngMaxFact
+                                }
+                            }
+
+                            Row {
+                                id:                 servoLimitRow
+                                spacing:            _margins
+                                enabled:            directionEnabled
+                                property var _labelBaseline: servoPWMMinField.baseline
+
+                                QGCLabel {
+                                    id:                 servoPWMLabel
+                                    anchors.baseline:   servoLimitRow._labelBaseline
+                                    text:               qsTr("Servo PWM limits:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                QGCLabel {
+                                    id:                 servoPWMMinLabel
+                                    anchors.baseline:   servoLimitRow._labelBaseline
+                                    text:               qsTr("min")
+                                    color:              "black"
+                                }
+
+                                FactTextField {
+                                    id:                 servoPWMMinField
+                                    fact:               servoPWMMinFact
+                                }
+
+                                QGCLabel {
+                                    id:                 servoPWMMaxLabel
+                                    anchors.baseline:   servoLimitRow._labelBaseline
+                                    text:               qsTr("max")
+                                    color:              "black"
+                                }
+
+                                FactTextField {
+                                    id:                 servoPWMMaxField
+                                    fact:               servoPWMMaxFact
+                                }
+                            }
+                        } // Column
                     } // Rectangle
-                } // Item
+                } // Column
             } // Component - gimbalDirectionSettings
 
             Component {
                 id: gimbalSettings
 
-                Item {
-                    width:  rectangle.x + rectangle.width
-                    height: rectangle.y + rectangle.height
+                Column {
+                    spacing: _margins / 2
 
                     property Fact _mountDefaultMode:    controller.getParameterFact(-1, "MNT_DEFLT_MODE")
                     property Fact _mountType:           controller.getParameterFact(-1, "MNT_TYPE")
@@ -405,65 +397,71 @@ SetupPage {
                         id:             settingsLabel
                         text:           qsTr("Gimbal Settings")
                         font.bold:      true
+                        color:          "black"
                     }
 
                     Rectangle {
                         id:                 rectangle
-                        anchors.topMargin:  _margins / 2
-                        anchors.top:        settingsLabel.bottom
-                        width:              gimbalModeCombo.x + gimbalModeCombo.width + _margins
-                        height:             gimbalModeCombo.y + gimbalModeCombo.height + _margins
-                        color:              qgcPal.windowShade
+                        width:              innerColumn.width + (_margins * 2)
+                        height:             innerColumn.height + (_margins * 2)
+                        color:              "white"
+                        border.color:       "black"
+                        border.width:       1
+                        radius:             ScreenTools.defaultFontPixelHeight / 2
 
-                        QGCLabel {
-                            id:                 gimbalTypeLabel
+                        Column {
+                            id:                 innerColumn
                             anchors.margins:    _margins
-                            anchors.left:       parent.left
-                            anchors.baseline:   gimbalTypeCombo.baseline
-                            text:               qsTr("Type:")
-                        }
-
-                        FactComboBox {
-                            id:                 gimbalTypeCombo
-                            anchors.topMargin:  _margins
                             anchors.top:        parent.top
-                            anchors.left:       gimbalModeCombo.left
-                            width:              gimbalModeCombo.width
-                            fact:               _mountType
-                            indexModel:         false
-                        }
-
-                        QGCLabel {
-                            id:                     rebootLabel
-                            anchors.topMargin:      _margins / 2
-                            anchors.leftMargin:     _margins
-                            anchors.rightMargin:    _margins
-                            anchors.left:           parent.left
-                            anchors.right:          parent.right
-                            anchors.top:            gimbalTypeCombo.bottom
-                            wrapMode:               Text.WordWrap
-                            text:                   qsTr("Gimbal Type changes takes affect next reboot of autopilot")
-                        }
-
-                        QGCLabel {
-                            id:                 gimbalModeLabel
-                            anchors.margins:    _margins
                             anchors.left:       parent.left
-                            anchors.baseline:   gimbalModeCombo.baseline
-                            text:               qsTr("Default Mode:")
-                        }
+                            spacing:            _margins
 
-                        FactComboBox {
-                            id:                 gimbalModeCombo
-                            anchors.margins:    _margins
-                            anchors.top:        rebootLabel.bottom
-                            anchors.left:       gimbalModeLabel.right
-                            width:              ScreenTools.defaultFontPixelWidth * 15
-                            fact:               _mountDefaultMode
-                            indexModel:         false
-                        }
+                            Row {
+                                spacing: _margins
+                                QGCLabel {
+                                    id:                 gimbalTypeLabel
+                                    anchors.baseline:   gimbalTypeCombo.baseline
+                                    text:               qsTr("Type:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                FactComboBox {
+                                    id:                 gimbalTypeCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 15
+                                    fact:               _mountType
+                                    indexModel:         false
+                                }
+                            }
+
+                            QGCLabel {
+                                id:                     rebootLabel
+                                width:                  ScreenTools.defaultFontPixelWidth * 30
+                                wrapMode:               Text.WordWrap
+                                text:                   qsTr("Gimbal Type changes takes affect next reboot of autopilot")
+                                color:                  "black"
+                            }
+
+                            Row {
+                                spacing: _margins
+                                QGCLabel {
+                                    id:                 gimbalModeLabel
+                                    anchors.baseline:   gimbalModeCombo.baseline
+                                    text:               qsTr("Default Mode:")
+                                    color:              "black"
+                                    font.bold:          true
+                                }
+
+                                FactComboBox {
+                                    id:                 gimbalModeCombo
+                                    width:              ScreenTools.defaultFontPixelWidth * 15
+                                    fact:               _mountDefaultMode
+                                    indexModel:         false
+                                }
+                            }
+                        } // Column
                     } // Rectangle
-                } // Item
+                } // Column
             } // Component - gimbalSettings
 
             Loader {
