@@ -90,7 +90,7 @@ public:
     QString         devName     (void) const                 { return _device.name; }
     QString         address     (void) const;
     QStringList     nameList    (void) const                  { return _nameList; }
-    bool            scanning    (void) const                 { return _deviceDiscover != nullptr; }
+    bool            scanning    (void) const                 { return _scanActive; }
     BluetoothData   device      (void) const                  { return _device; }
     void            setDevName  (const QString& name);
 
@@ -121,8 +121,10 @@ signals:
 private:
 
     bool _isLocationEnabled();
+    void _cleanupDiscoveryAgent(bool deleteAgent);
 
     QBluetoothDeviceDiscoveryAgent* _deviceDiscover = nullptr;
+    bool                            _scanActive = false;
     BluetoothData                   _device;
     QStringList                     _nameList;
     QList<BluetoothData>            _deviceList;

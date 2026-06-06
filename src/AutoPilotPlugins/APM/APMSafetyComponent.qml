@@ -20,10 +20,41 @@ import QGroundControl.ScreenTools
 
 
 SetupPage {
-    id:             safetyPage
-    pageComponent:  safetyPageComponent
+    id:            safetyPage
+    pageComponent: QGroundControl.multiVehicleManager.activeVehicle ? safetyPageComponent : bannercomponent
 
-    property bool   showBorder:         true
+    property bool showBorder: true
+
+    Component {
+        id: bannercomponent
+
+        ColumnLayout {
+            width:            availableWidth
+            Layout.fillWidth: true
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            // NO FactPanelController here
+
+            Rectangle {
+                Layout.fillWidth:    true
+                Layout.maximumWidth: ScreenTools.defaultFontPixelWidth * 95
+                Layout.alignment:    Qt.AlignHCenter
+                height:              noDroneBannerLabel.implicitHeight + 24
+                color:               "#FFF3CD"
+                border.color:        "#FFC107"
+                border.width:        1
+                radius:              ScreenTools.defaultFontPixelHeight / 2
+
+                QGCLabel {
+                    id:               noDroneBannerLabel
+                    anchors.centerIn: parent
+                    text:             qsTr("Connect a drone to configure failsafe settings")
+                    color:            "#856404"
+                    font.bold:        true
+                }
+            }
+        }
+    }
 
     Component {
         id: safetyPageComponent
@@ -34,7 +65,7 @@ SetupPage {
             Layout.fillWidth:   true
             anchors.horizontalCenter: parent.horizontalCenter
 
-             FactPanelController { id: controller; }
+            FactPanelController { id: controller; }
 
             QGCPalette { id: ggcPal; colorGroupEnabled: true }
 
@@ -88,6 +119,7 @@ SetupPage {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                     }
+
                     FactComboBox {
                         fact:           failsafeBattLowAct
                         indexModel:     false
@@ -101,6 +133,7 @@ SetupPage {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                     }
+
                     FactComboBox {
                         fact:           failsafeBattCritAct
                         indexModel:     false
@@ -114,6 +147,7 @@ SetupPage {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                     }
+
                     FactTextField {
                         fact:           failsafeBattLowVoltage
                         showUnits:      true
@@ -153,6 +187,7 @@ SetupPage {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                     }
+
                     FactTextField {
                         fact:           failsafeBattCritMah
                         showUnits:      true
@@ -427,7 +462,6 @@ SetupPage {
                 Layout.fillWidth:   true
             }
 
-
             Component {
                 id: copterGeneralFS
 
@@ -501,6 +535,7 @@ SetupPage {
                                     Layout.alignment:      Qt.AlignVCenter
                                     Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                                 }
+
                                 FactComboBox {
                                     fact:             _failsafeGCSEnable
                                     indexModel:       false
@@ -515,6 +550,7 @@ SetupPage {
                                     Layout.alignment:      Qt.AlignVCenter
                                     Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                                 }
+
                                 QGCComboBox {
                                     model:            [qsTr("Disabled"), qsTr("Always RTL"), qsTr("Continue with Mission in Auto Mode"), qsTr("Always Land")]
                                     currentIndex:     _failsafeThrEnable.value
@@ -530,11 +566,13 @@ SetupPage {
                                     Layout.alignment:      Qt.AlignVCenter
                                     Layout.preferredWidth: _isNarrow ? -1 : (ScreenTools.defaultFontPixelWidth * 38)
                                 }
+
                                 FactTextField {
                                     fact:             _failsafeThrValue
                                     showUnits:        true
                                     Layout.fillWidth: true   // FIX 5: stretch into available space
                                 }
+
                             } // GridLayout
                         }     // RowLayout
                     }         // Rectangle

@@ -116,10 +116,12 @@ Item {
             anchors.fill: parent
             visible: false
             gradient: Gradient {
+
                 GradientStop {
                     position: 0.0
                     color: "#E0E0E0"
                 } // Light grey top
+
                 GradientStop {
                     position: 1.0
                     color: "#EDEEF4"
@@ -1246,7 +1248,9 @@ Item {
                         id: linkConfigDialog
                         title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
                         buttons: Dialog.Save | Dialog.Cancel
-                        acceptAllowed: nameField.text !== ""
+                        acceptAllowed: _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
+                                        ? (editingConfig && editingConfig.devName !== "")
+                                        : nameField.text !== ""
 
                         property var originalConfig
                         property var editingConfig
@@ -1256,8 +1260,8 @@ Item {
 
                         // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
                         Connections {
-                            target: linkConfigDialog.editingConfig
-                            enabled: linkConfigDialog.editingConfig !== null
+                            target: editingConfig
+                            enabled: editingConfig !== null
 
                             function onShowToast(message) {
                                 mainWindow.showToastMessage(message);
@@ -1268,19 +1272,32 @@ Item {
                             console.log("Click Save");
                             if (_connectionInitiated) {
                                 console.log("linkConfigDialog: ignoring duplicate accept");
+                                preventClose = true;
                                 return;
                             }
-                            linkSettingsLoader.item.saveSettings();
-                            editingConfig.devName = nameField.text;
+                            if (!editingConfig) {
+                                preventClose = true;
+                                return;
+                            }
+                            if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                                editingConfig.stopScan();
+                            }
+                            if (linkSettingsLoader.item) {
+                                linkSettingsLoader.item.saveSettings();
+                            }
+                            if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
+                                editingConfig.devName = nameField.text;
+                            }
                             editingConfig.name = editingConfig.devName;
-
-                            //connecting_drone = true
 
                             if (originalConfig) {
                                 _linkManager.endConfigurationEditing(originalConfig, editingConfig);
                             } else {
                                 editingConfig.dynamic = false;
-                                _linkManager.endCreateConfiguration(editingConfig);
+                                if (!_linkManager.endCreateConfiguration(editingConfig)) {
+                                    preventClose = true;
+                                    return;
+                                }
                                 if (activeVehicle) {
                                     mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
                                     return;
@@ -1294,6 +1311,9 @@ Item {
                         onRejected: {
                             console.log("Click Cancel");
                             _connectionInitiated = false;  //reset on cancel
+                            if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                                editingConfig.stopScan();
+                            }
                             _linkManager.cancelConfigurationEditing(editingConfig);
                         }
 
@@ -1355,7 +1375,7 @@ Item {
                             Loader {
                                 id: linkSettingsLoader
                                 Layout.fillWidth: true
-                                source: subEditConfig.settingsURL
+                                source: editingConfig ? editingConfig.settingsURL : ""
 
                                 property var subEditConfig: linkConfigDialog.editingConfig
                                 property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12

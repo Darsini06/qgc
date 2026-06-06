@@ -46,8 +46,18 @@
 #include <qmdnsengine/service.h>
 #endif
 
+#include <QtCore/QSettings>
 #include <QtCore/QTimer>
 #include <QtQml/qqml.h>
+
+#ifdef QGC_ENABLE_BLUETOOTH
+namespace {
+bool bluetoothAddressesMatch(const QString &a, const QString &b)
+{
+    return a.trimmed().compare(b.trimmed(), Qt::CaseInsensitive) == 0;
+}
+} // namespace
+#endif
 
 QGC_LOGGING_CATEGORY(LinkManagerLog, "qgc.comms.linkmanager")
 QGC_LOGGING_CATEGORY(LinkManagerVerboseLog, "qgc.comms.linkmanager:verbose")
@@ -266,12 +276,20 @@ void LinkManager::disconnectLink(LinkConfiguration* config)
         return;
     }
 
-    // Clear saved autoConnect device if this is it
-    QSettings settings;
-    if (settings.value("LastConnectedBluetoothDevice").toString() == config->name()) {
-        settings.remove("LastConnectedBluetoothDevice");
-        qDebug() << "LinkManager: cleared last connected device on manual disconnect";
+    // Clear persisted last-connected address when user disconnects that device
+#ifdef QGC_ENABLE_BLUETOOTH
+    if (config->type() == LinkConfiguration::TypeBluetooth) {
+        const BluetoothConfiguration *btConfig = qobject_cast<const BluetoothConfiguration*>(config);
+        if (btConfig) {
+            QSettings settings;
+            const QString lastAddress = settings.value(QStringLiteral("LastConnectedBluetoothAddress")).toString();
+            if (bluetoothAddressesMatch(lastAddress, btConfig->address())) {
+                settings.remove(QStringLiteral("LastConnectedBluetoothAddress"));
+                qDebug() << "LinkManager: cleared last connected Bluetooth address on manual disconnect";
+            }
+        }
     }
+#endif
 
     // Find the link safely through our own list
     for (auto& link : _rgLinks) {
@@ -342,10 +360,6 @@ void LinkManager::loadLinkConfigurationList()
 {
     QSettings settings;
 
-    // Read last connected BT device BEFORE the loop
-    QString lastDevice = settings.value("LastConnectedBluetoothDevice", "").toString();
-    qDebug() << "LinkManager: last connected BT device:" << lastDevice;
-
     // Is the group even there?
     if (settings.contains(LinkConfiguration::settingsRoot() + "/count")) {
         // Find out how many configurations we have
@@ -410,52 +424,13 @@ void LinkManager::loadLinkConfigurationList()
                 link->setHighLatency(highLatency);
                 link->loadSettings(settings, root);
 
-#ifdef QGC_ENABLE_BLUETOOTH
-                if (type == LinkConfiguration::TypeBluetooth) {
-                    // For Bluetooth: only autoConnect the last successfully connected device
-                    // Prevents all saved BT configs from attempting connection on startup
-                    if (!lastDevice.isEmpty() && name == lastDevice) {
-                        link->setAutoConnect(true);
-                        qDebug() << "LinkManager: autoConnect ENABLED for last BT device:" << name;
-                    } else {
-                        link->setAutoConnect(false);
-                        qDebug() << "LinkManager: autoConnect DISABLED for BT device:" << name;
-                    }
-                } else {
-#endif
-    // Non-Bluetooth: respect the saved autoConnect setting as normal
-                    const bool autoConnect = settings.value(root + "/auto").toBool();
-                    link->setAutoConnect(autoConnect);
-#ifdef QGC_ENABLE_BLUETOOTH
-                }
-#endif
+                const bool autoConnect = settings.value(root + "/auto").toBool();
+                link->setAutoConnect(autoConnect);
                 addConfiguration(link);
             }
         }
     }
     // Enable automatic Serial PX4/3DR Radio hunting
-
-
-#ifdef QGC_ENABLE_BLUETOOTH
-    // First launch — no saved device — autoConnect only the first Bluetooth config found
-    if (lastDevice.isEmpty()) {
-        bool firstFound = false;
-        for (auto& config : _rgLinkConfigs) {
-            if (config->type() == LinkConfiguration::TypeBluetooth) {
-                if (!firstFound) {
-                    config->setAutoConnect(true);
-                    firstFound = true;
-                    qDebug() << "LinkManager: first launch, autoConnect enabled for:"
-                             << config->name();
-                } else {
-                    config->setAutoConnect(false);
-                    qDebug() << "LinkManager: first launch, autoConnect disabled for:"
-                             << config->name();
-                }
-            }
-        }
-    }
-#endif
 
     _configurationsLoaded = true;
 }
@@ -646,15 +621,50 @@ void LinkManager::endConfigurationEditing(LinkConfiguration *config, LinkConfigu
     delete editedConfig;
 }
 
-void LinkManager::endCreateConfiguration(LinkConfiguration *config)
+bool LinkManager::endCreateConfiguration(LinkConfiguration *config)
 {
     if (!config) {
         qCWarning(LinkManagerLog) << "Internal error";
-        return;
+        return false;
     }
+
+#ifdef QGC_ENABLE_BLUETOOTH
+    if (config->type() == LinkConfiguration::TypeBluetooth) {
+        BluetoothConfiguration* btConfig = qobject_cast<BluetoothConfiguration*>(config);
+        if (btConfig) {
+            const QString newAddress = btConfig->address().trimmed();
+            if (newAddress.isEmpty()) {
+                qgcApp()->showAppMessage(tr("No Bluetooth device selected."));
+                return false;
+            }
+
+            qCDebug(LinkManagerLog) << "endCreateConfiguration: checking duplicate for new BT config:"
+                                    << btConfig->name() << "address:" << newAddress;
+            for (const SharedLinkConfigurationPtr &existingConfig : _rgLinkConfigs) {
+                if (existingConfig->type() != LinkConfiguration::TypeBluetooth) {
+                    continue;
+                }
+
+                const BluetoothConfiguration *existingBt = qobject_cast<const BluetoothConfiguration*>(existingConfig.get());
+                if (!existingBt) {
+                    continue;
+                }
+
+                const QString existingAddress = existingBt->address().trimmed();
+                qCDebug(LinkManagerLog) << "Comparing with existing BT config:"
+                                          << existingBt->name() << "address:" << existingAddress;
+                if (bluetoothAddressesMatch(existingAddress, newAddress)) {
+                    qgcApp()->showAppMessage(tr("Device '%1' is already in the list.").arg(btConfig->name()));
+                    return false;
+                }
+            }
+        }
+    }
+#endif
 
     addConfiguration(config);
     saveLinkConfigurationList();
+    return true;
 }
 
 LinkConfiguration *LinkManager::createConfiguration(int type, const QString &name)
@@ -752,10 +762,29 @@ SharedLinkConfigurationPtr LinkManager::addConfiguration(LinkConfiguration *conf
 
 void LinkManager::startAutoConnectedLinks()
 {
+#ifdef QGC_ENABLE_BLUETOOTH
+    QSettings settings;
+    const QString lastConnectedAddress = settings.value(QStringLiteral("LastConnectedBluetoothAddress")).toString().trimmed();
+#endif
+
     for (SharedLinkConfigurationPtr &sharedConfig : _rgLinkConfigs) {
-        if (sharedConfig->isAutoConnect()) {
-            createConnectedLink(sharedConfig);
+        if (!sharedConfig->isAutoConnect()) {
+            continue;
         }
+
+#ifdef QGC_ENABLE_BLUETOOTH
+        if (sharedConfig->type() == LinkConfiguration::TypeBluetooth) {
+            const BluetoothConfiguration *btConfig = qobject_cast<const BluetoothConfiguration*>(sharedConfig.get());
+            if (!btConfig || lastConnectedAddress.isEmpty()
+                    || !bluetoothAddressesMatch(btConfig->address(), lastConnectedAddress)) {
+                qDebug() << "LinkManager: skipping autoconnect for Bluetooth link"
+                         << (btConfig ? btConfig->name() : QStringLiteral("<unknown>"))
+                         << "- last connected address:" << lastConnectedAddress;
+                continue;
+            }
+        }
+#endif
+        createConnectedLink(sharedConfig);
     }
 }
 

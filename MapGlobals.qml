@@ -106,6 +106,11 @@ QtObject {
     property string userName: QGroundControl.loadGlobalSetting("username", "Guest")
     property string userEmail: QGroundControl.loadGlobalSetting("email", "")
     property string displayName: QGroundControl.loadGlobalSetting("name", "")
+    property string mobileNo: QGroundControl.loadGlobalSetting("mobileNo", "")
+
+    property int rpcStatus: parseInt(QGroundControl.loadGlobalSetting("rpcStatus", "0"))
+
+
     
     property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
@@ -1082,9 +1087,6 @@ QtObject {
 
     function profile() {
 
-
-        console.log("profile method MapGLobals")
-
         var loginpage= QGroundControl.loadBoolGlobalSetting("login",false)
 
         if(loginpage===true) {
@@ -1106,6 +1108,18 @@ QtObject {
             //homescreen.visible = false
             rootWindow.openWelcomeScreen();
             QGroundControl.saveBoolGlobalSetting("login", false);
+
+            QGroundControl.saveGlobalSetting("username","")
+            QGroundControl.saveGlobalSetting("name","")
+            QGroundControl.saveGlobalSetting("email","")
+            QGroundControl.saveGlobalSetting("mobileNo","")
+            QGroundControl.saveGlobalSetting("rpcStatus","")
+
+            MapGlobals.userName=""
+            MapGlobals.displayName=""
+            MapGlobals.userEmail=""
+            MapGlobals.mobileNo=""
+            MapGlobals.rpcStatus=-1
         }
     }
 

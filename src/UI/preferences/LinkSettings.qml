@@ -113,7 +113,7 @@ ColumnLayout  {
         ColumnLayout {
             id:               linkRow
             Layout.fillWidth: true
-            visible:          !object.dynamic
+            visible:          object && !object.dynamic
             spacing:          ScreenTools.defaultFontPixelHeight / 4
 
             Rectangle {
@@ -399,7 +399,9 @@ ColumnLayout  {
                                       : originalConfig ? qsTr("Edit Link")
                                                        : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== ""
+            acceptAllowed:  _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
+                            ? (editingConfig && editingConfig.devName !== "")
+                            : nameField.text !== ""
 
 
             property var originalConfig
@@ -409,8 +411,8 @@ ColumnLayout  {
             property bool _connectionInitiated: false
 
             Connections {
-                target: linkConfigDialog.editingConfig
-                enabled: linkConfigDialog.editingConfig !== null
+                target: editingConfig
+                enabled: editingConfig !== null
 
                 function onShowToast(message) {
                     mainWindow.showToastMessage(message)
@@ -421,12 +423,27 @@ ColumnLayout  {
 
                 if ( _connectionInitiated ) {
                     console.log("linkConfigDialog: ignoring duplicate accept")
+                    preventClose = true
                     return
                 }
 
-                linkSettingsLoader.item.saveSettings()
-                editingConfig.devName = nameField.text
-                editingConfig.name    = editingConfig.devName
+                if (!editingConfig) {
+                    preventClose = true
+                    return
+                }
+
+                // Stop BLE scan before save — pending Android callbacks crash if agent is torn down mid-flight
+                if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan()
+                }
+
+                if (linkSettingsLoader.item) {
+                    linkSettingsLoader.item.saveSettings()
+                }
+                if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
+                    editingConfig.devName = nameField.text
+                }
+                editingConfig.name = editingConfig.devName
 
                 if (originalConfig) {
 
@@ -456,7 +473,10 @@ ColumnLayout  {
                     }
 
                     editingConfig.dynamic = false
-                    _linkManager.endCreateConfiguration(editingConfig)
+                    if (!_linkManager.endCreateConfiguration(editingConfig)) {
+                        preventClose = true
+                        return
+                    }
 
                     _connectionInitiated = true
                     mainWindow.connecting_drone = true
@@ -466,6 +486,9 @@ ColumnLayout  {
 
             onRejected: {
                 _connectionInitiated = false  // reset on cancel
+                if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan()
+                }
                 _linkManager.cancelConfigurationEditing(editingConfig)
             }
 
@@ -509,7 +532,7 @@ ColumnLayout  {
                 Loader {
                     id: linkSettingsLoader
                     Layout.fillWidth: true        // << ensures it spans the whole dialog
-                    source: subEditConfig.settingsURL
+                    source: editingConfig ? editingConfig.settingsURL : ""
 
                     property var subEditConfig:         linkConfigDialog.editingConfig
                     property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12

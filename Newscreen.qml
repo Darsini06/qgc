@@ -804,7 +804,9 @@ Item {
                                                : originalConfig ? qsTr("Edit Link")
                                                                 : qsTr("Add New Link")
             buttons:        Dialog.Save | Dialog.Cancel
-            acceptAllowed:  nameField.text !== ""
+            acceptAllowed:  _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
+                            ? (editingConfig && editingConfig.devName !== "")
+                            : nameField.text !== ""
 
             property var originalConfig
             property var editingConfig
@@ -820,20 +822,39 @@ Item {
             }
 
             onAccepted: {
-                linkSettingsLoader.item.saveSettings()
-                editingConfig.devName = nameField.text
-                editingConfig.name    = editingConfig.devName
+                if (!editingConfig) {
+                    preventClose = true
+                    return
+                }
+                if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan()
+                }
+                if (linkSettingsLoader.item) {
+                    linkSettingsLoader.item.saveSettings()
+                }
+                if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
+                    editingConfig.devName = nameField.text
+                }
+                editingConfig.name = editingConfig.devName
 
                 if (originalConfig) {
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
                 } else {
                     editingConfig.dynamic = false
-                    _linkManager.endCreateConfiguration(editingConfig)
+                    if (!_linkManager.endCreateConfiguration(editingConfig)) {
+                        preventClose = true
+                        return
+                    }
                     _linkManager.createConnectedLink(editingConfig)
                 }
             }
 
-            onRejected: _linkManager.cancelConfigurationEditing(editingConfig)
+            onRejected: {
+                if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan()
+                }
+                _linkManager.cancelConfigurationEditing(editingConfig)
+            }
 
             // ---------- MAIN LAYOUT ----------
             ColumnLayout {
@@ -862,7 +883,7 @@ Item {
                 Loader {
                     id: linkSettingsLoader
                     Layout.fillWidth: true        // << ensures it spans the whole dialog
-                    source: subEditConfig.settingsURL
+                    source: editingConfig ? editingConfig.settingsURL : ""
 
                     property var subEditConfig:         editingConfig
                     property int _firstColumnWidth:     ScreenTools.defaultFontPixelWidth * 12

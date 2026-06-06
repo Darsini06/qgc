@@ -11,6 +11,7 @@
 #include "DeviceInfo.h"
 #include "QGCApplication.h"
 
+#include <QtCore/QSettings>
 #include <QBluetoothLocalDevice>
 #include <QtBluetooth/QBluetoothDeviceDiscoveryAgent>
 #include <QtBluetooth/QBluetoothSocket>
@@ -426,9 +427,10 @@ void BluetoothLink::deviceConnected()
         _connectState = true;
         qDebug() << "Bluetooth Connected to device";
 
-        // Save this as the last successfully connected device
+        // Persist last successfully connected Bluetooth device for startup autoconnect
         QSettings settings;
-        settings.setValue("LastConnectedBluetoothDevice", _bluetoothConfig->name());
+        settings.setValue(QStringLiteral("LastConnectedBluetoothAddress"),
+                          _bluetoothConfig->address().trimmed());
 
         emit connected();
         //qgcApp()->showAppMessage("Bluetooth Connected to device");
@@ -515,12 +517,43 @@ BluetoothConfiguration::BluetoothConfiguration(const BluetoothConfiguration * so
 
 BluetoothConfiguration::~BluetoothConfiguration()
 {
-
-    if(_deviceDiscover)
-    {
-        _deviceDiscover->stop();
-        delete _deviceDiscover;
+    if (_deviceDiscover) {
+        QBluetoothDeviceDiscoveryAgent* const agent = _deviceDiscover;
+        _deviceDiscover = nullptr;
+        _scanActive = false;
+        QObject::disconnect(agent, nullptr, this, nullptr);
+        agent->stop();
+#ifndef Q_OS_ANDROID
+        delete agent;
+#endif
+        // On Android, do not delete here — pending JNI scan callbacks can SIGSEGV.
     }
+}
+
+void BluetoothConfiguration::_cleanupDiscoveryAgent(bool deleteAgent)
+{
+    if (!_deviceDiscover) {
+        _scanActive = false;
+        return;
+    }
+
+    QBluetoothDeviceDiscoveryAgent* const agent = _deviceDiscover;
+    _deviceDiscover = nullptr;
+    _scanActive = false;
+
+    QObject::disconnect(agent, nullptr, this, nullptr);
+    agent->stop();
+
+    if (deleteAgent) {
+#ifdef Q_OS_ANDROID
+        // Android may still deliver BLE scan results after stop(); defer destruction.
+        QTimer::singleShot(500, agent, [agent]() { agent->deleteLater(); });
+#else
+        agent->deleteLater();
+#endif
+    }
+
+    emit scanningChanged();
 }
 
 QString BluetoothConfiguration::settingsTitle()
@@ -567,51 +600,8 @@ void BluetoothConfiguration::loadSettings(QSettings& settings, const QString& ro
 
 void BluetoothConfiguration::stopScan()
 {
-    if(_deviceDiscover)
-    {
-        _deviceDiscover->stop();
-        _deviceDiscover->deleteLater();
-        _deviceDiscover = nullptr;
-        emit scanningChanged();
-    }
+    _cleanupDiscoveryAgent(true);
 }
-
-// void BluetoothConfiguration::startScan()
-// {
-
-// #ifdef Q_OS_ANDROID
-//     // Check Location
-//     if (!_isLocationEnabled()) {
-//         qDebug() << "Please turn ON Location to scan Bluetooth devices";
-//         emit showToast(tr("Please turn ON Location to scan Bluetooth devices"));
-//         return;
-//     }
-// #endif
-
-//     // Check Bluetooth
-//     QBluetoothLocalDevice localDevice;
-
-//     if (localDevice.hostMode() == QBluetoothLocalDevice::HostPoweredOff) {
-//         qDebug() << "Bluetooth is OFF. Requesting system to turn it ON...";
-//         localDevice.powerOn();
-//         return;
-//     }
-
-//     // Start scan
-//     if(!_deviceDiscover) {
-//         _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
-//         connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,  this, &BluetoothConfiguration::deviceDiscovered);
-//         connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::finished,          this, &BluetoothConfiguration::doneScanning);
-//         emit scanningChanged();
-//     } else {
-//         _deviceDiscover->stop();
-//     }
-
-//     _nameList.clear();
-//     _deviceList.clear();
-//     emit nameListChanged();
-//     _deviceDiscover->start();
-// }
 
 void BluetoothConfiguration::startScan()
 {
@@ -630,25 +620,26 @@ void BluetoothConfiguration::startScan()
         return;
     }
 
-    // Always clear lists before new scan
     _nameList.clear();
     _deviceList.clear();
     emit nameListChanged();
 
-    // Recreate discovery agent each scan to avoid stale cache
     if (_deviceDiscover) {
+        QObject::disconnect(_deviceDiscover, nullptr, this, nullptr);
         _deviceDiscover->stop();
-        delete _deviceDiscover;
-        _deviceDiscover = nullptr;
+    } else {
+        _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
     }
 
-    _deviceDiscover = new QBluetoothDeviceDiscoveryAgent(this);
-    connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
-            this, &BluetoothConfiguration::deviceDiscovered);
-    connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::finished,
-            this, &BluetoothConfiguration::doneScanning);
-    emit scanningChanged();
+    QObject::connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
+                     this, &BluetoothConfiguration::deviceDiscovered);
+    QObject::connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::finished,
+                     this, &BluetoothConfiguration::doneScanning);
+    QObject::connect(_deviceDiscover, &QBluetoothDeviceDiscoveryAgent::canceled,
+                     this, &BluetoothConfiguration::doneScanning);
 
+    _scanActive = true;
+    emit scanningChanged();
     _deviceDiscover->start();
 }
 
@@ -737,6 +728,10 @@ bool BluetoothConfiguration::isBluetoothAvailable()
 
 void BluetoothConfiguration::deviceDiscovered(QBluetoothDeviceInfo info)
 {
+    if (!_scanActive || !_deviceDiscover || sender() != _deviceDiscover) {
+        return;
+    }
+
     if (!info.name().isEmpty() && info.isValid()) {
         BluetoothData data;
         data.name    = info.name().trimmed();  // trim whitespace
@@ -766,12 +761,15 @@ void BluetoothConfiguration::deviceDiscovered(QBluetoothDeviceInfo info)
 
 void BluetoothConfiguration::doneScanning()
 {
-    if(_deviceDiscover)
-    {
-        deleteLater();
-        _deviceDiscover = nullptr;
-        emit scanningChanged();
+    if (!_scanActive) {
+        return;
     }
+
+    _scanActive = false;
+    emit scanningChanged();
+
+    // Keep the discovery agent alive on Android — BLE scan callbacks can still
+    // arrive via JNI after finished/canceled and crash if the agent is deleted.
 }
 
 

@@ -24,6 +24,11 @@ ColumnLayout {
     function saveSettings() { }
 
     Component.onCompleted: subEditConfig.startScan()
+    Component.onDestruction: {
+        if (subEditConfig) {
+            subEditConfig.stopScan()
+        }
+    }
 
     // Header section
     Item {

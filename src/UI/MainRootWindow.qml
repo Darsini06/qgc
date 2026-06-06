@@ -1162,6 +1162,7 @@ ApplicationWindow {
 
         readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
         readonly property real _iconSize: _btnSize * 0.55
+
         Rectangle {
             id:         utmIndicatorBtn
             Layout.alignment: Qt.AlignLeft
@@ -1259,7 +1260,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1505,11 +1506,11 @@ ApplicationWindow {
                     mainWindow.closefile()
                 }
 
-
             }
 
             ColumnLayout {
                 spacing: ScreenTools.defaultFontPixelWidth
+
                 QGCLabel {
                     text: qsTr("Your first point is selected as the takeoff point, and it is also your first waypoint.\nNow select your waypoints. Click OK to continue.")
                     Layout.fillWidth: true
