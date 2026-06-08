@@ -392,7 +392,6 @@ ColumnLayout  {
     Component {
         id: linkConfigDialogComponent
 
-
         QGCPopupDialog {
             id : linkConfigDialog
             title: selectedType === 0 ? "Bluetooth Devices"
@@ -440,9 +439,11 @@ ColumnLayout  {
                 if (linkSettingsLoader.item) {
                     linkSettingsLoader.item.saveSettings()
                 }
+
                 if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
                     editingConfig.devName = nameField.text
                 }
+
                 editingConfig.name = editingConfig.devName
 
                 if (originalConfig) {

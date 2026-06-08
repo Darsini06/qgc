@@ -58,6 +58,9 @@ Popup {
 
     property alias acceptButtonAlias: acceptButton
     property alias rejectButtonAlias: rejectButton
+    property alias nextButtonAlias:     nextButton
+
+    property bool   showNextButton:     false
 
     property var    dialogProperties
     property bool   destroyOnClose:         true
@@ -74,6 +77,7 @@ Popup {
 
     signal accepted
     signal rejected
+    signal nextClicked
 
     QGCPalette { id: popupPal; colorGroupEnabled: true }
     property var    _qgcPal:            popupPal
@@ -157,6 +161,7 @@ Popup {
         rejectButton.visible = false
         acceptButton.enabled = true
         rejectButton.enabled = true
+        nextButton.enabled = false
 
 
         // NO BUTTON MODE (Bluetooth dialog, etc.)
@@ -419,6 +424,29 @@ Popup {
                     }
                     contentItem: Text {
                         text: rejectButton.text
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.bold: true
+                        font.family: "Outfit"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                QGCButton {
+                    id: nextButton
+                    visible: root.showNextButton
+                    text: qsTr("Next")
+                    enabled: false
+                    onClicked: root.nextClicked()
+                    Layout.minimumWidth: height * 2.5
+                    background: Rectangle {
+                        radius: 8
+                        color: nextButton.pressed ? "#588D4E" : (nextButton.hovered ? "#8CC881" : "#79AE6F")
+                    }
+                    contentItem: Text {
+                        text: nextButton.text
                         anchors.centerIn: parent
                         color: "white"
                         font.bold: true
