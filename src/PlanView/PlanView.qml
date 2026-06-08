@@ -769,7 +769,7 @@ Item {
                     }
 
                     Text {
-                        text: qsTr("Set Ground Chitra")
+                        text: qsTr("Set Ground Name")
                         font.bold: true; color: "white"; font.pointSize: 15; anchors.centerIn: parent; font.family: "Outfit"
                     }
 
@@ -1694,10 +1694,25 @@ Item {
                                         opacity:                _editingLayer != _layerGeoFence ? editorMap._nonInteractiveOpacity : 1
                                     }
 
+                                    // ── Fence Circle ──
+                                    MapCircle {
+                                        id: fenceCircle
+                                        center: mapPolygonvisuals.fenceCenter.isValid ? mapPolygonvisuals.fenceCenter : QtPositioning.coordinate()
+                                        radius: mapPolygonvisuals.fenceRadius
+                                        color: "transparent"
+                                        border.color: "yellow"
+                                        border.width: 2
+                                        visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
+                                                 mapPolygonvisuals.fenceCenter.isValid &&
+                                                 mapPolygonvisuals.fenceRadius > 0
+                                    }
+
                                     // ── Fence center drag handle (yellow circle, no icon) ──
                                     MapQuickItem {
                                         id: fenceCenterHandle
                                         visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
                                                  mapPolygonvisuals.fenceCenter.isValid &&
                                                  mapPolygonvisuals.fenceRadius > 0
 
@@ -1749,6 +1764,7 @@ Item {
                                     MapQuickItem {
                                         id: fenceEditLabel
                                         visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
                                                  mapPolygonvisuals.fenceCenter.isValid &&
                                                  mapPolygonvisuals.fenceRadius > 0
 
@@ -3099,7 +3115,9 @@ Item {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.5
-            anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
+            anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
+
+
 
             Row {
                 spacing: ScreenTools.defaultFontPixelWidth    // space between the two buttons
@@ -3110,7 +3128,12 @@ Item {
                     width: baseSize
                     height: baseSize
 
+                    readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+                    readonly property real _iconSize: _btnSize * 0.50
+
                     background: Rectangle {
+                        width:  fileUploadbtn._btnSize
+                        height: width
                         radius: width / 2
                         color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
                         border.color: Qt.rgba(0, 0, 0, 0.40)
@@ -3122,8 +3145,8 @@ Item {
                         anchors.fill: parent
                         QGCColoredImage {
                             source: "/qmlimages/NewImages/upload_modern.svg"
-                            width: iconSize
-                            height: iconSize
+                            width:            fileUploadbtn._iconSize
+                            height:           width
                             anchors.centerIn: parent
                             color: "white"
                         }
@@ -3807,18 +3830,22 @@ Item {
         height:             baseSize
         anchors.top:        planToolBar.bottom
         anchors.left:       parent.left
-        anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 0.1
+        anchors.topMargin:  ScreenTools.defaultFontPixelHeight * 1.25
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
         z:                  QGroundControl.zOrderWidgets + 1
 
+        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+        readonly property real _iconSize: _btnSize * 0.55
+
         Rectangle {
-            width:        baseSize
-            height:       baseSize
-            radius:       width / 2
-            color:        "transparent"
+            Layout.alignment: Qt.AlignLeft
+            width:  compassNorth._btnSize
+            height: width                 // Keep it square
+            radius: width / 2            // Circle
+            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
             border.width: 0
-            border.color: Qt.rgba(0, 0, 0, 0.40)
-            clip:         true
+            border.color:  "transparent"
+
 
             MouseArea {
                 anchors.fill: parent
@@ -3831,9 +3858,8 @@ Item {
                 id:               compassArrow
                 source:           "/qmlimages/NewImages/cardinal_point.svg"
                 anchors.centerIn: parent
-                width:            iconSize
-                height:           iconSize
-                fillMode:         Image.PreserveAspectFit
+                width:            compassNorth._iconSize
+                height:           width
                 transform: Rotation {
                     origin.x: compassArrow.width  / 2
                     origin.y: compassArrow.height / 2

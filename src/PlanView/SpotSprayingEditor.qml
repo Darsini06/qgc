@@ -398,10 +398,12 @@ Item {
                 border.width:     1
                 Layout.alignment: Qt.AlignVCenter
 
-                Text {
+                Image {
                     anchors.centerIn: parent
-                    text:             "✏️"
-                    font.pixelSize:   14
+                    source:           "qrc:/qmlimages/NewImages/pencil_icon.png"
+                    width:            16
+                    height:           16
+                    fillMode:         Image.PreserveAspectFit
                 }
 
                 MouseArea {

@@ -130,6 +130,7 @@
 
 
 
+        <file alias="NewImages/pencil_icon.png">src/NewImages/pencil_icon.png</file>
         <file alias="NewImages/accountUpdate_black.svg">src/NewImages/accountUpdate_black.svg</file>
           <file alias="NewImages/cloud_plan_colour.png">src/NewImages/cloud_plan_colour.png</file>
             <file alias="NewImages/mission_history_colour.png">src/NewImages/mission_history_colour.png</file>

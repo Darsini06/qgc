@@ -34,6 +34,8 @@ Item {
     //readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 50
     //property bool isSmallScreen: ScreenTools.isTinyScreen
     property bool isMobile: ScreenTools.isMobile
+    // Phone = 1 col (<600px), Tablet = 2 cols (>=600px)
+    property bool isSmallScreen: accountUpdateRoot.width < 600
     readonly property real baseMargin: ScreenTools.defaultFontPixelWidth * 1.5
 
     // onVisibleChanged: {
@@ -56,15 +58,19 @@ Item {
         anchors.fill: parent
         color: bg_color
 
-        RowLayout {
+        GridLayout {
             anchors.fill: parent
-            spacing: 0
+            columns: isSmallScreen ? 1 : 2
+            rowSpacing: 0
+            columnSpacing: 0
 
             /* ================= LEFT SIDE: PROFILE OVERVIEW ================= */
             Rectangle {
                 id: sidebar
-                Layout.fillHeight: true
-                Layout.preferredWidth: 320
+                Layout.fillHeight: !isSmallScreen
+                Layout.preferredHeight: isSmallScreen ? Math.max(300, sidebarColumn.implicitHeight + 60) : -1
+                Layout.preferredWidth: isSmallScreen ? -1 : 320
+                Layout.fillWidth: isSmallScreen
                 color: "#1A1A1A"
                 clip: true
 
@@ -93,8 +99,12 @@ Item {
                 }
 
                 ColumnLayout {
-                    anchors.centerIn: parent
-                    width: parent.width - 80
+                    id: sidebarColumn
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: isSmallScreen ? undefined : parent.verticalCenter
+                    anchors.top: isSmallScreen ? backBtnContainer.bottom : undefined
+                    anchors.topMargin: isSmallScreen ? 20 : 0
+                    width: parent.width - (isSmallScreen ? 40 : 80)
                     spacing: 20
 
                     // Avatar Section (Reduced & Static)
@@ -138,7 +148,7 @@ Item {
                     // Stats / Quick Info
                     ColumnLayout {
                         Layout.fillWidth: true; spacing: 14
-                        
+
                         RowLayout {
                             spacing: 12
                             Rectangle { width: 34; height: 34; radius: 10; color: Qt.rgba(255, 255, 255, 0.1); QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 16; height: 16; color: "white" } }
@@ -177,13 +187,14 @@ Item {
 
                     ColumnLayout {
                         id: formColumn
-                        width: Math.min(600, parent.width - 100)
-                        //anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: isMobile ? 15 : 48
-                        anchors.top: parent.top
-                        anchors.topMargin: isMobile ? 20 : 50
-                        spacing: 20
+
+                           width: parent.width - (isMobile ? 30 : 100)
+
+                           anchors.left: parent.left
+                           anchors.leftMargin: isMobile ? 15 : 48
+                           anchors.top: parent.top
+                           anchors.topMargin: isMobile ? 20 : 50
+                           spacing: 20
 
                         Text {
                             text: qsTr("ACCOUNT INFORMATION")
@@ -198,10 +209,10 @@ Item {
                         }
 
                         GridLayout {
-                            columns: isMobile ? 1 : 2
-                            columnSpacing: 28
-                            rowSpacing: 24
                             Layout.fillWidth: true
+                            columns: isSmallScreen ? 1 : 2
+                            columnSpacing: 20
+                            rowSpacing: 20
 
                             // Full Name
                             ColumnLayout {
@@ -223,7 +234,7 @@ Item {
                                     color: "#f8fafc"
                                     border.color: nameField.activeFocus ? accent_color : border_color
                                     border.width: nameField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: nameIcon
                                     //     source: "qrc:/InstrumentValueIcons/contacts.svg"
@@ -257,13 +268,14 @@ Item {
 
                             // Username
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
+                                Layout.fillWidth: true
+                                spacing: 8
                                 Text { text: qsTr("Username"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
                                 Rectangle {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: usernameField.activeFocus ? accent_color : border_color
                                     border.width: usernameField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: userIcon
                                     //     source: "qrc:/qmlimages/NewImages/accountUpdate_black.svg"; width: 22; height: 22
@@ -294,13 +306,14 @@ Item {
 
                             // Email
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
+                                Layout.fillWidth: true
+                                spacing: 8
                                 Text { text: qsTr("Email Address"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
                                 Rectangle {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: emailField.activeFocus ? accent_color : border_color
                                     border.width: emailField.activeFocus ? 2 : 1
-                                    
+
                                     /* Email Icon removed for more space */
                                     // Item { id: emailIcon; width: 0; height: 0 }
 
@@ -336,7 +349,7 @@ Item {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: mobileField.activeFocus ? accent_color : border_color
                                     border.width: mobileField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: phoneIcon
                                     //     source: "qrc:/InstrumentValueIcons/phone-incoming.svg"; width: 22; height: 22

@@ -112,6 +112,9 @@ SetupPage {
                     rowSpacing:         _innerMargin
                     Layout.fillWidth:   true
 
+
+
+
                     QGCLabel {
                         text:           qsTr("Low action:")
                         font.bold:      true
@@ -227,14 +230,20 @@ SetupPage {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
+
+
+
                 Rectangle {
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color:              "white"//Qt.rgba(0, 0, 0, 0.4)
+                    border.color:       "black"//QGroundControl.globalPalette.groupBorder
+
                     width:              (battery1FailsafeLoader.item ? battery1FailsafeLoader.item.implicitWidth : 0) + (_margins * 2)
                     height:             (battery1FailsafeLoader.item ? battery1FailsafeLoader.item.implicitHeight : 0) + (_margins * 2)
-                    color:              "white"
-                    border.color:       "black"
+
                     border.width:       showBorder ? 1 : 0
                     radius:             ScreenTools.defaultFontPixelHeight / 2
-                    anchors.horizontalCenter: parent.horizontalCenter
 
                     Loader {
                         id:                 battery1FailsafeLoader

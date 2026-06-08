@@ -25,11 +25,7 @@ Item {
     signal menuItemSelected(string screenName)
     signal backClicked()
 
-    onMenuItemSelected: {
-        if (screenName === "changePassword") {
-            changePasswordDialog.open()
-        }
-    }
+    // Removed onMenuItemSelected for changePassword as it's handled directly now
 
     readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 100
 
@@ -200,7 +196,7 @@ Item {
                         Repeater {
                             model: [
                                 { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/account_settings_colour.png" },
-                                { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/cloud_plan_colour.png" },
+                                // { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/cloud_plan_colour.png" },
                                 { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/mission_history_colour.png" },
                                 { "id": "logfiles",      "name": "Log Files",        "desc": "View logs and performance of previous flights",
                                     "icon": "qrc:/qmlimages/NewImages/log_files_colour.jfif", "color": "#475569" },
@@ -251,14 +247,16 @@ Item {
                                     id: mouseItem
                                     anchors.fill: parent
                                     hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (modelData.id === "cloudPlans") {
-                                            MapGlobals.jumpToFileList = true
-                                            profileMainRoot.menuItemSelected("logfiles")
-                                        } else {
-                                            profileMainRoot.menuItemSelected(modelData.id)
-                                        }
-                                    }
+                                     onClicked: {
+                                         if (modelData.id === "changePassword") {
+                                             changePasswordDialog.open()
+                                         } else if (modelData.id === "cloudPlans") {
+                                             MapGlobals.jumpToFileList = true
+                                             profileMainRoot.menuItemSelected("logfiles")
+                                         } else {
+                                             profileMainRoot.menuItemSelected(modelData.id)
+                                         }
+                                     }
                                 }
                             }
                         }
