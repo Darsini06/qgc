@@ -182,96 +182,42 @@ SettingsPage {
             visible:          _videoSettings.videoSource.visible
         }
 
-        //Language
-        // LabelledFactComboBox {
-        //     label:      qsTr("Language")
-        //     fact:       _appSettings.qLocaleLanguage
-        //     indexModel: false
-        //     visible:    _appSettings.qLocaleLanguage.visible
-        // }
-
-        // RowLayout {
-        //     spacing: 20
-        //     visible: _appSettings.qLocaleLanguage.visible
-        //     QGCLabel {
-        //         text: qsTr("Language")
-        //         color: "black"
-        //         font.bold: true
-        //         Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 20
-        //     }
-        //     QGCLabel {
-        //         text: "English"
-        //         color: "gray"
-        //     }
-        // }
-
-        // LabelledFactComboBox {
-        //     label:      qsTr("Color Scheme")
-        //     fact:       _appSettings.indoorPalette
-        //     indexModel: false
-        //     visible:    _appSettings.indoorPalette.visible
-        // }
-
-        // LabelledFactComboBox {
-        //     label:       qsTr("Stream GCS Position")
-        //     fact:       _appSettings.followTarget
-        GridLayout {
-            columns:            _isNarrow ? 1 : 2
-            columnSpacing:      10
-            rowSpacing:         _isNarrow ? 5 : 0
-            Layout.fillWidth:   true
-            visible:            _appSettings.followTarget.visible
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _appSettings.followTarget.visible
+            spacing: 20
 
             QGCLabel {
-                text:               qsTr("Stream GCS Position")
-                color:              "black"
-                font.bold:          true
-                Layout.fillWidth:   true
-                wrapMode:           Text.WordWrap
-                Layout.preferredWidth: _labelWidth
+                text: qsTr("Stream GCS Position")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
             }
 
             FactComboBox {
-                id:                     followTargetCombo
-                fact:                   _appSettings.followTarget
-                sizeToContents:         false
-                Layout.fillWidth:       true
-                Layout.maximumWidth:    _isNarrow ? 10000 : _controlWidth
-                Layout.preferredWidth:  _controlWidth
+                id: followTargetCombo
+                fact: _appSettings.followTarget
+
+                Layout.fillWidth: true
                 Layout.preferredHeight: 40
-                Layout.alignment:       _isNarrow ? Qt.AlignLeft : Qt.AlignRight
+                Layout.alignment: Qt.AlignVCenter
+
                 background: Rectangle {
-                    color:          "white"
-                    border.color:   "#808080"
-                    border.width:   1
-                    radius:         4
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 4
                 }
+
                 onPressedChanged: {
                     if (pressed) {
                         popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
                         popup.x = width - popup.width
                     }
                 }
-                delegate: ItemDelegate {
-                    width:          parent.width
-                    padding:        ScreenTools.defaultFontPixelHeight / 4
-                    contentItem: QGCLabel {
-                        text:       modelData
-                        color:      (followTargetCombo.currentIndex === index || highlighted) ? "white" : "black"
-                        verticalAlignment: Text.AlignVCenter
-                        leftPadding: ScreenTools.defaultFontPixelWidth * 2
-                        rightPadding: ScreenTools.defaultFontPixelWidth * 2
-                    }
-                    background: Rectangle {
-                        color:      (followTargetCombo.currentIndex === index || highlighted) ? "#79AE6F" : "transparent"
-                        radius:     4
-                        anchors.fill: parent
-                        anchors.margins: 2
-                    }
-                }
             }
         }
-
         // --- SD Card Save (Tick Style) ---
         RowLayout {
             spacing:            10

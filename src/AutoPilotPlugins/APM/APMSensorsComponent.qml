@@ -27,7 +27,7 @@ import QtQuick.Effects
 
 SetupPage {
     id:             sensorsPage
-    pageComponent:  sensorsPageComponent
+        pageComponent:  QGroundControl.multiVehicleManager.activeVehicle ? sensorsPageComponent : bannerComponent
 
     property color app_color: "#301934"
 
@@ -40,6 +40,34 @@ SetupPage {
 
     function dp(value) {
         return value * baseUnit;
+    }
+    Component {
+        id: bannerComponent
+
+        ColumnLayout {
+            width:            availableWidth
+            Layout.fillWidth: true
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Rectangle {
+                Layout.fillWidth:    true
+                Layout.maximumWidth: ScreenTools.defaultFontPixelWidth * 95
+                Layout.alignment:    Qt.AlignHCenter
+                height:              noDroneBannerLabel.implicitHeight + 24
+                color:               "#FFF3CD"
+                border.color:        "#FFC107"
+                border.width:        1
+                radius:              ScreenTools.defaultFontPixelHeight / 2
+
+                QGCLabel {
+                    id:               noDroneBannerLabel
+                    anchors.centerIn: parent
+                    text:             qsTr("Connect a drone to configure sensor calibration")
+                    color:            "#856404"
+                    font.bold:        true
+                }
+            }
+        }
     }
 
 

@@ -1123,7 +1123,9 @@ Item {
 
                         // Set the overall popup UI width tightly
                         // Set a properly balanced dialog width to prevent text truncation
-                        popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
+                        popupWidth: (isSmallScreen || isMobile)
+                                    ? Math.min(mainWindow1.width * 0.92, 420)
+                                    : 560
 
                         property int selectedType: -1
 
@@ -1151,7 +1153,7 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 68 : 0
+                                    Layout.preferredHeight: visible ? 78 : 0
                                     Layout.bottomMargin: 12
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
@@ -1171,14 +1173,14 @@ Item {
 
                                     RowLayout {
                                         anchors.fill: parent
-                                        anchors.leftMargin: 16
-                                        anchors.rightMargin: 16
+                                        anchors.leftMargin: 20
+                                        anchors.rightMargin: 20
                                         spacing: 16
 
                                         // Number Icon Box
                                         Rectangle {
-                                            width: 34
-                                            height: 34
+                                            width: 42
+                                            height: 42
                                             radius: 8
                                             Layout.alignment: Qt.AlignVCenter
                                             color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
@@ -1386,4 +1388,6 @@ Item {
                         }
                     }
                 }
-            }
+
+}
+

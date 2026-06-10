@@ -10,7 +10,6 @@ Item {
     id:     root
     anchors.fill: parent
 
-
     property int agriall: QGroundControl.loadGlobalSetting("agriall","0")
     property int agrigimbal: QGroundControl.loadGlobalSetting("agrigimbal","0")
     property int cameragimbal: QGroundControl.loadGlobalSetting("cameragimbal","-1")
@@ -56,16 +55,38 @@ Item {
         { text: "SERVO", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#27ae60" },
         { text: "Relay", icon: "qrc:/qmlimages/NewImages/homeIcon.png", color: "#c0392b" }
     ]
+    // ── Banner shown when no drone is connected ──────────────────────────────
+      Rectangle {
+          anchors.top:              parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.topMargin:        20
+          visible:                  !activeVehicle
+          width:            noDroneBannerLabel.implicitWidth + 270
+          height:           noDroneBannerLabel.implicitHeight + 24
+          color:            "#FFF3CD"
+          border.color:     "#FFC107"
+          border.width:     1
+          radius:           8
 
+          QGCLabel {
+              id:               noDroneBannerLabel
+              anchors.centerIn: parent
+              text:             qsTr("Connect a drone to configure gimbal settings")
+              color:            "#856404"
+              font.bold:        true
+          }
+      }
+ // ── Main content shown only when drone is connected ───────────────────────
     Rectangle {
         anchors.fill: parent
-        color: "transparent"
+        visible:      activeVehicle !== null
+        color: "white"
 
-        Rectangle {
-            anchors.fill: parent
-            z: -10
-            color: "white"
-        }
+        // Rectangle {
+        //     anchors.fill: parent
+        //     z: -10
+        //     color: "white"
+        // }
 
         // ---- Curved Gradient Background ----
         // Canvas {

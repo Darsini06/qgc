@@ -125,8 +125,17 @@ Item {
                     }
 
                     Rectangle {
-                        anchors.fill: parent; color: "#00000020"; visible: termsRoot.loading
-                        BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }
+                        anchors.fill: parent
+                        color: "white"
+                        visible: termsRoot.loading
+                        z: 100
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: true
+                            width: 40
+                            height: 40
+                        }
                     }
                 }
             }

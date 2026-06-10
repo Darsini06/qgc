@@ -20,7 +20,7 @@ ColumnLayout {
 
     property string heading
     property string headingDescription
-    property bool   showDividers:       true
+    property bool   showDividers:       false
     property bool   showBorder:         true
 
     property real _margins: ScreenTools.defaultFontPixelHeight / 2

@@ -125,8 +125,14 @@ Item {
                     }
 
                     Rectangle {
-                        anchors.fill: parent; color: "#00000020"; visible: privacyRoot.loading
-                        BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }
+                        anchors.fill: parent
+                        color: "white"
+                        visible: privacyRoot.loading
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: true
+                        }
                     }
                 }
             }
