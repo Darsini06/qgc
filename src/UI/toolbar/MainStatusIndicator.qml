@@ -28,11 +28,11 @@ RowLayout {
     property real   _margins:           ScreenTools.defaultFontPixelWidth
     property real   _spacing:           ScreenTools.defaultFontPixelWidth / 2
     property bool   _healthAndArmingChecksSupported: _activeVehicle ? _activeVehicle.healthAndArmingCheckReport.supported : false
-
+property bool isTablet: Screen.width >= 800
     QGCMarqueeLabel {
         id:             mainStatusLabel
         text:           mainStatusText()
-        font.pointSize: ScreenTools.mediumFontPointSize
+        font.pointSize: isTablet?15:12//ScreenTools.mediumFontPointSize
         implicitWidth:  maxWidth
         maxWidth:       ScreenTools.defaultFontPixelWidth * ScreenTools.mediumFontPointRatio * 10
         color: "white"
