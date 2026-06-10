@@ -860,7 +860,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
                         anchors.rightMargin: dp(1)
-                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT")
+                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT   >>>>>")
                         color: "white"
                         font.family: "Outfit"
                         font.bold: true

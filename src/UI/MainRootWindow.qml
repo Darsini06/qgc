@@ -824,6 +824,10 @@ ApplicationWindow {
         flightMap : planView.editorMap
         mapRotation: MapGlobals.mapRotation
         planViewRef: planView
+
+        onDroneRedirectClicked: {
+               flyView.recenterDrone()
+           }
     }
 
     footer: LogReplayStatusBar {

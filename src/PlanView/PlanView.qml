@@ -21,7 +21,6 @@ import MapGlobals
 
 Item {
     id: _root
-
     property bool planControlColapsed: false
     property int selectedSpotPointIndex: -1
     property var fileDialogRef: null

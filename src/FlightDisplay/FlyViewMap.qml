@@ -300,6 +300,16 @@ import MapGlobals
         }
     }
 
+    function forceRecenterToVehicle() {
+        console.log("forceRecenterToVehicle called")
+
+        if (_activeVehicleCoordinate.isValid) {
+            animatedMapRecenter(_root.center, _activeVehicleCoordinate)
+        } else {
+            console.log("Vehicle coordinate is invalid")
+        }
+    }
+
     on_ActiveVehicleCoordinateChanged: {
         if (_keepMapCenteredOnVehicle && _activeVehicleCoordinate.isValid && !_disableVehicleTracking) {
             _root.center = _activeVehicleCoordinate
@@ -320,7 +330,7 @@ import MapGlobals
             console.log("Timer_1")
             _disableVehicleTracking = false
             updateMapToVehiclePosition()
-            MapGlobals.recenterInterval = 10000
+            MapGlobals.recenterInterval = 5000
              MapGlobals.forceRecenter = false
         }
     }

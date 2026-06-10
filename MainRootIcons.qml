@@ -50,6 +50,9 @@ Item {
     property var flightMap
     property var planViewRef
 
+    // for drone redirect
+    signal droneRedirectClicked()
+
     Component.onCompleted: {
         QGroundControl.mapEngineManager.loadTileSets()
     }
@@ -396,24 +399,40 @@ Item {
                                 fillMode: Image.PreserveAspectFit
                                 color: "white"
 
+                                // MouseArea {
+                                //     anchors.fill: parent
+                                //     onClicked: {
+                                //         console.log("DroneRedirect clicked");
+
+                                //         if(_activeVehicle){
+                                //             MapGlobals.forceRecenter = true;
+                                //             MapGlobals.recenterInterval = 0;
+
+                                //             Qt.callLater(function() {
+                                //                 MapGlobals.recenterInterval = 10000;
+                                //                 MapGlobals.forceRecenter = false;
+                                //             });
+                                //         }else {
+                                //             mainWindow.showToastMessage("Drone Not Connected");
+                                //         }
+
+                                //         iconsContainer.close();
+                                //     }
+                                // }
+
                                 MouseArea {
                                     anchors.fill: parent
+
                                     onClicked: {
-                                        console.log("DroneRedirect clicked");
+                                        console.log("DroneRedirect clicked")
 
-                                        if(_activeVehicle){
-                                            MapGlobals.forceRecenter = true;
-                                            MapGlobals.recenterInterval = 0;
-
-                                            Qt.callLater(function() {
-                                                MapGlobals.recenterInterval = 10000;
-                                                MapGlobals.forceRecenter = false;
-                                            });
-                                        }else {
-                                            mainWindow.showToastMessage("Drone Not Connected");
+                                        if (_activeVehicle) {
+                                            droneRedirectClicked()
+                                        } else {
+                                            mainWindow.showToastMessage("Drone Not Connected")
                                         }
 
-                                        iconsContainer.close();
+                                        iconsContainer.close()
                                     }
                                 }
                             }
