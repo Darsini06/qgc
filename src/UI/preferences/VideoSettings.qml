@@ -36,26 +36,22 @@ SettingsPage {
 
     SettingsGroupLayout {
         Layout.fillWidth:   true
-        heading:            qsTr("Video Source")
+        heading:            qsTr("Video Settings")
         headingDescription: _videoAutoStreamConfig ? qsTr("Mavlink camera stream is automatically configured") : ""
         enabled:            !_videoAutoStreamConfig
 
         LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Source")
-            indexModel:         false
-            fact:               _videoSettings.videoSource
-            visible:            fact.visible
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("Source")
+            indexModel:             false
+            fact:                   _videoSettings.videoSource
+            visible:                fact.visible
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Connection")
-        visible:            !_videoAutoStreamConfig && (_isTCP || _isRTSP | _requiresUDPPort)
 
         LabelledFactTextField {
             Layout.fillWidth:           true
+            labelPreferredWidth:        ScreenTools.defaultFontPixelWidth * 26
             textFieldPreferredWidth:    _urlFieldWidth
             label:                      qsTr("RTSP URL")
             fact:                       _videoSettings.rtspUrl
@@ -64,29 +60,27 @@ SettingsPage {
 
         LabelledFactTextField {
             Layout.fillWidth:           true
-            label:                      qsTr("TCP URL")
+            labelPreferredWidth:        ScreenTools.defaultFontPixelWidth * 26
             textFieldPreferredWidth:    _urlFieldWidth
+            label:                      qsTr("TCP URL")
             fact:                       _videoSettings.tcpUrl
             visible:                    _isTCP && _videoSettings.tcpUrl.visible
         }
 
         LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("UDP Port")
-            fact:               _videoSettings.udpPort
-            visible:            _requiresUDPPort && _videoSettings.udpPort.visible
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("UDP Port")
+            fact:                   _videoSettings.udpPort
+            visible:                _requiresUDPPort && _videoSettings.udpPort.visible
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Settings")
 
         LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("Aspect Ratio")
-            fact:               _videoSettings.aspectRatio
-            visible:            !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("Aspect Ratio")
+            fact:                   _videoSettings.aspectRatio
+            visible:                !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
         }
 
         FactCheckBoxSlider {
@@ -104,23 +98,20 @@ SettingsPage {
         }
 
         LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Video decode priority")
-            fact:               _videoSettings.forceVideoDecoder
-            visible:            fact.visible
-            indexModel:         false
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("Video decode priority")
+            fact:                   _videoSettings.forceVideoDecoder
+            visible:                fact.visible
+            indexModel:             false
         }
-    }
-
-    SettingsGroupLayout {
-        Layout.fillWidth: true
-        heading:            qsTr("Local Video Storage")
 
         LabelledFactComboBox {
-            Layout.fillWidth:   true
-            label:              qsTr("Record File Format")
-            fact:               _videoSettings.recordingFormat
-            visible:            _videoSettings.recordingFormat.visible
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("Record File Format")
+            fact:                   _videoSettings.recordingFormat
+            visible:                _videoSettings.recordingFormat.visible
         }
 
         FactCheckBoxSlider {
@@ -131,11 +122,12 @@ SettingsPage {
         }
 
         LabelledFactTextField {
-            Layout.fillWidth:   true
-            label:              qsTr("Max Storage Usage")
-            fact:               _videoSettings.maxVideoSize
-            visible:            fact.visible
-            enabled:            _videoSettings.enableStorageLimit.rawValue
+            Layout.fillWidth:       true
+            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
+            label:                  qsTr("Max Storage Usage")
+            fact:                   _videoSettings.maxVideoSize
+            visible:                fact.visible
+            enabled:                _videoSettings.enableStorageLimit.rawValue
         }
     }
 }

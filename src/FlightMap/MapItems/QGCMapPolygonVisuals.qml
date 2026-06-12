@@ -1943,7 +1943,7 @@ Item {
 
                     // ===== TITLE =====
                     Text {
-                        text:               qsTr("Set Ground Selvaraj")
+                        text:               qsTr("Set Ground Name")
                         font.bold:          true
                         color:              "white"
                         font.pointSize:     15

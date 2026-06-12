@@ -117,6 +117,7 @@ Item {
                     WebView {
                         id: webView
                         anchors.fill: parent
+                        visible: !privacyRoot.loading
                         url: "https://aviatricks.in/privacy-policy?embed=true"
                         onLoadingChanged: function(loadRequest) {
                             if (loadRequest.status === WebView.LoadStartedStatus) privacyRoot.loading = true
@@ -125,8 +126,14 @@ Item {
                     }
 
                     Rectangle {
-                        anchors.fill: parent; color: "#00000020"; visible: privacyRoot.loading
-                        BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }
+                        anchors.fill: parent
+                        color: "white"
+                        visible: privacyRoot.loading
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: true
+                        }
                     }
                 }
             }

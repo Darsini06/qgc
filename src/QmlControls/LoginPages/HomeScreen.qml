@@ -1,3 +1,4 @@
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -860,7 +861,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
                         anchors.rightMargin: dp(1)
-                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT")
+                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT   >>>>>")
                         color: "white"
                         font.family: "Outfit"
                         font.bold: true
@@ -1123,12 +1124,14 @@ Item {
 
                         // Set the overall popup UI width tightly
                         // Set a properly balanced dialog width to prevent text truncation
-                        popupWidth: (isSmallScreen || isMobile) ? Math.min(mainWindow1.width * 0.9, 380) : 520
+                        popupWidth: (isSmallScreen || isMobile)
+                                    ? Math.min(mainWindow1.width * 0.92, 420)
+                                    : 560
 
                         property int selectedType: -1
 
                         ColumnLayout {
-                            spacing: 18
+                            spacing: 2
                             width: parent.width - 24
                             anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
@@ -1151,8 +1154,8 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 68 : 0
-                                    Layout.bottomMargin: 12
+                                    Layout.preferredHeight: visible ? 52 : 0
+                                    Layout.bottomMargin: index === (_linkManager.linkTypeStrings.length - 1) ? 20 : 0
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
                                     border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
@@ -1173,12 +1176,12 @@ Item {
                                         anchors.fill: parent
                                         anchors.leftMargin: 16
                                         anchors.rightMargin: 16
-                                        spacing: 16
+                                        spacing: 12
 
                                         // Number Icon Box
                                         Rectangle {
-                                            width: 34
-                                            height: 34
+                                            width: 36
+                                            height: 36
                                             radius: 8
                                             Layout.alignment: Qt.AlignVCenter
                                             color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
@@ -1386,4 +1389,6 @@ Item {
                         }
                     }
                 }
-            }
+
+}
+

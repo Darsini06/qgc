@@ -375,6 +375,9 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
+
+        // modebtn1.visible = false
+
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -399,6 +402,9 @@ ApplicationWindow {
         mainWindow.closeScreens();
 
         mainrootIcons.visible=true
+
+        // modebtn1.visible = false
+
         plan="Plan"
         MapGlobals.edit = "edit1"
         _appSettings.username="";
@@ -422,6 +428,10 @@ ApplicationWindow {
 
         //homescreen.visible = false
         mainWindow.closeScreens();
+
+
+        modebtn1.visible = false
+
         plan="Start"
         MapGlobals.edit = "edit1"
 
@@ -814,6 +824,10 @@ ApplicationWindow {
         flightMap : planView.editorMap
         mapRotation: MapGlobals.mapRotation
         planViewRef: planView
+
+        onDroneRedirectClicked: {
+               flyView.recenterDrone()
+           }
     }
 
     footer: LogReplayStatusBar {
@@ -1151,8 +1165,10 @@ ApplicationWindow {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
-
-        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+property bool isTablet: Screen.width >= 800
+        readonly property real _btnSize: isTablet
+                                         ? ScreenTools.defaultFontPixelHeight * 1.8
+                                         : ScreenTools.defaultFontPixelHeight * 1.8
         readonly property real _iconSize: _btnSize * 0.55
 
         Rectangle {
@@ -1186,7 +1202,7 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             border.width: 0
             border.color:  "transparent"
 
@@ -1251,7 +1267,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+             color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1283,7 +1299,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1351,7 +1367,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1385,7 +1401,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1417,7 +1433,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1661,7 +1677,7 @@ ApplicationWindow {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("press & hold to confirm")
+                text: qsTr("Press & Hold to confirm")
                 color: "#dddddd"
                 font.pointSize: 10
             }
@@ -1739,19 +1755,26 @@ ApplicationWindow {
     }
 
     ColumnLayout {
+        id:columnbtnplus
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.bottomMargin: 10
         anchors.rightMargin: 20
         spacing: 20  // Adjust this value to control space between icons
 
+        property bool isTablet: Screen.width >= 800
+                readonly property real _btnSize: isTablet
+                                                 ? ScreenTools.defaultFontPixelHeight * 1.8
+                                                 : ScreenTools.defaultFontPixelHeight * 1.8
+                readonly property real _iconSize: _btnSize * 0.55
+
         Rectangle {
             id: planbtn
             Layout.alignment: Qt.AlignRight
-            width: 48
-            height: 48
-            radius: width / 2
-            color:  Qt.rgba(0, 0, 0, 0.40)      // More transparent black toolbars button
+            width: columnbtnplus._btnSize
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible: plan === "Plan"
 
             Text {
@@ -1759,7 +1782,7 @@ ApplicationWindow {
                 color: "white"
                 anchors.centerIn: parent
                 font.bold: true
-                font.pointSize: 24
+                font.pointSize: columnbtnplus._iconSize
             }
 
             MouseArea {
@@ -1769,16 +1792,11 @@ ApplicationWindow {
                     QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
+
                 }
-
-
-                // onClicked: {
-                //     // mainWindow.showPlanView()
-                //     // //viewer3DWindow.close()
-
-                // }
             }
         }
+
 
     }
 
@@ -2453,17 +2471,17 @@ ApplicationWindow {
                             }
                         }
 
-                        SubMenuButton {
-                            id:                 analyzeButton2
-                            height:             toolSelectDialog._toolButtonHeight
-                            Layout.fillWidth:   true
-                            text:               qsTr("Loiter")
-                            imageResource:      "/res/ArrowRight.svg"
-                            visible:            true
-                            onClicked: {
+                        // SubMenuButton {
+                        //     id:                 analyzeButton2
+                        //     height:             toolSelectDialog._toolButtonHeight
+                        //     Layout.fillWidth:   true
+                        //     text:               qsTr("Loiter")
+                        //     imageResource:      "/res/ArrowRight.svg"
+                        //     visible:            true
+                        //     onClicked: {
 
-                            }
-                        }
+                        //     }
+                        // }
 
                         SubMenuButton {
                             id:                 analyzeButton7
@@ -2751,6 +2769,10 @@ ApplicationWindow {
         topInset:       0
         bottomInset:    0
         padding:        0
+        topPadding:     12
+        leftPadding:    8
+        rightPadding:   8
+        bottomPadding:  12
         visible:        false
         modal:          true
         focus:          true
@@ -2760,7 +2782,7 @@ ApplicationWindow {
         property var indicatorItem
         property bool isRightAligned: false
         property bool _expanded:    false
-        property real _margins:     ScreenTools.defaultFontPixelHeight / 4
+        property real _margins:     ScreenTools.defaultFontPixelHeight
 
         function calcXPosition() {
             if (indicatorItem) {

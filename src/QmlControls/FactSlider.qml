@@ -35,6 +35,7 @@ Slider {
     property real _minMaxVisibilityPadding: ScreenTools.defaultFontPixelWidth
     property Fact _nullFact:                Fact { }
     property Fact _fact:                    fact ? fact : _nullFact
+    property color labelColor:              qgcPal.text
     
     Component.onCompleted: {
         _loadComplete = true
@@ -86,6 +87,7 @@ Slider {
 
         QGCLabel {
             text:       control.from.toFixed(_fact.decimalPlaces)
+            color:      control.labelColor
             visible:    fact && sliderValueLabel.x > x + contentWidth + _minMaxVisibilityPadding
             anchors {
                 left:   parent.left
@@ -95,6 +97,7 @@ Slider {
 
         QGCLabel {
             text:       control.to.toFixed(_fact.decimalPlaces)
+            color:      control.labelColor
             visible:    fact && sliderValueLabel.x + sliderValueLabel.contentWidth < x - _minMaxVisibilityPadding
             anchors {
                 right:  parent.right
@@ -107,6 +110,7 @@ Slider {
             anchors.bottom:         parent.bottom
             x:                      control.leftPadding + (control.visualPosition * (control.availableWidth - width))
             text:                   fact ? valuePlusUnits(control.value.toFixed(control._fact.decimalPlaces)) : qsTr("N/A")
+            color:                  control.labelColor
             horizontalAlignment:    Text.AlignHCenter
         }
     }

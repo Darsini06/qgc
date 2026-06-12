@@ -61,38 +61,46 @@ Item {
                     anchors.margins: -100
                 }
 
+                // ── Back Arrow pinned to top-left ──
+                Rectangle {
+                    width: 44; height: 44; radius: 12
+                    anchors.top:        parent.top
+                    anchors.left:       parent.left
+                    anchors.topMargin:  20
+                    anchors.leftMargin: 20
+                    z: 10
+                    color:        backMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
+                    border.color: Qt.rgba(255, 255, 255, 0.2)
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 22; height: 22; color: "white"
+                        anchors.centerIn: parent
+                    }
+                    MouseArea {
+                        id: backMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: feedbackRoot.backClicked()
+                    }
+                }
+
+                // ── Centered content ──
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 50
+                    anchors.topMargin: 100
                     spacing: 30
 
-                    // Back Arrow (Premium)
-                    Rectangle {
-                        width: 44; height: 44; radius: 12
-                        color: backMouse.containsMouse ? Qt.rgba(255, 255, 255, 0.15) : Qt.rgba(255, 255, 255, 0.08)
-                        border.color: Qt.rgba(255, 255, 255, 0.2)
-                        
-                        QGCColoredImage {
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            width: 22; height: 22; color: "white"
-                            anchors.centerIn: parent
-                        }
-
-                        MouseArea {
-                            id: backMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: feedbackRoot.backClicked()
-                        }
-                    }
+                    // back arrow REMOVED from here
 
                     Item { Layout.fillHeight: true }
 
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 12
-                        
+
                         Text {
                             text: "Feedback"
                             font.family: "Outfit"
@@ -100,7 +108,6 @@ Item {
                             font.bold: true
                             color: "white"
                         }
-
                         Text {
                             Layout.fillWidth: true
                             text: "Help us shape the future of flight. Your insights drive our continuous improvement."
@@ -112,7 +119,6 @@ Item {
                         }
                     }
 
-                    // Static Icon instead of Animation to improve scroll performance
                     Item {
                         Layout.preferredHeight: 120
                         Layout.fillWidth: true
@@ -169,7 +175,7 @@ Item {
                         width: Math.min(500, parent.width - 60)
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        anchors.topMargin: isSmallScreen ? 20 : 80
+                        anchors.topMargin: isSmallScreen ? 10 : 20
                         spacing: 40
 
                         ColumnLayout {

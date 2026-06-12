@@ -450,23 +450,38 @@ ColumnLayout  {
 
                     _linkManager.endConfigurationEditing(originalConfig, editingConfig)
 
-                } else {
+                }
+                else {
+
+                    // Check for existing config with same name
+                    for (var i = 0; i < _linkManager.linkConfigurations.length; i++) {
+                        var cfg = _linkManager.linkConfigurations[i]
+
+                        if (cfg.name === editingConfig.name) {
+                            console.log("Device already exists:", cfg.name)
+
+                            if (activeVehicle) {
+                                mainWindow.showToastMessage(
+                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
+                                return
+                            }
+
+                            _connectionInitiated = true
+                            mainWindow.connecting_drone = true
+                            _linkManager.createConnectedLink(cfg)
+                            return
+                        }
+                    }
+
                     editingConfig.dynamic = false
                     if (!_linkManager.endCreateConfiguration(editingConfig)) {
                         preventClose = true
                         return
                     }
 
-                    if (activeVehicle) {
-                        mainWindow.showToastMessage(
-                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
-                        return
-                    }
-
-                    _connectionInitiated = true         // mark as initiated
-                    mainWindow.connecting_drone = true  // only set true once
+                    _connectionInitiated = true
+                    mainWindow.connecting_drone = true
                     _linkManager.createConnectedLink(editingConfig)
-                    console.log("click save button editingConfig : ")
                 }
             }
 

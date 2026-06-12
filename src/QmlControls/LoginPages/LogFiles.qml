@@ -431,7 +431,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: parent.width * 0.45
                 visible: !isSmallScreen
                 color: app_color
                 clip: true
@@ -445,31 +445,47 @@ Item {
                     }
                 }
 
-                // Decorative Accents
+                // Decorative Accent
                 Rectangle {
                     width: 400; height: 400; radius: 200; color: Qt.rgba(255,255,255,0.03)
                     anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
                 }
 
+                // ── Back Arrow pinned to top-left ──────────────────────────────
+                Rectangle {
+                    width: 44; height: 44; radius: 12
+                    anchors.top:        parent.top
+                    anchors.left:       parent.left
+                    anchors.topMargin:  20
+                    anchors.leftMargin: 20
+                    z: 10
+                    color:        Qt.rgba(255, 255, 255, 0.08)
+                    border.color: Qt.rgba(255, 255, 255, 0.15)
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 20; height: 20; color: "white"
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            logfiles.backClicked()
+                            console.log("Button clicked2")
+                        }
+                    }
+                }
+
+                // ── Centered content (title + stats) ──────────────────────────
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 50
+                    anchors.topMargin: 100
                     spacing: 0
 
-                    // Back Arrow
-                    Rectangle {
-                        width: 44; height: 44; radius: 12
-                        color: Qt.rgba(255, 255, 255, 0.08)
-                        border.color: Qt.rgba(255, 255, 255, 0.15)
-                        QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-
-                        MouseArea {
-                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                            onClicked: {MapGlobals.rootWindow.homescreen()
-                                console.log("Button clicked2")
-                            } }
-
-                    }
+                    // no back arrow here anymore
 
                     Item { Layout.fillHeight: true }
 
@@ -488,7 +504,6 @@ Item {
 
                     Item { Layout.fillHeight: true }
 
-                    // Stats (Keeping the contents as requested)
                     ColumnLayout {
                         Layout.fillWidth: true; spacing: 14
 
@@ -522,7 +537,6 @@ Item {
                     Item { Layout.preferredHeight: 40 }
                 }
             }
-
             /* ================= DATA CONTENT AREA (55%) ================= */
             Rectangle {
                 Layout.fillWidth: true

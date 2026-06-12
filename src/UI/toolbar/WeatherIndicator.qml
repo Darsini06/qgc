@@ -91,14 +91,14 @@ Item {
 
         Text {
             text: weatherIconText
-            font.pixelSize: 22
+            font.pixelSize: 20
             color: "white"
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Text {
             text: tempString
-            font.pixelSize: 15
+            font.pixelSize: 12
             color: "white"
             font.bold: true
             anchors.verticalCenter: parent.verticalCenter

@@ -21,15 +21,12 @@ Item {
     property color accent_color: "#262626"
     property color surface_color: "#ffffff"
     property color bg_color: "#f8f9fa"
+    property bool showChangePassword: false
 
     signal menuItemSelected(string screenName)
     signal backClicked()
 
-    onMenuItemSelected: {
-        if (screenName === "changePassword") {
-            changePasswordDialog.open()
-        }
-    }
+    // Removed onMenuItemSelected for changePassword as it's handled directly now
 
     readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 100
 
@@ -145,7 +142,7 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true; spacing: 12
                         Rectangle {
-                            Layout.fillWidth: true; height: 75; radius: 15; color: "white" // Reduced Height
+                            Layout.fillWidth: true; height: 50; radius: 9; color: "white" // Reduced Height
                             Column {
                                 anchors.centerIn: parent
                                 Text { text: "AIR TIME"; color: "#94a3b8"; font.pointSize: 6.5; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
@@ -153,7 +150,7 @@ Item {
                             }
                         }
                         Rectangle {
-                            Layout.fillWidth: true; height: 75; radius: 15; color: "white" // Reduced Height
+                            Layout.fillWidth: true; height: 50; radius: 9; color: "white" // Reduced Height
 
                             Column {
                                 anchors.centerIn: parent
@@ -185,7 +182,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: 50
-                    spacing: 30
+                    spacing: 20
 
                     Text {
                         text: "SETTINGS & PREFERENCES"
@@ -195,36 +192,47 @@ Item {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        spacing: 12
+                        spacing: 4
 
                         Repeater {
                             model: [
-                                { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/accountUpdate_black.svg" },
-                                { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
-                                { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/report_color.svg" },
+                                { "id": "accountUpdate", "name": "Account Settings", "icon": "qrc:/qmlimages/NewImages/account_settings_colour.png" },
+                                // { "id": "cloudPlans",    "name": "Cloud Plans",      "icon": "qrc:/qmlimages/NewImages/cloud_plan_colour.png" },
+                                { "id": "reports",       "name": "Mission History",  "icon": "qrc:/qmlimages/NewImages/mission_history_colour.png" },
                                 { "id": "logfiles",      "name": "Log Files",        "desc": "View logs and performance of previous flights",
-                                    "icon": "qrc:/qmlimages/NewImages/report_color.svg", "color": "#475569" },
+                                    "icon": "qrc:/qmlimages/NewImages/log_files_colour.jfif", "color": "#475569" },
                                 //{ "id": "drone", "name": "Operation Mode", "icon": "qrc:/qmlimages/NewImages/select_drone_type_color.svg" },
-                                { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_color.svg" },
-                                { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
-                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_black.svg"},
-                                { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/privacy_policy_black.svg" },
+                                { "id": "feedback", "name": "Submit Feedback", "icon": "qrc:/qmlimages/NewImages/feedback_colour.png" },
+                                { "id": "privacy_policy", "name": "Privacy Policy", "icon": "qrc:/qmlimages/NewImages/privacy_policy_colour.png" },
+                                { "id": "terms&conditions", "name": "Terms & Conditions", "icon": "qrc:/qmlimages/NewImages/terms_condition_colour.jfif"},
+                                { "id": "changePassword", "name": "Change Password", "icon": "qrc:/qmlimages/NewImages/change_password_colour.png" },
                                 { "id": "logout",         "name": "Sign Out",         "icon": "qrc:/qmlimages/NewImages/signIn.svg", "isWarning": true }
                             ]
 
                             Rectangle {
-                                Layout.fillWidth: true; height: 68; radius: 14
-                                color: mouseItem.containsMouse ? "white" : "transparent"
+                               width: rightContentColumn.width; height: 56; radius: 14
+                                color: mouseItem.containsMouse ? "white" :"transparent"
                                 border.color: mouseItem.containsMouse ? "#f1f5f9" : "transparent"
                                 
                                 RowLayout {
-                                    anchors.fill: parent; anchors.margins: 20; spacing: 20
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 20
+                                    anchors.rightMargin: 20
+                                    anchors.topMargin: 6
+                                    anchors.bottomMargin: 6
+                                    spacing: 20
                                     Rectangle {
-                                        width: 44; height: 44; radius: 10; color: "#f1f5f9"
-                                        QGCColoredImage {
+                                        width: 44
+                                        height: 44
+                                        radius: 10
+                                        color: "#f1f5f9"
+
+                                        Image {
                                             anchors.centerIn: parent
-                                            source: modelData.icon; width: 22; height: 22
-                                            color: modelData.isWarning ? "#ef4444" : "#475569"
+                                            source: modelData.icon
+                                            width: 22
+                                            height: 22
+                                            fillMode: Image.PreserveAspectFit
                                         }
                                     }
                                     Text {
@@ -245,14 +253,16 @@ Item {
                                     id: mouseItem
                                     anchors.fill: parent
                                     hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (modelData.id === "cloudPlans") {
-                                            MapGlobals.jumpToFileList = true
-                                            profileMainRoot.menuItemSelected("logfiles")
-                                        } else {
-                                            profileMainRoot.menuItemSelected(modelData.id)
-                                        }
-                                    }
+                                     onClicked: {
+                                         if (modelData.id === "changePassword") {
+                                            profileMainRoot.showChangePassword = true
+                                         } else if (modelData.id === "cloudPlans") {
+                                             MapGlobals.jumpToFileList = true
+                                             profileMainRoot.menuItemSelected("logfiles")
+                                         } else {
+                                             profileMainRoot.menuItemSelected(modelData.id)
+                                         }
+                                     }
                                 }
                             }
                         }
@@ -260,6 +270,7 @@ Item {
                 }
             }
         }
+
     }
 
     Component.onCompleted: {
@@ -273,411 +284,412 @@ Item {
         }
     }
 
-    // Change Password Dialog
-    Dialog {
-        id: changePasswordDialog
-        property bool showOldPass: false
-        property bool showNewPass: false
-        property bool showConfirmPass: false
-        modal: true
-        anchors.centerIn: parent
-        width: Math.min(parent.width * 0.9, 400) // Small, professional compact size
-        padding: 0 // Use custom padding in contentItem to avoid QML bugs
+    // // Change Password Dialog
+    // Dialog {
+    //     id: changePasswordDialog
+    //     property bool showOldPass: false
+    //     property bool showNewPass: false
+    //     property bool showConfirmPass: false
 
-        background: Rectangle {
-            color: "white"
-            radius: 16
-            layer.enabled: true
-        }
+    //     modal: true
+    //     anchors.centerIn: parent
+    //     width: Math.min(parent.width * 0.9, 400) // Small, professional compact size
+    //     padding: 0 // Use custom padding in contentItem to avoid QML bugs
 
-        // Custom header
-        header: Item {
-            height: 64
+    //     background: Rectangle {
+    //         color: "white"
+    //         radius: 16
+    //         layer.enabled: true
+    //     }
 
-            Rectangle {
-                anchors.fill: parent
-                color: app_color
-                radius: 16
+    //     // Custom header
+    //     header: Item {
+    //         height: 64
 
-                // Square off bottom corners
-                Rectangle {
-                    anchors.bottom: parent.bottom
-                    width: parent.width
-                    height: 16
-                    color: app_color
-                }
-            }
+    //         Rectangle {
+    //             anchors.fill: parent
+    //             color: app_color
+    //             radius: 16
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 24
-                anchors.rightMargin: 16
+    //             // Square off bottom corners
+    //             Rectangle {
+    //                 anchors.bottom: parent.bottom
+    //                 width: parent.width
+    //                 height: 16
+    //                 color: app_color
+    //             }
+    //         }
 
-                QGCColoredImage {
-                    source: "/qmlimages/NewImages/privacy_policy_black.svg"
-                    width: 22; height: 22
-                    color: "white"
-                }
+    //         RowLayout {
+    //             anchors.fill: parent
+    //             anchors.leftMargin: 24
+    //             anchors.rightMargin: 16
 
-                Text {
-                    text: "Change Password"
-                    font.pointSize: ScreenTools.mediumFontPointSize
-                    font.weight: Font.Bold
-                    font.family: "Outfit"
-                    color: "white"
-                    Layout.fillWidth: true
-                }
+    //             QGCColoredImage {
+    //                 source: "/qmlimages/NewImages/privacy_policy_black.svg"
+    //                 width: 22; height: 22
+    //                 color: "white"
+    //             }
 
-                // Close button
-                Rectangle {
-                    width: 32; height: 32; radius: 16
-                    color: closeBtnMouse.containsMouse ? Qt.rgba(1,1,1,0.2) : "transparent"
+    //             Text {
+    //                 text: "Change Password"
+    //                 font.pointSize: ScreenTools.mediumFontPointSize
+    //                 font.weight: Font.Bold
+    //                 font.family: "Outfit"
+    //                 color: "white"
+    //                 Layout.fillWidth: true
+    //             }
 
-                    Item {
-                        anchors.centerIn: parent
-                        width: 12
-                        height: 12
+    //             // Close button
+    //             Rectangle {
+    //                 width: 32; height: 32; radius: 16
+    //                 color: closeBtnMouse.containsMouse ? Qt.rgba(1,1,1,0.2) : "transparent"
+
+    //                 Item {
+    //                     anchors.centerIn: parent
+    //                     width: 12
+    //                     height: 12
                         
-                        Rectangle {
-                            width: parent.width * 1.414
-                            height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
-                            color: "white"
-                            anchors.centerIn: parent
-                            rotation: 45
-                            antialiasing: true
-                        }
+    //                     Rectangle {
+    //                         width: parent.width * 1.414
+    //                         height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
+    //                         color: "white"
+    //                         anchors.centerIn: parent
+    //                         rotation: 45
+    //                         antialiasing: true
+    //                     }
                         
-                        Rectangle {
-                            width: parent.width * 1.414
-                            height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
-                            color: "white"
-                            anchors.centerIn: parent
-                            rotation: -45
-                            antialiasing: true
-                        }
-                    }
+    //                     Rectangle {
+    //                         width: parent.width * 1.414
+    //                         height: Math.max(2, Math.round(ScreenTools.defaultFontPointSize * 0.15))
+    //                         color: "white"
+    //                         anchors.centerIn: parent
+    //                         rotation: -45
+    //                         antialiasing: true
+    //                     }
+    //                 }
 
-                    MouseArea {
-                        id: closeBtnMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: changePasswordDialog.close()
-                    }
-                }
-            }
-        }
+    //                 MouseArea {
+    //                     id: closeBtnMouse
+    //                     anchors.fill: parent
+    //                     hoverEnabled: true
+    //                     cursorShape: Qt.PointingHandCursor
+    //                     onClicked: changePasswordDialog.close()
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        contentItem: Item {
-            // Set max height dynamically (up to 80% of screen) to enforce scrolling if content is too large
-            property real maxDialogHeight: Overlay.overlay ? Overlay.overlay.height * 0.8 : 500
-            implicitHeight: Math.min(scrollContainer.implicitHeight, maxDialogHeight)
+    //     contentItem: Item {
+    //         // Set max height dynamically (up to 80% of screen) to enforce scrolling if content is too large
+    //         property real maxDialogHeight: Overlay.overlay ? Overlay.overlay.height * 0.8 : 500
+    //         implicitHeight: Math.min(scrollContainer.implicitHeight, maxDialogHeight)
 
-            ScrollView {
-                anchors.fill: parent
-                contentWidth: availableWidth
-                clip: true
-                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                ScrollBar.vertical.policy: ScrollBar.AsNeeded
+    //         ScrollView {
+    //             anchors.fill: parent
+    //             contentWidth: availableWidth
+    //             clip: true
+    //             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+    //             ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
-                Item {
-                    id: scrollContainer
-                    width: parent.width
-                    implicitHeight: mainLayout.implicitHeight + 48
+    //             Item {
+    //                 id: scrollContainer
+    //                 width: parent.width
+    //                 implicitHeight: mainLayout.implicitHeight + 48
 
-                    ColumnLayout {
-                        id: mainLayout
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.margins: 24 // Flawless padding around all edges inside the scroll area
-                        spacing: 20
+    //                 ColumnLayout {
+    //                     id: mainLayout
+    //                     anchors.left: parent.left
+    //                     anchors.right: parent.right
+    //                     anchors.top: parent.top
+    //                     anchors.margins: 24 // Flawless padding around all edges inside the scroll area
+    //                     spacing: 20
 
-                        // Subtitle
-                        Text {
-                            text: "Enter your current password and set a new one"
-                            font.pointSize: ScreenTools.smallFontPointSize
-                            color: "#94a3b8"
-                            Layout.fillWidth: true
-                            wrapMode: Text.WordWrap
-                        }
+    //                     // Subtitle
+    //                     Text {
+    //                         text: "Enter your current password and set a new one"
+    //                         font.pointSize: ScreenTools.smallFontPointSize
+    //                         color: "#94a3b8"
+    //                         Layout.fillWidth: true
+    //                         wrapMode: Text.WordWrap
+    //                     }
 
-                        // Old Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
+    //                     // Old Password
+    //                     ColumnLayout {
+    //                         spacing: 8
+    //                         Layout.fillWidth: true
 
-                            Row {
-                                spacing: 4
-                                Text {
-                                    text: "Current Password"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.DemiBold
-                                    color: "#1e293b"
-                                }
-                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
-                            }
+    //                         Row {
+    //                             spacing: 4
+    //                             Text {
+    //                                 text: "Current Password"
+    //                                 font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+    //                                 font.weight: Font.DemiBold
+    //                                 color: "#1e293b"
+    //                             }
+    //                             Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+    //                         }
 
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 45
-                                radius: 8
-                                border.color: oldPasswordInput.activeFocus ? app_color : "#e2e8f0"
-                                border.width: oldPasswordInput.activeFocus ? 2 : 1
-                                color: "#f8fafc"
+    //                         Rectangle {
+    //                             Layout.fillWidth: true
+    //                             height: 45
+    //                             radius: 8
+    //                             border.color: oldPasswordInput.activeFocus ? app_color : "#e2e8f0"
+    //                             border.width: oldPasswordInput.activeFocus ? 2 : 1
+    //                             color: "#f8fafc"
 
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 12
-                                    anchors.rightMargin: 6
-                                    spacing: 8
+    //                             RowLayout {
+    //                                 anchors.fill: parent
+    //                                 anchors.leftMargin: 12
+    //                                 anchors.rightMargin: 6
+    //                                 spacing: 8
 
-                                    TextField {
-                                        id: oldPasswordInput
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        echoMode: changePasswordDialog.showOldPass ? TextInput.Normal : TextInput.Password
-                                        placeholderText: "Enter current password"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.family: "Outfit"
-                                        color: "#1e293b"
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        background: null
-                                    }
+    //                                 TextField {
+    //                                     id: oldPasswordInput
+    //                                     Layout.fillWidth: true
+    //                                     Layout.fillHeight: true
+    //                                     echoMode: changePasswordDialog.showOldPass ? TextInput.Normal : TextInput.Password
+    //                                     placeholderText: "Enter current password"
+    //                                     font.pointSize: ScreenTools.defaultFontPointSize
+    //                                     font.family: "Outfit"
+    //                                     color: "#1e293b"
+    //                                     verticalAlignment: TextInput.AlignVCenter
+    //                                     background: null
+    //                                 }
 
-                                    Button {
-                                        width: 32; height: 32
-                                        checkable: true
-                                        checked: changePasswordDialog.showOldPass
-                                        onCheckedChanged: changePasswordDialog.showOldPass = checked
-                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
-                                        contentItem: QGCColoredImage {
-                                            anchors.fill: parent; anchors.margins: 6
-                                            fillMode: Image.PreserveAspectFit
-                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: app_color
-                                        }
-                                    }
-                                }
-                            }
-                        }
+    //                                 Button {
+    //                                     width: 32; height: 32
+    //                                     checkable: true
+    //                                     checked: changePasswordDialog.showOldPass
+    //                                     onCheckedChanged: changePasswordDialog.showOldPass = checked
+    //                                     background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+    //                                     contentItem: QGCColoredImage {
+    //                                         anchors.fill: parent; anchors.margins: 6
+    //                                         fillMode: Image.PreserveAspectFit
+    //                                         source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+    //                                         color: app_color
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
 
-                        // Separator
-                        Rectangle {
-                            Layout.fillWidth: true
-                            height: 1
-                            color: "#f1f5f9"
-                        }
+    //                     // Separator
+    //                     Rectangle {
+    //                         Layout.fillWidth: true
+    //                         height: 1
+    //                         color: "#f1f5f9"
+    //                     }
 
-                        // New Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
+    //                     // New Password
+    //                     ColumnLayout {
+    //                         spacing: 8
+    //                         Layout.fillWidth: true
 
-                            Row {
-                                spacing: 4
-                                Text {
-                                    text: "New Password"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.DemiBold
-                                    color: "#1e293b"
-                                }
-                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
-                            }
+    //                         Row {
+    //                             spacing: 4
+    //                             Text {
+    //                                 text: "New Password"
+    //                                 font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+    //                                 font.weight: Font.DemiBold
+    //                                 color: "#1e293b"
+    //                             }
+    //                             Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+    //                         }
 
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 45
-                                radius: 8
-                                border.color: newPasswordInput.activeFocus ? app_color : "#e2e8f0"
-                                border.width: newPasswordInput.activeFocus ? 2 : 1
-                                color: "#f8fafc"
+    //                         Rectangle {
+    //                             Layout.fillWidth: true
+    //                             height: 45
+    //                             radius: 8
+    //                             border.color: newPasswordInput.activeFocus ? app_color : "#e2e8f0"
+    //                             border.width: newPasswordInput.activeFocus ? 2 : 1
+    //                             color: "#f8fafc"
 
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 12
-                                    anchors.rightMargin: 6
-                                    spacing: 8
+    //                             RowLayout {
+    //                                 anchors.fill: parent
+    //                                 anchors.leftMargin: 12
+    //                                 anchors.rightMargin: 6
+    //                                 spacing: 8
 
-                                    TextField {
-                                        id: newPasswordInput
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        echoMode: changePasswordDialog.showNewPass ? TextInput.Normal : TextInput.Password
-                                        placeholderText: "Min 4 characters"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.family: "Outfit"
-                                        color: "#1e293b"
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        background: null
-                                    }
+    //                                 TextField {
+    //                                     id: newPasswordInput
+    //                                     Layout.fillWidth: true
+    //                                     Layout.fillHeight: true
+    //                                     echoMode: changePasswordDialog.showNewPass ? TextInput.Normal : TextInput.Password
+    //                                     placeholderText: "Min 4 characters"
+    //                                     font.pointSize: ScreenTools.defaultFontPointSize
+    //                                     font.family: "Outfit"
+    //                                     color: "#1e293b"
+    //                                     verticalAlignment: TextInput.AlignVCenter
+    //                                     background: null
+    //                                 }
 
-                                    Button {
-                                        width: 32; height: 32
-                                        checkable: true
-                                        checked: changePasswordDialog.showNewPass
-                                        onCheckedChanged: changePasswordDialog.showNewPass = checked
-                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
-                                        contentItem: QGCColoredImage {
-                                            anchors.fill: parent; anchors.margins: 6
-                                            fillMode: Image.PreserveAspectFit
-                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: app_color
-                                        }
-                                    }
-                                }
-                            }
-                        }
+    //                                 Button {
+    //                                     width: 32; height: 32
+    //                                     checkable: true
+    //                                     checked: changePasswordDialog.showNewPass
+    //                                     onCheckedChanged: changePasswordDialog.showNewPass = checked
+    //                                     background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+    //                                     contentItem: QGCColoredImage {
+    //                                         anchors.fill: parent; anchors.margins: 6
+    //                                         fillMode: Image.PreserveAspectFit
+    //                                         source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+    //                                         color: app_color
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
 
-                        // Confirm Password
-                        ColumnLayout {
-                            spacing: 8
-                            Layout.fillWidth: true
+    //                     // Confirm Password
+    //                     ColumnLayout {
+    //                         spacing: 8
+    //                         Layout.fillWidth: true
 
-                            Row {
-                                spacing: 4
-                                Text {
-                                    text: "Confirm Password"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 0.9
-                                    font.weight: Font.DemiBold
-                                    color: "#1e293b"
-                                }
-                                Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
-                            }
+    //                         Row {
+    //                             spacing: 4
+    //                             Text {
+    //                                 text: "Confirm Password"
+    //                                 font.pointSize: ScreenTools.defaultFontPointSize * 0.9
+    //                                 font.weight: Font.DemiBold
+    //                                 color: "#1e293b"
+    //                             }
+    //                             Text { text: "*"; font.pointSize: ScreenTools.defaultFontPointSize * 0.8; color: "#ef4444" }
+    //                         }
 
-                            Rectangle {
-                                Layout.fillWidth: true
-                                height: 45
-                                radius: 8
-                                border.color: confirmPasswordInput.activeFocus ? app_color : "#e2e8f0"
-                                border.width: confirmPasswordInput.activeFocus ? 2 : 1
-                                color: "#f8fafc"
+    //                         Rectangle {
+    //                             Layout.fillWidth: true
+    //                             height: 45
+    //                             radius: 8
+    //                             border.color: confirmPasswordInput.activeFocus ? app_color : "#e2e8f0"
+    //                             border.width: confirmPasswordInput.activeFocus ? 2 : 1
+    //                             color: "#f8fafc"
 
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 12
-                                    anchors.rightMargin: 6
-                                    spacing: 8
+    //                             RowLayout {
+    //                                 anchors.fill: parent
+    //                                 anchors.leftMargin: 12
+    //                                 anchors.rightMargin: 6
+    //                                 spacing: 8
 
-                                    TextField {
-                                        id: confirmPasswordInput
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        echoMode: changePasswordDialog.showConfirmPass ? TextInput.Normal : TextInput.Password
-                                        placeholderText: "Confirm new password"
-                                        font.pointSize: ScreenTools.defaultFontPointSize
-                                        font.family: "Outfit"
-                                        color: "#1e293b"
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        background: null
-                                    }
+    //                                 TextField {
+    //                                     id: confirmPasswordInput
+    //                                     Layout.fillWidth: true
+    //                                     Layout.fillHeight: true
+    //                                     echoMode: changePasswordDialog.showConfirmPass ? TextInput.Normal : TextInput.Password
+    //                                     placeholderText: "Confirm new password"
+    //                                     font.pointSize: ScreenTools.defaultFontPointSize
+    //                                     font.family: "Outfit"
+    //                                     color: "#1e293b"
+    //                                     verticalAlignment: TextInput.AlignVCenter
+    //                                     background: null
+    //                                 }
 
-                                    Button {
-                                        width: 32; height: 32
-                                        checkable: true
-                                        checked: changePasswordDialog.showConfirmPass
-                                        onCheckedChanged: changePasswordDialog.showConfirmPass = checked
-                                        background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
-                                        contentItem: QGCColoredImage {
-                                            anchors.fill: parent; anchors.margins: 6
-                                            fillMode: Image.PreserveAspectFit
-                                            source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
-                                            color: app_color
-                                        }
-                                    }
-                                }
-                            }
-                        }
+    //                                 Button {
+    //                                     width: 32; height: 32
+    //                                     checkable: true
+    //                                     checked: changePasswordDialog.showConfirmPass
+    //                                     onCheckedChanged: changePasswordDialog.showConfirmPass = checked
+    //                                     background: Rectangle { radius: 6; color: parent.hovered ? Qt.rgba(0,0,0,0.05) : "transparent" }
+    //                                     contentItem: QGCColoredImage {
+    //                                         anchors.fill: parent; anchors.margins: 6
+    //                                         fillMode: Image.PreserveAspectFit
+    //                                         source: parent.checked ? "/qmlimages/NewImages/password_visible.svg" : "/qmlimages/NewImages/password_hidden.svg"
+    //                                         color: app_color
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
 
-                        // Spacer
-                        Item { Layout.fillHeight: true; Layout.minimumHeight: 8 }
+    //                     // Spacer
+    //                     Item { Layout.fillHeight: true; Layout.minimumHeight: 8 }
 
-                        // Buttons at bottom
-                        RowLayout {
-                            Layout.fillWidth: true
-                            spacing: 12
+    //                     // Buttons at bottom
+    //                     RowLayout {
+    //                         Layout.fillWidth: true
+    //                         spacing: 12
 
-                            Button {
-                                id: cancelBtn
-                                Layout.fillWidth: true
-                                height: 45
-                                text: "Cancel"
-                                background: Rectangle {
-                                    radius: 8
-                                    color: cancelBtn.hovered ? "#e2e8f0" : "#f1f5f9"
-                                    border.color: "#e2e8f0"
-                                    border.width: 1
-                                    Behavior on color { ColorAnimation { duration: 150 } }
-                                }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: "#475569"
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.Medium
-                                    font.family: "Outfit"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: {
-                                    changePasswordDialog.close()
-                                    oldPasswordInput.text = ""
-                                    newPasswordInput.text = ""
-                                    confirmPasswordInput.text = ""
-                                    changePasswordDialog.showOldPass = false
-                                    changePasswordDialog.showNewPass = false
-                                    changePasswordDialog.showConfirmPass = false
-                                }
-                            }
+    //                         Button {
+    //                             id: cancelBtn
+    //                             Layout.fillWidth: true
+    //                             height: 45
+    //                             text: "Cancel"
+    //                             background: Rectangle {
+    //                                 radius: 8
+    //                                 color: cancelBtn.hovered ? "#e2e8f0" : "#f1f5f9"
+    //                                 border.color: "#e2e8f0"
+    //                                 border.width: 1
+    //                                 Behavior on color { ColorAnimation { duration: 150 } }
+    //                             }
+    //                             contentItem: Text {
+    //                                 text: parent.text
+    //                                 color: "#475569"
+    //                                 font.pointSize: ScreenTools.defaultFontPointSize
+    //                                 font.weight: Font.Medium
+    //                                 font.family: "Outfit"
+    //                                 horizontalAlignment: Text.AlignHCenter
+    //                                 verticalAlignment: Text.AlignVCenter
+    //                             }
+    //                             onClicked: {
+    //                                 changePasswordDialog.close()
+    //                                 oldPasswordInput.text = ""
+    //                                 newPasswordInput.text = ""
+    //                                 confirmPasswordInput.text = ""
+    //                                 changePasswordDialog.showOldPass = false
+    //                                 changePasswordDialog.showNewPass = false
+    //                                 changePasswordDialog.showConfirmPass = false
+    //                             }
+    //                         }
 
-                            Button {
-                                id: changePwdBtn
-                                Layout.fillWidth: true
-                                height: 45
-                                text: "Save Password"
-                                background: Rectangle {
-                                    radius: 8
-                                    color: changePwdBtn.pressed ? Qt.darker(app_color, 1.15) : (changePwdBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
-                                    Behavior on color { ColorAnimation { duration: 150 } }
-                                }
-                                contentItem: Text {
-                                    text: parent.text
-                                    color: "white"
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    font.weight: Font.DemiBold
-                                    font.family: "Outfit"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: {
-                                    if (oldPasswordInput.text === "") {
-                                        showMessage("Enter current password!", "error");
-                                        return;
-                                    }
+    //                         Button {
+    //                             id: changePwdBtn
+    //                             Layout.fillWidth: true
+    //                             height: 45
+    //                             text: "Save Password"
+    //                             background: Rectangle {
+    //                                 radius: 8
+    //                                 color: changePwdBtn.pressed ? Qt.darker(app_color, 1.15) : (changePwdBtn.hovered ? Qt.lighter(app_color, 1.1) : app_color)
+    //                                 Behavior on color { ColorAnimation { duration: 150 } }
+    //                             }
+    //                             contentItem: Text {
+    //                                 text: parent.text
+    //                                 color: "white"
+    //                                 font.pointSize: ScreenTools.defaultFontPointSize
+    //                                 font.weight: Font.DemiBold
+    //                                 font.family: "Outfit"
+    //                                 horizontalAlignment: Text.AlignHCenter
+    //                                 verticalAlignment: Text.AlignVCenter
+    //                             }
+    //                             onClicked: {
+    //                                 if (oldPasswordInput.text === "") {
+    //                                     showMessage("Enter current password!", "error");
+    //                                     return;
+    //                                 }
 
-                                    if (newPasswordInput.text !== confirmPasswordInput.text) {
-                                        showMessage("Passwords do not match!", "error");
-                                        return;
-                                    }
+    //                                 if (newPasswordInput.text !== confirmPasswordInput.text) {
+    //                                     showMessage("Passwords do not match!", "error");
+    //                                     return;
+    //                                 }
 
-                                    if (newPasswordInput.text.length < 4) {
-                                        showMessage("Min 4 characters required!", "error");
-                                        return;
-                                    }
+    //                                 if (newPasswordInput.text.length < 4) {
+    //                                     showMessage("Min 4 characters required!", "error");
+    //                                     return;
+    //                                 }
 
-                                    changePasswordAPI();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    //                                 changePasswordAPI();
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        // Dim overlay
-        Overlay.modal: Rectangle {
-            color: Qt.rgba(0, 0, 0, 0.5)
-        }
-    }
+    //     // Dim overlay
+    //     Overlay.modal: Rectangle {
+    //         color: Qt.rgba(0, 0, 0, 0.5)
+    //     }
+    // }
 
     Dialog {
         id: messageDialog
@@ -791,5 +803,18 @@ Item {
             oldPassword: oldPasswordInput.text,
             newPassword: newPasswordInput.text
         }));
+    }
+    Loader {
+        anchors.fill: parent
+        active:       showChangePassword
+        visible:      showChangePassword
+        z:            10
+        source:       "ChangePassword.qml"
+
+        onLoaded: {
+            item.backClicked.connect(function() {
+                showChangePassword = false
+            })
+        }
     }
 }

@@ -56,6 +56,8 @@ Item {
     property real fullVoltagePerCell: batterySettings && batterySettings.fullVoltagePerCell ? batterySettings.fullVoltagePerCell.rawValue : 4.2
     property real emptyVoltagePerCell: batterySettings && batterySettings.emptyVoltagePerCell ? batterySettings.emptyVoltagePerCell.rawValue : 3.0
 
+    property bool isTablet: Screen.width >= 800
+
     Row {
         id: batteryIndicatorRow
         anchors.top: parent.top
@@ -117,6 +119,8 @@ Item {
 
     Component {
         id: batteryVisual
+
+
 
         Row {
             anchors.top: parent.top
@@ -426,8 +430,8 @@ Item {
             QGCColoredImage {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: 20
-                height: 20
+                width: isTablet ? 20 : 18
+                height: isTablet ? 20 : 18
                 sourceSize.width: width
                 source: getBatterySvgSource()
                 fillMode: Image.PreserveAspectFit
@@ -449,6 +453,8 @@ Item {
                     text: getBatteryPercentageText()
                     //font.pointSize:         _showBoth ? ScreenTools.defaultFontPointSize : ScreenTools.mediumFontPointSize
                     visible: _showBoth || _showPercentage
+                    font.bold: true
+                    font.pointSize: isTablet ? 12 : 10
                 }
 
                 QGCLabel {
@@ -459,6 +465,8 @@ Item {
                     color: "white"
                     text: getBatteryVoltageText()
                     visible: _showBoth || _showVoltage
+                    font.bold: true
+                    font.pointSize: isTablet ? 12 : 10
                 }
             }
         }
@@ -494,6 +502,7 @@ Item {
                     heading: qsTr("Battery Status")/*.arg(_activeVehicle.batteries.length === 1 ? qsTr("Status") : object.id.rawValue)*/
                     contentSpacing: 0
                     showDividers: false
+                    Layout.topMargin: 4
 
                     property var batteryValuesAvailable: batteryValuesAvailableLoader.item
 

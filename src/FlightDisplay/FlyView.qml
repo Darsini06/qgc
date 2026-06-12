@@ -94,6 +94,9 @@ Item {
         toolbar.dropMessageIndicatorTool();
     }
 
+    function recenterDrone() {
+        mapControl.forceRecenterToVehicle()
+    }
 
     QGCToolInsets {
         id:                     _toolInsets

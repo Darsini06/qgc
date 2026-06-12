@@ -84,7 +84,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: parent.width * 0.45
                 visible: !isSmallScreen
                 color: sidebar_color
                 clip: true
@@ -104,34 +104,56 @@ Item {
                     anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
                 }
 
+                // ── Back Arrow pinned to top-left ──
+                Rectangle {
+                    width: 44; height: 44; radius: 12
+                    anchors.top:        parent.top
+                    anchors.left:       parent.left
+                    anchors.topMargin:  20
+                    anchors.leftMargin: 20
+                    z: 10
+                    color:        Qt.rgba(255, 255, 255, 0.08)
+                    border.color: Qt.rgba(255, 255, 255, 0.15)
+
+                    QGCColoredImage {
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 20; height: 20; color: "white"
+                        anchors.centerIn: parent
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: reportsRoot.backClicked()
+                    }
+                }
+
+                // ── Centered content ──
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 50
+                    anchors.topMargin: 100
                     spacing: 0
-
-                    // Back Arrow
-                    Rectangle {
-                        width: 44; height: 44; radius: 12
-                        color: Qt.rgba(255, 255, 255, 0.08)
-                        border.color: Qt.rgba(255, 255, 255, 0.15)
-                        QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reportsRoot.backClicked() }
-                    }
 
                     Item { Layout.fillHeight: true }
 
                     ColumnLayout {
                         Layout.fillWidth: true; spacing: 16
                         Text { text: "Mission History"; font.family: "Outfit"; font.pointSize: 32; font.bold: true; color: "white" }
-                        Text { text: "Comprehensive log of your flight deployments, timestamps, and mission cycles."; font.family: "Outfit"; font.pointSize: 12; color: Qt.rgba(255, 255, 255, 0.6); wrapMode: Text.WordWrap; Layout.fillWidth: true; lineHeight: 1.5 }
+                        Text {
+                            text: "Comprehensive log of your flight deployments, timestamps, and mission cycles."
+                            font.family: "Outfit"; font.pointSize: 12
+                            color: Qt.rgba(255, 255, 255, 0.6)
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            lineHeight: 1.5
+                        }
                     }
 
                     Item { Layout.fillHeight: true }
-                    
                     Item { Layout.preferredHeight: 40 }
                 }
             }
-
             /* ================= DATA CONTENT AREA (65%) ================= */
             Rectangle {
                 Layout.fillWidth: true
@@ -159,12 +181,12 @@ Item {
                         id: mainCol
                         width: Math.min(tableMaxWidth, parent.width - (outerPadding * 2))
                         anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top; anchors.topMargin: isSmallScreen ? 30 : 70
-                        spacing: 24
+                        anchors.top: parent.top; anchors.topMargin: isSmallScreen ? 10 : 20
+                        spacing: 0
 
                         // Page Title (Desktop Only)
                         ColumnLayout {
-                            visible: !isSmallScreen; Layout.fillWidth: true; spacing: 4
+                            visible: !isSmallScreen; Layout.fillWidth: true; spacing: 0
                             Text { text: "Mission Session Logs"; font.family: "Outfit"; font.pointSize: 24; font.bold: true; color: text_primary }
                             Text { text: "Detailed records of flight cycles per session."; font.family: "Outfit"; font.pointSize: 11; color: text_secondary }
                         }

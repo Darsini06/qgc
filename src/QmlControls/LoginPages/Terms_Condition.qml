@@ -117,6 +117,7 @@ Item {
                     WebView {
                         id: webView
                         anchors.fill: parent
+                        visible: !termsRoot.loading
                         url: "https://aviatricks.in/terms-and-conditions?embed=true"
                         onLoadingChanged: function(loadRequest) {
                             if (loadRequest.status === WebView.LoadStartedStatus) termsRoot.loading = true
@@ -125,8 +126,17 @@ Item {
                     }
 
                     Rectangle {
-                        anchors.fill: parent; color: "#00000020"; visible: termsRoot.loading
-                        BusyIndicator { anchors.centerIn: parent; running: true; width: 40; height: 40 }
+                        anchors.fill: parent
+                        color: "white"
+                        visible: termsRoot.loading
+                        z: 100
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: true
+                            width: 40
+                            height: 40
+                        }
                     }
                 }
             }

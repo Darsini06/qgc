@@ -178,6 +178,7 @@ Item {
         id:     _textMeasure
         text:   "X"
         font.family:    normalFontFamily
+        style: Text.Outline
         property real   fontWidth:    contentWidth
         property real   fontHeight:   contentHeight
 

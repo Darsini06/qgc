@@ -348,16 +348,16 @@ Rectangle {
 
                                 // Card header
                                 RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 10
-                                    Rectangle {
-                                        width: 32; height: 32; radius: 6
-                                        color: "#1E4D2B"
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "⬜"; font.pointSize: 14
-                                        }
-                                    }
+                                    // Layout.fillWidth: true
+                                    // spacing: 10
+                                    // Rectangle {
+                                    //     width: 32; height: 32; radius: 6
+                                    //     color: "#1E4D2B"
+                                    //     // Text {
+                                    //     //     anchors.centerIn: parent
+                                    //     //     text: "⬜"; font.pointSize: 14
+                                    //     // }
+                                    // }
                                     Text {
                                         text:           qsTr("Square #") + (index + 1)
                                         color:          "white"
@@ -545,16 +545,16 @@ Rectangle {
 
                                 // Card header
                                 RowLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 10
-                                    Rectangle {
-                                        width: 32; height: 32; radius: 6
-                                        color: "#1A2E4A"
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "⭕"; font.pointSize: 14
-                                        }
-                                    }
+                                    // Layout.fillWidth: true
+                                    // spacing: 10
+                                    // Rectangle {
+                                    //     width: 32; height: 32; radius: 6
+                                    //     color: "#1A2E4A"
+                                    //     // Text {
+                                    //     //     anchors.centerIn: parent
+                                    //     //     text: "⭕"; font.pointSize: 14
+                                    //     // }
+                                    // }
                                     Text {
                                         text:           qsTr("Circle #") + (index + 1)
                                         color:          "white"

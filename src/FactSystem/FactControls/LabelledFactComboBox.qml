@@ -21,6 +21,7 @@ RowLayout {
     property alias indexModel:              _comboBox.indexModel
     property var   comboBox:                _comboBox
     property real  comboBoxPreferredWidth:  -1
+    property real  labelPreferredWidth:     -1
 
     spacing: ScreenTools.defaultFontPixelWidth * 2
 
@@ -28,7 +29,8 @@ RowLayout {
 
     QGCLabel {
         id:                 label  
-        Layout.fillWidth:   true
+        Layout.fillWidth:   labelPreferredWidth < 0
+        Layout.preferredWidth: labelPreferredWidth
         color:"#301934"
         font.bold:      true
     }

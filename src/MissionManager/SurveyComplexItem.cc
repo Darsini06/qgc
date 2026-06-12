@@ -64,6 +64,7 @@ SurveyComplexItem::SurveyComplexItem(PlanMasterController *masterController,
             ->appSettings()
             ->defaultMissionItemAltitude()
             ->rawValue());
+    _cameraCalc.adjustedFootprintSide()->setRawValue(5.0);
   }
 
   connect(&_gridAngleFact, &Fact::valueChanged, this,

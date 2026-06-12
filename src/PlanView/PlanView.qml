@@ -21,7 +21,6 @@ import MapGlobals
 
 Item {
     id: _root
-
     property bool planControlColapsed: false
     property int selectedSpotPointIndex: -1
     property var fileDialogRef: null
@@ -769,7 +768,7 @@ Item {
                     }
 
                     Text {
-                        text: qsTr("Set Ground Chitra")
+                        text: qsTr("Set Ground Name")
                         font.bold: true; color: "white"; font.pointSize: 15; anchors.centerIn: parent; font.family: "Outfit"
                     }
 
@@ -1694,10 +1693,25 @@ Item {
                                         opacity:                _editingLayer != _layerGeoFence ? editorMap._nonInteractiveOpacity : 1
                                     }
 
+                                    // ── Fence Circle ──
+                                    MapCircle {
+                                        id: fenceCircle
+                                        center: mapPolygonvisuals.fenceCenter.isValid ? mapPolygonvisuals.fenceCenter : QtPositioning.coordinate()
+                                        radius: mapPolygonvisuals.fenceRadius
+                                        color: "transparent"
+                                        border.color: "yellow"
+                                        border.width: 2
+                                        visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
+                                                 mapPolygonvisuals.fenceCenter.isValid &&
+                                                 mapPolygonvisuals.fenceRadius > 0
+                                    }
+
                                     // ── Fence center drag handle (yellow circle, no icon) ──
                                     MapQuickItem {
                                         id: fenceCenterHandle
                                         visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
                                                  mapPolygonvisuals.fenceCenter.isValid &&
                                                  mapPolygonvisuals.fenceRadius > 0
 
@@ -1749,6 +1763,7 @@ Item {
                                     MapQuickItem {
                                         id: fenceEditLabel
                                         visible: isAgriFenceMode &&
+                                                 !MapGlobals.isSpotSprayingActive &&
                                                  mapPolygonvisuals.fenceCenter.isValid &&
                                                  mapPolygonvisuals.fenceRadius > 0
 
@@ -2182,7 +2197,7 @@ Item {
                                 anchors.fill: parent
                             }
                             contentItem: Text {
-                                text:               qsTr("Boundary Point")
+                                text:               qsTr(   "Boundary Point")
                                 font.bold:          true
                                 color:              "white"
                                 font.pointSize:     ScreenTools.defaultFontPointSize

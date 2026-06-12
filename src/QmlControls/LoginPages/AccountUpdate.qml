@@ -1,3 +1,502 @@
+// import QtQuick
+// import QtQuick.Controls
+// import QtQuick.Layouts
+// import QtQuick.Effects
+// import QGroundControl
+// import QGroundControl.Controls
+// import QGroundControl.FactControls
+// import QGroundControl.ScreenTools
+// import QGroundControl.Palette
+// import MapGlobals
+
+// Item {
+//     id: accountUpdateRoot
+//     anchors.fill: parent
+
+//     property color app_color:       MapGlobals.rootWindow ? MapGlobals.rootWindow.app_color : "#262626"
+//     property color accent_color:    MapGlobals.rootWindow ? MapGlobals.rootWindow.accent_color : "#4A2C6D"
+//     property color surface_color:   "#ffffff"
+//     property color bg_color:        "#f8f9fa"
+//     property color text_primary:    "#1e293b"
+//     property color text_muted:      "#64748b"
+//     property color border_color:    "#e2e8f0"
+
+//     property string userName:           ""
+//     property string displayName:        ""
+//     property string userEmail:          ""
+//     property string mobileNo:           ""
+//     property int    rpcCompletedStatus: -1
+
+//     signal backClicked()
+//     signal updated()
+
+//     property bool isMobile: ScreenTools.isMobile
+//     property bool isSmallScreen: accountUpdateRoot.width < 600
+//     readonly property real baseMargin: ScreenTools.defaultFontPixelWidth * 1.5
+
+//     Component.onCompleted: {
+//         console.log("isMobile in AccountUpdate", ScreenTools.isMobile)
+//         console.log("email:", userEmail, "mobile:", mobileNo)
+//     }
+
+//     Rectangle {
+//         anchors.fill: parent
+//         color: bg_color
+
+//         GridLayout {
+//             anchors.fill: parent
+//             columns:1 /*isSmallScreen ? 1 : 2*/
+//             rowSpacing: 0
+//             columnSpacing: 0
+
+//             /* ================= LEFT SIDE (UNCHANGED) ================= */
+//             Rectangle {
+//                 id: sidebar
+//                 Layout.fillHeight: !isSmallScreen
+//                 Layout.preferredHeight: isSmallScreen ? Math.max(300, sidebarColumn.implicitHeight + 60) : -1
+//                 Layout.preferredWidth: isSmallScreen ? -1 : 320
+//                 Layout.fillWidth: isSmallScreen
+//                 color: "#1A1A1A"
+//                 clip: true
+
+//                 Rectangle {
+//                     id: backBtnContainer
+//                     width: 44; height: 44; radius: 12
+//                     color: backMouse.containsMouse ? Qt.rgba(255,255,255,0.2) : Qt.rgba(255,255,255,0.1)
+//                     border.color: Qt.rgba(255,255,255,0.2)
+//                     anchors.left: parent.left; anchors.leftMargin: 20
+//                     anchors.top: parent.top;  anchors.topMargin: 20
+//                     z: 20
+//                     QGCColoredImage {
+//                         source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+//                         width: 24; height: 24; color: "white"
+//                         anchors.centerIn: parent
+//                     }
+//                     MouseArea {
+//                         id: backMouse
+//                         anchors.fill: parent
+//                         hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+//                         onClicked: accountUpdateRoot.backClicked()
+//                     }
+//                 }
+
+//                 ColumnLayout {
+//                     id: sidebarColumn
+//                     anchors.horizontalCenter: parent.horizontalCenter
+//                     anchors.verticalCenter: isSmallScreen ? undefined : parent.verticalCenter
+//                     anchors.top: isSmallScreen ? backBtnContainer.bottom : undefined
+//                     anchors.topMargin: isSmallScreen ? 20 : 0
+//                     width: parent.width - (isSmallScreen ? 40 : 80)
+//                     spacing: 20
+
+//                     Rectangle {
+//                         Layout.alignment: Qt.AlignHCenter
+//                         width: 85; height: 85; radius: 42.5
+//                         color: "#f1f5f9"; border.color: accent_color; border.width: 2; clip: true
+//                         Image {
+//                             anchors.centerIn: parent
+//                             source: "qrc:/qmlimages/NewImages/report_gif.gif"
+//                             width: 75; height: 75; fillMode: Image.PreserveAspectFit
+//                         }
+//                     }
+
+//                     ColumnLayout {
+//                         Layout.alignment: Qt.AlignHCenter; spacing: 2
+//                         Text { text: displayName ? displayName : ""; font.family: "Outfit"; font.pointSize: ScreenTools.mediumFontPointSize; font.bold: true; color: "white"; Layout.alignment: Qt.AlignHCenter }
+//                         Text { text: MapGlobals.userEmail || QGroundControl.loadGlobalSetting("email",""); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; color: Qt.rgba(255,255,255,0.85); Layout.alignment: Qt.AlignHCenter; elide: Text.ElideRight; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+//                         Text { text: userName ? userName : ""; font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.9; color: Qt.rgba(255,255,255,0.4); Layout.alignment: Qt.AlignHCenter }
+//                     }
+
+//                     Rectangle { Layout.fillWidth: true; height: 1; color: Qt.rgba(255,255,255,0.12); Layout.topMargin: 4; Layout.bottomMargin: 4 }
+
+//                     ColumnLayout {
+//                         Layout.fillWidth: true; spacing: 14
+//                         RowLayout {
+//                             spacing: 12
+//                             Rectangle { width: 34; height: 34; radius: 10; color: Qt.rgba(255,255,255,0.1); QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 16; height: 16; color: "white" } }
+//                             ColumnLayout { spacing: 0; Text { text: qsTr("Email Status"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.75; color: Qt.rgba(255,255,255,0.6) } Text { text: qsTr("Verified"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: "white" } }
+//                         }
+//                         RowLayout {
+//                             spacing: 12
+//                             Rectangle { width: 34; height: 34; radius: 10; color: Qt.rgba(255,255,255,0.1); QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 16; height: 16; color: "white" } }
+//                             ColumnLayout { spacing: 0; Text { text: qsTr("RPC Badge"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.75; color: Qt.rgba(255,255,255,0.6) } Text { text: rpcCompletedStatus === 1 ? qsTr("Certified Pilot") : qsTr("Not Certified"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: "white" } }
+//                         }
+//                     }
+
+//                     Item { Layout.preferredHeight: 12 }
+
+//                     Text {
+//                         Layout.fillWidth: true
+//                         text: qsTr("Safe flight operations require updated account info.")
+//                         font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.8
+//                         color: Qt.rgba(255,255,255,0.55); wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter
+//                     }
+//                 }
+//             }
+
+//             /* ================= RIGHT SIDE: FORM ================= */
+//             Rectangle {
+//                 Layout.fillWidth: true
+//                 Layout.fillHeight: true
+//                 color: "white"
+
+//                 Flickable {
+//                     anchors.fill: parent
+//                     contentHeight: formColumn.implicitHeight + (isMobile ? 80 : 100)
+//                     clip: true
+//                     boundsBehavior: Flickable.StopAtBounds
+
+//                     ColumnLayout {
+//                         id: formColumn
+//                         width: parent.width - (isMobile ? 30 : 100)
+//                         anchors.left: parent.left
+//                         anchors.leftMargin: isMobile ? 15 : 48
+//                         anchors.top: parent.top
+//                         anchors.topMargin: isMobile ? 20 : 50
+//                         spacing: 20
+
+//                         Text {
+//                             text: qsTr("ACCOUNT INFORMATION")
+//                             font.family: "Outfit"; font.pointSize: ScreenTools.mediumFontPointSize
+//                             font.bold: true; color: text_primary
+//                         }
+//                         Rectangle { Layout.fillWidth: true; height: 1; color: border_color; Layout.bottomMargin: isMobile ? 2 : 10 }
+
+//                         // ── Helper component for a labelled input field ──────────
+//                         // (inline below for each field — no separate component needed)
+
+//                         // ════════════════════════════════════════════════════════
+//                         // ROW 1 — Full Name (both) | Username (tablet col-2)
+//                         // ════════════════════════════════════════════════════════
+//                         RowLayout {
+//                             Layout.fillWidth: true
+//                             spacing: 20
+
+//                             // FULL NAME — always visible
+//                             ColumnLayout {
+//                                 Layout.fillWidth: true; spacing: 8
+//                                 Text {
+//                                     text: qsTr("Full Name")
+//                                     font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                     font.bold: true; color: text_primary
+//                                 }
+//                                 Rectangle {
+//                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                     border.color: nameField.activeFocus ? accent_color : border_color
+//                                     border.width: nameField.activeFocus ? 2 : 1
+//                                     TextField {
+//                                         id: nameField
+//                                         anchors.fill: parent
+//                                         anchors.leftMargin: 12
+//                                         anchors.rightMargin: 12
+//                                         anchors.topMargin: 2
+//                                         anchors.bottomMargin: 2
+//                                         // ✅ Direct binding — no intermediate property needed
+//                                         text: displayName
+//                                         background: null
+//                                         selectByMouse: true
+//                                         color: text_primary
+//                                         font.family: "Outfit"
+//                                         font.pointSize: ScreenTools.defaultFontPointSize
+//                                         horizontalAlignment: Qt.AlignLeft
+//                                         verticalAlignment: Qt.AlignVCenter
+//                                         placeholderText: qsTr("Enter Full Name")
+//                                     }
+//                                 }
+//                             }
+
+//                             // USERNAME — tablet col-2 only
+//                             ColumnLayout {
+//                                 visible: !isSmallScreen
+//                                 Layout.fillWidth: true; spacing: 8
+//                                 Text {
+//                                     text: qsTr("Username")
+//                                     font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                     font.bold: true; color: text_primary
+//                                 }
+//                                 Rectangle {
+//                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                     border.color: usernameFieldTablet.activeFocus ? accent_color : border_color
+//                                     border.width: usernameFieldTablet.activeFocus ? 2 : 1
+//                                     TextField {
+//                                         id: usernameFieldTablet
+//                                         anchors.fill: parent
+//                                         anchors.leftMargin: 12
+//                                         anchors.rightMargin: 12
+//                                         anchors.topMargin: 2
+//                                         anchors.bottomMargin: 2
+//                                         text: userName
+//                                         background: null
+//                                         selectByMouse: true
+//                                         color: text_primary
+//                                         font.family: "Outfit"
+//                                         font.pointSize: ScreenTools.defaultFontPointSize
+//                                         horizontalAlignment: Qt.AlignLeft
+//                                         verticalAlignment: Qt.AlignVCenter
+//                                         placeholderText: qsTr("Username")
+//                                     }
+//                                 }
+//                             }
+//                         }
+
+//                         // ════════════════════════════════════════════════════════
+//                         // USERNAME — mobile only (full width, row 2)
+//                         // ════════════════════════════════════════════════════════
+//                         ColumnLayout {
+//                             visible: isSmallScreen
+//                             Layout.fillWidth: true; spacing: 8
+//                             Text {
+//                                 text: qsTr("Username")
+//                                 font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                 font.bold: true; color: text_primary
+//                             }
+//                             Rectangle {
+//                                 Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                 border.color: usernameFieldMobile.activeFocus ? accent_color : border_color
+//                                 border.width: usernameFieldMobile.activeFocus ? 2 : 1
+//                                 TextField {
+//                                     id: usernameFieldMobile
+//                                     anchors.fill: parent
+//                                     anchors.leftMargin: 12
+//                                     anchors.rightMargin: 12
+//                                     anchors.topMargin: 2
+//                                     anchors.bottomMargin: 2
+//                                     text: userName
+//                                     background: null
+//                                     selectByMouse: true
+//                                     color: text_primary
+//                                     font.family: "Outfit"
+//                                     font.pointSize: ScreenTools.defaultFontPointSize
+//                                     horizontalAlignment: Qt.AlignLeft
+//                                     verticalAlignment: Qt.AlignVCenter
+//                                     placeholderText: qsTr("Username")
+//                                 }
+//                             }
+//                         }
+
+//                         // ════════════════════════════════════════════════════════
+//                         // ROW 2 (tablet) / ROW 3 (mobile) — Email | Mobile Number
+//                         // ════════════════════════════════════════════════════════
+//                         RowLayout {
+//                             Layout.fillWidth: true
+//                             spacing: 20
+
+//                             // EMAIL — always visible
+//                             ColumnLayout {
+//                                 Layout.fillWidth: true; spacing: 8
+//                                 Text {
+//                                     text: qsTr("Email Address")
+//                                     font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                     font.bold: true; color: text_primary
+//                                 }
+//                                 Rectangle {
+//                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                     border.color: emailField.activeFocus ? accent_color : border_color
+//                                     border.width: emailField.activeFocus ? 2 : 1
+//                                     // ✅ clip: true prevents text visually leaking outside border
+//                                     clip: true
+//                                     TextField {
+//                                         id: emailField
+//                                         anchors.fill: parent
+//                                         // ✅ FIX: use top/bottom anchors + leftMargin so text
+//                                         //    is never clipped by a narrow width calculation
+//                                         anchors.leftMargin: 12
+//                                         anchors.rightMargin: 12
+//                                         anchors.topMargin: 2
+//                                         anchors.bottomMargin: 2
+//                                         // ✅ FIX: bind directly to property — updates whenever
+//                                         //    parent sets userEmail (even after onCompleted)
+//                                         text: userEmail
+//                                         background: null
+//                                         selectByMouse: true
+//                                         color: text_primary
+//                                         font.family: "Outfit"
+//                                         font.pointSize: ScreenTools.defaultFontPointSize
+//                                         horizontalAlignment: Qt.AlignLeft
+//                                         verticalAlignment: Qt.AlignVCenter
+//                                         placeholderText: qsTr("Email Address")
+//                                         // ✅ FIX: reset cursor to 0 so first char is visible
+//                                         onTextChanged: {
+//                                             if (!activeFocus) cursorPosition = 0
+//                                         }
+//                                     }
+//                                 }
+//                             }
+
+//                             // MOBILE NUMBER — tablet col-2 only
+//                             ColumnLayout {
+//                                 visible: !isSmallScreen
+//                                 Layout.fillWidth: true; spacing: 8
+//                                 Text {
+//                                     text: qsTr("Mobile Number")
+//                                     font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                     font.bold: true; color: text_primary
+//                                 }
+//                                 Rectangle {
+//                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                     border.color: mobileFieldTablet.activeFocus ? accent_color : border_color
+//                                     border.width: mobileFieldTablet.activeFocus ? 2 : 1
+//                                     TextField {
+//                                         id: mobileFieldTablet
+//                                         anchors.fill: parent
+//                                         anchors.leftMargin: 12
+//                                         anchors.rightMargin: 12
+//                                         anchors.topMargin: 2
+//                                         anchors.bottomMargin: 2
+//                                         text: mobileNo
+//                                         background: null
+//                                         selectByMouse: true
+//                                         inputMethodHints: Qt.ImhDigitsOnly
+//                                         color: text_primary
+//                                         font.family: "Outfit"
+//                                         font.pointSize: ScreenTools.defaultFontPointSize
+//                                         horizontalAlignment: Qt.AlignLeft
+//                                         verticalAlignment: Qt.AlignVCenter
+//                                         placeholderText: qsTr("Mobile No.")
+//                                     }
+//                                 }
+//                             }
+//                         }
+
+//                         // ════════════════════════════════════════════════════════
+//                         // MOBILE NUMBER — mobile only (full width, row 4)
+//                         // ════════════════════════════════════════════════════════
+//                         ColumnLayout {
+//                             visible: isSmallScreen
+//                             Layout.fillWidth: true; spacing: 8
+//                             Text {
+//                                 text: qsTr("Mobile Number")
+//                                 font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                 font.bold: true; color: text_primary
+//                             }
+//                             Rectangle {
+//                                 Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
+//                                 border.color: mobileFieldMobile.activeFocus ? accent_color : border_color
+//                                 border.width: mobileFieldMobile.activeFocus ? 2 : 1
+//                                 TextField {
+//                                     id: mobileFieldMobile
+//                                     anchors.fill: parent
+//                                     anchors.leftMargin: 12
+//                                     anchors.rightMargin: 12
+//                                     anchors.topMargin: 2
+//                                     anchors.bottomMargin: 2
+//                                     // ✅ FIX: direct binding to mobileNo property
+//                                     //    This auto-updates whenever mobileNo is set by parent,
+//                                     //    even if it arrives late (after component creation)
+//                                     text: mobileNo
+//                                     background: null
+//                                     selectByMouse: true
+//                                     inputMethodHints: Qt.ImhDigitsOnly
+//                                     color: text_primary
+//                                     font.family: "Outfit"
+//                                     font.pointSize: ScreenTools.defaultFontPointSize
+//                                     horizontalAlignment: Qt.AlignLeft
+//                                     verticalAlignment: Qt.AlignVCenter
+//                                     placeholderText: qsTr("Mobile No.")
+//                                 }
+//                             }
+//                         }
+
+//                         // ════════════════════════════════════════════════════════
+//                         // RPC QUESTION
+//                         // ════════════════════════════════════════════════════════
+//                         ColumnLayout {
+//                             Layout.fillWidth: true; spacing: 14; Layout.topMargin: 8
+//                             Text {
+//                                 text: qsTr("Have you completed the RPC?")
+//                                 font.family: "Outfit"; font.pointSize: ScreenTools.defaultFontPointSize
+//                                 font.bold: true; color: text_primary
+//                             }
+//                             RowLayout {
+//                                 spacing: 16
+//                                 Repeater {
+//                                     model: [
+//                                         { label: qsTr("Yes, Certified"), val: 1 },
+//                                         { label: qsTr("Not Yet"),        val: 0 }
+//                                     ]
+//                                     Rectangle {
+//                                         Layout.preferredWidth: 160; Layout.preferredHeight: 46; radius: 23
+//                                         color:        rpcCompletedStatus === modelData.val ? accent_color : "white"
+//                                         border.color: rpcCompletedStatus === modelData.val ? accent_color : border_color
+//                                         border.width: 1
+//                                         Text {
+//                                             anchors.centerIn: parent
+//                                             text: modelData.label; color: rpcCompletedStatus === modelData.val ? "white" : text_primary
+//                                             font.family: "Outfit"; font.bold: rpcCompletedStatus === modelData.val
+//                                         }
+//                                         MouseArea {
+//                                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+//                                             onClicked: rpcCompletedStatus = modelData.val
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         }
+
+//                         Item { Layout.preferredHeight: isMobile ? 20 : 32 }
+
+//                         // ════════════════════════════════════════════════════════
+//                         // SAVE BUTTON
+//                         // ════════════════════════════════════════════════════════
+//                         Button {
+//                             id: updateBtn
+//                             Layout.alignment: Qt.AlignHCenter
+//                             Layout.preferredWidth: 320; Layout.preferredHeight: 56
+//                             background: Rectangle {
+//                                 radius: 12
+//                                 gradient: Gradient {
+//                                     orientation: Gradient.Horizontal
+//                                     GradientStop { position: 0.0; color: updateBtn.pressed ? Qt.darker(app_color,1.2) : app_color }
+//                                     GradientStop { position: 1.0; color: updateBtn.pressed ? Qt.darker(app_color,1.2) : app_color }
+//                                 }
+//                                 layer.enabled: true
+//                                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: Qt.rgba(0,0,0,0.4); shadowBlur: 0.6; shadowVerticalOffset: 4 }
+//                             }
+//                             contentItem: Text {
+//                                 text: qsTr("SAVE CHANGES"); color: "white"
+//                                 font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize
+//                                 font.bold: true; horizontalAlignment: Text.AlignHCenter
+//                                 verticalAlignment: Text.AlignVCenter; font.letterSpacing: 1
+//                             }
+//                             onClicked: {
+//                                 // ✅ Read from whichever field is currently visible
+//                                 var finalUsername = isSmallScreen ? usernameFieldMobile.text : usernameFieldTablet.text
+//                                 var finalMobile   = isSmallScreen ? mobileFieldMobile.text   : mobileFieldTablet.text
+
+//                                 if (!MapGlobals.validateUsername(finalUsername,       isSmallScreen ? usernameFieldMobile : usernameFieldTablet)) return
+//                                 if (!MapGlobals.validateDisplayName(nameField.text,   nameField))  return
+//                                 if (!MapGlobals.validateEmail(emailField.text,        emailField)) return
+
+//                                 MapGlobals.updateUser(userName, finalUsername, nameField.text, emailField.text, finalMobile, rpcCompletedStatus, function(result) {
+//                                     if (result) {
+//                                         QGroundControl.saveGlobalSetting("username", finalUsername)
+//                                         QGroundControl.saveGlobalSetting("name",     nameField.text)
+//                                         QGroundControl.saveGlobalSetting("email",    emailField.text)
+//                                         QGroundControl.saveGlobalSetting("mobileNo", finalMobile)
+//                                         QGroundControl.saveGlobalSetting("rpcStatus", rpcCompletedStatus.toString())
+
+//                                         MapGlobals.rpcStatus   = rpcCompletedStatus
+//                                         MapGlobals.userName    = finalUsername
+//                                         MapGlobals.userEmail   = emailField.text
+//                                         MapGlobals.displayName = nameField.text
+//                                         MapGlobals.mobileNo    = finalMobile
+
+//                                         if (MapGlobals.rootWindow)
+//                                             MapGlobals.rootWindow.showToastMessage(qsTr("Profile updated successfully!"))
+//                                         accountUpdateRoot.updated()
+//                                     }
+//                                 })
+//                             }
+//                         }
+
+//                     } // formColumn
+//                 } // Flickable
+//             } // right Rectangle
+//         } // GridLayout
+//     } // bg Rectangle
+// }
+
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -64,7 +563,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: 320
+                Layout.preferredWidth: parent.width * 0.45
                 color: "#1A1A1A"
                 clip: true
 
@@ -100,6 +599,7 @@ Item {
                     // Avatar Section (Reduced & Static)
                     Rectangle {
                         Layout.alignment: Qt.AlignHCenter
+                        Layout.topMargin: 40
                         width: 85; height: 85; radius: 42.5
                         color: "#f1f5f9"
                         border.color: accent_color
@@ -137,8 +637,8 @@ Item {
 
                     // Stats / Quick Info
                     ColumnLayout {
-                        Layout.fillWidth: true; spacing: 14
-                        
+                        Layout.fillWidth: true; spacing: 9
+
                         RowLayout {
                             spacing: 12
                             Rectangle { width: 34; height: 34; radius: 10; color: Qt.rgba(255, 255, 255, 0.1); QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 16; height: 16; color: "white" } }
@@ -146,13 +646,12 @@ Item {
                         }
 
                         RowLayout {
-                            spacing: 12
+                            spacing: 9
                             Rectangle { width: 34; height: 34; radius: 10; color: Qt.rgba(255, 255, 255, 0.1); QGCColoredImage { anchors.centerIn: parent; source: "qrc:/InstrumentValueIcons/checkmark.svg"; width: 16; height: 16; color: "white" } }
                             ColumnLayout { spacing: 0; Text { text: qsTr("RPC Badge"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.75; color: Qt.rgba(255, 255, 255, 0.6) } Text { text: rpcCompletedStatus === 1 ? qsTr("Certified Pilot") : qsTr("Not Certified"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: "white" } }
                         }
-                    }
 
-                    Item { Layout.preferredHeight: 12 }
+                    // Item { Layout.preferredHeight: 2 }
 
                     Text {
                         Layout.fillWidth: true
@@ -160,6 +659,7 @@ Item {
                         font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize * 0.8
                         color: Qt.rgba(255, 255, 255, 0.55); wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter
                     }
+                }
                 }
             }
 
@@ -183,7 +683,7 @@ Item {
                         anchors.leftMargin: isMobile ? 15 : 48
                         anchors.top: parent.top
                         anchors.topMargin: isMobile ? 20 : 50
-                        spacing: 20
+                        spacing: 9
 
                         Text {
                             text: qsTr("ACCOUNT INFORMATION")
@@ -199,14 +699,14 @@ Item {
 
                         GridLayout {
                             columns: isMobile ? 1 : 2
-                            columnSpacing: 28
-                            rowSpacing: 24
+                            columnSpacing: 6
+                            rowSpacing: 12
                             Layout.fillWidth: true
 
                             // Full Name
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 8
+                                spacing: 4
 
                                 Text {
                                     text: qsTr("Full Name")
@@ -223,7 +723,7 @@ Item {
                                     color: "#f8fafc"
                                     border.color: nameField.activeFocus ? accent_color : border_color
                                     border.width: nameField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: nameIcon
                                     //     source: "qrc:/InstrumentValueIcons/contacts.svg"
@@ -257,13 +757,13 @@ Item {
 
                             // Username
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
+                                Layout.fillWidth: true; spacing: 4
                                 Text { text: qsTr("Username"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
                                 Rectangle {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: usernameField.activeFocus ? accent_color : border_color
                                     border.width: usernameField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: userIcon
                                     //     source: "qrc:/qmlimages/NewImages/accountUpdate_black.svg"; width: 22; height: 22
@@ -300,7 +800,7 @@ Item {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: emailField.activeFocus ? accent_color : border_color
                                     border.width: emailField.activeFocus ? 2 : 1
-                                    
+
                                     /* Email Icon removed for more space */
                                     // Item { id: emailIcon; width: 0; height: 0 }
 
@@ -336,7 +836,7 @@ Item {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
                                     border.color: mobileField.activeFocus ? accent_color : border_color
                                     border.width: mobileField.activeFocus ? 2 : 1
-                                    
+
                                     // QGCColoredImage {
                                     //     id: phoneIcon
                                     //     source: "qrc:/InstrumentValueIcons/phone-incoming.svg"; width: 22; height: 22
@@ -465,6 +965,7 @@ Item {
                     }
                 }
             }
+
         }
     }
 
