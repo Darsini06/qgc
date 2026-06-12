@@ -332,10 +332,9 @@ property bool isTablet: Screen.width >= 800
 
                             MapIconColumn {
                                 label: qsTr("Default")
-                                typeNameSuffix: "street"
-                                iconSource: "map_default.jpeg"
+                                typeNameSuffix: "hybrid"
+                                iconSource: "map_hybrid.jpeg"
                             }
-
                             MapIconColumn {
                                 label: qsTr("Satellite")
                                 typeNameSuffix: "satellite"
@@ -349,8 +348,8 @@ property bool isTablet: Screen.width >= 800
                             }
 
                             MapIconColumn {
-                                label: qsTr("Hybrid")
-                                typeNameSuffix: "hybrid"
+                                label: qsTr("Street")
+                                typeNameSuffix: "street"
                                 iconSource: "map_hybrid.jpeg"
                             }
                         }

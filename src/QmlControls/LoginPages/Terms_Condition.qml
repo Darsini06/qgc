@@ -117,6 +117,7 @@ Item {
                     WebView {
                         id: webView
                         anchors.fill: parent
+                        visible: !termsRoot.loading
                         url: "https://aviatricks.in/terms-and-conditions?embed=true"
                         onLoadingChanged: function(loadRequest) {
                             if (loadRequest.status === WebView.LoadStartedStatus) termsRoot.loading = true

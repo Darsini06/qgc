@@ -117,6 +117,7 @@ Item {
                     WebView {
                         id: webView
                         anchors.fill: parent
+                        visible: !privacyRoot.loading
                         url: "https://aviatricks.in/privacy-policy?embed=true"
                         onLoadingChanged: function(loadRequest) {
                             if (loadRequest.status === WebView.LoadStartedStatus) privacyRoot.loading = true
