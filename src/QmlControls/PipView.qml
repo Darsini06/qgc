@@ -21,7 +21,11 @@ Item {
     width:      parent.width * 0.2//_pipSize
     height:     parent.width * 0.2 * (9/16)//_pipSize * (9/16)
     visible:    item2 && item2.pipState !== item2.pipState.window && show
-
+    property bool isTablet: Screen.width >= 800
+            readonly property real _btnSize: isTablet
+                                             ? ScreenTools.defaultFontPixelHeight * 1.8
+                                             : ScreenTools.defaultFontPixelHeight * 1.8
+            readonly property real _iconSize: _btnSize * 0.55
     property var    item1:                  null    // Required
     property var    item2:                  null    // Optional, may come and go
     property string item1IsFullSettingsKey          // Settings key to save whether item1 was saved in full mode
@@ -252,7 +256,7 @@ Item {
 
     Image {
         id:             hidePIP
-        source:         "/qmlimages/MapType.svg"
+        source:         "/qmlimages/camera_photo.svg"
         mipmap:         true
         fillMode:       Image.PreserveAspectFit
         anchors.left:   parent.left
@@ -271,17 +275,17 @@ Item {
         id:                     showPip
         anchors.left :          parent.left
         anchors.bottom:         parent.bottom
-        height:                 ScreenTools.defaultFontPixelHeight * 2
-        width:                  ScreenTools.defaultFontPixelHeight * 2
+        width: _root._btnSize
+        height: width
         radius:                 width/2
         visible:                !_isExpanded
-        color:                  Qt.rgba(0, 0, 0, 0.40)
+        color:                  Qt.rgba(0, 0, 0, 0.70)
 
         Image {
-            width:              parent.width  * 0.75
-            height:             parent.height * 0.75
+            width: _root._iconSize
+            height: width
             sourceSize.height:  height
-            source:             "/qmlimages/MapType.svg"
+            source:             "/qmlimages/camera_photo.svg"
             mipmap:             true
             fillMode:           Image.PreserveAspectFit
             anchors.verticalCenter:     parent.verticalCenter

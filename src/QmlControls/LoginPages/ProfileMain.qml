@@ -142,7 +142,7 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true; spacing: 12
                         Rectangle {
-                            Layout.fillWidth: true; height: 75; radius: 15; color: "white" // Reduced Height
+                            Layout.fillWidth: true; height: 50; radius: 9; color: "white" // Reduced Height
                             Column {
                                 anchors.centerIn: parent
                                 Text { text: "AIR TIME"; color: "#94a3b8"; font.pointSize: 6.5; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter }
@@ -150,7 +150,7 @@ Item {
                             }
                         }
                         Rectangle {
-                            Layout.fillWidth: true; height: 75; radius: 15; color: "white" // Reduced Height
+                            Layout.fillWidth: true; height: 50; radius: 9; color: "white" // Reduced Height
 
                             Column {
                                 anchors.centerIn: parent
@@ -210,12 +210,17 @@ Item {
                             ]
 
                             Rectangle {
-                                Layout.fillWidth: true; height: 56; radius: 14
+                               width: rightContentColumn.width; height: 56; radius: 14
                                 color: mouseItem.containsMouse ? "white" :"transparent"
                                 border.color: mouseItem.containsMouse ? "#f1f5f9" : "transparent"
                                 
                                 RowLayout {
-                                    anchors.fill: parent; anchors.margins: 20; spacing: 20
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 20
+                                    anchors.rightMargin: 20
+                                    anchors.topMargin: 6
+                                    anchors.bottomMargin: 6
+                                    spacing: 20
                                     Rectangle {
                                         width: 44
                                         height: 44

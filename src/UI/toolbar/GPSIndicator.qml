@@ -25,6 +25,8 @@ Item {
     property var    _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property bool   _rtkConnected:  QGroundControl.gpsRtk.connected.value
 
+    property bool isTablet: Screen.width >= 800
+
     Item {
         id:             gpsIndicatorRow
         anchors.top:    parent.top
@@ -103,7 +105,7 @@ Item {
                         Layout.alignment:   Qt.AlignHCenter
                         color:              "white"
                         text:               _activeVehicle ? _activeVehicle.gps.count.valueString : ""
-                        font.pointSize:     ScreenTools.smallFontPointSize
+                        font.pointSize:     isTablet ? 12 : 10
                         font.bold:          true
                     }
 
@@ -112,8 +114,9 @@ Item {
                         Layout.alignment:   Qt.AlignHCenter
                         color:              "white"
                         text:               _activeVehicle ? _activeVehicle.gps.hdop.value.toFixed(1) : ""
-                        font.pointSize:     ScreenTools.smallFontPointSize - 2
+                        font.pointSize:     isTablet ? 10 : 8
                         opacity:            0.8
+                        font.bold: true
                     }
                 }
             }

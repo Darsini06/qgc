@@ -30,9 +30,12 @@ Item {
     implicitWidth:  mainColumn.width
     implicitHeight: mainColumn.height
 
+property bool isTablet: Screen.width >= 800
     // Shared responsive base
-    property real baseSize: parent.width * 0.045
-    property real iconSize: baseSize * 1.2
+    readonly property real baseSize: isTablet
+                                     ? ScreenTools.defaultFontPixelHeight * 1.8
+                                     : ScreenTools.defaultFontPixelHeight * 1.8
+    property real iconSize: baseSize * 1
 
     property real mapRotation: 0
     property var _settingsManager: QGroundControl.settingsManager
@@ -54,7 +57,21 @@ Item {
     signal droneRedirectClicked()
 
     Component.onCompleted: {
-        QGroundControl.mapEngineManager.loadTileSets()
+        console.log("Current Map Type:", _mapTypeFact.rawValue)
+
+        var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
+        console.log("Available Types:", types)
+
+        var satelliteType = types.find(function(t) {
+            return t.toLowerCase().includes("satellite")
+        })
+
+        console.log("Satellite Found:", satelliteType)
+
+        if (satelliteType) {
+            _mapTypeFact.rawValue = satelliteType
+            console.log("Changed To:", _mapTypeFact.rawValue)
+        }
     }
 
     function toggleIcons() {
@@ -79,7 +96,7 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.40)
+                color: Qt.rgba(0, 0, 0, 0.70)
                 clip: true
 
                 MouseArea {
@@ -114,9 +131,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.40)
+                color: Qt.rgba(0, 0, 0, 0.70)
                 border.width: width * 0.05
-                border.color: Qt.rgba(0, 0, 0, 0.40)
+                border.color: Qt.rgba(0, 0, 0, 0.70)
                 clip: true
 
                 MouseArea {
@@ -142,9 +159,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.40)
+                color: Qt.rgba(0, 0, 0, 0.70)
                 border.width: width * 0.05
-                border.color: Qt.rgba(0, 0, 0, 0.40)
+                border.color: Qt.rgba(0, 0, 0, 0.70)
                 clip: true
 
                 MouseArea {
@@ -348,9 +365,9 @@ Item {
                 Layout.preferredHeight: baseSize
                 Layout.alignment: Qt.AlignVCenter
                 radius: width / 2
-                color: Qt.rgba(0, 0, 0, 0.40)
+                color: Qt.rgba(0, 0, 0, 0.70)
                 border.width: width * 0.05
-                border.color: Qt.rgba(0, 0, 0, 0.40)
+                border.color: Qt.rgba(0, 0, 0, 0.70)
 
                 MouseArea {
                     anchors.fill: parent

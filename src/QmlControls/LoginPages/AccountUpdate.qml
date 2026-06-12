@@ -683,7 +683,7 @@ Item {
                         anchors.leftMargin: isMobile ? 15 : 48
                         anchors.top: parent.top
                         anchors.topMargin: isMobile ? 20 : 50
-                        spacing: 20
+                        spacing: 9
 
                         Text {
                             text: qsTr("ACCOUNT INFORMATION")
@@ -699,14 +699,14 @@ Item {
 
                         GridLayout {
                             columns: isMobile ? 1 : 2
-                            columnSpacing: 28
-                            rowSpacing: 24
+                            columnSpacing: 6
+                            rowSpacing: 12
                             Layout.fillWidth: true
 
                             // Full Name
                             ColumnLayout {
                                 Layout.fillWidth: true
-                                spacing: 8
+                                spacing: 4
 
                                 Text {
                                     text: qsTr("Full Name")
@@ -757,7 +757,7 @@ Item {
 
                             // Username
                             ColumnLayout {
-                                Layout.fillWidth: true; spacing: 8
+                                Layout.fillWidth: true; spacing: 4
                                 Text { text: qsTr("Username"); font.family: "Outfit"; font.pointSize: ScreenTools.smallFontPointSize; font.bold: true; color: text_primary }
                                 Rectangle {
                                     Layout.fillWidth: true; height: 56; radius: 10; color: "#f8fafc"
@@ -965,6 +965,7 @@ Item {
                     }
                 }
             }
+
         }
     }
 

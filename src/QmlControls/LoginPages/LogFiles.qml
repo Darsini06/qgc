@@ -431,7 +431,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: parent.width * 0.45
                 visible: !isSmallScreen
                 color: app_color
                 clip: true

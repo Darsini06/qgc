@@ -84,7 +84,7 @@ Item {
             Rectangle {
                 id: sidebar
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : 350
+                Layout.preferredWidth: parent.width * 0.45
                 visible: !isSmallScreen
                 color: sidebar_color
                 clip: true
@@ -181,12 +181,12 @@ Item {
                         id: mainCol
                         width: Math.min(tableMaxWidth, parent.width - (outerPadding * 2))
                         anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top; anchors.topMargin: isSmallScreen ? 30 : 70
-                        spacing: 24
+                        anchors.top: parent.top; anchors.topMargin: isSmallScreen ? 10 : 20
+                        spacing: 0
 
                         // Page Title (Desktop Only)
                         ColumnLayout {
-                            visible: !isSmallScreen; Layout.fillWidth: true; spacing: 4
+                            visible: !isSmallScreen; Layout.fillWidth: true; spacing: 0
                             Text { text: "Mission Session Logs"; font.family: "Outfit"; font.pointSize: 24; font.bold: true; color: text_primary }
                             Text { text: "Detailed records of flight cycles per session."; font.family: "Outfit"; font.pointSize: 11; color: text_secondary }
                         }

@@ -62,16 +62,6 @@ qt_add_library(QmlControls STATIC
     ToolStripAction.h
     ToolStripActionList.cc
     ToolStripActionList.h
-    LoginPages/Trial.qml
-    LoginPages/Sample.qml
-
-
-
-
-
-
-
-
 )
 
 target_link_libraries(QmlControls

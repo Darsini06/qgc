@@ -1,3 +1,4 @@
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
@@ -1130,7 +1131,7 @@ Item {
                         property int selectedType: -1
 
                         ColumnLayout {
-                            spacing: 18
+                            spacing: 2
                             width: parent.width - 24
                             anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
@@ -1153,8 +1154,8 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 78 : 0
-                                    Layout.bottomMargin: 12
+                                    Layout.preferredHeight: visible ? 52 : 0
+                                    Layout.bottomMargin: index === (_linkManager.linkTypeStrings.length - 1) ? 20 : 0
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
                                     border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
@@ -1173,14 +1174,14 @@ Item {
 
                                     RowLayout {
                                         anchors.fill: parent
-                                        anchors.leftMargin: 20
-                                        anchors.rightMargin: 20
-                                        spacing: 16
+                                        anchors.leftMargin: 16
+                                        anchors.rightMargin: 16
+                                        spacing: 12
 
                                         // Number Icon Box
                                         Rectangle {
-                                            width: 42
-                                            height: 42
+                                            width: 36
+                                            height: 36
                                             radius: 8
                                             Layout.alignment: Qt.AlignVCenter
                                             color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"

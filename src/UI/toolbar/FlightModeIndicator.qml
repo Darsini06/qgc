@@ -32,7 +32,7 @@ RowLayout {
     property bool allowEditMode:    true
     property bool editMode:         false
     property var    _activeVehicle:             QGroundControl.multiVehicleManager.activeVehicle
-
+property bool isTablet: Screen.width >= 800
     RowLayout {
         Layout.fillWidth: true
 
@@ -49,9 +49,11 @@ RowLayout {
 
         QGCLabel {
             text:               activeVehicle ? activeVehicle.flightMode : qsTr("N/A", "No data to display")
-            font.pointSize:     fontPointSize
+            font.pointSize: isTablet ? 12 : 10
             Layout.alignment:   Qt.AlignCenter
             color:      "white"
+            font.bold: true
+
             MouseArea {
                 anchors.fill:   parent
                 onClicked:      if(_activeVehicle){

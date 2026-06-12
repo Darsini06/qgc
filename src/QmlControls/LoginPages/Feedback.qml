@@ -175,7 +175,7 @@ Item {
                         width: Math.min(500, parent.width - 60)
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        anchors.topMargin: isSmallScreen ? 20 : 80
+                        anchors.topMargin: isSmallScreen ? 10 : 20
                         spacing: 40
 
                         ColumnLayout {

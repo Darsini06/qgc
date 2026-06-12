@@ -2197,7 +2197,7 @@ Item {
                                 anchors.fill: parent
                             }
                             contentItem: Text {
-                                text:               qsTr("Boundary Point")
+                                text:               qsTr(   "Boundary Point")
                                 font.bold:          true
                                 color:              "white"
                                 font.pointSize:     ScreenTools.defaultFontPointSize

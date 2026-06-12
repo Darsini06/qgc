@@ -331,7 +331,7 @@ import MapGlobals
             _disableVehicleTracking = false
             updateMapToVehiclePosition()
             MapGlobals.recenterInterval = 5000
-             MapGlobals.forceRecenter = false
+            MapGlobals.forceRecenter = false
         }
     }
 

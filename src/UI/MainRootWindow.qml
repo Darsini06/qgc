@@ -1165,8 +1165,10 @@ ApplicationWindow {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
-
-        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+property bool isTablet: Screen.width >= 800
+        readonly property real _btnSize: isTablet
+                                         ? ScreenTools.defaultFontPixelHeight * 1.8
+                                         : ScreenTools.defaultFontPixelHeight * 1.8
         readonly property real _iconSize: _btnSize * 0.55
 
         Rectangle {
@@ -1200,7 +1202,7 @@ ApplicationWindow {
             width:  columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             border.width: 0
             border.color:  "transparent"
 
@@ -1265,7 +1267,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-             color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+             color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1297,7 +1299,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1365,7 +1367,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1399,7 +1401,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1431,7 +1433,7 @@ ApplicationWindow {
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1753,19 +1755,26 @@ ApplicationWindow {
     }
 
     ColumnLayout {
+        id:columnbtnplus
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.bottomMargin: 10
         anchors.rightMargin: 20
         spacing: 20  // Adjust this value to control space between icons
 
+        property bool isTablet: Screen.width >= 800
+                readonly property real _btnSize: isTablet
+                                                 ? ScreenTools.defaultFontPixelHeight * 1.8
+                                                 : ScreenTools.defaultFontPixelHeight * 1.8
+                readonly property real _iconSize: _btnSize * 0.55
+
         Rectangle {
             id: planbtn
             Layout.alignment: Qt.AlignRight
-            width: 48
-            height: 48
-            radius: width / 2
-            color:  Qt.rgba(0, 0, 0, 0.40)      // More transparent black toolbars button
+            width: columnbtnplus._btnSize
+            height: width                 // Keep it square
+            radius: width / 2   // Makes it a circle
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible: plan === "Plan"
 
             Text {
@@ -1773,7 +1782,7 @@ ApplicationWindow {
                 color: "white"
                 anchors.centerIn: parent
                 font.bold: true
-                font.pointSize: 24
+                font.pointSize: columnbtnplus._iconSize
             }
 
             MouseArea {
@@ -1783,16 +1792,11 @@ ApplicationWindow {
                     QGroundControl.saveGlobalSetting("waypoint", "waypoint1")
                     dialog.visible = true
                     MapGlobals.save = "save"
+
                 }
-
-
-                // onClicked: {
-                //     // mainWindow.showPlanView()
-                //     // //viewer3DWindow.close()
-
-                // }
             }
         }
+
 
     }
 

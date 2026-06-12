@@ -24,8 +24,8 @@ import QGroundControl.FactControls
 Rectangle {
     id: _root
     width: parent.width
-    height: ScreenTools.toolbarHeight * 0.8
-    color: Qt.rgba(0, 0, 0, 0.40)  // More transparent black toolbar
+    height: ScreenTools.toolbarHeight * 0.7
+    color: Qt.rgba(0, 0, 0, 0.80)  // More transparent black toolbar
 
     property var _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property bool _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
@@ -79,6 +79,8 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 1
         spacing: ScreenTools.defaultFontPixelWidth / 2
+
+        property bool isTablet: Screen.width >= 800
 
         QGCToolBarButton {
             id: currentButton1
@@ -296,7 +298,7 @@ Rectangle {
 
         // ── Thin vertical divider ──
         Rectangle {
-
+            visible: _activeVehicle
             width: 1; height: parent.height * 0.55; color: Qt.rgba(1, 1, 1, 0.25)
             Layout.alignment: Qt.AlignVCenter
             Layout.leftMargin: 8; Layout.rightMargin: 8
@@ -308,7 +310,7 @@ Rectangle {
             Layout.preferredHeight: 40
             Layout.preferredWidth: 45 // Fixed width to ensure it doesn't collapse
             Layout.alignment: Qt.AlignVCenter
-            visible: true // _activeVehicle ? true : false
+            visible: _activeVehicle ? true : false
 
         }
 
@@ -328,8 +330,8 @@ Rectangle {
 
             QGCColoredImage {
                 visible: _activeVehicle ? false : true
-                width: 22
-                height: 22
+                width: isTablet ? 20 : 18
+                height: isTablet ? 20 : 18
                 source: "/qmlimages/NewImages/satellite.svg"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter
@@ -381,8 +383,8 @@ Rectangle {
                 id: labelCol
                 anchors.centerIn: parent
                 text: qsTr("Spray")
-                font.bold: false
-                font.pointSize: ScreenTools.defaultFontPointSize
+                font.bold: true
+                font.pointSize: isTablet ? 12 : 10//ScreenTools.defaultFontPointSize
                 color: sprayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.75) : "white"
                 Behavior on color {
                     ColorAnimation {
@@ -417,15 +419,17 @@ Rectangle {
 
         // ── Settings ──
         Item {
-            width: 26
-            height: 26
+            width: isTablet ? 20 : 18
+            height: isTablet ? 20 : 18
             Layout.alignment: Qt.AlignVCenter
-
+property bool isTablet: Screen.width >= 800
             QGCColoredImage {
                 id: settingsIcon
                 anchors.fill: parent
-                source: "/qmlimages/NewImages/settings.png"
+                source: "/res/gear-black.svg"
                 color: "white"
+                width: isTablet ? 20 : 18
+                                    height: isTablet ? 20 : 18
             }
 
             MouseArea {
@@ -433,6 +437,7 @@ Rectangle {
                 onClicked: mainWindow.showToolSelectDialog()
             }
         }
+
     }
 
     //     Rectangle {

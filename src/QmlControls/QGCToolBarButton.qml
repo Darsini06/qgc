@@ -26,7 +26,7 @@ Button {
     checkable:          false
 
     property bool logo: false
-
+property bool isTablet: Screen.width >= 800
     property real _horizontalMargin: ScreenTools.defaultFontPixelWidth
 
     onCheckedChanged: checkable = false
@@ -43,8 +43,8 @@ Button {
         anchors.verticalCenter: button.verticalCenter
         QGCColoredImage {
             id:                     _icon
-            height:                 25//ScreenTools.defaultFontPixelHeight * 2
-            width:                  25//height
+            width: isTablet ? 20 : 15
+                    height: isTablet ? 20 : 15
             sourceSize.height:      parent.height
             fillMode:               Image.PreserveAspectFit
             color:                  "white"//logo ? "transparent" : (button.checked ? qgcPal.buttonHighlightText : qgcPal.buttonText)

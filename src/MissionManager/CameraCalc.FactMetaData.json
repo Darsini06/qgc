@@ -22,7 +22,7 @@
     "min":              0.1,
     "units":            "m",
     "decimalPlaces":    2,
-    "default":          50.0
+    "default":          10.0
 },
 {
     "name":             "ImageDensity",
@@ -67,7 +67,7 @@
     "decimalPlaces":    2,
     "min":              0,
     "units":            "m",
-    "default":          25
+    "default":          5.0
 }
 ]
 }
