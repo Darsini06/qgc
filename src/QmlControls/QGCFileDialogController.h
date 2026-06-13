@@ -34,6 +34,12 @@ public:
     /// Deletes the file specified by the fully qualified file name
     Q_INVOKABLE void deleteFile(const QString& filename);
 
+    /// Saves text content to the specified fully qualified file name
+    Q_INVOKABLE void saveFile(const QString& filename, const QString& content);
+
+    /// Saves text content to the public Downloads folder so it's easily visible on mobile
+    Q_INVOKABLE QString saveToDownloads(const QString& filename, const QString& content);
+
     Q_INVOKABLE QString urlToLocalFile(QUrl url);
 
     /// Important: Should only be used in mobile builds where default save location cannot be changed.

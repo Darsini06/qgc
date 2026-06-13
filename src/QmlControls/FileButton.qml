@@ -19,6 +19,7 @@ Rectangle {
 
     signal clicked
     signal hamburgerClicked
+    signal downloadClicked
 
     property real _margins: 15
 
@@ -28,7 +29,7 @@ Rectangle {
         id:                     label
         anchors.margins:        _margins
         anchors.left:           parent.left
-        anchors.right:          hamburger.left
+        anchors.right:          downloadIcon.left
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom
         verticalAlignment:      Text.AlignVCenter
@@ -37,6 +38,20 @@ Rectangle {
         font.pixelSize:         16
         font.bold:              true
         elide:                  Text.ElideRight
+    }
+
+    QGCColoredImage {
+        id:                     downloadIcon
+        anchors.rightMargin:    15
+        anchors.right:          hamburger.left
+        anchors.verticalCenter: parent.verticalCenter
+        width:                  _hamburgerSize
+        height:                 _hamburgerSize
+        sourceSize.height:      _hamburgerSize
+        source:                 "/qmlimages/arrow-down.png"
+        color:                  downloadMouseArea.containsMouse ? "#2980B9" : "#95A5A6"
+        
+        property real _hamburgerSize: 20
     }
 
     QGCColoredImage {
@@ -59,6 +74,16 @@ Rectangle {
         hoverEnabled:   true
         cursorShape:    Qt.PointingHandCursor
         onClicked:      parent.clicked()
+    }
+
+    MouseArea {
+        id:               downloadMouseArea
+        anchors.centerIn: downloadIcon
+        width:            36
+        height:           36
+        hoverEnabled:     true
+        cursorShape:      Qt.PointingHandCursor
+        onClicked:        parent.downloadClicked()
     }
 
     MouseArea {

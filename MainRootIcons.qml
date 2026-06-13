@@ -304,7 +304,7 @@ property bool isTablet: Screen.width >= 800
                                     Image {
                                         anchors.fill: parent
                                         source: mapTypeGrid._rootPath + iconSource
-                                        fillMode: Image.AlwaysCrop
+                                        fillMode: Image.PreserveAspectCrop
                                     }
 
                                     MouseArea {

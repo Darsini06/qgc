@@ -12,7 +12,7 @@
             "name": "mapType",
             "shortDesc": "Currently selected map type for flight maps",
             "type": "string",
-            "default": "Google Satellite"
+            "default": "Hybrid"
         }
     ]
 }

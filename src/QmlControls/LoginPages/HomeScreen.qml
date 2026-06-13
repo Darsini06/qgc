@@ -1131,7 +1131,7 @@ Item {
                         property int selectedType: -1
 
                         ColumnLayout {
-                            spacing: 2
+                            spacing: 8
                             width: parent.width - 24
                             anchors.horizontalCenter: parent.horizontalCenter
                             Layout.fillWidth: true
@@ -1154,7 +1154,7 @@ Item {
                                     property bool isDisabled: index === 4 || index === 5
                                     visible: !isDisabled
                                     Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 52 : 0
+                                    Layout.preferredHeight: visible ? 56 : 0
                                     Layout.bottomMargin: index === (_linkManager.linkTypeStrings.length - 1) ? 20 : 0
                                     radius: 8
                                     color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
@@ -1238,6 +1238,10 @@ Item {
                                         }
                                     }
                                 }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 20
                             }
                         }
                     }

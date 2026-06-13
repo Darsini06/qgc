@@ -825,9 +825,9 @@ ApplicationWindow {
         mapRotation: MapGlobals.mapRotation
         planViewRef: planView
 
-        onDroneRedirectClicked: {
-               flyView.recenterDrone()
-           }
+        // onDroneRedirectClicked: {
+        //        flyView.recenterDrone()
+        //    }
     }
 
     footer: LogReplayStatusBar {
@@ -1165,7 +1165,7 @@ ApplicationWindow {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.2
         visible: true
-property bool isTablet: Screen.width >= 800
+        property bool isTablet: Screen.width >= 800
         readonly property real _btnSize: isTablet
                                          ? ScreenTools.defaultFontPixelHeight * 1.8
                                          : ScreenTools.defaultFontPixelHeight * 1.8
@@ -1267,7 +1267,7 @@ property bool isTablet: Screen.width >= 800
             width: columnbtn._btnSize
             height: width                 // Keep it square
             radius: width / 2   // Makes it a circle
-             color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             visible:  false
             border.width: 0
             border.color:  "transparent"
@@ -1763,10 +1763,10 @@ property bool isTablet: Screen.width >= 800
         spacing: 20  // Adjust this value to control space between icons
 
         property bool isTablet: Screen.width >= 800
-                readonly property real _btnSize: isTablet
-                                                 ? ScreenTools.defaultFontPixelHeight * 1.8
-                                                 : ScreenTools.defaultFontPixelHeight * 1.8
-                readonly property real _iconSize: _btnSize * 0.55
+        readonly property real _btnSize: isTablet
+                                         ? ScreenTools.defaultFontPixelHeight * 1.8
+                                         : ScreenTools.defaultFontPixelHeight * 1.8
+        readonly property real _iconSize: _btnSize * 0.55
 
         Rectangle {
             id: planbtn
@@ -2114,7 +2114,7 @@ property bool isTablet: Screen.width >= 800
                             }
                         }
                         Text {
-                            text: "Mark with GPS"; color: "white"
+                            text: "Hand Hold GPS"; color: "white"
                             font.pointSize: ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter

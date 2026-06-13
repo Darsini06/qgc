@@ -80,6 +80,7 @@ Item {
         return value * baseUnit;
     }
 
+
     ListModel {
         id: sessionModel
     }
@@ -664,7 +665,24 @@ Item {
 
             property bool isCloudView: true
             property var fileList: controller.getFiles(folder, _rgExtensions)
-
+            function downloadPlan(planName, planData) {
+                var jsonStr
+                if (typeof planData === "string") {
+                    // Already a string - use as-is (might be pre-stringified JSON)
+                    jsonStr = planData
+                } else {
+                    // JavaScript object - serialize to pretty JSON
+                    jsonStr = JSON.stringify(planData, null, 2)
+                }
+                var binName = planName.split(".")[0] + ".bin"
+                var savePath = controller.saveToDownloads(binName, jsonStr)
+                if (savePath !== "") {
+                    mainWindow.showToastMessage(qsTr("Saved to: ") + savePath)
+                    Qt.openUrlExternally("file://" + savePath)
+                } else {
+                    mainWindow.showToastMessage(qsTr("Failed to save file."))
+                }
+            }
             function refreshFiles() {
                 if (isCloudView) {
                     fetchCloudFiles()
@@ -692,7 +710,7 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 spacing: 10
-
+ 
                 // Removed Toggle Buttons as only Cloud Plans are shown now
                 QGCLabel {
                     text: qsTr("Plan Files")
@@ -756,20 +774,28 @@ Item {
 
                                     }
                                     onHamburgerClicked: {
-                                        mainWindow.showMessageDialog(qsTr("Delete Cloud Plan"),
-                                                                     qsTr("Are you sure you want to permanently delete '%1' from the cloud? This cannot be undone.").arg(model.plan_name.split(".")[0] + ".plan"),
-                                                                     Dialog.Yes | Dialog.Cancel,
-                                                                     function() {
-                                                                         MapGlobals.deleteCloudPlan(model.plan_name, function(success) {
-                                                                             if (success) {
-                                                                                 mainWindow.showToastMessage(qsTr("Plan deleted successfully"))
-                                                                                 refreshFiles() // Refresh the list
-                                                                             } else {
-                                                                                 mainWindow.showToastMessage(qsTr("Failed to delete plan from cloud"))
-                                                                             }
-                                                                         })
-                                                                     }
-                                                                     )
+                                        mainWindow.showMessageDialog(
+                                            qsTr("Delete Plan"),
+                                            qsTr("Delete '%1'?").arg(model.plan_name),
+                                            Dialog.Yes | Dialog.Cancel,
+                                            function() {
+                                                MapGlobals.deleteCloudPlan(model.plan_name, function(success) {
+                                                    if(success) refreshFiles()
+                                                })
+                                            }
+                                        )
+                                    }
+                                    onDownloadClicked: {
+                                        var binName = model.plan_name.split(".")[0] + ".bin"
+                                        mainWindow.showMessageDialog(
+                                            qsTr("Download Plan"),
+                                            qsTr("Download '%1'?").arg(binName),
+                                            Dialog.Yes | Dialog.Cancel,
+                                            function() {
+                                                downloadPlan(binName,
+                                                             model.plan_data)
+                                            }
+                                        )
                                     }
                                 }
                             }
