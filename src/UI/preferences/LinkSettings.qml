@@ -287,7 +287,8 @@ ColumnLayout  {
         QGCPopupDialog {
             id: typeDialog
             title: qsTr("Select Link Type")
-            buttons: false
+            buttons: 0
+            showButtons: false
             closeOnClickOutside: true
 
             popupWidth: ScreenTools.isMobile ? Math.min(mainWindow.width * 0.9, 380) : 520
@@ -301,7 +302,9 @@ ColumnLayout  {
                 Layout.fillWidth: true
 
                 Repeater {
+
                     model: _linkManager.linkTypeStrings
+
                     delegate: Rectangle {
                         id: typeItem
                         visible: modelData !== "Mock Link" && modelData !== "Log Replay"
