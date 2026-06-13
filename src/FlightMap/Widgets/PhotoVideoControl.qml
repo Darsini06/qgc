@@ -34,7 +34,11 @@ Rectangle {
 
     anchors.top: parent.top
     anchors.topMargin: ScreenTools.defaultFontPixelHeight * 0.8
-
+property bool isTablet: Screen.width >= 800
+    readonly property real baseSize: isTablet
+                                     ? ScreenTools.defaultFontPixelHeight * 1.8
+                                     : ScreenTools.defaultFontPixelHeight * 1.8
+    property real iconSize: baseSize * 1
     property real   _margins:                   ScreenTools.defaultFontPixelHeight / 2
     property real   _smallMargins:              ScreenTools.defaultFontPixelWidth / 2
     property var    _activeVehicle:             globals.activeVehicle
@@ -124,7 +128,7 @@ Rectangle {
                             height: parent.height
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: parent.height * 0.45
+                                width: isTablet ? 20 : 15
                                 height: width
                                 source: "/qmlimages/camera_photo.svg"
                                 color: _cameraInPhotoMode ? "black" : "white"
@@ -144,7 +148,7 @@ Rectangle {
                             height: parent.height
                             QGCColoredImage {
                                 anchors.centerIn: parent
-                                width: parent.height * 0.45
+                                width:isTablet ? 20 : 15
                                 height: width
                                 source: "/qmlimages/camera_video.svg"
                                 color: "white" // Always white on red or dark background
