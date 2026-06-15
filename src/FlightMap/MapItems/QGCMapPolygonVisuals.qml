@@ -83,7 +83,6 @@ Item {
 
     //property string droneType: "loadpage"
 
-
     // Base size relative to screen
     property real baseSize: Math.min(Screen.width, Screen.height) * 0.06
 
@@ -105,7 +104,9 @@ Item {
 
 
     function addCommonVisuals() {
+
         console.log("addCommonVisuals method")
+
         if (_objMgrCommonVisuals.empty) {
             _objMgrCommonVisuals.createObject(polygonComponent, mapControl, true)
         }
@@ -463,7 +464,7 @@ Item {
                 fenceCenter.longitude !== 0
         var isEnabled = QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
         var isDialogOpen = MapGlobals.editdialog === "editdialog"
-        
+
         if (hasValidCenter && isEnabled && !isDialogOpen) {
             _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
@@ -473,7 +474,6 @@ Item {
             console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen)
         }
     }
-
     QGCPalette { id: qgcPal }
 
     KMLOrSHPFileDialog {
@@ -654,12 +654,14 @@ Item {
 
         Column {
             id: menuColumn
+
             anchors {
                 top: parent.top
                 left: parent.left
                 right: parent.right
                 margins: 2
             }
+
             spacing: 0
 
             // Remove vertex
@@ -737,6 +739,7 @@ Item {
                 color: "transparent"
                 radius: 8
                 Behavior on color { ColorAnimation { duration: 120 } }
+
                 QGCColoredImage {
                     anchors.centerIn: parent
                     width: ScreenTools.defaultFontPixelHeight * 0.9
@@ -747,6 +750,7 @@ Item {
                     smooth: true
                     color: qgcPal.text
                 }
+
                 MouseArea {
                     id: editMouseArea
                     anchors.fill: parent

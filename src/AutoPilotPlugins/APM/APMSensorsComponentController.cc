@@ -550,6 +550,10 @@ void APMSensorsComponentController::nextClicked(void)
 
         _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
 
+        if (_nextButton) {
+            _nextButton->setEnabled(false);
+        }
+
         if (_calTypeInProgress == QGCMAVLink::CalibrationAPMCompassMot) {
             _stopCalibration(StopCalibrationSuccess);
         }
@@ -728,6 +732,9 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
                 if (_progressBar) {
                     _progressBar->setProperty("value", (qreal)(17 / 100.0));
                 }
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
+                }
 
             }
             break;
@@ -739,6 +746,9 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
                 _orientationCalRightSideInProgress = true;
                 if (_progressBar) {
                     _progressBar->setProperty("value", (qreal)(34 / 100.0));
+                }
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
                 }
 
             }
@@ -752,6 +762,9 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
                 if (_progressBar) {
                     _progressBar->setProperty("value", (qreal)(51 / 100.0));
                 }
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
+                }
 
             }
             break;
@@ -764,6 +777,9 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
                 if (_progressBar) {
                     _progressBar->setProperty("value", (qreal)(68 / 100.0));
                 }
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
+                }
 
             }
             break;
@@ -775,6 +791,9 @@ void APMSensorsComponentController::_handleCommandLong(mavlink_message_t& messag
                 _orientationCalUpsideDownSideInProgress = true;
                 if (_progressBar) {
                     _progressBar->setProperty("value", (qreal)(85 / 100.0));
+                }
+                if (_nextButton) {
+                    _nextButton->setEnabled(true);
                 }
 
             }

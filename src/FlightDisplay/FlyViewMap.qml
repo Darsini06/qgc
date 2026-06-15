@@ -65,16 +65,16 @@ import MapGlobals
     property real   fenceRadius:                60
 
     function updateFence() {
-        var planPath = _planMasterController.currentPlanFile
-        if (!planPath) return
-        MapGlobals.getFence(planPath, function(fenceData) {
-            if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
-                fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
-                fenceRadius = fenceData.radius || 60
-                console.log("FlyView fence loaded:", fenceCenter, fenceRadius)
-            }
-        })
-    }
+           var planPath = _planMasterController.currentPlanFile
+           if (!planPath) return
+           MapGlobals.getFence(planPath, function(fenceData) {
+               if (fenceData && fenceData.lat !== 0 && fenceData.lon !== 0) {
+                   fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                   fenceRadius = fenceData.radius || 60
+                   console.log("FlyView fence loaded:", fenceCenter, fenceRadius)
+               }
+           })
+       }
 
 
     function forceRecenterOnVehicle() {

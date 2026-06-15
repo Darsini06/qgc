@@ -16,6 +16,7 @@ Rectangle {
     
     property alias  text:       label.text
     property bool   highlight:  false
+    property bool showDownloadButton: true
 
     signal clicked
     signal hamburgerClicked
@@ -50,7 +51,8 @@ Rectangle {
         sourceSize.height:      _hamburgerSize
         source:                 "/qmlimages/arrow-down.png"
         color:                  downloadMouseArea.containsMouse ? "#2980B9" : "#95A5A6"
-        
+        visible: showDownloadButton
+
         property real _hamburgerSize: 20
     }
 
@@ -83,6 +85,7 @@ Rectangle {
         height:           36
         hoverEnabled:     true
         cursorShape:      Qt.PointingHandCursor
+        visible: showDownloadButton
         onClicked:        parent.downloadClicked()
     }
 

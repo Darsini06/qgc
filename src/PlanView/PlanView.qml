@@ -394,36 +394,34 @@ Item {
 
         console.log("loadFenceData called for:", planPath)
 
-        // Don't use timer, load directly
         MapGlobals.getFence(planPath, function(fenceData) {
-            console.log("loadFenceData: fenceData=", JSON.stringify(fenceData))
+            console.log("loadFenceData:", fenceData)
 
-            if (fenceData && fenceData.lat && fenceData.lon &&
-                    fenceData.lat !== 0 && fenceData.lon !== 0 &&
-                    Math.abs(fenceData.lat) > 0.0001) {
+            if (fenceData &&
+                typeof fenceData.lat === "number" &&
+                typeof fenceData.lon === "number" &&
+                Math.abs(fenceData.lat) > 0.0001 &&
+                fenceData.lat !== 0 && fenceData.lon !== 0) {
 
-                console.log("loadFenceData: Restoring fence - lat:", fenceData.lat, "lon:", fenceData.lon)
-
-                // Force set fence mode
                 isAgriFenceMode = true
                 fenceSettingsVisible = true
 
-                mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(fenceData.lat, fenceData.lon)
+                // This is a normal plan with fence, NOT spot spraying
+                MapGlobals.isSpotSprayingActive = false  // ← KEY FIX
+
+                mapPolygonvisuals.fenceCenter =
+                    QtPositioning.coordinate(fenceData.lat, fenceData.lon)
                 mapPolygonvisuals.fenceRadius = fenceData.radius || 60
                 mapPolygonvisuals.updateFence()
 
-                // Also update the fence button appearance
-                if (circularFenceBtn) {
-                    circularFenceBtn.checked = true
-                }
+                console.log("Fence restored successfully")
             } else {
-                console.log("loadFenceData: No valid fence data found")
+                console.log("No valid fence data")
                 isAgriFenceMode = false
                 fenceSettingsVisible = false
             }
         })
     }
-
     Timer {
         id: fenceLoadTimer
         interval: 300
@@ -469,6 +467,8 @@ Item {
         onLoadLocalPlan: (path) => {
                              console.log("PlanView: loading local plan:", path)
                              _planMasterController.loadFromFile(path)
+                             _missionController.setCurrentPlanViewSeqNum(0, true)
+                             MapGlobals.isSpotSprayingActive = _missionController.isSpotSprayingActive
                              loadFenceData(path)
                              MapGlobals.isReviewMode = true
                              MapGlobals.showMissionItems = false
@@ -476,43 +476,45 @@ Item {
         onLoadCloudPlan: (data) => {
                              console.log("PlanView: loading cloud plan data")
                              try {
-                                 var json = (typeof data === "string") ? JSON.parse(data) : data
-                                 _planMasterController.loadFromJson(json)
+                                  var json = (typeof data === "string") ? JSON.parse(data) : data
+                                  _planMasterController.loadFromJson(json)
+                                  _missionController.setCurrentPlanViewSeqNum(0, true)
+                                  MapGlobals.isSpotSprayingActive = _missionController.isSpotSprayingActive
 
-                                 // Restore fence from cloud data
-                                 if (json.fenceData && json.fenceData.lat && json.fenceData.lon &&
-                                     json.fenceData.lat !== 0 && json.fenceData.lon !== 0) {
+                                  // Restore fence from cloud data
+                                  if (json.fenceData && json.fenceData.lat && json.fenceData.lon &&
+                                      json.fenceData.lat !== 0 && json.fenceData.lon !== 0) {
 
-                                     // Set fence mode BEFORE updating visuals
-                                     isAgriFenceMode = true
-                                     fenceSettingsVisible = true
+                                      // Set fence mode BEFORE updating visuals
+                                      isAgriFenceMode = true
+                                      fenceSettingsVisible = true
 
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
-                                     mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
-                                     mapPolygonvisuals.updateFence()
+                                      mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
+                                      mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
+                                      mapPolygonvisuals.updateFence()
 
-                                     console.log("PlanView: Restored cloud fence data at:", json.fenceData.lat, json.fenceData.lon)
-                                 } else {
-                                     // Clear fence if no data
-                                     isAgriFenceMode = false
-                                     fenceSettingsVisible = false
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
-                                     mapPolygonvisuals.updateFence()
-                                 }
+                                      console.log("PlanView: Restored cloud fence data at:", json.fenceData.lat, json.fenceData.lon)
+                                  } else {
+                                      // Clear fence if no data
+                                      isAgriFenceMode = false
+                                      fenceSettingsVisible = false
+                                      mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                      mapPolygonvisuals.updateFence()
+                                  }
 
-                                 // Restore boundary points
-                                 if (json.boundaryPoints && json.boundaryPoints.length > 0) {
-                                     console.log("PlanView: Restoring", json.boundaryPoints.length, "boundary points")
-                                     mapPolygonvisuals.mapPolygon.clear()
-                                     for (var j = 0; j < json.boundaryPoints.length; j++) {
-                                         mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[j].lat, json.boundaryPoints[j].lon))
-                                     }
-                                 }
+                                  // Restore boundary points
+                                  if (json.boundaryPoints && json.boundaryPoints.length > 0) {
+                                      console.log("PlanView: Restoring", json.boundaryPoints.length, "boundary points")
+                                      mapPolygonvisuals.mapPolygon.clear()
+                                      for (var j = 0; j < json.boundaryPoints.length; j++) {
+                                          mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[j].lat, json.boundaryPoints[j].lon))
+                                      }
+                                  }
 
-                                 MapGlobals.isReviewMode = true
-                                 MapGlobals.showMissionItems = false
+                                  MapGlobals.isReviewMode = true
+                                  MapGlobals.showMissionItems = false
                              } catch (e) {
-                                 console.error("Failed to process cloud plan data:", e)
+                                  console.error("Failed to process cloud plan data:", e)
                              }
                          }
     }
@@ -1162,6 +1164,11 @@ Item {
                 MapGlobals.time = days + " days " + Qt.formatTime(t, 'hh:mm:ss')
             }
         }
+
+        function onIsSpotSprayingActiveChanged(active) {
+            console.log("onIsSpotSprayingActiveChanged in PlanView:", active)
+            MapGlobals.isSpotSprayingActive = active
+        }
     }
 
     function insertSimpleItemAfterCurrent(coordinate) {
@@ -1263,58 +1270,77 @@ Item {
                                 }
 
         onAcceptedForLoad: (file) => {
-                               console.log("Click Files at onAcceptedForLoad")
-                               MapGlobals.setGridLines(true)
-                               _planMasterController.loadFromFile(file)
-                               loadFenceData(file)
-                               _planMasterController.fitViewportToItems()
-                               _missionController.setCurrentPlanViewSeqNum(0, true)
-                               close()
+            console.log("Click Files at onAcceptedForLoad")
+            MapGlobals.setGridLines(true)
+            _planMasterController.loadFromFile(file)
+            _planMasterController.fitViewportToItems()
+            _missionController.setCurrentPlanViewSeqNum(0, true)
+            MapGlobals.isSpotSprayingActive = _missionController.isSpotSprayingActive
+            close()
+            mainWindow.showPlanView()
 
-
-                               mainWindow.showPlanView()
-                           }
-
+            // Delay fence load to ensure plan is fully loaded first
+            fenceLoadAfterOpenTimer.planPath = file
+            fenceLoadAfterOpenTimer.restart()
+        }
         onAcceptedCloudPlan: (planData) => {
                                  console.log("Clicked Cloud File at onAcceptedCloudPlan")
                                  MapGlobals.setGridLines(true)
 
                                  var json = (typeof planData === "string") ? JSON.parse(planData) : planData
                                  _planMasterController.loadFromJson(json)
+                                 // MapGlobals.isSpotSprayingActive = true
+                                 // MapGlobals.isReviewMode = false
 
+                                 console.log("After Restore:", MapGlobals.isSpotSprayingActive)
                                  // Restore fence from cloud data
                                  if (json.fenceData) {
 
-                                     var fenceEnabledDialog = (json.fenceData.enabled === true || json.fenceData.enabled === "true")
-                                     QGroundControl.saveGlobalSetting("enableFence", fenceEnabledDialog ? "true" : "false")
+                                     var fenceEnabledDialog =
+                                         (json.fenceData.enabled === true ||
+                                          json.fenceData.enabled === "true")
 
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate(json.fenceData.lat, json.fenceData.lon)
-                                     mapPolygonvisuals.fenceRadius = json.fenceData.radius || 60
+                                     QGroundControl.saveGlobalSetting("enableFence",
+                                         fenceEnabledDialog ? "true" : "false")
+
+                                     // ADD THIS (CRITICAL)
+                                     isAgriFenceMode = fenceEnabledDialog
+                                     fenceSettingsVisible = fenceEnabledDialog
+
+                                     mapPolygonvisuals.fenceCenter =
+                                         QtPositioning.coordinate(json.fenceData.lat,
+                                                                  json.fenceData.lon)
+
+                                     mapPolygonvisuals.fenceRadius =
+                                         json.fenceData.radius || 60
+
                                      mapPolygonvisuals.updateFence()
-                                     console.log("PlanView: Restored cloud fence from dialog. Visible:", fenceEnabledDialog)
 
+                                     console.log("Cloud fence restored. Mode:",
+                                                  isAgriFenceMode,
+                                                  "Visible:", fenceEnabledDialog)
                                  } else {
-                                     QGroundControl.saveGlobalSetting("enableFence", "false")
-                                     mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
-                                     mapPolygonvisuals.updateFence()
-                                 }
+                                                                    QGroundControl.saveGlobalSetting("enableFence", "false")
+                                                                    mapPolygonvisuals.fenceCenter = QtPositioning.coordinate()
+                                                                    mapPolygonvisuals.updateFence()
+                                                                }
 
-                                 // Restore boundary points
-                                 if (json.boundaryPoints && json.boundaryPoints.length > 0) {
-                                     mapPolygonvisuals.mapPolygon.clear()
-                                     for (var m = 0; m < json.boundaryPoints.length; m++) {
-                                         mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[m].lat, json.boundaryPoints[m].lon))
-                                     }
-                                 }
+                                                                // Restore boundary points
+                                                                if (json.boundaryPoints && json.boundaryPoints.length > 0) {
+                                                                    mapPolygonvisuals.mapPolygon.clear()
+                                                                    for (var m = 0; m < json.boundaryPoints.length; m++) {
+                                                                        mapPolygonvisuals.mapPolygon.appendVertex(QtPositioning.coordinate(json.boundaryPoints[m].lat, json.boundaryPoints[m].lon))
+                                                                    }
+                                                                }
 
-                                 _planMasterController.fitViewportToItems()
-                                 _missionController.setCurrentPlanViewSeqNum(0, true)
-                                 close()
-                                 mainWindow.showPlanView()
-                             }
+                                                                _planMasterController.fitViewportToItems()
+                                                                _missionController.setCurrentPlanViewSeqNum(0, true)
+                                                                MapGlobals.isSpotSprayingActive = _missionController.isSpotSprayingActive
+                                                                close()
+                                                                mainWindow.showPlanView()
+                                                            }
 
-    }
-
+                                   }
 
     AirspaceRestrictionDialog {
         id:         _airspaceRestrictionDialog
@@ -2795,10 +2821,23 @@ Item {
                 text:                   qsTr("Save Plan")
 
 
-                //Show Save button in more cases
-                visible: (isMissionTab || isAgriFenceMode) &&
-                         (!MapGlobals.isReviewMode || MapGlobals.showMissionItems || MapGlobals.isSpotSprayingActive) &&
-                         activeRightPanel == ""
+                // //Show Save button in more cases
+                // visible: (isMissionTab || isAgriFenceMode) &&
+                //          (!MapGlobals.isReviewMode || MapGlobals.showMissionItems || MapGlobals.isSpotSprayingActive) &&
+                //          activeRightPanel == ""
+                visible: {
+                     console.log("Save Button Check")
+                     console.log("isMissionTab =", isMissionTab)
+                     console.log("isAgriFenceMode =", isAgriFenceMode)
+                     console.log("isReviewMode =", MapGlobals.isReviewMode)
+                     console.log("showMissionItems =", MapGlobals.showMissionItems)
+                     console.log("isSpotSprayingActive =", MapGlobals.isSpotSprayingActive)
+                     console.log("activeRightPanel =", activeRightPanel)
+
+                     return (isMissionTab || isAgriFenceMode) &&
+                            (!MapGlobals.isReviewMode || MapGlobals.showMissionItems || MapGlobals.isSpotSprayingActive) &&
+                            activeRightPanel == ""
+                 }
 
                 background: Rectangle {
                     radius: ScreenTools.defaultFontPixelHeight * 0.45
@@ -2842,6 +2881,7 @@ Item {
                     }
                 }
             }
+
         }
 
         QGCLabel {
@@ -3657,6 +3697,7 @@ Item {
         MapGlobals.isReviewMode = false
         MapGlobals.showMissionItems = false
     }
+
     function _mapCenter() {
         var centerPoint = Qt.point(editorMap.centerViewport.left + (editorMap.centerViewport.width / 2), editorMap.centerViewport.top + (editorMap.centerViewport.height / 2))
         return editorMap.toCoordinate(centerPoint, false /* clipToViewPort */)

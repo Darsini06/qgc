@@ -890,8 +890,8 @@ Item {
 
                         Image {
                             source: connectClick._swiped
-                                ? "qrc:/qmlimages/NewImages/check.svg"
-                                : "qrc:/qmlimages/NewImages/commlinks.svg"
+                                    ? "qrc:/qmlimages/NewImages/check.svg"
+                                    : "qrc:/qmlimages/NewImages/commlinks.svg"
                             width: parent.width * 0.5
                             height: width
                             anchors.centerIn: parent
@@ -915,11 +915,11 @@ Item {
                                     swipeThumb.x = maxX + dp(0.5)
                                     // ---- your original onClicked logic here ----
                                     var editingConfig = _linkManager.createConfiguration(
-                                        ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
+                                                ScreenTools.isSerialAvailable ? LinkConfiguration.TypeSerial : LinkConfiguration.TypeUdp, "")
                                     typeSelectionDialogComponent.createObject(mainWindow1, {
-                                        editingConfig: editingConfig,
-                                        originalConfig: null
-                                    }).open()
+                                                                                  editingConfig: editingConfig,
+                                                                                  originalConfig: null
+                                                                              }).open()
                                     // reset after 2 seconds
                                     resetTimer.start()
                                 }
@@ -1071,328 +1071,326 @@ Item {
             }
         }
 
-        }
+    }
 
 
-            function showDynamicCalibrationDialog(qmlFile, title) {
-                dynamicCalDialog.dialogTitleText = title;
-                dialogLoader.source = qmlFile;
-                dynamicCalDialog.open();
+    function showDynamicCalibrationDialog(qmlFile, title) {
+        dynamicCalDialog.dialogTitleText = title;
+        dialogLoader.source = qmlFile;
+        dynamicCalDialog.open();
+    }
+
+    // Logout Dialog Component
+    Component {
+        id: logoutdialog
+
+        QGCPopupDialog {
+            id: popup
+            title: qsTr("Sign Out")
+
+            buttons: Dialog.Yes | Dialog.No
+
+            onAccepted: {
+                QGroundControl.saveBoolGlobalSetting("login", false);
+                QGroundControl.saveGlobalSetting("loadpage", "loadpage");
+                popup.visible = false;
+                MapGlobals.profile();
             }
 
-                // Logout Dialog Component
-                Component {
-                    id: logoutdialog
+            onRejected: {
+                popup.visible = false;
+            }
 
-                    QGCPopupDialog {
-                        id: popup
-                        title: qsTr("Sign Out")
+            ColumnLayout {
+                spacing: ScreenTools.defaultFontPixelWidth
+                QGCLabel {
+                    text: qsTr("Are you sure you want to sign out?")
+                    Layout.fillWidth: true
+                }
+            }
+        }
+    }
 
-                        buttons: Dialog.Yes | Dialog.No
+    // First Dialog – Type Selection Only
+    Component {
+        id: typeSelectionDialogComponent
 
-                        onAccepted: {
-                            QGroundControl.saveBoolGlobalSetting("login", false);
-                            QGroundControl.saveGlobalSetting("loadpage", "loadpage");
-                            popup.visible = false;
-                            MapGlobals.profile();
-                        }
+        QGCPopupDialog {
+            id: typeDialog
+            title: qsTr("Select Connection Type")
+            buttons: 0
+            showButtons: false
+            closeOnClickOutside: true
 
-                        onRejected: {
-                            popup.visible = false;
-                        }
+            // Set the overall popup UI width tightly
+            // Set a properly balanced dialog width to prevent text truncation
+            popupWidth: (isSmallScreen || isMobile)
+                        ? Math.min(mainWindow1.width * 0.92, 420)
+                        : 560
 
-                        ColumnLayout {
-                            spacing: ScreenTools.defaultFontPixelWidth
-                            QGCLabel {
-                                text: qsTr("Are you sure you want to sign out?")
-                                Layout.fillWidth: true
-                            }
-                        }
-                    }
+            property int selectedType: -1
+
+            ColumnLayout {
+                spacing: 2
+                width: parent.width - 24
+                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.fillWidth: true
+
+                Text {
+                    text: qsTr("Choose how you want to connect to your drone from the options below.")
+                    font.family: "Outfit"
+                    font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
+                    color: "black"
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: 16
                 }
 
-                // First Dialog – Type Selection Only
-                Component {
-                    id: typeSelectionDialogComponent
+                Repeater {
+                    model: _linkManager.linkTypeStrings
+                    delegate: Rectangle {
+                        id: typeItem
+                        property bool isDisabled: index === 4 || index === 5
+                        visible: !isDisabled
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: visible ? 52 : 0
+                        Layout.bottomMargin: index === (_linkManager.linkTypeStrings.length - 1) ? 20 : 0
+                        radius: 8
+                        color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
+                        border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
+                        border.width: 1
 
-                    QGCPopupDialog {
-                        id: typeDialog
-                        title: qsTr("Select Connection Type")
-                        buttons: 0
-                        showButtons: false
-                        closeOnClickOutside: true
-
-                        // Set the overall popup UI width tightly
-                        // Set a properly balanced dialog width to prevent text truncation
-                        popupWidth: (isSmallScreen || isMobile)
-                                    ? Math.min(mainWindow1.width * 0.92, 420)
-                                    : 560
-
-                        property int selectedType: -1
-
-                        ColumnLayout {
-                            spacing: 8
-                            width: parent.width - 24
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            Layout.fillWidth: true
-
-                            Text {
-                                text: qsTr("Choose how you want to connect to your drone from the options below.")
-                                font.family: "Outfit"
-                                font.pointSize: ScreenTools.defaultFontPointSize * ((isSmallScreen || isMobile) ? 0.9 : 1.1)
-                                color: "black"
-                                wrapMode: Text.WordWrap
-                                horizontalAlignment: Text.AlignHCenter
-                                Layout.fillWidth: true
-                                Layout.bottomMargin: 16
-                            }
-
-                            Repeater {
-                                model: _linkManager.linkTypeStrings
-                                delegate: Rectangle {
-                                    id: typeItem
-                                    property bool isDisabled: index === 4 || index === 5
-                                    visible: !isDisabled
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: visible ? 56 : 0
-                                    Layout.bottomMargin: index === (_linkManager.linkTypeStrings.length - 1) ? 20 : 0
-                                    radius: 8
-                                    color: typeMouseArea.containsMouse ? "#F8F9FA" : "#FFFFFF"
-                                    border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#E2E8F0"
-                                    border.width: 1
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: 150
-                                        }
-                                    }
-                                    Behavior on border.color {
-                                        ColorAnimation {
-                                            duration: 150
-                                        }
-                                    }
-
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 16
-                                        anchors.rightMargin: 16
-                                        spacing: 12
-
-                                        // Number Icon Box
-                                        Rectangle {
-                                            width: 36
-                                            height: 36
-                                            radius: 8
-                                            Layout.alignment: Qt.AlignVCenter
-                                            color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
-                                            border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
-                                            border.width: 1
-
-                                            Text {
-                                                anchors.centerIn: parent
-                                                font.family: "Outfit"
-                                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                                font.bold: true
-                                                color: typeMouseArea.containsMouse ? "white" : "black"
-                                                text: (index + 1)
-                                            }
-                                        }
-
-                                        // Connection Type Title
-                                        Text {
-                                            Layout.fillWidth: true
-                                            Layout.alignment: Qt.AlignVCenter
-                                            text: modelData
-                                            font.family: "Outfit"
-                                            font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                            font.bold: true
-                                            color: "black"
-                                            elide: Text.ElideRight
-                                        }
-
-                                        // Arrow Indicator
-                                        Text {
-                                            Layout.alignment: Qt.AlignVCenter
-                                            text: "→"
-                                            font.family: "Outfit"
-                                            font.pointSize: ScreenTools.defaultFontPointSize * 1.4
-                                            font.bold: true
-                                            color: typeMouseArea.containsMouse ? "white" : "#666666"
-                                        }
-                                    }
-
-                                    MouseArea {
-                                        id: typeMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            typeDialog.selectedType = index;
-                                            typeDialog.close();
-                                            var editingConfig = _linkManager.createConfiguration(index, "");
-                                            linkConfigDialogComponent.createObject(mainWindow, {
-                                                                                       editingConfig: editingConfig,
-                                                                                       originalConfig: null,
-                                                                                       selectedType: index
-                                                                                   }).open();
-                                        }
-                                    }
-                                }
-                            }
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 20
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 150
                             }
                         }
-                    }
-                }
-
-                // Second Dialog - Configuration (without type dropdown)
-                Component {
-                    id: linkConfigDialogComponent
-
-                    QGCPopupDialog {
-                        id: linkConfigDialog
-                        title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
-                        buttons: Dialog.Save | Dialog.Cancel
-                        acceptAllowed: _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
-                                        ? (editingConfig && editingConfig.devName !== "")
-                                        : nameField.text !== ""
-
-                        property var originalConfig
-                        property var editingConfig
-                        property int selectedType
-
-                        property bool _connectionInitiated: false
-
-                        // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
-                        Connections {
-                            target: editingConfig
-                            enabled: editingConfig !== null
-
-                            function onShowToast(message) {
-                                mainWindow.showToastMessage(message);
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: 150
                             }
                         }
 
-                        onAccepted: {
-                            console.log("Click Save");
-                            if (_connectionInitiated) {
-                                console.log("linkConfigDialog: ignoring duplicate accept");
-                                preventClose = true;
-                                return;
-                            }
-                            if (!editingConfig) {
-                                preventClose = true;
-                                return;
-                            }
-                            if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
-                                editingConfig.stopScan();
-                            }
-                            if (linkSettingsLoader.item) {
-                                linkSettingsLoader.item.saveSettings();
-                            }
-                            if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
-                                editingConfig.devName = nameField.text;
-                            }
-                            editingConfig.name = editingConfig.devName;
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 16
+                            anchors.rightMargin: 16
+                            spacing: 12
 
-                            if (originalConfig) {
-                                _linkManager.endConfigurationEditing(originalConfig, editingConfig);
-                            } else {
-                                editingConfig.dynamic = false;
-                                if (!_linkManager.endCreateConfiguration(editingConfig)) {
-                                    preventClose = true;
-                                    return;
-                                }
-                                if (activeVehicle) {
-                                    mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
-                                    return;
-                                }
-                                _connectionInitiated = true;         // mark as initiated
-                                connecting_drone = true;  // only set true once
-                                _linkManager.createConnectedLink(editingConfig);
-                            }
-                        }
-
-                        onRejected: {
-                            console.log("Click Cancel");
-                            _connectionInitiated = false;  //reset on cancel
-                            if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
-                                editingConfig.stopScan();
-                            }
-                            _linkManager.cancelConfigurationEditing(editingConfig);
-                        }
-
-                        // ---------- MAIN LAYOUT ----------
-                        ColumnLayout {
-                            id: mainColumn
-                            spacing: isSmallScreen ? ScreenTools.defaultFontPixelHeight * 0.5 : ScreenTools.defaultFontPixelHeight
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: isSmallScreen ? mainWindow1.width * 0.9 : 400
-
-                            // ---- Name row (not shown for Bluetooth) ----
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 16
-                                visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
-
-                                QGCLabel {
-                                    text: qsTr("Connection Name")
-                                    font.bold: true
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    color: "black"
-                                }
-
-                                TextField {
-                                    id: nameField
-                                    Layout.fillWidth: true
-                                    text: editingConfig.devName
-                                    placeholderText: qsTr("e.g. My Custom Drone Connection")
-
-                                    font.pointSize: ScreenTools.defaultFontPointSize
-                                    color: "black"
-                                    leftPadding: 16
-                                    rightPadding: 16
-
-                                    background: Rectangle {
-                                        radius: 8
-                                        color: "#FFFFFF"
-                                        border.color: nameField.activeFocus ? (linkConfigDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
-                                        border.width: nameField.activeFocus ? 2 : 1
-                                        implicitHeight: 44
-                                        Behavior on border.color {
-                                            ColorAnimation {
-                                                duration: 200
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Divider line if not Bluetooth
+                            // Number Icon Box
                             Rectangle {
-                                Layout.fillWidth: true
-                                height: 1
-                                color: "#E0E0E0"
-                                visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+                                width: 36
+                                height: 36
+                                radius: 8
+                                Layout.alignment: Qt.AlignVCenter
+                                color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
+                                border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
+                                border.width: 1
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    font.family: "Outfit"
+                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                    font.bold: true
+                                    color: typeMouseArea.containsMouse ? "white" : "black"
+                                    text: (index + 1)
+                                }
                             }
 
-                            // ---- Device list / settings loader ----
-                            Loader {
-                                id: linkSettingsLoader
+                            // Connection Type Title
+                            Text {
                                 Layout.fillWidth: true
-                                source: editingConfig ? editingConfig.settingsURL : ""
+                                Layout.alignment: Qt.AlignVCenter
+                                text: modelData
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.1
+                                font.bold: true
+                                color: "black"
+                                elide: Text.ElideRight
+                            }
 
-                                property var subEditConfig: linkConfigDialog.editingConfig
-                                property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12
-                                property int _secondColumnWidth: ScreenTools.defaultFontPixelWidth * 30
-                                property int _rowSpacing: ScreenTools.defaultFontPixelHeight / 2
-                                property int _colSpacing: ScreenTools.defaultFontPixelWidth / 2
+                            // Arrow Indicator
+                            Text {
+                                Layout.alignment: Qt.AlignVCenter
+                                text: "→"
+                                font.family: "Outfit"
+                                font.pointSize: ScreenTools.defaultFontPointSize * 1.4
+                                font.bold: true
+                                color: typeMouseArea.containsMouse ? "white" : "#666666"
+                            }
+                        }
+
+                        MouseArea {
+                            id: typeMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                typeDialog.selectedType = index;
+                                typeDialog.close();
+                                var editingConfig = _linkManager.createConfiguration(index, "");
+                                linkConfigDialogComponent.createObject(mainWindow, {
+                                                                           editingConfig: editingConfig,
+                                                                           originalConfig: null,
+                                                                           selectedType: index
+                                                                       }).open();
                             }
                         }
                     }
                 }
+                Item {
+                    Layout.preferredHeight: 10
+                }
+            }
+        }
+    }
+
+    // Second Dialog - Configuration (without type dropdown)
+    Component {
+        id: linkConfigDialogComponent
+
+        QGCPopupDialog {
+            id: linkConfigDialog
+            title: selectedType === 0 ? "Bluetooth Devices" : originalConfig ? qsTr("Edit Link") : qsTr("Add New Link")
+            buttons: Dialog.Save | Dialog.Cancel
+            acceptAllowed: _linkManager.linkTypeStrings[selectedType] === "Bluetooth"
+                           ? (editingConfig && editingConfig.devName !== "")
+                           : nameField.text !== ""
+
+            property var originalConfig
+            property var editingConfig
+            property int selectedType
+
+            property bool _connectionInitiated: false
+
+            // if the Mobile Location is in Off state while iam click Refresh button, show the Toast message
+            Connections {
+                target: editingConfig
+                enabled: editingConfig !== null
+
+                function onShowToast(message) {
+                    mainWindow.showToastMessage(message);
+                }
+            }
+
+            onAccepted: {
+                console.log("Click Save");
+                if (_connectionInitiated) {
+                    console.log("linkConfigDialog: ignoring duplicate accept");
+                    preventClose = true;
+                    return;
+                }
+                if (!editingConfig) {
+                    preventClose = true;
+                    return;
+                }
+                if (_linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan();
+                }
+                if (linkSettingsLoader.item) {
+                    linkSettingsLoader.item.saveSettings();
+                }
+                if (_linkManager.linkTypeStrings[selectedType] !== "Bluetooth") {
+                    editingConfig.devName = nameField.text;
+                }
+                editingConfig.name = editingConfig.devName;
+
+                if (originalConfig) {
+                    _linkManager.endConfigurationEditing(originalConfig, editingConfig);
+                } else {
+                    editingConfig.dynamic = false;
+                    if (!_linkManager.endCreateConfiguration(editingConfig)) {
+                        preventClose = true;
+                        return;
+                    }
+                    if (activeVehicle) {
+                        mainWindow.showToastMessage(qsTr("Please disconnect the active vehicle before connecting a new one"));
+                        return;
+                    }
+                    _connectionInitiated = true;         // mark as initiated
+                    connecting_drone = true;  // only set true once
+                    _linkManager.createConnectedLink(editingConfig);
+                }
+            }
+
+            onRejected: {
+                console.log("Click Cancel");
+                _connectionInitiated = false;  //reset on cancel
+                if (editingConfig && _linkManager.linkTypeStrings[selectedType] === "Bluetooth") {
+                    editingConfig.stopScan();
+                }
+                _linkManager.cancelConfigurationEditing(editingConfig);
+            }
+
+            // ---------- MAIN LAYOUT ----------
+            ColumnLayout {
+                id: mainColumn
+                spacing: isSmallScreen ? ScreenTools.defaultFontPixelHeight * 0.5 : ScreenTools.defaultFontPixelHeight
+                Layout.fillWidth: true
+                Layout.minimumWidth: isSmallScreen ? mainWindow1.width * 0.9 : 400
+
+                // ---- Name row (not shown for Bluetooth) ----
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 16
+                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+
+                    QGCLabel {
+                        text: qsTr("Connection Name")
+                        font.bold: true
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        color: "black"
+                    }
+
+                    TextField {
+                        id: nameField
+                        Layout.fillWidth: true
+                        text: editingConfig.devName
+                        placeholderText: qsTr("e.g. My Custom Drone Connection")
+
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        color: "black"
+                        leftPadding: 16
+                        rightPadding: 16
+
+                        background: Rectangle {
+                            radius: 8
+                            color: "#FFFFFF"
+                            border.color: nameField.activeFocus ? (linkConfigDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
+                            border.width: nameField.activeFocus ? 2 : 1
+                            implicitHeight: 44
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: 200
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Divider line if not Bluetooth
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: "#E0E0E0"
+                    visible: _linkManager.linkTypeStrings[selectedType] !== "Bluetooth"
+                }
+
+                // ---- Device list / settings loader ----
+                Loader {
+                    id: linkSettingsLoader
+                    Layout.fillWidth: true
+                    source: editingConfig ? editingConfig.settingsURL : ""
+
+                    property var subEditConfig: linkConfigDialog.editingConfig
+                    property int _firstColumnWidth: ScreenTools.defaultFontPixelWidth * 12
+                    property int _secondColumnWidth: ScreenTools.defaultFontPixelWidth * 30
+                    property int _rowSpacing: ScreenTools.defaultFontPixelHeight / 2
+                    property int _colSpacing: ScreenTools.defaultFontPixelWidth / 2
+                }
+            }
+        }
+    }
 
 }
-

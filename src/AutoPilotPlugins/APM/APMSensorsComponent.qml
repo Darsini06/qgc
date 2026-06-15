@@ -130,6 +130,7 @@ SetupPage {
                     status: "none",
                     color: "#ffffff"
                 },
+
                 {
                     text: "RC Calibration",
                     type: "rc",
@@ -138,6 +139,7 @@ SetupPage {
                     status: "none",
                     color: "#ffffff"
                 },
+
                 {
                     text: "Flight Modes",
                     type: "flightModes",
@@ -241,7 +243,6 @@ SetupPage {
                                     shadowVerticalOffset: dp(2)
                                     shadowColor: "#40000000"   // soft black
                                 }
-
                                     Rectangle {
                                         anchors.fill: parent
                                         //anchors.margins: 5
@@ -307,7 +308,6 @@ SetupPage {
                                             }
                                         }
                                     }
-
                             }
 
                         }
@@ -317,13 +317,8 @@ SetupPage {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 10
                     }
-
-
                 }
-
-
             }
-
 
         }
     }

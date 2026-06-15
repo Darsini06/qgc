@@ -229,11 +229,26 @@ int UrlFactory::getQtMapIdFromProviderType(QStringView type)
     return -1;
 }
 
+// QStringList UrlFactory::getProviderTypes()
+// {
+//     QStringList types;
+//     for (const SharedMapProvider &provider : _providers) {
+//         (void) types.append(provider->getMapName());
+//     }
+
+//     return types;
+// }
+
 QStringList UrlFactory::getProviderTypes()
 {
     QStringList types;
+
+    qDebug() << "===== PROVIDERS DEBUG =====";
+    qDebug() << "Provider Count:" << _providers.size();
+
     for (const SharedMapProvider &provider : _providers) {
-        (void) types.append(provider->getMapName());
+        qDebug() << "Map Name:" << provider->getMapName();
+        types.append(provider->getMapName());
     }
 
     return types;

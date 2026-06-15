@@ -760,6 +760,7 @@ SetupPage {
                     title: qsTr("IMU Calibration")
                     buttons: Dialog.Ok | Dialog.Cancel
                     preventClose: true
+                    showNextButton: controller.showOrientationCalArea
 
                     property bool calibrationDone: false
                     //property string dialogWarningText: qsTr("Follow the instructions to calibrate the IMU by rotating the vehicle to different positions.")
@@ -768,7 +769,6 @@ SetupPage {
                     // Expose the dialog's progress bar if needed
                     property alias dialogProgressBar: dialogProgressBar
                     property alias orientationCalAreaHelpTextAlias: dialogorientationCalAreaHelpText
-                    property alias nextButtonAlias: nextButtonInDialog
                     property alias cancelButtonAlias: cancelButtonInDialog
 
                     Column {
@@ -839,30 +839,13 @@ SetupPage {
                                     spacing: 10
                                     padding: ScreenTools.defaultFontPixelWidth
 
-                                    Row {
-                                        id: helpAndNextRow
-                                        spacing: 10
+                                    QGCLabel {
+                                        id: dialogorientationCalAreaHelpText
                                         width: parent.width
-                                        anchors.horizontalCenter: parent.horizontalCenter
-
-                                        QGCLabel {
-                                            id: dialogorientationCalAreaHelpText
-                                            width: parent.width - nextButtonInDialog.width - 20
-                                            wrapMode: Text.WordWrap
-                                            font.pointSize: ScreenTools.defaultFontPointSize
-                                            text: controller.orientationCalAreaHelpText || qsTr("Rotate the vehicle to the shown positions")
-                                            color:              "black"
-                                        }
-
-                                        QGCButton {
-                                            id: nextButtonInDialog
-                                            width: implicitWidth * 1.5
-                                            height: implicitHeight * 0.7
-                                            heightFactor: 0.3
-                                            text: qsTr("Next")
-                                            enabled: false
-                                            onClicked: controller.nextClicked()
-                                        }
+                                        wrapMode: Text.WordWrap
+                                        font.pointSize: ScreenTools.defaultFontPointSize
+                                        text: controller.orientationCalAreaHelpText || qsTr("Rotate the vehicle to the shown positions")
+                                        color: "black"
                                     }
 
                                     // Cancel button (optional — shown below)
@@ -957,8 +940,14 @@ SetupPage {
 
                         controller.progressBar = dialogProgressBar;
                         controller.orientationCalAreaHelpText = dialogorientationCalAreaHelpText;
-                        controller.nextButton = nextButtonInDialog;
+                        controller.nextButton = nextButtonAlias;
                         controller.cancelButton = cancelButtonInDialog;
+                    }
+
+                    onNextClicked: {
+                        if (controller) {
+                            controller.nextClicked()
+                        }
                     }
 
                     onClosed: {
@@ -984,7 +973,7 @@ SetupPage {
                                 controller.calibrateAccel(false)
                                 acceptButtonAlias.text = qsTr("Calibrating...") // temporarily show progress
                                 acceptButtonAlias.enabled = false
-                                rejectButtonAlias.enabled = false
+                                rejectButtonAlias.enabled = true
                             } else {
                                 console.warn("controller.calibrateAccel not available")
                             }

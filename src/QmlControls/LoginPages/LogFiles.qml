@@ -763,6 +763,7 @@ Item {
                                                     qsTr("Do you want to download and load '%1' from the cloud?").arg(model.plan_name.split(".")[0] + ".plan"),
                                                     Dialog.Yes | Dialog.Cancel,
                                                     function() {
+                                                        MapGlobals.share_edit_visibility = true
                                                         mainWindow.openHomeScreen()
                                                         mainWindow.showFlyView()
                                                         mainWindow.showPlanView()

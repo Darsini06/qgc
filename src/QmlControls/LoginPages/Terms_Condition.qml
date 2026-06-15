@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Effects
 import QtWebView 1.1
+
 import QGroundControl
 import QGroundControl.Controls
 import QGroundControl.ScreenTools
@@ -21,9 +22,13 @@ Item {
     property color text_secondary:  "#6B7280"
 
     property bool loading: true
+
+    // Change this URL later with your actual PDF
+    property string termsUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+
     signal backClicked()
 
-    readonly property bool isSmallScreen: width < ScreenTools.defaultFontPixelWidth * 90
+ readonly property bool isSmallScreen: width < 800
 
     Rectangle {
         anchors.fill: parent
@@ -33,16 +38,18 @@ Item {
             anchors.fill: parent
             spacing: 0
 
-            /* ================= PREMIUM SIDEBAR (45%) ================= */
+            /* ================= SIDEBAR ================= */
+
             Rectangle {
                 id: sidebar
+
                 Layout.fillHeight: true
-                Layout.preferredWidth: isSmallScreen ? 0 : parent.width * 0.45
+                Layout.preferredWidth: parent.width * 0.45
+
                 visible: !isSmallScreen
                 color: sidebar_color
                 clip: true
 
-                // Background Gradient
                 Rectangle {
                     anchors.fill: parent
                     gradient: Gradient {
@@ -51,38 +58,60 @@ Item {
                     }
                 }
 
-                // Decorative Accents
-                Rectangle {
-                    width: 400; height: 400; radius: 200; color: Qt.rgba(255,255,255,0.03)
-                    anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: -80
-                }
-
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 50
                     spacing: 0
 
-                    // Back Arrow
                     Rectangle {
-                        width: 44; height: 44; radius: 12
-                        color: Qt.rgba(255, 255, 255, 0.08)
-                        border.color: Qt.rgba(255, 255, 255, 0.15)
-                        QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 20; height: 20; color: "white"; anchors.centerIn: parent }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: termsRoot.backClicked() }
+                        width: 44
+                        height: 44
+                        radius: 12
+
+                        color: Qt.rgba(255,255,255,0.08)
+                        border.color: Qt.rgba(255,255,255,0.15)
+
+                        QGCColoredImage {
+                            anchors.centerIn: parent
+                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                            width: 20
+                            height: 20
+                            color: "white"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: termsRoot.backClicked()
+                        }
                     }
 
                     Item { Layout.fillHeight: true }
 
                     ColumnLayout {
-                        Layout.fillWidth: true; spacing: 16
-                        Text { text: "Terms & Conditions"; font.family: "Outfit"; font.pointSize: 32; font.bold: true; color: "white" }
-                        Text { text: "Please review the terms of service and usage guidelines for the Drone Commander GCS platform."; font.family: "Outfit"; font.pointSize: 12; color: Qt.rgba(255, 255, 255, 0.6); wrapMode: Text.WordWrap; Layout.fillWidth: true; lineHeight: 1.5 }
+                        Layout.fillWidth: true
+                        spacing: 16
+
+                        Text {
+                            text: "Terms & Conditions"
+                            font.family: "Outfit"
+                            font.pointSize: 32
+                            font.bold: true
+                            color: "white"
+                        }
+
+                        Text {
+                            text: "Please review the terms of service and usage guidelines for the Drone Commander GCS platform."
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            color: Qt.rgba(255,255,255,0.6)
+                        }
                     }
 
                     Item { Layout.fillHeight: true }
 
                     QGCColoredImage {
-                        Layout.preferredHeight: 120; Layout.preferredWidth: 120
+                        Layout.preferredWidth: 120
+                        Layout.preferredHeight: 120
                         source: "qrc:/qmlimages/NewImages/terms_condition_black.svg"
                         color: "white"
                         opacity: 0.15
@@ -91,52 +120,37 @@ Item {
                     Item { Layout.preferredHeight: 40 }
                 }
             }
+            /* ================= CONTENT AREA ================= */
 
-            /* ================= DATA CONTENT AREA (55%) ================= */
             Rectangle {
-                Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.preferredWidth: parent.width * 0.55
+
                 color: "white"
 
-                // Mobile Navigation Bar
-                Rectangle {
-                    visible: isSmallScreen; width: parent.width; height: 70; color: "white"
-                    anchors.top: parent.top; z: 10
-                    Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: border_color }
-                    RowLayout {
-                        anchors.fill: parent; anchors.margins: 20
-                        QGCColoredImage { source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"; width: 24; height: 24; color: text_primary; MouseArea { anchors.fill: parent; onClicked: termsRoot.backClicked() } }
-                        Text { text: "Terms & Conditions"; font.family: "Outfit"; font.bold: true; font.pointSize: ScreenTools.mediumFontPointSize; color: text_primary }
+                WebView {
+                    id: webView
+                    anchors.fill: parent
+
+                    url: "https://aviatricks.in/terms-and-conditions?embed=true"
+
+                    onLoadingChanged: function(loadRequest) {
+                        if (loadRequest.status === WebView.LoadStartedStatus)
+                            termsRoot.loading = true
+                        else if (loadRequest.status === WebView.LoadSucceededStatus ||
+                                 loadRequest.status === WebView.LoadFailedStatus)
+                            termsRoot.loading = false
                     }
                 }
 
-                Item {
+                Rectangle {
                     anchors.fill: parent
-                    anchors.topMargin: isSmallScreen ? 70 : 0
+                    color: "white"
+                    visible: termsRoot.loading
 
-                    WebView {
-                        id: webView
-                        anchors.fill: parent
-                        visible: !termsRoot.loading
-                        url: "https://aviatricks.in/terms-and-conditions?embed=true"
-                        onLoadingChanged: function(loadRequest) {
-                            if (loadRequest.status === WebView.LoadStartedStatus) termsRoot.loading = true
-                            else if (loadRequest.status === WebView.LoadSucceededStatus || loadRequest.status === WebView.LoadFailedStatus) termsRoot.loading = false
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: "white"
-                        visible: termsRoot.loading
-                        z: 100
-
-                        BusyIndicator {
-                            anchors.centerIn: parent
-                            running: true
-                            width: 40
-                            height: 40
-                        }
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: true
                     }
                 }
             }
