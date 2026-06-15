@@ -160,7 +160,7 @@ SetupPage {
                     _orientationsDialogShowCompass = false
                     _orientationDialogHelp = orientationHelpCal
                     console.log("_calTypeAccel Switch case")
-                    dialogTitle = qsTr("Calibrate Accelerometer")
+                    dialogTitle = qsTr("Simple Accel Calibration")
                     dialogButtons |= Dialog.Cancel
                     break
                 case _calTypeSet:
@@ -191,8 +191,9 @@ SetupPage {
 
                 console.log("Clicked type:", buttonType)
                 switch(buttonType) {
+
                 case "accel":
-                    showOrientationsDialog(_calTypeAccel);
+                    openAccelCalibrationDialog();
                     //showSimpleAccelCalOption();
                     break;
 
@@ -267,9 +268,9 @@ SetupPage {
                     showDynamicCalibrationDialog("qrc:/qml/APMMotorComponent.qml","Motors");
                     break;
 
-                case "imu":
-                    toastContainer.showToast("IMU Calibration");
-                    openImuCalibrationDialog();
+                case "simple":
+                    //toastContainer.showToast("IMU Calibration");
+                    showOrientationsDialog(_calTypeAccel);
                     break;
                 }
             }
@@ -285,9 +286,9 @@ SetupPage {
                 dynamicCalDialog.open()
             }
 
-            function openImuCalibrationDialog() {
-                var imuDialog = imuCalibrationDialogComponent.createObject(mainWindow);
-                imuDialog.open();
+            function openAccelCalibrationDialog() {
+                var accelDialog = accelCalibrationDialogComponent.createObject(mainWindow);
+                accelDialog.open();
             }
 
             function compassLabel(index)
@@ -473,8 +474,8 @@ SetupPage {
                         }
 
                         ListElement {
-                            name: "IMU"
-                            type: "imu"
+                            name: "Simple Accel"
+                            type: "simple"
                             indicator: true
                             icon: "/qmlimages/NewImages/homeIcon.png"
                             status: "none"
@@ -753,17 +754,17 @@ SetupPage {
             }
 
             Component {
-                id: imuCalibrationDialogComponent
+                id: accelCalibrationDialogComponent
 
                 QGCPopupDialog {
-                    id: imuCalibrationDialog
-                    title: qsTr("IMU Calibration")
+                    id: accelCalibrationDialog
+                    title: qsTr("Calibrate Accelerometer")
                     buttons: Dialog.Ok | Dialog.Cancel
                     preventClose: true
                     showNextButton: controller.showOrientationCalArea
 
                     property bool calibrationDone: false
-                    //property string dialogWarningText: qsTr("Follow the instructions to calibrate the IMU by rotating the vehicle to different positions.")
+                    //property string dialogWarningText: qsTr("Follow the instructions to calibrate the Accel by rotating the vehicle to different positions.")
                     property string dialogWarningText: qsTr("Click the Ok Button to Start Calibration")
 
                     // Expose the dialog's progress bar if needed
@@ -818,12 +819,12 @@ SetupPage {
                             // visible: controller.calibrationInProgress
                         }
 
-                        // IMU Calibration Area - Your rectangle code
+                        // Accel Calibration Area - Your rectangle code
                         Rectangle {
                             id: orientationCalArea
                             width: parent.width
                             visible: controller.showOrientationCalArea
-                            height: 180
+                            height: 200
                             color: qgcPal.windowShade
 
                             Flickable {
@@ -858,19 +859,23 @@ SetupPage {
                                         onClicked: controller.cancelCalibration()
                                     }
 
-                                    Flow {
+                                    Item {
                                         id: vehicleFlow
                                         width: parent.width
-                                        height: 150
-                                        spacing: ScreenTools.defaultFontPixelWidth
+                                        height: 130
 
-                                        property real indicatorWidth: (width / 3) - spacing
-                                        property real indicatorHeight: (height / 2) - spacing
+                                        property bool anyInProgress: controller.orientationCalDownSideInProgress ||
+                                                                     controller.orientationCalLeftSideInProgress ||
+                                                                     controller.orientationCalRightSideInProgress ||
+                                                                     controller.orientationCalNoseDownSideInProgress ||
+                                                                     controller.orientationCalTailDownSideInProgress ||
+                                                                     controller.orientationCalUpsideDownSideInProgress
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalDownSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalDownSideInProgress || !vehicleFlow.anyInProgress
                                             calValid: controller.orientationCalDownSideDone
                                             calInProgress: controller.orientationCalDownSideInProgress
                                             calInProgressText: controller.orientationCalDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -878,9 +883,10 @@ SetupPage {
                                         }
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalLeftSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalLeftSideInProgress
                                             calValid: controller.orientationCalLeftSideDone
                                             calInProgress: controller.orientationCalLeftSideInProgress
                                             calInProgressText: controller.orientationCalLeftSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -888,9 +894,10 @@ SetupPage {
                                         }
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalRightSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalRightSideInProgress
                                             calValid: controller.orientationCalRightSideDone
                                             calInProgress: controller.orientationCalRightSideInProgress
                                             calInProgressText: controller.orientationCalRightSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -898,9 +905,10 @@ SetupPage {
                                         }
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalNoseDownSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalNoseDownSideInProgress
                                             calValid: controller.orientationCalNoseDownSideDone
                                             calInProgress: controller.orientationCalNoseDownSideInProgress
                                             calInProgressText: controller.orientationCalNoseDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -908,9 +916,10 @@ SetupPage {
                                         }
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalTailDownSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalTailDownSideInProgress
                                             calValid: controller.orientationCalTailDownSideDone
                                             calInProgress: controller.orientationCalTailDownSideInProgress
                                             calInProgressText: controller.orientationCalTailDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -918,9 +927,10 @@ SetupPage {
                                         }
 
                                         VehicleRotationCal {
-                                            width: parent.indicatorWidth
-                                            height: parent.indicatorHeight
-                                            visible: controller.orientationCalUpsideDownSideVisible
+                                            anchors.centerIn: parent
+                                            width: Math.min(parent.width * 0.6, 220)
+                                            height: 120
+                                            visible: controller.orientationCalUpsideDownSideInProgress
                                             calValid: controller.orientationCalUpsideDownSideDone
                                             calInProgress: controller.orientationCalUpsideDownSideInProgress
                                             calInProgressText: controller.orientationCalUpsideDownSideRotate ? qsTr("Rotate") : qsTr("Hold Still")
@@ -928,12 +938,8 @@ SetupPage {
                                         }
                                     }
                                 }
-
                             }
-
-
                         }
-
                     }
 
                     onOpened: {
@@ -951,7 +957,7 @@ SetupPage {
                     }
 
                     onClosed: {
-                        console.log("IMU dialog closed — clearing controller pointers")
+                        console.log("Accel dialog closed — clearing controller pointers")
                         // clear pointers so controller doesn't hold dangling QObjects
                         try {
                             controller.progressBar = null
@@ -959,20 +965,19 @@ SetupPage {
                             controller.nextButton = null
                             controller.cancelButton = null
                         } catch (e) {
-                            console.warn("Error clearing controller pointers on IMU dialog close:", e)
+                            console.warn("Error clearing controller pointers on Accel dialog close:", e)
                         }
                     }
 
                     onAccepted: {
                         if (calibrationDone) {
                             console.log("Calibration complete - closing dialog")
-                            imuCalibrationDialog.close()
+                            accelCalibrationDialog.close()
                         } else {
-                            console.log("Starting IMU calibration...")
+                            console.log("Starting Accel calibration...")
                             if (controller && controller.calibrateAccel) {
                                 controller.calibrateAccel(false)
-                                acceptButtonAlias.text = qsTr("Calibrating...") // temporarily show progress
-                                acceptButtonAlias.enabled = false
+                                acceptButtonAlias.visible = false
                                 rejectButtonAlias.enabled = true
                             } else {
                                 console.warn("controller.calibrateAccel not available")
@@ -981,9 +986,11 @@ SetupPage {
                     }
 
                     onRejected: {
-                        console.log("IMU calibration cancelled by user")
-                        imuCalibrationDialog.close()
-                        // if (controller && controller.cancelCalibration) controller.cancelCalibration()
+                        console.log("Accel calibration cancelled by user")
+                        if (controller && typeof controller.cancelCalibration === "function") {
+                            controller.cancelCalibration()
+                        }
+                        accelCalibrationDialog.close()
                     }
 
 
@@ -993,9 +1000,10 @@ SetupPage {
                         onCalibrationComplete: function(calType) {
                             if (calType === MAVLink.CalibrationAccel) {
                                 console.log("MAVLink.CalibrationAccel received — marking done")
-                                imuCalibrationDialog.calibrationDone = true
+                                accelCalibrationDialog.calibrationDone = true
                                 acceptButtonAlias.text = qsTr("Done")
                                 acceptButtonAlias.enabled = true
+                                acceptButtonAlias.visible = true
                                 rejectButtonAlias.enabled = true
                             }
                         }
@@ -1006,6 +1014,7 @@ SetupPage {
                         calibrationDone = false
                         acceptButtonAlias.text = qsTr("OK")
                         acceptButtonAlias.enabled = true
+                        acceptButtonAlias.visible = true
                         rejectButtonAlias.enabled = true
                     }
 
@@ -1356,7 +1365,7 @@ SetupPage {
                     title: {
                         switch(calType) {
                         case _calTypeCompass: return qsTr("Calibrate Compass");
-                        case _calTypeAccel: return qsTr("Calibrate Accelerometer");
+                        case _calTypeAccel: return qsTr("Simple Accel Calibration");
                         case _calTypeSet: return qsTr("Sensor Settings");
                         default: return "";
                         }
@@ -1663,7 +1672,6 @@ SetupPage {
                 }
             }
 
-
             // Ensure the controller doesn't hold dangling pointers when the component is destroyed
             Component.onDestruction: {
                 console.log("sensorComponentInner is being destroyed — cleaning controller pointers")
@@ -1683,7 +1691,6 @@ SetupPage {
                     console.warn("Error during Component.onDestruction cleanup:", e)
                 }
             }
-
         }
     }
 

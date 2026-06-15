@@ -203,6 +203,7 @@ private:
     bool _orientationCalTailDownSideRotate;
     
     bool _waitingForCancel;
+    bool _cancelInProgress;
 
     bool _restoreCompassCalFitness;
     float _previousCompassCalFitness;

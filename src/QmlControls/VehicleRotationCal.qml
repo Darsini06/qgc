@@ -41,16 +41,22 @@ Rectangle {
         color: qgcPal.windowShade
 
         Image {
-            width:      parent.width
-            height:     parent.height
-            source:     imageSource
-            fillMode:   Image.PreserveAspectFit
-            smooth: true
+            id:                     calImage
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top:            parent.top
+            anchors.topMargin:      4
+            width:                  Math.min(parent.width - 8, ScreenTools.defaultFontPixelWidth * 20)
+            height:                 Math.min(parent.height - statusText.height - 12, ScreenTools.defaultFontPixelWidth * 20)
+            source:                 imageSource
+            fillMode:               Image.PreserveAspectFit
+            smooth:                 true
         }
 
         QGCLabel {
+            id:                     statusText
+            anchors.bottom:         parent.bottom
+            anchors.bottomMargin:   4
             width:                  parent.width
-            height:                 parent.height
             horizontalAlignment:    Text.AlignHCenter
             verticalAlignment:      Text.AlignBottom
             font.pointSize:         ScreenTools.defaultFontPointSize

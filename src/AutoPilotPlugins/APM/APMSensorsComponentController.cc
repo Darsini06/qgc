@@ -55,6 +55,7 @@ APMSensorsComponentController::APMSensorsComponentController(void)
     , _orientationCalNoseDownSideRotate(false)
     , _orientationCalTailDownSideRotate(false)
     , _waitingForCancel(false)
+    , _cancelInProgress(false)
     , _restoreCompassCalFitness(false)
 {
     APMAutoPilotPlugin * apmPlugin = qobject_cast<APMAutoPilotPlugin*>(_vehicle->autopilotPlugin());
@@ -522,11 +523,10 @@ void APMSensorsComponentController::cancelCalibration(void)
         _vehicle->sendMavCommand(_vehicle->defaultComponentId(), MAV_CMD_DO_CANCEL_MAG_CAL, true /* showError */);
         _stopCalibration(StopCalibrationCancelled);
     } else {
-        _waitingForCancel = true;
-        emit waitingForCancelChanged();
-        // The firmware doesn't always allow us to cancel calibration. The best we can do is wait
-        // for it to timeout.
-        _vehicle->stopCalibration(true /* showError */);
+        // The firmware doesn't always allow us to cancel calibration, but we immediately stop it locally
+        // and swallow any "command not supported" error on cancel.
+        _vehicle->stopCalibration(false /* showError */);
+        _stopCalibration(StopCalibrationCancelled);
     }
 
 }
