@@ -464,7 +464,7 @@ Item {
                 fenceCenter.longitude !== 0
         var isEnabled = QGroundControl.loadGlobalSetting("enableFence", "false") === "true"
         var isDialogOpen = MapGlobals.editdialog === "editdialog"
-        
+
         if (hasValidCenter && isEnabled && !isDialogOpen) {
             _objMgrFenceVisuals.createObject(fenceCircleComponent, mapControl, true)
             _objMgrFenceVisuals.createObject(fenceCenterHandleComponent, mapControl, true)
@@ -474,7 +474,6 @@ Item {
             console.log("Fence visuals suppressed: hasValidCenter=", hasValidCenter, "isEnabled=", isEnabled, "isDialogOpen=", isDialogOpen)
         }
     }
-
     QGCPalette { id: qgcPal }
 
     KMLOrSHPFileDialog {

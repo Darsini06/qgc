@@ -1113,7 +1113,6 @@ Item {
 
     // First Dialog – Type Selection Only
     Component {
-
         id: typeSelectionDialogComponent
 
         QGCPopupDialog {
@@ -1167,7 +1166,6 @@ Item {
                                 duration: 150
                             }
                         }
-
                         Behavior on border.color {
                             ColorAnimation {
                                 duration: 150
@@ -1240,6 +1238,9 @@ Item {
                             }
                         }
                     }
+                }
+                Item {
+                    Layout.preferredHeight: 10
                 }
             }
         }
@@ -1393,4 +1394,3 @@ Item {
     }
 
 }
-

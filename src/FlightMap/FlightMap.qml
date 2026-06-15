@@ -151,7 +151,9 @@ Map {
 
     function updateActiveMapType() {
         var settings =  QGroundControl.settingsManager.flightMapSettings
-        var fullMapName = settings.mapProvider.value + " " + settings.mapType.value
+        var provider =  settings.mapProvider.value
+        var type =      settings.mapType.value
+        var fullMapName = (provider === "Google" && type !== "Labels") ? type : (provider + " " + type)
 
         for (var i = 0; i < _map.supportedMapTypes.length; i++) {
             if (fullMapName === _map.supportedMapTypes[i].name) {

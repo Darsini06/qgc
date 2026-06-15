@@ -1224,4 +1224,22 @@ public class QGCActivity extends QtActivity
 
         return null;
     }
+
+    /**
+     * @brief Notifies Android media scanner of a new file so it appears in Downloads/Files apps.
+     * @param filePath Absolute path of the file to scan.
+     */
+    public static void mediaScanFile(final String filePath) {
+        if (m_instance == null) return;
+        android.media.MediaScannerConnection.scanFile(
+            m_instance.getApplicationContext(),
+            new String[]{ filePath },
+            null,
+            new android.media.MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String path, android.net.Uri uri) {
+                    Log.i(TAG, "Media scan completed: " + path + " -> " + uri);
+                }
+            }
+        );
+    }
 }

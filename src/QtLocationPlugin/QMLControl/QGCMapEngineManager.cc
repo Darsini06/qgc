@@ -196,6 +196,14 @@ QStringList QGCMapEngineManager::mapTypeList(const QString &provider)
     (void) mapStringList.replaceInStrings(providerType,"\\2");
     (void) mapStringList.removeDuplicates();
 
+    qDebug() << "===== MAP LIST =====";
+
+    for (const QString& s: mapStringList) {
+        qDebug() << s;
+    }
+
+    qDebug() << "===== PROVIDER =====" << provider;
+
     return mapStringList;
 }
 

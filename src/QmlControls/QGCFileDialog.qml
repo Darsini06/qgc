@@ -284,6 +284,7 @@ Item {
                                     text:           modelData.displayName
                                     border.width:   0
                                     radius:         0
+                                    showDownloadButton: false
 
                                     onClicked: {
                                         mobileFileOpenDialog.close()
@@ -401,8 +402,10 @@ Item {
 
                 // Removed 'See More' and 'Show Less' UI as all files are now displayed by default.
             }
+
         }
     }
+
     Component {
         id: savefiledialog
 

@@ -1262,7 +1262,6 @@ void SurveyComplexItem::_rebuildTransectsPhase1WorkerSinglePolygon(bool refly) {
   }
 
   if (_enableDirectionalIndentation) {
-      double gridAngle = _gridAngleFact.rawValue().toDouble();
       // Rotate polygon back by gridAngle so we can apply cardinal offsets
       QPointF center = polygon.boundingRect().center();
       QPolygonF rotatedPoly;

@@ -13,6 +13,12 @@
 #include "QGCApplication.h"
 #include "SettingsManager.h"
 #include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
+#include <QtGui/QDesktopServices>
+#include <QtCore/QUrl>
+#ifdef Q_OS_ANDROID
+#include <QtCore/QJniObject>
+#endif
 
 QGC_LOGGING_CATEGORY(QGCFileDialogControllerLog, "QGCFileDialogControllerLog")
 
@@ -81,6 +87,77 @@ QString QGCFileDialogController::fullyQualifiedFilename(const QString& directory
 void QGCFileDialogController::deleteFile(const QString& filename)
 {
     QFile::remove(filename);
+}
+
+void QGCFileDialogController::saveFile(const QString& filename, const QString& content)
+{
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << content;
+        file.close();
+    } else {
+        qCWarning(QGCFileDialogControllerLog) << "Failed to open file for writing:" << filename;
+    }
+}
+
+QString QGCFileDialogController::saveToDownloads(const QString& filename, const QString& content)
+{
+    QString saveFolder;
+
+#ifdef Q_OS_ANDROID
+    // App has requestLegacyExternalStorage=true and WRITE_EXTERNAL_STORAGE permission
+    // Use the standard public Downloads folder directly
+    saveFolder = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    // GenericDataLocation on Android gives /storage/emulated/0/Android/data/... or /storage/emulated/0
+    // Append "Download" to reach the public Downloads folder
+    if (!saveFolder.isEmpty()) {
+        int idx = saveFolder.indexOf("/Android/data/");
+        if (idx != -1) {
+            saveFolder = saveFolder.left(idx) + "/Download";
+        } else {
+            saveFolder = saveFolder + "/Download";
+        }
+    } else {
+        saveFolder = "/storage/emulated/0/Download";
+    }
+#else
+    saveFolder = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    if (saveFolder.isEmpty()) {
+        saveFolder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    }
+#endif
+
+    QDir dir(saveFolder);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QString savePath = dir.absoluteFilePath(filename);
+
+    QFile file(savePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << content;
+        file.close();
+        qCDebug(QGCFileDialogControllerLog) << "Saved file to:" << savePath;
+
+#ifdef Q_OS_ANDROID
+        // Notify Android media scanner so the file appears in Downloads/Files apps immediately
+        QJniObject jPath = QJniObject::fromString(savePath);
+        QJniObject::callStaticMethod<void>(
+            "org/mavlink/DCGCS/QGCActivity",
+            "mediaScanFile",
+            "(Ljava/lang/String;)V",
+            jPath.object<jstring>()
+        );
+#endif
+
+        return savePath;
+    } else {
+        qCWarning(QGCFileDialogControllerLog) << "Failed to save:" << savePath;
+        return QString();
+    }
 }
 
 QString QGCFileDialogController::fullFolderPathToShortMobilePath(const QString& fullFolderPath)

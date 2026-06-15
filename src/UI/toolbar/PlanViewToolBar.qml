@@ -184,12 +184,12 @@ Rectangle {
         visible:        MapGlobals.editdialog !== "editdialog"
 
         QGCToolBarButton {
-            id:                     currentButton
+            id: currentButton
             Layout.preferredHeight: largeProgressBar1.height
-            icon.source:            "/qmlimages/NewImages/settings.svg"
-            logo:                   true
-            onClicked:              mainWindow.showToolSelectDialog()
-            Layout.alignment:        Qt.AlignRight
+            icon.source: "/res/gear-black.svg"
+            logo: true
+            onClicked: mainWindow.showToolSelectDialog()
+            Layout.alignment: Qt.AlignRight
         }
 
     }

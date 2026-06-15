@@ -30,7 +30,7 @@ Item {
     implicitWidth:  mainColumn.width
     implicitHeight: mainColumn.height
 
-property bool isTablet: Screen.width >= 800
+    property bool isTablet: Screen.width >= 800
     // Shared responsive base
     readonly property real baseSize: isTablet
                                      ? ScreenTools.defaultFontPixelHeight * 1.8
@@ -57,21 +57,33 @@ property bool isTablet: Screen.width >= 800
     signal droneRedirectClicked()
 
     Component.onCompleted: {
-        console.log("Current Map Type:", _mapTypeFact.rawValue)
+        console.log("========== MAP DEBUG START ==========")
 
-        var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
-        console.log("Available Types:", types)
+        console.log("enumStrings =", _mapTypeFact.enumStrings)
+        console.log("enumValues =", _mapTypeFact.enumValues)
 
-        var satelliteType = types.find(function(t) {
-            return t.toLowerCase().includes("satellite")
-        })
+        console.log("_mapProviderFact:", _mapProviderFact)
+        console.log("_mapTypeFact:", _mapTypeFact)
 
-        console.log("Satellite Found:", satelliteType)
+        if (_mapProviderFact)
+            console.log("Current Provider:", _mapProviderFact.rawValue)
 
-        if (satelliteType) {
-            _mapTypeFact.rawValue = satelliteType
-            console.log("Changed To:", _mapTypeFact.rawValue)
+        if (_mapTypeFact)
+            console.log("Current Map Type:", _mapTypeFact.rawValue)
+
+        try {
+            var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
+
+            console.log("Types Count:", types.length)
+
+            for (var i = 0; i < types.length; i++) {
+                console.log("Type[" + i + "] =", types[i])
+            }
+        } catch (e) {
+            console.log("mapTypeList ERROR:", e)
         }
+
+        console.log("========== MAP DEBUG END ==========")
     }
 
     function toggleIcons() {
@@ -304,17 +316,29 @@ property bool isTablet: Screen.width >= 800
                                     Image {
                                         anchors.fill: parent
                                         source: mapTypeGrid._rootPath + iconSource
-                                        fillMode: Image.AlwaysCrop
+                                        fillMode: Image.PreserveAspectCrop
                                     }
 
                                     MouseArea {
                                         anchors.fill: parent
+
                                         onClicked: {
-                                            var types = _mapEngineManager.mapTypeList(_mapProviderFact.rawValue)
-                                            var found = types.find(t => t.toLowerCase().includes(typeNameSuffix.toLowerCase()))
-                                            if (found) {
-                                                _mapTypeFact.rawValue = found
-                                            }
+                                            console.log("Before:", _mapTypeFact.rawValue)
+
+                                            if (label === "Satellite")
+                                                _mapTypeFact.rawValue = "Satellite"
+                                            else if (label === "Terrain")
+                                                _mapTypeFact.rawValue = "Terrain"
+                                            else if (label === "Street")
+                                                _mapTypeFact.rawValue = "Street Map"
+                                            else if (label === "Default")
+                                                _mapTypeFact.rawValue = "Hybrid"
+
+                                            console.log("After:", _mapTypeFact.rawValue)
+
+                                            Qt.callLater(function() {
+                                                console.log("Actual Current Type:", _mapTypeFact.rawValue)
+                                            })
                                         }
                                     }
                                 }
@@ -353,6 +377,7 @@ property bool isTablet: Screen.width >= 800
                                 iconSource: "map_hybrid.jpeg"
                             }
                         }
+
                     }
                 }
             }

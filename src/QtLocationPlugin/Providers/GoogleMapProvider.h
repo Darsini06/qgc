@@ -59,7 +59,7 @@ class GoogleStreetMapProvider : public GoogleMapProvider
 public:
     GoogleStreetMapProvider()
         : GoogleMapProvider(
-            QStringLiteral("Google Street Map"),
+            QStringLiteral("Street Map"),
             QStringLiteral("lyrs"),
             QStringLiteral("m"),
             QStringLiteral("png"),
@@ -72,7 +72,7 @@ class GoogleSatelliteMapProvider : public GoogleMapProvider
 public:
     GoogleSatelliteMapProvider()
         : GoogleMapProvider(
-            QStringLiteral("Google Satellite"),
+            QStringLiteral("Satellite"),
             QStringLiteral("lyrs"),
             QStringLiteral("s"),
             QStringLiteral("jpg"),
@@ -98,7 +98,7 @@ class GoogleTerrainMapProvider : public GoogleMapProvider
 public:
     GoogleTerrainMapProvider()
         : GoogleMapProvider(
-            QStringLiteral("Google Terrain"),
+            QStringLiteral("Terrain"),
             QStringLiteral("v"),
             QStringLiteral("t,r"),
             QStringLiteral("png"),
@@ -111,7 +111,7 @@ class GoogleHybridMapProvider : public GoogleMapProvider
 public:
     GoogleHybridMapProvider()
         : GoogleMapProvider(
-            QStringLiteral("Google Hybrid"),
+            QStringLiteral("Hybrid"),
             QStringLiteral("lyrs"),
             QStringLiteral("y"),
             QStringLiteral("png"),
