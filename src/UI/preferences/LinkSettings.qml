@@ -324,23 +324,30 @@ ColumnLayout  {
                             anchors.rightMargin: 16
                             spacing: ScreenTools.isMobile ? 12 : 16
 
-                            // Number Icon Box
+                            // Icon Box
                             Rectangle {
-                                width: ScreenTools.isMobile ? 28 : 34
-                                height: width
+                                width: 36
+                                height: 36
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? "#301934" : "#F1F5F9"
-                                border.color: typeMouseArea.containsMouse ? "#301934" : "#DDE1EA"
-                                border.width: 1
+                                color: "transparent"
+                                border.width: 0
 
-                                Text {
+                                property var _connIcons: [
+                                    "qrc:/qmlimages/NewImages/bluetooth.png",
+                                    "qrc:/qmlimages/NewImages/serial.png",
+                                    "qrc:/qmlimages/NewImages/udp.png",
+                                    "qrc:/qmlimages/NewImages/tcp.jfif"
+                                ]
+
+                                QGCColoredImage {
                                     anchors.centerIn: parent
-                                    font.family: "Outfit"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                    font.bold: true
-                                    color: typeMouseArea.containsMouse ? "white" : "black"
-                                    text: (index + 1)
+                                    width: parent.width * 0.6
+                                    height: width
+                                    sourceSize.width: width
+                                    fillMode: Image.PreserveAspectFit
+                                    color: "transparent"
+                                    source: index < parent._connIcons.length ? parent._connIcons[index] : ""
                                 }
                             }
 
@@ -386,6 +393,9 @@ ColumnLayout  {
                             }
                         }
                     }
+                }
+                Item {
+                    Layout.preferredHeight: 10
                 }
             }
         }

@@ -53,6 +53,7 @@
         <file alias="FlyViewSettings.qml">src/UI/preferences/FlyViewSettings.qml</file>
         <file alias="FWLandingPatternEditor.qml">src/PlanView/FWLandingPatternEditor.qml</file>
         <file alias="GeneralSettings.qml">src/UI/preferences/GeneralSettings.qml</file>
+        <file alias="OnOffToggle.qml">src/UI/preferences/OnOffToggle.qml</file>
         <file alias="GeoTagPage.qml">src/AnalyzeView/GeoTagPage.qml</file>
         <file alias="HelpSettings.qml">src/UI/preferences/HelpSettings.qml</file>
         <file alias="IntegratedAttitudeIndicator.qml">src/FlightMap/Widgets/IntegratedAttitudeIndicator.qml</file>

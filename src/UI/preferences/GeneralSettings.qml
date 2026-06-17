@@ -16,7 +16,7 @@ SettingsPage {
     id: root
 
     component UnitSelector: RowLayout {
-        spacing:            6
+        spacing:            20
         Layout.fillWidth:   true
 
         property string labelText
@@ -37,7 +37,7 @@ SettingsPage {
             color:                  "black"
             font.bold:              true
             Layout.alignment:       Qt.AlignVCenter
-            Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * 10
+            Layout.preferredWidth:  220
         }
 
         RowLayout {
@@ -85,44 +85,7 @@ SettingsPage {
         }
     }
 
-    component OnOffToggle: Rectangle {
-        id: toggleRoot
-        width:              48
-        height:             26
-        radius:             height / 2
-        color:              checked ? "#79AE6F" : "#E0E0E0"
-        border.color:       checked ? "#79AE6F" : "#CCCCCC"
-        border.width:       1
-        
-        property bool checked: false
-        signal toggled(bool newValue)
 
-        Behavior on color {
-            ColorAnimation { duration: 150 }
-        }
-
-        Rectangle {
-            id: thumb
-            width:              20
-            height:             20
-            radius:             height / 2
-            color:              "white"
-            anchors.verticalCenter: parent.verticalCenter
-            x:                  checked ? (parent.width - width - 3) : 3
-
-            Behavior on x {
-                NumberAnimation { duration: 150; easing.type: Easing.InOutQuad }
-            }
-        }
-
-        MouseArea {
-            anchors.fill:       parent
-            cursorShape:        Qt.PointingHandCursor
-            onClicked: {
-                toggleRoot.toggled(!toggleRoot.checked)
-            }
-        }
-    }
 
     //General Settings ------------------------------------------------------------------------------------
     property var    _settingsManager:           QGroundControl.settingsManager
@@ -207,7 +170,7 @@ SettingsPage {
                     color: "white"
                     border.color: "#808080"
                     border.width: 1
-                    radius: 4
+                    radius: 12
                 }
 
                 onPressedChanged: {
@@ -218,6 +181,8 @@ SettingsPage {
                 }
             }
         }
+
+
         // --- SD Card Save (Tick Style) ---
         RowLayout {
             spacing:            10
