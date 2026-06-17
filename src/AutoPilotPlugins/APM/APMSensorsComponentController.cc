@@ -186,6 +186,7 @@ void APMSensorsComponentController::_stopCalibration(APMSensorsComponentControll
     _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(true);
 
     disconnect(_vehicle, &Vehicle::textMessageReceived, this, &APMSensorsComponentController::_handleUASTextMessage);
+    disconnect(_vehicle, &Vehicle::mavCommandResult, this, &APMSensorsComponentController::_mavCommandResult);
     
     emit setAllCalButtonsEnabled(true);
 
@@ -200,6 +201,44 @@ void APMSensorsComponentController::_stopCalibration(APMSensorsComponentControll
     if (_calTypeInProgress == QGCMAVLink::CalibrationMag) {
         _restorePreviousCompassCalFitness();
     }
+
+    // Reset ALL calibration state flags to their initial values on stop/cancel
+    _orientationCalDownSideDone = false;
+    _orientationCalUpsideDownSideDone = false;
+    _orientationCalLeftSideDone = false;
+    _orientationCalRightSideDone = false;
+    _orientationCalTailDownSideDone = false;
+    _orientationCalNoseDownSideDone = false;
+
+    _orientationCalDownSideVisible = false;
+    _orientationCalUpsideDownSideVisible = false;
+    _orientationCalLeftSideVisible = false;
+    _orientationCalRightSideVisible = false;
+    _orientationCalTailDownSideVisible = false;
+    _orientationCalNoseDownSideVisible = false;
+
+    _orientationCalDownSideInProgress = false;
+    _orientationCalUpsideDownSideInProgress = false;
+    _orientationCalLeftSideInProgress = false;
+    _orientationCalRightSideInProgress = false;
+    _orientationCalNoseDownSideInProgress = false;
+    _orientationCalTailDownSideInProgress = false;
+
+    _orientationCalDownSideRotate = false;
+    _orientationCalUpsideDownSideRotate = false;
+    _orientationCalLeftSideRotate = false;
+    _orientationCalRightSideRotate = false;
+    _orientationCalNoseDownSideRotate = false;
+    _orientationCalTailDownSideRotate = false;
+
+    emit orientationCalSidesDoneChanged();
+    emit orientationCalSidesVisibleChanged();
+    emit orientationCalSidesInProgressChanged();
+    emit orientationCalSidesRotateChanged();
+
+    _waitingForCancel = false;
+    _cancelInProgress = false;
+    emit waitingForCancelChanged();
 
     if (code == StopCalibrationSuccess) {
         _resetInternalState();
@@ -216,9 +255,6 @@ void APMSensorsComponentController::_stopCalibration(APMSensorsComponentControll
         }
     }
     
-    _waitingForCancel = false;
-    emit waitingForCancelChanged();
-
     _refreshParams();
     
     switch (code) {

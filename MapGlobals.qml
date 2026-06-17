@@ -524,7 +524,7 @@ QtObject {
                 }
             }
         }
-        xhr.send(JSON.stringify(data));
+       \,m xhr.send(JSON.stringify(data));
     }
 
     function registerUser(username, displayname, email, password, confirmpassword, otp, callback) {

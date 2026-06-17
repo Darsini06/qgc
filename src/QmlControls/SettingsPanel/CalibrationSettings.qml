@@ -845,7 +845,7 @@ SetupPage {
                                         width: parent.width
                                         wrapMode: Text.WordWrap
                                         font.pointSize: ScreenTools.defaultFontPointSize
-                                        text: controller.orientationCalAreaHelpText || qsTr("Rotate the vehicle to the shown positions")
+                                        text: qsTr("Rotate the vehicle to the shown positions")
                                         color: "black"
                                     }
 
@@ -861,7 +861,8 @@ SetupPage {
 
                                     Item {
                                         id: vehicleFlow
-                                        width: parent.width
+                                        width: parent.width * 0.8
+                                        anchors.horizontalCenter: parent.horizontalCenter
                                         height: 130
 
                                         property bool anyInProgress: controller.orientationCalDownSideInProgress ||

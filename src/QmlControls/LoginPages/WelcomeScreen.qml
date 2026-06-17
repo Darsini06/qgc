@@ -55,9 +55,6 @@ Item {
     property string _controllerSyncInProgressA: ""
 
 
-
-
-
     function dp(value) {
         return value * baseUnit;
     }
@@ -866,6 +863,7 @@ Item {
 
                                         xhr.send(data);
                                     }
+
                                 }
                             }
                         }

@@ -42,11 +42,9 @@ Rectangle {
 
         Image {
             id:                     calImage
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top:            parent.top
-            anchors.topMargin:      4
-            width:                  Math.min(parent.width - 8, ScreenTools.defaultFontPixelWidth * 20)
-            height:                 Math.min(parent.height - statusText.height - 12, ScreenTools.defaultFontPixelWidth * 20)
+            anchors.centerIn:       parent
+            width:                  Math.min(parent.width - 8, parent.height - statusText.height - 12)
+            height:                 Math.min(parent.width - 8, parent.height - statusText.height - 12)
             source:                 imageSource
             fillMode:               Image.PreserveAspectFit
             smooth:                 true
