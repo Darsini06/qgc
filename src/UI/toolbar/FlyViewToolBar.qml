@@ -33,7 +33,7 @@ Rectangle {
 
     property var _sprayEnable: _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_ENABLE") : null
 
-    // //property var _sprayPumpRate:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_RATE") : null
+    property var _sprayPumpRate:    _activeVehicle && _activeVehicle.parameterManager && _activeVehicle.parameterManager.parameterExists(-1, "SPRAY_PUMP_RATE") ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_RATE") : null
     // property var _sprayPumpMin:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_PUMP_MIN") : null
     //property var _spraySpinner:     _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPINNER") : null
     // property var _spraySpeedMin:    _activeVehicle ? _activeVehicle.parameterManager.getParameter(-1, "SPRAY_SPEED_MIN") : null

@@ -1544,6 +1544,18 @@ Item {
     function _refreshMediaStorage() {
         var photoPath = _settingsFolderPath(_appSettings.photoSavePath)
         var videoPath = _settingsFolderPath(_appSettings.videoSavePath)
+
+        if (!mediaFileController.folderSizeBytes ||
+                !mediaFileController.storageBytesAvailable ||
+                !mediaFileController.storageBytesTotal ||
+                !mediaFileController.storagePathWritable) {
+            _mediaStorageBytes = -1
+            _saveStorageBytesAvailable = -1
+            _saveStorageBytesTotal = -1
+            _saveStorageWritable = true
+            return
+        }
+
         var photoBytes = mediaFileController.folderSizeBytes(photoPath, ["*.jpg", "*.jpeg", "*.png"])
         var videoBytes = mediaFileController.folderSizeBytes(videoPath, ["*.mp4", "*.mov", "*.mkv"])
         _mediaStorageBytes = photoBytes + videoBytes
@@ -4486,14 +4498,15 @@ Item {
 
                     Button {
                         Layout.fillWidth: true
-                        text: _root._camera.trackingEnabled ? qsTr("Tracking On") : qsTr("Tracking Off")
+                        text: _root._trackingAvailable() && _root._camera.trackingEnabled ? qsTr("Tracking On") : qsTr("Tracking Off")
+                        enabled: _root._trackingAvailable()
                         onClicked: _root._camera.trackingEnabled = !_root._camera.trackingEnabled
                     }
 
                     Button {
                         Layout.fillWidth: true
                         text: qsTr("Stop Track")
-                        enabled: _root._camera.trackingEnabled
+                        enabled: _root._trackingAvailable() && _root._camera.trackingEnabled
                         onClicked: _root._camera.stopTracking()
                     }
                 }
