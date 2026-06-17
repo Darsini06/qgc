@@ -136,6 +136,128 @@
     "enumValues":       "0,1,2,3,4,5",
     "default":           0,
     "qgcRebootRequired": true
+},
+{
+    "name":             "cameraIso",
+    "shortDesc":        "Camera ISO",
+    "longDesc":         "Preferred camera ISO value. This is stored for camera-control integrations that support ISO.",
+    "type":             "uint32",
+    "enumStrings":      "Auto,100,200,400,800,1600,3200",
+    "enumValues":       "0,100,200,400,800,1600,3200",
+    "default":          0
+},
+{
+    "name":             "cameraShutter",
+    "shortDesc":        "Shutter Speed",
+    "longDesc":         "Preferred shutter speed for camera-control integrations.",
+    "type":             "uint32",
+    "enumStrings":      "Auto,1/50,1/60,1/120,1/240,1/500,1/1000",
+    "enumValues":       "0,50,60,120,240,500,1000",
+    "default":          0
+},
+{
+    "name":             "cameraExposure",
+    "shortDesc":        "Exposure Compensation",
+    "longDesc":         "Exposure compensation in EV steps for camera-control integrations.",
+    "type":             "float",
+    "min":              -3.0,
+    "max":              3.0,
+    "decimalPlaces":    1,
+    "units":            "EV",
+    "default":          0.0
+},
+{
+    "name":             "cameraWhiteBalance",
+    "shortDesc":        "White Balance",
+    "longDesc":         "Preferred camera white-balance mode.",
+    "type":             "uint32",
+    "enumStrings":      "Auto,Daylight,Cloudy,Indoor,Tungsten,Fluorescent,Manual",
+    "enumValues":       "0,1,2,3,4,5,6",
+    "default":          0
+},
+{
+    "name":             "cameraFocusMode",
+    "shortDesc":        "Focus Mode",
+    "longDesc":         "Preferred camera focus mode.",
+    "type":             "uint32",
+    "enumStrings":      "Auto,Manual,Infinity,Macro",
+    "enumValues":       "0,1,2,3",
+    "default":          0
+},
+{
+    "name":             "cameraFocusValue",
+    "shortDesc":        "Manual Focus",
+    "longDesc":         "Manual focus value from 0 to 100.",
+    "type":             "uint32",
+    "min":              0,
+    "max":              100,
+    "units":            "%",
+    "default":          50
+},
+{
+    "name":             "cameraBrightness",
+    "shortDesc":        "Brightness",
+    "longDesc":         "Local video brightness adjustment.",
+    "type":             "int32",
+    "min":              -100,
+    "max":              100,
+    "default":          0
+},
+{
+    "name":             "cameraContrast",
+    "shortDesc":        "Contrast",
+    "longDesc":         "Local video contrast adjustment.",
+    "type":             "int32",
+    "min":              -100,
+    "max":              100,
+    "default":          0
+},
+{
+    "name":             "cameraSaturation",
+    "shortDesc":        "Saturation",
+    "longDesc":         "Local video color saturation adjustment.",
+    "type":             "int32",
+    "min":              -100,
+    "max":              100,
+    "default":          0
+},
+{
+    "name":             "cameraSharpness",
+    "shortDesc":        "Sharpness",
+    "longDesc":         "Local video sharpness adjustment.",
+    "type":             "int32",
+    "min":              -100,
+    "max":              100,
+    "default":          0
+},
+{
+    "name":             "cameraGamma",
+    "shortDesc":        "Gamma",
+    "longDesc":         "Local video gamma correction.",
+    "type":             "float",
+    "min":              0.5,
+    "max":              2.5,
+    "decimalPlaces":    1,
+    "default":          1.0
+},
+{
+    "name":             "cameraColorTemperature",
+    "shortDesc":        "Color Temperature",
+    "longDesc":         "Local video color temperature target.",
+    "type":             "uint32",
+    "min":              2500,
+    "max":              9000,
+    "units":            "K",
+    "default":          5600
+},
+{
+    "name":             "cameraColorProfile",
+    "shortDesc":        "Color Profile",
+    "longDesc":         "Preferred local video color profile.",
+    "type":             "uint32",
+    "enumStrings":      "Normal,Cinematic,Inspection,Night,High Contrast,Low Light",
+    "enumValues":       "0,1,2,3,4,5",
+    "default":          0
 }
 ]
 }

@@ -227,6 +227,7 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
         (void) _updateSettings(videoReceiver.index);
     }
 
+    (void) _autoSelectUvcVideoSource();
     emit isStreamSourceChanged();
     startVideo();
 }
@@ -277,6 +278,8 @@ VideoManager::startVideo()
     if (_app->runningUnitTests()) {
         return;
     }
+
+    (void) _autoSelectUvcVideoSource();
 
     if(!_videoSettings->streamEnabled()->rawValue().toBool() || !hasVideo()) {
         qCDebug(VideoManagerLog) << "Stream not enabled/configured";
@@ -629,6 +632,46 @@ VideoManager::_initVideo()
             qCDebug(VideoManagerLog) << widgetTypes.at(videoReceiver.index) << "receiver disabled";
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+bool
+VideoManager::_autoSelectUvcVideoSource()
+{
+#ifndef QGC_DISABLE_UVC
+    if (!_videoSettings) {
+        return false;
+    }
+
+    const QList<QCameraDevice> videoInputs = QMediaDevices::videoInputs();
+    if (videoInputs.isEmpty()) {
+        return false;
+    }
+
+    const QString currentSource = _videoSettings->videoSource()->rawValue().toString();
+    if (currentSource != VideoSettings::videoDisabled && currentSource != VideoSettings::videoSourceNoVideo && !currentSource.isEmpty()) {
+        for (const auto& cameraDevice: videoInputs) {
+            if (currentSource == cameraDevice.description()) {
+                return false;
+            }
+        }
+    }
+
+    QCameraDevice selectedCamera = QMediaDevices::defaultVideoInput();
+    if (selectedCamera.isNull()) {
+        selectedCamera = videoInputs.first();
+    }
+
+    if (selectedCamera.isNull() || selectedCamera.description().isEmpty()) {
+        return false;
+    }
+
+    qCDebug(VideoManagerLog) << "Auto-selecting UVC video source:" << selectedCamera.description();
+    _videoSettings->videoSource()->setRawValue(selectedCamera.description());
+    return true;
+#else
+    return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------

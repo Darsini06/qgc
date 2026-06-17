@@ -19,6 +19,19 @@
 #include <QtMultimedia/QCameraDevice>
 #endif
 
+namespace {
+QString firstUvcCameraDescription()
+{
+#ifndef QGC_DISABLE_UVC
+    const QList<QCameraDevice> videoInputs = QMediaDevices::videoInputs();
+    if (!videoInputs.isEmpty()) {
+        return videoInputs.first().description();
+    }
+#endif
+    return QString();
+}
+} // namespace
+
 DECLARE_SETTINGGROUP(Video, "Video")
 {
     qmlRegisterUncreatableType<VideoSettings>("QGroundControl.SettingsManager", 1, 0, "VideoSettings", "Reference only");
@@ -38,6 +51,9 @@ DECLARE_SETTINGGROUP(Video, "Video")
 #ifndef QGC_DISABLE_UVC
     QList<QCameraDevice> videoInputs = QMediaDevices::videoInputs();
     for (const auto& cameraDevice: videoInputs) {
+        if (_autoDetectedVideoSource.isEmpty()) {
+            _autoDetectedVideoSource = cameraDevice.description();
+        }
         videoSourceList.append(cameraDevice.description());
     }
 #endif
@@ -86,6 +102,8 @@ void VideoSettings::_setDefaults()
 {
     if (_noVideo) {
         _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(videoSourceNoVideo);
+    } else if (!_autoDetectedVideoSource.isEmpty()) {
+        _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(_autoDetectedVideoSource);
     } else {
         _nameToMetaDataMap[videoSourceName]->setRawDefaultValue(videoDisabled);
     }
@@ -102,18 +120,36 @@ DECLARE_SETTINGSFACT(VideoSettings, rtspTimeout)
 DECLARE_SETTINGSFACT(VideoSettings, streamEnabled)
 DECLARE_SETTINGSFACT(VideoSettings, disableWhenDisarmed)
 DECLARE_SETTINGSFACT(VideoSettings, lowLatencyMode)
+DECLARE_SETTINGSFACT(VideoSettings, cameraIso)
+DECLARE_SETTINGSFACT(VideoSettings, cameraShutter)
+DECLARE_SETTINGSFACT(VideoSettings, cameraExposure)
+DECLARE_SETTINGSFACT(VideoSettings, cameraWhiteBalance)
+DECLARE_SETTINGSFACT(VideoSettings, cameraFocusMode)
+DECLARE_SETTINGSFACT(VideoSettings, cameraFocusValue)
+DECLARE_SETTINGSFACT(VideoSettings, cameraBrightness)
+DECLARE_SETTINGSFACT(VideoSettings, cameraContrast)
+DECLARE_SETTINGSFACT(VideoSettings, cameraSaturation)
+DECLARE_SETTINGSFACT(VideoSettings, cameraSharpness)
+DECLARE_SETTINGSFACT(VideoSettings, cameraGamma)
+DECLARE_SETTINGSFACT(VideoSettings, cameraColorTemperature)
+DECLARE_SETTINGSFACT(VideoSettings, cameraColorProfile)
 
 DECLARE_SETTINGSFACT_NO_FUNC(VideoSettings, videoSource)
 {
     if (!_videoSourceFact) {
         _videoSourceFact = _createSettingsFact(videoSourceName);
+        const QString autoDetectedVideoSource = firstUvcCameraDescription();
         //-- Check for sources no longer available
         if(!_videoSourceFact->enumValues().contains(_videoSourceFact->rawValue().toString())) {
-            if (_noVideo) {
+            if (!autoDetectedVideoSource.isEmpty()) {
+                _videoSourceFact->setRawValue(autoDetectedVideoSource);
+            } else if (_noVideo) {
                 _videoSourceFact->setRawValue(videoSourceNoVideo);
             } else {
                 _videoSourceFact->setRawValue(videoDisabled);
             }
+        } else if (_videoSourceFact->rawValue().toString() == videoDisabled && !autoDetectedVideoSource.isEmpty()) {
+            _videoSourceFact->setRawValue(autoDetectedVideoSource);
         }
         connect(_videoSourceFact, &Fact::valueChanged, this, &VideoSettings::_configChanged);
     }

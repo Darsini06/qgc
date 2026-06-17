@@ -164,7 +164,7 @@ bool SimulatedCameraControl::startVideoRecording()
     _videoRecordTimeUpdateTimer.start();
     _videoRecordTimeElapsedTimer.start();
     _videoManager->startRecording();
-    return false;
+    return true;
 }
 
 bool SimulatedCameraControl::stopVideoRecording()

@@ -36,6 +36,19 @@ public:
     DEFINE_SETTINGFACT(disableWhenDisarmed)
     DEFINE_SETTINGFACT(lowLatencyMode)
     DEFINE_SETTINGFACT(forceVideoDecoder)
+    DEFINE_SETTINGFACT(cameraIso)
+    DEFINE_SETTINGFACT(cameraShutter)
+    DEFINE_SETTINGFACT(cameraExposure)
+    DEFINE_SETTINGFACT(cameraWhiteBalance)
+    DEFINE_SETTINGFACT(cameraFocusMode)
+    DEFINE_SETTINGFACT(cameraFocusValue)
+    DEFINE_SETTINGFACT(cameraBrightness)
+    DEFINE_SETTINGFACT(cameraContrast)
+    DEFINE_SETTINGFACT(cameraSaturation)
+    DEFINE_SETTINGFACT(cameraSharpness)
+    DEFINE_SETTINGFACT(cameraGamma)
+    DEFINE_SETTINGFACT(cameraColorTemperature)
+    DEFINE_SETTINGFACT(cameraColorProfile)
 
     Q_ENUM(VideoDecoderOptions)
 
@@ -79,5 +92,6 @@ private:
 
 private:
     bool _noVideo = false;
+    QString _autoDetectedVideoSource;
 
 };

@@ -299,6 +299,7 @@ void QtMultimediaReceiver::takeScreenshot(const QString &imageFile)
     if (!_videoSink) {
         qCWarning(QtMultimediaReceiverLog) << "Video Sink is NULL";
         emit onTakeScreenshotComplete(STATUS_FAIL);
+        return;
     }
 
     const QVideoFrame frame = _videoSink->videoFrame();
@@ -309,17 +310,36 @@ void QtMultimediaReceiver::takeScreenshot(const QString &imageFile)
     } else {
         qCWarning(QtMultimediaReceiverLog) << "Screenshot Frame is Invalid";
         emit onTakeScreenshotComplete(STATUS_FAIL);
+        return;
+    }
+
+    if (!_mediaPlayer || !_mediaPlayer->videoOutput()) {
+        qCWarning(QtMultimediaReceiverLog) << "Video Output is NULL";
+        emit onTakeScreenshotComplete(STATUS_FAIL);
+        return;
     }
 
     _videoOutput = reinterpret_cast<QQuickVideoOutput*>(_mediaPlayer->videoOutput());
-    const QSize targetSize = _mediaRecorder->videoResolution();
+    if (!_videoOutput) {
+        qCWarning(QtMultimediaReceiverLog) << "Video Output item is NULL";
+        emit onTakeScreenshotComplete(STATUS_FAIL);
+        return;
+    }
+
+    QSize targetSize = _mediaRecorder ? _mediaRecorder->videoResolution() : QSize();
+    if (!targetSize.isValid() || targetSize.isEmpty()) {
+        targetSize = _videoOutput->size().toSize();
+    }
+
     QSharedPointer<QQuickItemGrabResult> screenshot = _videoOutput->grabToImage(targetSize);
-    // (void) connect(&screenshot, &QQuickItemGrabResult::ready, this, [screenshot, imageFile]() {
-        // screenshot->saveToFile(imageFile);
-    // }
-    screenshot->saveToFile(imageFile);
+    if (screenshot.isNull()) {
+        qCWarning(QtMultimediaReceiverLog) << "Unable to grab screenshot image";
+        emit onTakeScreenshotComplete(STATUS_FAIL);
+        return;
+    }
 
-    qCDebug(QtMultimediaReceiverLog) << "Screenshot";
-
-    emit onTakeScreenshotComplete(STATUS_NOT_IMPLEMENTED);
+    (void) connect(screenshot.data(), &QQuickItemGrabResult::ready, this, [this, screenshot, imageFile]() {
+        qCDebug(QtMultimediaReceiverLog) << "Screenshot" << imageFile;
+        emit onTakeScreenshotComplete(screenshot->saveToFile(imageFile) ? STATUS_OK : STATUS_FAIL);
+    });
 }

@@ -38,6 +38,7 @@ import MapGlobals
     property var    rightPanelWidth
     property var    planMasterController
     property bool   pipMode:                    false   // true: map is shown in a small pip mode
+    property real   topReservedInset:           0
 
     // Insets for the center viewport area
     property var toolInsets: QtObject {

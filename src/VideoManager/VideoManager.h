@@ -115,6 +115,7 @@ protected:
     friend class FinishVideoInitialization;
 
     void _initVideo       ();
+    bool _autoSelectUvcVideoSource();
     bool _updateSettings  (unsigned id);
     bool _updateVideoUri  (unsigned id, const QString& uri);
     void _cleanupOldVideos();

@@ -440,7 +440,7 @@ void AirspaceManager::_handleNetworkReply()
         QByteArray data = reply->readAll();
         
         // Offset parsing to background thread to prevent UI hang
-        QtConcurrent::run([this, data] {
+        (void) QtConcurrent::run([this, data] {
             QJsonParseError parseError;
             QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
             

@@ -40,6 +40,7 @@ Item {
     property var    totalToolInsets:        _totalToolInsets
     property var    mapControl
     property bool   isViewer3DOpen:         false
+    property real   topReservedInset:       0
 
     property var    _activeVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property var    _planMasterController:  globals.planMasterControllerFlyView

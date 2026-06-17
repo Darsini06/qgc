@@ -1,5 +1,9 @@
 Module QGroundControl.FlightDisplay
 
+AIDetectionOverlay             1.0 AIDetectionOverlay.qml
+FlightTimelinePanel            1.0 FlightTimelinePanel.qml
+FlightDisplayViewVideo         1.0 FlightDisplayViewVideo.qml
+YoloDetectionController        1.0 YoloDetectionController.qml
 FlyView                         1.0 FlyView.qml
 FlyViewBottomRightRowLayout     1.0 FlyViewBottomRightRowLayout.qml
 FlyViewCustomLayer              1.0 FlyViewCustomLayer.qml
@@ -28,6 +32,7 @@ GuidedActionGripper             1.0 GuidedActionGripper.qml
 GuidedToolStripAction           1.0 GuidedToolStripAction.qml
 MultiVehicleList                1.0 MultiVehicleList.qml
 PreFlightBatteryCheck           1.0 PreFlightBatteryCheck.qml
+PreFlightReadiness              1.0 PreFlightReadiness.qml
 PreFlightGPSCheck               1.0 PreFlightGPSCheck.qml
 PreFlightRCCheck                1.0 PreFlightRCCheck.qml
 PreFlightSensorsHealthCheck     1.0 PreFlightSensorsHealthCheck.qml
