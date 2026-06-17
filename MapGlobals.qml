@@ -112,9 +112,9 @@ QtObject {
 
 
     
-    property string backendUrl: "https://qgc-backend-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
+    // property string backendUrl: "https://qgc-agri-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
-    //property string backendUrl: "http://192.168.1.104:5000/api"
+    property string backendUrl: "http://192.168.58.73:5001/api"
 
 
 

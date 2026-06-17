@@ -855,23 +855,22 @@ Item {
                     }
 
                     // Label
-                    Label {
-                        anchors.left: swipeThumb.right
-                        anchors.leftMargin: dp(1.5)
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                        anchors.rightMargin: dp(1)
-                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT   >>>>>")
-                        color: "white"
-                        font.family: "Outfit"
-                        font.bold: true
-                        font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                        elide: Text.ElideRight
-                        fontSizeMode: Text.Fit
-                        minimumPointSize: 6
-                        opacity: connectClick._swiped ? 1.0 : Math.max(0, 1 - connectClick._progress * 3)
-                    }
-
+                                    Label {
+                                        anchors.left: swipeThumb.right
+                                        anchors.leftMargin: dp(1.5)
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.right: parent.right
+                                        anchors.rightMargin: dp(1)
+                                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT   >>>>>")
+                                        color: "white"
+                                        font.family: "Outfit"
+                                        font.bold: true
+                                        font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
+                                        elide: Text.ElideRight
+                                        fontSizeMode: Text.Fit
+                                        minimumPointSize: 6
+                                        opacity: connectClick._swiped ? 1.0 : Math.max(0, 1 - connectClick._progress * 3)
+                                    }
                     // Thumb
                     Rectangle {
                         id: swipeThumb
@@ -1178,23 +1177,35 @@ Item {
                             anchors.rightMargin: 16
                             spacing: 12
 
-                            // Number Icon Box
+                            // Icon Box
                             Rectangle {
-                                width: 36
-                                height: 36
+                                width: index === 2 ? 48 : 36
+                                   height: index === 2 ? 48 : 36
                                 radius: 8
                                 Layout.alignment: Qt.AlignVCenter
-                                color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#F1F5F9"
-                                border.color: typeMouseArea.containsMouse ? (typeDialog.isAgri ? "#79AE6F" : "#262626") : "#DDE1EA"
-                                border.width: 1
+                                color: "transparent"
+                                border.width: 0
 
-                                Text {
+                                property var _connIcons: [
+                                    "qrc:/qmlimages/NewImages/bluetooth.png",
+                                    "qrc:/qmlimages/NewImages/serial.png",
+                                    "qrc:/qmlimages/NewImages/udp.png",
+                                    "qrc:/qmlimages/NewImages/tcp.jfif"
+                                ]
+
+                                QGCColoredImage {
                                     anchors.centerIn: parent
-                                    font.family: "Outfit"
-                                    font.pointSize: ScreenTools.defaultFontPointSize * 1.1
-                                    font.bold: true
-                                    color: typeMouseArea.containsMouse ? "white" : "black"
-                                    text: (index + 1)
+
+                                    width: index === 2 ? 28 : 22
+                                    height: width
+
+                                    sourceSize.width: width
+                                    sourceSize.height: height
+
+                                    fillMode: Image.PreserveAspectFit
+                                    color: "transparent"
+
+                                    source: index < parent._connIcons.length ? parent._connIcons[index] : ""
                                 }
                             }
 

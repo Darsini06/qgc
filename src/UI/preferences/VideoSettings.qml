@@ -1,13 +1,3 @@
-/****************************************************************************
- *
- * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
- *
- * QGroundControl is licensed according to the terms in the file
- * COPYING.md in the root of the source code directory.
- *
- ****************************************************************************/
-
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -19,7 +9,9 @@ import QGroundControl.Controls
 import QGroundControl.ScreenTools
 
 SettingsPage {
-    property var    _settingsManager:            QGroundControl.settingsManager
+    id: root
+
+    property var    _settingsManager:           QGroundControl.settingsManager
     property var    _videoManager:              QGroundControl.videoManager
     property var    _videoSettings:             _settingsManager.videoSettings
     property string _videoSource:               _videoSettings.videoSource.rawValue
@@ -31,103 +23,370 @@ SettingsPage {
     property bool   _isTCP:                     _isStreamSource && (_videoSource === _videoSettings.tcpVideoSource)
     property bool   _isMPEGTS:                  _isStreamSource && (_videoSource === _videoSettings.mpegtsVideoSource)
     property bool   _videoAutoStreamConfig:     _videoManager.autoStreamConfigured
-    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 25
+    property real   _urlFieldWidth:             ScreenTools.defaultFontPixelWidth * 30
     property bool   _requiresUDPPort:           _isUDP264 || _isUDP265 || _isMPEGTS
 
-    SettingsGroupLayout {
-        Layout.fillWidth:   true
-        heading:            qsTr("Video Settings")
-        headingDescription: _videoAutoStreamConfig ? qsTr("Mavlink camera stream is automatically configured") : ""
-        enabled:            !_videoAutoStreamConfig
+    property bool   _isNarrow:                  width < ScreenTools.defaultFontPixelWidth * 110
+    property real   _innerMargin:               ScreenTools.isMobile ? ScreenTools.defaultFontPixelWidth * 2 : ScreenTools.defaultFontPixelWidth * 8
+    property real   _maxContentWidth:           ScreenTools.defaultFontPixelWidth * 90
+    property real   _contentWidth:              Math.min(width - (_innerMargin * 2), _maxContentWidth)
 
-        LabelledFactComboBox {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("Source")
-            indexModel:             false
-            fact:                   _videoSettings.videoSource
-            visible:                fact.visible
+    ColumnLayout {
+        id:                 contentLayout
+        width:              _contentWidth
+        spacing:            _isNarrow ? ScreenTools.defaultFontPixelHeight : ScreenTools.defaultFontPixelHeight * 1.5
+        Layout.alignment:   Qt.AlignHCenter
+
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#E0E0E0"
+            Layout.bottomMargin: ScreenTools.defaultFontPixelHeight * 0.3
+            visible:          _videoSettings.videoSource.visible
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:           true
-            labelPreferredWidth:        ScreenTools.defaultFontPixelWidth * 26
-            textFieldPreferredWidth:    _urlFieldWidth
-            label:                      qsTr("RTSP URL")
-            fact:                       _videoSettings.rtspUrl
-            visible:                    _isRTSP && _videoSettings.rtspUrl.visible
+        // Source Dropdown
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _videoSettings.videoSource.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Source")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactComboBox {
+                id: videoSourceCombo
+                fact: _videoSettings.videoSource
+                indexModel: false
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+
+                onPressedChanged: {
+                    if (pressed) {
+                        popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                        popup.x = width - popup.width
+                    }
+                }
+            }
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:           true
-            labelPreferredWidth:        ScreenTools.defaultFontPixelWidth * 26
-            textFieldPreferredWidth:    _urlFieldWidth
-            label:                      qsTr("TCP URL")
-            fact:                       _videoSettings.tcpUrl
-            visible:                    _isTCP && _videoSettings.tcpUrl.visible
+        // RTSP URL
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _isRTSP && _videoSettings.rtspUrl.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("RTSP URL")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactTextField {
+                fact: _videoSettings.rtspUrl
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+            }
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("UDP Port")
-            fact:                   _videoSettings.udpPort
-            visible:                _requiresUDPPort && _videoSettings.udpPort.visible
+        // TCP URL
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _isTCP && _videoSettings.tcpUrl.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("TCP URL")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactTextField {
+                fact: _videoSettings.tcpUrl
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+            }
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("Aspect Ratio")
-            fact:                   _videoSettings.aspectRatio
-            visible:                !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+        // UDP Port
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _requiresUDPPort && _videoSettings.udpPort.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("UDP Port")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactTextField {
+                fact: _videoSettings.udpPort
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+            }
         }
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Stop recording when disarmed")
-            fact:               _videoSettings.disableWhenDisarmed
-            visible:            !_videoAutoStreamConfig && _isStreamSource && fact.visible
+        // Aspect Ratio
+        RowLayout {
+            Layout.fillWidth: true
+            visible: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.aspectRatio.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Aspect Ratio")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactTextField {
+                fact: _videoSettings.aspectRatio
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+            }
         }
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Low Latency Mode")
-            fact:               _videoSettings.lowLatencyMode
-            visible:            !_videoAutoStreamConfig && _isStreamSource && fact.visible && _isGST
+        // Stop recording when disarmed
+        RowLayout {
+            Layout.fillWidth: true
+            visible: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.disableWhenDisarmed.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Stop recording when disarmed")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+            }
+
+            Item { Layout.fillWidth: true }
+
+            OnOffToggle {
+                checked: _videoSettings.disableWhenDisarmed.rawValue
+                onToggled: (val) => _videoSettings.disableWhenDisarmed.rawValue = val
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("Video decode priority")
-            fact:                   _videoSettings.forceVideoDecoder
-            visible:                fact.visible
-            indexModel:             false
+        // Low Latency Mode
+        RowLayout {
+            Layout.fillWidth: true
+            visible: !_videoAutoStreamConfig && _isStreamSource && _videoSettings.lowLatencyMode.visible && _isGST
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Low Latency Mode")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+            }
+
+            Item { Layout.fillWidth: true }
+
+            OnOffToggle {
+                checked: _videoSettings.lowLatencyMode.rawValue
+                onToggled: (val) => _videoSettings.lowLatencyMode.rawValue = val
+                Layout.alignment: Qt.AlignVCenter
+            }
         }
 
-        LabelledFactComboBox {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("Record File Format")
-            fact:                   _videoSettings.recordingFormat
-            visible:                _videoSettings.recordingFormat.visible
+        // Video decode priority
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _videoSettings.forceVideoDecoder.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Video decode priority")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactComboBox {
+                fact: _videoSettings.forceVideoDecoder
+                indexModel: false
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+
+                onPressedChanged: {
+                    if (pressed) {
+                        popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                        popup.x = width - popup.width
+                    }
+                }
+            }
         }
 
-        FactCheckBoxSlider {
-            Layout.fillWidth:   true
-            text:               qsTr("Auto-Delete Saved Recordings")
-            fact:               _videoSettings.enableStorageLimit
-            visible:            fact.visible
+        // Record File Format
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _videoSettings.recordingFormat.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Record File Format")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactComboBox {
+                fact: _videoSettings.recordingFormat
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+
+                onPressedChanged: {
+                    if (pressed) {
+                        popup.width = Math.max(width, ScreenTools.defaultFontPixelWidth * 40)
+                        popup.x = width - popup.width
+                    }
+                }
+            }
         }
 
-        LabelledFactTextField {
-            Layout.fillWidth:       true
-            labelPreferredWidth:    ScreenTools.defaultFontPixelWidth * 26
-            label:                  qsTr("Max Storage Usage")
-            fact:                   _videoSettings.maxVideoSize
-            visible:                fact.visible
-            enabled:                _videoSettings.enableStorageLimit.rawValue
+        // Auto-Delete Saved Recordings
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _videoSettings.enableStorageLimit.visible
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Auto-Delete Saved Recordings")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+            }
+
+            Item { Layout.fillWidth: true }
+
+            OnOffToggle {
+                checked: _videoSettings.enableStorageLimit.rawValue
+                onToggled: (val) => _videoSettings.enableStorageLimit.rawValue = val
+                Layout.alignment: Qt.AlignVCenter
+            }
+        }
+
+        // Max Storage Usage
+        RowLayout {
+            Layout.fillWidth: true
+            visible: _videoSettings.maxVideoSize.visible
+            enabled: _videoSettings.enableStorageLimit.rawValue
+            opacity: enabled ? 1.0 : 0.5
+            spacing: 20
+
+            QGCLabel {
+                text: qsTr("Max Storage Usage")
+                color: "black"
+                font.bold: true
+                Layout.preferredWidth: 220
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            FactTextField {
+                fact: _videoSettings.maxVideoSize
+                Layout.preferredWidth: ScreenTools.defaultFontPixelWidth * 15
+                Layout.preferredHeight: 40
+                Layout.alignment: Qt.AlignVCenter
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#808080"
+                    border.width: 1
+                    radius: 12
+                }
+            }
+
+            QGCLabel {
+                text: "MB"
+                color: "black"
+                font.bold: true
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Item { Layout.fillWidth: true }
+        }
+
+        // Bottom Spacer
+        Item {
+            Layout.preferredHeight: 20
         }
     }
 }
