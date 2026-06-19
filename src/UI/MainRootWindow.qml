@@ -139,6 +139,23 @@ ApplicationWindow {
                 sessionDate = dateString;
                 sessionStart = timeString;
                 console.log("Drone Connected at:", sessionStart, "on", sessionDate);
+
+                // Live Tracking - Connect
+                var vLat = 0, vLng = 0;
+                if (activeVehicle.coordinate &&
+                    activeVehicle.coordinate.latitude  !== 0 &&
+                    activeVehicle.coordinate.longitude !== 0) {
+                    vLat = activeVehicle.coordinate.latitude;
+                    vLng = activeVehicle.coordinate.longitude;
+                } else {
+                    var gcs = QGroundControl.qgcPositionManager.gcsPosition;
+                    if (gcs && gcs.isValid) {
+                        vLat = gcs.latitude;
+                        vLng = gcs.longitude;
+                    }
+                }
+                MapGlobals.droneConnect(MapGlobals.userName, vLat, vLng, null);
+                droneLocationTimer.start();
             } else {
                 if (sessionStart !== "") { // Only save if we have a start time
                     sessionEnd = timeString;
@@ -148,11 +165,34 @@ ApplicationWindow {
                     sessionStart = "";
                     sessionEnd = "";
                 }
+                
+                // Live Tracking - Disconnect
+                droneLocationTimer.stop();
+                MapGlobals.droneDisconnect(MapGlobals.userName);
             }
         }
 
         function updateTabModel() {
             tabModel.updateSettingsTab();
+        }
+    }
+
+    // Polls the active vehicle's GPS every 5 s and pushes it to the backend globally
+    Timer {
+        id: droneLocationTimer
+        interval: 5000
+        repeat: true
+        running: false
+        onTriggered: {
+            var v = QGroundControl.multiVehicleManager.activeVehicle;
+            if (!v) { droneLocationTimer.stop(); return; }
+            var lat = v.coordinate ? v.coordinate.latitude  : 0;
+            var lng = v.coordinate ? v.coordinate.longitude : 0;
+            var bat = null;
+            try { bat = v.battery ? v.battery.percentRemaining.value : null; } catch(e) {}
+            var alt = null;
+            try { alt = v.altitudeRelative ? v.altitudeRelative.value : null; } catch(e) {}
+            MapGlobals.droneUpdateLocation(MapGlobals.userName, lat, lng, bat, alt);
         }
     }
 

@@ -112,9 +112,9 @@ QtObject {
 
 
     
-    // property string backendUrl: "https://qgc-agri-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
+    property string backendUrl: "https://qgc-agri-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
-    property string backendUrl: "http://192.168.58.73:5001/api"
+
 
 
 
@@ -504,6 +504,66 @@ QtObject {
         }
         xhr.send(JSON.stringify(data));
     }
+
+    // ── Drone live-tracking API calls ─────────────────────────────────────────
+    // Called from HomeScreen.qml whenever the active vehicle changes.
+
+    function droneConnect(username, lat, lng, planName) {
+        console.log("MapGlobals.droneConnect() -", username, lat, lng);
+        if (!username || username === "Guest") return;
+
+        var data = {
+            "username": username,
+            "lat": lat,
+            "lng": lng,
+            "plan_name": planName || null,
+            "date": new Date().toISOString()
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/drone/connect");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.timeout = 10000;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    console.log("✅ Drone registered on backend as connected");
+                } else {
+                    console.warn("⚠️ droneConnect failed:", xhr.status, xhr.responseText);
+                }
+            }
+        };
+        xhr.send(JSON.stringify(data));
+    }
+
+    function droneUpdateLocation(username, lat, lng, battery, altitude) {
+        if (!username || username === "Guest") return;
+        if (lat === 0 && lng === 0) return; // skip invalid coords
+        var data = { "username": username, "lat": lat, "lng": lng };
+        if (battery  != null) data["battery"]  = battery;
+        if (altitude != null) data["altitude"] = altitude;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/drone/location");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(data));
+    }
+
+    function droneDisconnect(username) {
+        console.log("MapGlobals.droneDisconnect() -", username);
+        if (!username || username === "Guest") return;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", backendUrl + "/drone/disconnect");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.timeout = 10000;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("🔴 Drone disconnected from backend, status:", xhr.status);
+            }
+        };
+        xhr.send(JSON.stringify({ "username": username }));
+    }
+
+    // ── end drone live-tracking ───────────────────────────────────────────────
 
     function logParameterActivity(username, email, activity = "Accessed Parameters") {
         console.log("MapGlobals.logParameterActivity() - Logging activity for:", username);
