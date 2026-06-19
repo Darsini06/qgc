@@ -1247,6 +1247,7 @@ ApplicationWindow {
             border.color:  "transparent"
             visible: false
 
+
             QGCColoredImage {
                 id: flightModeIndicator2
                 source: "/qmlimages/NewImages/savefile.svg" //"/qmlimages/NewImages/log.png"
@@ -1979,6 +1980,11 @@ ApplicationWindow {
             // Small centered group
             width:   Math.min(parent.width * 0.85, ScreenTools.defaultFontPixelWidth * 85)
             spacing: ScreenTools.defaultFontPixelHeight * 1.8
+            property bool isTablet: Screen.width >= 600
+                    readonly property real _btnSize: isTablet
+                                                     ? ScreenTools.defaultFontPixelHeight * 1.8
+                                                     : ScreenTools.defaultFontPixelHeight * 1.8
+                    readonly property real _iconSize: _btnSize * 0.55
 
             // Header
             ColumnLayout {
@@ -1988,7 +1994,7 @@ ApplicationWindow {
                 Text {
                     text: "SELECT MISSION TYPE"
                     color: "white"
-                    font.pointSize:   ScreenTools.largeFontPointSize * 1.2
+                    font.pointSize:   isTablet ? 20 : 18//ScreenTools.largeFontPointSize * 1.2
                     font.bold:        true
                     font.letterSpacing: 2
                     Layout.alignment: Qt.AlignHCenter
@@ -2037,7 +2043,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Map Selection"; color: "white"
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: isTablet ? 18 : 15//ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }
@@ -2094,7 +2100,7 @@ ApplicationWindow {
                         }
                         Text {
                             text: "Mark with Drone"; color: "white"
-                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.pointSize: isTablet ? 18 : 15//ScreenTools.defaultFontPointSize
                             font.bold: true; wrapMode: Text.WordWrap
                             width: parent.width; horizontalAlignment: Text.AlignHCenter
                         }

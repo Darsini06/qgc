@@ -486,8 +486,6 @@ Item {
                     anchors.topMargin: 100
                     spacing: 0
 
-                    // no back arrow here anymore
-
                     Item { Layout.fillHeight: true }
 
                     ColumnLayout {
@@ -732,8 +730,6 @@ Item {
                         width: parent.width
                         spacing: 8
                         padding: 4
-
-
 
                         // Cloud View
                         Column {

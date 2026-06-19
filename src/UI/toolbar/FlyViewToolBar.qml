@@ -330,8 +330,8 @@ Rectangle {
 
             QGCColoredImage {
                 visible: _activeVehicle ? false : true
-                width: isTablet ? 20 : 18
-                height: isTablet ? 20 : 18
+                width: isTablet ? 20 : 15
+                height: isTablet ? 20 : 15
                 source: "/qmlimages/NewImages/satellite.svg"
                 color: "white"
                 anchors.verticalCenter: parent.verticalCenter

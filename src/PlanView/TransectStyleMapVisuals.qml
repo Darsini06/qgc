@@ -305,28 +305,28 @@ Item {
            x: map.parent.parent.compassNorthX
            y: map.parent.parent.compassBottomY
 
+
            Button {
                id: editBtn
-               padding: 0
                visible: MapGlobals.share_edit_visibility
-               implicitWidth: baseSize
-               implicitHeight: baseSize
+               width: baseSize *0.91
+               height: baseSize*0.91
 
-               readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+               readonly property real _btnSize: ScreenTools.defaultFontPixelHeight *1.8
                readonly property real _iconSize: _btnSize * 0.50
 
                background: Rectangle {
                    width:  editBtn._btnSize
                    height: width                 // Keep it square
                    radius: width / 2
-                   color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+                   color:  Qt.rgba(0, 0, 0, 0.80)  // More transparent black
                    border.width: 0
                    border.color:  "transparent"
+                   anchors.fill: parent
                }
 
                contentItem: Item {
                    anchors.fill: parent
-
                    QGCColoredImage {
                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
                        width:            editBtn._iconSize
@@ -346,6 +346,7 @@ Item {
 
                }
            }
-       }
+
+    }
 
 }

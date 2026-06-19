@@ -527,33 +527,33 @@ Item {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 1.5
         spacing: ScreenTools.defaultFontPixelHeight * 1.1
 
-        Rectangle {
-            id: sharebtn
-            Layout.alignment: Qt.AlignLeft
-            width: baseSize
-            height: baseSize
-            radius: width / 2
-            color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
-            border.color: Qt.rgba(0, 0, 0, 0.40)
-            border.width: 0
-            opacity: 0.95
-            visible: true
+        // Rectangle {
+        //     id: sharebtn
+        //     Layout.alignment: Qt.AlignLeft
+        //     width: baseSize
+        //     height: baseSize
+        //     radius: width / 2
+        //     color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black circle
+        //     border.color: Qt.rgba(0, 0, 0, 0.40)
+        //     border.width: 0
+        //     opacity: 0.95
+        //     visible: true
 
-            QGCColoredImage {
-                source: "qrc:/InstrumentValueIcons/share-alt.svg"
-                width: iconSize
-                height: iconSize
-                anchors.centerIn: parent
-                color: "white"
-            }
+        //     QGCColoredImage {
+        //         source: "qrc:/InstrumentValueIcons/share-alt.svg"
+        //         width: iconSize
+        //         height: iconSize
+        //         anchors.centerIn: parent
+        //         color: "white"
+        //     }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    dialog.open()
-                }
-            }
-        }
+        //     MouseArea {
+        //         anchors.fill: parent
+        //         onClicked: {
+        //             dialog.open()
+        //         }
+        //     }
+        // }
 
         // Save button
         Rectangle {
@@ -2074,64 +2074,6 @@ Item {
                 ]
             }
 
-            Dialog {
-                id: dialog
-                modal: true
-                dim: true
-                parent:  Overlay.overlay
-                anchors.centerIn: parent
-                width: parent.width * 0.4   // 80% of screen width
-                height: parent.height * 0.2 // 50% of screen height
-                background: Rectangle {
-                    color: "#BF000000" // Dark Transparent Black 75% alpha
-                    radius: 12
-                    border.color: "white"  // Light border for dark background
-                    border.width: 2
-                }
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 25
-                    width: parent.width * 0.8
-
-                    Text {
-                        text: "Are you sure you want to share the plan?"
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: 16
-                        color: "white"
-                        font.bold: true
-                    }
-
-                    Button {
-                        text: qsTr("Share")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: 120
-                        height: 40
-                        background: Rectangle {
-                            color: Qt.rgba(0, 0, 0, 0.60)  // Darker for button action
-                            radius: 20
-                            border.color: Qt.rgba(0, 0, 0, 0.40)
-                            border.width: 0
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font.bold: true
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        onClicked: {
-                            dialog.close()
-                            if (_planMasterController.currentPlanFile !== "") {
-                                _planMasterController.saveToCurrent()
-                                saveFenceData(_planMasterController.currentPlanFile)
-                            } else {
-                                _planMasterController.saveToSelectedFile1()
-                            }
-                        }
-                    }
-                }
-            }
-
             model: toolStripActionList.model
 
             function allAddClickBoolsOff() {
@@ -2722,7 +2664,7 @@ Item {
                             map: editorMap
                             masterController:  _planMasterController
                             missionItem:    object
-                            width:          parent.width
+                            width:          200//parent.width
                             readOnly:       false
                             onClicked: (sequenceNumber) => {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
@@ -3164,18 +3106,18 @@ Item {
                 // ========== Upload Button ==========
                 Button {
                     id: fileUploadbtn
-                    width: baseSize
-                    height: baseSize
+                    width: baseSize *0.91
+                    height: baseSize*0.91
 
-                    readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+                    readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 1.8
                     readonly property real _iconSize: _btnSize * 0.50
 
                     background: Rectangle {
                         width:  fileUploadbtn._btnSize
                         height: width
                         radius: width / 2
-                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: Qt.rgba(0, 0, 0, 0.40)
+                        color: Qt.rgba(0, 0, 0, 0.80)  // Transparent black button
+                        border.color: Qt.rgba(0, 0, 0, 0.80)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -3253,75 +3195,75 @@ Item {
         }
 
 
-        Component {
-            id: customdialog
+        // Component {
+        //     id: customdialog
 
-            Item {
-                id: customDialogItem
-                parent: Overlay.overlay
-                anchors.centerIn: parent
-                width: 600
-                height: 200
+        //     Item {
+        //         id: customDialogItem
+        //         parent: Overlay.overlay
+        //         anchors.centerIn: parent
+        //         width: 600
+        //         height: 200
 
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 12
-                    color: "#BF000000" // Dark Transparent Black 75% alpha
-                    border.color: "#471880"
-                    border.width: 2
+        //         Rectangle {
+        //             anchors.fill: parent
+        //             radius: 12
+        //             color: "#BF000000" // Dark Transparent Black 75% alpha
+        //             border.color: "#471880"
+        //             border.width: 2
 
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 25
-                        anchors.margins: 20
+        //             Column {
+        //                 anchors.centerIn: parent
+        //                 spacing: 25
+        //                 anchors.margins: 20
 
-                        // Centered Title
-                        Label {
-                            text: qsTr("Are you sure you want to share the plan?")
-                            font.bold: true
-                            font.pointSize: 16
-                            color: "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            width: parent.width
-                        }
+        //                 // Centered Title
+        //                 Label {
+        //                     text: qsTr("Are you sure you want to share the plan?")
+        //                     font.bold: true
+        //                     font.pointSize: 16
+        //                     color: "white"
+        //                     horizontalAlignment: Text.AlignHCenter
+        //                     width: parent.width
+        //                 }
 
-                        // Buttons Row
-                        Row {
-                            spacing: 30
-                            anchors.horizontalCenter: parent.horizontalCenter
+        //                 // Buttons Row
+        //                 Row {
+        //                     spacing: 30
+        //                     anchors.horizontalCenter: parent.horizontalCenter
 
-                            Button {
-                                text: " Share"
-                                width: 120
-                                height: 40
-                                background: Rectangle {
-                                    radius: 20
-                                    color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black dialog button
-                                    border.color: Qt.rgba(0, 0, 0, 0.40)
-                                    border.width: 0
-                                }
-                                contentItem: Text {
-                                    text: parent.text
-                                    font.bold: true
-                                    color: "white"
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
-                                onClicked: {
-                                    if (_planMasterController.currentPlanFile !== "") {
-                                        _planMasterController.saveToCurrent()
-                                        saveFenceData(_planMasterController.currentPlanFile)
-                                    } else {
-                                        _planMasterController.saveToSelectedFile1()
-                                    }
-                                    customDialogItem.visible=false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                     Button {
+        //                         text: " Share"
+        //                         width: 120
+        //                         height: 40
+        //                         background: Rectangle {
+        //                             radius: 20
+        //                             color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black dialog button
+        //                             border.color: Qt.rgba(0, 0, 0, 0.40)
+        //                             border.width: 0
+        //                         }
+        //                         contentItem: Text {
+        //                             text: parent.text
+        //                             font.bold: true
+        //                             color: "white"
+        //                             horizontalAlignment: Text.AlignHCenter
+        //                             verticalAlignment: Text.AlignVCenter
+        //                         }
+        //                         onClicked: {
+        //                             if (_planMasterController.currentPlanFile !== "") {
+        //                                 _planMasterController.saveToCurrent()
+        //                                 saveFenceData(_planMasterController.currentPlanFile)
+        //                             } else {
+        //                                 _planMasterController.saveToSelectedFile1()
+        //                             }
+        //                             customDialogItem.visible=false;
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         TerrainStatus {
             id:                 terrainStatus
@@ -3874,7 +3816,7 @@ Item {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
         z:                  QGroundControl.zOrderWidgets + 1
 
-        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 1.8
         readonly property real _iconSize: _btnSize * 0.55
 
         Rectangle {
@@ -3882,7 +3824,7 @@ Item {
             width:  compassNorth._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.80)  // More transparent black
             border.width: 0
             border.color:  "transparent"
 
@@ -3924,8 +3866,8 @@ Item {
         readonly property real _reservedHeight: 124
 
         // Responsive width
-        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
-        height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
+        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.75)
+        height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4.5, _maxPopupHeight)
 
         // Left side, keeping it classy and subtle
         x: ScreenTools.defaultFontPixelWidth
@@ -3948,16 +3890,16 @@ Item {
         }
 
         background: Rectangle {
-            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
+            color: Qt.rgba(0, 0, 0, 0.80)
             radius: 12
-            border.color: Qt.rgba(1, 1, 1, 0.30)
+            border.color: Qt.rgba(1, 1, 1, 0.80)
             border.width: 1
         }
 
         contentItem: Column {
             id: popupInnerCol
             spacing: 12
-            width: itemEditPopup.width - 40
+            width: itemEditPopup.width - 35
             anchors.centerIn: parent
 
             Text {
@@ -4096,9 +4038,9 @@ Item {
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
+            color: Qt.rgba(0.05, 0.05, 0.05, 0.80)
             radius: 12
-            border.color: Qt.rgba(1, 1, 1, 0.30)
+            border.color: Qt.rgba(1, 1, 1, 0.80)
             border.width: 1
         }
 
@@ -4110,7 +4052,7 @@ Item {
 
             Text {
                 text: qsTr("Select Command")
-                font.pointSize: 16
+                font.pointSize: 14
                 font.bold: true
                 color: "white"
                 font.family: "Outfit"
@@ -4224,8 +4166,8 @@ Item {
             Button {
                 text: qsTr("Cancel")
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: 150
-                height: 40
+                width: 120
+                height: 30
                 onClicked: commandSelectionPopup.close()
 
                 background: Rectangle {
