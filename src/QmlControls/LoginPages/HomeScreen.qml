@@ -80,7 +80,7 @@ Item {
         }
     }
 
-    // Success path
+    // Success path — resolves connection UI state
     Connections {
         target: QGroundControl.multiVehicleManager
 
@@ -100,8 +100,7 @@ Item {
 
         function onCommunicationError(linkName, errorMessage) {
             console.log("LinkSettings: connect failed for", linkName);
-            connecting_drone = false;     // stop loading screen
-
+            connecting_drone = false;
             mainWindow.showToastMessage("Connection failed: " + errorMessage);
         }
     }
