@@ -678,6 +678,7 @@ QtObject {
         xhr.send(JSON.stringify(data));
     }
 
+    //Update User
     function updateUser(old_userName, new_username, newDisplayname, newEmail, mobile_no, _rpcCompleted, callback) {
         console.log("MapGlobals.updateUser() - From:", old_userName, "To:", new_username);
 
