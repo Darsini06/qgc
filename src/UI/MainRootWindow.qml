@@ -1191,6 +1191,7 @@ property bool isTablet: Screen.width >= 800
             color:  Qt.rgba(0, 0, 0, 0.70)  // More transparent black
             border.width: 0
             border.color:  "transparent"
+            visible:    false
 
             QGCColoredImage {
                 id: flightModeIndicator2

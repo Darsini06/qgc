@@ -23,7 +23,7 @@ Rectangle {
     id:     _root
     width:  parent.width
     height: ScreenTools.toolbarHeight * 0.8
-    color:  Qt.rgba(0, 0, 0, 0.40)  // Transparent black background
+    color:  Qt.rgba(0, 0, 0, 0.80)  // Transparent black background
 
     property var    planMasterController
 
@@ -179,14 +179,14 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color:          Qt.rgba(0, 0, 0, 0.40)
+        color:          Qt.rgba(0, 0, 0, 0.80)
         width:50
         visible:        MapGlobals.editdialog !== "editdialog"
 
         QGCToolBarButton {
             id:                     currentButton
             Layout.preferredHeight: largeProgressBar1.height
-            icon.source:            "/qmlimages/NewImages/settings.svg"
+            icon.source:            "/res/gear-white.svg"
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
             Layout.alignment:        Qt.AlignRight

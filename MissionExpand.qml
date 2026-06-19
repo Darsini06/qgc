@@ -18,9 +18,10 @@ Rectangle {
     height: mainColumn.implicitHeight
     clip:           false
 
+
     gradient: Gradient {
-        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.41) }
-        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.41) }
+        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.80) }
+        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.80) }
     }
 
     radius:         ScreenTools.defaultFontPixelHeight * 0.45
@@ -97,7 +98,7 @@ Rectangle {
         Item {
             id:                 topRowLayout
             width:              parent.width
-            height: ScreenTools.defaultFontPixelHeight * 3.2
+            height: ScreenTools.defaultFontPixelHeight * 2.2
 
 
 
@@ -171,7 +172,7 @@ Rectangle {
             QGCLabel {
                 id:                     commandLabel
                 anchors.left:           parent.left
-                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 0.5
+                anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * 1.5
                 anchors.right:          parent.right
                 anchors.rightMargin:    editItemBtn.visible ? (editItemBtn.width + ScreenTools.defaultFontPixelWidth) : ScreenTools.defaultFontPixelWidth * 0.5
                 anchors.verticalCenter: parent.verticalCenter
@@ -207,7 +208,7 @@ Rectangle {
                 visible: missionItem.commandName === "Mission Start" ||
                          missionItem.commandName === "Survey" || missionItem.commandName === "Spot Spraying"
 
-                color:  editMouseArea.pressed ? "#444" : "#222"
+                color:  editMouseArea.pressed ? Qt.rgba(0, 0, 0, 0.90) : Qt.rgba(0, 0, 0, 0.70)
                 radius: ScreenTools.defaultFontPixelHeight * 0.2
                 border.color: "white"
                 border.width: 1

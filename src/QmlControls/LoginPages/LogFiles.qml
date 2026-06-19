@@ -465,7 +465,8 @@ Item {
 
                         MouseArea {
                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                            onClicked: {MapGlobals.rootWindow.homescreen()
+                            onClicked: {
+                                MapGlobals.rootWindow.homescreen()
                                 console.log("Button clicked2")
                             } }
 

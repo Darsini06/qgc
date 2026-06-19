@@ -14,7 +14,7 @@ import QGroundControl.Controllers
 // Editor for Mission Settings
 Rectangle {
     id:                 valuesRect
-    width:              availableWidth
+    width:              availableWidth *0.5
     height:             valuesColumn.implicitHeight + (_margin * 2)
     implicitHeight:     height
     color:              "transparent"
@@ -86,7 +86,7 @@ Rectangle {
 
                         Rectangle {
                             visible: rootCol.showMinusButton
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 0.5
                             Layout.preferredWidth: Layout.preferredHeight
                             radius: 4
                             color: "#66000000"
@@ -117,7 +117,7 @@ Rectangle {
                         FactTextField {
                             id: factField
                             Layout.fillWidth:       true
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 0.5
                             fact:                   rootCol.fact
                             showUnits:              true
                             color:                  _valueColor
@@ -132,7 +132,7 @@ Rectangle {
 
                         Rectangle {
                             visible: rootCol.showPlusButton
-                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 1.2
+                            Layout.preferredHeight: ScreenTools.implicitTextFieldHeight * 0.5
                             Layout.preferredWidth: Layout.preferredHeight
                             radius: 4
                             color: "#66000000"
@@ -203,6 +203,7 @@ Rectangle {
                     text:   qsTr("All Altitudes")
                     color:  _labelColor
                     font.bold: true
+                    font.pointSize: isTablet?12:10
                 }
 
                 GridLayout {
@@ -270,6 +271,7 @@ Rectangle {
                             text:   qsTr("Initial Point")
                             color:  _labelColor
                             font.bold: true
+                            font.pointSize: isTablet?12:10
                         }
 
                         Loader {
@@ -314,6 +316,7 @@ Rectangle {
                     text:   qsTr("Flight speed")
                     color:  _labelColor
                     font.bold: true
+                    font.pointSize: isTablet?12:10
                 }
 
                 Loader {
@@ -476,6 +479,8 @@ Rectangle {
                         QGCLabel {
                             text: qsTr("Hover speed")
                             color: _labelColor
+                            font.bold: true
+                            font.pointSize: isTablet?12:10
                         }
                         Loader {
                             width:              parent.width

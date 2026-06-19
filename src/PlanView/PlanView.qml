@@ -2681,7 +2681,7 @@ Item {
                             map: editorMap
                             masterController:  _planMasterController
                             missionItem:    object
-                            width:          parent.width
+                            width:          200//parent.width
                             readOnly:       false
                             onClicked: (sequenceNumber) => {
                                            _missionController.setCurrentPlanViewSeqNum(object.sequenceNumber, false)
@@ -3109,18 +3109,18 @@ Item {
                 // ========== Upload Button ==========
                 Button {
                     id: fileUploadbtn
-                    width: baseSize
-                    height: baseSize
+                    width: baseSize *0.91
+                    height: baseSize*0.91
 
-                    readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+                    readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 1.8
                     readonly property real _iconSize: _btnSize * 0.50
 
                     background: Rectangle {
                         width:  fileUploadbtn._btnSize
                         height: width
                         radius: width / 2
-                        color: Qt.rgba(0, 0, 0, 0.40)  // Transparent black button
-                        border.color: Qt.rgba(0, 0, 0, 0.40)
+                        color: Qt.rgba(0, 0, 0, 0.80)  // Transparent black button
+                        border.color: Qt.rgba(0, 0, 0, 0.80)
                         border.width: 0
                         anchors.fill: parent
                     }
@@ -3818,7 +3818,7 @@ Item {
         anchors.leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
         z:                  QGroundControl.zOrderWidgets + 1
 
-        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 2.2
+        readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 1.8
         readonly property real _iconSize: _btnSize * 0.55
 
         Rectangle {
@@ -3826,7 +3826,7 @@ Item {
             width:  compassNorth._btnSize
             height: width                 // Keep it square
             radius: width / 2            // Circle
-            color:  Qt.rgba(0, 0, 0, 0.40)  // More transparent black
+            color:  Qt.rgba(0, 0, 0, 0.80)  // More transparent black
             border.width: 0
             border.color:  "transparent"
 
@@ -3868,8 +3868,8 @@ Item {
         readonly property real _reservedHeight: 124
 
         // Responsive width
-        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.85)
-        height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4, _maxPopupHeight)
+        width:  Math.min(ScreenTools.defaultFontPixelWidth * 25, parent.width * 0.75)
+        height: Math.min(popupInnerCol.implicitHeight + ScreenTools.defaultFontPixelHeight * 4.5, _maxPopupHeight)
 
         // Left side, keeping it classy and subtle
         x: ScreenTools.defaultFontPixelWidth
@@ -3892,16 +3892,16 @@ Item {
         }
 
         background: Rectangle {
-            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
+            color: Qt.rgba(0, 0, 0, 0.80)
             radius: 12
-            border.color: Qt.rgba(1, 1, 1, 0.30)
+            border.color: Qt.rgba(1, 1, 1, 0.80)
             border.width: 1
         }
 
         contentItem: Column {
             id: popupInnerCol
             spacing: 12
-            width: itemEditPopup.width - 40
+            width: itemEditPopup.width - 35
             anchors.centerIn: parent
 
             Text {
@@ -4040,9 +4040,9 @@ Item {
         parent: Overlay.overlay
 
         background: Rectangle {
-            color: Qt.rgba(0.05, 0.05, 0.05, 0.35)
+            color: Qt.rgba(0.05, 0.05, 0.05, 0.80)
             radius: 12
-            border.color: Qt.rgba(1, 1, 1, 0.30)
+            border.color: Qt.rgba(1, 1, 1, 0.80)
             border.width: 1
         }
 
@@ -4054,7 +4054,7 @@ Item {
 
             Text {
                 text: qsTr("Select Command")
-                font.pointSize: 16
+                font.pointSize: 14
                 font.bold: true
                 color: "white"
                 font.family: "Outfit"
@@ -4168,8 +4168,8 @@ Item {
             Button {
                 text: qsTr("Cancel")
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: 150
-                height: 40
+                width: 120
+                height: 30
                 onClicked: commandSelectionPopup.close()
 
                 background: Rectangle {
