@@ -15,8 +15,10 @@ import QGroundControl.SettingsManager
 SettingsPage {
     id: root
 
-    component UnitSelector: RowLayout {
-        spacing:            20
+    component UnitSelector: GridLayout {
+        columns:            root._isNarrow ? 1 : 2
+        columnSpacing:      20
+        rowSpacing:         root._isNarrow ? 5 : 0
         Layout.fillWidth:   true
 
         property string labelText
@@ -37,7 +39,8 @@ SettingsPage {
             color:                  "black"
             font.bold:              true
             Layout.alignment:       Qt.AlignVCenter
-            Layout.preferredWidth:  220
+            Layout.preferredWidth:  root._isNarrow ? -1 : 220
+            Layout.fillWidth:       root._isNarrow
         }
 
         RowLayout {
@@ -145,26 +148,29 @@ SettingsPage {
             visible:          _videoSettings.videoSource.visible
         }
 
-        RowLayout {
-            Layout.fillWidth: true
-            visible: _appSettings.followTarget.visible
-            spacing: 20
+        GridLayout {
+            columns:            _isNarrow ? 1 : 2
+            columnSpacing:      20
+            rowSpacing:         _isNarrow ? 5 : 0
+            Layout.fillWidth:   true
+            visible:            _appSettings.followTarget.visible
 
             QGCLabel {
-                text: qsTr("Stream GCS Position")
-                color: "black"
-                font.bold: true
-                Layout.preferredWidth: 220
-                Layout.alignment: Qt.AlignVCenter
+                text:                   qsTr("Stream GCS Position")
+                color:                  "black"
+                font.bold:              true
+                Layout.preferredWidth:  _isNarrow ? -1 : 220
+                Layout.fillWidth:       _isNarrow
+                Layout.alignment:       Qt.AlignVCenter
             }
 
             FactComboBox {
-                id: followTargetCombo
-                fact: _appSettings.followTarget
+                id:                     followTargetCombo
+                fact:                   _appSettings.followTarget
 
-                Layout.fillWidth: true
+                Layout.fillWidth:       true
                 Layout.preferredHeight: 40
-                Layout.alignment: Qt.AlignVCenter
+                Layout.alignment:       Qt.AlignVCenter
 
                 background: Rectangle {
                     color: "white"

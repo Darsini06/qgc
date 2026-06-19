@@ -74,7 +74,8 @@ ColumnLayout  {
             color:            "black"
             font.bold:        true
             bottomPadding:    ScreenTools.defaultFontPixelHeight * 0.3
-            Layout.fillWidth: _isNarrow
+            Layout.fillWidth: true
+            elide:            Text.ElideRight
         }
 
         Item { visible: !_isNarrow; Layout.fillWidth: true } // Spacer pushes button to the right
@@ -145,6 +146,7 @@ ColumnLayout  {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 2
+                        Layout.alignment: Qt.AlignVCenter
 
                         Text {
                             Layout.fillWidth: true
@@ -163,108 +165,104 @@ ColumnLayout  {
                         }
                     }
 
-                    // Actions
-                    RowLayout {
-                        spacing: _isNarrow ? 8 : 15
+                    // Delete Action
+                    Rectangle {
+                        width:  36
+                        height: 36
+                        radius: 8
+                        color:  deleteArea.containsMouse ? "#FDEDEC" : "transparent"
+                        border.color: deleteArea.containsMouse ? "#E74C3C" : "transparent"
                         Layout.alignment: Qt.AlignVCenter
 
-                        // Delete Action
-                        Rectangle {
-                            width:  36
-                            height: 36
-                            radius: 8
-                            color:  deleteArea.containsMouse ? "#FDEDEC" : "transparent"
-                            border.color: deleteArea.containsMouse ? "#E74C3C" : "transparent"
+                        QGCColoredImage {
+                            anchors.centerIn: parent
+                            height:           18
+                            width:            18
+                            sourceSize.height: 18
+                            fillMode:         Image.PreserveAspectFit
+                            color:            "#E74C3C"
+                            source:           "/res/TrashDelete.svg"
+                        }
 
-                            QGCColoredImage {
-                                anchors.centerIn: parent
-                                height:           18
-                                width:            18
-                                sourceSize.height: 18
-                                fillMode:         Image.PreserveAspectFit
-                                color:            "#E74C3C"
-                                source:           "/res/TrashDelete.svg"
+                        MouseArea {
+                            id: deleteArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                var cfg = object
+                                if (!cfg) return
+                                mainWindow.showMessageDialog(
+                                            qsTr("Delete Link"),
+                                            qsTr("Are you sure you want to delete '%1'?").arg(cfg.name),
+                                            Dialog.Ok | Dialog.Cancel,
+                                            function() { _linkManager.removeConfiguration(cfg) }
+                                            )
                             }
+                        }
+                    }
 
-                            MouseArea {
-                                id: deleteArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    var cfg = object
-                                    if (!cfg) return
-                                    mainWindow.showMessageDialog(
-                                                qsTr("Delete Link"),
-                                                qsTr("Are you sure you want to delete '%1'?").arg(cfg.name),
-                                                Dialog.Ok | Dialog.Cancel,
-                                                function() { _linkManager.removeConfiguration(cfg) }
-                                                )
-                                }
+                    // Connect/Disconnect Action
+                    Rectangle {
+                        width:            100
+                        height:           36
+                        radius:           18
+                        color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#301934" : "#301934")
+                        border.color:     object.link ? "#E74C3C" : "transparent"
+                        border.width:     1
+                        Layout.alignment: Qt.AlignVCenter
+
+                        Connections {
+                            target: object
+                            function onLinkChanged() {
+                                console.log("object.linkChanged fired, link is now:", object.link)
                             }
                         }
 
-                        // Connect/Disconnect Action
-                        Rectangle {
-                            width:            100
-                            height:           36
-                            radius:           18
-                            color:            object.link ? (connectMouse.containsMouse ? "#FADBD8" : "#FDEDEC") : (connectMouse.containsMouse ? "#301934" : "#301934")
-                            border.color:     object.link ? "#E74C3C" : "transparent"
-                            border.width:     1
+                        Text {
+                            anchors.centerIn: parent
+                            text:             object.link ? qsTr("Disconnect") : qsTr("Connect")
+                            color:            object.link ? "#C0392B" : "white"
+                            font.bold:        true
+                            font.pixelSize:   14
+                        }
 
-                            Connections {
-                                target: object
-                                function onLinkChanged() {
-                                    console.log("object.linkChanged fired, link is now:", object.link)
+                        MouseArea {
+                            id:             connectMouse
+                            anchors.fill:   parent
+                            hoverEnabled:   true
+                            cursorShape:    Qt.PointingHandCursor
+                            onClicked: {
+                                if (!object) {
+                                    console.warn("LinkSettings: config object is null")
+                                    return
                                 }
-                            }
 
-                            Text {
-                                anchors.centerIn: parent
-                                text:             object.link ? qsTr("Disconnect") : qsTr("Connect")
-                                color:            object.link ? "#C0392B" : "white"
-                                font.bold:        true
-                                font.pixelSize:   14
-                            }
+                                if (object.link) {
+                                    console.log("Click DisConnect Button")
+                                    _linkManager.disconnectLink(object)
+                                } else {
+                                    // Check Bluetooth availability before connecting
+                                    // object is a LinkConfiguration — if it's Bluetooth type,
+                                    // it has isBluetoothAvailable()
+                                    console.log("click Connect Button",object.linkType)
 
-                            MouseArea {
-                                id:             connectMouse
-                                anchors.fill:   parent
-                                hoverEnabled:   true
-                                cursorShape:    Qt.PointingHandCursor
-                                onClicked: {
-                                    if (!object) {
-                                        console.warn("LinkSettings: config object is null")
+                                    if (object.linkType === 0) {  // 0 = TypeBluetooth
+                                        if (!object.isBluetoothAvailable()) {
+                                            console.log("Please turn ON Bluetooth")
+                                            mainWindow.showToastMessage("Please turn ON Bluetooth");
+                                            return
+                                        }
+                                    }
+
+                                    if (activeVehicle) {
+                                        mainWindow.showToastMessage(
+                                                    qsTr("Please disconnect the active vehicle before connecting a new one"))
                                         return
                                     }
 
-                                    if (object.link) {
-                                        console.log("Click DisConnect Button")
-                                        _linkManager.disconnectLink(object)
-                                    } else {
-                                        // Check Bluetooth availability before connecting
-                                        // object is a LinkConfiguration — if it's Bluetooth type,
-                                        // it has isBluetoothAvailable()
-                                        console.log("click Connect Button",object.linkType)
-
-                                        if (object.linkType === 0) {  // 0 = TypeBluetooth
-                                            if (!object.isBluetoothAvailable()) {
-                                                console.log("Please turn ON Bluetooth")
-                                                mainWindow.showToastMessage("Please turn ON Bluetooth");
-                                                return
-                                            }
-                                        }
-
-                                        if (activeVehicle) {
-                                            mainWindow.showToastMessage(
-                                                        qsTr("Please disconnect the active vehicle before connecting a new one"))
-                                            return
-                                        }
-
-                                        _linkManager.createConnectedLink(object)
-                                        mainWindow.connecting_drone = true
-                                    }
+                                    _linkManager.createConnectedLink(object)
+                                    mainWindow.connecting_drone = true
                                 }
                             }
                         }
