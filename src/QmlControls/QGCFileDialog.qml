@@ -866,19 +866,19 @@ Item {
 
                         // ===== LIMIT WARNING =====
                         Text {
+                            id: limitText
                             visible: nameField.text.length >= 12
-
                             text: qsTr("Only 12 characters allowed")
 
-                            width: parent.width
+                            anchors.horizontalCenter: parent.horizontalCenter
 
-                            horizontalAlignment: Text.AlignHCenter
-
-                            color: "#EF5350"
-
+                            color: "#B71C1C"
+                            font.pixelSize: 15
                             font.bold: true
-                            font.pointSize: 12
                             font.family: "Outfit"
+
+                            style: Text.Outline
+                            styleColor: "white"
                         }
 
                         // ===== INPUT ROW =====

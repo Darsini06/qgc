@@ -58,10 +58,12 @@ Item {
     // ── Banner shown when no drone is connected ──────────────────────────────
       Rectangle {
           anchors.top:              parent.top
-          anchors.horizontalCenter: parent.horizontalCenter
+          Layout.fillWidth:    true
+          Layout.maximumWidth: ScreenTools.defaultFontPixelWidth * 95
+          Layout.alignment:    Qt.AlignHCenter
           anchors.topMargin:        20
           visible:                  !activeVehicle
-          width:            noDroneBannerLabel.implicitWidth + 270
+          width:            noDroneBannerLabel.implicitWidth + 330
           height:           noDroneBannerLabel.implicitHeight + 24
           color:            "#FFF3CD"
           border.color:     "#FFC107"

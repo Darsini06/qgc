@@ -309,8 +309,8 @@ Item {
            Button {
                id: editBtn
                visible: MapGlobals.share_edit_visibility
-               width: baseSize *0.91
-               height: baseSize*0.91
+               width: _btnSize
+               height: _btnSize
 
                readonly property real _btnSize: ScreenTools.defaultFontPixelHeight *1.8
                readonly property real _iconSize: _btnSize * 0.50

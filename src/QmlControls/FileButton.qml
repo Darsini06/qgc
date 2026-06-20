@@ -41,19 +41,18 @@ Rectangle {
         elide:                  Text.ElideRight
     }
 
-    QGCColoredImage {
-        id:                     downloadIcon
-        anchors.rightMargin:    15
-        anchors.right:          hamburger.left
+    Image {
+        id: downloadIcon
+        anchors.right: hamburger.left
+        anchors.rightMargin: 15
         anchors.verticalCenter: parent.verticalCenter
-        width:                  _hamburgerSize
-        height:                 _hamburgerSize
-        sourceSize.height:      _hamburgerSize
-        source:                 "/qmlimages/arrow-down.png"
-        color:                  downloadMouseArea.containsMouse ? "#2980B9" : "#95A5A6"
-        visible: showDownloadButton
 
-        property real _hamburgerSize: 20
+        width: 20
+        height: 20
+
+        source: "/qmlimages/download.png"
+        fillMode: Image.PreserveAspectFit
+        visible: showDownloadButton
     }
 
     QGCColoredImage {

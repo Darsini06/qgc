@@ -2002,13 +2002,15 @@ Item {
                             visible: nameField.text.length >= 12
                             text: qsTr("Only 12 characters allowed")
 
-                            color: "#EF5350"
-                            font.pointSize: 12
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            color: "#B71C1C"
+                            font.pixelSize: 15
                             font.bold: true
                             font.family: "Outfit"
 
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
+                            style: Text.Outline
+                            styleColor: "white"
                         }
 
                         // ===== INPUT ROW =====

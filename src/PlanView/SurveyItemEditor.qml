@@ -162,6 +162,7 @@ TransectStyleComplexItemEditor {
                         QGCCheckBox {
                             id: directionalCheck
                             text:    qsTr("Enable")
+                            textColor: "white"
                             checked: missionItem.enableDirectionalIndentation
                             onClicked: {
                                 missionItem.enableDirectionalIndentation = checked
@@ -188,11 +189,11 @@ TransectStyleComplexItemEditor {
                             spacing: ScreenTools.defaultFontPixelWidth
                             Rectangle {
                                 width: 30; height: 30; radius: 4
-                                color: "transparent"; border.color: "black"; border.width: 2
-                                Rectangle { anchors.centerIn: parent; width: 18; height: 18; radius: 2; color: _linkIndentation ? "black" : "transparent" }
+                                color: "transparent"; border.color: "white"; border.width: 2
+                                Rectangle { anchors.centerIn: parent; width: 18; height: 18; radius: 2; color: _linkIndentation ? "white" : "transparent" }
                                 MouseArea { anchors.fill: parent; onClicked: _linkIndentation = !_linkIndentation }
                             }
-                            QGCLabel { text: qsTr("Choose all"); color: "black"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true }
+                            QGCLabel { text: qsTr("Choose all"); color: "white"; font.pointSize: ScreenTools.defaultFontPointSize; font.bold: true }
                         }
 
                         // Field graphic (Square image)

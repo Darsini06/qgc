@@ -254,7 +254,7 @@
         <file alias="NewImages/military.png">src/NewImages/military.png</file>
         <file alias="APMode.svg">src/AutoPilotPlugins/Common/Images/APMode.svg</file>
         <file alias="Armed.svg">src/UI/toolbar/Images/Armed.svg</file>
-        <file alias="arrow-down.png">src/QmlControls/arrow-down.png</file>
+        <file alias="download.png">src/QmlControls/download.png</file>
         <file alias="ArrowCCW.svg">src/AutoPilotPlugins/Common/Images/ArrowCCW.svg</file>
         <file alias="ArrowCW.svg">src/AutoPilotPlugins/Common/Images/ArrowCW.svg</file>
         <file alias="ArrowDirection.svg">src/AutoPilotPlugins/Common/Images/ArrowDirection.svg</file>

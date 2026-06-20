@@ -820,15 +820,19 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Text {
+                        id: limitText
                         visible: nameField.text.length >= 12
                         text: qsTr("Only 12 characters allowed")
 
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
 
-                        color: "red"
-                        font.bold: true
-                        font.pointSize: 11
+                        color: "#B71C1C"
+                        font.pixelSize: 15
+                        font.bold: tr15
+                        font.family: "Outfit"
+
+                        style: Text.Outline
+                        styleColor: "white"
                     }
                     RowLayout {
                         anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 25; rightMargin: 25 }
@@ -3106,8 +3110,8 @@ Item {
                 // ========== Upload Button ==========
                 Button {
                     id: fileUploadbtn
-                    width: baseSize *0.91
-                    height: baseSize*0.91
+                    width: _btnSize
+                    height: _btnSize
 
                     readonly property real _btnSize: ScreenTools.defaultFontPixelHeight * 1.8
                     readonly property real _iconSize: _btnSize * 0.50

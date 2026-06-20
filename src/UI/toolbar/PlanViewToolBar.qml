@@ -21,8 +21,8 @@ import QGroundControl.Controllers
 
 Rectangle {
     id:     _root
-    width:  parent.width
-    height: ScreenTools.toolbarHeight * 0.8
+    width: parent.width
+    height: ScreenTools.toolbarHeight * 0.7
     color:  Qt.rgba(0, 0, 0, 0.80)  // Transparent black background
 
     property var    planMasterController
@@ -173,25 +173,31 @@ Rectangle {
             }
         }
     }
+    // ── Thin vertical divider ──
+    Rectangle {
+        width: 1
+        height: parent.height * 0.55
+        color: Qt.rgba(1, 1, 1, 0.25)
+        Layout.alignment: Qt.AlignVCenter
+        Layout.leftMargin: 8; Layout.rightMargin: 8
+    }
 
     Rectangle {
         id:             largeProgressBar1
         anchors.bottom: parent.bottom
         anchors.right:  parent.right
         height:         parent.height
-        color:          Qt.rgba(0, 0, 0, 0.80)
+        color: "transparent"
         width:50
         visible:        MapGlobals.editdialog !== "editdialog"
 
         QGCToolBarButton {
             id: currentButton
-            Layout.preferredHeight: largeProgressBar1.height
+            anchors.fill: parent
             icon.source: "/res/gear-black.svg"
             logo: true
             onClicked: mainWindow.showToolSelectDialog()
-            Layout.alignment: Qt.AlignRight
         }
-
     }
 
     WeatherIndicator {

@@ -117,31 +117,47 @@ Item {
                     }
                 }
 
+                Rectangle {
+                    width: 400
+                    height: 400
+                    radius: 200
+                    color: Qt.rgba(255,255,255,0.03)
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    anchors.margins: -80
+                }
+
+                Rectangle {
+                    width: 44
+                    height: 44
+                    radius: 12
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.topMargin: 20
+                    anchors.leftMargin: 20
+                    color: Qt.rgba(255,255,255,0.08)
+                    border.color: Qt.rgba(255,255,255,0.15)
+
+                    QGCColoredImage {
+                        anchors.centerIn: parent
+                        source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
+                        width: 20
+                        height: 20
+                        color: "white"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: termsRoot.backClicked()
+                    }
+                }
+
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 50
+                    anchors.topMargin: 100
                     spacing: 0
-
-                    Rectangle {
-                        width: 44
-                        height: 44
-                        radius: 12
-                        color: Qt.rgba(255,255,255,0.08)
-                        border.color: Qt.rgba(255,255,255,0.15)
-
-                        QGCColoredImage {
-                            anchors.centerIn: parent
-                            source: "qrc:/InstrumentValueIcons/arrow-thin-left.svg"
-                            width: 20
-                            height: 20
-                            color: "white"
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: termsRoot.backClicked()
-                        }
-                    }
 
                     Item { Layout.fillHeight: true }
 
