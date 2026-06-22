@@ -1117,11 +1117,26 @@ Item {
 
             onAccepted: {
                 QGroundControl.saveBoolGlobalSetting("login", false);
+
+                // Clear previous user's data
+                QGroundControl.saveGlobalSetting("username", "Guest");
+                QGroundControl.saveGlobalSetting("name", "");
+                QGroundControl.saveGlobalSetting("email", "");
+                QGroundControl.saveGlobalSetting("mobileNo", "");
+                QGroundControl.saveGlobalSetting("rpcStatus", "-1");
+
+                // Clear runtime globals
+                MapGlobals.userName = "";
+                MapGlobals.displayName = "";
+                MapGlobals.userEmail = "";
+                MapGlobals.mobileNo = "";
+                MapGlobals.rpcStatus = -1;
+
                 QGroundControl.saveGlobalSetting("loadpage", "loadpage");
+
                 popup.visible = false;
                 MapGlobals.profile();
             }
-
             onRejected: {
                 popup.visible = false;
             }

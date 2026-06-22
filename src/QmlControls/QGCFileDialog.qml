@@ -175,10 +175,15 @@ Item {
             function refreshFiles() {
                 loading = true
                 var localFiles = controller.getFiles(folder, _rgExtensions)
+                var userName = QGroundControl.loadGlobalSetting("username", "Guest")
                 var combinedList = []
 
                 for (var j = 0; j < localFiles.length; j++) {
+
                     var lName = localFiles[j]
+
+                    if (!lName.startsWith(userName + "_"))
+                        continue;
                     var bName = lName.split(".")[0]
                     combinedList.push({
                                           displayName: bName + ".plan",
@@ -290,7 +295,7 @@ Item {
                                         mobileFileOpenDialog.close()
 
                                         var strippedFileName = modelData.baseName
-                                        _appSettings.username = strippedFileName
+
 
                                         if (modelData.isLocal) {
                                             _root.acceptedForLoad(controller.fullyQualifiedFilename(folder, modelData.actualName))

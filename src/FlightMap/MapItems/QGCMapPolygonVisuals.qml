@@ -888,31 +888,20 @@ Item {
         id: polygonComponent
 
         MapPolygon {
-            z:              QGroundControl.zOrderMapItems + 5
-            color:          (mapPolygon && mapPolygon.showAltColor) ? altColor : interiorColor
-            opacity:        (MapGlobals.isSpotSprayingActive || _missionController.isSpotSprayingActive) ? 0 : interiorOpacity
-            border.color:   borderColor
-            border.width:   (MapGlobals.isSpotSprayingActive || _missionController.isSpotSprayingActive) ? 0 : borderWidth
-            path:           mapPolygon ? mapPolygon.path : []
+            z: QGroundControl.zOrderMapItems + 5
 
-            // Modern subtle pulsing fill effect for an active mission coverage area
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                running: interactive && (interiorOpacity > 0) && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
-                NumberAnimation { to: Math.max(0.05, interiorOpacity * 0.4); duration: 1800; easing.type: Easing.InOutSine }
-                NumberAnimation { to: interiorOpacity; duration: 1800; easing.type: Easing.InOutSine }
-            }
+            color: "#79AE6F"
+            opacity: 0.35
 
-            // Glow ring expansion on the border
-            SequentialAnimation on border.width {
-                loops: Animation.Infinite
-                running: interactive && (borderWidth > 0) && !MapGlobals.isSpotSprayingActive && !_missionController.isSpotSprayingActive
-                NumberAnimation { to: borderWidth + 2; duration: 1800; easing.type: Easing.InOutSine }
-                NumberAnimation { to: borderWidth; duration: 1800; easing.type: Easing.InOutSine }
-            }
+            border.color: "#5C8F54"
+            border.width: 4
+
+            path: mapPolygon ? mapPolygon.path : []
+
+            visible: !(MapGlobals.isSpotSprayingActive ||
+                       _missionController.isSpotSprayingActive)
         }
     }
-
     Component {
         id: edgeLengthHandleComponent
 

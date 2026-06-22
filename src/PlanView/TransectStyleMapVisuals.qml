@@ -1,4 +1,4 @@
-/****************************************************************************
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     /****************************************************************************
  *
  * (c) 2009-2020 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
  *
@@ -91,8 +91,8 @@ Item {
 
     //property bool _isAgri: QGroundControl.loadGlobalSetting(" loadpage", "loadpage") === "Agri"
 
-    property color _themeColor: "#79AE6F"  // Agri Green or Professional Gray
-    property color _themeBorder: Qt.darker("#79AE6F", 1.2)
+    property color _themeColor: "#556B2F"
+    property color _themeBorder: "#3D4F1F"
     property color _gridColor: MapGlobals.gridColor
 
     // Area polygon

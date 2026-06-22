@@ -110,7 +110,8 @@ QtObject {
     property string mobileNo: QGroundControl.loadGlobalSetting("mobileNo", "")
 
     property int rpcStatus: parseInt(QGroundControl.loadGlobalSetting("rpcStatus", "0"))
-    
+
+    // property string backendUrl: "http://192.168.137.1:5001/api"
     property string backendUrl: "https://qgc-agri-215243751192.asia-south1.run.app/api" // MUST NOT use localhost
 
     function recenterMap() {
