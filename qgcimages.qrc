@@ -131,7 +131,7 @@
         <file alias="NewImages/upload_modern.svg">src/NewImages/upload_modern.svg</file>
         <file alias="NewImages/location_mark.svg">src/NewImages/location_mark.svg</file>
         <file alias="NewImages/privacy_policy_black.svg">src/NewImages/privacy_policy_black.svg</file>
-        <file alias="NewImages/double_arrow.png">src/NewImages/double_arrow.png</file>
+        <file alias="NewImages/right-arrow.png">src/NewImages/right-arrow.png</file>
 
         <file alias="NewImages/pencil_icon.png">src/NewImages/pencil_icon.png</file>
         <file alias="NewImages/accountUpdate_black.svg">src/NewImages/accountUpdate_black.svg</file>

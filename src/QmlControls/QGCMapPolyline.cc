@@ -119,12 +119,13 @@ void QGCMapPolyline::setPath(const QList<QGeoCoordinate>& path)
 {
     _beginResetIfNotActive();
 
-    _polylinePath.clear();
     _polylineModel.clearAndDeleteContents();
+    QVariantList newPath;
     for (const QGeoCoordinate& coord: path) {
-        _polylinePath.append(QVariant::fromValue(coord));
+        newPath.append(QVariant::fromValue(coord));
         _polylineModel.append(new QGCQGeoCoordinate(coord, this));
     }
+    _polylinePath = newPath;
 
     setDirty(true);
 
@@ -349,8 +350,6 @@ QList<QGeoCoordinate> QGCMapPolyline::offsetPolyline(double distance)
 
 bool QGCMapPolyline::loadKMLFile(const QString& kmlFile)
 {
-    _beginResetIfNotActive();
-
     QString errorString;
     QList<QGeoCoordinate> rgCoords;
     if (!KMLHelper::loadPolylineFromFile(kmlFile, rgCoords, errorString)) {
@@ -358,10 +357,7 @@ bool QGCMapPolyline::loadKMLFile(const QString& kmlFile)
         return false;
     }
 
-    clear();
-    appendVertices(rgCoords);
-
-    _endResetIfNotActive();
+    setPath(rgCoords);
 
     return true;
 }

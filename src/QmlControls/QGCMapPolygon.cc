@@ -159,12 +159,13 @@ bool QGCMapPolygon::containsCoordinate(const QGeoCoordinate& coordinate) const
 
 void QGCMapPolygon::setPath(const QList<QGeoCoordinate>& path)
 {
-    _polygonPath.clear();
     _polygonModel.clearAndDeleteContents();
+    QVariantList newPath;
     for(const QGeoCoordinate& coord: path) {
-        _polygonPath.append(QVariant::fromValue(coord));
+        newPath.append(QVariant::fromValue(coord));
         _polygonModel.append(new QGCQGeoCoordinate(coord, this));
     }
+    _polygonPath = newPath;
 
     setDirty(true);
     emit pathChanged();
@@ -483,10 +484,7 @@ bool QGCMapPolygon::loadKMLOrSHPFile(const QString& file)
         return false;
     }
 
-    _beginResetIfNotActive();
-    clear();
-    appendVertices(rgCoords);
-    _endResetIfNotActive();
+    setPath(rgCoords);
 
     return true;
 }

@@ -852,24 +852,50 @@ Item {
                         opacity: 0.85
                         Behavior on color { ColorAnimation { duration: 200 } }
                     }
+                    Item {
+                        anchors.left: swipeThumb.right
+                        anchors.leftMargin: dp(2)
+                        anchors.right: parent.right
+                        anchors.rightMargin: dp(6)
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
 
-                    // Label
-                                    Label {
-                                        anchors.left: swipeThumb.right
-                                        anchors.leftMargin: dp(1.5)
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.right: parent.right
-                                        anchors.rightMargin: dp(1)
-                                        text: connectClick._swiped ? qsTr("CONNECTED") : qsTr("CONNECT   >>>>>")
-                                        color: "white"
-                                        font.family: "Outfit"
-                                        font.bold: true
-                                        font.pointSize: (isSmallScreen || isMobile) ? ScreenTools.smallFontPointSize : ScreenTools.defaultFontPointSize
-                                        elide: Text.ElideRight
-                                        fontSizeMode: Text.Fit
-                                        minimumPointSize: 6
-                                        opacity: connectClick._swiped ? 1.0 : Math.max(0, 1 - connectClick._progress * 3)
-                                    }
+                        Label {
+                            id: connectLabel
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+
+                            visible: !connectClick._swiped
+                            text: qsTr("CONNECT")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                        }
+
+                        Image {
+                            id: arrowImage
+                            visible: !connectClick._swiped
+                            source: "qrc:/qmlimages/NewImages/right-arrow.png"
+
+                            width: dp(5)
+                            height: dp(5)
+                            fillMode: Image.PreserveAspectFit
+
+                            anchors.left: connectLabel.right
+                            anchors.leftMargin: dp(0)
+                            anchors.verticalCenter: connectLabel.verticalCenter
+                        }
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+
+                            visible: connectClick._swiped
+                            text: qsTr("CONNECTED")
+                            color: "white"
+                            font.family: "Outfit"
+                            font.bold: true
+                        }
+                    }
                     // Thumb
                     Rectangle {
                         id: swipeThumb
@@ -936,6 +962,7 @@ Item {
                     }
                 }
             }
+
             // Flexible spacer to push operational buttons to the right
             Item {
                 Layout.fillWidth: true

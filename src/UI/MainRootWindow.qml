@@ -1920,6 +1920,7 @@ ApplicationWindow {
                     console.log("KML localPath passed to C++:", localPath)
 
                     MapGlobals.kmlPath               = localPath
+                    MapGlobals.kmlLoadTrigger++
                     MapGlobals.mark_with             = "KML_File"
                     MapGlobals.appType               = dialog._kmlForSpotSpraying ? "SpotSpraying" : ""
                     MapGlobals.edit                  = "edit"

@@ -33,6 +33,7 @@ QtObject {
     property string appType: ""
 
     property string kmlPath: ""
+    property int kmlLoadTrigger: 0
     property string waypoint: "waypoint"
 
     property string currentView_profile: "profile"
