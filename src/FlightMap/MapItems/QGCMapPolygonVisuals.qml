@@ -566,7 +566,7 @@ Item {
         y: 60
         z: 1000
         radius: 8
-        color: "transparent"
+        color: Qt.rgba(0, 0, 0, 0.80)
         border.color: qgcPal.text
         border.width: 1
         opacity: 0
@@ -669,7 +669,7 @@ Item {
                 visible:        vertexMenu._showRemove
                 implicitWidth:  removeRow.implicitWidth  + 28
                 implicitHeight: removeRow.implicitHeight + 20
-                color:          "transparent"//removeMouseArea.containsMouse ? app_color : "transparent"
+                color: "transparent"//removeMouseArea.containsMouse ? app_color : "transparent"
                 radius:         8
 
                 Behavior on color {
@@ -695,12 +695,12 @@ Item {
                         fillMode:           Image.PreserveAspectFit
                         mipmap:             true
                         smooth:             true
-                        color:              qgcPal.text
+                        color: "white"
                     }
 
                     Text {
                         text:               qsTr("Delete")
-                        color:              qgcPal.text
+                        color:              "white"
                         font.pointSize:     ScreenTools.defaultFontPointSize
                         font.weight:        Font.Medium
                         anchors.verticalCenter: parent.verticalCenter
@@ -725,34 +725,44 @@ Item {
                 visible: vertexMenu._showRemove
                 width:  menuColumn.implicitWidth
                 height: 1
-                color: qgcPal.text
+                color: "white"
                 opacity: 0.2
                 //anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            // "Edit position..." item
             Rectangle {
                 id: editBtn
                 visible: !_circleMode && vertexMenu._editingVertexIndex >= 0
-                implicitWidth: ScreenTools.defaultFontPixelHeight * 2
-                implicitHeight: ScreenTools.defaultFontPixelHeight * 2
+                implicitWidth: editRow.implicitWidth + 28
+                implicitHeight: editRow.implicitHeight + 20
                 color: "transparent"
                 radius: 8
-                Behavior on color { ColorAnimation { duration: 120 } }
 
-                QGCColoredImage {
+                Row {
+                    id: editRow
                     anchors.centerIn: parent
-                    width: ScreenTools.defaultFontPixelHeight * 0.9
-                    height: ScreenTools.defaultFontPixelHeight * 0.9
-                    source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
-                    fillMode: Image.PreserveAspectFit
-                    mipmap: true
-                    smooth: true
-                    color: qgcPal.text
+                    spacing: 10
+
+                    QGCColoredImage {
+                        width: ScreenTools.defaultFontPixelHeight
+                        height: ScreenTools.defaultFontPixelHeight
+                        source: "qrc:/InstrumentValueIcons/edit-pencil.svg"
+                        fillMode: Image.PreserveAspectFit
+                        mipmap: true
+                        smooth: true
+                        color: "white"
+                    }
+
+                    Text {
+                        text: qsTr("Edit")
+                        color: "white"
+                        font.pointSize: ScreenTools.defaultFontPointSize
+                        font.weight: Font.Medium
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
 
                 MouseArea {
-                    id: editMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
@@ -1378,7 +1388,9 @@ Item {
                     anchors.centerIn: parent
                     width: 32
                     height: 32
-                    visible: (mapPolygon ? mapPolygon.traceMode : false) && MapGlobals.mark_with === "Mark_With_Manual"
+                    visible: (mapPolygon ? mapPolygon.traceMode : false)
+                                && MapGlobals.mark_with === "Mark_With_Manual"
+                                && !MapGlobals.gridLines
                 }
             }
 
@@ -1403,7 +1415,7 @@ Item {
                 y: 60
                 z: 1000
                 radius: 8
-                color: "transparent"
+                color: Qt.rgba(0, 0, 0, 0.80)
                 border.color: qgcPal.text
                 border.width: 1
                 opacity: 0

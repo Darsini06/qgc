@@ -1448,6 +1448,7 @@ Item {
                                       if (MapGlobals.squareCornerStep === 4) {
                                           _geoFenceController.addInclusionPolygonAgri()
                                           var lastPoly = _geoFenceController.polygons.get(_geoFenceController.polygons.count - 1)
+                                          lastPoly.clear()
                                           lastPoly.appendVertices(MapGlobals.tempCorners)
                                           lastPoly.traceMode = false
                                           _geoFenceController.clearAllInteractive()
